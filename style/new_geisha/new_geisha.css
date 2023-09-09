@@ -614,6 +614,84 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
     background: var(--avatar-frame-border_gradient) !important;
 }
 
+/* Special Mission Override */
+#spec_miss_wrapper {
+    background: var(--sidebar-button-background-color);
+}
+.spec_miss_log_entry_text {
+    color: var(--font-color-3) !important;
+}
+.spec_miss_log_entry_timestamp {
+    color: var(--font-color-3) !important;
+}
+.spec_miss_log_entry_timestamp_wraooer {
+    color: var(--font-color-3) !important;
+}
+.spec_miss_page_warning {
+    color: var(--font-color-3) !important;
+}
+a#spec_miss_cancel {
+    color: var(--font-color-3) !important;
+}
+
+/* Inbox Override */
+#inbox_convo_list_title_container {
+    background: var(--sidebar-header-background);
+    border-bottom: 1px solid var(--sidebar-header-background);
+}
+#inbox_convo_main_controls_container {
+    background: var(--sidebar-header-background);
+}
+#inbox_convo_list, #inbox_convo_container, #inbox_convo_details_container {
+    scrollbar-color: var(--sidebar-button-border-color);
+}
+#inbox_container {
+    background: var(--sidebar-button-background-color);
+    border: 1px solid var(--sidebar-button-border-color);
+}
+#content #inbox_new {
+    background: var(--sidebar-header-background);
+    border-color: var(--sidebar-header-background);
+}
+#inbox_convo_list_title {
+    color: var(--font-color-2);
+}
+#inbox_convo_list_count {
+    color: var(--font-color-2);
+}
+#inbox_convo_textbox {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+.inbox_convo_list_container_selected {
+    background: var(--content-background-color);
+}
+.inbox_convo_title {
+    color: var(--font-color-3);
+}
+.inbox_convo_list_container {
+    border-color: var(--sidebar-header-background);
+}
+#content #inbox_new span {
+    color: var(--font-color-2);
+}
+.inbox_message {
+    border-color: var(--sidebar-header-background);
+}
+#inbox_convo_textbox_characters_remaining {
+    color: var(--font-color-2);
+}
+.inbox_message_timestamp, .inbox_message_report {
+    color: var(--font-color-3);
+}
+#content .inbox_message_report a {
+    color: var(--font-color-3);
+}
+.inbox_message_self::before {
+    background: none;
+}
+
 /* Mobile Overrides */
 @media screen and (max-width: 999px) {
     #container {
