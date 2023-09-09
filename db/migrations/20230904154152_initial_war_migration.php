@@ -102,6 +102,18 @@ final class InitialWarMigration extends AbstractMigration
         $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (3, 5, 'Neutral', 'Ancient Calm', NULL, NULL)");
         $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (4, 5, 'Neutral', 'Ancient Calm', NULL, NULL)");
 
+        // Create village_seats table
+        $this->execute("CREATE TABLE `shinobi_chronicles`.`village_seats` (
+            `seat_id` INT(11) NOT NULL AUTO_INCREMENT,
+            `user_id` INT(11) NOT NULL,
+            `village_id` INT(11) NOT NULL,
+            `seat_type` VARCHAR(50) NOT NULL,
+            `seat_title` VARCHAR(100) NOT NULL,
+            `seat_start` INT(11) NOT NULL,
+            `seat_end` INT(11) NULL DEFAULT NULL,
+            PRIMARY KEY (`seat_id`))
+        ");
+
         // Commit Transaction
         $this->execute("COMMIT");
     }
@@ -135,6 +147,9 @@ final class InitialWarMigration extends AbstractMigration
 
         // Create village_relations table
         $this->execute("DROP TABLE `village_relations`");
+
+        // Create village_seats table
+        $this->execute("DROP TABLE `village_seats`");
 
         // Commit Transaction
         $this->execute("COMMIT");
