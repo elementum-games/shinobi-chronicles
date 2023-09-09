@@ -103,7 +103,7 @@ final class InitialWarMigration extends AbstractMigration
         $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (4, 5, 'Neutral', 'Ancient Calm', NULL, NULL)");
 
         // Create village_seats table
-        $this->execute("CREATE TABLE `shinobi_chronicles`.`village_seats` (
+        $this->execute("CREATE TABLE `village_seats` (
             `seat_id` INT(11) NOT NULL AUTO_INCREMENT,
             `user_id` INT(11) NOT NULL,
             `village_id` INT(11) NOT NULL,
@@ -113,6 +113,23 @@ final class InitialWarMigration extends AbstractMigration
             `seat_end` INT(11) NULL DEFAULT NULL,
             PRIMARY KEY (`seat_id`))
         ");
+
+        // Add operations table
+        $this->execute("CREATE TABLE `operations` (
+            `operation_id` INT(11) NOT NULL AUTO_INCREMENT,
+            `user_id` INT(11) NOT NULL,
+            `location_id` INT(11) NOT NULL,
+            `type` INT(11) NOT NULL,
+            `progress` INT(11) NOT NULL,
+            `status` INT(11) NOT NULL,
+            `target_village` INT(11) NOT NULL,
+            `user_village` INT(11) NOT NULL,
+            `last_update` INT(11) NOT NULL,
+            PRIMARY KEY (`operation_id`))
+        ");
+
+        // Alter users table
+        $this->execute("ALTER TABLE `users` ADD `operation_id` INT(11) NOT NULL DEFAULT 0");
 
         // Commit Transaction
         $this->execute("COMMIT");
@@ -150,6 +167,12 @@ final class InitialWarMigration extends AbstractMigration
 
         // Create village_seats table
         $this->execute("DROP TABLE `village_seats`");
+
+        // Add operations table
+        $this->execute("DROP TABLE `operations`");
+
+        // Alter users table
+        $this->execute("ALTER TABLE `users` DROP COLUMN `operation_id`");
 
         // Commit Transaction
         $this->execute("COMMIT");
