@@ -100,6 +100,9 @@
     --taijutsu_text_color: #FF4C4C;
     --genjutsu_text_color: #B54CFF;
     --heal_text_color: #4CFF70;
+    /* Notification Config */
+    --notification-background-color: #141317;
+    --notification-background-border: #575749;
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */
