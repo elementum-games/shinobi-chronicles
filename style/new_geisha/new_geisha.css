@@ -95,11 +95,13 @@
     --travel-ui-color: #1a191d;
     --travel-button-hover: #262631;
     --travel-background-color: #20222b;
-    /* Battle Text Config */
-    --ninjutsu_text_color: #4C8CFF;
-    --taijutsu_text_color: #FF4C4C;
+    /* Battle Config */
+    --ninjutsu-text-color: #4C8CFF;
+    --taijutsu-text-color: #FF4C4C;
     --genjutsu_text_color: #B54CFF;
-    --heal_text_color: #4CFF70;
+    --heal-text-color: #4CFF70;
+    --hand-seal-highlight: #d1c5ad;
+    --hand-seal-text: black;
     /* Notification Config */
     --notification-background-color: #141317;
     --notification-background-border: #575749;
@@ -843,16 +845,16 @@ select {
     background: var(--chakra-fill) !important;
 }
 .battle_text_ninjutsu {
-    color: var(--ninjutsu_text_color) !important;
+    color: var(--ninjutsu-text-color) !important;
 }
 .battle_text_taijutsu {
-    color: var(--taijutsu_text_color) !important;
+    color: var(--taijutsu-text-color) !important;
 }
 .battle_text_genjutsu {
-    color: var(--genjutsu_text_color) !important;
+    color: var(--genjutsu-text-color) !important;
 }
 .battle_text_heal {
-    color: var(--heal_text_color) !important;
+    color: var(--heal-text-color) !important;
 }
 #content table.table th a {
     color: var(--font-color-2);
@@ -879,4 +881,11 @@ select {
 }
 .jutsu_select_wrapper {
     border-color: var(--sidebar-button-border-color) !important;
+}
+#handSeals p[data-selected="yes"] img {
+    border-color: var(--hand-seal-highlight) !important;
+}
+#handSeals .handsealNumber {
+    background-color: var(--hand-seal-highlight) !important;
+    color: var(--hand-seal-text);
 }
