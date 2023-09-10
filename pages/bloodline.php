@@ -189,16 +189,19 @@ function bloodline() {
                     $player_offense = Fighter::BASE_OFFENSE + ($player->ninjutsu_skill * Fighter::SKILL_OFFENSE_RATIO);
 					$replace_array[3] = round($boost['effect_amount'] / $player_offense, 0) * 100;
                     $replace_array[2] *= 10;
+					$replace_array[1] *= 10;
 					break;
 				case 'taijutsu_boost':
                     $player_offense = Fighter::BASE_OFFENSE + ($player->taijutsu_skill * Fighter::SKILL_OFFENSE_RATIO);
                     $replace_array[3] = round($boost['effect_amount'] / $player_offense, 0) * 100;
                     $replace_array[2] *= 10;
+					$replace_array[1] *= 10;
 					break;
 				case 'genjutsu_boost':
                     $player_offense = Fighter::BASE_OFFENSE + ($player->genjutsu_skill * Fighter::SKILL_OFFENSE_RATIO);
                     $replace_array[3] = round($boost['effect_amount'] / $player_offense, 0) * 100;
                     $replace_array[2] *= 10;
+					$replace_array[1] *= 10;
 					break;
                 case 'taijutsu_resist':
                 case 'genjutsu_resist':
