@@ -1013,7 +1013,7 @@ class BattleManager {
                     $collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
                 }
                 else {
-                    $collision_text .= "[player] cast [gender2] jutsu before [opponent] cast, negating " .
+                    $collision_text .= "[player] cast [gender2] jutsu before [opponent], negating " .
                         ($damage_reduction * 100) . "% of [opponent]'s damage!";
                 }
             }
@@ -1035,7 +1035,7 @@ class BattleManager {
                     $collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
                 }
                 else {
-                    $collision_text .= "[opponent] cast [targetGender2] jutsu before [player] cast, negating " .
+                    $collision_text .= "[opponent] cast [targetGender2] jutsu before [player], negating " .
                         ($damage_reduction * 100) . "% of [player]'s damage!";
                 }
             }
