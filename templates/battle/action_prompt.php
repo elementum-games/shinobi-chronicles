@@ -234,15 +234,15 @@ $prefill_item_id = $_POST['item_id'] ?? '';
             currentlySelectedJutsu = this;
             $(currentlySelectedJutsu).css('box-shadow', '0px 0px 4px 0px #000000');
             $(currentlySelectedJutsu).addClass('selected_jutsu');
-            $('.handsealTooltip').html('&nbsp;');
+            //$('.handsealTooltip').html('&nbsp;');
             var handseal_string = $(this).attr('data-handseals');
             var handseal_array = handseal_string.split('-');
-            for(var x in handseal_array) {
+            /*for(var x in handseal_array) {
                 if(!isNaN(parseInt(handseal_array[x]))) {
                     id = 'handseal_' + handseal_array[x];
                     $('#' + id).children('.handsealTooltip').text((parseInt(x) + 1));
                 }
-            }
+            }*/
         });
 
         var currentlySelectedWeapon = $('p[data-id=0]');

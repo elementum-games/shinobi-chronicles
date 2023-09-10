@@ -174,7 +174,7 @@
                 </select>
                 <input type='submit' name='change_layout' value='Change' />
             </form>
-            <span><i>Note: Legacy layouts may not be compatibile with all pages</i></span>
+            <span><i>Note: Legacy layouts may not be compatible with all pages</i></span>
             <?php if($current_layout->usesV2Interface()): ?>
             <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap">
                 <div>
