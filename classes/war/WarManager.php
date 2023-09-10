@@ -42,4 +42,44 @@ class WarManager {
                 throw new RuntimeException("Invalid operation status!");
         }
     }
+
+    public function startOperation(int $operation_type, int $target_id) {
+        $target = $this->system->db->query("SELECT * FROM `region_locations`, `regions`.`village`
+            INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+            WHERE `id` = {$target_id} LIMIT 1");
+        if ($this->system->db->last_num_rows == 0) {
+            throw new RuntimeException("Invalid operation target!");
+        }
+        $target = $this->system->db->fetch($target);
+        // must be at target location
+        $target_location = new TravelCoords($target['x'], $target['y'], $target['map_id']);
+        if ($this->user->location->fetchString() != $target_location->fetchString()) {
+            throw new RuntimeException("Invalid operation target!");
+        }
+        switch ($operation_type) {
+            case Operation::OPERATION_INFILTRATE:
+                // must be neutral or at war
+                if ($this->user->village->relations[$target['village']]->relation_type != "neutral" && $this->user->village->relations[$target['village']]->relation_type != "war") {
+                    throw new RuntimeException("Invalid operation target!");
+                }
+                // WIP
+                break;
+            case Operation::OPERATION_REINFORCE:
+                // must be owned or ally
+                if ($target['village'] != $this->user->village->village_id && $this->user->village->relations[$target['village']]->relation_type != "alliance") {
+                    throw new RuntimeException("Invalid operation target!");
+                }
+                // WIP
+                break;
+            case Operation::OPERATION_RAID:
+                // must be at war
+                if ($this->user->village->relations[$target['village']]->relation_type != "war") {
+                    throw new RuntimeException("Invalid operation target!");
+                }
+                // WIP
+                break;
+            default:
+                throw new RuntimeException("Invalid operation type!");
+        }
+    }
 }
