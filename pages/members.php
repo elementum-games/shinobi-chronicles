@@ -204,7 +204,7 @@ function members(): void {
 		$query_custom = '';
 		$view = 'highest_exp';
 		if(isset($_GET['view']) && $_GET['view'] == 'highest_exp') {
-			$query_custom = " WHERE `staff_level` <= " . User::STAFF_HEAD_MODERATOR .
+			$query_custom = " WHERE `staff_level` <= " . User::STAFF_ADMINISTRATOR.
                 " ORDER BY `exp` DESC, ABS(`village_rep`) DESC";
 			$view = 'highest_exp';
 		}
@@ -231,8 +231,8 @@ function members(): void {
             $results_per_page = 20;
 		}
 		else {
-            $query_custom = " WHERE `staff_level` <= " . User::STAFF_HEAD_MODERATOR .
-                " ORDER BY `exp` DESC, `pvp_wins` DESC";
+            $query_custom = " WHERE `staff_level` <= " . User::STAFF_ADMINISTRATOR .
+                " ORDER BY `exp` DESC, ABS(`village_rep`) DESC";
 			$view = 'highest_exp';
 
 		}
