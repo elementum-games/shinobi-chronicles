@@ -212,7 +212,7 @@ class BattleManager {
 
                             $this->player->updateData();
                             $this->player->updateInventory();
-                            $this->battle->battle_text .= sprintf("%s used a %s and healed for %.2f[br]", $this->player->user_name, $item->name, $item->effect_amount);
+                            $this->battle->battle_text .= sprintf("%s used a %s and healed for %.0f[br]", $this->player->user_name, $item->name, $item->effect_amount);
                             $this->updateData();
                         }
                     }
@@ -795,13 +795,13 @@ class BattleManager {
                     $text .= "<p style=\"font-weight:bold;\">
                             {$user->getName()} deals
                                 <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
-                                    " . sprintf('%.2f', $attack_damage) . " damage
+                                    " . sprintf('%.0f', $attack_damage) . " damage
                                 </span>
                                     to {$target->getName()}" . ($has_element ? $element_text : "") . ".
                                 <span style=\"font-weight:bold;\">
                                     (resists
                                  <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
-                                    " . sprintf('%.2f', $damage_resisted) . "
+                                    " . sprintf('%.0f', $damage_resisted) . "
                                 </span>
                                  damage)
                             </p>"; }
@@ -809,7 +809,7 @@ class BattleManager {
                         $text .= "<p style=\"font-weight:bold;\">
                             {$user->getName()} deals
                                 <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
-                                    " . sprintf('%.2f', $attack_damage) . " damage
+                                    " . sprintf('%.0f', $attack_damage) . " damage
                                 </span>
                                     to {$target->getName()}" . ($has_element ? $element_text : "") . ".
                                 </p>"; }

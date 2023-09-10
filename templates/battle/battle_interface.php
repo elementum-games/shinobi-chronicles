@@ -137,7 +137,7 @@ if($battle->battle_text) {
 
                 <!-- Health -->
                 <div class='resourceBarOuter'>
-                    <label class='innerResourceBarLabel' ><?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?></label>
+                    <label class='innerResourceBarLabel' ><?= sprintf("%.0f", $player->health) ?> / <?= sprintf("%.0f", $player->max_health) ?></label>
                     <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
                 </div>
 
@@ -145,13 +145,13 @@ if($battle->battle_text) {
 
                     <!-- Chakra -->
                     <div class='resourceBarOuter' style='margin-top:6px;'>
-                        <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?></label>
+                        <label class='innerResourceBarLabel'><?= sprintf("%.0f", $player->chakra) ?> / <?= sprintf("%.0f", $player->max_chakra) ?></label>
                         <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
                     </div>
 
                     <!-- Stamina -->
                     <div class='resourceBarOuter' style='margin-top:6px;'>
-                        <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->stamina) ?> / <?= sprintf("%.2f", $player->max_stamina) ?></label>
+                        <label class='innerResourceBarLabel'><?= sprintf("%.0f", $player->stamina) ?> / <?= sprintf("%.0f", $player->max_stamina) ?></label>
                         <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
                     </div>
 
@@ -162,7 +162,7 @@ if($battle->battle_text) {
             <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
             <div id='ai_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
                 <div class='resourceBarOuter' style='margin-top:8px;'><div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
-                        <label  class='innerResourceBarLabel'><?= sprintf("%.2f", $opponent->health) ?> / <?= sprintf("%.2f", $opponent->max_health) ?></label>
+                        <label  class='innerResourceBarLabel'><?= sprintf("%.0f", $opponent->health) ?> / <?= sprintf("%.0f", $opponent->max_health) ?></label>
                     </div>
                 </div>
             </div>
