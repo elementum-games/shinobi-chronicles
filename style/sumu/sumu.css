@@ -1042,3 +1042,39 @@ select {
     background-color: var(--hand-seal-highlight) !important;
     color: var(--hand-seal-text);
 }
+#handseal_1 img {
+    content: url(../../images/v2/sumu/Seal1.png) !important;
+}
+#handseal_2 img {
+    content: url(../../images/v2/sumu/Seal2.png) !important;
+}
+#handseal_3 img {
+    content: url(../../images/v2/sumu/Seal3.png) !important;
+}
+#handseal_4 img {
+    content: url(../../images/v2/sumu/Seal4.png) !important;
+}
+#handseal_5 img {
+    content: url(../../images/v2/sumu/Seal5.png) !important;
+}
+#handseal_6 img {
+    content: url(../../images/v2/sumu/Seal6.png) !important;
+}
+#handseal_7 img {
+    content: url(../../images/v2/sumu/Seal7.png) !important;
+}
+#handseal_8 img {
+    content: url(../../images/v2/sumu/Seal8.png) !important;
+}
+#handseal_9 img {
+    content: url(../../images/v2/sumu/Seal9.png) !important;
+}
+#handseal_10 img {
+    content: url(../../images/v2/sumu/Seal10.png) !important;
+}
+#handseal_11 img {
+    content: url(../../images/v2/sumu/Seal11.png) !important;
+}
+#handseal_12 img {
+    content: url(../../images/v2/sumu/Seal12.png) !important;
+}
