@@ -62,21 +62,21 @@ class WarManager {
                 if ($this->user->village->relations[$target['village']]->relation_type != "neutral" && $this->user->village->relations[$target['village']]->relation_type != "war") {
                     throw new RuntimeException("Invalid operation target!");
                 }
-                // WIP
+                Operation::createOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
                 break;
             case Operation::OPERATION_REINFORCE:
                 // must be owned or ally
                 if ($target['village'] != $this->user->village->village_id && $this->user->village->relations[$target['village']]->relation_type != "alliance") {
                     throw new RuntimeException("Invalid operation target!");
                 }
-                // WIP
+                Operation::createOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
                 break;
             case Operation::OPERATION_RAID:
                 // must be at war
                 if ($this->user->village->relations[$target['village']]->relation_type != "war") {
                     throw new RuntimeException("Invalid operation target!");
                 }
-                // WIP
+                Operation::createOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
                 break;
             default:
                 throw new RuntimeException("Invalid operation type!");

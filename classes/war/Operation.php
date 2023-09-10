@@ -101,4 +101,14 @@ class Operation
         }
         $this->user->operation = 0;
     }
+
+    public static function createOperation(System $system, User $user, int $location_id, int $type, int $target_village): int {
+        $time = time();
+        $system->db->query("INSERT INTO operations (`user_id`, `location_id`, `type`, `progress`, `status`, `target_village`, `user_village`, `last_update`)
+            VALUES ({$user->user_id}, {$location_id}, {$type}, 0, 1, {$target_village}, {$user->village->village_id}, {$time})
+        ");
+        $operation_id = $system->db->last_insert_id;
+        $user->operation = $operation_id;
+        return $operation_id;
+    }
 }
