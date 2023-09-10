@@ -93,31 +93,31 @@ function bloodline() {
 			'ratio_multiplier' => 100
 		),
 		'ninjutsu_boost' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Ninjutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost decreases to 75% strength as Bloodline Skill exceeds Ninjutsu</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Ninjutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost decreases to 75% strength as Bloodline Skill exceeds Ninjutsu skill</span>"
 		),
 		'taijutsu_boost' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Taijutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost decreases to 75% strength as Bloodline Skill exceeds Taijutsu</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Taijutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost decreases to 75% strength as Bloodline Skill exceeds Taijutsu skill</span>"
 		),
 		'genjutsu_boost' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Genjutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost decreases to 75% strength as Bloodline Skill exceeds Genjutsu</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Genjutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost decreases to 75% strength as Bloodline Skill exceeds Genjutsu skill</span>"
 		),
 		'heal' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] per turn</span>"
 		),
 		'ninjutsu_resist' => array(
-			'text' => "[BL_SKILL] * [RATIO] * 0.7 -> <span class='amount'>[AMOUNT] less ninjutsu damage taken</span>"
+			'text' => "[BL_SKILL] * [RATIO] * [0.7] -> <span class='amount'>[AMOUNT] less Ninjutsu damage taken</span>"
 		),
 		'genjutsu_resist' => array(
-			'text' => "[BL_SKILL] * [RATIO] * 0.7 -> <span class='amount'>[AMOUNT] less genjutsu damage taken</span>"
+			'text' => "[BL_SKILL] * [RATIO] * [0.7] -> <span class='amount'>[AMOUNT] less Genjutsu damage taken</span>"
 		),
 		'taijutsu_resist' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> [random/defense] -> <span class='amount'>[AMOUNT] less taijutsu damage taken</span>"
+			'text' => "[BL_SKILL] * [RATIO] * [0.7] -> <span class='amount'>[AMOUNT] less Taijutsu damage taken</span>"
 		),
 		'speed_boost' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra speed</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra Speed</span>"
 		),
 		'cast_speed_boost' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra cast speed</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra Cast Speed</span>"
 		),
 		'endurance_boost' => array(
 			'text' => "<span style='color:#00A0C0;'>R.I.P. Endurance 2014-2014, gone but not forgotten :/</span>"
