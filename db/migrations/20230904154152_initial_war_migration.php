@@ -129,7 +129,7 @@ final class InitialWarMigration extends AbstractMigration
         ");
 
         // Alter users table
-        $this->execute("ALTER TABLE `users` ADD `operation_id` INT(11) NOT NULL DEFAULT 0");
+        $this->execute("ALTER TABLE `users` ADD `operation` INT(11) NOT NULL DEFAULT 0");
 
         // Commit Transaction
         $this->execute("COMMIT");
@@ -172,7 +172,7 @@ final class InitialWarMigration extends AbstractMigration
         $this->execute("DROP TABLE `operations`");
 
         // Alter users table
-        $this->execute("ALTER TABLE `users` DROP COLUMN `operation_id`");
+        $this->execute("ALTER TABLE `users` DROP COLUMN `operation`");
 
         // Commit Transaction
         $this->execute("COMMIT");
