@@ -188,7 +188,7 @@
 .travel-buttons {
     position: absolute;
     top: 10%;
-    left: 0;
+    left: 32px;
     right: 0;
     margin: 0 auto;
     display: flex;
