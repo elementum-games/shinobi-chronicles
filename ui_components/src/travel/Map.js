@@ -132,6 +132,7 @@ export const Map = ({ mapData, scoutData, patrolData, playerId, ranksToView, str
                         objectives={mapData.region_objectives || []}
                         tileWidth={tile_width}
                         tileHeight={tile_height}
+                        strategicView={strategicView}
                     />
                     <MapNearbyPlayers
                         scoutData={scoutData || []}
@@ -276,7 +277,7 @@ function MapObjectives({ objectives, tileWidth, tileHeight }) {
 }
 
 
-function RegionObjectives({ objectives, tileWidth, tileHeight }) {
+function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView }) {
     return (
         <div className='region_objectives'>
             <ReactTransitionGroup.TransitionGroup>
@@ -291,41 +292,51 @@ function RegionObjectives({ objectives, tileWidth, tileHeight }) {
                             style={{
                                 cursor: "pointer",
                                 backgroundColor: "#" + objective.background_color,
-                                backgroundImage: objective.image ? `url(${objective.image})` : null,
+                                backgroundImage: objective.image ? (objective.objective_type == 'village' && !strategicView ? 'url(/images/map/icons/village.png)' : `url(${objective.image})`) : null,
                                 transform: `translate3d(${(objective.x - 1) * tileWidth}px, ${(objective.y - 1) * tileHeight}px, 0)`,
                                 backfaceVisibility: "hidden",
                                 filter: "blur(0)",
                             }}
                         >
-                            <div className='region_objective_tooltip'>{objective.name}</div>
+                            <div className='region_objective_tooltip' style={{ display: strategicView ? 'flex' : 'none' }}>
+                                <span className='region_objective_tooltip_name'>{objective.name}</span>
+                                <div className='region_objective_tooltip_tags'>
+                                    <span className='region_objective_tooltip_defense'>{objective.defense}</span>
+                                    <span className='region_objective_tooltip_village'></span>
+                                </div>
+                            </div>
                             {objective.objective_health && objective.objective_max_health > 0 &&
                                 (() => {
                                     const percentage = (objective.objective_health / objective.objective_max_health) * 100;
                                     let barColor;
-
+                                    let strokeColor = '#2b2c2c';
+                                    let strokeColor2 = '#3c2b2bcc';
                                     if (percentage >= 50) {
-                                        barColor = 'green';
+                                        barColor = '#00b044';
                                     } else if (percentage >= 25) {
                                         barColor = 'yellow';
                                     } else {
                                         barColor = 'red';
-                                    }
+                                }
 
-                                return (percentage < 100 ? (
-                                    <div
-                                        className='region_objective_health'
-                                        style={{
-                                            backgroundColor: barColor,
-                                            width: `${percentage}%`,
-                                            height: '6px',
-                                            position: 'absolute',
-                                            color: 'white',
-                                            textAlign: 'center',
-                                            lineHeight: '8px',
-                                            fontSize: '8px',
-                                            top: '3px',
-                                        }}
-                                    />) : null
+                                return (percentage < 100 || strategicView ? (
+                                    <div className='region_objective_health'>
+                                        <svg width="60" height="9">
+                                            <g transform="skewX(-25)">
+                                                <rect x="5" y="0" width="50" height="5" style={{ fill: strokeColor, stroke: strokeColor, strokeWidth: '0' }} />
+                                            </g>
+                                            <g transform="skewX(-25)">
+                                                <rect x="5" y="0" width={percentage / 2} height="5" style={{ fill: barColor, stroke: strokeColor, strokeWidth: '0' }} />
+                                            </g>
+                                            <g transform="skewX(-25)">
+                                                <rect x="5" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth:'2'}} />
+                                                <rect x="15" y="0" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth:'2'}} />
+                                                <rect x="25" y="0" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth:'2'}} />
+                                                <rect x="35" y="0" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth:'2'}} />
+                                                <rect x="45" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth:'2'}} />
+                                            </g>
+                                          </svg>
+                                    </div>) : null
                                     );
                                 })()
                             }

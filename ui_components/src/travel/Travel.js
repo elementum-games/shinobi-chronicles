@@ -33,6 +33,9 @@ import { ScoutArea } from "./ScoutArea.js";
     region_objectives:   object,
     map_objectives:      object,
     battle_url:          boolean,
+    operations:          object,
+    operation_type:      string,
+    operation_progress:  int,
  * }} mapData
  *
  * @param {{
@@ -258,6 +261,22 @@ function Travel({
         });
     }
 
+    const BeginOperation = (type) => {
+        apiFetch(
+            travelAPILink,
+            {
+                request: 'BeginOperation',
+                operation_type: type,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setMapData(response.data.mapData);
+        });
+    }
+
     const SparPlayer = (target) => {
         window.location.href = mapData.spar_link + "&challenge=" + target;
     }
@@ -387,6 +406,16 @@ function Travel({
                                 <a href={mapData.action_url}>
                                     <button className='button'>{mapData.action_message}</button>
                                 </a>
+                            )}
+                            {(mapData && mapData.operation_type) && (
+                                <button className='button'>Cancel</button>
+                            )}
+                            {(mapData && mapData.operations && typeof mapData.operations_type === 'undefined') && (
+                                Object.entries(mapData.operations).map(([key, value], index) => (
+                                    <button key={index} className='button'>
+                                        {`${value}`}
+                                    </button>
+                                ))
                             )}
                         </div>
                         {feedback && (

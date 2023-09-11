@@ -837,7 +837,7 @@ class TravelManager {
                     case "village":
                         if ($distance <= $this->user->scout_range || $obj['village_name'] == $this->user->village->name) {
                             $image = "/images/map/icons/village.png";
-                            if (isset($this->user->filters['strategic_view']) && $this->user->filters['strategic_view'] == "true" && isset($obj['resource_name'])) {
+                            if (isset($obj['resource_name'])) {
                                 switch ($obj['resource_name']) {
                                     case null:
                                         break;

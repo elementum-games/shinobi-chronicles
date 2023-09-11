@@ -33,6 +33,9 @@ import { ScoutArea } from "./ScoutArea.js";
     region_objectives:   object,
     map_objectives:      object,
     battle_url:          boolean,
+    operations:          object,
+    operation_type:      string,
+    operation_progress:  int,
  * }} mapData
  *
  * @param {{
@@ -206,6 +209,18 @@ function Travel({
       window.location.href = response.data.redirect;
     });
   };
+  const BeginOperation = type => {
+    apiFetch(travelAPILink, {
+      request: 'BeginOperation',
+      operation_type: type
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      setMapData(response.data.mapData);
+    });
+  };
   const SparPlayer = target => {
     window.location.href = mapData.spar_link + "&challenge=" + target;
   };
@@ -319,7 +334,12 @@ function Travel({
     href: mapData.action_url
   }, /*#__PURE__*/React.createElement("button", {
     className: "button"
-  }, mapData.action_message))), feedback && /*#__PURE__*/React.createElement("div", {
+  }, mapData.action_message)), mapData && mapData.operation_type && /*#__PURE__*/React.createElement("button", {
+    className: "button"
+  }, "Cancel"), mapData && mapData.operations && typeof mapData.operations_type === 'undefined' && Object.entries(mapData.operations).map(([key, value], index) => /*#__PURE__*/React.createElement("button", {
+    key: index,
+    className: "button"
+  }, `${value}`))), feedback && /*#__PURE__*/React.createElement("div", {
     className: "travel-messages"
   }, /*#__PURE__*/React.createElement(Message, {
     message: feedback[0],

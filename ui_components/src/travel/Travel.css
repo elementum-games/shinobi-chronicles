@@ -201,22 +201,42 @@
 #content .travel-buttons .button {
     font-family: sans-serif;
     text-transform: none;
-}
-
-.travel-actions a {
-    flex-grow: 1;
-    display: block;
-    width: 33.333%;
-    height: 33.333%;
-    z-index: 1;
-    position: relative;
+    font-size: 12px;
+    color: #eee1c8;
+    font-weight: bold;
+    text-shadow: 1px 2px 1px #1b1424;
+    display: inline-block;
+    padding: 5px 7px;
+    margin-bottom: 10px;
     cursor: pointer;
-    user-select: none;
-    touch-action: none;
-    -webkit-tap-highlight-color: transparent;
-    background: var(--travel-ui-color);
-    box-shadow: 0 0 0 1px var(--travel-background-color) inset;
+    background: radial-gradient(var(--sidebar-button-background-color) 0%, var(--sidebar-button-border-color) 10%);
+    border: 1px solid #2f2e5b;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 0 4px 0 rgba(0,0,0,0);
 }
+    #content .travel-buttons .button:hover {
+        color: white;
+    }
+    #content .travel-buttons .button:active {
+        color: #eee1c8;
+        background: radial-gradient(var(--sidebar-button-border-color) 0%, var(--sidebar-button-background-color) 10%);
+    }
+
+    .travel-actions a {
+        flex-grow: 1;
+        display: block;
+        width: 33.333%;
+        height: 33.333%;
+        z-index: 1;
+        position: relative;
+        cursor: pointer;
+        user-select: none;
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+        background: var(--travel-ui-color);
+        box-shadow: 0 0 0 1px var(--travel-background-color) inset;
+    }
 
 :root {
     --travel-arrow-size: 16px;
@@ -467,10 +487,7 @@
     background-position: center;
     background-size: auto 100%;
 }
-    
-.map_location_objective_health {
-    display: none;
-}
+
 .map_location_tooltip {
     display: none;
     position: absolute;
@@ -553,15 +570,15 @@
     pointer-events: auto;
 }
 .region_objective:hover .region_objective_tooltip {
-    display: block;
+    display: flex !important;
 }
 .map_objective:hover .map_objective_tooltip {
     display: block;
 }
 .region_objective_tooltip {
-    display: none;
+    align-items: center;
     position: absolute;
-    bottom: 110%;
+    bottom: 105%;
     left: 50%;
     right: 0;
     transform: translateX(-50%);
@@ -580,10 +597,36 @@
     font-size: 12px;
     text-shadow: 1px 0px 2px black;
 }
+.region_objective_tooltip_tags {
+    position: absolute;
+    display: flex;
+    height: 32px;
+    gap: 1px;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%)
+}
+.region_objective_tooltip_defense {
+    height: 18px;
+    width: 18px;
+    background-image: url('/images/map/icons/shield(3).png');
+    background-size: cover;
+    line-height: 18px;
+    font-size: smaller;
+    box-sizing: border-box;
+    padding-right: 1px;
+}
+.region_objective_tooltip_village {
+    height: 18px;
+    width: 18px;
+    background-image: url(/images/village_icons/stone.png);
+    background-size: cover;
+    margin-left: 2px;
+}
 .map_objective_tooltip {
     display: none;
     position: absolute;
-    bottom: 110%;
+    bottom: 100%;
     left: 50%;
     right: 0;
     transform: translateX(-50%);
@@ -601,6 +644,13 @@
     font-weight: bold;
     font-size: 12px;
     text-shadow: 1px 0px 2px black;
+}
+.region_objective_health {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    bottom: -14px;
 }
 
 /* Player */

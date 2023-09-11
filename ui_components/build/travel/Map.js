@@ -122,7 +122,8 @@ export const Map = ({
   }), /*#__PURE__*/React.createElement(RegionObjectives, {
     objectives: mapData.region_objectives || [],
     tileWidth: tile_width,
-    tileHeight: tile_height
+    tileHeight: tile_height,
+    strategicView: strategicView
   }), /*#__PURE__*/React.createElement(MapNearbyPlayers, {
     scoutData: scoutData || [],
     tileWidth: tile_width,
@@ -255,7 +256,8 @@ function MapObjectives({
 function RegionObjectives({
   objectives,
   tileWidth,
-  tileHeight
+  tileHeight,
+  strategicView
 }) {
   return /*#__PURE__*/React.createElement("div", {
     className: "region_objectives"
@@ -269,37 +271,122 @@ function RegionObjectives({
     style: {
       cursor: "pointer",
       backgroundColor: "#" + objective.background_color,
-      backgroundImage: objective.image ? `url(${objective.image})` : null,
+      backgroundImage: objective.image ? objective.objective_type == 'village' && !strategicView ? 'url(/images/map/icons/village.png)' : `url(${objective.image})` : null,
       transform: `translate3d(${(objective.x - 1) * tileWidth}px, ${(objective.y - 1) * tileHeight}px, 0)`,
       backfaceVisibility: "hidden",
       filter: "blur(0)"
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "region_objective_tooltip"
-  }, objective.name), objective.objective_health && objective.objective_max_health > 0 && (() => {
+    className: "region_objective_tooltip",
+    style: {
+      display: strategicView ? 'flex' : 'none'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "region_objective_tooltip_name"
+  }, objective.name), /*#__PURE__*/React.createElement("div", {
+    className: "region_objective_tooltip_tags"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "region_objective_tooltip_defense"
+  }, objective.defense), /*#__PURE__*/React.createElement("span", {
+    className: "region_objective_tooltip_village"
+  }))), objective.objective_health && objective.objective_max_health > 0 && (() => {
     const percentage = objective.objective_health / objective.objective_max_health * 100;
     let barColor;
+    let strokeColor = '#2b2c2c';
+    let strokeColor2 = '#3c2b2bcc';
     if (percentage >= 50) {
-      barColor = 'green';
+      barColor = '#00b044';
     } else if (percentage >= 25) {
       barColor = 'yellow';
     } else {
       barColor = 'red';
     }
-    return percentage < 100 ? /*#__PURE__*/React.createElement("div", {
-      className: "region_objective_health",
+    return percentage < 100 || strategicView ? /*#__PURE__*/React.createElement("div", {
+      className: "region_objective_health"
+    }, /*#__PURE__*/React.createElement("svg", {
+      width: "60",
+      height: "9"
+    }, /*#__PURE__*/React.createElement("g", {
+      transform: "skewX(-25)"
+    }, /*#__PURE__*/React.createElement("rect", {
+      x: "5",
+      y: "0",
+      width: "50",
+      height: "5",
       style: {
-        backgroundColor: barColor,
-        width: `${percentage}%`,
-        height: '6px',
-        position: 'absolute',
-        color: 'white',
-        textAlign: 'center',
-        lineHeight: '8px',
-        fontSize: '8px',
-        top: '3px'
+        fill: strokeColor,
+        stroke: strokeColor,
+        strokeWidth: '0'
       }
-    }) : null;
+    })), /*#__PURE__*/React.createElement("g", {
+      transform: "skewX(-25)"
+    }, /*#__PURE__*/React.createElement("rect", {
+      x: "5",
+      y: "0",
+      width: percentage / 2,
+      height: "5",
+      style: {
+        fill: barColor,
+        stroke: strokeColor,
+        strokeWidth: '0'
+      }
+    })), /*#__PURE__*/React.createElement("g", {
+      transform: "skewX(-25)"
+    }, /*#__PURE__*/React.createElement("rect", {
+      x: "5",
+      y: "0",
+      rx: "2",
+      ry: "2",
+      width: "10",
+      height: "5",
+      style: {
+        fill: 'transparent',
+        stroke: strokeColor,
+        strokeWidth: '2'
+      }
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "15",
+      y: "0",
+      width: "10",
+      height: "5",
+      style: {
+        fill: 'transparent',
+        stroke: strokeColor,
+        strokeWidth: '2'
+      }
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "25",
+      y: "0",
+      width: "10",
+      height: "5",
+      style: {
+        fill: 'transparent',
+        stroke: strokeColor,
+        strokeWidth: '2'
+      }
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "35",
+      y: "0",
+      width: "10",
+      height: "5",
+      style: {
+        fill: 'transparent',
+        stroke: strokeColor,
+        strokeWidth: '2'
+      }
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "45",
+      y: "0",
+      rx: "2",
+      ry: "2",
+      width: "10",
+      height: "5",
+      style: {
+        fill: 'transparent',
+        stroke: strokeColor,
+        strokeWidth: '2'
+      }
+    })))) : null;
   })())))));
 }
 function MapNearbyPlayers({
