@@ -103,6 +103,8 @@ class System {
 
     const MAX_LINK_DISPLAY_LENGTH = 60;
 
+    public bool $war_enabled = false;
+
     public static array $explicit_words = [
         'fuck',
         'fuk',
@@ -195,6 +197,10 @@ class System {
         $this->timezoneOffset = date('Z');
 
         $this->checkForActiveEvent();
+
+        if ($this->isDevEnvironment()) {
+            $this->war_enabled = true;
+        }
     }
 
     /**

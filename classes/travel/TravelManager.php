@@ -113,6 +113,11 @@ class TravelManager {
             throw new InvalidMovementException('You are currently in a Special Mission and cannot travel!');
         }
 
+        // check if the user is in an active operation
+        if ($this->user->operation) {
+            throw new InvalidMovementException('You are currently in an active Operation and cannot travel!');
+        }
+
         // check if the user is in a combat mission fail it
         if ($this->user->mission_id
             && $this->user->mission_stage['action_type'] == 'combat') {
@@ -600,6 +605,11 @@ class TravelManager {
     #[Trace]
     public function fetchNearbyPatrols(): array {
         $return_arr = [];
+
+        // exit if war disabled
+        if (!$this->system->war_enabled) {
+            return $return_arr;
+        }
 
         $result = $this->system->db->query("SELECT * FROM `patrols`");
         $result = $this->system->db->fetch_all($result);

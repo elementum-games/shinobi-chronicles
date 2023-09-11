@@ -29,6 +29,8 @@ final class InitialWarMigration extends AbstractMigration
         $this->execute("ALTER TABLE `region_locations` ADD `resource_penalty` INT(11) DEFAULT 0");
         $this->execute("ALTER TABLE `region_locations` ADD `defense` INT(11) NOT NULL DEFAULT '0' AFTER `resource_penalty`");
         $this->execute("UPDATE `region_locations` SET `resource_production` = 25");
+        $this->execute("UPDATE `region_locations` SET `defense` = 75 where `type` = 'castle'");
+        $this->execute("UPDATE `region_locations` SET `defense` = 50 where `type` = 'village'");
 
         // Update villages table - add column for resources
         $this->execute("ALTER TABLE `villages` ADD `resources` VARCHAR(200) DEFAULT '[]'");

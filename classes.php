@@ -73,3 +73,6 @@ require_once __DIR__ . "/classes/forbidden_shop/ForbiddenShopAPIPresenter.php";
 require_once __DIR__ . "/classes/forbidden_shop/ForbiddenShopManager.php";
 
 require_once __DIR__ . "/classes/village/VillageRelation.php";
+
+require_once __DIR__ . "/classes/war/WarManager.php";
+require_once __DIR__ . "/classes/war/Operation.php";
