@@ -202,6 +202,7 @@ $rank_names = RankManager::fetchNames($system);
             }
             else {
                 $(".jutsu_details_table").show();
+                $('.jutsu_details_table').get(0).scrollIntoView({behavior: 'smooth'});
                 // only display child jutsu if set
                 $("#" + $(this).attr("data-target")).attr("data-jutsu_child") == "None" ? $("#jutsu_details_child_row").hide() : $("#jutsu_details_child_row").show();
                 // populate details modal with jutsu data
