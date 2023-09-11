@@ -157,13 +157,13 @@
             <th id='premium_fourDragonSeal_header'><?=ForbiddenSeal::$forbidden_seal_names[2]?></th>
         </tr>
         <tr>
-            <td id='premium_twinSparrowSeal_data' style='width:50%;vertical-align:top;'>
+            <td id='premium_twinSparrowSeal_data' style='width:50%;vertical-align:top;text-align:center;'>
                 <p style='font-weight:bold;text-align:center;'>
                     <?= $premiumShopManager->costs['forbidden_seal_monthly_cost'][1] ?> Ancient Kunai / 30 days</p>
                 <br/>
                 +<?=$twinSeal->regen_boost?>% regen rate<br/>
                 <?=$twinSeal->name_color_display?> username color in chat<br/>
-                Additional avatar styles (new layout)<br/>
+                Additional avatar styles<br/>
                 Larger avatar (<?=$baseDisplay['avatar_size_display']?> -> <?=$twinSeal->avatar_size_display?>)<br/>
                 Larger inbox (<?=$baseDisplay['inbox_size']?> -> <?=$twinSeal->inbox_size?> messages)<br/>
                 Longer journal (<?=$baseDisplay['journal_size']?> -> <?=$twinSeal->journal_size?> characters)<br/>
@@ -184,7 +184,7 @@
                     </p>
                 </form>
             </td>
-            <td id='premium_fourDragonSeal_data' style='width:50%;vertical-align:top;'>
+            <td id='premium_fourDragonSeal_data' style='width:50%;vertical-align:top;text-align:center;'>
                 <p style='font-weight:bold;text-align:center;'>
                     <?= $premiumShopManager->costs['forbidden_seal_monthly_cost'][2] ?> Ancient Kunai / 30 days</p>
                 <br/>
