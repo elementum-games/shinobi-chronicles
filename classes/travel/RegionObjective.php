@@ -12,5 +12,6 @@ class RegionObjective {
         public int $objective_max_health,
         public int $defense,
         public ?string $objective_type = null,
+        public int $village_id,
     ) {}
 }

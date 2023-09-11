@@ -789,7 +789,7 @@ class TravelManager {
         $objectives = [];
 
         // Get Region Objectives
-        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `max_health`, `type`, `x`, `y`, `resource_name`, `defense`, `village`, `villages`.`name` as `village_name` FROM `region_locations`
+        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `max_health`, `type`, `x`, `y`, `resource_name`, `defense`, `village`, `villages`.`name` as `village_name`, `villages`.`village_id` FROM `region_locations`
             INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
             INNER JOIN `villages` ON `regions`.`village` = `villages`.`village_id`
             LEFT JOIN `resources` on `region_locations`.`resource_id` = `resources`.`resource_id`");
@@ -817,6 +817,7 @@ class TravelManager {
                             defense: $obj['defense'],
                             objective_type: $obj['type'],
                             image: $image,
+                            village_id: $obj['village_id'],
                         );
                         break;
                     case "tower":
@@ -833,6 +834,7 @@ class TravelManager {
                             defense: $obj['defense'],
                             objective_type: $obj['type'],
                             image: $image,
+                            village_id: $obj['village_id'],
                         );
                     case "village":
                         if ($distance <= $this->user->scout_range || $obj['village_name'] == $this->user->village->name) {
@@ -863,6 +865,7 @@ class TravelManager {
                                 defense: $obj['defense'],
                                 objective_type: $obj['type'],
                                 image: $image,
+                                village_id: $obj['village_id'],
                             );
                         }
                         break;

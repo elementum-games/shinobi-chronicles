@@ -747,4 +747,10 @@ return [
         'text' => ':lyin:',
         'public' => true,
     ],
+    [
+        'code' => ':gojo:',
+        'image' => "<img src='./images/memes/gojo.png' />",
+        'text' => ':gojo:',
+        'public' => true,
+    ],
 ];

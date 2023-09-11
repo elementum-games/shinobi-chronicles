@@ -259,6 +259,22 @@ function RegionObjectives({
   tileHeight,
   strategicView
 }) {
+  function getVillageIcon(village_id) {
+    switch (village_id) {
+      case 1:
+        return 'url(images/village_icons/stone.png)';
+      case 2:
+        return 'url(images/village_icons/cloud.png)';
+      case 3:
+        return 'url(images/village_icons/leaf.png)';
+      case 4:
+        return 'url(images/village_icons/sand.png)';
+      case 5:
+        return 'url(images/village_icons/mist.png)';
+      default:
+        return null;
+    }
+  }
   return /*#__PURE__*/React.createElement("div", {
     className: "region_objectives"
   }, /*#__PURE__*/React.createElement(ReactTransitionGroup.TransitionGroup, null, objectives.map(objective => /*#__PURE__*/React.createElement(ReactTransitionGroup.CSSTransition, {
@@ -288,7 +304,10 @@ function RegionObjectives({
   }, /*#__PURE__*/React.createElement("span", {
     className: "region_objective_tooltip_defense"
   }, objective.defense), /*#__PURE__*/React.createElement("span", {
-    className: "region_objective_tooltip_village"
+    className: "region_objective_tooltip_village",
+    style: {
+      backgroundImage: getVillageIcon(objective.village_id)
+    }
   }))), objective.objective_health && objective.objective_max_health > 0 && (() => {
     const percentage = objective.objective_health / objective.objective_max_health * 100;
     let barColor;
