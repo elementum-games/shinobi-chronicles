@@ -7,6 +7,7 @@ class TravelApiPresenter {
             'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $travelManager, system: $system),
             'nearbyPlayers' => TravelApiPresenter::nearbyPlayersResponse(travelManager: $travelManager),
             'nearbyPatrols' => TravelApiPresenter::nearbyPatrolsResponse(travelManager: $travelManager),
+            'travel_message' => $travelManager->travel_message,
         ];
     }
 
@@ -15,6 +16,7 @@ class TravelApiPresenter {
         $current_location_portal = $travelManager->fetchCurrentLocationPortal();
         $location_action = $travelManager->getMapLocationAction($locations, $player);
         $regions = $travelManager->getRegions($player);
+        $travelManager->checkOperation($player->operation);
         $operation = $player->operation > 0 ? $travelManager->warManager->getOperationById($player->operation) : null;
         return [
             'player_x'          => $player->location->x,

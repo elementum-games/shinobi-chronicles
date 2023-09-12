@@ -26,27 +26,29 @@ class WarManager {
     /**
      * @throws RuntimeException
      */
-    public function processOperation(int $operation_id, ?int $status = null)
+    public function processOperation(int $operation_id, ?int $status = null): string
     {
+        $message = '';
         $operation = $this->getOperationById($operation_id);
         if (!empty($status)) {
             $operation->status = $status;
         }
         switch ($operation->status) {
             case Operation::OPERATION_ACTIVE:
-                $operation->progressActiveOperation();
+                $message = $operation->progressActiveOperation();
                 break;
             case Operation::OPERATION_COMPLETE:
-                $operation->handleCompletion();
+                $message = $operation->handleCompletion();
                 $operation->updateData();
                 break;
             case Operation::OPERATION_FAILED:
-                $operation->handleFailure();
+                $message = $operation->handleFailure();
                 $operation->updateData();
                 break;
             default:
                 throw new RuntimeException("Invalid operation status!");
         }
+        return $message;
     }
 
     /**
@@ -130,15 +132,18 @@ class WarManager {
                 $valid_operations = [
                     Operation::OPERATION_INFILTRATE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_INFILTRATE]),
                 ];
+                break;
             case 'alliance':
                 $valid_operations = [
                     Operation::OPERATION_REINFORCE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_REINFORCE])
                 ];
+                break;
             case 'war':
                 $valid_operations = [
                     Operation::OPERATION_INFILTRATE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_INFILTRATE]),
                     Operation::OPERATION_RAID => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_RAID]),
                 ];
+                break;
             case 'default':
                 return $valid_operations;
         }

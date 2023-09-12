@@ -22,6 +22,8 @@ class TravelManager {
 
     public WarManager $warManager;
 
+    public string $travel_message = '';
+
     public array $map_data;
 
     const DISPLAY_RADIUS = 12;
@@ -910,6 +912,7 @@ class TravelManager {
     }
 
     function beginOperation($operation_type): bool {
+        $message = '';
         $target = $this->system->db->query("SELECT `id` FROM `region_locations`
             WHERE `x` = {$this->user->location->x}
             AND `y` = {$this->user->location->y}
@@ -921,13 +924,43 @@ class TravelManager {
         }
         $target = $this->system->db->fetch($target);
         $this->warManager->beginOperation($operation_type, $target['id']);
+        $message = "Operation started!";
         $this->user->updateData();
+        $this->setTravelMessage($message);
         return true;
     }
 
     function cancelOperation(): bool {
+        $message = '';
         $this->warManager->cancelOperation();
         $this->user->updateData();
+        $message = "Operation cancelled!";
+        $this->setTravelMessage($message);
         return true;
+    }
+
+    function checkOperation() {
+        $message = '';
+        if ($this->system->war_enabled && $this->user->operation > 0) {
+            try {
+                $message = $this->warManager->processOperation($this->user->operation);
+            } catch (RuntimeException $e) {
+                $message = "Operation cancelled";
+                $this->user->operation = 0;
+            }
+        }
+        $this->user->updateData();
+        $this->setTravelMessage($message);
+    }
+
+    private function setTravelMessage($message) {
+        if (!empty($message)) {
+            if (!empty($this->travel_message)) {
+                $this->travel_message .= "\n" . $message;
+            }
+            else {
+                $this->travel_message = $message;
+            }
+        }
     }
 }

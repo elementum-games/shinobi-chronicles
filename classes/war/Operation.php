@@ -71,8 +71,9 @@ class Operation
         $this->system->db->query($query);
     }
 
-    public function progressActiveOperation()
+    public function progressActiveOperation(): string
     {
+        $message = '';
         // only progress if active and interval time has passed
         if ($this->status == self::OPERATION_ACTIVE && time() > $this->last_update + Operation::BASE_OPERATION_INTERVAL) {
             $this->progress += self::BASE_OPERATION_SPEED;
@@ -81,29 +82,38 @@ class Operation
                 $this->progress = 100;
                 $this->status = self::OPERATION_COMPLETE;
                 // handle completion
-                $this->handleCompletion();
+                $message = $this->handleCompletion();
             }
             // update operation data
             $this->updateData();
         }
+        return $message;
     }
 
     /**
      * @throws RuntimeException
      */
-    public function handleCompletion() {
+    public function handleCompletion(): string {
+        $message = 'Operation complete!';
         if ($this->status != self::OPERATION_COMPLETE) {
             throw new RuntimeException("Invalid operation status!");
         }
         switch ($this->type) {
             case self::OPERATION_INFILTRATE:
+                $message .= "\n Decreased target Defense by 1!";
+                $message .= "\n Stole 1 Materials!";
                 break;
             case self::OPERATION_REINFORCE:
+                $message .= "\n Increased target Defense by 1!";
+                $message .= "\n Gained 1 Materials!";
                 break;
             case self::OPERATION_RAID:
+                $message .= "\n Dealt 100 damage to target!";
+                $message .= "\n Gained 1 Materials!";
                 break;
         }
         $this->user->operation = 0;
+        return $message;
     }
 
     /**
@@ -134,6 +144,7 @@ class Operation
      */
     public static function cancelOperation(System $system, User $user) {
         $user->operation = 0;
+        $user->updateData();
         $system->db->query("UPDATE `operations` set `status` = " . self::OPERATION_FAILED . " WHERE `operation_id` = {$user->operation}");
         if ($system->db->last_num_rows == 0) {
             throw new RuntimeException("Operation not found!");

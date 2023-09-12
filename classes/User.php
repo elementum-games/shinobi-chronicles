@@ -892,12 +892,6 @@ class User extends Fighter {
         // Load training manager
         $this->loadTrainingManager();
 
-        // Update operations
-        if ($this->system->war_enabled && $this->operation > 0) {
-            $warManager = new WarManager($this->system, $this);
-            $warManager->processOperation($this->operation);
-        }
-
         return;
     }
 

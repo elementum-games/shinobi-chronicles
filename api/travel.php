@@ -33,6 +33,7 @@ try {
                 'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $TravelManager, system: $system),
                 'nearbyPlayers' => TravelApiPresenter::nearbyPlayersResponse(travelManager: $TravelManager),
                 'nearbyPatrols' => TravelApiPresenter::nearbyPatrolsResponse(travelManager: $TravelManager),
+                'travel_message' => $TravelManager->travel_message,
             ];
             break;
 
