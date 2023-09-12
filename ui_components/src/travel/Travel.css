@@ -1090,3 +1090,26 @@
         text-shadow: 0 0 1px #fff, 0 0 2px #5b1e1e, 0 0 3px #5b1e1e, 0 0 4px #5b1e1e, 0 0 5px #5b1e1e, 0 0 6px #5b1e1e, 0 0 7px #5b1e1e, 0 0 8px #5b1e1e, 0 0 9px #5b1e1e;
     }
 }
+
+#operation_progress_bar {
+    bottom: -60px;
+    position: absolute;
+}
+
+#operation_progress_circle_background {
+    transition-property: stroke-dashoffset;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
+}
+
+#operation_progress_circle {
+    transition-property: stroke-dashoffset;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
+}
+
+#operation_interval_circle {
+    transition-property: stroke-dashoffset;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-out;
+}

@@ -48,6 +48,7 @@ class TravelApiPresenter {
             'operations'        => $travelManager->warManager->getValidOperations(),
             'operation_type'    => $operation ? System::unSlug(Operation::OPERATION_TYPE_DESCRIPTOR[$operation->type]) : null,
             'operation_progress'=> $operation ? $operation->progress : null,
+            'operation_interval'=> $operation ? $operation->interval_progress : null,
         ];
     }
 

@@ -36,6 +36,7 @@ import { ScoutArea } from "./ScoutArea.js";
     operations:          object,
     operation_type:      string,
     operation_progress:  int,
+    operation_interval:  int,
  * }} mapData
  *
  * @param {{

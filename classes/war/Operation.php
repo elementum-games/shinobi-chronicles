@@ -29,8 +29,8 @@ class Operation
     ];
 
     const BASE_OPERATION_SPEED = 5; // progress per interval
-    const BASE_OPERATION_INTERVAL = 10000; // time per interval
-    /* 100 / 5 * 10000ms = 3:20 */
+    const BASE_OPERATION_INTERVAL = 10; // time per interval
+    /* 100 / 5 * 10s = 3:20 */
 
     private System $system;
     private User $user;
@@ -44,6 +44,7 @@ class Operation
     public int $target_village;
     public int $user_village;
     public int $last_update;
+    public int $interval_progress = 0;
 
     public function __construct(System $system, User $user, array $operation_data)
     {
@@ -52,6 +53,7 @@ class Operation
         }
         $this->system = $system;
         $this->user = $user;
+        $this->interval_progress = ((time() - $this->last_update) / self::BASE_OPERATION_INTERVAL) * 100;
     }
 
     public function updateData() {
@@ -65,7 +67,7 @@ class Operation
                 `target_village` = '{$this->target_village}',
                 `user_village` = '{$this->user_village}',
                 `last_update` = '{$this->last_update}'
-            WHERE `operation_id` = '{$this->operation_id}')";
+            WHERE `operation_id` = '{$this->operation_id}'";
         $this->system->db->query($query);
     }
 
