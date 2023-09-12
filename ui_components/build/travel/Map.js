@@ -58,7 +58,7 @@ export const Map = ({
   const map_height = parseInt(mapData.end_y) - parseInt(mapData.start_y) + 1;
   const PlayerStyle = {
     position: "absolute",
-    backgroundImage: `url(./${mapData.invulnerable ? 'images/ninja_head_grey.png' : mapData.player_icon})`,
+    backgroundImage: mapData.operation_type ? null : `url(./${mapData.invulnerable ? 'images/ninja_head_grey.png' : mapData.player_icon})`,
     top: 0,
     left: 0,
     transform: `translate3d(
