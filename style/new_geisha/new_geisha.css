@@ -843,6 +843,9 @@ select {
 .healthFill {
     background: var(--health-fill) !important;
 }
+.resourceFill.health {
+    background: var(--health-fill) !important;
+}
 .staminaFill {
     background: var(--stamina-fill) !important;
 }

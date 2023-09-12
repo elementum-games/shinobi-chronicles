@@ -82,7 +82,7 @@ function resourceBar(float $current_amount, float $max_amount, string $resource_
     ?>
     <div class='resourceBarOuter'>
         <div class='resourceFill <?= $resource_type ?>' style='width:<?= $resource_percent ?>%;'></div>
-        <div class='text'><?= sprintf("%.2f", $current_amount) ?> / <?= sprintf("%.2f", $max_amount) ?></div>
+        <div class='text'><?= sprintf("%.0f", $current_amount) ?> / <?= sprintf("%.0f", $max_amount) ?></div>
     </div>
     <?php
 }
