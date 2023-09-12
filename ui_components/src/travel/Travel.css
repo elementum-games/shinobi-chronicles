@@ -1070,7 +1070,7 @@
 }
 
 .operation_text {
-    color: white;
+    color: #ffecd4;
     font-family: 'Segoe UI';
     font-style: italic;
     font-weight: 600;
@@ -1083,11 +1083,13 @@
 
 @-webkit-keyframes glow {
     50% {
-        text-shadow: 0 0 1px #fff, 0 0 2px #5b1e1e, 0 0 3px #5b1e1e, 0 0 4px #a36b72, 0 0 5px #a36b72, 0 0 6px #5b1e1e, 0 0 7px #a36b72;
+        color: white;
+        text-shadow: 0 0 1px #fff, 0 0 2px #402727, 0 0 3px #402727, 0 0 4px #d60808, 0 0 5px #d60808, 0 0 6px #d60808, 0 0 7px #d60808;
     }
 
     0%, 100% {
-        text-shadow: 0 0 1px #fff, 0 0 2px #5b1e1e, 0 0 3px #5b1e1e, 0 0 4px #5b1e1e, 0 0 5px #5b1e1e, 0 0 6px #5b1e1e, 0 0 7px #5b1e1e, 0 0 8px #5b1e1e, 0 0 9px #5b1e1e;
+        color: #ffecd4;
+        text-shadow: 0 0 0px #402727, 0 0 1px #402727, 0 0 2px #402727, 0 0 3px #402727, 0 0 4px #402727, 0 0 5px #402727, 0 0 6px #402727, 0 0 7px #b10000, 0 0 8px #b10000, 0 0 9px #b10000;
     }
 }
 
