@@ -1092,7 +1092,7 @@
 }
 
 #operation_progress_bar {
-    bottom: -60px;
+    top: 1px;
     position: absolute;
 }
 

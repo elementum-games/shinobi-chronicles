@@ -37,6 +37,7 @@ import { ScoutArea } from "./ScoutArea.js";
     operation_type:      string,
     operation_progress:  int,
     operation_interval:  int,
+    travel_message:      string,
  * }} mapData
  *
  * @param {{
@@ -140,6 +141,9 @@ function Travel({
             if (response.errors.length) {
                 handleErrors(response.errors);
                 return;
+            }
+            if (response.data.travel_message) {
+                setFeedback([response.data.travel_message, 'info']);
             }
             setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
             setStrategicView(response.data.mapData.player_filters.strategic_view === "true");
@@ -274,6 +278,9 @@ function Travel({
                 handleErrors(response.errors);
                 return;
             }
+            if (response.data.travel_message) {
+                setFeedback([response.data.travel_message, 'info']);
+            }
             setMapData(response.data.mapData);
         });
     }
@@ -288,6 +295,9 @@ function Travel({
             if (response.errors.length) {
                 handleErrors(response.errors);
                 return;
+            }
+            if (response.data.travel_message) {
+                setFeedback([response.data.travel_message, 'info']);
             }
             setMapData(response.data.mapData);
         });

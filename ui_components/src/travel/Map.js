@@ -387,9 +387,9 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView }) 
                                     let barColor;
                                     let strokeColor = '#2b2c2c';
                                     let strokeColor2 = '#3c2b2bcc';
-                                    if (percentage >= 50) {
+                                    if (percentage > 50) {
                                         barColor = '#00b044';
-                                    } else if (percentage >= 25) {
+                                    } else if (percentage > 25) {
                                         barColor = 'yellow';
                                     } else {
                                         barColor = 'red';
