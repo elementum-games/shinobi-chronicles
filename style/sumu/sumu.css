@@ -416,6 +416,11 @@ body {
     background-repeat: no-repeat;
     z-index: 2;
 }
+.systemMessage-new-info {
+    background: var(--travel-ui-color);
+    border: 1px solid var(--travel-background-color);
+    color: var(--font-color-3);
+}
 
 /* Avatar styles */
 .avy_none {
