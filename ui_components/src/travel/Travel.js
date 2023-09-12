@@ -277,6 +277,21 @@ function Travel({
         });
     }
 
+    const CancelOperation = () => {
+        apiFetch(
+            travelAPILink,
+            {
+                request: 'CancelOperation',
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setMapData(response.data.mapData);
+        });
+    }
+
     const SparPlayer = (target) => {
         window.location.href = mapData.spar_link + "&challenge=" + target;
     }
@@ -408,11 +423,11 @@ function Travel({
                                 </a>
                             )}
                             {(mapData && mapData.operation_type) && (
-                                <button className='button'>Cancel</button>
+                                <button className='button' onClick={() => CancelOperation()}>Cancel</button>
                             )}
-                            {(mapData && mapData.operations && typeof mapData.operations_type === 'undefined') && (
+                            {((mapData && mapData.operations && !mapData.operation_type) && typeof mapData.operations_type === 'undefined') && (
                                 Object.entries(mapData.operations).map(([key, value], index) => (
-                                    <button key={index} className='button'>
+                                    <button key={index} onClick={() => BeginOperation(key)} className='button'>
                                         {`${value}`}
                                     </button>
                                 ))

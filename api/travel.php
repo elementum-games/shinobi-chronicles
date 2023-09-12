@@ -64,6 +64,19 @@ try {
             $success = $TravelManager->attackPlayer($target_attack_id);
             $TravelAPIResponse->response = TravelApiPresenter::attackPlayerResponse($success, $system);
             break;
+
+        case 'BeginOperation':
+            $operation_type = $system->db->clean($_POST['operation_type']);
+
+            $success = $TravelManager->beginOperation($operation_type);
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
+            break;
+
+        case 'CancelOperation':
+            $success = $TravelManager->cancelOperation();
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
+            break;
+
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
     }

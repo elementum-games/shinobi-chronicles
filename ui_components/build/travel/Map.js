@@ -139,7 +139,9 @@ export const Map = ({
   }), /*#__PURE__*/React.createElement("div", {
     id: "map_player",
     style: PlayerStyle
-  }))));
+  }, mapData.operation_type && /*#__PURE__*/React.createElement("div", {
+    className: "operation_text"
+  }, mapData.operation_type)))));
 };
 function MapGutters({
   stageWidth,

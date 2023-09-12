@@ -20,6 +20,8 @@ class TravelManager {
     private System $system;
     private User $user;
 
+    public WarManager $warManager;
+
     public array $map_data;
 
     const DISPLAY_RADIUS = 12;
@@ -32,6 +34,7 @@ class TravelManager {
     public function __construct(System $system, User $user) {
         $this->system = $system;
         $this->user = $user;
+        $this->warManager = new WarManager($system, $user);
 
         $result = $this->system->db->query("SELECT * FROM `maps` WHERE `map_id`={$this->user->location->map_id}");
         $this->map_data = $this->system->db->fetch($result);
@@ -904,5 +907,27 @@ class TravelManager {
             }
         }
         return $link;
+    }
+
+    function beginOperation($operation_type): bool {
+        $target = $this->system->db->query("SELECT `id` FROM `region_locations`
+            WHERE `x` = {$this->user->location->x}
+            AND `y` = {$this->user->location->y}
+            AND `map_id` = {$this->user->location->map_id}
+            LIMIT 1
+        ");
+        if ($this->system->db->last_num_rows == 0) {
+            throw new RuntimeException("No operation target found!");
+        }
+        $target = $this->system->db->fetch($target);
+        $this->warManager->beginOperation($operation_type, $target['id']);
+        $this->user->updateData();
+        return true;
+    }
+
+    function cancelOperation(): bool {
+        $this->warManager->cancelOperation();
+        $this->user->updateData();
+        return true;
     }
 }

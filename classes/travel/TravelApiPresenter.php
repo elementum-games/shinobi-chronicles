@@ -15,8 +15,7 @@ class TravelApiPresenter {
         $current_location_portal = $travelManager->fetchCurrentLocationPortal();
         $location_action = $travelManager->getMapLocationAction($locations, $player);
         $regions = $travelManager->getRegions($player);
-        $warManager = new WarManager($system, $player);
-        $operation = $player->operation > 0 ? $warManager->getOperationById($player->operation) : null;
+        $operation = $player->operation > 0 ? $travelManager->warManager->getOperationById($player->operation) : null;
         return [
             'player_x'          => $player->location->x,
             'player_y'          => $player->location->y,
@@ -46,8 +45,8 @@ class TravelApiPresenter {
             'region_objectives' => $travelManager->fetchRegionObjectives(),
             'map_objectives'    => $travelManager->fetchMapObjectives(),
             'battle_url'        => $travelManager->getPlayerBattleUrl(),
-            'operations'        => $warManager->getValidOperations(),
-            'operation_type'    => $operation ? Operation::OPERATION_TYPE[$operation->type] : null,
+            'operations'        => $travelManager->warManager->getValidOperations(),
+            'operation_type'    => $operation ? System::unSlug(Operation::OPERATION_TYPE_DESCRIPTOR[$operation->type]) : null,
             'operation_progress'=> $operation ? $operation->progress : null,
         ];
     }

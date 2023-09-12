@@ -52,7 +52,7 @@ class WarManager {
     /**
      * @throws RuntimeException
      */
-    public function startOperation(int $operation_type, int $target_id) {
+    public function beginOperation(int $operation_type, int $target_id) {
         $target = $this->system->db->query("SELECT `region_locations`.*, `regions`.`village` FROM `region_locations`
             INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
             WHERE `id` = {$target_id} LIMIT 1");
@@ -71,25 +71,29 @@ class WarManager {
                 if ($this->user->village->relations[$target['village']]->relation_type != "neutral" && $this->user->village->relations[$target['village']]->relation_type != "war") {
                     throw new RuntimeException("Invalid operation target!");
                 }
-                Operation::createOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
+                $operation_id = Operation::beginOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
                 break;
             case Operation::OPERATION_REINFORCE:
                 // must be owned or ally
                 if ($target['village'] != $this->user->village->village_id && $this->user->village->relations[$target['village']]->relation_type != "alliance") {
                     throw new RuntimeException("Invalid operation target!");
                 }
-                Operation::createOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
+                $operation_id = Operation::beginOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
                 break;
             case Operation::OPERATION_RAID:
                 // must be at war
                 if ($this->user->village->relations[$target['village']]->relation_type != "war") {
                     throw new RuntimeException("Invalid operation target!");
                 }
-                Operation::createOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
+                $operation_id = Operation::beginOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
                 break;
             default:
                 throw new RuntimeException("Invalid operation type!");
         }
+    }
+
+    public function cancelOperation() {
+        Operation::cancelOperation($this->system, $this->user);
     }
 
     /**
@@ -126,20 +130,18 @@ class WarManager {
                 $valid_operations = [
                     Operation::OPERATION_INFILTRATE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_INFILTRATE]),
                 ];
-                return $valid_operations;
             case 'alliance':
                 $valid_operations = [
                     Operation::OPERATION_REINFORCE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_REINFORCE])
                 ];
-                return $valid_operations;
             case 'war':
                 $valid_operations = [
                     Operation::OPERATION_INFILTRATE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_INFILTRATE]),
                     Operation::OPERATION_RAID => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_RAID]),
                 ];
-                return $valid_operations;
             case 'default':
                 return $valid_operations;
         }
+        return $valid_operations;
     }
 }

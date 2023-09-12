@@ -334,29 +334,7 @@ class User extends Fighter {
         $user = new User($system, $user_id);
         $user->read_only = $read_only;
 
-        $query = "SELECT
-                `user_id`,
-                `user_name`,
-                `ban_data`,
-                `ban_type`,
-                `ban_expire`,
-                `journal_ban`,
-                `avatar_ban`,
-                `song_ban`,
-                `last_login`,
-                `regen_rate`,
-                `forbidden_seal`,
-                `chat_color`,
-                `chat_effect`,
-                `staff_level`,
-                `username_changes`,
-                `support_level`,
-                `special_mission`,
-                `rank`,
-                `sensei_id`,
-                `accept_students`,
-                `village`
-                FROM `users` WHERE `user_id`='$user_id' LIMIT 1";
+        $query = "SELECT * FROM `users` WHERE `user_id` = '{$user_id}' LIMIT 1";
         if(!$read_only) {
             $query .= " FOR UPDATE";
         }
@@ -511,10 +489,10 @@ class User extends Fighter {
         $this->village = new Village($this->system, $user_data['village']);
         $this->village_rep = $user_data['village_rep'];
         $this->weekly_rep = $user_data['weekly_rep'];
-	$this->pvp_rep = $user_data['pvp_rep'];
+	    $this->pvp_rep = $user_data['pvp_rep'];
         $this->mission_rep_cd = $user_data['mission_rep_cd'];
         $this->recent_players_killed_ids = $user_data['recent_players_killed_ids'];
-	$this->recent_killer_ids = $user_data['recent_killer_ids'];
+	    $this->recent_killer_ids = $user_data['recent_killer_ids'];
         $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->pvp_rep, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd, $this->system->event);
 
         $this->gender = $user_data['gender'];
@@ -1817,11 +1795,7 @@ class User extends Fighter {
             $query .= "`special_mission`='0',";
         }
 
-        if ($this->operation) {
-            $query .= "`operation`='$this->operation',";
-        } else {
-            $query .= "`operation`='0',";
-        }
+        $query .= "`operation`='$this->operation',";
 
         $query .= "`exam_stage` = '{$this->exam_stage}',
 		`last_ai_ms` = '$this->last_ai_ms',

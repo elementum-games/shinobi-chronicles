@@ -221,6 +221,17 @@ function Travel({
       setMapData(response.data.mapData);
     });
   };
+  const CancelOperation = () => {
+    apiFetch(travelAPILink, {
+      request: 'CancelOperation'
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      setMapData(response.data.mapData);
+    });
+  };
   const SparPlayer = target => {
     window.location.href = mapData.spar_link + "&challenge=" + target;
   };
@@ -335,9 +346,11 @@ function Travel({
   }, /*#__PURE__*/React.createElement("button", {
     className: "button"
   }, mapData.action_message)), mapData && mapData.operation_type && /*#__PURE__*/React.createElement("button", {
-    className: "button"
-  }, "Cancel"), mapData && mapData.operations && typeof mapData.operations_type === 'undefined' && Object.entries(mapData.operations).map(([key, value], index) => /*#__PURE__*/React.createElement("button", {
+    className: "button",
+    onClick: () => CancelOperation()
+  }, "Cancel"), mapData && mapData.operations && !mapData.operation_type && typeof mapData.operations_type === 'undefined' && Object.entries(mapData.operations).map(([key, value], index) => /*#__PURE__*/React.createElement("button", {
     key: index,
+    onClick: () => BeginOperation(key),
     className: "button"
   }, `${value}`))), feedback && /*#__PURE__*/React.createElement("div", {
     className: "travel-messages"

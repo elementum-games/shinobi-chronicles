@@ -12,6 +12,12 @@ class Operation
         self::OPERATION_RAID => "raid",
     ];
 
+    const OPERATION_TYPE_DESCRIPTOR = [
+        self::OPERATION_INFILTRATE => "infiltrating",
+        self::OPERATION_REINFORCE => "reinforcing",
+        self::OPERATION_RAID => "raiding",
+    ];
+
     const OPERATION_ACTIVE = 1;
     const OPERATION_FAILED = 2;
     const OPERATION_COMPLETE = 3;
@@ -59,7 +65,7 @@ class Operation
                 `target_village` = '{$this->target_village}',
                 `user_village` = '{$this->user_village}',
                 `last_update` = '{$this->last_update}'
-            WHERE operation_id = '{$this->operation_id}')";
+            WHERE `operation_id` = '{$this->operation_id}')";
         $this->system->db->query($query);
     }
 
@@ -80,6 +86,9 @@ class Operation
         }
     }
 
+    /**
+     * @throws RuntimeException
+     */
     public function handleCompletion() {
         if ($this->status != self::OPERATION_COMPLETE) {
             throw new RuntimeException("Invalid operation status!");
@@ -95,6 +104,9 @@ class Operation
         $this->user->operation = 0;
     }
 
+    /**
+     * @throws RuntimeException
+     */
     public function handleFailure() {
         if ($this->status != self::OPERATION_FAILED) {
             throw new RuntimeException("Invalid operation status!");
@@ -102,13 +114,27 @@ class Operation
         $this->user->operation = 0;
     }
 
-    public static function createOperation(System $system, User $user, int $location_id, int $type, int $target_village): int {
+    /**
+     * @throws RuntimeException
+     */
+    public static function beginOperation(System $system, User $user, int $location_id, int $type, int $target_village): int {
         $time = time();
-        $system->db->query("INSERT INTO operations (`user_id`, `location_id`, `type`, `progress`, `status`, `target_village`, `user_village`, `last_update`)
-            VALUES ({$user->user_id}, {$location_id}, {$type}, 0, 1, {$target_village}, {$user->village->village_id}, {$time})
+        $system->db->query("INSERT INTO `operations` (`user_id`, `location_id`, `type`, `progress`, `status`, `target_village`, `user_village`, `last_update`)
+            VALUES ({$user->user_id}, {$location_id}, {$type}, 0, " . self::OPERATION_ACTIVE . ", {$target_village}, {$user->village->village_id}, {$time})
         ");
         $operation_id = $system->db->last_insert_id;
         $user->operation = $operation_id;
         return $operation_id;
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    public static function cancelOperation(System $system, User $user) {
+        $user->operation = 0;
+        $system->db->query("UPDATE `operations` set `status` = " . self::OPERATION_FAILED . " WHERE `operation_id` = {$user->operation}");
+        if ($system->db->last_num_rows == 0) {
+            throw new RuntimeException("Operation not found!");
+        }
     }
 }

@@ -148,7 +148,11 @@ export const Map = ({ mapData, scoutData, patrolData, playerId, ranksToView, str
                         playerId={playerId}
                         ranksToView={ranksToView}
                     />
-                    <div id='map_player' style={ PlayerStyle }></div>
+                    <div id='map_player' style={PlayerStyle}>
+                        {mapData.operation_type &&
+                            <div className='operation_text'>{mapData.operation_type}</div>
+                        }
+                    </div>
                 </div>
             </div>
         </>
