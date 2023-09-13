@@ -486,16 +486,134 @@ function MapNearbyPlayers({
 function MapNearbyPatrols({
   patrolData,
   tileWidth,
-  tileHeight,
-  playerId,
-  ranksToView
+  tileHeight
 }) {
   return /*#__PURE__*/React.createElement("div", {
     id: "patrol_locations",
     className: "map_locations"
-  }, patrolData.map((patrol, index) => /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("svg", null, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("filter", {
+    id: "green_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "green",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "2"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "yellow_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "yellow",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "2"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "red_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "red",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "2"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "orange_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "orange",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "2"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "blue_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "blue",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "1"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))))), patrolData.map((patrol, index) => /*#__PURE__*/React.createElement("div", {
     key: patrol.patrol_id + '_' + patrol.patrol_type,
-    className: alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type,
+    className: "map_location",
     style: {
       cursor: "pointer",
       transform: `translate3d(${(patrol.target_x - 1) * tileWidth}px, ${(patrol.target_y - 1) * tileHeight}px, 0)`,
@@ -504,7 +622,9 @@ function MapNearbyPatrols({
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "map_location_tooltip"
-  }, patrol.patrol_name))));
+  }, patrol.patrol_name), /*#__PURE__*/React.createElement("div", {
+    className: alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type
+  }))));
 }
 const visibilityClass = invulnerable => {
   if (invulnerable) {

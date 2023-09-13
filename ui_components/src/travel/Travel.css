@@ -878,65 +878,51 @@
     opacity: 0.5;
 }
 
+.patrol, .caravan {
+    background-size: 25px 25px !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+}
+
 .map_location.patrol_stone.caravan {
-    background: url(../../../images/map/icons/carriage4.png), radial-gradient(circle, rgba(10, 144, 35, 1) 70%, transparent 75%);
-    background-size: 25px 25px;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: url(../../../images/map/icons/caravan.png);
+    filter: url("#green_glow");
 }
 .map_location.patrol_cloud.caravan {
-    background: url(../../../images/map/icons/wheel.png), radial-gradient(circle, rgba(240, 163, 10, 1) 70%, transparent 75%);
-    background-size: 25px 25px;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: url(../../../images/map/icons/caravan.png);
+    filter: url("#yellow_glow");
 }
 .map_location.patrol_leaf.caravan {
-    background: url(../../../images/map/icons/wheel.png), radial-gradient(circle, rgba(255, 0, 0, 1) 70%, transparent 75%);
-    background-size: 25px 25px;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: url(../../../images/map/icons/caravan.png);
+    filter: url("#red_glow");
 }
 .map_location.patrol_sand.caravan {
-    background: url(../../../images/map/icons/carriage10.png), radial-gradient(circle, rgba(249, 105, 14, 1) 70%, transparent 75%);
-    background-size: 25px 25px;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: url(../../../images/map/icons/caravan.png);
+    filter: url("#orange_glow");
 }
 .map_location.patrol_mist.caravan {
-    background: url(../../../images/map/icons/wheel.png), radial-gradient(circle, rgba(61, 84, 255, 1) 70%, transparent 75%);
-    background-size: 25px 25px;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: url(../../../images/map/icons/caravan.png);
+    filter: url("#blue_glow");
 }
 .map_location.patrol_stone.patrol {
-    background: url(../../../images/map/icons/samurai.png), radial-gradient(circle, rgba(10, 144, 35, 1) 70%, transparent 75%);
-    background-size: 25px 25px;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: url(../../../images/map/icons/patrol.png);
+    filter: url("#green_glow");
 }
 .map_location.patrol_cloud.patrol {
-    background: url(../../../images/map/icons/samurai.png), radial-gradient(circle, rgba(240, 163, 10, 1) 70%, transparent 75%);
-    background-size: 25px 25px;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: url(../../../images/map/icons/patrol.png);
+    filter: url("#yellow_glow");
 }
 .map_location.patrol_leaf.patrol {
-    background: url(../../../images/map/icons/samurai.png), radial-gradient(circle, rgba(255, 0, 0, 1) 70%, transparent 75%);
-    background-size: 25px 25px;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: url(../../../images/map/icons/patrol.png);
+    filter: url("#red_glow");
 }
 .map_location.patrol_sand.patrol {
-    background: url(../../../images/map/icons/samurai.png), radial-gradient(circle, rgba(249, 105, 14, 1) 70%, transparent 75%);
-    background-size: 25px 25px;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: url(../../../images/map/icons/patrol.png);
+    filter: url("#orange_glow");
 }
 .map_location.patrol_mist.patrol {
-    background: url(../../../images/map/icons/samurai.png), radial-gradient(circle, rgba(61, 84, 255, 1) 70%, transparent 75%);
-    background-size: 25px 25px;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: url(../../../images/map/icons/patrol.png);
+    filter: url("#blue_glow");
 }
 
 /* Transition Animation Logic */
