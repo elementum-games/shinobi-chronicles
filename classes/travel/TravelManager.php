@@ -621,7 +621,11 @@ class TravelManager {
         foreach ($result as $row) {
             $patrol = new NearbyPatrol($row, "patrol");
             $patrol->setLocation($this->system);
-            if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
+            $distance = $this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id));
+            if ($distance == 0) {
+                $this->warManager->checkBeginPatrolBattle($patrol);
+            }
+            if ($distance <= $this->user->scout_range) {
                 $return_arr[] = $patrol;
             }
         }

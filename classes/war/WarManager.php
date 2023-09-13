@@ -70,21 +70,21 @@ class WarManager {
         switch ($operation_type) {
             case Operation::OPERATION_INFILTRATE:
                 // must be neutral or at war
-                if ($this->user->village->relations[$target['village']]->relation_type != "neutral" && $this->user->village->relations[$target['village']]->relation_type != "war") {
+                if ($this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_NEUTRAL && $this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_WAR) {
                     throw new RuntimeException("Invalid operation target!");
                 }
                 $operation_id = Operation::beginOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
                 break;
             case Operation::OPERATION_REINFORCE:
                 // must be owned or ally
-                if ($target['village'] != $this->user->village->village_id && $this->user->village->relations[$target['village']]->relation_type != "alliance") {
+                if ($target['village'] != $this->user->village->village_id && $this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_ALLIANCE) {
                     throw new RuntimeException("Invalid operation target!");
                 }
                 $operation_id = Operation::beginOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
                 break;
             case Operation::OPERATION_RAID:
                 // must be at war
-                if ($this->user->village->relations[$target['village']]->relation_type != "war") {
+                if ($this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_WAR) {
                     throw new RuntimeException("Invalid operation target!");
                 }
                 $operation_id = Operation::beginOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
@@ -128,17 +128,17 @@ class WarManager {
         }
         // check each operation type, return array
         switch ($this->user->village->relations[$target['village']]->relation_type) {
-            case 'neutral':
+            case VillageRelation::RELATION_NEUTRAL:
                 $valid_operations = [
                     Operation::OPERATION_INFILTRATE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_INFILTRATE]),
                 ];
                 break;
-            case 'alliance':
+            case VillageRelation::RELATION_ALLIANCE:
                 $valid_operations = [
                     Operation::OPERATION_REINFORCE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_REINFORCE])
                 ];
                 break;
-            case 'war':
+            case VillageRelation::RELATION_WAR:
                 $valid_operations = [
                     Operation::OPERATION_INFILTRATE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_INFILTRATE]),
                     Operation::OPERATION_RAID => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_RAID]),
@@ -148,5 +148,30 @@ class WarManager {
                 return $valid_operations;
         }
         return $valid_operations;
+    }
+
+    function checkBeginPatrolBattle(NearbyPatrol $patrol) {
+        $patrol_location = new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id);
+        if ($this->user->village->village_id == $patrol->village_id || $this->user->village->relations[$patrol->village_id]->relation_type == VillageRelation::RELATION_ALLIANCE) {
+            return;
+        }
+        if ($this->user->location->fetchString() != $patrol_location->fetchString()) {
+            return;
+        }
+        if (empty($patrol->ai_id)) {
+            return;
+        }
+        $ai = $this->system->db->query("SELECT `ai_id` FROM `ai_opponents` WHERE `id` = {$patrol->ai_id} LIMIT 1");
+        if ($this->system->db->last_num_rows == 0) {
+            return;
+        }
+        $ai = new NPC($system, $patrol->ai_id);
+        $ai->loadData();
+        $ai->health = $ai->max_health;
+        if ($this->system->USE_NEW_BATTLES) {
+            BattleV2::start($this->system, $this->player, $ai, BattleV2::TYPE_AI_PATROL);
+        } else {
+            Battle::start($this->system, $this->player, $ai, Battle::TYPE_AI_PATROL);
+        }
     }
 }

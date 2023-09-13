@@ -341,15 +341,15 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView }) 
     function getVillageIcon(village_id) {
         switch (village_id) {
             case 1:
-                return 'url(images/village_icons/stone.png)';
+                return '/images/village_icons/stone.png';
             case 2:
-                return 'url(images/village_icons/cloud.png)';
+                return '/images/village_icons/cloud.png';
             case 3:
-                return 'url(images/village_icons/leaf.png)';
+                return '/images/village_icons/leaf.png';
             case 4:
-                return 'url(images/village_icons/sand.png)';
+                return '/images/village_icons/sand.png';
             case 5:
-                return 'url(images/village_icons/mist.png)';
+                return '/images/village_icons/mist.png';
             default:
                 return null;
         }
@@ -378,7 +378,7 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView }) 
                                 <span className='region_objective_tooltip_name'>{objective.name}</span>
                                 <div className='region_objective_tooltip_tags'>
                                     <span className='region_objective_tooltip_defense'>{objective.defense}</span>
-                                    <span className='region_objective_tooltip_village' style={{ backgroundImage: getVillageIcon(objective.village_id) }}></span>
+                                    <img className='region_objective_tooltip_village' src={getVillageIcon(objective.village_id)}/>
                                 </div>
                             </div>
                             {objective.objective_health && objective.objective_max_health > 0 &&

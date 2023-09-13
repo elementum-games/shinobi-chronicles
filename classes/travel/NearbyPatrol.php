@@ -12,6 +12,7 @@ class NearbyPatrol {
     public string $name = "Patrol";
     public int $level = 100;
     public int $village_id;
+    public ?int $ai_id = null;
     public string $patrol_type;
     const DESTINATION_BUFFER_MS = 5000; // duration non-looped patrols should appear at their destination
     public function __construct(array $row, string $patrol_type) {
@@ -22,7 +23,7 @@ class NearbyPatrol {
     }
     public function setLocation(System $system) {
         $points = [];
-        $loop;
+        $loop = false;
         switch ($this->patrol_type) {
             case "patrol":
                 $loop = true;

@@ -45,6 +45,7 @@ final class InitialWarMigration extends AbstractMigration
             `travel_interval` int(11) DEFAULT NULL,
             `region_id` int(11) NOT NULL,
             `village_id` int(11) DEFAULT NULL,
+            `ai_id` INT(11) NULL DEFAULT NULL,
             `name` varchar(50) NOT NULL
         )");
         $this->execute("ALTER TABLE `patrols` ADD PRIMARY KEY (`id`)");
@@ -90,7 +91,7 @@ final class InitialWarMigration extends AbstractMigration
             `relation_id` INT(11) NOT NULL AUTO_INCREMENT,
             `village1_id` INT(11) NOT NULL,
             `village2_id` INT(11) NOT NULL,
-            `relation_type` VARCHAR(50) NOT NULL,
+            `relation_type` INT(11) NOT NULL,
             `relation_name` VARCHAR(200) NOT NULL,
             `relation_start` INT(11) NOT NULL,
             `relation_end` INT(11) NULL DEFAULT NULL,
