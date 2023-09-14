@@ -23,7 +23,7 @@ return $routes = [
         title: 'Jutsu',
         function_name: 'jutsu',
         menu: Route::MENU_USER,
-        battle_ok: false,
+        battle_ok: true,
     ),
     5 => new Route(
         file_name: 'gear.php',
