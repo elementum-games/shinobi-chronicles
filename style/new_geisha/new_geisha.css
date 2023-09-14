@@ -698,7 +698,13 @@ a#spec_miss_cancel {
 .inbox_message_self::before {
     background: none;
 }
-
+#inbox_convo_details_container, #inbox_new_convo_container {
+    background: var(--sidebar-button-background-color);
+}
+.inbox_convo_details_title {
+    background: var(--sidebar-header-background);
+    color: var(--font-color-2);
+}
 /* Mobile Overrides */
 @media screen and (max-width: 999px) {
     #container {
@@ -788,6 +794,16 @@ select {
     border-color: var(--font-color-3);
 }
     #content .button:hover, .contentDiv button:hover {
+        background: var(--box-color-default);
+        color: var(--font-color-2);
+        border-color: var(--font-color-2);
+    }
+button {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+    button:hover {
         background: var(--box-color-default);
         color: var(--font-color-2);
         border-color: var(--font-color-2);
