@@ -590,6 +590,13 @@ class BattleManager {
 
         $this->battle->fighter_actions = [];
 
+        if ($this->battle->player1->health > $this->battle->player1->max_health) {
+            $this->battle->player1->health = $this->battle->player1->max_health;
+        }
+        if ($this->battle->player2->health > $this->battle->player2->max_health) {
+            $this->battle->player2->health = $this->battle->player2->max_health;
+        }
+
         $this->battle->fighter_health[$this->battle->player1->combat_id] = $this->battle->player1->health;
         $this->battle->fighter_health[$this->battle->player2->combat_id] = $this->battle->player2->health;
 

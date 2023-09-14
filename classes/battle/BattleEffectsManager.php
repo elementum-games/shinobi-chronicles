@@ -374,9 +374,6 @@ class BattleEffectsManager {
             $this->addDisplay($target, $target->getName() . " heals " . "<span class=\"battle_text_heal\" style=\"color:green\">" . round($heal) . "</span>" . " health");
 
             $target->health += $heal;
-            if($target->health > $target->max_health) {
-                $target->health = $target->max_health;
-            }
         }
         else if($effect->effect == 'drain_chakra') {
             $drain = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type);
