@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/SpecialMission.php';
+require_once __DIR__ . '/../classes/village/VillageRelation.php';
 
 class Village {
     public System $system;

@@ -136,7 +136,7 @@ if($battle->battle_text) {
             <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
 
                 <!-- Health -->
-                <div class='resourceBarOuter'>
+                <div class='resourceBarOuter healthPreview'>
                     <label class='innerResourceBarLabel' ><?= sprintf("%.0f", $player->health) ?> / <?= sprintf("%.0f", $player->max_health) ?></label>
                     <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
                 </div>
@@ -144,16 +144,20 @@ if($battle->battle_text) {
                 <?php if(!$battleManager->spectate): ?>
 
                     <!-- Chakra -->
-                    <div class='resourceBarOuter' style='margin-top:6px;'>
-                        <label class='innerResourceBarLabel'><?= sprintf("%.0f", $player->chakra) ?> / <?= sprintf("%.0f", $player->max_chakra) ?></label>
-                        <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
-                    </div>
+                <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
+                    <label class='innerResourceBarLabel'>
+                        <?= sprintf("%.0f", $player->chakra) ?> / <?= sprintf("%.0f", $player->max_chakra) ?>
+                    </label>
+                    <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
+                </div>
 
                     <!-- Stamina -->
-                    <div class='resourceBarOuter' style='margin-top:6px;'>
-                        <label class='innerResourceBarLabel'><?= sprintf("%.0f", $player->stamina) ?> / <?= sprintf("%.0f", $player->max_stamina) ?></label>
-                        <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
-                    </div>
+                <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
+                    <label class='innerResourceBarLabel'>
+                        <?= sprintf("%.0f", $player->stamina) ?> / <?= sprintf("%.0f", $player->max_stamina) ?>
+                    </label>
+                    <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
+                </div>
 
                 <?php endif; ?>
             </div>
@@ -161,8 +165,11 @@ if($battle->battle_text) {
         <td style='text-align: center;' id='bi_td_opponent'>
             <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
             <div id='ai_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
-                <div class='resourceBarOuter' style='margin-top:8px;'><div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
-                        <label  class='innerResourceBarLabel'><?= sprintf("%.0f", $opponent->health) ?> / <?= sprintf("%.0f", $opponent->max_health) ?></label>
+                <div class='resourceBarOuter healthPreview' style='margin-top:8px;'>
+                    <div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
+                        <label class='innerResourceBarLabel'>
+                            <?= sprintf("%.0f", $opponent->health) ?> / <?= sprintf("%.0f", $opponent->max_health) ?>
+                        </label>
                     </div>
                 </div>
             </div>

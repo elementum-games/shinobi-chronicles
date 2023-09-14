@@ -999,11 +999,20 @@ select {
 .resourceFill.health {
     background: var(--health-fill) !important;
 }
+.healthPreview {
+    background: var(--health-preview) !important;
+}
 .staminaFill {
     background: var(--stamina-fill) !important;
 }
+.staminaPreview {
+    background: var(--stamina-preview) !important;
+}
 .chakraFill {
     background: var(--chakra-fill) !important;
+}
+.chakraPreview {
+    background: var(--chakra-preview) !important;
 }
 .battle_text_ninjutsu {
     color: var(--ninjutsu-text-color) !important;
