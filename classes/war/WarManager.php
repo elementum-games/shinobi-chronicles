@@ -152,12 +152,19 @@ class WarManager {
 
     function checkBeginPatrolBattle(NearbyPatrol $patrol) {
         $patrol_location = new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id);
+        // if already in battle
+        if ($this->user->battle_id) {
+            return;
+        }
+        // if patrol non-hostile
         if ($this->user->village->village_id == $patrol->village_id || $this->user->village->relations[$patrol->village_id]->relation_type == VillageRelation::RELATION_ALLIANCE) {
             return;
         }
+        // if not at same location
         if ($this->user->location->fetchString() != $patrol_location->fetchString()) {
             return;
         }
+        // if no AI set
         if (empty($patrol->ai_id)) {
             return;
         }
@@ -165,13 +172,13 @@ class WarManager {
         if ($this->system->db->last_num_rows == 0) {
             return;
         }
-        $ai = new NPC($system, $patrol->ai_id);
+        $ai = new NPC($this->system, $patrol->ai_id);
         $ai->loadData();
         $ai->health = $ai->max_health;
         if ($this->system->USE_NEW_BATTLES) {
-            BattleV2::start($this->system, $this->player, $ai, BattleV2::TYPE_AI_PATROL);
+            BattleV2::start($this->system, $this->user, $ai, BattleV2::TYPE_AI_WAR);
         } else {
-            Battle::start($this->system, $this->player, $ai, Battle::TYPE_AI_PATROL);
+            Battle::start($this->system, $this->user, $ai, Battle::TYPE_AI_WAR);
         }
     }
 }

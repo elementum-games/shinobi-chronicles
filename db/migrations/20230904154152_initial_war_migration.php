@@ -142,7 +142,7 @@ final class InitialWarMigration extends AbstractMigration
             `entity_id` INT(11) NOT NULL,
             `type` INT(11) NOT NULL,
             `start_time` INT(11) NOT NULL,
-            `end_time` INT(11) NULL DEFAULT NULL,
+            `user_id` INT(11) NULL DEFAULT NULL,
             PRIMARY KEY (`log_id`))
         ");
 
