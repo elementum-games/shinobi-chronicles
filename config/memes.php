@@ -753,4 +753,16 @@ return [
         'text' => ':gojo:',
         'public' => true,
     ],
+    [
+        'code' => ':sadgies:',
+        'image' => "<img src='./images/memes/sadgies.png' />",
+        'text' => ':sadgies:',
+        'public' => true,
+    ],
+    [
+        'code' => ':applecat:',
+        'image' => "<img src='./images/memes/applecat.gif' />",
+        'text' => ':applecat:',
+        'public' => true,
+    ],
 ];
