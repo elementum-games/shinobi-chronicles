@@ -136,6 +136,16 @@ final class InitialWarMigration extends AbstractMigration
         // Alter users table
         $this->execute("ALTER TABLE `users` ADD `operation` INT(11) NOT NULL DEFAULT 0");
 
+        // Add war_logs table
+        $this->execute("CREATE TABLE `war_logs` (
+            `log_id` INT(11) NOT NULL AUTO_INCREMENT,
+            `entity_id` INT(11) NOT NULL,
+            `type` INT(11) NOT NULL,
+            `start_time` INT(11) NOT NULL,
+            `end_time` INT(11) NULL DEFAULT NULL,
+            PRIMARY KEY (`log_id`))
+        ");
+
         // Commit Transaction
         $this->execute("COMMIT");
     }
@@ -178,6 +188,9 @@ final class InitialWarMigration extends AbstractMigration
 
         // Alter users table
         $this->execute("ALTER TABLE `users` DROP COLUMN `operation`");
+
+        // Add war_logs table
+        $this->execute("DROP TABLE `war_logs`");
 
         // Commit Transaction
         $this->execute("COMMIT");

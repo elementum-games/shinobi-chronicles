@@ -106,6 +106,10 @@ if($battle->battle_text) {
         margin-top: 12px;
         padding: 0 25px;
     }
+
+    #forfeitDialog, #retreatDialog {
+        display: none;
+    }
 </style>
 
 <div class='submenu'>
@@ -216,7 +220,7 @@ if($battle->battle_text) {
                 </p>
                 <?php if ($battle->isPreparationPhase()): ?>
                     <a id='retreatButton'>Retreat</a>
-                    <dialog id="retreatDialog">
+                    <div id="retreatDialog">
                         <form method="post">
                             <p>Are you sure you want to retreat from this battle? You will suffer half the normal Reputation loss.</p>
                             <div class='retreatFormButtons'>
@@ -224,23 +228,23 @@ if($battle->battle_text) {
                                 <button id="confirmBtn" name="retreat" value="1">Confirm</button>
                             </div>
                         </form>
-                    </dialog>
+                    </div>
                     <script type='text/javascript'>
                         const retreatButton = document.getElementById('retreatButton');
                         const retreatDialog = document.getElementById('retreatDialog');
                         const cancelButton = document.getElementById('cancelBtn');
 
                         retreatButton.addEventListener('click', () => {
-                            retreatDialog.showModal();
+                            $(retreatDialog).show();
                         });
                         cancelButton.addEventListener('click', (e) => {
                             e.preventDefault();
-                            retreatDialog.close();
+                            $(retreatDialog).hide();
                         });
                     </script>
                 <?php else: ?>
                     <a id='forfeitButton'>Forfeit</a>
-                    <dialog id="forfeitDialog">
+                    <div id="forfeitDialog">
                         <form method="post">
                             <p>Are you sure you want to forfeit this battle?</p>
                             <div class='forfeitFormButtons'>
@@ -248,23 +252,23 @@ if($battle->battle_text) {
                                 <button id="confirmBtn" name="forfeit" value="1">Confirm</button>
                             </div>
                         </form>
-                    </dialog>
+                    </div>
                     <script type='text/javascript'>
                         const forfeitButton = document.getElementById('forfeitButton');
                         const forfeitDialog = document.getElementById('forfeitDialog');
                         const cancelButton = document.getElementById('cancelBtn');
 
                         forfeitButton.addEventListener('click', () => {
-                            forfeitDialog.showModal();
+                            $(forfeitDialog).show();
                         });
                         cancelButton.addEventListener('click', (e) => {
                             e.preventDefault();
-                            forfeitDialog.close();
+                            $(forfeitDialog).hide();
                         });
                     </script>
-                <?php endif; ?>
-                
-            </td></tr>
+                    <?php endif; ?>
+
+</td></tr>
     <?php endif; ?>
 
     <?php if($battleManager->spectate): ?>
