@@ -41,7 +41,8 @@ if($battle->battle_text) {
             prep_time_remaining--;
             $("#prep_time_remaining").text(prep_time_remaining);
             if (prep_time_remaining == 0) {
-                window.location.href = window.location.href;
+                clearInterval(refreshInterval);
+                updateContent();
             }
         }
         player1_time--;
@@ -49,19 +50,34 @@ if($battle->battle_text) {
         player2_time--;
         $("#player2_time").text(player2_time);
         if ((player1_time <= 0 || player1_submitted) && (player2_time <= 0 || player2_submitted)) {
-            window.location.href = window.location.href;
+            clearInterval(refreshInterval);
+            updateContent();
         }
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 if (data.data != undefined) {
                     if (data.data.turn_count > turn_count) {
-                        window.location.href = window.location.href;
+                        clearInterval(refreshInterval);
+                        updateContent();
                     }
                 }
             })
             .catch(err => {
                 console.error(err);
+            });
+    }
+    function updateContent() {
+        fetch(window.location.href)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, "text/html");
+                const newContent = doc.querySelector("#content").innerHTML;
+                $("#content").html(newContent);
+            })
+            .catch(err => {
+                console.error('Failed to fetch new content', err);
             });
     }
 </script>
