@@ -90,6 +90,7 @@ class Battle {
             case self::TYPE_CHALLENGE:
             case self::TYPE_AI_MISSION:
             case self::TYPE_AI_RANKUP:
+            case self::TYPE_AI_WAR:
                 break;
             default:
                 throw new RuntimeException("Invalid battle type!");

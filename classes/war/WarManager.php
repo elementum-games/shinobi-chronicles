@@ -168,7 +168,7 @@ class WarManager {
         if (empty($patrol->ai_id)) {
             return;
         }
-        $ai = $this->system->db->query("SELECT `ai_id` FROM `ai_opponents` WHERE `id` = {$patrol->ai_id} LIMIT 1");
+        $ai = $this->system->db->query("SELECT `ai_id` FROM `ai_opponents` WHERE `ai_id` = {$patrol->ai_id} LIMIT 1");
         if ($this->system->db->last_num_rows == 0) {
             return;
         }

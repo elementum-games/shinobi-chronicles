@@ -243,6 +243,9 @@ class NotificationAPIManager {
                     case Battle::TYPE_AI_RANKUP:
                         $link = $this->system->router->getUrl('rankup');
                         break;
+                    case Battle::TYPE_AI_WAR:
+                        $link = $this->system->router->getUrl('war');
+                        break;
                     case Battle::TYPE_SPAR:
                         $link = $this->system->router->getUrl('spar');
                         break;
