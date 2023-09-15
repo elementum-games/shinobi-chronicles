@@ -856,73 +856,72 @@
 
 /* Icon Classes */
 
-.map_location.player_stone {
-    background: url(../../../images/ninja_head.png), radial-gradient(circle, green 70%, transparent 75%);
+.player_ally {
+    height: 32px;
+    width: 32px;
+    background: url(../../../images/ninja_head.png);
     background-size: 25px 25px;
     background-repeat: no-repeat;
     background-position: center;
+    filter: url("#ally_glow");
 }
-
-.map_location.player_leaf {
-    background: url(../../../images/ninja_head.png), radial-gradient(circle, red 70%, transparent 75%);
+.player_neutral {
+    height: 32px;
+    width: 32px;
+    background: url(../../../images/ninja_head.png);
     background-size: 25px 25px;
     background-repeat: no-repeat;
     background-position: center;
+    filter: url("#neutral_glow");
 }
-
-.map_location.player_ally.invulnerable {
+.player_enemy {
+    height: 32px;
+    width: 32px;
+    background: url(../../../images/ninja_head.png);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: url("#enemy_glow");
+}
+.invulnerable {
     opacity: 0.5;
 }
-
-.map_location.player_enemy.invulnerable {
-    opacity: 0.5;
-}
-
 .patrol, .caravan {
+    height: 32px;
+    width: 32px;
     background-size: 25px 25px !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
 }
-
-.map_location.patrol_stone.caravan {
-    background: url(../../../images/map/icons/caravan.png);
-    filter: url("#green_glow");
-}
-.map_location.patrol_cloud.caravan {
-    background: url(../../../images/map/icons/caravan.png);
-    filter: url("#yellow_glow");
-}
-.map_location.patrol_leaf.caravan {
-    background: url(../../../images/map/icons/caravan.png);
-    filter: url("#red_glow");
-}
-.map_location.patrol_sand.caravan {
-    background: url(../../../images/map/icons/caravan.png);
-    filter: url("#orange_glow");
-}
-.map_location.patrol_mist.caravan {
-    background: url(../../../images/map/icons/caravan.png);
-    filter: url("#blue_glow");
-}
-.map_location.patrol_stone.patrol {
+.patrol {
     background: url(../../../images/map/icons/patrol.png);
-    filter: url("#green_glow");
 }
-.map_location.patrol_cloud.patrol {
-    background: url(../../../images/map/icons/patrol.png);
-    filter: url("#yellow_glow");
+.caravan {
+    background: url(../../../images/map/icons/caravan.png);
 }
-.map_location.patrol_leaf.patrol {
-    background: url(../../../images/map/icons/patrol.png);
-    filter: url("#red_glow");
+.patrol_stone {
+    filter: url("#stone_glow");
 }
-.map_location.patrol_sand.patrol {
-    background: url(../../../images/map/icons/patrol.png);
-    filter: url("#orange_glow");
+.patrol_cloud {
+    filter: url("#cloud_glow");
 }
-.map_location.patrol_mist.patrol {
-    background: url(../../../images/map/icons/patrol.png);
-    filter: url("#blue_glow");
+.patrol_leaf {
+    filter: url("#leaf_glow");
+}
+.patrol_sand {
+    filter: url("#sand_glow");
+}
+.patrol_mist {
+    filter: url("#mist_glow");
+}
+.patrol_ally {
+    filter: url("#ally_glow");
+}
+.patrol_neutral {
+    filter: url("#neutral_glow");
+}
+.patrol_enemy {
+    filter: url("#enemy_glow");
 }
 
 /* Transition Animation Logic */

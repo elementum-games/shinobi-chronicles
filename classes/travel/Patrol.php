@@ -1,6 +1,6 @@
 <?php
 
-class NearbyPatrol {
+class Patrol {
     public int $id;
     public int $start_time;
     public ?int $travel_time;
@@ -14,6 +14,7 @@ class NearbyPatrol {
     public int $village_id;
     public ?int $ai_id = null;
     public string $patrol_type;
+    public string $alignment;
     const DESTINATION_BUFFER_MS = 5000; // duration non-looped patrols should appear at their destination
     public function __construct(array $row, string $patrol_type) {
         foreach ($row as $key => $value) {
@@ -214,4 +215,24 @@ class NearbyPatrol {
         return sqrt(pow($point2['x'] - $point1['x'], 2) + pow($point2['y'] - $point1['y'], 2));
     }
 
+    public function setAlignment(User $user) {
+        if ($user->village->village_id == $this->village_id) {
+            $this->alignment = 'Ally';
+        }
+        else {
+            $alignment = $user->village->relations[$this->village_id]->relation_type;
+            switch ($alignment) {
+                case VillageRelation::RELATION_NEUTRAL:
+                    $this->alignment = 'Neutral';
+                    break;
+                case VillageRelation::RELATION_ALLIANCE:
+                    $this->alignment = 'Ally';
+                    break;
+                case VillageRelation::RELATION_WAR:
+                    $this->alignment = 'Enemy';
+                    break;
+            }
+        }
+        return;
+    }
 }

@@ -484,6 +484,7 @@ function Travel({
                     />
                 )}
             </div>
+            <GlowFilters/>
         </>
     );
 }
@@ -793,6 +794,111 @@ function directionFromKeysPressed(directionKeysPressed) {
     }
 
     return direction;
+}
+
+function GlowFilters() {
+    return (
+        <svg height="0" width="0">
+            <defs>
+                <filter id="ally_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="green" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="3" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="neutral_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="#ffb600" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="2" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="enemy_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="red" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="2" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="stone_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="green" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="3" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="cloud_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="yellow" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="2" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="leaf_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="red" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="2" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="sand_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="orange" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="2" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="mist_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="blue" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="1" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+        </svg>
+    );
 }
 
 window.Travel = Travel;

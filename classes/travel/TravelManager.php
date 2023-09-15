@@ -243,12 +243,23 @@ class TravelManager {
                 continue;
             }
 
-            // if ally or enemy
-            // if there were alliance we can do additional checks here
-            if ($user['village'] === $this->user->village->name) {
+            // if there were alliance we can do additional checks here - the future is now, old man
+            if ($this->user->village->village_id == $user['village_id']) {
                 $user_alignment = 'Ally';
-            } else {
-                $user_alignment = 'Enemy';
+            }
+            else {
+                $alignment = $this->user->village->relations[$user['village_id']]->relation_type;
+                switch ($alignment) {
+                    case VillageRelation::RELATION_NEUTRAL:
+                        $user_alignment = 'Neutral';
+                        break;
+                    case VillageRelation::RELATION_ALLIANCE:
+                        $user_alignment = 'Ally';
+                        break;
+                    case VillageRelation::RELATION_WAR:
+                        $user_alignment = 'Enemy';
+                        break;
+                }
             }
 
             // only display attack links if the same rank
@@ -605,7 +616,7 @@ class TravelManager {
     }
 
     /**
-     * @return NearbyPatrol[]
+     * @return Patrol[]
      */
     #[Trace]
     public function fetchNearbyPatrols(): array {
@@ -619,8 +630,9 @@ class TravelManager {
         $result = $this->system->db->query("SELECT * FROM `patrols`");
         $result = $this->system->db->fetch_all($result);
         foreach ($result as $row) {
-            $patrol = new NearbyPatrol($row, "patrol");
+            $patrol = new Patrol($row, "patrol");
             $patrol->setLocation($this->system);
+            $patrol->setAlignment($this->user);
             $distance = $this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id));
             if ($distance == 0) {
                 $this->warManager->checkBeginPatrolBattle($patrol);
@@ -634,16 +646,18 @@ class TravelManager {
         foreach ($result as $row) {
             // if travel time is set then only display if active
             if (!empty($row['travel_time'])) {
-                if ($row['travel_time'] + ($row['start_time'] * 1000) + NearbyPatrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
-                    $patrol = new NearbyPatrol($row, "caravan");
+                if ($row['travel_time'] + ($row['start_time'] * 1000) + Patrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
+                    $patrol = new Patrol($row, "caravan");
                     $patrol->setLocation($this->system);
+                    $patrol->setAlignment($this->user);
                     if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
                         $return_arr[] = $patrol;
                     }
                 }
             } else {
-                $patrol = new NearbyPatrol($row, "caravan");
+                $patrol = new Patrol($row, "caravan");
                 $patrol->setLocation($this->system);
+                $patrol->setAlignment($this->user);
                 if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
                     $return_arr[] = $patrol;
                 }

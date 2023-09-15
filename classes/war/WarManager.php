@@ -150,7 +150,7 @@ class WarManager {
         return $valid_operations;
     }
 
-    function checkBeginPatrolBattle(NearbyPatrol $patrol) {
+    function checkBeginPatrolBattle(Patrol $patrol) {
         $patrol_location = new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id);
         // if already in battle
         if ($this->user->battle_id) {

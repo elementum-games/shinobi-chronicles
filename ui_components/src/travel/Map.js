@@ -432,14 +432,14 @@ function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId, ranksToV
                 .map((player, index) => (
                     (player.user_id != playerId) &&
                     <div key={player.user_id}
-                        className={alignmentClassPlayer(player.alignment, player.village_id) + " " + visibilityClass(player.invulnerable)}
+                        className='map_location'
                         style={{
                             cursor: "pointer",
                             transform: `translate3d(${(player.target_x - 1) * tileWidth}px, ${(player.target_y - 1) * tileHeight}px, 0)`,
                             backfaceVisibility: "hidden",
-                            filter: "blur(0)",
                         }}>
                         <div className='map_location_tooltip'>{player.user_name}</div>
+                        <div className={alignmentClassPlayer(player.alignment, player.village_id) + visibilityClass(player.invulnerable)}></div>
                     </div>
                 ))}
         </div>
@@ -449,70 +449,6 @@ function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId, ranksToV
 function MapNearbyPatrols({ patrolData, tileWidth, tileHeight }) {
     return (
         <div id="patrol_locations" className='map_locations'>
-            <svg>
-                <defs>
-                    <filter id="green_glow">
-                        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
-                        <feFlood floodColor="green" result="floodColor" />
-                        <feComponentTransfer in="blur" result="opacityAdjustedBlur">
-                            <feFuncA type="linear" slope="2" />
-                        </feComponentTransfer>
-                        <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
-                        <feMerge>
-                            <feMergeNode in="coloredBlur" />
-                            <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                    </filter>
-                    <filter id="yellow_glow">
-                        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
-                        <feFlood floodColor="yellow" result="floodColor" />
-                        <feComponentTransfer in="blur" result="opacityAdjustedBlur">
-                            <feFuncA type="linear" slope="2" />
-                        </feComponentTransfer>
-                        <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
-                        <feMerge>
-                            <feMergeNode in="coloredBlur" />
-                            <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                    </filter>
-                    <filter id="red_glow">
-                        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
-                        <feFlood floodColor="red" result="floodColor" />
-                        <feComponentTransfer in="blur" result="opacityAdjustedBlur">
-                            <feFuncA type="linear" slope="2" />
-                        </feComponentTransfer>
-                        <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
-                        <feMerge>
-                            <feMergeNode in="coloredBlur" />
-                            <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                    </filter>
-                    <filter id="orange_glow">
-                        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
-                        <feFlood floodColor="orange" result="floodColor" />
-                        <feComponentTransfer in="blur" result="opacityAdjustedBlur">
-                            <feFuncA type="linear" slope="2" />
-                        </feComponentTransfer>
-                        <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
-                        <feMerge>
-                            <feMergeNode in="coloredBlur" />
-                            <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                    </filter>
-                    <filter id="blue_glow">
-                        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
-                        <feFlood floodColor="blue" result="floodColor" />
-                        <feComponentTransfer in="blur" result="opacityAdjustedBlur">
-                            <feFuncA type="linear" slope="1" />
-                        </feComponentTransfer>
-                        <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
-                        <feMerge>
-                            <feMergeNode in="coloredBlur" />
-                            <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                    </filter>
-                </defs>
-            </svg>
             {patrolData
                 .map((patrol, index) => (
                     <div key={patrol.patrol_id + '_' + patrol.patrol_type}
@@ -521,7 +457,6 @@ function MapNearbyPatrols({ patrolData, tileWidth, tileHeight }) {
                             cursor: "pointer",
                             transform: `translate3d(${(patrol.target_x - 1) * tileWidth}px, ${(patrol.target_y - 1) * tileHeight}px, 0)`,
                             backfaceVisibility: "hidden",
-                            filter: "blur(0)",
                         }}>
                         <div className='map_location_tooltip'>{patrol.patrol_name}</div>
                         <div className={alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type}></div>
@@ -533,22 +468,22 @@ function MapNearbyPatrols({ patrolData, tileWidth, tileHeight }) {
 
 const visibilityClass = (invulnerable) => {
     if (invulnerable) {
-        return 'invulnerable';
+        return ' invulnerable';
     }
-    return ' ';
+    return '';
 }
 
 const alignmentClassPlayer = (alignment, village_id) => {
-    let class_name = 'map_location';
+    let class_name = '';
     switch (alignment) {
         case 'Ally':
-            class_name += ' player_ally';
+            class_name += 'player_ally';
             break;
         case 'Enemy':
-            class_name += ' player_enemy';
+            class_name += 'player_enemy';
             break;
         case 'Neutral':
-            class_name += ' player_neutral';
+            class_name += 'player_neutral';
             break;
     }
     switch (village_id) {
@@ -572,16 +507,16 @@ const alignmentClassPlayer = (alignment, village_id) => {
 }
 
 const alignmentClassPatrol = (alignment, village_id) => {
-    let class_name = 'map_location';
+    let class_name = '';
     switch (alignment) {
         case 'Ally':
-            class_name += ' patrol_ally';
+            class_name += 'patrol_ally';
             break;
         case 'Enemy':
-            class_name += ' patrol_enemy';
+            class_name += 'patrol_enemy';
             break;
         case 'Neutral':
-            class_name += ' patrol_neutral';
+            class_name += 'patrol_neutral';
             break;
     }
     switch (village_id) {

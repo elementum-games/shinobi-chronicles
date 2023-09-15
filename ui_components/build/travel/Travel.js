@@ -395,7 +395,7 @@ function Travel({
     sparPlayer: SparPlayer,
     ranksToView: ranksToView,
     playerId: playerId
-  })));
+  })), /*#__PURE__*/React.createElement(GlowFilters, null));
 }
 function TravelFilters({
   ranksToView,
@@ -656,5 +656,203 @@ function directionFromKeysPressed(directionKeysPressed) {
     direction = 'north';
   }
   return direction;
+}
+function GlowFilters() {
+  return /*#__PURE__*/React.createElement("svg", {
+    height: "0",
+    width: "0"
+  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("filter", {
+    id: "ally_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "green",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "3"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "neutral_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "#ffb600",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "2"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "enemy_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "red",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "2"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "stone_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "green",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "3"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "cloud_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "yellow",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "2"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "leaf_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "red",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "2"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "sand_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "orange",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "2"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "mist_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "blue",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "1"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  })))));
 }
 window.Travel = Travel;

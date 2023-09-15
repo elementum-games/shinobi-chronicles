@@ -472,16 +472,17 @@ function MapNearbyPlayers({
     className: "map_locations"
   }, scoutData.filter(user => ranksToView[parseInt(user.rank_num)] === true).map((player, index) => player.user_id != playerId && /*#__PURE__*/React.createElement("div", {
     key: player.user_id,
-    className: alignmentClassPlayer(player.alignment, player.village_id) + " " + visibilityClass(player.invulnerable),
+    className: "map_location",
     style: {
       cursor: "pointer",
       transform: `translate3d(${(player.target_x - 1) * tileWidth}px, ${(player.target_y - 1) * tileHeight}px, 0)`,
-      backfaceVisibility: "hidden",
-      filter: "blur(0)"
+      backfaceVisibility: "hidden"
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "map_location_tooltip"
-  }, player.user_name))));
+  }, player.user_name), /*#__PURE__*/React.createElement("div", {
+    className: alignmentClassPlayer(player.alignment, player.village_id) + visibilityClass(player.invulnerable)
+  }))));
 }
 function MapNearbyPatrols({
   patrolData,
@@ -491,134 +492,13 @@ function MapNearbyPatrols({
   return /*#__PURE__*/React.createElement("div", {
     id: "patrol_locations",
     className: "map_locations"
-  }, /*#__PURE__*/React.createElement("svg", null, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("filter", {
-    id: "green_glow"
-  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
-    in: "SourceAlpha",
-    stdDeviation: "2",
-    result: "blur"
-  }), /*#__PURE__*/React.createElement("feFlood", {
-    floodColor: "green",
-    result: "floodColor"
-  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
-    in: "blur",
-    result: "opacityAdjustedBlur"
-  }, /*#__PURE__*/React.createElement("feFuncA", {
-    type: "linear",
-    slope: "2"
-  })), /*#__PURE__*/React.createElement("feComposite", {
-    in: "floodColor",
-    in2: "opacityAdjustedBlur",
-    operator: "in",
-    result: "coloredBlur"
-  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
-    in: "coloredBlur"
-  }), /*#__PURE__*/React.createElement("feMergeNode", {
-    in: "SourceGraphic"
-  }))), /*#__PURE__*/React.createElement("filter", {
-    id: "yellow_glow"
-  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
-    in: "SourceAlpha",
-    stdDeviation: "2",
-    result: "blur"
-  }), /*#__PURE__*/React.createElement("feFlood", {
-    floodColor: "yellow",
-    result: "floodColor"
-  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
-    in: "blur",
-    result: "opacityAdjustedBlur"
-  }, /*#__PURE__*/React.createElement("feFuncA", {
-    type: "linear",
-    slope: "2"
-  })), /*#__PURE__*/React.createElement("feComposite", {
-    in: "floodColor",
-    in2: "opacityAdjustedBlur",
-    operator: "in",
-    result: "coloredBlur"
-  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
-    in: "coloredBlur"
-  }), /*#__PURE__*/React.createElement("feMergeNode", {
-    in: "SourceGraphic"
-  }))), /*#__PURE__*/React.createElement("filter", {
-    id: "red_glow"
-  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
-    in: "SourceAlpha",
-    stdDeviation: "2",
-    result: "blur"
-  }), /*#__PURE__*/React.createElement("feFlood", {
-    floodColor: "red",
-    result: "floodColor"
-  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
-    in: "blur",
-    result: "opacityAdjustedBlur"
-  }, /*#__PURE__*/React.createElement("feFuncA", {
-    type: "linear",
-    slope: "2"
-  })), /*#__PURE__*/React.createElement("feComposite", {
-    in: "floodColor",
-    in2: "opacityAdjustedBlur",
-    operator: "in",
-    result: "coloredBlur"
-  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
-    in: "coloredBlur"
-  }), /*#__PURE__*/React.createElement("feMergeNode", {
-    in: "SourceGraphic"
-  }))), /*#__PURE__*/React.createElement("filter", {
-    id: "orange_glow"
-  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
-    in: "SourceAlpha",
-    stdDeviation: "2",
-    result: "blur"
-  }), /*#__PURE__*/React.createElement("feFlood", {
-    floodColor: "orange",
-    result: "floodColor"
-  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
-    in: "blur",
-    result: "opacityAdjustedBlur"
-  }, /*#__PURE__*/React.createElement("feFuncA", {
-    type: "linear",
-    slope: "2"
-  })), /*#__PURE__*/React.createElement("feComposite", {
-    in: "floodColor",
-    in2: "opacityAdjustedBlur",
-    operator: "in",
-    result: "coloredBlur"
-  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
-    in: "coloredBlur"
-  }), /*#__PURE__*/React.createElement("feMergeNode", {
-    in: "SourceGraphic"
-  }))), /*#__PURE__*/React.createElement("filter", {
-    id: "blue_glow"
-  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
-    in: "SourceAlpha",
-    stdDeviation: "2",
-    result: "blur"
-  }), /*#__PURE__*/React.createElement("feFlood", {
-    floodColor: "blue",
-    result: "floodColor"
-  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
-    in: "blur",
-    result: "opacityAdjustedBlur"
-  }, /*#__PURE__*/React.createElement("feFuncA", {
-    type: "linear",
-    slope: "1"
-  })), /*#__PURE__*/React.createElement("feComposite", {
-    in: "floodColor",
-    in2: "opacityAdjustedBlur",
-    operator: "in",
-    result: "coloredBlur"
-  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
-    in: "coloredBlur"
-  }), /*#__PURE__*/React.createElement("feMergeNode", {
-    in: "SourceGraphic"
-  }))))), patrolData.map((patrol, index) => /*#__PURE__*/React.createElement("div", {
+  }, patrolData.map((patrol, index) => /*#__PURE__*/React.createElement("div", {
     key: patrol.patrol_id + '_' + patrol.patrol_type,
     className: "map_location",
     style: {
       cursor: "pointer",
       transform: `translate3d(${(patrol.target_x - 1) * tileWidth}px, ${(patrol.target_y - 1) * tileHeight}px, 0)`,
-      backfaceVisibility: "hidden",
-      filter: "blur(0)"
+      backfaceVisibility: "hidden"
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "map_location_tooltip"
@@ -628,21 +508,21 @@ function MapNearbyPatrols({
 }
 const visibilityClass = invulnerable => {
   if (invulnerable) {
-    return 'invulnerable';
+    return ' invulnerable';
   }
-  return ' ';
+  return '';
 };
 const alignmentClassPlayer = (alignment, village_id) => {
-  let class_name = 'map_location';
+  let class_name = '';
   switch (alignment) {
     case 'Ally':
-      class_name += ' player_ally';
+      class_name += 'player_ally';
       break;
     case 'Enemy':
-      class_name += ' player_enemy';
+      class_name += 'player_enemy';
       break;
     case 'Neutral':
-      class_name += ' player_neutral';
+      class_name += 'player_neutral';
       break;
   }
   switch (village_id) {
@@ -665,16 +545,16 @@ const alignmentClassPlayer = (alignment, village_id) => {
   return class_name;
 };
 const alignmentClassPatrol = (alignment, village_id) => {
-  let class_name = 'map_location';
+  let class_name = '';
   switch (alignment) {
     case 'Ally':
-      class_name += ' patrol_ally';
+      class_name += 'patrol_ally';
       break;
     case 'Enemy':
-      class_name += ' patrol_enemy';
+      class_name += 'patrol_enemy';
       break;
     case 'Neutral':
-      class_name += ' patrol_neutral';
+      class_name += 'patrol_neutral';
       break;
   }
   switch (village_id) {

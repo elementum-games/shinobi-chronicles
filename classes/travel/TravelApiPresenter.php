@@ -84,7 +84,7 @@ class TravelApiPresenter {
     public static function nearbyPatrolsResponse(TravelManager $travelManager): array
     {
         return array_map(
-            function (NearbyPatrol $nearbyPatrol) {
+            function (Patrol $nearbyPatrol) {
                 return [
                     'patrol_id' => $nearbyPatrol->id,
                     'patrol_name' => $nearbyPatrol->name,
@@ -92,11 +92,7 @@ class TravelApiPresenter {
                     'target_y' => $nearbyPatrol->current_y,
                     'target_map_id' => $nearbyPatrol->map_id,
                     'patrol_type' => $nearbyPatrol->patrol_type,
-                    'rank_name' => 'Jonin',
-                    'rank_num' => 4,
-                    'village_icon' => '',
-                    'alignment' => 'Ally',
-                    'level' => 100,
+                    'alignment' => $nearbyPatrol->alignment,
                     'village_id' => $nearbyPatrol->village_id,
                 ];
             },
