@@ -30,12 +30,20 @@ if($battle->battle_text) {
 <script type='text/javascript'>
     var apiUrl = `api/battle.php?check_turn=true`;
     let turn_count = <?= $battle->turn_count ?>;
+    let prep_time_remaining = <?= $battle->prepTimeRemaining() ?>;
     let player1_submitted = <?= (int)isset($battle->fighter_actions[$battle->player1->combat_id]) ?>;
     let player2_submitted = <?= (int)isset($battle->fighter_actions[$battle->player2->combat_id]) ?>;
     let player1_time = <?= $battle->timeRemaining($battle->player1_id) ?>;
     let player2_time = <?= $battle->timeRemaining($battle->player2_id) ?>;
     let refreshInterval = setInterval(() => checkTurn(), 1000);
     function checkTurn() {
+        if (prep_time_remaining > 0) {
+            prep_time_remaining--;
+            $("#prep_time_remaining").text(prep_time_remaining);
+            if (prep_time_remaining == 0) {
+                window.location.href = window.location.href;
+            }
+        }
         player1_time--;
         $("#player1_time").text(player1_time);
         player2_time--;
@@ -233,7 +241,7 @@ if($battle->battle_text) {
         <tr><td style='text-align:center;' colspan='2'>
                 <p>
                     <?php if ($battle->isPreparationPhase()): ?>
-                        <?php echo "Prep-Time Remaining: " . $battle->prepTimeRemaining() ?>
+                        <?php echo "Prep-Time Remaining: <span id='prep_time_remaining'>" . $battle->prepTimeRemaining() . "</span>" ?>
                     <?php elseif (!$battleManager->opponent instanceof NPC): ?>
                         <?php echo "Time Remaining<br>"?>
                         <?php if (isset($battle->fighter_actions[$battle->player1->combat_id])): ?>
