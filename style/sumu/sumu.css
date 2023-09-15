@@ -402,7 +402,7 @@ body {
     background-color: rgba(123, 50, 76, 0.15);
     border-radius: 50%;
     transform: translate(-50%, 0%);
-    z-index: 0;
+    z-index: -1;
 }
 .travel-scout::after {
     content: "";
@@ -414,7 +414,7 @@ body {
     background-image: url("../../../images/v2/decorations/NinjaScout.png");
     background-position: bottom;
     background-repeat: no-repeat;
-    z-index: 2;
+    z-index: -1;
 }
 .systemMessage-new-info {
     background: var(--travel-ui-color);

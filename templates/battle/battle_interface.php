@@ -27,6 +27,37 @@ if($battle->battle_text) {
 }
 ?>
 
+<script type='text/javascript'>
+    var apiUrl = `api/battle.php?check_turn=true`;
+    let turn_count = <?= $battle->turn_count ?>;
+    let player1_submitted = <?= (int)isset($battle->fighter_actions[$battle->player1->combat_id]) ?>;
+    let player2_submitted = <?= (int)isset($battle->fighter_actions[$battle->player2->combat_id]) ?>;
+    let player1_time = <?= $battle->timeRemaining($battle->player1_id) ?>;
+    let player2_time = <?= $battle->timeRemaining($battle->player2_id) ?>;
+    let refreshInterval = setInterval(() => checkTurn(), 1000);
+    function checkTurn() {
+        player1_time--;
+        $("#player1_time").text(player1_time);
+        player2_time--;
+        $("#player2_time").text(player2_time);
+        if ((player1_time <= 0 || player1_submitted) && (player2_time <= 0 || player2_submitted)) {
+            window.location.href = window.location.href;
+        }
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.data != undefined) {
+                    if (data.data.turn_count > turn_count) {
+                        window.location.href = window.location.href;
+                    }
+                }
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
+</script>
+
 <style type='text/css'>
     .playerAvatar {
         display:block;
@@ -208,13 +239,13 @@ if($battle->battle_text) {
                         <?php if (isset($battle->fighter_actions[$battle->player1->combat_id])): ?>
                             <?php echo "<b>" . $battle->player1->user_name . ":</b> ". "waiting" ?>
                         <?php else: ?>
-                            <?php echo "<b>" . $battle->player1->user_name . ":</b> ". $battle->timeRemaining($battle->player1_id) . " seconds" ?>
+                            <?php echo "<b>" . $battle->player1->user_name . ":</b> <span id='player1_time'>". $battle->timeRemaining($battle->player1_id) . "</span> seconds" ?>
                         <?php endif; ?>
                         <br />
                         <?php if (isset($battle->fighter_actions[$battle->player2->combat_id])): ?>
                             <?php echo "<b>" . $battle->player2->user_name . ":</b> ". "waiting" ?>
                         <?php else: ?>
-                            <?php echo "<b>" . $battle->player2->user_name . ":</b> " . $battle->timeRemaining($battle->player2_id) . " seconds" ?>
+                            <?php echo "<b>" . $battle->player2->user_name . ":</b> <span id='player2_time'>" . $battle->timeRemaining($battle->player2_id) . "</span> seconds" ?>
                         <?php endif; ?>
                     <?php endif; ?>
                 </p>
@@ -284,13 +315,13 @@ if($battle->battle_text) {
                         <?php if (isset($battle->fighter_actions[$battle->player1->combat_id])): ?>
                             <?php echo "<b>" . $battle->player1->user_name . ":</b> ". "waiting" ?>
                         <?php else: ?>
-                            <?php echo "<b>" . $battle->player1->user_name . ":</b> ". $battle->timeRemaining($battle->player1_id) . " seconds" ?>
+                            <?php echo "<b>" . $battle->player1->user_name . ":</b> <span id='player1_time'>". $battle->timeRemaining($battle->player1_id) . "</span> seconds" ?>
                         <?php endif; ?>
                         <br />
                         <?php if (isset($battle->fighter_actions[$battle->player2->combat_id])): ?>
                             <?php echo "<b>" . $battle->player2->user_name . ":</b> ". "waiting" ?>
                         <?php else: ?>
-                            <?php echo "<b>" . $battle->player2->user_name . ":</b> " . $battle->timeRemaining($battle->player2_id) . " seconds" ?>
+                <?php echo "<b>" . $battle->player2->user_name . ":</b> <span id='player2_time'>" . $battle->timeRemaining($battle->player2_id) . "</span> seconds" ?>
                         <?php endif; ?>
                 <?php endif; ?>
             </td></tr>
