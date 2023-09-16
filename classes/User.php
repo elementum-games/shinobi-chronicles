@@ -1383,7 +1383,7 @@ class User extends Fighter {
             }
 
             // Check caps
-            $gain_description = $this->addStatGain($this->stat_transfer_target_stat, $this->stat_transfer_amount);
+            $gain_description = $this->addStatGain($this->stat_transfer_target_stat, $this->stat_transfer_amount, event_boost: false);
 
             $this->stat_transfer_completion_time = 0;
             if($gain_description) {
@@ -1411,12 +1411,12 @@ class User extends Fighter {
      * @return string
      * @throws RuntimeException
      */
-    public function addStatGain(string $stat, int $stat_gain): string {
+    public function addStatGain(string $stat, int $stat_gain, bool $event_boost = true): string {
         if(!in_array($stat, $this->stats)) {
             throw new RuntimeException("Invalid stat!");
         }
 
-        if (!empty($this->system->event) && $this->system->event instanceof DoubleExpEvent) {
+        if ($event_boost && !empty($this->system->event) && $this->system->event instanceof DoubleExpEvent) {
             $stat_gain *= DoubleExpEvent::exp_modifier;
         }
 
