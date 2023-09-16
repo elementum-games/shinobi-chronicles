@@ -96,16 +96,16 @@ final class InitialWarMigration extends AbstractMigration
             `relation_start` INT(11) NOT NULL,
             `relation_end` INT(11) NULL DEFAULT NULL,
             PRIMARY KEY (`relation_id`))");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 2, 'neutral', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 3, 'neutral', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 4, 'neutral', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 5, 'neutral', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 3, 'neutral', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 4, 'neutral', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 5, 'neutral', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (3, 4, 'neutral', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (3, 5, 'neutral', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (4, 5, 'neutral', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 2, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 3, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 4, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 5, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 3, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 4, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 5, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (3, 4, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (3, 5, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (4, 5, '1', 'Neutral', 1694426071, NULL)");
 
         // Create village_seats table
         $this->execute("CREATE TABLE `village_seats` (
