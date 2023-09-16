@@ -284,7 +284,7 @@ function premiumShop(): void {
                         'bloodline_id' => ['input_type' => 'hidden', 'value' => $bloodline_id]
                     ]
                 );
-            } 
+            }
             else {
                 if ($player->bloodline_id == $bloodline_id) {
                     throw new RuntimeException("You already have this bloodline!");
@@ -625,7 +625,9 @@ function premiumShop(): void {
 
             if (!isset($_POST['confirm_village_change'])) {
                 $confirmation_string = "Are you sure you want to move from the {$player->village->name} village to the $village
-                village? You will be kicked out of your clan and placed in a random clan in the new village.<br />
+                village?"
+                    . (!$player->clan->bloodline_only ? " You will be kicked out of your clan and placed in a random clan in the new village." : "")
+                    . "<br />
                 <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village
                 you will have to pay a higher transfer fee)</b>";
 
@@ -641,16 +643,18 @@ function premiumShop(): void {
                 );
             } else {
                 //Update clan data if player holds a seat
-                if ($player->clan->leader_id == $player->user_id) {
-                    $system->db->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
-                } else if ($player->clan->elder_1_id == $player->user_id) {
-                    $system->db->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
-                } else if ($player->clan->elder_2_id == $player->user_id) {
-                    $system->db->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
-                }
-                //Remove clan seat from player if they hold seat
-                if ($player->clan_office) {
-                    $player->clan_office = 0;
+                if (!$player->clan->bloodline_only) {
+                    if ($player->clan->leader_id == $player->user_id) {
+                        $system->db->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    } else if ($player->clan->elder_1_id == $player->user_id) {
+                        $system->db->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    } else if ($player->clan->elder_2_id == $player->user_id) {
+                        $system->db->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    }
+                    //Remove clan seat from player if they hold seat
+                    if ($player->clan_office) {
+                        $player->clan_office = 0;
+                    }
                 }
 
                 //Remove active student applications
@@ -668,69 +672,76 @@ function premiumShop(): void {
                 $player->village = new Village($system, $village);
 
                 // Clan
-                $result = $system->db->query(
-                    "SELECT `clan_id`, `name` FROM `clans`
+                if (!$player->clan->bloodline_only) {
+                    $result = $system->db->query(
+                        "SELECT `clan_id`, `name` FROM `clans`
                         WHERE `village`='{$player->village->name}' AND `bloodline_only`='0'"
-                );
-                if ($system->db->last_num_rows == 0) {
-                    $result = $system->db->query("SELECT `clan_id`, `name` FROM `clans` WHERE `bloodline_only`='0'");
-                }
-
-                if (!$system->db->last_num_rows) {
-                    throw new RuntimeException("No clans available!");
-                }
-
-                $clans = array();
-                $count = 0;
-                while ($row = $system->db->fetch($result)) {
-                    $clans[$row['clan_id']] = $row;
-                    $count++;
-                }
-
-                $query = "SELECT ";
-                $x = 0;
-                foreach ($clans as $id => $clan) {
-                    $query .= "SUM(IF(`clan_id` = $id, 1, 0)) as `$id`";
-                    $x++;
-                    if ($x < $count) {
-                        $query .= ', ';
+                    );
+                    if ($system->db->last_num_rows == 0) {
+                        $result = $system->db->query("SELECT `clan_id`, `name` FROM `clans` WHERE `bloodline_only`='0'");
                     }
-                }
-                $query .= " FROM `users`";
 
-                $clan_counts = array();
-                $result = $system->db->query($query);
-                $row = $system->db->fetch($result);
-                $total_users = 0;
-                foreach ($row as $id => $user_count) {
-                    $clan_counts[$id] = $user_count;
-                    $total_users += $user_count;
-                }
+                    if (!$system->db->last_num_rows) {
+                        throw new RuntimeException("No clans available!");
+                    }
 
-                $average_users = round($total_users / $count);
+                    $clans = array();
+                    $count = 0;
+                    while ($row = $system->db->fetch($result)) {
+                        $clans[$row['clan_id']] = $row;
+                        $count++;
+                    }
 
-                $clan_rolls = array();
-                foreach ($clans as $id => $clan) {
-                    $entries = 4;
-                    if ($clan_counts[$id] > $average_users) {
-                        $entries--;
-                        if ($clan_counts[$id] / 3 > $average_users) {
+                    $query = "SELECT ";
+                    $x = 0;
+                    foreach ($clans as $id => $clan) {
+                        $query .= "SUM(IF(`clan_id` = $id, 1, 0)) as `$id`";
+                        $x++;
+                        if ($x < $count) {
+                            $query .= ', ';
+                        }
+                    }
+                    $query .= " FROM `users`";
+
+                    $clan_counts = array();
+                    $result = $system->db->query($query);
+                    $row = $system->db->fetch($result);
+                    $total_users = 0;
+                    foreach ($row as $id => $user_count) {
+                        $clan_counts[$id] = $user_count;
+                        $total_users += $user_count;
+                    }
+
+                    $average_users = round($total_users / $count);
+
+                    $clan_rolls = array();
+                    foreach ($clans as $id => $clan) {
+                        $entries = 4;
+                        if ($clan_counts[$id] > $average_users) {
                             $entries--;
+                            if ($clan_counts[$id] / 3 > $average_users) {
+                                $entries--;
+                            }
+
+
+                        }
+                        for ($i = 0; $i < $entries; $i++) {
+                            $clan_rolls[] = $id;
                         }
 
+                        $clan_id = $clan_rolls[mt_rand(0, count($clan_rolls) - 1)];
 
+                        $player->clan = Clan::loadFromId($system, $clan_id);
+                        $player->clan_id = $clan_id;
+                        $clan_name = $clans[$clan_id]['name'];
+
+                        $system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
+                        $player->location->x = $player->village->coords->x;
+                        $player->location->y = $player->village->coords->y;
+                        $player->location->map_id = $player->village->coords->map_id;
                     }
-                    for ($i = 0; $i < $entries; $i++) {
-                        $clan_rolls[] = $id;
-                    }
-
-                    $clan_id = $clan_rolls[mt_rand(0, count($clan_rolls) - 1)];
-
-                    $player->clan = Clan::loadFromId($system, $clan_id);
-                    $player->clan_id = $clan_id;
-                    $clan_name = $clans[$clan_id]['name'];
-
-                    $system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
+                } else {
+                    $system->message("You have moved to the $village village.");
                     $player->location->x = $player->village->coords->x;
                     $player->location->y = $player->village->coords->y;
                     $player->location->map_id = $player->village->coords->map_id;
