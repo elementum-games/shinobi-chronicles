@@ -239,6 +239,9 @@ function Travel({
             }
 
             debug('Filters updated!');
+            setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
+            setStrategicView(response.data.mapData.player_filters.strategic_view === "true");
+            setDisplayGrid(response.data.mapData.player_filters.display_grid === "true");
             setMapData(response.data.mapData);
             setScoutData(response.data.nearbyPlayers);
         });
@@ -353,12 +356,10 @@ function Travel({
     }
 
     function updateStrategicView(value) {
-        setStrategicView(value);
         UpdateFilter("strategic_view", value);
     }
 
     function updateDisplayGrid(value) {
-        setDisplayGrid(value);
         UpdateFilter("display_grid", value);
     }
 
