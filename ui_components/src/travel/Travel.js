@@ -817,7 +817,7 @@ function GlowFilters() {
                     <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
                     <feFlood floodColor="#ffb600" result="floodColor" />
                     <feComponentTransfer in="blur" result="opacityAdjustedBlur">
-                        <feFuncA type="linear" slope="2" />
+                        <feFuncA type="linear" slope="3" />
                     </feComponentTransfer>
                     <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
                     <feMerge>

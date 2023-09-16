@@ -700,7 +700,7 @@ function GlowFilters() {
     result: "opacityAdjustedBlur"
   }, /*#__PURE__*/React.createElement("feFuncA", {
     type: "linear",
-    slope: "2"
+    slope: "3"
   })), /*#__PURE__*/React.createElement("feComposite", {
     in: "floodColor",
     in2: "opacityAdjustedBlur",
