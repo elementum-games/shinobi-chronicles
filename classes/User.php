@@ -1416,6 +1416,10 @@ class User extends Fighter {
             throw new RuntimeException("Invalid stat!");
         }
 
+        if (!empty($this->system->event) && $this->system->event instanceof DoubleExpEvent) {
+            $stat_gain *= DoubleExpEvent::exp_modifier;
+        }
+
         $new_total_stats = $this->total_stats + $stat_gain;
         if($new_total_stats > $this->rank->stat_cap) {
             $stat_gain -= $new_total_stats - $this->rank->stat_cap;
