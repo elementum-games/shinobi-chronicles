@@ -26,7 +26,11 @@ class TravelManager {
 
     public array $map_data;
 
-    const DISPLAY_RADIUS = 12;
+    const DISPLAY_RADIUS = 10;
+    const GRID_POSITIVE_X = 16;
+    const GRID_NEGATIVE_X = 14;
+    const GRID_POSITIVE_Y = 9;
+    const GRID_NEGATIVE_Y = 8;
 
     /**
      * @var TravelCoords[]
@@ -312,7 +316,7 @@ class TravelManager {
         if ($this->system->isDevEnvironment()) {
             $placeholder_coords = new TravelCoords(15, 15, 1);
 
-            for ($i = 0; $i < 2; $i++) {
+            for ($i = 0; $i < 7; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
@@ -561,10 +565,10 @@ class TravelManager {
     public function getRegions(User $player): array {
         // generate vertices for player view area
         $player_area = [
-            [$player->location->x - self::DISPLAY_RADIUS, $player->location->y - self::DISPLAY_RADIUS], // top left bound
-            [$player->location->x + self::DISPLAY_RADIUS, $player->location->y - self::DISPLAY_RADIUS], // top right bound
-            [$player->location->x + self::DISPLAY_RADIUS, $player->location->y + self::DISPLAY_RADIUS], // bottom right bound
-            [$player->location->x - self::DISPLAY_RADIUS, $player->location->y + self::DISPLAY_RADIUS], // bottom left bound
+            [$player->location->x - self::GRID_NEGATIVE_X, $player->location->y - self::GRID_NEGATIVE_Y], // top left bound
+            [$player->location->x + self::GRID_POSITIVE_X, $player->location->y - self::GRID_NEGATIVE_Y], // top right bound
+            [$player->location->x + self::GRID_POSITIVE_X, $player->location->y + self::GRID_POSITIVE_Y], // bottom right bound
+            [$player->location->x - self::GRID_NEGATIVE_X, $player->location->y + self::GRID_POSITIVE_Y], // bottom left bound
         ];
 
         $result = $this->system->db->query("SELECT * FROM `regions`");
@@ -581,7 +585,7 @@ class TravelManager {
                 }
             }
             if ($in_view_area) {
-                $regions[] = Region::fromDb($region, $player->location->x - self::DISPLAY_RADIUS, $player->location->y - self::DISPLAY_RADIUS, $player->location->x + self::DISPLAY_RADIUS, $player->location->y + self::DISPLAY_RADIUS);
+                $regions[] = Region::fromDb($region, $player->location->x - self::GRID_NEGATIVE_X, $player->location->y - self::GRID_NEGATIVE_Y, $player->location->x + self::GRID_POSITIVE_X, $player->location->y + self::GRID_POSITIVE_Y);
             }
         }
 

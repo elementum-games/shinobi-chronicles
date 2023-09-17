@@ -1,8 +1,8 @@
 /* Layout */
 #travelContainer {
     display: flex;
-    flex-flow: row wrap;
-    align-items: flex-start;
+    flex-flow: column;
+    align-items: center;
     justify-content: center;
     gap: 10px;
     margin: 20px auto 0 auto;
@@ -17,7 +17,7 @@
 }
 
 .travel-filter {
-    width: 95%;
+    width: 93%;
     max-width: calc(1000px);
     display: flex;
     flex-flow: row nowrap;
@@ -39,12 +39,13 @@
     display: flex;
     flex-shrink: 0;
     flex-direction: column;
-    flex-basis: 65.5%;
+    flex-basis: 100%;
+    align-items: center;
 }
 
 #travel-container {
     height: 450px;
-    width: 578px;
+    width: 98%;
 }
 
 /*@media (max-height: 1200px) {
@@ -74,16 +75,21 @@
 }*/
 
 .travel-scout-container {
-    width: 100%;
+    width: 250px;
+    height: 412px;
     flex-grow: 0;
     display: flex;
     border: 1px solid var(--border-color-default);
+    position: absolute;
+    right: 11px;
+    top: 35px;
+    overflow-y: clip;
 }
 .travel-scout {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 6px 0;
+    gap: 3px 0;
     z-index: 10;
     position: relative;
 }
@@ -96,7 +102,7 @@
     justify-content: space-between;
     position: relative;
     padding: 4px 0 8px 8px;
-    background: var(--travel-ui-color);
+    background: var(--travel-scout-background);
     border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
@@ -178,7 +184,7 @@
 }
 
 .travel-actions {
-    width: 100%;
+    width: 98%;
     height: 225px;
     display: flex;
     flex-flow: row wrap;
@@ -316,7 +322,6 @@
 #travel-container {
     display: flex;
     flex-flow: row wrap;
-    align-self: flex-start;
     justify-content: flex-start;
     position: relative;
     z-index: 10;
@@ -744,9 +749,18 @@
     max-height: 20px;
 }
 
+.travel-scout-level {
+    justify-self: flex-end;
+    width: 40px;
+    text-align: right;
+    color: var(--font-color-3);
+    font-family: sans-serif;
+    font-size: 1em;
+}
+
 .travel-scout-location {
     justify-self: flex-end;
-    width: 55px;
+    width: 40px;
     text-align: center;
 
     color: var(--font-color-3);

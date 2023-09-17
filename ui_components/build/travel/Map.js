@@ -38,7 +38,7 @@ export const Map = ({
        How do we calculate the starting coordinate in this example? We need to offset the first visible tile by +2 which
      is equal to player X - stage midpoint X.
    */
-  const stage_offset_x = player_x - stage_midpoint_x - 1;
+  const stage_offset_x = player_x - stage_midpoint_x;
   const stage_offset_y = player_y - stage_midpoint_y - 1;
 
   /* Start player at midpoint. Offset is the desired tile number minus 1 so player sits inside the desired tile rather

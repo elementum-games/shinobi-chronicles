@@ -95,6 +95,7 @@
     --travel-ui-color: #1a191d;
     --travel-button-hover: #262631;
     --travel-background-color: #20222b;
+    --travel-scout-background: rgba(26, 25, 29, 0.75);
     /* Battle Config */
     --ninjutsu-text-color: #4C8CFF;
     --taijutsu-text-color: #FF4C4C;
@@ -378,30 +379,6 @@ body {
 }
 
 /* Travel */
-.travel-scout::before {
-    content: "";
-    position: absolute;
-    top: 5%;
-    left: 50%;
-    width: 270px;
-    height: 270px;
-    background-color: rgba(123, 50, 76, 0.15);
-    border-radius: 50%;
-    transform: translate(-50%, 0%);
-    z-index: -1;
-}
-.travel-scout::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url("../../../images/v2/decorations/NinjaScout.png");
-    background-position: bottom;
-    background-repeat: no-repeat;
-    z-index: -1;
-}
 .systemMessage-new-info {
     background: var(--travel-ui-color);
     border: 1px solid var(--travel-background-color);

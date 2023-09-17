@@ -94,13 +94,13 @@ const Player = ({
                 <a href={membersLink + '&user=' + player_data.user_name}>
                     {player_data.user_name}
                 </a>
-                <span>Lv.{player_data.level}</span>
             </div>
-            <div className='travel-scout-location'>
-                {player_data.target_x} &#8729; {player_data.target_y}
-            </div>
+            <div className='travel-scout-level'>Lv.{player_data.level}</div>
             <div className='travel-scout-faction'>
                 <img src={'./' + player_data.village_icon} alt='mist' />
+            </div>
+            <div className='travel-scout-location'>
+                {player_data.target_x}&#8729;{player_data.target_y}
             </div>
             <div className='travel-scout-attack'>
                 {(player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && !player_data.invulnerable) && (

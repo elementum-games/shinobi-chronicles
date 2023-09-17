@@ -79,14 +79,16 @@ const Player = ({
     className: 'travel-scout-name' + " " + visibilityClass(player_data.invulnerable)
   }, /*#__PURE__*/React.createElement("a", {
     href: membersLink + '&user=' + player_data.user_name
-  }, player_data.user_name), /*#__PURE__*/React.createElement("span", null, "Lv.", player_data.level)), /*#__PURE__*/React.createElement("div", {
-    className: "travel-scout-location"
-  }, player_data.target_x, " \u2219 ", player_data.target_y), /*#__PURE__*/React.createElement("div", {
+  }, player_data.user_name)), /*#__PURE__*/React.createElement("div", {
+    className: "travel-scout-level"
+  }, "Lv.", player_data.level), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-faction"
   }, /*#__PURE__*/React.createElement("img", {
     src: './' + player_data.village_icon,
     alt: "mist"
   })), /*#__PURE__*/React.createElement("div", {
+    className: "travel-scout-location"
+  }, player_data.target_x, "\u2219", player_data.target_y), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-attack"
   }, player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && !player_data.invulnerable && (player_data.target_x === colosseumCoords.x && player_data.target_y === colosseumCoords.y ? /*#__PURE__*/React.createElement("a", {
     onClick: () => sparPlayer(player_data.user_id)
