@@ -29,7 +29,7 @@ class Patrol {
         $this->patrol_type = $patrol_type;
     }
     public function setLocation(System $system) {
-        $points = [];
+        $route_locations = [];
         $loop = false;
         switch ($this->patrol_type) {
             case self::PATROL_TYPE_PATROL:
@@ -40,12 +40,12 @@ class Patrol {
 
                 foreach ($result as $point) {
                     if ($point['type'] == 'castle') {
-                        $points[] = ['x' => $point['x'], 'y' => $point['y']];
+                        $route_locations[] = ['x' => $point['x'], 'y' => $point['y']];
                     }
                 }
                 foreach ($result as $point) {
                     if ($point['type'] == 'village') {
-                        $points[] = ['x' => $point['x'], 'y' => $point['y']];
+                        $route_locations[] = ['x' => $point['x'], 'y' => $point['y']];
                     }
                 }
                 break;
@@ -63,13 +63,13 @@ class Patrol {
                 switch ($this->caravan_type) {
                     case self::CARAVAN_TYPE_RESOURCE:
                         // move from castle -> village
-                        $points[] = ['x' => $castle_result['x'], 'y' => $castle_result['y']];
-                        $points[] = ['x' => $village_result['x'], 'y' => $village_result['y']];
+                        $route_locations[] = ['x' => $castle_result['x'], 'y' => $castle_result['y']];
+                        $route_locations[] = ['x' => $village_result['x'], 'y' => $village_result['y']];
                         break;
                     case self::CARAVAN_TYPE_SUPPLY:
                         // move from village -> castle
-                        $points[] = ['x' => $village_result['x'], 'y' => $village_result['y']];
-                        $points[] = ['x' => $castle_result['x'], 'y' => $castle_result['y']];
+                        $route_locations[] = ['x' => $village_result['x'], 'y' => $village_result['y']];
+                        $route_locations[] = ['x' => $castle_result['x'], 'y' => $castle_result['y']];
                         break;
                 }
                 break;
@@ -77,12 +77,12 @@ class Patrol {
 
         // if total travel time is set, we use given duration
         if (!empty($this->travel_time)) {
-            $position = $this->calculatePositionNormalized(time() * 1000, $this->start_time * 1000, $this->travel_time, $points, $loop);
+            $position = $this->calculatePositionNormalized(time() * 1000, $this->start_time * 1000, $this->travel_time, $route_locations, $loop);
         }
         // if travel interval is set, we can calculate the total time based on the distance and interval
         else if (!empty($this->travel_interval)) {
-            $loop_duration = $this->totalIntermediatePoints($points) * $this->travel_interval;
-            $position = $this->calculatePositionNormalized(time() * 1000, $this->start_time * 1000, $loop_duration, $points, $loop);
+            $loop_duration = $this->totalIntermediatePoints($route_locations) * $this->travel_interval;
+            $position = $this->calculatePositionNormalized(time() * 1000, $this->start_time * 1000, $loop_duration, $route_locations, $loop);
         }
         else {
             throw new RuntimeException("Invalid Patrol Configuration");
