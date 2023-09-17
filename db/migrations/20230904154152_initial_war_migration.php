@@ -39,21 +39,20 @@ final class InitialWarMigration extends AbstractMigration
 
         // Create patrols table
         $this->execute("CREATE TABLE `patrols` (
-            `id` int(11) NOT NULL,
+            `id` int(11) NOT NULL AUTO_INCREMENT,
             `start_time` int(11) NOT NULL,
             `travel_time` int(11) DEFAULT NULL,
             `travel_interval` int(11) DEFAULT NULL,
             `region_id` int(11) NOT NULL,
             `village_id` int(11) DEFAULT NULL,
-            `ai_id` INT(11) NULL DEFAULT NULL,
-            `name` varchar(50) NOT NULL
+            `ai_id` int(11) NULL DEFAULT NULL,
+            `name` varchar(50) NOT NULL,
+            PRIMARY KEY (`id`)
         )");
-        $this->execute("ALTER TABLE `patrols` ADD PRIMARY KEY (`id`)");
-        $this->execute("ALTER TABLE `patrols` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT");
 
         // Create caravan table
         $this->execute("CREATE TABLE `caravans` (
-          `id` int(11) NOT NULL,
+          `id` int(11) NOT NULL AUTO_INCREMENT,
           `start_time` int(11) NOT NULL,
           `travel_time` int(11) DEFAULT NULL,
           `travel_interval` int(11) DEFAULT NULL,
@@ -61,29 +60,27 @@ final class InitialWarMigration extends AbstractMigration
           `village_id` int(11) NOT NULL,
           `caravan_type` varchar(50) NOT NULL,
           `resources` varchar(100) NOT NULL DEFAULT '[]',
-          `name` varchar(50) NOT NULL
+          `name` varchar(50) NOT NULL,
+          PRIMARY KEY (`id`)
         )");
-        $this->execute("ALTER TABLE `caravans` ADD PRIMARY KEY (`id`)");
-        $this->execute("ALTER TABLE `caravans` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT");
 
         // Create resources table
         $this->execute("CREATE TABLE `resources` (
-          `resource_id` int(11) NOT NULL,
-          `resource_name` varchar(50) NOT NULL
+            `resource_id` int(11) NOT NULL AUTO_INCREMENT,
+            `resource_name` varchar(50) NOT NULL,
+            PRIMARY KEY (`resource_id`)
         )");
-        $this->execute("ALTER TABLE `resources` ADD PRIMARY KEY (`resource_id`)");
-        $this->execute("ALTER TABLE `resources` MODIFY `resource_id` int(11) NOT NULL AUTO_INCREMENT");
 
         // Add placeholders to resources table
-        $this->execute("INSERT INTO `resources` (`resource_id`, `resource_name`) VALUES
-            (1, 'materials'),
-            (2, 'food'),
-            (3, 'wealth'),
-            (4, 'adamantine'),
-            (5, 'orichalcum'),
-            (6, 'elderwood'),
-            (7, 'breezepowder'),
-            (8, 'relics')
+        $this->execute("INSERT INTO `resources` (`resource_name`) VALUES
+            ('materials'),
+            ('food'),
+            ('wealth'),
+            ('adamantine'),
+            ('orichalcum'),
+            ('elderwood'),
+            ('breezepowder'),
+            ('relics')
         ");
 
         // Create village_relations table
@@ -96,16 +93,16 @@ final class InitialWarMigration extends AbstractMigration
             `relation_start` INT(11) NOT NULL,
             `relation_end` INT(11) NULL DEFAULT NULL,
             PRIMARY KEY (`relation_id`))");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 2, '1', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 3, '1', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 4, '1', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 5, '1', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 3, '1', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 4, '1', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 5, '1', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (3, 4, '1', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (3, 5, '1', 'Neutral', 1694426071, NULL)");
-        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (4, 5, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 2, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 3, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 4, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 5, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 3, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 4, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 5, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (3, 4, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (3, 5, '1', 'Neutral', 1694426071, NULL)");
+        $this->execute("INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (4, 5, '1', 'Neutral', 1694426071, NULL)");
 
         // Create village_seats table
         $this->execute("CREATE TABLE `village_seats` (
