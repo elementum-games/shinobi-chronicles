@@ -76,7 +76,7 @@
 
 .travel-scout-container {
     width: 250px;
-    height: 412px;
+    max-height: 412px;
     flex-grow: 0;
     display: flex;
     border: 1px solid var(--border-color-default);
