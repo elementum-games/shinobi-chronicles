@@ -136,64 +136,10 @@ export const Map = ({
     tileHeight: tile_height,
     playerId: playerId,
     ranksToView: ranksToView
-  }), /*#__PURE__*/React.createElement("div", {
-    id: "map_player",
-    style: PlayerStyle
-  }, mapData.operation_type && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    className: "operation_text"
-  }, mapData.operation_type), /*#__PURE__*/React.createElement("div", {
-    id: "operation_progress_bar"
-  }, /*#__PURE__*/React.createElement("svg", {
-    height: "32",
-    width: "32",
-    viewBox: "0 0 50 50"
-  }, /*#__PURE__*/React.createElement("circle", {
-    id: "operation_progress_circle_background_outer",
-    stroke: "#592424",
-    cx: "24.5",
-    cy: "24",
-    r: "15",
-    strokeWidth: "5",
-    strokeMiterlimit: "0",
-    fill: "none",
-    transform: "rotate(-90, 24.5, 24)"
-  }), /*#__PURE__*/React.createElement("circle", {
-    id: "operation_progress_circle_background",
-    stroke: "#592424",
-    cx: "24.5",
-    cy: "24",
-    r: "10",
-    strokeWidth: "11",
-    strokeMiterlimit: "0",
-    fill: "none",
-    strokeDasharray: "62.83",
-    strokeDashoffset: "0",
-    transform: "rotate(-90, 24.5, 24)"
-  }), /*#__PURE__*/React.createElement("circle", {
-    id: "operation_progress_circle",
-    stroke: "#ff6a6a",
-    cx: "24.5",
-    cy: "24",
-    r: "10",
-    strokeWidth: "5",
-    strokeMiterlimit: "0",
-    fill: "none",
-    strokeDasharray: "62.83",
-    strokeDashoffset: 62.83 - 62.83 / 100 * mapData.operation_progress,
-    transform: "rotate(-90, 24.5, 24)"
-  }), /*#__PURE__*/React.createElement("circle", {
-    id: "operation_interval_circle",
-    stroke: "#00b044",
-    cx: "24.5",
-    cy: "24",
-    r: "15",
-    strokeWidth: "2",
-    strokeMiterlimit: "0",
-    fill: "none",
-    strokeDasharray: "100",
-    strokeDashoffset: 100 - 100 / 100 * mapData.operation_interval,
-    transform: "rotate(-90, 24.5, 24)"
-  }))))))));
+  }), /*#__PURE__*/React.createElement(Player, {
+    playerStyle: PlayerStyle,
+    mapData: mapData
+  }))));
 };
 function MapGutters({
   stageWidth,
@@ -505,6 +451,69 @@ function MapNearbyPatrols({
   }, patrol.patrol_name), /*#__PURE__*/React.createElement("div", {
     className: alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type
   }))));
+}
+function Player({
+  mapData,
+  playerStyle
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    id: "map_player",
+    style: playerStyle
+  }, mapData.operation_type && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "operation_text"
+  }, mapData.operation_type), /*#__PURE__*/React.createElement("div", {
+    id: "operation_progress_bar"
+  }, /*#__PURE__*/React.createElement("svg", {
+    height: "32",
+    width: "32",
+    viewBox: "0 0 50 50"
+  }, /*#__PURE__*/React.createElement("circle", {
+    id: "operation_progress_circle_background_outer",
+    stroke: "#592424",
+    cx: "24.5",
+    cy: "24",
+    r: "15",
+    strokeWidth: "5",
+    strokeMiterlimit: "0",
+    fill: "none",
+    transform: "rotate(-90, 24.5, 24)"
+  }), /*#__PURE__*/React.createElement("circle", {
+    id: "operation_progress_circle_background",
+    stroke: "#592424",
+    cx: "24.5",
+    cy: "24",
+    r: "10",
+    strokeWidth: "11",
+    strokeMiterlimit: "0",
+    fill: "none",
+    strokeDasharray: "62.83",
+    strokeDashoffset: "0",
+    transform: "rotate(-90, 24.5, 24)"
+  }), /*#__PURE__*/React.createElement("circle", {
+    id: "operation_progress_circle",
+    stroke: "#ff6a6a",
+    cx: "24.5",
+    cy: "24",
+    r: "10",
+    strokeWidth: "5",
+    strokeMiterlimit: "0",
+    fill: "none",
+    strokeDasharray: "62.83",
+    strokeDashoffset: 62.83 - 62.83 / 100 * mapData.operation_progress,
+    transform: "rotate(-90, 24.5, 24)"
+  }), /*#__PURE__*/React.createElement("circle", {
+    id: "operation_interval_circle",
+    stroke: "#00b044",
+    cx: "24.5",
+    cy: "24",
+    r: "15",
+    strokeWidth: "2",
+    strokeMiterlimit: "0",
+    fill: "none",
+    strokeDasharray: "100",
+    strokeDashoffset: 100 - 100 / 100 * mapData.operation_interval,
+    transform: "rotate(-90, 24.5, 24)"
+  })))));
 }
 const visibilityClass = invulnerable => {
   if (invulnerable) {
