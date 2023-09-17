@@ -91,7 +91,7 @@ class Patrol {
         $this->current_y = $position['y'];
     }
 
-    // Piecewise Linear Interpolation Formula
+    /* Piecewise Linear Interpolation Formula
     function calculatePosition($t, $T_start, $T_cycle, $points)
     {
         $n = count($points);
@@ -118,9 +118,9 @@ class Patrol {
         }
 
         return ['x' => $points[0]['x'], 'y' => $points[0]['y']];
-    }
+    }*/
 
-    // Reverses the formula to generate a new start time for a point - this is used to correct the position if the patrol is stationary for a time
+    /* Reverses the formula to generate a new start time for a point - this is used to correct the position if the patrol is stationary for a time
     function findNewStartTime($t, $T_cycle, $points, $desiredPoint)
     {
         $n = count($points);
@@ -140,7 +140,7 @@ class Patrol {
         }
 
         return null;
-    }
+    }*/
 
     // Used to determine the total points in the path for speed calculations
     private function totalIntermediatePoints($points, $step_size = 1)
@@ -163,21 +163,33 @@ class Patrol {
         return sqrt(pow($x2 - $x1, 2) + pow($y2 - $y1, 2));
     }
 
-    // Variation of the original formula that uses an equal time for each segment between given points
+    /* Variation of the original formula that uses an equal time for each segment between given points.
+     * $t: The current time.
+     * $T_start: The start time of the cycle.
+     * $T_cycle: The total duration of one cycle.
+     * $points: An array of points (coordinates) that the object should pass through.
+     * $loop: A boolean variable indicating whether the path should loop back to the start or not.
+     */
     function calculatePositionNormalized($t, $T_start, $T_cycle, $points, $loop = true)
     {
-        $loopFactor = $loop ? 0 : 1; // 0 if looping, 1 if not
+        // Variable to determine if the movement is in a loop or not. 0 for looping, 1 for not looping.
+        $loopFactor = $loop ? 0 : 1;
+
+        // Total number of points in the $points array.
         $n = count($points);
+
+        // Initialize variables to store the total length of the path, the lengths of individual segments, and the time allocated for each segment.
         $totalLength = 0;
         $segmentLengths = [];
         $segmentTimes = [];
 
-        // If not looping and time complete, set to last point
+        // If not looping and time complete, set to final point.
         if (!$loop && $T_start + $T_cycle <= $t) {
             return ['x' => $points[$n - 1]['x'], 'y' => $points[$n - 1]['y']];
         }
 
-        // Calculate the total length and individual segment lengths
+        // Calculate the total length and individual segment lengths.
+        // If $loop is false, excludes the final segment (connecting the final point to the first point.
         for ($i = 0; $i < $n - $loopFactor; $i++) {
             $nextIndex = ($i + 1) % $n;
             $length = $this->calculateSegmentLength($points[$i], $points[$nextIndex]);
@@ -185,14 +197,18 @@ class Patrol {
             $totalLength += $length;
         }
 
-        // Calculate the time to allocate for each segment
+        // Calculate the time to allocate for each segment based on its length.
         for ($i = 0; $i < $n - $loopFactor; $i++) {
             $segmentTimes[$i] = ($segmentLengths[$i] / $totalLength) * $T_cycle;
         }
 
+        // Normalize the time within the cycle duration.
         $T_norm = ($t - $T_start) % $T_cycle;
+        // Keeps track of the accumulated time looping through each segment.
         $elapsedTime = 0;
 
+        // Calculate the current position.
+        // The last loop calculates the object's position at the current time $t, based on which segment it's supposed to be in.
         for ($i = 0; $i < $n - $loopFactor; $i++) {
             $nextIndex = ($i + 1) % $n;
 
@@ -211,7 +227,8 @@ class Patrol {
 
             $elapsedTime += $segmentTimes[$i];
         }
-
+        
+        // Fail-safe if no conditions met, returns first point.
         return ['x' => $points[0]['x'], 'y' => $points[0]['y']];
     }
 
