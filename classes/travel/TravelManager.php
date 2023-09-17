@@ -316,7 +316,7 @@ class TravelManager {
         if ($this->system->isDevEnvironment()) {
             $placeholder_coords = new TravelCoords(15, 15, 1);
 
-            for ($i = 0; $i < 3; $i++) {
+            for ($i = 0; $i < 2; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
@@ -327,6 +327,48 @@ class TravelManager {
                     rank_num: 3,
                     village_icon: TravelManager::VILLAGE_ICONS['Mist'],
                     alignment: 'Enemy',
+                    attack: $this->user->location->equals($placeholder_coords),
+                    attack_id: 'abc' . $i . mt_rand(10000, 20000),
+                    level: 30,
+                    battle_id: 0,
+                    direction: $this->user->location->directionToTarget($placeholder_coords),
+                    distance: $this->user->location->distanceDifference($placeholder_coords),
+                    invulnerable: false,
+                    village_id: 3,
+                );
+            }
+            for ($i = 0; $i < 2; $i++) {
+                $return_arr[] = new NearbyPlayerDto(
+                    user_id: $i . mt_rand(10000, 20000),
+                    user_name: 'Konohamaru',
+                    target_x: $placeholder_coords->x,
+                    target_y: $placeholder_coords->y,
+                    target_map_id: $placeholder_coords->map_id,
+                    rank_name: 'Akademi-sei',
+                    rank_num: 3,
+                    village_icon: TravelManager::VILLAGE_ICONS['Stone'],
+                    alignment: 'Ally',
+                    attack: $this->user->location->equals($placeholder_coords),
+                    attack_id: 'abc' . $i . mt_rand(10000, 20000),
+                    level: 30,
+                    battle_id: 0,
+                    direction: $this->user->location->directionToTarget($placeholder_coords),
+                    distance: $this->user->location->distanceDifference($placeholder_coords),
+                    invulnerable: false,
+                    village_id: 3,
+                );
+            }
+            for ($i = 0; $i < 2; $i++) {
+                $return_arr[] = new NearbyPlayerDto(
+                    user_id: $i . mt_rand(10000, 20000),
+                    user_name: 'Konohamaru',
+                    target_x: $placeholder_coords->x,
+                    target_y: $placeholder_coords->y,
+                    target_map_id: $placeholder_coords->map_id,
+                    rank_name: 'Akademi-sei',
+                    rank_num: 3,
+                    village_icon: TravelManager::VILLAGE_ICONS['Sand'],
+                    alignment: 'Neutral',
                     attack: $this->user->location->equals($placeholder_coords),
                     attack_id: 'abc' . $i . mt_rand(10000, 20000),
                     level: 30,

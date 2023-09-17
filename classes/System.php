@@ -610,7 +610,7 @@ class System {
         $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
         $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
         $september_2023_double_exp_start_time = new DateTimeImmutable('2023-09-17');
-        $september_2023_double_exp_end_time = new DateTimeImmutable('2023-10-1');
+        $september_2023_double_exp_end_time = new DateTimeImmutable('2023-10-2');
         if($this->isDevEnvironment()) {
             $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-15');
             $september_2023_double_exp_start_time = new DateTimeImmutable('2023-09-13');
