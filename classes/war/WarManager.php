@@ -1,6 +1,10 @@
 <?php
 
 class WarManager {
+
+    const BASE_RESOURCE_PRODUCTION = 25;
+    const BASE_CARAVAN_TIME_MS = 300000;
+
     private System $system;
     private User $user;
 

@@ -4,9 +4,7 @@ session_start();
 require_once __DIR__ . '/../classes/System.php';
 require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
-
-const BASE_RESOURCE_PRODUCTION = 25;
-const BASE_CARAVAN_TIME_MS = 300000;
+require_once __DIR__ . '/../classes/War/WarManager.php';
 
 $system = new System();
 $system->db->connect();
@@ -118,7 +116,7 @@ function hourlyCaravan(System $system, $debug = true): void
         }
         // create new caravan for region
         $start_time = time();
-        $travel_time = BASE_CARAVAN_TIME_MS;
+        $travel_time = WarManager::BASE_CARAVAN_TIME_MS;
         $region_id = $region['region_id'];
         $village_id = $region['village'];
         $caravan_type = Patrol::CARAVAN_TYPE_RESOURCE;

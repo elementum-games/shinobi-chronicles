@@ -263,7 +263,7 @@ function members(): void {
                 $online_users = $system->db->fetch($online_users_result)['online_users'];
                 $daily_users_result = $system->db->query("SELECT COUNT(`user_id`) as `daily_users` FROM `users` WHERE `last_active` > UNIX_TIMESTAMP() - $daily_seconds");
                 $daily_users = $system->db->fetch($daily_users_result)['daily_users'];
-                $list_name = 'Online Users (' . $online_users . ' online, ' . $daily_users . ' daily)';
+                $list_name = 'Online Users (' . $online_users . ' online, ' . $daily_users . ' today)';
 				break;
             case "highest_pvp":
                 $table_header = 'Pvp Kills';
