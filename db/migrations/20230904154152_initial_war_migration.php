@@ -152,44 +152,39 @@ final class InitialWarMigration extends AbstractMigration
      */
     public function down(): void
     {
-        // Start Transaction
-        $this->execute("START TRANSACTION");
-
-        // Update region_locations - setting resource to ID value
-        $this->execute("ALTER TABLE `region_locations` CHANGE `resource_id` `resource` VARCHAR(50) NULL DEFAULT NULL");
-
-        // Update region_locations - add columns for production
-        $this->execute("ALTER TABLE `region_locations` DROP COLUMN `resource_production`");
-        $this->execute("ALTER TABLE `region_locations` DROP COLUMN `resource_penalty`");
-
-        // Update villages table - add column for resources
-        $this->execute("ALTER TABLE `villages` DROP COLUMN `resources`");
-
-        // Create patrols table
-        $this->execute("DROP TABLE `patrols`");
-
-        // Create caravan table
-        $this->execute("DROP TABLE `caravans`");
-
-        // Create resources table
-        $this->execute("DROP TABLE `resources`");
-
-        // Create village_relations table
-        $this->execute("DROP TABLE `village_relations`");
-
-        // Create village_seats table
-        $this->execute("DROP TABLE `village_seats`");
-
-        // Add operations table
-        $this->execute("DROP TABLE `operations`");
-
-        // Alter users table
-        $this->execute("ALTER TABLE `users` DROP COLUMN `operation`");
-
-        // Add war_logs table
-        $this->execute("DROP TABLE `war_logs`");
-
-        // Commit Transaction
-        $this->execute("COMMIT");
+        $this->execute("
+            ALTER TABLE `region_locations` CHANGE `resource_id` `resource` VARCHAR(50) NULL DEFAULT NULL;
+            
+            -- Update region_locations - add columns for production
+            ALTER TABLE `region_locations` DROP COLUMN `resource_production`;
+            ALTER TABLE `region_locations` DROP COLUMN `resource_penalty`;
+            ALTER TABLE `region_locations` DROP COLUMN `defense`;
+    
+            -- Update villages table - add column for resources
+            ALTER TABLE `villages` DROP COLUMN `resources`;
+    
+            -- Create patrols table
+            DROP TABLE `patrols`;
+    
+            -- Create caravan table
+            DROP TABLE `caravans`;
+    
+            -- Create resources table
+            DROP TABLE `resources`;
+    
+            -- Create village_relations table
+            DROP TABLE `village_relations`;
+    
+            -- Create village_seats table
+            DROP TABLE `village_seats`;
+    
+            -- Add operations table
+            DROP TABLE `operations`;
+    
+            -- Alter users table
+            ALTER TABLE `users` DROP COLUMN `operation`;
+    
+            -- Add war_logs table
+            DROP TABLE `war_logs`");
     }
 }
