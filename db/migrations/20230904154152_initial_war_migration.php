@@ -39,21 +39,20 @@ final class InitialWarMigration extends AbstractMigration
 
         // Create patrols table
         $this->execute("CREATE TABLE `patrols` (
-            `id` int(11) NOT NULL,
+            `id` int(11) NOT NULL AUTO_INCREMENT,
             `start_time` int(11) NOT NULL,
             `travel_time` int(11) DEFAULT NULL,
             `travel_interval` int(11) DEFAULT NULL,
             `region_id` int(11) NOT NULL,
             `village_id` int(11) DEFAULT NULL,
-            `ai_id` INT(11) NULL DEFAULT NULL,
-            `name` varchar(50) NOT NULL
+            `ai_id` int(11) NULL DEFAULT NULL,
+            `name` varchar(50) NOT NULL,
+            PRIMARY KEY (`id`)
         )");
-        $this->execute("ALTER TABLE `patrols` ADD PRIMARY KEY (`id`)");
-        $this->execute("ALTER TABLE `patrols` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT");
 
         // Create caravan table
         $this->execute("CREATE TABLE `caravans` (
-          `id` int(11) NOT NULL,
+          `id` int(11) NOT NULL AUTO_INCREMENT,
           `start_time` int(11) NOT NULL,
           `travel_time` int(11) DEFAULT NULL,
           `travel_interval` int(11) DEFAULT NULL,
@@ -61,18 +60,16 @@ final class InitialWarMigration extends AbstractMigration
           `village_id` int(11) NOT NULL,
           `caravan_type` varchar(50) NOT NULL,
           `resources` varchar(100) NOT NULL DEFAULT '[]',
-          `name` varchar(50) NOT NULL
+          `name` varchar(50) NOT NULL,
+          PRIMARY KEY (`id`)
         )");
-        $this->execute("ALTER TABLE `caravans` ADD PRIMARY KEY (`id`)");
-        $this->execute("ALTER TABLE `caravans` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT");
 
         // Create resources table
         $this->execute("CREATE TABLE `resources` (
-          `resource_id` int(11) NOT NULL,
-          `resource_name` varchar(50) NOT NULL
+            `resource_id` int(11) NOT NULL AUTO_INCREMENT,
+            `resource_name` varchar(50) NOT NULL,
+            PRIMARY KEY (`resource_id`)
         )");
-        $this->execute("ALTER TABLE `resources` ADD PRIMARY KEY (`resource_id`)");
-        $this->execute("ALTER TABLE `resources` MODIFY `resource_id` int(11) NOT NULL AUTO_INCREMENT");
 
         // Add placeholders to resources table
         $this->execute("INSERT INTO `resources` (`resource_id`, `resource_name`) VALUES
