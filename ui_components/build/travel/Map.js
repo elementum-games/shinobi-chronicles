@@ -74,10 +74,11 @@ export const Map = ({
     backgroundPositionX: map_offset_x * tile_width + "px",
     backgroundPositionY: map_offset_y * tile_height + "px"
   };
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(MapGutters, {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(MapGutterX, {
     stageWidth: stage_width,
+    stageOffsetX: stage_offset_x
+  }), /*#__PURE__*/React.createElement(MapGutterY, {
     stageHeight: stage_height,
-    stageOffsetX: stage_offset_x,
     stageOffsetY: stage_offset_y
   }), /*#__PURE__*/React.createElement("div", {
     className: "travel_map_stage"
@@ -139,7 +140,10 @@ export const Map = ({
   }), /*#__PURE__*/React.createElement(Player, {
     playerStyle: PlayerStyle,
     mapData: mapData
-  }))));
+  }))), /*#__PURE__*/React.createElement(MapGutterY, {
+    stageHeight: stage_height,
+    stageOffsetY: stage_offset_y
+  }));
 };
 function MapGutters({
   stageWidth,
@@ -150,7 +154,7 @@ function MapGutters({
   // By default, gutter should show tile 1. Apply stage offset to get to the current number.
   const gutter_start_x = 1 + stageOffsetX;
   const gutter_start_y = 1 + stageOffsetY;
-  const gutter_x = Array.from(new Array(stageWidth), (x, i) => i + gutter_start_x);
+  const gutter_x = Array.from(new Array(stageWidth - 1), (x, i) => i + gutter_start_x);
   const gutter_y = Array.from(new Array(stageHeight), (x, i) => i + gutter_start_y);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     id: "travel-x-container"
@@ -158,6 +162,34 @@ function MapGutters({
     key: 'gutter_x:' + gutter,
     className: "travel-gutter-grid travel-gutter-grid-x"
   }, gutter))), /*#__PURE__*/React.createElement("div", {
+    id: "travel-y-container"
+  }, gutter_y && gutter_y.map(gutter => /*#__PURE__*/React.createElement("div", {
+    key: 'gutter_y:' + gutter,
+    className: "travel-gutter-grid travel-gutter-grid-y"
+  }, gutter))));
+}
+function MapGutterX({
+  stageWidth,
+  stageOffsetX
+}) {
+  // By default, gutter should show tile 1. Apply stage offset to get to the current number.
+  const gutter_start_x = 1 + stageOffsetX;
+  const gutter_x = Array.from(new Array(stageWidth - 1), (x, i) => i + gutter_start_x);
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    id: "travel-x-container"
+  }, gutter_x && gutter_x.map(gutter => /*#__PURE__*/React.createElement("div", {
+    key: 'gutter_x:' + gutter,
+    className: "travel-gutter-grid travel-gutter-grid-x"
+  }, gutter))));
+}
+function MapGutterY({
+  stageHeight,
+  stageOffsetY
+}) {
+  // By default, gutter should show tile 1. Apply stage offset to get to the current number.
+  const gutter_start_y = 1 + stageOffsetY;
+  const gutter_y = Array.from(new Array(stageHeight), (x, i) => i + gutter_start_y);
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     id: "travel-y-container"
   }, gutter_y && gutter_y.map(gutter => /*#__PURE__*/React.createElement("div", {
     key: 'gutter_y:' + gutter,

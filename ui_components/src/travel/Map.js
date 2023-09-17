@@ -83,10 +83,12 @@ export const Map = ({ mapData, scoutData, patrolData, playerId, ranksToView, str
 
     return (
         <>
-            <MapGutters
+            <MapGutterX
                 stageWidth={stage_width}
-                stageHeight={stage_height}
                 stageOffsetX={stage_offset_x}
+            />
+            <MapGutterY
+                stageHeight={stage_height}
                 stageOffsetY={stage_offset_y}
             />
             <div className='travel_map_stage'>
@@ -154,6 +156,10 @@ export const Map = ({ mapData, scoutData, patrolData, playerId, ranksToView, str
                     />
                 </div>
             </div>
+            <MapGutterY
+                stageHeight={stage_height}
+                stageOffsetY={stage_offset_y}
+            />
         </>
     );
 }
@@ -163,7 +169,7 @@ function MapGutters({ stageWidth, stageHeight, stageOffsetX, stageOffsetY}) {
     const gutter_start_x = 1 + stageOffsetX;
     const gutter_start_y = 1 + stageOffsetY;
 
-    const gutter_x = Array.from(new Array(stageWidth), (x, i) => i + gutter_start_x);
+    const gutter_x = Array.from(new Array(stageWidth-1), (x, i) => i + gutter_start_x);
     const gutter_y = Array.from(new Array(stageHeight), (x, i) => i + gutter_start_y);
 
     return (
@@ -181,6 +187,44 @@ function MapGutters({ stageWidth, stageHeight, stageOffsetX, stageOffsetY}) {
                     <div key={ 'gutter_y:' + gutter }
                          className='travel-gutter-grid travel-gutter-grid-y'>
                         { gutter }
+                    </div>
+                )}
+            </div>
+        </>
+    )
+}
+
+function MapGutterX({ stageWidth, stageOffsetX }) {
+    // By default, gutter should show tile 1. Apply stage offset to get to the current number.
+    const gutter_start_x = 1 + stageOffsetX;
+    const gutter_x = Array.from(new Array(stageWidth - 1), (x, i) => i + gutter_start_x);
+
+    return (
+        <>
+            <div id='travel-x-container'>
+                {(gutter_x) && gutter_x.map((gutter) =>
+                    <div key={'gutter_x:' + gutter}
+                        className='travel-gutter-grid travel-gutter-grid-x'>
+                        {gutter}
+                    </div>
+                )}
+            </div>
+        </>
+    )
+}
+
+function MapGutterY({ stageHeight, stageOffsetY }) {
+    // By default, gutter should show tile 1. Apply stage offset to get to the current number.
+    const gutter_start_y = 1 + stageOffsetY;
+    const gutter_y = Array.from(new Array(stageHeight), (x, i) => i + gutter_start_y);
+
+    return (
+        <>
+            <div id="travel-y-container">
+                {(gutter_y) && gutter_y.map((gutter) =>
+                    <div key={'gutter_y:' + gutter}
+                        className='travel-gutter-grid travel-gutter-grid-y'>
+                        {gutter}
                     </div>
                 )}
             </div>

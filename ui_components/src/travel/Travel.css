@@ -81,7 +81,7 @@
     display: flex;
     border: 1px solid var(--border-color-default);
     position: absolute;
-    right: 11px;
+    right: 44px;
     top: 35px;
     overflow-y: clip;
 }
