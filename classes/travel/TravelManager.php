@@ -26,7 +26,7 @@ class TravelManager {
 
     public array $map_data;
 
-    const DISPLAY_RADIUS = 10;
+    const DISPLAY_RADIUS = 12;
     const GRID_POSITIVE_X = 16;
     const GRID_NEGATIVE_X = 14;
     const GRID_POSITIVE_Y = 9;

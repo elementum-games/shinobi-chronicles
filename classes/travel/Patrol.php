@@ -1,6 +1,12 @@
 <?php
 
 class Patrol {
+
+    const CARAVAN_TYPE_RESOURCE = 'resource';
+    const CARAVAN_TYPE_SUPPLY = 'supply';
+    const PATROL_TYPE_CARAVAN = 'caravan';
+    const PATROL_TYPE_PATROL = 'patrol';
+
     public int $id;
     public int $start_time;
     public ?int $travel_time;
@@ -26,7 +32,7 @@ class Patrol {
         $points = [];
         $loop = false;
         switch ($this->patrol_type) {
-            case "patrol":
+            case self::PATROL_TYPE_PATROL:
                 $loop = true;
                 // patrols loop between each location within their region
                 $result = $system->db->query("SELECT `x`, `y`, `type` FROM `region_locations` WHERE `region_id` = {$this->region_id}");
@@ -43,7 +49,7 @@ class Patrol {
                     }
                 }
                 break;
-            case "caravan":
+            case self::PATROL_TYPE_CARAVAN:
                 $loop = false;
                 // get village location
                 $village_result = $system->db->query("SELECT `x`, `y` FROM `maps_locations`
@@ -55,13 +61,13 @@ class Patrol {
                     WHERE `region_id` = {$this->region_id} AND `type` = 'castle' LIMIT 1");
                 $castle_result = $system->db->fetch($castle_result);
                 switch ($this->caravan_type) {
-                    case "resource":
+                    case self::CARAVAN_TYPE_RESOURCE:
                         // move from castle -> village
                         $points[] = ['x' => $castle_result['x'], 'y' => $castle_result['y']];
                         $points[] = ['x' => $village_result['x'], 'y' => $village_result['y']];
                         break;
-                    case "supply":
-                        // move from village - castle
+                    case self::CARAVAN_TYPE_SUPPLY:
+                        // move from village -> castle
                         $points[] = ['x' => $village_result['x'], 'y' => $village_result['y']];
                         $points[] = ['x' => $castle_result['x'], 'y' => $castle_result['y']];
                         break;

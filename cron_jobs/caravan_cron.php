@@ -121,7 +121,7 @@ function hourlyCaravan(System $system, $debug = true): void
         $travel_time = BASE_CARAVAN_TIME_MS;
         $region_id = $region['region_id'];
         $village_id = $region['village'];
-        $caravan_type = 'resource';
+        $caravan_type = Patrol::CARAVAN_TYPE_RESOURCE;
         $resources = json_encode($caravan_resources);
         $name = $villages[$region['village']]->name . " Caravan";
         $system->db->query("INSERT INTO `caravans` (`start_time`, `travel_time`, `region_id`, `village_id`, `caravan_type`, `resources`, `name`)
