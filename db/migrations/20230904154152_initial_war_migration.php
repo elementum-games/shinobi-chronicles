@@ -72,15 +72,15 @@ final class InitialWarMigration extends AbstractMigration
         )");
 
         // Add placeholders to resources table
-        $this->execute("INSERT INTO `resources` (`resource_id`, `resource_name`) VALUES
-            (1, 'materials'),
-            (2, 'food'),
-            (3, 'wealth'),
-            (4, 'adamantine'),
-            (5, 'orichalcum'),
-            (6, 'elderwood'),
-            (7, 'breezepowder'),
-            (8, 'relics')
+        $this->execute("INSERT INTO `resources` (`resource_name`) VALUES
+            ('materials'),
+            ('food'),
+            ('wealth'),
+            ('adamantine'),
+            ('orichalcum'),
+            ('elderwood'),
+            ('breezepowder'),
+            ('relics')
         ");
 
         // Create village_relations table
