@@ -399,7 +399,17 @@ function Travel({
     attackPlayer: AttackPlayer,
     sparPlayer: SparPlayer,
     ranksToView: ranksToView,
-    playerId: playerId
+    playerId: playerId,
+    displayAllies: true
+  }), mapData && scoutData && /*#__PURE__*/React.createElement(ScoutArea, {
+    mapData: mapData,
+    scoutData: scoutData,
+    membersLink: membersLink,
+    attackPlayer: AttackPlayer,
+    sparPlayer: SparPlayer,
+    ranksToView: ranksToView,
+    playerId: playerId,
+    displayAllies: false
   })), /*#__PURE__*/React.createElement(GlowFilters, null));
 }
 function TravelFilters({

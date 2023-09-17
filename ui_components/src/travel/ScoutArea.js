@@ -25,12 +25,14 @@ export const ScoutArea = ({
     sparPlayer,
     ranksToView,
     playerId,
+    displayAllies,
 }) => {
     return (
-        <div className='travel-scout-container'>
+        <div className={`travel-scout-container ${displayAllies ? 'allies' : ''}`}>
             <div className='travel-scout'>
                 {(mapData) && scoutData
                     .filter(user => ranksToView[parseInt(user.rank_num)] === true)
+                    .filter(player_data => displayAllies ? player_data.alignment === "Ally" : player_data.alignment !== "Ally")
                     .map((player_data) => (
                         (player_data.user_id != playerId) &&
                         <Player

@@ -24,13 +24,14 @@ export const ScoutArea = ({
   attackPlayer,
   sparPlayer,
   ranksToView,
-  playerId
+  playerId,
+  displayAllies
 }) => {
   return /*#__PURE__*/React.createElement("div", {
-    className: "travel-scout-container"
+    className: `travel-scout-container ${displayAllies ? 'allies' : ''}`
   }, /*#__PURE__*/React.createElement("div", {
     className: "travel-scout"
-  }, mapData && scoutData.filter(user => ranksToView[parseInt(user.rank_num)] === true).map(player_data => player_data.user_id != playerId && /*#__PURE__*/React.createElement(Player, {
+  }, mapData && scoutData.filter(user => ranksToView[parseInt(user.rank_num)] === true).filter(player_data => displayAllies ? player_data.alignment === "Ally" : player_data.alignment !== "Ally").map(player_data => player_data.user_id != playerId && /*#__PURE__*/React.createElement(Player, {
     key: player_data.user_id,
     player_data: player_data,
     membersLink: membersLink,

@@ -486,8 +486,22 @@ function Travel({
                         sparPlayer={SparPlayer}
                         ranksToView={ranksToView}
                         playerId={playerId}
+                        displayAllies={true}
                     />
                 )}
+                {(mapData && scoutData) && (
+                    <ScoutArea
+                        mapData={mapData}
+                        scoutData={scoutData}
+                        membersLink={membersLink}
+                        attackPlayer={AttackPlayer}
+                        sparPlayer={SparPlayer}
+                        ranksToView={ranksToView}
+                        playerId={playerId}
+                        displayAllies={false}
+                    />
+                )}
+
             </div>
             <GlowFilters/>
         </>

@@ -27,7 +27,7 @@ class TravelManager {
     public array $map_data;
 
     const DISPLAY_RADIUS = 12;
-    const GRID_POSITIVE_X = 16;
+    const GRID_POSITIVE_X = 15;
     const GRID_NEGATIVE_X = 14;
     const GRID_POSITIVE_Y = 9;
     const GRID_NEGATIVE_Y = 8;
@@ -316,7 +316,7 @@ class TravelManager {
         if ($this->system->isDevEnvironment()) {
             $placeholder_coords = new TravelCoords(15, 15, 1);
 
-            for ($i = 0; $i < 7; $i++) {
+            for ($i = 0; $i < 3; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
