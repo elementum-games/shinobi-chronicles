@@ -80,15 +80,15 @@
 
 <!-- Content -->
 <table class="table">
-
     <tr><th>Bloodline List</th></tr>
-
     <!-- Bloodline UI Filter -->
     <tr><td style='text-align:center;'>
-        <p>Using the form below, you can search for bloodlines based on rank.</p>
+        <span>Using the form below, you can search for bloodlines based on rank.</span>
+        <br /><br />
         <div style="text-align:center;">
             <!--Selection Input: Ranks-->
             <?php foreach(Bloodline::$public_ranks as $id=> $name): ?>
+                <?php if ($id > 3) continue; ?>
                 <input type="checkbox" onclick="toggleBloodlineDetails('<?=$id?>_rank')"
                        class="<?=$id?>_rank_box" checked="checked" /><?=$name?>
             <?php endforeach ?>
@@ -120,7 +120,7 @@
     </tr>
 
     <?php foreach(Bloodline::$public_ranks as $id=> $rank): ?>
-        <?php if(empty($bloodlines[$id])): ?>
+        <?php if(empty($bloodlines[$id]) || $id > 3): ?>
             <?php continue; ?>
         <?php else: ?>
             <tr class="<?=$id?>_rank"><th><?=$rank?></th></tr>

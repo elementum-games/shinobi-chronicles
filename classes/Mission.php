@@ -257,7 +257,10 @@ class Mission {
                 else if ($stage_id == 1 && $this->mission_type != $this::TYPE_EVENT) {
                     $location = $this->rollLocation($this->player->village_location);
                 }
-
+                // if last_location is set, use last_location
+                else if (!empty($this->current_stage['last_location'])) {
+                    $location = $this->rollLocation(TravelCoords::fromDbString($this->current_stage['last_location']));
+                }
                 // otherwise, use player current location
                 else {
                     $location = $this->rollLocation($this->player->location);

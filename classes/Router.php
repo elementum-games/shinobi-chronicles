@@ -39,6 +39,7 @@ class Router {
         'account_record' => 34,
         'send_money' => 35,
         'forbiddenShop' => 36,
+        'war' => 37,
     ];
 
     /** @var Route[] $routes */

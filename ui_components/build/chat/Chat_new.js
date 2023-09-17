@@ -22,6 +22,7 @@ function Chat({
   const currentPagePostIdRef = React.useRef(initialPostId);
   const [error, setError] = React.useState(null);
   const [message, setMessage] = React.useState("");
+  const chatInputRef = React.useRef(null);
   if (banInfo.isBanned) {
     return /*#__PURE__*/React.createElement(ChatBanInfo, {
       banName: banInfo.name,
@@ -101,6 +102,7 @@ function Chat({
   };
   function quotePost(postId) {
     setMessage(prevMessage => `${prevMessage}[quote:${postId}]`);
+    chatInputRef.current.focus();
   }
   return /*#__PURE__*/React.createElement("div", null, error != null && /*#__PURE__*/React.createElement("p", {
     className: "systemMessage"
@@ -109,7 +111,8 @@ function Chat({
     memes: memes,
     submitPost: submitPost,
     message: message,
-    setMessage: setMessage
+    setMessage: setMessage,
+    chatInputRef: chatInputRef
   }), /*#__PURE__*/React.createElement(ChatPosts, {
     posts: posts,
     previousPagePostId: previousPagePostId,
@@ -143,7 +146,8 @@ function ChatInput({
   memes,
   submitPost,
   message,
-  setMessage
+  setMessage,
+  chatInputRef
 }) {
   const [quickReply, _setQuickReply] = React.useState(JSON.parse(localStorage.getItem("quick_reply_on") ?? "true"));
   const [showMemeSelect, setShowMemeSelect] = React.useState(false);
@@ -154,6 +158,7 @@ function ChatInput({
   function handleMemeSelect(memeIndex) {
     setMessage(prevMessage => `${prevMessage}${memes.codes[memeIndex]}`);
     setShowMemeSelect(false);
+    chatInputRef.current.focus();
   }
   const handlePostSubmit = React.useCallback(() => {
     submitPost(message);
@@ -198,6 +203,7 @@ function ChatInput({
     className: "chat_input_center"
   }, /*#__PURE__*/React.createElement("textarea", {
     id: "chat_input_box",
+    ref: chatInputRef,
     minLength: "3",
     maxLength: maxPostLength,
     value: message,

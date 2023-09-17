@@ -1,7 +1,8 @@
 <?php
 
-class MapObjectiveLocation {
+class MapObjective {
     public function __construct(
+        public ?int $id = null,
         public string $name,
         public int $map_id,
         public int $x,

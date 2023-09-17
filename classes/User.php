@@ -83,7 +83,6 @@ class User extends Fighter {
     const UPDATE_NOTHING = 0;
     const UPDATE_REGEN = 1;
     const UPDATE_FULL = 2;
-    const UPDATE_PREVIEW = 3; // used to simulate full update without changing user data
     const ATTACK_LINK_DURATION_MIN = 10;
 
     public static int $jutsu_train_gain = 5;
@@ -254,6 +253,8 @@ class User extends Fighter {
 
     public int $special_mission;
 
+    public int $operation;
+
     public int $exam_stage;
 
     public int $last_ai_ms;
@@ -333,29 +334,7 @@ class User extends Fighter {
         $user = new User($system, $user_id);
         $user->read_only = $read_only;
 
-        $query = "SELECT
-                `user_id`,
-                `user_name`,
-                `ban_data`,
-                `ban_type`,
-                `ban_expire`,
-                `journal_ban`,
-                `avatar_ban`,
-                `song_ban`,
-                `last_login`,
-                `regen_rate`,
-                `forbidden_seal`,
-                `chat_color`,
-                `chat_effect`,
-                `staff_level`,
-                `username_changes`,
-                `support_level`,
-                `special_mission`,
-                `rank`,
-                `sensei_id`,
-                `accept_students`,
-                `village`
-                FROM `users` WHERE `user_id`='$user_id' LIMIT 1";
+        $query = "SELECT * FROM `users` WHERE `user_id` = '{$user_id}' LIMIT 1";
         if(!$read_only) {
             $query .= " FOR UPDATE";
         }
@@ -510,10 +489,10 @@ class User extends Fighter {
         $this->village = new Village($this->system, $user_data['village']);
         $this->village_rep = $user_data['village_rep'];
         $this->weekly_rep = $user_data['weekly_rep'];
-	$this->pvp_rep = $user_data['pvp_rep'];
+	    $this->pvp_rep = $user_data['pvp_rep'];
         $this->mission_rep_cd = $user_data['mission_rep_cd'];
         $this->recent_players_killed_ids = $user_data['recent_players_killed_ids'];
-	$this->recent_killer_ids = $user_data['recent_killer_ids'];
+	    $this->recent_killer_ids = $user_data['recent_killer_ids'];
         $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->pvp_rep, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd, $this->system->event);
 
         $this->gender = $user_data['gender'];
@@ -548,6 +527,7 @@ class User extends Fighter {
         }
 
         $this->special_mission = $user_data['special_mission'];
+        $this->operation = $user_data['operation'];
 
         $this->exam_stage = $user_data['exam_stage'];
 
@@ -857,7 +837,7 @@ class User extends Fighter {
 
         // Regen/time-based events
         $time_difference = time() - $this->last_update;
-        if($time_difference > 60 && $UPDATE == User::UPDATE_REGEN || $UPDATE == User::UPDATE_FULL) {
+        if ($time_difference > 60 && $UPDATE >= User::UPDATE_REGEN) {
             $minutes = floor($time_difference / 60);
 
             $regen_amount = $minutes * ($this->regen_rate + $this->regen_boost);
@@ -887,12 +867,10 @@ class User extends Fighter {
         }
 
         // Check training
-        if ($this->train_time && $UPDATE == User::UPDATE_FULL) {
+        if ($this->train_time && $UPDATE >= User::UPDATE_FULL) {
             $this->checkTraining();
-        } else if ($this->train_time && $UPDATE == User::UPDATE_PREVIEW) {
-            $this->checkTraining(is_preview: true);
         }
-        if($this->stat_transfer_completion_time && $UPDATE == User::UPDATE_FULL) {
+        if ($this->stat_transfer_completion_time && $UPDATE >= User::UPDATE_FULL) {
             $this->checkStatTransfer();
         }
 
@@ -1215,9 +1193,10 @@ class User extends Fighter {
      * @return void
      * @throws RuntimeException
      */
-    public function checkTraining($is_preview = false): void {
+    public function checkTraining(): void
+    {
         // Used for sidemenu display
-        if($this->train_time < time()) {
+        if ($this->train_time < time()) {
             $team_boost_description = "";
 
             // Bloodline Jutsu training
@@ -1235,17 +1214,16 @@ class User extends Fighter {
                 }
 
                 // Daily task
-                if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING) && !$is_preview) {
+                if ($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
                     $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $gain, DailyTask::SUB_TASK_JUTSU);
                 }
 
-	    	    if ($this->bloodline->jutsu[$jutsu_id]->level < 100) {
+                if ($this->bloodline->jutsu[$jutsu_id]->level < 100) {
                     $new_level = $this->bloodline->jutsu[$jutsu_id]->level + $gain;
 
                     if ($new_level > 100) {
                         $this->bloodline->jutsu[$jutsu_id]->level = 100;
-                    }
-                    else {
+                    } else {
                         $this->bloodline->jutsu[$jutsu_id]->level += $gain;
                     }
                     $message = $this->bloodline->jutsu[$jutsu_id]->name . " has increased to level " .
@@ -1256,7 +1234,7 @@ class User extends Fighter {
                         $this->{$jutsu_skill_type}++;
                         $this->exp += 10;
                         $message .= ' You have gained 1 ' . ucwords(str_replace('_', ' ', $jutsu_skill_type)) .
-                        ' and 10 experience.';
+                            ' and 10 experience.';
                     }
 
                     // Create notification
@@ -1270,46 +1248,45 @@ class User extends Fighter {
                     NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
 
                     $this->system->message($message);
+                    $this->system->printMessage();
 
-                    if (!$this->ban_type && !$is_preview) {
+                    if (!$this->ban_type) {
                         $this->updateInventory();
                     }
-		        }
+                }
 
                 $this->train_time = 0;
-            }
-            else if(str_contains($this->train_type, 'jutsu:')) {
+            } else if (str_contains($this->train_type, 'jutsu:')) {
                 $jutsu_id = $this->train_gain;
                 $this->getInventory();
 
                 $gain = User::$jutsu_train_gain;
-                if($this->system->TRAIN_BOOST) {
+                if ($this->system->TRAIN_BOOST) {
                     $gain += $this->system->TRAIN_BOOST;
                 }
-                if($this->jutsu[$jutsu_id]->level + $gain > 100) {
+                if ($this->jutsu[$jutsu_id]->level + $gain > 100) {
                     $gain = 100 - $this->jutsu[$jutsu_id]->level;
                 }
 
                 // Daily task
-                if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING) && !$is_preview) {
+                if ($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
                     $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $gain, DailyTask::SUB_TASK_JUTSU);
                 }
 
-                if($this->hasJutsu($jutsu_id)) {
-                    if($this->jutsu[$jutsu_id]->level < 100) {
+                if ($this->hasJutsu($jutsu_id)) {
+                    if ($this->jutsu[$jutsu_id]->level < 100) {
                         $new_level = $this->jutsu[$jutsu_id]->level + $gain;
 
-                        if($new_level > 100) {
+                        if ($new_level > 100) {
                             $this->jutsu[$jutsu_id]->level = 100;
-                        }
-                        else {
+                        } else {
                             $this->jutsu[$jutsu_id]->level += $gain;
                         }
                         $message = $this->jutsu[$jutsu_id]->name . " has increased to level " .
                             $this->jutsu[$jutsu_id]->level . '.';
 
                         $jutsu_skill_type = $this->jutsu[$jutsu_id]->jutsu_type . '_skill';
-                        if($this->total_stats < $this->rank->stat_cap) {
+                        if ($this->total_stats < $this->rank->stat_cap) {
                             $this->{$jutsu_skill_type}++;
                             $this->exp += 10;
                             $message .= ' You have gained 1 ' . ucwords(str_replace('_', ' ', $jutsu_skill_type)) .
@@ -1327,8 +1304,9 @@ class User extends Fighter {
                         NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
 
                         $this->system->message($message);
+                        $this->system->printMessage();
 
-                        if(!$this->ban_type && !$is_preview) {
+                        if (!$this->ban_type) {
                             $this->updateInventory();
                         }
                     }
@@ -1338,7 +1316,7 @@ class User extends Fighter {
             }
             // Skill/attribute training
             else {
-                if(!in_array($this->train_type, $this->stats)) {
+                if (!in_array($this->train_type, $this->stats)) {
                     $this->system->message("Training an invalid stat: {$this->train_type}. Training cancelled.");
                     $this->system->log('invalid_training', $this->user_id, "Stat: {$this->train_type} / Amount: $this->train_gain");
                     $this->train_time = 0;
@@ -1346,9 +1324,9 @@ class User extends Fighter {
                 }
 
                 // TEAM BOOST TRAINING GAINS
-                if($this->team != null && $this->train_gain < $this->rank->stat_cap * 0.05) {
+                if ($this->team != null && $this->train_gain < $this->rank->stat_cap * 0.05) {
                     $boost_percent = $this->team->checkForTrainingBoostTrigger();
-                    if($boost_percent != null) {
+                    if ($boost_percent != null) {
                         $boost_amount = round($this->train_gain * $boost_percent, 0, PHP_ROUND_HALF_DOWN);
                         $this->train_gain += $boost_amount;
 
@@ -1362,16 +1340,15 @@ class User extends Fighter {
                 $gain_description = $this->addStatGain($this->train_type, $this->train_gain);
 
                 // Daily task
-                if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING) && !$is_preview) {
+                if ($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
                     $sub_task_type = (str_contains($this->train_type, 'skill')) ? DailyTask::SUB_TASK_SKILL : DailyTask::SUB_TASK_GEN;
                     $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $this->train_gain, $sub_task_type);
                 }
 
                 $this->train_time = 0;
-                if($gain_description) {
+                if ($gain_description) {
                     $this->system->message($gain_description . '.' . $team_boost_description);
-                }
-                else if($this->total_stats >= $this->rank->stat_cap) {
+                } else if ($this->total_stats >= $this->rank->stat_cap) {
                     $this->system->message("Training has finished but you cannot gain any more stats!");
                 }
 
@@ -1406,7 +1383,7 @@ class User extends Fighter {
             }
 
             // Check caps
-            $gain_description = $this->addStatGain($this->stat_transfer_target_stat, $this->stat_transfer_amount);
+            $gain_description = $this->addStatGain($this->stat_transfer_target_stat, $this->stat_transfer_amount, event_boost: false);
 
             $this->stat_transfer_completion_time = 0;
             if($gain_description) {
@@ -1434,9 +1411,13 @@ class User extends Fighter {
      * @return string
      * @throws RuntimeException
      */
-    public function addStatGain(string $stat, int $stat_gain): string {
+    public function addStatGain(string $stat, int $stat_gain, bool $event_boost = true): string {
         if(!in_array($stat, $this->stats)) {
             throw new RuntimeException("Invalid stat!");
+        }
+
+        if ($event_boost && !empty($this->system->event) && $this->system->event instanceof DoubleExpEvent) {
+            $stat_gain *= DoubleExpEvent::exp_modifier;
         }
 
         $new_total_stats = $this->total_stats + $stat_gain;
@@ -1817,6 +1798,8 @@ class User extends Fighter {
         } else {
             $query .= "`special_mission`='0',";
         }
+
+        $query .= "`operation`='$this->operation',";
 
         $query .= "`exam_stage` = '{$this->exam_stage}',
 		`last_ai_ms` = '$this->last_ai_ms',
@@ -2205,10 +2188,11 @@ class User extends Fighter {
     const LOG_SPECIAL_MISSION = 'special_mission';
     const LOG_IN_BATTLE = 'in_battle';
     const LOG_NOT_IN_VILLAGE = 'not_in_village';
+    const LOG_OPERATION = 'operation';
 
     public function log(string $log_type, string $log_contents): bool {
         $valid_log_types = [
-            self::LOG_TRAINING, self::LOG_ARENA, self::LOG_LOGIN, self::LOG_MISSION, self::LOG_SPECIAL_MISSION, self::LOG_IN_BATTLE, self::LOG_NOT_IN_VILLAGE
+            self::LOG_TRAINING, self::LOG_ARENA, self::LOG_LOGIN, self::LOG_MISSION, self::LOG_SPECIAL_MISSION, self::LOG_IN_BATTLE, self::LOG_NOT_IN_VILLAGE, self::LOG_OPERATION
         ];
         if(!in_array($log_type, $valid_log_types)) {
             error_log("Invalid player log type {$log_type}");
@@ -2509,5 +2493,25 @@ class User extends Fighter {
         }
 
         return $progress_percent;
+    }
+
+    /**
+     * @return bool
+     * checks if PvP battle is complete, used to redirect playuer
+     */
+    public function checkPvPComplete(): bool {
+        $complete = false;
+        if ($this->battle_id > 0) {
+            $result = $this->system->db->query(
+                "SELECT `battle_type`, `winner` FROM `battles` WHERE `battle_id`='{$this->battle_id}' LIMIT 1"
+            );
+            if (!$this->system->db->last_num_rows == 0) {
+                $result = $this->system->db->fetch($result);
+                if ($result['battle_type'] == Battle::TYPE_FIGHT && !empty($result['winner'])) {
+                    $complete = true;
+                }
+            }
+        }
+        return $complete;
     }
 }

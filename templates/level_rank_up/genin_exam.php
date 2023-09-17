@@ -135,9 +135,9 @@ $number_name = [
                 <div id='handSeals'>
                     <?php for($i = 1; $i <= 12; $i++): ?>
                         <p id='handseal_<?=$i?>' data-selected='no' data-handseal='<?=$i?>'>
-                            <img src='./images/handseal_<?=$i?>.png' draggable='false' />
+                            <img src='./images/v2/handseals/Seal<?=$i?>.png' draggable='false' />
                             <span class='handsealNumber'>1</span>
-                            <span class='handsealTooltip'>&nbsp;</span>
+                            <span class='handsealTooltip'><?=$i?></span>
                         </p>
                         <?php if($i == 6): ?>
                             <br />

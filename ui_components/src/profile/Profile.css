@@ -123,12 +123,12 @@
 
 /* Reusable */
 #content .profile_container a {
-    color: #9e97ba;
+    color: var(--font-link);
     text-decoration: none;
     font-weight: normal;
 }
 #content .profile_container a:hover {
-    color: #bdb3e3;
+    color: var(--font-link-hover);
 }
 
 .progress_bar_container {

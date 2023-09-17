@@ -1,6 +1,7 @@
 export const Map = ({
   mapData,
   scoutData,
+  patrolData,
   playerId,
   ranksToView,
   strategicView,
@@ -37,8 +38,8 @@ export const Map = ({
        How do we calculate the starting coordinate in this example? We need to offset the first visible tile by +2 which
      is equal to player X - stage midpoint X.
    */
-  const stage_offset_x = player_x - stage_midpoint_x;
-  const stage_offset_y = player_y - stage_midpoint_y;
+  const stage_offset_x = player_x - stage_midpoint_x - 1;
+  const stage_offset_y = player_y - stage_midpoint_y - 1;
 
   /* Start player at midpoint. Offset is the desired tile number minus 1 so player sits inside the desired tile rather
    than to the right/bottom of it. For example if you want to show the player in visible tile 1, you don't want to
@@ -57,7 +58,7 @@ export const Map = ({
   const map_height = parseInt(mapData.end_y) - parseInt(mapData.start_y) + 1;
   const PlayerStyle = {
     position: "absolute",
-    backgroundImage: `url(./${mapData.invulnerable ? 'images/ninja_head_grey.png' : mapData.player_icon})`,
+    backgroundImage: mapData.operation_type ? null : `url(./${mapData.invulnerable ? 'images/ninja_head_grey.png' : mapData.player_icon})`,
     top: 0,
     left: 0,
     transform: `translate3d(
@@ -114,8 +115,23 @@ export const Map = ({
     locations: mapData.all_locations || [],
     tileWidth: tile_width,
     tileHeight: tile_height
+  }), /*#__PURE__*/React.createElement(MapObjectives, {
+    objectives: mapData.map_objectives || [],
+    tileWidth: tile_width,
+    tileHeight: tile_height
+  }), /*#__PURE__*/React.createElement(RegionObjectives, {
+    objectives: mapData.region_objectives || [],
+    tileWidth: tile_width,
+    tileHeight: tile_height,
+    strategicView: strategicView
   }), /*#__PURE__*/React.createElement(MapNearbyPlayers, {
     scoutData: scoutData || [],
+    tileWidth: tile_width,
+    tileHeight: tile_height,
+    playerId: playerId,
+    ranksToView: ranksToView
+  }), /*#__PURE__*/React.createElement(MapNearbyPatrols, {
+    patrolData: patrolData || [],
     tileWidth: tile_width,
     tileHeight: tile_height,
     playerId: playerId,
@@ -123,7 +139,61 @@ export const Map = ({
   }), /*#__PURE__*/React.createElement("div", {
     id: "map_player",
     style: PlayerStyle
-  }))));
+  }, mapData.operation_type && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "operation_text"
+  }, mapData.operation_type), /*#__PURE__*/React.createElement("div", {
+    id: "operation_progress_bar"
+  }, /*#__PURE__*/React.createElement("svg", {
+    height: "32",
+    width: "32",
+    viewBox: "0 0 50 50"
+  }, /*#__PURE__*/React.createElement("circle", {
+    id: "operation_progress_circle_background_outer",
+    stroke: "#592424",
+    cx: "24.5",
+    cy: "24",
+    r: "15",
+    strokeWidth: "5",
+    strokeMiterlimit: "0",
+    fill: "none",
+    transform: "rotate(-90, 24.5, 24)"
+  }), /*#__PURE__*/React.createElement("circle", {
+    id: "operation_progress_circle_background",
+    stroke: "#592424",
+    cx: "24.5",
+    cy: "24",
+    r: "10",
+    strokeWidth: "11",
+    strokeMiterlimit: "0",
+    fill: "none",
+    strokeDasharray: "62.83",
+    strokeDashoffset: "0",
+    transform: "rotate(-90, 24.5, 24)"
+  }), /*#__PURE__*/React.createElement("circle", {
+    id: "operation_progress_circle",
+    stroke: "#ff6a6a",
+    cx: "24.5",
+    cy: "24",
+    r: "10",
+    strokeWidth: "5",
+    strokeMiterlimit: "0",
+    fill: "none",
+    strokeDasharray: "62.83",
+    strokeDashoffset: 62.83 - 62.83 / 100 * mapData.operation_progress,
+    transform: "rotate(-90, 24.5, 24)"
+  }), /*#__PURE__*/React.createElement("circle", {
+    id: "operation_interval_circle",
+    stroke: "#00b044",
+    cx: "24.5",
+    cy: "24",
+    r: "15",
+    strokeWidth: "2",
+    strokeMiterlimit: "0",
+    fill: "none",
+    strokeDasharray: "100",
+    strokeDashoffset: 100 - 100 / 100 * mapData.operation_interval,
+    transform: "rotate(-90, 24.5, 24)"
+  }))))))));
 };
 function MapGutters({
   stageWidth,
@@ -191,8 +261,12 @@ function MapLocations({
 }) {
   return /*#__PURE__*/React.createElement("div", {
     className: "map_locations"
-  }, locations.map(location => /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(ReactTransitionGroup.TransitionGroup, null, locations.map(location => /*#__PURE__*/React.createElement(ReactTransitionGroup.CSSTransition, {
     key: location.location_id,
+    timeout: 500 // Set the animation duration in milliseconds
+    ,
+    classNames: "fade"
+  }, /*#__PURE__*/React.createElement("div", {
     className: location.objective_type != undefined ? 'map_location ' + location.objective_type : 'map_location',
     style: {
       cursor: "pointer",
@@ -203,37 +277,188 @@ function MapLocations({
       filter: "blur(0)"
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "map_locations_tooltip"
+    className: "map_location_tooltip"
   }, location.name), location.objective_image && /*#__PURE__*/React.createElement("div", {
     className: location.objective_type != undefined ? 'map_location_objective ' + location.objective_type : 'map_location_objective',
     style: {
       backgroundImage: "url(." + location.objective_image + ")"
     }
-  }), location.objective_health && location.objective_max_health > 0 && (() => {
-    const percentage = location.objective_health / location.objective_max_health * 100;
+  }))))));
+}
+function MapObjectives({
+  objectives,
+  tileWidth,
+  tileHeight
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "map_objectives"
+  }, objectives.map(objective => /*#__PURE__*/React.createElement("div", {
+    key: objective.id,
+    className: objective.objective_type != undefined ? 'map_objective ' + objective.objective_type : 'map_objective',
+    style: {
+      cursor: "pointer",
+      backgroundColor: "#" + objective.background_color,
+      backgroundImage: objective.image ? `url(${objective.image})` : null,
+      transform: `translate3d(${(objective.x - 1) * tileWidth}px, ${(objective.y - 1) * tileHeight}px, 0)`,
+      backfaceVisibility: "hidden",
+      filter: "blur(0)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "map_objective_tooltip"
+  }, objective.name))));
+}
+function RegionObjectives({
+  objectives,
+  tileWidth,
+  tileHeight,
+  strategicView
+}) {
+  function getVillageIcon(village_id) {
+    switch (village_id) {
+      case 1:
+        return '/images/village_icons/stone.png';
+      case 2:
+        return '/images/village_icons/cloud.png';
+      case 3:
+        return '/images/village_icons/leaf.png';
+      case 4:
+        return '/images/village_icons/sand.png';
+      case 5:
+        return '/images/village_icons/mist.png';
+      default:
+        return null;
+    }
+  }
+  return /*#__PURE__*/React.createElement("div", {
+    className: "region_objectives"
+  }, /*#__PURE__*/React.createElement(ReactTransitionGroup.TransitionGroup, null, objectives.map(objective => /*#__PURE__*/React.createElement(ReactTransitionGroup.CSSTransition, {
+    key: objective.id,
+    timeout: 500 // Set the animation duration in milliseconds
+    ,
+    classNames: "fade"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: objective.objective_type != undefined ? 'region_objective ' + objective.objective_type : 'region_objective',
+    style: {
+      cursor: "pointer",
+      backgroundColor: "#" + objective.background_color,
+      backgroundImage: objective.image ? objective.objective_type == 'village' && !strategicView ? 'url(/images/map/icons/village.png)' : `url(${objective.image})` : null,
+      transform: `translate3d(${(objective.x - 1) * tileWidth}px, ${(objective.y - 1) * tileHeight}px, 0)`,
+      backfaceVisibility: "hidden",
+      filter: "blur(0)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "region_objective_tooltip",
+    style: {
+      display: strategicView ? 'flex' : 'none'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "region_objective_tooltip_name"
+  }, objective.name), /*#__PURE__*/React.createElement("div", {
+    className: "region_objective_tooltip_tags"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "region_objective_tooltip_defense"
+  }, objective.defense), /*#__PURE__*/React.createElement("img", {
+    className: "region_objective_tooltip_village",
+    src: getVillageIcon(objective.village_id)
+  }))), objective.objective_health && objective.objective_max_health > 0 && (() => {
+    const percentage = objective.objective_health / objective.objective_max_health * 100;
     let barColor;
-    if (percentage >= 50) {
-      barColor = 'green';
-    } else if (percentage >= 25) {
+    let strokeColor = '#2b2c2c';
+    let strokeColor2 = '#3c2b2bcc';
+    if (percentage > 50) {
+      barColor = '#00b044';
+    } else if (percentage > 25) {
       barColor = 'yellow';
     } else {
       barColor = 'red';
     }
-    return /*#__PURE__*/React.createElement("div", {
-      className: "map_location_objective_health",
+    return percentage < 100 || strategicView ? /*#__PURE__*/React.createElement("div", {
+      className: "region_objective_health"
+    }, /*#__PURE__*/React.createElement("svg", {
+      width: "60",
+      height: "9"
+    }, /*#__PURE__*/React.createElement("g", {
+      transform: "skewX(-25)"
+    }, /*#__PURE__*/React.createElement("rect", {
+      x: "5",
+      y: "0",
+      width: "50",
+      height: "5",
       style: {
-        backgroundColor: barColor,
-        width: `${percentage}%`,
-        height: '6px',
-        position: 'absolute',
-        color: 'white',
-        textAlign: 'center',
-        lineHeight: '8px',
-        fontSize: '8px',
-        top: '3px'
+        fill: strokeColor,
+        stroke: strokeColor,
+        strokeWidth: '0'
       }
-    });
-  })())));
+    })), /*#__PURE__*/React.createElement("g", {
+      transform: "skewX(-25)"
+    }, /*#__PURE__*/React.createElement("rect", {
+      x: "5",
+      y: "0",
+      width: percentage / 2,
+      height: "5",
+      style: {
+        fill: barColor,
+        stroke: strokeColor,
+        strokeWidth: '0'
+      }
+    })), /*#__PURE__*/React.createElement("g", {
+      transform: "skewX(-25)"
+    }, /*#__PURE__*/React.createElement("rect", {
+      x: "5",
+      y: "0",
+      rx: "2",
+      ry: "2",
+      width: "10",
+      height: "5",
+      style: {
+        fill: 'transparent',
+        stroke: strokeColor,
+        strokeWidth: '2'
+      }
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "15",
+      y: "0",
+      width: "10",
+      height: "5",
+      style: {
+        fill: 'transparent',
+        stroke: strokeColor,
+        strokeWidth: '2'
+      }
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "25",
+      y: "0",
+      width: "10",
+      height: "5",
+      style: {
+        fill: 'transparent',
+        stroke: strokeColor,
+        strokeWidth: '2'
+      }
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "35",
+      y: "0",
+      width: "10",
+      height: "5",
+      style: {
+        fill: 'transparent',
+        stroke: strokeColor,
+        strokeWidth: '2'
+      }
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "45",
+      y: "0",
+      rx: "2",
+      ry: "2",
+      width: "10",
+      height: "5",
+      style: {
+        fill: 'transparent',
+        stroke: strokeColor,
+        strokeWidth: '2'
+      }
+    })))) : null;
+  })())))));
 }
 function MapNearbyPlayers({
   scoutData,
@@ -247,34 +472,106 @@ function MapNearbyPlayers({
     className: "map_locations"
   }, scoutData.filter(user => ranksToView[parseInt(user.rank_num)] === true).map((player, index) => player.user_id != playerId && /*#__PURE__*/React.createElement("div", {
     key: player.user_id,
-    className: alignmentClass(player.alignment) + " " + visibilityClass(player.invulnerable),
+    className: "map_location",
     style: {
       cursor: "pointer",
       transform: `translate3d(${(player.target_x - 1) * tileWidth}px, ${(player.target_y - 1) * tileHeight}px, 0)`,
-      backfaceVisibility: "hidden",
-      filter: "blur(0)"
+      backfaceVisibility: "hidden"
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "map_locations_tooltip"
-  }, player.user_name))));
+    className: "map_location_tooltip"
+  }, player.user_name), /*#__PURE__*/React.createElement("div", {
+    className: alignmentClassPlayer(player.alignment, player.village_id) + visibilityClass(player.invulnerable)
+  }))));
+}
+function MapNearbyPatrols({
+  patrolData,
+  tileWidth,
+  tileHeight
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    id: "patrol_locations",
+    className: "map_locations"
+  }, patrolData.map((patrol, index) => /*#__PURE__*/React.createElement("div", {
+    key: patrol.patrol_id + '_' + patrol.patrol_type,
+    className: "map_location",
+    style: {
+      cursor: "pointer",
+      transform: `translate3d(${(patrol.target_x - 1) * tileWidth}px, ${(patrol.target_y - 1) * tileHeight}px, 0)`,
+      backfaceVisibility: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "map_location_tooltip"
+  }, patrol.patrol_name), /*#__PURE__*/React.createElement("div", {
+    className: alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type
+  }))));
 }
 const visibilityClass = invulnerable => {
   if (invulnerable) {
-    return 'invulnerable';
+    return ' invulnerable';
   }
-  return ' ';
+  return '';
 };
-const alignmentClass = alignment => {
-  let class_name = 'map_location';
+const alignmentClassPlayer = (alignment, village_id) => {
+  let class_name = '';
   switch (alignment) {
     case 'Ally':
-      class_name += ' player_ally';
+      class_name += 'player_ally';
       break;
     case 'Enemy':
-      class_name += ' player_enemy';
+      class_name += 'player_enemy';
       break;
     case 'Neutral':
-      class_name += ' player_neutral';
+      class_name += 'player_neutral';
+      break;
+  }
+  switch (village_id) {
+    case 1:
+      class_name += ' player_stone';
+      break;
+    case 2:
+      class_name += ' player_cloud';
+      break;
+    case 3:
+      class_name += ' player_leaf';
+      break;
+    case 4:
+      class_name += ' player_sand';
+      break;
+    case 5:
+      class_name += ' player_mist';
+      break;
+  }
+  return class_name;
+};
+const alignmentClassPatrol = (alignment, village_id) => {
+  let class_name = '';
+  switch (alignment) {
+    case 'Ally':
+      class_name += 'patrol_ally';
+      break;
+    case 'Enemy':
+      class_name += 'patrol_enemy';
+      break;
+    case 'Neutral':
+      class_name += 'patrol_neutral';
+      break;
+  }
+  switch (village_id) {
+    case 1:
+      class_name += ' patrol_stone';
+      break;
+    case 2:
+      class_name += ' patrol_cloud';
+      break;
+    case 3:
+      class_name += ' patrol_leaf';
+      break;
+    case 4:
+      class_name += ' patrol_sand';
+      break;
+    case 5:
+      class_name += ' patrol_mist';
       break;
   }
   return class_name;

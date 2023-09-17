@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../classes/Route.php';
 
 // KEEP IDS IN SYNC WITH Router::PAGE_IDS
-// NEXT ID: 37 (i.e. if you add 28, update this to 29 to help other contributors)
+// NEXT ID: 38 (i.e. if you add 28, update this to 29 to help other contributors)
 return $routes = [
     // User Menu
     1 => new Route(
@@ -23,7 +23,7 @@ return $routes = [
         title: 'Jutsu',
         function_name: 'jutsu',
         menu: Route::MENU_USER,
-        battle_ok: false,
+        battle_ok: true,
     ),
     5 => new Route(
         file_name: 'gear.php',
@@ -263,5 +263,12 @@ return $routes = [
         title: "???",
         function_name: 'forbiddenShop',
         menu: Route::MENU_NONE,
+    ),
+    37 => new Route(
+        file_name: 'war.php',
+        title: "War",
+        function_name: 'war',
+        menu: Route::MENU_NONE,
+        battle_type: Battle::TYPE_AI_WAR,
     ),
 ];

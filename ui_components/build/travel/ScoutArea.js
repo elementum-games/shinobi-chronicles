@@ -39,6 +39,32 @@ export const ScoutArea = ({
     colosseumCoords: mapData.colosseum_coords
   }))));
 };
+export const QuickScout = ({
+  mapData,
+  scoutData,
+  attackPlayer,
+  sparPlayer,
+  ranksToView,
+  playerId,
+  updateMovementDirection
+}) => {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "quick-scout-contrainer",
+    onContextMenu: e => {
+      e.preventDefault();
+    },
+    onClick: e => {
+      e.preventDefault();
+    }
+  }, scoutData && scoutData.find(user => ranksToView[parseInt(user.rank_num)] === true && user.user_id !== playerId) && /*#__PURE__*/React.createElement(QuickScoutInner, {
+    key: scoutData[0].user_id,
+    player_data: scoutData.find(user => ranksToView[parseInt(user.rank_num)] === true && user.user_id !== playerId),
+    attackPlayer: attackPlayer,
+    sparPlayer: sparPlayer,
+    colosseumCoords: mapData ? mapData.colosseum_coords : null,
+    updateMovementDirection: updateMovementDirection
+  }));
+};
 const Player = ({
   player_data,
   membersLink,
@@ -53,7 +79,7 @@ const Player = ({
     className: 'travel-scout-name' + " " + visibilityClass(player_data.invulnerable)
   }, /*#__PURE__*/React.createElement("a", {
     href: membersLink + '&user=' + player_data.user_name
-  }, player_data.user_name), /*#__PURE__*/React.createElement("span", null, "Lv.", player_data.level, " - ", player_data.rank_name)), /*#__PURE__*/React.createElement("div", {
+  }, player_data.user_name), /*#__PURE__*/React.createElement("span", null, "Lv.", player_data.level)), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-location"
   }, player_data.target_x, " \u2219 ", player_data.target_y), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-faction"
@@ -71,6 +97,35 @@ const Player = ({
   }), player_data.attack === false && player_data.direction !== 'none' && /*#__PURE__*/React.createElement("span", {
     className: `direction ${player_data.direction}`
   })));
+};
+const QuickScoutInner = ({
+  player_data,
+  attackPlayer,
+  sparPlayer,
+  colosseumCoords,
+  updateMovementDirection
+}) => {
+  const onKeyDown = e => {
+    e.preventDefault();
+    updateMovementDirection(player_data.direction);
+  };
+  const onKeyUp = e => {
+    e.preventDefault();
+    updateMovementDirection(null);
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "quick-scout",
+    onMouseUp: e => onKeyUp(e)
+  }, player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && !player_data.invulnerable && (player_data.target_x === colosseumCoords.x && player_data.target_y === colosseumCoords.y ? /*#__PURE__*/React.createElement("a", {
+    onClick: () => sparPlayer(player_data.user_id)
+  }) : /*#__PURE__*/React.createElement("a", {
+    onClick: () => attackPlayer(player_data.attack_id)
+  })), player_data.attack === true && parseInt(player_data.battle_id, 10) > 0 && /*#__PURE__*/React.createElement("span", {
+    className: "in-battle"
+  }), player_data.attack === false && player_data.direction !== 'none' && /*#__PURE__*/React.createElement("span", {
+    className: `direction ${player_data.direction}`,
+    onMouseDown: e => onKeyDown(e)
+  }));
 };
 const visibilityClass = invulnerable => {
   if (invulnerable) {

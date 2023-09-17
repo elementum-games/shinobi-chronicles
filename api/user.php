@@ -60,6 +60,10 @@ try {
             API::exitWithError(message: "Invalid request!", system: $system);
     }
 
+    if ($player->checkPvPComplete()) {
+        $UserAPIResponse->response_data['battle_url'] = $system->router->getUrl("battle");
+    }
+
     API::exitWithData(
         data: $UserAPIResponse->response_data,
         errors: $UserAPIResponse->errors,

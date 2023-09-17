@@ -10,6 +10,7 @@ class Battle {
     const TYPE_CHALLENGE = 4;
     const TYPE_AI_MISSION = 5;
     const TYPE_AI_RANKUP = 6;
+    const TYPE_AI_WAR = 7;
 
     const TURN_LENGTH = 15;
     const INITIAL_TURN_LENGTH = 40;
@@ -89,6 +90,7 @@ class Battle {
             case self::TYPE_CHALLENGE:
             case self::TYPE_AI_MISSION:
             case self::TYPE_AI_RANKUP:
+            case self::TYPE_AI_WAR:
                 break;
             default:
                 throw new RuntimeException("Invalid battle type!");

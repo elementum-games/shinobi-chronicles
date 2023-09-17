@@ -69,7 +69,7 @@ function bloodline() {
 	$bloodline_ranks = array(4 => 'Lesser', 3 => 'Common', 2 => 'Elite', 1 => 'Legendary', 5 => 'Admin');
 	echo "<label style='width: 8.8em;font-weight:bold;'>Name:</label>" . $player->bloodline->name . "<br />
 		<label style='width: 8.8em;font-weight:bold;'>Rank:</label>" . $bloodline_ranks[$player->bloodline->rank] . "<br />
-		<label style='width: 8.8em;font-weight:bold;'>Bloodline skill:</label>" . $player->bloodline_skill . "<br />";
+		<label style='width: 8.8em;font-weight:bold;'>Bloodline skill:</label>" . $player->bloodline_skill . " (+100 Base)<br />";
 	echo "<br />";
 
 
@@ -93,31 +93,31 @@ function bloodline() {
 			'ratio_multiplier' => 100
 		),
 		'ninjutsu_boost' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra ninjutsu offense (+[PERCENTAGE]%)</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Ninjutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost decreases to 75% strength as Bloodline Skill exceeds Ninjutsu skill</span>"
 		),
 		'taijutsu_boost' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra taijutsu offense (+[PERCENTAGE]%)</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Taijutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost decreases to 75% strength as Bloodline Skill exceeds Taijutsu skill</span>"
 		),
 		'genjutsu_boost' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra genjutsu offense (+[PERCENTAGE]%)</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Genjutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost decreases to 75% strength as Bloodline Skill exceeds Genjutsu skill</span>"
 		),
 		'heal' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] per turn</span>"
 		),
 		'ninjutsu_resist' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> [random/defense] -> <span class='amount'>[AMOUNT] less ninjutsu damage taken</span>"
+			'text' => "[BL_SKILL] * [RATIO] * [0.7] -> <span class='amount'>[AMOUNT] less Ninjutsu damage taken</span>"
 		),
 		'genjutsu_resist' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> [random/defense] -> <span class='amount'>[AMOUNT] less genjutsu damage taken</span>"
+			'text' => "[BL_SKILL] * [RATIO] * [0.7] -> <span class='amount'>[AMOUNT] less Genjutsu damage taken</span>"
 		),
 		'taijutsu_resist' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> [random/defense] -> <span class='amount'>[AMOUNT] less taijutsu damage taken</span>"
+			'text' => "[BL_SKILL] * [RATIO] * [0.7] -> <span class='amount'>[AMOUNT] less Taijutsu damage taken</span>"
 		),
 		'speed_boost' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra speed</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra Speed</span>"
 		),
 		'cast_speed_boost' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra cast speed</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra Cast Speed</span>"
 		),
 		'endurance_boost' => array(
 			'text' => "<span style='color:#00A0C0;'>R.I.P. Endurance 2014-2014, gone but not forgotten :/</span>"
@@ -182,27 +182,33 @@ function bloodline() {
 				$replace_array[2] *= $boosts[$boost['effect']]['amount_multiplier'];
 			}
 			$replace_array[1] = round($replace_array[1], 2);
-			$replace_array[2] = round($replace_array[2], 2);
+			$replace_array[2] = round($replace_array[2], 0);
 
 			switch($boost['effect']) {
 				case 'ninjutsu_boost':
                     $player_offense = Fighter::BASE_OFFENSE + ($player->ninjutsu_skill * Fighter::SKILL_OFFENSE_RATIO);
-					$replace_array[3] = round($boost['effect_amount'] / $player_offense, 2) * 100;
+					$replace_array[3] = round($boost['effect_amount'] / $player_offense, 0) * 100;
+                    $replace_array[2] *= 10;
+					$replace_array[1] *= 10;
 					break;
 				case 'taijutsu_boost':
                     $player_offense = Fighter::BASE_OFFENSE + ($player->taijutsu_skill * Fighter::SKILL_OFFENSE_RATIO);
-                    $replace_array[3] = round($boost['effect_amount'] / $player_offense, 2) * 100;
+                    $replace_array[3] = round($boost['effect_amount'] / $player_offense, 0) * 100;
+                    $replace_array[2] *= 10;
+					$replace_array[1] *= 10;
 					break;
 				case 'genjutsu_boost':
                     $player_offense = Fighter::BASE_OFFENSE + ($player->genjutsu_skill * Fighter::SKILL_OFFENSE_RATIO);
-                    $replace_array[3] = round($boost['effect_amount'] / $player_offense, 2) * 100;
+                    $replace_array[3] = round($boost['effect_amount'] / $player_offense, 0) * 100;
+                    $replace_array[2] *= 10;
+					$replace_array[1] *= 10;
 					break;
                 case 'taijutsu_resist':
                 case 'genjutsu_resist':
                 case 'ninjutsu_resist':
 					$replace_array[2] = round(
                         ($boost['effect_amount'] * Fighter::BLOODLINE_DEFENSE_MULTIPLIER) / Fighter::BASE_DEFENSE,
-                        2
+                        0
                     );
 					break;
             }

@@ -8,6 +8,7 @@ require_once __DIR__ . '/API.php';
 require_once __DIR__ . '/Layout.php';
 require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/Route.php';
+require_once __DIR__ . '/../classes/event/DoubleExpEvent.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -95,13 +96,15 @@ class System {
 
     // Default layout
     const DEFAULT_LAYOUT = 'new_geisha';
-    const VERSION_NUMBER = '0.9.1';
-    const VERSION_NAME = '0.9 Flickering Ambitions';
+    const VERSION_NUMBER = '0.9.2';
+    const VERSION_NAME = '0.9.2 Flickering Ambitions';
 
     // Misc stuff
     const SC_MAX_RANK = 4;
 
     const MAX_LINK_DISPLAY_LENGTH = 60;
+
+    public bool $war_enabled = false;
 
     public static array $explicit_words = [
         'fuck',
@@ -195,6 +198,10 @@ class System {
         $this->timezoneOffset = date('Z');
 
         $this->checkForActiveEvent();
+
+        if ($this->isDevEnvironment()) {
+            $this->war_enabled = true;
+        }
     }
 
     /**
@@ -602,12 +609,19 @@ class System {
         // July 2023 Lantern Event
         $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
         $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
+        $september_2023_double_exp_start_time = new DateTimeImmutable('2023-09-17');
+        $september_2023_double_exp_end_time = new DateTimeImmutable('2023-10-1');
         if($this->isDevEnvironment()) {
             $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-15');
+            $september_2023_double_exp_start_time = new DateTimeImmutable('2023-09-13');
         }
 
         if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
             $this->event = new LanternEvent($july_2023_lantern_event_end_time);
+        }
+
+        if ($current_datetime > $september_2023_double_exp_start_time && $current_datetime < $september_2023_double_exp_end_time) {
+            $this->event = new DoubleExpEvent($september_2023_double_exp_end_time);
         }
     }
 

@@ -229,27 +229,31 @@ $prefill_item_id = $_POST['item_id'] ?? '';
 
             if(currentlySelectedJutsu !== false) {
                 $(currentlySelectedJutsu).css('box-shadow', '0px');
+                $(currentlySelectedJutsu).removeClass('selected_jutsu');
             }
             currentlySelectedJutsu = this;
             $(currentlySelectedJutsu).css('box-shadow', '0px 0px 4px 0px #000000');
-            $('.handsealTooltip').html('&nbsp;');
+            $(currentlySelectedJutsu).addClass('selected_jutsu');
+            //$('.handsealTooltip').html('&nbsp;');
             var handseal_string = $(this).attr('data-handseals');
             var handseal_array = handseal_string.split('-');
-            for(var x in handseal_array) {
+            /*for(var x in handseal_array) {
                 if(!isNaN(parseInt(handseal_array[x]))) {
                     id = 'handseal_' + handseal_array[x];
                     $('#' + id).children('.handsealTooltip').text((parseInt(x) + 1));
                 }
-            }
+            }*/
         });
 
         var currentlySelectedWeapon = $('p[data-id=0]');
         $('.weapon').click(function(){
             if(currentlySelectedWeapon !== false) {
                 $(currentlySelectedWeapon).css('box-shadow', '0px');
+                $(currentlySelectedWeapon).removeClass('selected_weapon');
             }
             currentlySelectedWeapon = this;
             $(currentlySelectedWeapon).css('box-shadow', '0px 0px 4px 0px #000000');
+            $(currentlySelectedWeapon).addClass('selected_weapon');
             $('#weaponID').val( $(this).attr('data-id') );
             $('#weaponElement').val($(this).attr('data-element') || "None");
         });
@@ -442,9 +446,9 @@ $prefill_item_id = $_POST['item_id'] ?? '';
             <div id='handSeals'>
                 <?php for ($i = 1; $i <= 12; $i++): ?>
                     <p id='handseal_<?= $i ?>' data-selected='no' data-handseal='<?= $i ?>'>
-                        <img src='./images/handseal_<?= $i ?>.png' draggable='false' />
+                        <img src='./images/v2/handseals/Seal<?= $i ?>.png' draggable='false' />
                         <span class='handsealNumber'>1</span>
-                        <span class='handsealTooltip'>&nbsp;</span>
+                        <span class='handsealTooltip'><?= $i ?></span>
                     </p>
                     <?php if($i == 6): ?>
                         <br />

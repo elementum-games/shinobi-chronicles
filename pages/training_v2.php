@@ -51,6 +51,9 @@ function training() {
                 $stat = ($train_skill) ? $system->db->clean($_POST['skill']) : $system->db->clean($_POST['attributes']);
                 $player->trainingManager->train_type = $stat; // Temp override for clan boost calculations
                 //Validate stat
+                if ($player->total_stats >= $player->rank->stat_cap) {
+                    throw new RuntimeException("You cannot train any more at this rank!");
+                }
                 if($train_skill && !in_array($stat, $valid_skills)) {
                     throw new RuntimeException("Invalid skill!");
                 }

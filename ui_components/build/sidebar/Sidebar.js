@@ -43,6 +43,9 @@ function Sidebar({
       if (response.errors.length) {
         handleErrors(response.errors);
         return;
+      }
+      if (response.data.battle_url) {
+        window.location.href = response.data.battle_url;
       } else {
         setPlayerResources(response.data.playerResources);
         setRegenTime(response.data.playerResources.regen_time);

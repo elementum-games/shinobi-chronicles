@@ -6,6 +6,8 @@ class TravelApiPresenter {
             'success' => $success,
             'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $travelManager, system: $system),
             'nearbyPlayers' => TravelApiPresenter::nearbyPlayersResponse(travelManager: $travelManager),
+            'nearbyPatrols' => TravelApiPresenter::nearbyPatrolsResponse(travelManager: $travelManager),
+            'travel_message' => $travelManager->travel_message,
         ];
     }
 
@@ -14,6 +16,8 @@ class TravelApiPresenter {
         $current_location_portal = $travelManager->fetchCurrentLocationPortal();
         $location_action = $travelManager->getMapLocationAction($locations, $player);
         $regions = $travelManager->getRegions($player);
+        $travelManager->checkOperation($player->operation);
+        $operation = $player->operation > 0 ? $travelManager->warManager->getOperationById($player->operation) : null;
         return [
             'player_x'          => $player->location->x,
             'player_y'          => $player->location->y,
@@ -40,6 +44,13 @@ class TravelApiPresenter {
             'region_coords'     => $travelManager->getCoordsByRegion($regions),
             'spar_link'         => $system->router->getUrl('spar'),
             'colosseum_coords'  => $travelManager->getColosseumCoords(),
+            'region_objectives' => $travelManager->fetchRegionObjectives(),
+            'map_objectives'    => $travelManager->fetchMapObjectives(),
+            'battle_url'        => $travelManager->getPlayerBattleUrl(),
+            'operations'        => $travelManager->warManager->getValidOperations(),
+            'operation_type'    => $operation ? System::unSlug(Operation::OPERATION_TYPE_DESCRIPTOR[$operation->type]) : null,
+            'operation_progress'=> $operation ? $operation->progress : null,
+            'operation_interval'=> $operation ? $operation->interval_progress : null,
         ];
     }
 
@@ -63,9 +74,29 @@ class TravelApiPresenter {
                     'direction'     => $nearbyPlayer->direction,
                     'invulnerable'  => $nearbyPlayer->invulnerable,
                     'distance'      => $nearbyPlayer->distance,
+                    'village_id'    => $nearbyPlayer->village_id,
                 ];
             },
             $travelManager->fetchNearbyPlayers()
+        );
+    }
+
+    public static function nearbyPatrolsResponse(TravelManager $travelManager): array
+    {
+        return array_map(
+            function (Patrol $nearbyPatrol) {
+                return [
+                    'patrol_id' => $nearbyPatrol->id,
+                    'patrol_name' => $nearbyPatrol->name,
+                    'target_x' => $nearbyPatrol->current_x,
+                    'target_y' => $nearbyPatrol->current_y,
+                    'target_map_id' => $nearbyPatrol->map_id,
+                    'patrol_type' => $nearbyPatrol->patrol_type,
+                    'alignment' => $nearbyPatrol->alignment,
+                    'village_id' => $nearbyPatrol->village_id,
+                ];
+            },
+            $travelManager->fetchNearbyPatrols()
         );
     }
 

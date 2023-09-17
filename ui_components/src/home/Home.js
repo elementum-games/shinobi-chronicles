@@ -14,6 +14,7 @@ type Props = {|
     +isLoggedIn: bool,
     +isAdmin: bool,
     +version: string,
+    +versionNumber: string,
     +initialView: "login" | "reset" | "register",
     +loginErrorText: string,
     +registerErrorText: string,
@@ -32,6 +33,7 @@ function Home({
     isLoggedIn,
     isAdmin,
     version,
+    versionNumber,
     initialView,
     loginErrorText,
     registerErrorText,
@@ -83,7 +85,9 @@ function Home({
             {/*<ContactSection
                 contactRef={contactRef}
             />*/}
-            <FooterSection />
+            <FooterSection
+                version={versionNumber}
+            />
         </>
     );
 }
@@ -444,10 +448,10 @@ function ContactSection({ contactRef }) {
         </div>
     );
 }
-function FooterSection({ }) {
+function FooterSection({ version }) {
     return (
         <div className={"home_section footer_section"}>
-            <div className="footer_text">SHINOBI CHRONICLES V0.9.0 COPYRIGHT &copy; LM VISIONS</div>
+            <div className="footer_text">SHINOBI CHRONICLES V{version} COPYRIGHT &copy; LM VISIONS</div>
         </div>
     );
 }

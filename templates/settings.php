@@ -8,6 +8,8 @@
  * @var string $journal
  * @var string $list
  *
+ * @var Layout $current_layout
+ *
  * @var array $layouts
  *
  * @var int $max_journal_length
@@ -167,12 +169,13 @@
             <form action='<?=$self_link?>' method='post'>
                 <select name='layout'>";
                     <?php foreach($layouts as $layout):?>
-                        <option value='<?=$layout?>' <?=($player->layout == $layout ? "selected='selected'" : "")?>><?=ucwords(str_replace("_", " ", $layout))?></option>
+                        <option value='<?=$layout?>' <?=($player->layout == $layout ? "selected='selected'" : "")?>><?=ucwords(str_replace("_", " ", $layout_names[$layout]))?></option>
                     <?php endforeach ?>
                 </select>
                 <input type='submit' name='change_layout' value='Change' />
             </form>
-            <?php if($player->layout == "new_geisha"): ?>
+            <span><i>Note: Legacy layouts may not be compatible with all pages</i></span>
+            <?php if($current_layout->usesV2Interface()): ?>
             <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap">
                 <div>
                     <label>Avatar Style</label>

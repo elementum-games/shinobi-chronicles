@@ -34,6 +34,9 @@ function jutsu(): void {
         $equipped_jutsu = [];
 
         try {
+            if ($player->battle_id) {
+                throw new RuntimeException("Cannot change jutsu while in battle!");
+            }
             $count = 0;
             $jutsu_types = ['ninjutsu', 'taijutsu', 'genjutsu'];
             foreach($jutsu as $jutsu_data) {
@@ -67,6 +70,9 @@ function jutsu(): void {
     if(!empty($_GET['learn_jutsu'])) {
         $jutsu_id = (int)$_GET['learn_jutsu'];
         try {
+            if ($player->battle_id) {
+                throw new RuntimeException("Cannot change jutsu while in battle!");
+            }
             if(!isset($player->jutsu_scrolls[$jutsu_id])) {
                 throw new RuntimeException("Invalid jutsu!");
             }
@@ -113,6 +119,9 @@ function jutsu(): void {
         }
     }
     else if(!empty($_GET['forget_jutsu'])) {
+        if ($player->battle_id) {
+            throw new RuntimeException("Cannot change jutsu while in battle!");
+        }
         $jutsu_id = (int)$_GET['forget_jutsu'];
         try {
             //Checking if player knows the jutsu he's trying to forget.
