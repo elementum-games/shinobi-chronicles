@@ -289,8 +289,8 @@ class TrainingManager {
         if(str_contains($type, "jutsu:")) {
             $gain = $this->getTrainingAmount($length, $type);
 
-            return "Takes " . $this->getTrainingLength($length, true, true) . " or more depending on level, "
-                . "gives $gain level" . ($gain > 1 ? 's' : '');
+            return "Takes " . $this->getTrainingLength($length, true, true) . " or more minutes depending on level, "
+                . "increases level by $gain";
         }
         else {
             switch ($length) {

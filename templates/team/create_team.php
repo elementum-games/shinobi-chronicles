@@ -75,9 +75,9 @@
             <form action='<?= $self_link ?>' method='post'>
                 <b>Name</b><br />
                 <i>(<?= Team::MIN_NAME_LENGTH ?>-<?= Team::MAX_NAME_LENGTH ?> characters, only letters, numbers, spaces, dashes, and underscores allowed)</i><br />
-                <input type='text' name='name' value='<?= ($name ?? '') ?>' /><br />
+                <input type='text' style='margin-top: 7px' name='name' value='<?= ($name ?? '') ?>' /><br />
                 <!--TYPE-->
-                <input type='submit' name='create_team' value='Create' />
+                <input type='submit' style='margin-top: 7px' name='create_team' value='Create' />
             </form>
         </td></tr>
 </table>

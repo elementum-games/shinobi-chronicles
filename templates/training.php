@@ -44,11 +44,10 @@
 <?php endif ?>
 
 <table class="table">
-    <tr><th colspan="<?=($player->bloodline_id != 0 && $trainable_bl_jutsu) ? 4 : 3?>">Academy</th></tr>
+    <tr><th colspan="<?=($player->bloodline_id != 0 && $trainable_bl_jutsu) ? 4 : 3?>">Training</th></tr>
     <tr>
-        <td colspan="<?=($player->bloodline_id != 0 && $trainable_bl_jutsu) ? 4 : 3?>">
-            <p style="text-align:center;">Here at the academy, you can take classes to improve your skills, attributes, or skill with a
-                jutsu.</p>
+        <td style='text-align: center' colspan="<?=($player->bloodline_id != 0 && $trainable_bl_jutsu) ? 4 : 3?>">
+            <p style="text-align:center;">You can train to improve your skills, attributes, or proficiency with jutsu.</p>
             <span class="header">Skill/Attribute training:</span><br />
             <p class="indent">
                 <label>Short:</label>
@@ -97,7 +96,7 @@
         <tr style="text-align: center;">
             <td>
                 <form action="<?=$self_link?>" method="post">
-                    <select name="skill">
+                    <select style="margin-bottom: 5px" name="skill">
                         <?php foreach($valid_skills as $skill): ?>
                             <option value="<?=$skill?>" <?=($player->trainingManager->train_type == $skill ? "selected='selected'" : "")?>
                             ><?=ucwords(str_replace('_', ' ', $skill))?></option>
@@ -110,7 +109,7 @@
             </td>
             <td>
                 <form action="<?=$self_link?>" method="post">
-                    <select name="attributes">
+                    <select style="margin-bottom: 5px" name="attributes">
                         <?php foreach($valid_attributes as $attribute): ?>
                             <option value="<?=$attribute?>" <?=($player->trainingManager->train_type == $attribute ? "selected='selected'" : "")?>
                             ><?=ucwords(str_replace('_', ' ', $attribute))?></option>
@@ -123,7 +122,7 @@
             </td>
             <td>
                 <form action="<?=$self_link?>" method="post">
-                    <select name="jutsu">
+                    <select style="margin-bottom: 5px" name="jutsu">
                         <?php foreach($player->jutsu as $id => $jutsu): ?>
                             <?php if($jutsu->level >= Jutsu::MAX_LEVEL): ?>
                                 <?php continue; ?>
@@ -138,7 +137,7 @@
             <?php if($player->bloodline_id != 0 && $trainable_bl_jutsu): ?>
                 <td>
                     <form action="<?=$self_link?>" method="post">
-                        <select name="bloodline_jutsu">
+                        <select style="margin-bottom: 5px" name="bloodline_jutsu">
                             <?php foreach($player->bloodline->jutsu as $id => $jutsu): ?>
                                 <?php if($jutsu->level >= Jutsu::MAX_LEVEL): ?>
                                     <?php continue; ?>

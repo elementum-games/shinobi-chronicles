@@ -151,8 +151,8 @@ $RANK_NAMES = RankManager::fetchNames($system);
                 <b>Invite Player</b><br />
                 <form action='<?= $self_link ?>' method='get'>
                     <input type='hidden' name='id' value='<?= Router::PAGE_IDS['team'] ?>'>
-                    <input type='text' name='user_name' /><br />
-                    <input type='submit' name='invite' value='Send' />
+                    <input type='text' style='margin-top: 7px' name='user_name' /><br />
+                    <input type='submit' style='margin-top: 7px' name='invite' value='Send' />
                 </form>
                 <br />
 

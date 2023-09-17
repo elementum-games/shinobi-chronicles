@@ -21,7 +21,7 @@ function members(): void {
 		<form action='$self_link' method='get'>
 		<input type='hidden' name='id' value='6' />
 		<input type='text' name='user' /><br />
-		<input type='submit' value='Search' />
+		<input style='margin-top: 7px' type='submit' value='Search' />
 		</form>
 	</div>";
 
