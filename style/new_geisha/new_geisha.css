@@ -95,7 +95,7 @@
     --travel-ui-color: #1a191d;
     --travel-button-hover: #262631;
     --travel-background-color: #20222b;
-    --travel-scout-background: rgba(26, 25, 29, 0.75);
+    --travel-scout-background: rgba(26, 25, 29, 0.85);
     /* Battle Config */
     --ninjutsu-text-color: #4C8CFF;
     --taijutsu-text-color: #FF4C4C;
@@ -528,7 +528,6 @@ input[type=checkbox] {
     width: 100%;
     top: 5px;
     color: var(--font-color-1);
-    font-weight: bold;
 }
 
 /* User Colors */

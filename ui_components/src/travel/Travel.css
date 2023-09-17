@@ -77,8 +77,11 @@
 .travel-scout-container.allies {
     left: 44px;
 }
+.travel-scout-container.allies .travel-scout-entry {
+    flex-direction: row-reverse;
+}
 .travel-scout-container {
-    width: 250px;
+    width: 180px;
     max-height: 412px;
     flex-grow: 0;
     display: flex;
@@ -98,15 +101,14 @@
 }
 .travel-scout-entry {
     width: 100%;
-    height: 40px;
+    height: 36px;
     display: flex;
     flex-flow: row wrap;
     align-items: center;
-    justify-content: space-between;
     position: relative;
-    padding: 4px 0 8px 8px;
     background: var(--travel-scout-background);
     border: 1px solid rgba(0, 0, 0, 0.12);
+    clip-path: polygon(0% 5px, 5px 5px, 5px 0%, calc(100% - 5px) 0%, calc(100% - 5px) 5px, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 5px calc(100% - 5px), 0% calc(100% - 5px));
 }
 
 /* Slightly bigger buttons for small touchscreens
@@ -682,7 +684,7 @@
 
 /* Scout Report */
 
-.travel-scout-entry::before {
+/*.travel-scout-entry::before {
     content: '';
     width: 2px;
     height: 80%;
@@ -691,29 +693,48 @@
     transform: translateY(-50%);
     left: 4px;
     border-radius: 2px;
-}
+}*/
 
 .travel-scout-ally::before {
     background: #58ce58;
 }
-
 .travel-scout-neutral::before {
     background: #c6ce58;
 }
-
 .travel-scout-enemy::before {
     background: #ff0000;
 }
+.travel-scout-ally {
+    background: linear-gradient(to right, var(--travel-scout-background) 20%, rgba(0, 85, 0, 0.75) 100%);
+}
+.travel-scout-neutral {
+    background: linear-gradient(to left, var(--travel-scout-background) 20%, rgba(85, 85, 0, 0.75) 100%);
+}
+.travel-scout-enemy {
+    background: linear-gradient(to left, var(--travel-scout-background) 20%, rgba(85, 0, 0, 0.75) 100%);
+}
 
+.travel-scout-player {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 2;
+    max-width: 90px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.travel-scout-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px !important;
+}
 .travel-scout-name {
     word-break: break-all;
+    text-align: center;
     display: flex;
     flex-flow: row nowrap;
-    text-indent: 5px;
     white-space: nowrap;
-    padding-right: 5px;
     flex-grow: 2;
-    align-items: center;
+    align-items: baseline;
 }
 #content .travel-scout-name a {
     width: 100%;
@@ -744,8 +765,11 @@
 
 
 .travel-scout-faction {
-    margin: 0 5px;
-
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     /*box-shadow: 0 0 2px #000000 inset;*/
     /*background: rgba(10, 10, 12, 0.7);*/
     /*border-radius: 100%;*/
@@ -760,8 +784,7 @@
 
 .travel-scout-level {
     justify-self: flex-end;
-    width: 40px;
-    text-align: right;
+    text-align: center;
     color: var(--font-color-3);
     font-family: sans-serif;
     font-size: 1em;
@@ -769,7 +792,6 @@
 
 .travel-scout-location {
     justify-self: flex-end;
-    width: 40px;
     text-align: center;
 
     color: var(--font-color-3);
