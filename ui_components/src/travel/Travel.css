@@ -609,7 +609,7 @@
 .region_objective_tooltip_defense {
     height: 18px;
     width: 18px;
-    background-image: url('/images/map/icons/shield(3).png');
+    background-image: url('/images/map/icons/shield.png');
     background-size: cover;
     line-height: 17px;
     font-size: smaller;
