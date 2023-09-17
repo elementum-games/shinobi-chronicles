@@ -230,7 +230,7 @@ function gear(): void {
     }
     echo "</td>";
 
-    echo "<td class='fullwidth' style='text-align:center;'>";
+    echo "<td class='fullwidth' style='text-align:center;'><div style='display: flex; gap: 10px; align-items: center; justify-content: center; flex-direction: column'>";
     foreach($player->items as $id => $item) {
         if($item->use_type != 3) {
             continue;
@@ -240,15 +240,14 @@ function gear(): void {
             continue;
         }
 
-        echo "<a href='$self_link&use_item=$id'><span class='button' style='min-width:8em;'>" . $item->name . '<br />';
+        echo "<a href='$self_link&use_item=$id'><span class='button' style='min-width:8em; margin: 0'>" . $item->name . '<br />';
         echo "<span style='font-weight:normal;'>Amount: {$item->quantity}</span><br/>";
         if($item->effect == 'heal') {
-            echo "<span style='font-weight:normal;'>(Heal " . $item->effect_amount . " HP)</span></span></a><br />";
+            echo "<span style='font-weight:normal;'>(Heal " . $item->effect_amount . " HP)</span></span></a>";
         }
-        echo "<br />";
     }
     echo "</select>
-	</td>
+	</div></td>
 
 
 	<br />
