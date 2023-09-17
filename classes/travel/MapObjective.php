@@ -1,6 +1,10 @@
 <?php
 
 class MapObjective {
+
+    const MISSION_OBJECTIVE_ID = 0;
+    const EVENT_ID_START = 1;
+
     public function __construct(
         public ?int $id = null,
         public string $name,

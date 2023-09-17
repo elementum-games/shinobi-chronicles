@@ -685,7 +685,7 @@ class TravelManager {
                 $mission_result = $this->system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
                 $mission_location = TravelCoords::fromDbString($this->user->mission_stage['action_data']);
                 $objectives[] = new MapObjective(
-                    id: null,
+                    id: MapObjective::MISSION_OBJECTIVE_ID,
                     name: $this->system->db->fetch($mission_result)['name'],
                     map_id: $mission_location->map_id,
                     x: $mission_location->x,
@@ -698,7 +698,7 @@ class TravelManager {
                 $mission_result = $this->system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
                 $mission_location = TravelCoords::fromDbString($this->user->mission_stage['last_location']);
                 $objectives[] = new MapObjective(
-                    id: null,
+                    id: MapObjective::MISSION_OBJECTIVE_ID,
                     name: $this->system->db->fetch($mission_result)['name'],
                     map_id: $mission_location->map_id,
                     x: $mission_location->x,
@@ -709,11 +709,12 @@ class TravelManager {
         }
 
         // TEMP Add Events - We have to hard code the mission IDs is System for now
+        $event_objective_id = MapObjective::EVENT_ID_START;
         if ($this->system->event != null) {
             if ($this->system->event instanceof LanternEvent) {
                 foreach ($this->system->event->mission_coords['gold'] as $event_mission) {
                     $objectives[] = new MapObjective(
-                        id: null,
+                        id: $event_objective_id,
                         name: "Treasure",
                         map_id: 1,
                         x: $event_mission['x'],
@@ -725,10 +726,11 @@ class TravelManager {
                         ]),
                         action_message: "Chase the Kotengu",
                     );
+                    $event_objective_id++;
                 }
                 foreach ($this->system->event->mission_coords['special'] as $event_mission) {
                     $objectives[] = new MapObjective(
-                        id: null,
+                        id: $event_objective_id,
                         name: "Special",
                         map_id: 1,
                         x: $event_mission['x'],
@@ -740,10 +742,11 @@ class TravelManager {
                         ]),
                         action_message: "Enter the Fray",
                     );
+                    $event_objective_id++;
                 }
                 foreach ($this->system->event->mission_coords['easy'] as $event_mission) {
                     $objectives[] = new MapObjective(
-                        id: null,
+                        id: $event_objective_id,
                         name: "Easy",
                         map_id: 1,
                         x: $event_mission['x'],
@@ -755,10 +758,11 @@ class TravelManager {
                         ]),
                         action_message: "Begin Search",
                     );
+                    $event_objective_id++;
                 }
                 foreach ($this->system->event->mission_coords['medium'] as $event_mission) {
                     $objectives[] = new MapObjective(
-                        id: null,
+                        id: $event_objective_id,
                         name: "Medium",
                         map_id: 1,
                         x: $event_mission['x'],
@@ -770,10 +774,11 @@ class TravelManager {
                         ]),
                         action_message: "Follow Signs of battle",
                     );
+                    $event_objective_id++;
                 }
                 foreach ($this->system->event->mission_coords['hard'] as $event_mission) {
                     $objectives[] = new MapObjective(
-                        id: null,
+                        id: $event_objective_id,
                         name: "Hard",
                         map_id: 1,
                         x: $event_mission['x'],
@@ -785,10 +790,11 @@ class TravelManager {
                         ]),
                         action_message: "Investigate Suspicious Markings",
                     );
+                    $event_objective_id++;
                 }
                 foreach ($this->system->event->mission_coords['nightmare'] as $event_mission) {
                     $objectives[] = new MapObjective(
-                        id: null,
+                        id: $event_objective_id,
                         name: "Nightmare",
                         map_id: 1,
                         x: $event_mission['x'],
@@ -800,6 +806,7 @@ class TravelManager {
                         ]),
                         action_message: "Stop the Ritual",
                     );
+                    $event_objective_id++;
                 }
             }
         }
