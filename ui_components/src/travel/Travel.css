@@ -162,6 +162,12 @@
 /* Misc */
 #travel-container .systemMessage-new {
     max-width: 85%;
+    opacity: 1;
+    animation-name: fadeOut;
+    animation-duration: 2s;
+    animation-timing-function: ease-out;
+    animation-delay: 2s;
+    animation-fill-mode: forwards;
 }
 
 
