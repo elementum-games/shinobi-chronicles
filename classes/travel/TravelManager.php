@@ -639,7 +639,7 @@ class TravelManager {
             $patrol->setAlignment($this->user);
             $distance = $this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id));
             if ($distance == 0) {
-                $this->warManager->checkBeginPatrolBattle($patrol);
+                $this->warManager->tryBeginPatrolBattle($patrol);
             }
             if ($distance <= $this->user->scout_range) {
                 $return_arr[] = $patrol;
