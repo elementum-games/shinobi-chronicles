@@ -187,7 +187,7 @@ function gear(): void {
     $equipped_weapons = [];
     for($i = 0; $i < $max_equipped_weapons; $i++) {
         $selected_displayed = false;
-        echo "<select name='items[" . ($item_count++) . "]'>
+        echo "<select style='margin-top: 7px' name='items[" . ($item_count++) . "]'>
 		<option value='none'>None</option>";
         foreach($player->items as $item) {
             if($item->use_type != 1) {
@@ -210,7 +210,7 @@ function gear(): void {
     $equipped_armor = [];
     for($i = 0; $i < $max_equipped_armor; $i++) {
         $selected_displayed = false;
-        echo "<select name='items[" . ($item_count++) . "]'>
+        echo "<select style='margin-top: 7px' name='items[" . ($item_count++) . "]'>
 		<option value='none'>None</option>";
         foreach($player->items as $item) {
             if($item->use_type != 2) {

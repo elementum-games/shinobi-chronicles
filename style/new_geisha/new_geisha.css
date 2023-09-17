@@ -528,6 +528,7 @@ input[type=checkbox] {
     width: 100%;
     top: 5px;
     color: var(--font-color-1);
+    font-weight: bold;
 }
 
 /* User Colors */
@@ -734,6 +735,7 @@ a#spec_miss_cancel {
     background-color: var(--sidebar-button-background-color);
     border-radius: 0px;
     font-size: var(--font-default);
+    border: none;
 }
 #content td a {
     color: var(--font-link);
@@ -813,6 +815,7 @@ button {
 }
 #content ul.submenu {
     background: var(--sidebar-header-color);
+    border: none;
 }
     #content ul.submenu li {
         background: var(--sidebar-header-background);
