@@ -28,7 +28,8 @@ if($battle->battle_text) {
 ?>
 
 <script type='text/javascript'>
-    var apiUrl = `api/battle.php?check_turn=true`;
+    let battle_id = <?=  $battle->battle_id ?>;
+    var apiUrl = `api/battle.php?check_turn=` + battle_id;
     let turn_count = <?= $battle->turn_count ?>;
     let prep_time_remaining = <?= $battle->prepTimeRemaining() ?>;
     let player1_submitted = <?= (int)isset($battle->fighter_actions[$battle->player1->combat_id]) ?>;
