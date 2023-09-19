@@ -527,7 +527,7 @@ input[type=checkbox] {
 .systemMessage {
     width: 100%;
     top: 5px;
-    color: var(--font-color-1);
+    color: #d1beef;
 }
 
 /* User Colors */
