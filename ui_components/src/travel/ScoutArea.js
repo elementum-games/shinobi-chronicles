@@ -68,7 +68,7 @@ export const QuickScout = ({
                 e.preventDefault();
             }}
         >
-            {scoutData && scoutData.find(user => ranksToView[parseInt(user.rank_num)] === true && user.user_id !== playerId) && (
+            {scoutData && scoutData.find(user => ranksToView[parseInt(user.rank_num)] === true && user.user_id !== playerId && user.alignment !== "Ally") && (
                 <QuickScoutInner
                     key={scoutData[0].user_id}
                     player_data={scoutData.find(user => ranksToView[parseInt(user.rank_num)] === true && user.user_id !== playerId)}
