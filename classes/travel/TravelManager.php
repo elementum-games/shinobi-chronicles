@@ -27,6 +27,10 @@ class TravelManager {
     public array $map_data;
 
     const DISPLAY_RADIUS = 12;
+    const GRID_POSITIVE_X = 15;
+    const GRID_NEGATIVE_X = 14;
+    const GRID_POSITIVE_Y = 9;
+    const GRID_NEGATIVE_Y = 8;
 
     /**
      * @var TravelCoords[]
@@ -333,6 +337,48 @@ class TravelManager {
                     village_id: 3,
                 );
             }
+            for ($i = 0; $i < 2; $i++) {
+                $return_arr[] = new NearbyPlayerDto(
+                    user_id: $i . mt_rand(10000, 20000),
+                    user_name: 'Konohamaru',
+                    target_x: $placeholder_coords->x,
+                    target_y: $placeholder_coords->y,
+                    target_map_id: $placeholder_coords->map_id,
+                    rank_name: 'Akademi-sei',
+                    rank_num: 3,
+                    village_icon: TravelManager::VILLAGE_ICONS['Stone'],
+                    alignment: 'Ally',
+                    attack: $this->user->location->equals($placeholder_coords),
+                    attack_id: 'abc' . $i . mt_rand(10000, 20000),
+                    level: 30,
+                    battle_id: 0,
+                    direction: $this->user->location->directionToTarget($placeholder_coords),
+                    distance: $this->user->location->distanceDifference($placeholder_coords),
+                    invulnerable: false,
+                    village_id: 3,
+                );
+            }
+            for ($i = 0; $i < 2; $i++) {
+                $return_arr[] = new NearbyPlayerDto(
+                    user_id: $i . mt_rand(10000, 20000),
+                    user_name: 'Konohamaru',
+                    target_x: $placeholder_coords->x,
+                    target_y: $placeholder_coords->y,
+                    target_map_id: $placeholder_coords->map_id,
+                    rank_name: 'Akademi-sei',
+                    rank_num: 3,
+                    village_icon: TravelManager::VILLAGE_ICONS['Sand'],
+                    alignment: 'Neutral',
+                    attack: $this->user->location->equals($placeholder_coords),
+                    attack_id: 'abc' . $i . mt_rand(10000, 20000),
+                    level: 30,
+                    battle_id: 0,
+                    direction: $this->user->location->directionToTarget($placeholder_coords),
+                    distance: $this->user->location->distanceDifference($placeholder_coords),
+                    invulnerable: false,
+                    village_id: 3,
+                );
+            }
         }
 
         usort($return_arr, function ($a, $b) {
@@ -561,10 +607,10 @@ class TravelManager {
     public function getRegions(User $player): array {
         // generate vertices for player view area
         $player_area = [
-            [$player->location->x - self::DISPLAY_RADIUS, $player->location->y - self::DISPLAY_RADIUS], // top left bound
-            [$player->location->x + self::DISPLAY_RADIUS, $player->location->y - self::DISPLAY_RADIUS], // top right bound
-            [$player->location->x + self::DISPLAY_RADIUS, $player->location->y + self::DISPLAY_RADIUS], // bottom right bound
-            [$player->location->x - self::DISPLAY_RADIUS, $player->location->y + self::DISPLAY_RADIUS], // bottom left bound
+            [$player->location->x - self::GRID_NEGATIVE_X, $player->location->y - self::GRID_NEGATIVE_Y], // top left bound
+            [$player->location->x + self::GRID_POSITIVE_X, $player->location->y - self::GRID_NEGATIVE_Y], // top right bound
+            [$player->location->x + self::GRID_POSITIVE_X, $player->location->y + self::GRID_POSITIVE_Y], // bottom right bound
+            [$player->location->x - self::GRID_NEGATIVE_X, $player->location->y + self::GRID_POSITIVE_Y], // bottom left bound
         ];
 
         $result = $this->system->db->query("SELECT * FROM `regions`");
@@ -581,7 +627,7 @@ class TravelManager {
                 }
             }
             if ($in_view_area) {
-                $regions[] = Region::fromDb($region, $player->location->x - self::DISPLAY_RADIUS, $player->location->y - self::DISPLAY_RADIUS, $player->location->x + self::DISPLAY_RADIUS, $player->location->y + self::DISPLAY_RADIUS);
+                $regions[] = Region::fromDb($region, $player->location->x - self::GRID_NEGATIVE_X, $player->location->y - self::GRID_NEGATIVE_Y, $player->location->x + self::GRID_POSITIVE_X, $player->location->y + self::GRID_POSITIVE_Y);
             }
         }
 
@@ -635,7 +681,7 @@ class TravelManager {
             $patrol->setAlignment($this->user);
             $distance = $this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id));
             if ($distance == 0) {
-                $this->warManager->checkBeginPatrolBattle($patrol);
+                $this->warManager->tryBeginPatrolBattle($patrol);
             }
             if ($distance <= $this->user->scout_range) {
                 $return_arr[] = $patrol;
@@ -681,7 +727,7 @@ class TravelManager {
                 $mission_result = $this->system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
                 $mission_location = TravelCoords::fromDbString($this->user->mission_stage['action_data']);
                 $objectives[] = new MapObjective(
-                    id: null,
+                    id: MapObjective::MISSION_OBJECTIVE_ID,
                     name: $this->system->db->fetch($mission_result)['name'],
                     map_id: $mission_location->map_id,
                     x: $mission_location->x,
@@ -694,7 +740,7 @@ class TravelManager {
                 $mission_result = $this->system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
                 $mission_location = TravelCoords::fromDbString($this->user->mission_stage['last_location']);
                 $objectives[] = new MapObjective(
-                    id: null,
+                    id: MapObjective::MISSION_OBJECTIVE_ID,
                     name: $this->system->db->fetch($mission_result)['name'],
                     map_id: $mission_location->map_id,
                     x: $mission_location->x,
@@ -705,11 +751,12 @@ class TravelManager {
         }
 
         // TEMP Add Events - We have to hard code the mission IDs is System for now
+        $event_objective_id = MapObjective::EVENT_ID_START;
         if ($this->system->event != null) {
             if ($this->system->event instanceof LanternEvent) {
                 foreach ($this->system->event->mission_coords['gold'] as $event_mission) {
                     $objectives[] = new MapObjective(
-                        id: null,
+                        id: $event_objective_id,
                         name: "Treasure",
                         map_id: 1,
                         x: $event_mission['x'],
@@ -721,10 +768,11 @@ class TravelManager {
                         ]),
                         action_message: "Chase the Kotengu",
                     );
+                    $event_objective_id++;
                 }
                 foreach ($this->system->event->mission_coords['special'] as $event_mission) {
                     $objectives[] = new MapObjective(
-                        id: null,
+                        id: $event_objective_id,
                         name: "Special",
                         map_id: 1,
                         x: $event_mission['x'],
@@ -736,10 +784,11 @@ class TravelManager {
                         ]),
                         action_message: "Enter the Fray",
                     );
+                    $event_objective_id++;
                 }
                 foreach ($this->system->event->mission_coords['easy'] as $event_mission) {
                     $objectives[] = new MapObjective(
-                        id: null,
+                        id: $event_objective_id,
                         name: "Easy",
                         map_id: 1,
                         x: $event_mission['x'],
@@ -751,10 +800,11 @@ class TravelManager {
                         ]),
                         action_message: "Begin Search",
                     );
+                    $event_objective_id++;
                 }
                 foreach ($this->system->event->mission_coords['medium'] as $event_mission) {
                     $objectives[] = new MapObjective(
-                        id: null,
+                        id: $event_objective_id,
                         name: "Medium",
                         map_id: 1,
                         x: $event_mission['x'],
@@ -766,10 +816,11 @@ class TravelManager {
                         ]),
                         action_message: "Follow Signs of battle",
                     );
+                    $event_objective_id++;
                 }
                 foreach ($this->system->event->mission_coords['hard'] as $event_mission) {
                     $objectives[] = new MapObjective(
-                        id: null,
+                        id: $event_objective_id,
                         name: "Hard",
                         map_id: 1,
                         x: $event_mission['x'],
@@ -781,10 +832,11 @@ class TravelManager {
                         ]),
                         action_message: "Investigate Suspicious Markings",
                     );
+                    $event_objective_id++;
                 }
                 foreach ($this->system->event->mission_coords['nightmare'] as $event_mission) {
                     $objectives[] = new MapObjective(
-                        id: null,
+                        id: $event_objective_id,
                         name: "Nightmare",
                         map_id: 1,
                         x: $event_mission['x'],
@@ -796,6 +848,7 @@ class TravelManager {
                         ]),
                         action_message: "Stop the Ritual",
                     );
+                    $event_objective_id++;
                 }
             }
         }

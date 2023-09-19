@@ -120,6 +120,7 @@ function Travel({
         return;
       }
       if (response.data.travel_message) {
+        setFeedback(null);
         setFeedback([response.data.travel_message, 'info']);
       }
       setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
@@ -203,6 +204,7 @@ function Travel({
   };
   function handleErrors(errors) {
     console.warn(errors);
+    setFeedback(null);
     setFeedback([errors, 'info']);
   }
   const AttackPlayer = target => {
@@ -227,6 +229,7 @@ function Travel({
         return;
       }
       if (response.data.travel_message) {
+        setFeedback(null);
         setFeedback([response.data.travel_message, 'info']);
       }
       setMapData(response.data.mapData);
@@ -241,6 +244,7 @@ function Travel({
         return;
       }
       if (response.data.travel_message) {
+        setFeedback(null);
         setFeedback([response.data.travel_message, 'info']);
       }
       setMapData(response.data.mapData);
@@ -395,7 +399,17 @@ function Travel({
     attackPlayer: AttackPlayer,
     sparPlayer: SparPlayer,
     ranksToView: ranksToView,
-    playerId: playerId
+    playerId: playerId,
+    displayAllies: true
+  }), mapData && scoutData && /*#__PURE__*/React.createElement(ScoutArea, {
+    mapData: mapData,
+    scoutData: scoutData,
+    membersLink: membersLink,
+    attackPlayer: AttackPlayer,
+    sparPlayer: SparPlayer,
+    ranksToView: ranksToView,
+    playerId: playerId,
+    displayAllies: false
   })), /*#__PURE__*/React.createElement(GlowFilters, null));
 }
 function TravelFilters({

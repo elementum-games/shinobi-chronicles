@@ -1,6 +1,10 @@
 <?php
 
 class WarManager {
+
+    const BASE_RESOURCE_PRODUCTION = 25;
+    const BASE_CARAVAN_TIME_MS = 300000;
+
     private System $system;
     private User $user;
 
@@ -150,7 +154,7 @@ class WarManager {
         return $valid_operations;
     }
 
-    function checkBeginPatrolBattle(Patrol $patrol) {
+    function tryBeginPatrolBattle(Patrol $patrol) {
         $patrol_location = new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id);
         // if already in battle
         if ($this->user->battle_id) {

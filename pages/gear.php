@@ -187,7 +187,7 @@ function gear(): void {
     $equipped_weapons = [];
     for($i = 0; $i < $max_equipped_weapons; $i++) {
         $selected_displayed = false;
-        echo "<select name='items[" . ($item_count++) . "]'>
+        echo "<select style='margin-top: 7px' name='items[" . ($item_count++) . "]'>
 		<option value='none'>None</option>";
         foreach($player->items as $item) {
             if($item->use_type != 1) {
@@ -210,7 +210,7 @@ function gear(): void {
     $equipped_armor = [];
     for($i = 0; $i < $max_equipped_armor; $i++) {
         $selected_displayed = false;
-        echo "<select name='items[" . ($item_count++) . "]'>
+        echo "<select style='margin-top: 7px' name='items[" . ($item_count++) . "]'>
 		<option value='none'>None</option>";
         foreach($player->items as $item) {
             if($item->use_type != 2) {
@@ -230,7 +230,7 @@ function gear(): void {
     }
     echo "</td>";
 
-    echo "<td class='fullwidth' style='text-align:center;'>";
+    echo "<td class='fullwidth' style='text-align:center;'><div style='display: flex; gap: 10px; align-items: center; justify-content: center; flex-direction: column'>";
     foreach($player->items as $id => $item) {
         if($item->use_type != 3) {
             continue;
@@ -240,15 +240,14 @@ function gear(): void {
             continue;
         }
 
-        echo "<a href='$self_link&use_item=$id'><span class='button' style='min-width:8em;'>" . $item->name . '<br />';
+        echo "<a href='$self_link&use_item=$id'><span class='button' style='min-width:8em; margin: 0'>" . $item->name . '<br />';
         echo "<span style='font-weight:normal;'>Amount: {$item->quantity}</span><br/>";
         if($item->effect == 'heal') {
-            echo "<span style='font-weight:normal;'>(Heal " . $item->effect_amount . " HP)</span></span></a><br />";
+            echo "<span style='font-weight:normal;'>(Heal " . $item->effect_amount . " HP)</span></span></a>";
         }
-        echo "<br />";
     }
     echo "</select>
-	</td>
+	</div></td>
 
 
 	<br />

@@ -84,8 +84,8 @@
     <!-- Bloodline UI Filter -->
     <tr><td style='text-align:center;'>
         <span>Using the form below, you can search for bloodlines based on rank.</span>
-        <br /><br />
-        <div style="text-align:center;">
+        <br />
+        <div style="text-align:center; margin-top: 5px; margin-bottom: 5px;">
             <!--Selection Input: Ranks-->
             <?php foreach(Bloodline::$public_ranks as $id=> $name): ?>
                 <?php if ($id > 3) continue; ?>
@@ -96,7 +96,7 @@
             <!--Selection Input: Jutsu Type-->
             <?php ?>
             <br>
-                <label for="jutsuElementFilter">Jutsu Element:</label>
+                <label style='margin-bottom: 5px; margin-top: 5px' for="jutsuElementFilter">Jutsu Element:</label>
                 <select name="jutsuElementFilter" onchange="filterByElement(this.value)" id="jutsuElementFilter">
                     <option value="none">Any</option>
                     <option value="Fire">Fire</option>

@@ -44,7 +44,7 @@ class TravelApiPresenter {
             'region_coords'     => $travelManager->getCoordsByRegion($regions),
             'spar_link'         => $system->router->getUrl('spar'),
             'colosseum_coords'  => $travelManager->getColosseumCoords(),
-            'region_objectives' => $travelManager->fetchRegionObjectives(),
+            'region_objectives' => TravelApiPresenter::regionObjectiveResponse($travelManager),
             'map_objectives'    => $travelManager->fetchMapObjectives(),
             'battle_url'        => $travelManager->getPlayerBattleUrl(),
             'operations'        => $travelManager->warManager->getValidOperations(),
@@ -97,6 +97,28 @@ class TravelApiPresenter {
                 ];
             },
             $travelManager->fetchNearbyPatrols()
+        );
+    }
+
+    public static function regionObjectiveResponse(TravelManager $travelManager): array
+    {
+        return array_map(
+            function (RegionObjective $regionObjective) {
+                return [
+                    'id' => $regionObjective->id,
+                    'name' => $regionObjective->name,
+                    'map_id' => $regionObjective->map_id,
+                    'x' => $regionObjective->x,
+                    'y' => $regionObjective->y,
+                    'image' => $regionObjective->image,
+                    'objective_health' => $regionObjective->objective_health,
+                    'objective_max_health' => $regionObjective->objective_max_health,
+                    'defense' => $regionObjective->defense,
+                    'objective_type' => $regionObjective->objective_type,
+                    'village_id' => $regionObjective->village_id,
+                ];
+            },
+            $travelManager->fetchRegionObjectives()
         );
     }
 

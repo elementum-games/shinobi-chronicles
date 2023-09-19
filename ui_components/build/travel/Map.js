@@ -38,7 +38,7 @@ export const Map = ({
        How do we calculate the starting coordinate in this example? We need to offset the first visible tile by +2 which
      is equal to player X - stage midpoint X.
    */
-  const stage_offset_x = player_x - stage_midpoint_x - 1;
+  const stage_offset_x = player_x - stage_midpoint_x;
   const stage_offset_y = player_y - stage_midpoint_y - 1;
 
   /* Start player at midpoint. Offset is the desired tile number minus 1 so player sits inside the desired tile rather
@@ -74,10 +74,11 @@ export const Map = ({
     backgroundPositionX: map_offset_x * tile_width + "px",
     backgroundPositionY: map_offset_y * tile_height + "px"
   };
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(MapGutters, {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(MapGutterX, {
     stageWidth: stage_width,
+    stageOffsetX: stage_offset_x
+  }), /*#__PURE__*/React.createElement(MapGutterY, {
     stageHeight: stage_height,
-    stageOffsetX: stage_offset_x,
     stageOffsetY: stage_offset_y
   }), /*#__PURE__*/React.createElement("div", {
     className: "travel_map_stage"
@@ -136,64 +137,13 @@ export const Map = ({
     tileHeight: tile_height,
     playerId: playerId,
     ranksToView: ranksToView
-  }), /*#__PURE__*/React.createElement("div", {
-    id: "map_player",
-    style: PlayerStyle
-  }, mapData.operation_type && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    className: "operation_text"
-  }, mapData.operation_type), /*#__PURE__*/React.createElement("div", {
-    id: "operation_progress_bar"
-  }, /*#__PURE__*/React.createElement("svg", {
-    height: "32",
-    width: "32",
-    viewBox: "0 0 50 50"
-  }, /*#__PURE__*/React.createElement("circle", {
-    id: "operation_progress_circle_background_outer",
-    stroke: "#592424",
-    cx: "24.5",
-    cy: "24",
-    r: "15",
-    strokeWidth: "5",
-    strokeMiterlimit: "0",
-    fill: "none",
-    transform: "rotate(-90, 24.5, 24)"
-  }), /*#__PURE__*/React.createElement("circle", {
-    id: "operation_progress_circle_background",
-    stroke: "#592424",
-    cx: "24.5",
-    cy: "24",
-    r: "10",
-    strokeWidth: "11",
-    strokeMiterlimit: "0",
-    fill: "none",
-    strokeDasharray: "62.83",
-    strokeDashoffset: "0",
-    transform: "rotate(-90, 24.5, 24)"
-  }), /*#__PURE__*/React.createElement("circle", {
-    id: "operation_progress_circle",
-    stroke: "#ff6a6a",
-    cx: "24.5",
-    cy: "24",
-    r: "10",
-    strokeWidth: "5",
-    strokeMiterlimit: "0",
-    fill: "none",
-    strokeDasharray: "62.83",
-    strokeDashoffset: 62.83 - 62.83 / 100 * mapData.operation_progress,
-    transform: "rotate(-90, 24.5, 24)"
-  }), /*#__PURE__*/React.createElement("circle", {
-    id: "operation_interval_circle",
-    stroke: "#00b044",
-    cx: "24.5",
-    cy: "24",
-    r: "15",
-    strokeWidth: "2",
-    strokeMiterlimit: "0",
-    fill: "none",
-    strokeDasharray: "100",
-    strokeDashoffset: 100 - 100 / 100 * mapData.operation_interval,
-    transform: "rotate(-90, 24.5, 24)"
-  }))))))));
+  }), /*#__PURE__*/React.createElement(Player, {
+    playerStyle: PlayerStyle,
+    mapData: mapData
+  }))), /*#__PURE__*/React.createElement(MapGutterY, {
+    stageHeight: stage_height,
+    stageOffsetY: stage_offset_y
+  }));
 };
 function MapGutters({
   stageWidth,
@@ -204,7 +154,7 @@ function MapGutters({
   // By default, gutter should show tile 1. Apply stage offset to get to the current number.
   const gutter_start_x = 1 + stageOffsetX;
   const gutter_start_y = 1 + stageOffsetY;
-  const gutter_x = Array.from(new Array(stageWidth), (x, i) => i + gutter_start_x);
+  const gutter_x = Array.from(new Array(stageWidth - 1), (x, i) => i + gutter_start_x);
   const gutter_y = Array.from(new Array(stageHeight), (x, i) => i + gutter_start_y);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     id: "travel-x-container"
@@ -212,6 +162,34 @@ function MapGutters({
     key: 'gutter_x:' + gutter,
     className: "travel-gutter-grid travel-gutter-grid-x"
   }, gutter))), /*#__PURE__*/React.createElement("div", {
+    id: "travel-y-container"
+  }, gutter_y && gutter_y.map(gutter => /*#__PURE__*/React.createElement("div", {
+    key: 'gutter_y:' + gutter,
+    className: "travel-gutter-grid travel-gutter-grid-y"
+  }, gutter))));
+}
+function MapGutterX({
+  stageWidth,
+  stageOffsetX
+}) {
+  // By default, gutter should show tile 1. Apply stage offset to get to the current number.
+  const gutter_start_x = 1 + stageOffsetX;
+  const gutter_x = Array.from(new Array(stageWidth - 1), (x, i) => i + gutter_start_x);
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    id: "travel-x-container"
+  }, gutter_x && gutter_x.map(gutter => /*#__PURE__*/React.createElement("div", {
+    key: 'gutter_x:' + gutter,
+    className: "travel-gutter-grid travel-gutter-grid-x"
+  }, gutter))));
+}
+function MapGutterY({
+  stageHeight,
+  stageOffsetY
+}) {
+  // By default, gutter should show tile 1. Apply stage offset to get to the current number.
+  const gutter_start_y = 1 + stageOffsetY;
+  const gutter_y = Array.from(new Array(stageHeight), (x, i) => i + gutter_start_y);
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     id: "travel-y-container"
   }, gutter_y && gutter_y.map(gutter => /*#__PURE__*/React.createElement("div", {
     key: 'gutter_y:' + gutter,
@@ -505,6 +483,69 @@ function MapNearbyPatrols({
   }, patrol.patrol_name), /*#__PURE__*/React.createElement("div", {
     className: alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type
   }))));
+}
+function Player({
+  mapData,
+  playerStyle
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    id: "map_player",
+    style: playerStyle
+  }, mapData.operation_type && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "operation_text"
+  }, mapData.operation_type), /*#__PURE__*/React.createElement("div", {
+    id: "operation_progress_bar"
+  }, /*#__PURE__*/React.createElement("svg", {
+    height: "32",
+    width: "32",
+    viewBox: "0 0 50 50"
+  }, /*#__PURE__*/React.createElement("circle", {
+    id: "operation_progress_circle_background_outer",
+    stroke: "#592424",
+    cx: "24.5",
+    cy: "24",
+    r: "15",
+    strokeWidth: "5",
+    strokeMiterlimit: "0",
+    fill: "none",
+    transform: "rotate(-90, 24.5, 24)"
+  }), /*#__PURE__*/React.createElement("circle", {
+    id: "operation_progress_circle_background",
+    stroke: "#592424",
+    cx: "24.5",
+    cy: "24",
+    r: "10",
+    strokeWidth: "11",
+    strokeMiterlimit: "0",
+    fill: "none",
+    strokeDasharray: "62.83",
+    strokeDashoffset: "0",
+    transform: "rotate(-90, 24.5, 24)"
+  }), /*#__PURE__*/React.createElement("circle", {
+    id: "operation_progress_circle",
+    stroke: "#ff6a6a",
+    cx: "24.5",
+    cy: "24",
+    r: "10",
+    strokeWidth: "5",
+    strokeMiterlimit: "0",
+    fill: "none",
+    strokeDasharray: "62.83",
+    strokeDashoffset: 62.83 - 62.83 / 100 * mapData.operation_progress,
+    transform: "rotate(-90, 24.5, 24)"
+  }), /*#__PURE__*/React.createElement("circle", {
+    id: "operation_interval_circle",
+    stroke: "#00b044",
+    cx: "24.5",
+    cy: "24",
+    r: "15",
+    strokeWidth: "2",
+    strokeMiterlimit: "0",
+    fill: "none",
+    strokeDasharray: "100",
+    strokeDashoffset: 100 - 100 / 100 * mapData.operation_interval,
+    transform: "rotate(-90, 24.5, 24)"
+  })))));
 }
 const visibilityClass = invulnerable => {
   if (invulnerable) {

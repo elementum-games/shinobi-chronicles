@@ -43,6 +43,7 @@ if($battle->battle_text) {
             if (prep_time_remaining == 0) {
                 clearInterval(refreshInterval);
                 updateContent();
+                return;
             }
         }
         player1_time--;
@@ -52,6 +53,7 @@ if($battle->battle_text) {
         if ((player1_time <= 0 || player1_submitted) && (player2_time <= 0 || player2_submitted)) {
             clearInterval(refreshInterval);
             updateContent();
+            return;
         }
         fetch(apiUrl)
             .then(response => response.json())
@@ -60,6 +62,7 @@ if($battle->battle_text) {
                     if (data.data.turn_count > turn_count) {
                         clearInterval(refreshInterval);
                         updateContent();
+                        return;
                     }
                 }
             })

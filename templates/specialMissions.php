@@ -24,18 +24,10 @@
             <li>Special missions reward money, experience and village reputation increasing with mission difficulty.</li>
             <li>Completing special missions gradually drains chakra or stamina in exchange for jutsu experience.</li>
         </ul><br />
-        <a href="<?= $self_link ?>&start=easy">
-            <button>Start Easy Mission!</button>
-        </a>
-        <a href="<?= $self_link ?>&start=normal">
-            <button>Start Normal Mission!</button>
-        </a>
-        <a href="<?= $self_link ?>&start=hard">
-            <button>Start Hard Mission!</button>
-        </a>
-        <a href="<?= $self_link ?>&start=nightmare">
-            <button>Start Nightmare Mission!</button>
-        </a><br /><br />
+        <a href="<?= $self_link ?>&start=easy"><button>Start Easy Mission!</button></a>
+        <a href="<?= $self_link ?>&start=normal"><button>Start Normal Mission!</button></a>
+        <a href="<?= $self_link ?>&start=hard"><button>Start Hard Mission!</button></a>
+        <a href="<?= $self_link ?>&start=nightmare"><button>Start Nightmare Mission!</button></a><br /><br />
     </div>
 <?php endif; ?>
 

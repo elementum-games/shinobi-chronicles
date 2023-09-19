@@ -64,7 +64,7 @@
                     <?php foreach(Bloodline::$public_ranks as $rank_id => $rank): ?>
                         <?php if(empty($bloodlines[$rank_id]) || $rank_id > 2) continue; ?>
                         <?= $rank ?> Bloodlines (<?= $premiumShopManager->costs['bloodline'][$rank_id] ?> Ancient Kunai)<br/>
-                        <form action='<?= $self_link ?>&view=bloodlines' method='post'>
+                        <form style='margin-bottom: 7px' action='<?= $self_link ?>&view=bloodlines' method='post'>
                             <select name='bloodline_id'>
                                 <?php foreach($bloodlines[$rank_id] as $bloodline_id => $bloodline): ?>
                                     <!-- Need to keep bloodline in the bloodlines array for bloodline list-->
@@ -94,7 +94,7 @@
                     <?php foreach(Bloodline::$public_ranks as $rank_id => $rank): ?>
                         <?php if(empty($bloodlines[$rank_id]) || $rank_id > 2) continue; ?>
                         <?= $rank ?> Bloodline (<?= $premiumShopManager->costs['bloodline_random'][$rank_id] ?> Ancient Kunai)<br/>
-                        <form action='<?= $self_link ?>&view=bloodlines' method='post'>
+                        <form style='margin-bottom: 7px' action='<?= $self_link ?>&view=bloodlines' method='post'>
                             <input type='submit' name='purchase_bloodline_random' value='Awaken <?= $rank ?> Bloodline'/>
                             <input type='hidden' name='bloodline_rank' value=<?=$rank_id?>/>
                         </form>
@@ -147,7 +147,7 @@
                             <input type="radio" name="chat_effect" value="sparkles" <?= ($player->chat_effect == "sparkles" ? "checked='checked'" : "") ?> />On
                         <?php endif ?>
                         <br />
-                        <input type='submit' name='change_color' value='Change Name Color'/>
+                        <input type='submit' style='margin-top: 5px' name='change_color' value='Change Name Color'/>
                     </form>
                 <?php endif; ?>
             </td>
@@ -180,7 +180,7 @@
                                 <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> AK)</option>
                             <?php endforeach ?>
                         </select><br/>
-                        <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 1 ? 'Extend' : 'Purchase') ?>' />
+                        <input type='submit' style='margin-top: 5px' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 1 ? 'Extend' : 'Purchase') ?>' />
                     </p>
                 </form>
             </td>
@@ -208,7 +208,7 @@
                                 <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> AK)</option>
                             <?php endforeach ?>
                         </select><br/>
-                        <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 2 ? 'Extend' : 'Purchase') ?>' />
+                        <input type='submit' style='margin-top: 5px' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 2 ? 'Extend' : 'Purchase') ?>' />
                     </p>
                 </form>
             </td>

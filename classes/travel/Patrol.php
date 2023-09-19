@@ -1,6 +1,12 @@
 <?php
 
 class Patrol {
+
+    const CARAVAN_TYPE_RESOURCE = 'resource';
+    const CARAVAN_TYPE_SUPPLY = 'supply';
+    const PATROL_TYPE_CARAVAN = 'caravan';
+    const PATROL_TYPE_PATROL = 'patrol';
+
     public int $id;
     public int $start_time;
     public ?int $travel_time;
@@ -23,10 +29,10 @@ class Patrol {
         $this->patrol_type = $patrol_type;
     }
     public function setLocation(System $system) {
-        $points = [];
+        $route_locations = [];
         $loop = false;
         switch ($this->patrol_type) {
-            case "patrol":
+            case self::PATROL_TYPE_PATROL:
                 $loop = true;
                 // patrols loop between each location within their region
                 $result = $system->db->query("SELECT `x`, `y`, `type` FROM `region_locations` WHERE `region_id` = {$this->region_id}");
@@ -34,16 +40,16 @@ class Patrol {
 
                 foreach ($result as $point) {
                     if ($point['type'] == 'castle') {
-                        $points[] = ['x' => $point['x'], 'y' => $point['y']];
+                        $route_locations[] = ['x' => $point['x'], 'y' => $point['y']];
                     }
                 }
                 foreach ($result as $point) {
                     if ($point['type'] == 'village') {
-                        $points[] = ['x' => $point['x'], 'y' => $point['y']];
+                        $route_locations[] = ['x' => $point['x'], 'y' => $point['y']];
                     }
                 }
                 break;
-            case "caravan":
+            case self::PATROL_TYPE_CARAVAN:
                 $loop = false;
                 // get village location
                 $village_result = $system->db->query("SELECT `x`, `y` FROM `maps_locations`
@@ -55,15 +61,15 @@ class Patrol {
                     WHERE `region_id` = {$this->region_id} AND `type` = 'castle' LIMIT 1");
                 $castle_result = $system->db->fetch($castle_result);
                 switch ($this->caravan_type) {
-                    case "resource":
+                    case self::CARAVAN_TYPE_RESOURCE:
                         // move from castle -> village
-                        $points[] = ['x' => $castle_result['x'], 'y' => $castle_result['y']];
-                        $points[] = ['x' => $village_result['x'], 'y' => $village_result['y']];
+                        $route_locations[] = ['x' => $castle_result['x'], 'y' => $castle_result['y']];
+                        $route_locations[] = ['x' => $village_result['x'], 'y' => $village_result['y']];
                         break;
-                    case "supply":
-                        // move from village - castle
-                        $points[] = ['x' => $village_result['x'], 'y' => $village_result['y']];
-                        $points[] = ['x' => $castle_result['x'], 'y' => $castle_result['y']];
+                    case self::CARAVAN_TYPE_SUPPLY:
+                        // move from village -> castle
+                        $route_locations[] = ['x' => $village_result['x'], 'y' => $village_result['y']];
+                        $route_locations[] = ['x' => $castle_result['x'], 'y' => $castle_result['y']];
                         break;
                 }
                 break;
@@ -71,12 +77,12 @@ class Patrol {
 
         // if total travel time is set, we use given duration
         if (!empty($this->travel_time)) {
-            $position = $this->calculatePositionNormalized(time() * 1000, $this->start_time * 1000, $this->travel_time, $points, $loop);
+            $position = $this->calculatePositionNormalized(time() * 1000, $this->start_time * 1000, $this->travel_time, $route_locations, $loop);
         }
         // if travel interval is set, we can calculate the total time based on the distance and interval
         else if (!empty($this->travel_interval)) {
-            $loop_duration = $this->totalIntermediatePoints($points) * $this->travel_interval;
-            $position = $this->calculatePositionNormalized(time() * 1000, $this->start_time * 1000, $loop_duration, $points, $loop);
+            $loop_duration = $this->totalIntermediatePoints($route_locations) * $this->travel_interval;
+            $position = $this->calculatePositionNormalized(time() * 1000, $this->start_time * 1000, $loop_duration, $route_locations, $loop);
         }
         else {
             throw new RuntimeException("Invalid Patrol Configuration");
@@ -85,7 +91,7 @@ class Patrol {
         $this->current_y = $position['y'];
     }
 
-    // Piecewise Linear Interpolation Formula
+    /* Piecewise Linear Interpolation Formula
     function calculatePosition($t, $T_start, $T_cycle, $points)
     {
         $n = count($points);
@@ -112,9 +118,9 @@ class Patrol {
         }
 
         return ['x' => $points[0]['x'], 'y' => $points[0]['y']];
-    }
+    }*/
 
-    // Reverses the formula to generate a new start time for a point - this is used to correct the position if the patrol is stationary for a time
+    /* Reverses the formula to generate a new start time for a point - this is used to correct the position if the patrol is stationary for a time
     function findNewStartTime($t, $T_cycle, $points, $desiredPoint)
     {
         $n = count($points);
@@ -134,7 +140,7 @@ class Patrol {
         }
 
         return null;
-    }
+    }*/
 
     // Used to determine the total points in the path for speed calculations
     private function totalIntermediatePoints($points, $step_size = 1)
@@ -157,21 +163,33 @@ class Patrol {
         return sqrt(pow($x2 - $x1, 2) + pow($y2 - $y1, 2));
     }
 
-    // Variation of the original formula that uses an equal time for each segment between given points
+    /* Variation of the original formula that uses an equal time for each segment between given points.
+     * $t: The current time.
+     * $T_start: The start time of the cycle.
+     * $T_cycle: The total duration of one cycle.
+     * $points: An array of points (coordinates) that the object should pass through.
+     * $loop: A boolean variable indicating whether the path should loop back to the start or not.
+     */
     function calculatePositionNormalized($t, $T_start, $T_cycle, $points, $loop = true)
     {
-        $loopFactor = $loop ? 0 : 1; // 0 if looping, 1 if not
+        // Variable to determine if the movement is in a loop or not. 0 for looping, 1 for not looping.
+        $loopFactor = $loop ? 0 : 1;
+
+        // Total number of points in the $points array.
         $n = count($points);
+
+        // Initialize variables to store the total length of the path, the lengths of individual segments, and the time allocated for each segment.
         $totalLength = 0;
         $segmentLengths = [];
         $segmentTimes = [];
 
-        // If not looping and time complete, set to last point
+        // If not looping and time complete, set to final point.
         if (!$loop && $T_start + $T_cycle <= $t) {
             return ['x' => $points[$n - 1]['x'], 'y' => $points[$n - 1]['y']];
         }
 
-        // Calculate the total length and individual segment lengths
+        // Calculate the total length and individual segment lengths.
+        // If $loop is false, excludes the final segment (connecting the final point to the first point.
         for ($i = 0; $i < $n - $loopFactor; $i++) {
             $nextIndex = ($i + 1) % $n;
             $length = $this->calculateSegmentLength($points[$i], $points[$nextIndex]);
@@ -179,14 +197,18 @@ class Patrol {
             $totalLength += $length;
         }
 
-        // Calculate the time to allocate for each segment
+        // Calculate the time to allocate for each segment based on its length.
         for ($i = 0; $i < $n - $loopFactor; $i++) {
             $segmentTimes[$i] = ($segmentLengths[$i] / $totalLength) * $T_cycle;
         }
 
+        // Normalize the time within the cycle duration.
         $T_norm = ($t - $T_start) % $T_cycle;
+        // Keeps track of the accumulated time looping through each segment.
         $elapsedTime = 0;
 
+        // Calculate the current position.
+        // The last loop calculates the object's position at the current time $t, based on which segment it's supposed to be in.
         for ($i = 0; $i < $n - $loopFactor; $i++) {
             $nextIndex = ($i + 1) % $n;
 
@@ -205,7 +227,8 @@ class Patrol {
 
             $elapsedTime += $segmentTimes[$i];
         }
-
+        
+        // Fail-safe if no conditions met, returns first point.
         return ['x' => $points[0]['x'], 'y' => $points[0]['y']];
     }
 
