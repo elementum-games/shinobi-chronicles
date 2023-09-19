@@ -436,7 +436,8 @@ class TravelManager {
 
         $locations = [];
         foreach ($this->system->db->fetch_all($result) as $loc) {
-            if ($loc['name'] == "Ayakashi's Abyss" && $this->system->event == null) {
+            //if ($loc['name'] == "Ayakashi's Abyss" && $this->system->event == null) {
+            if ($loc['name'] == "Ayakashi's Abyss") {
                 $loc['action_url'] = $this->system->router->getUrl("forbiddenShop");
                 $loc['action_message'] = "Enter the Abyss";
 
@@ -467,7 +468,7 @@ class TravelManager {
             }
             else {
                 $new_location = new MapLocation($loc);
-                $new_location->objective_type = "key_location";
+                $new_location->location_type = "key_location";
                 $distance = $this->user->location->distanceDifference(
                     new TravelCoords(
                         x: $new_location->x,

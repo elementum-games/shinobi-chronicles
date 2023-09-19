@@ -9,7 +9,7 @@ class MapLocation {
     public int $y;
     public string $background_image;
     public string $background_color;
-    public string $objective_image = "";
+    public string $location_type;
     public string $action_url = "";
     public string $action_message = "";
     public int $pvp_allowed;

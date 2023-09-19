@@ -277,23 +277,17 @@ function MapLocations({ locations, tileWidth, tileHeight }) {
                         timeout={500} // Set the animation duration in milliseconds
                         classNames="fade"
                     >
-                        <div className={location.objective_type != undefined ? 'map_location ' + location.objective_type : 'map_location'}
+                        <div className={location.location_type != undefined ? 'map_location ' + location.location_type : 'map_location'}
                             style={{
                                 cursor: "pointer",
                                 backgroundColor: "#" + location.background_color,
                                 backgroundImage: location.background_image ? `url(${location.background_image})` : null,
-                                transform: location.objective_type == 'key_location' ? `translate3d(${((location.x - 1) * tileWidth) - 8}px, ${((location.y - 1) * tileHeight) - 8}px, 0)`
+                                transform: location.location_type == 'key_location' ? `translate3d(${((location.x - 1) * tileWidth) - 8}px, ${((location.y - 1) * tileHeight) - 8}px, 0)`
                                     : `translate3d(${(location.x - 1) * tileWidth}px, ${(location.y - 1) * tileHeight}px, 0)`,
                                 backfaceVisibility: "hidden",
                                 filter: "blur(0)",
                             }}>
                             <div className='map_location_tooltip'>{location.name}</div>
-                            {location.objective_image &&
-                                <div className={location.objective_type != undefined ? 'map_location_objective ' + location.objective_type : 'map_location_objective'}
-                                    style={{
-                                        backgroundImage: "url(." + location.objective_image + ")",
-                                    }}></div>
-                            }
                         </div>
                     </ReactTransitionGroup.CSSTransition>
                 ))}
