@@ -732,7 +732,7 @@ class TravelManager {
                     map_id: $mission_location->map_id,
                     x: $mission_location->x,
                     y: $mission_location->y,
-                    image: "/images/v2/icons/reticle.png",
+                    image: "/images/map/icons/reticle.png",
                     objective_type: "target",
                 );
             }

@@ -93,13 +93,13 @@ function bloodline() {
 			'ratio_multiplier' => 100
 		),
 		'ninjutsu_boost' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Ninjutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost decreases to 75% strength as Bloodline Skill exceeds Ninjutsu skill</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Ninjutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost gradually decreases to 75% strength as Bloodline Skill exceeds Ninjutsu skill</span>"
 		),
 		'taijutsu_boost' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Taijutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost decreases to 75% strength as Bloodline Skill exceeds Taijutsu skill</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Taijutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost gradually  decreases to 75% strength as Bloodline Skill exceeds Taijutsu skill</span>"
 		),
 		'genjutsu_boost' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Genjutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost decreases to 75% strength as Bloodline Skill exceeds Genjutsu skill</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Genjutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost gradually  decreases to 75% strength as Bloodline Skill exceeds Genjutsu skill</span>"
 		),
 		'heal' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] per turn</span>"
@@ -240,9 +240,9 @@ function bloodline() {
 
 			<label style='width:6.5em;'>Level:</label>" . $jutsu->level . "<br />
 			<label style='width:6.5em;'>Exp:</label>" . $jutsu->exp . "<br />";
-			echo "<br /><br />";
+			echo "<br />";
 			echo "<label style='width:6.5em;float:left;'>Description:</label>
-			<p style='display:inline-block;width:37.1em;margin:0;'>" . $jutsu->description . "</p>
+			<p style='display:inline-block;width:37.1em;margin:0;'>" . $jutsu->description . "</p><br>
 			<br style='margin:0;clear:both;' />";
 
 		}
