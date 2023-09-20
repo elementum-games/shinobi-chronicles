@@ -182,7 +182,7 @@ function bloodline() {
 				$replace_array[2] *= $boosts[$boost['effect']]['amount_multiplier'];
 			}
 			$replace_array[1] = round($replace_array[1], 2);
-			$replace_array[2] = round($replace_array[2], 0);
+			$replace_array[2] = round($replace_array[2], 2);
 
 			switch($boost['effect']) {
 				case 'ninjutsu_boost':
