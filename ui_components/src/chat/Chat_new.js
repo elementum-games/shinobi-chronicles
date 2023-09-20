@@ -371,6 +371,11 @@ function ChatPosts({
                                     src='../images/v2/icons/quote_hover.png'
                                     onClick={() => quotePost(post.id)}
                                 /></div>
+                                <div className='post_report_wrapper'>
+                                    <a className='imageLink' href={post.reportLink}>
+                                        <img className='post_report' src='../images/v2/icons/report_hover.png' />
+                                    </a>
+                                </div>
                                 {isModerator &&
                                     <div className='post_delete_wrapper'>
                                         <img
@@ -379,13 +384,7 @@ function ChatPosts({
                                             onClick={() => deletePost(post.id)}
                                         />
                                     </div>
-                                    
                                 }
-                                <div className='post_report_wrapper'>
-                                    <a className='imageLink' href={post.reportLink}>
-                                        <img className='post_report' src='../images/v2/icons/report_hover.png' />
-                                    </a>
-                                </div>
                             </div>
                             <div className="post_timestamp">
                                 <div style={{ marginBottom: "2px" }}>{post.timeString}</div>

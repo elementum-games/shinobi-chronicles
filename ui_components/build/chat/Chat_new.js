@@ -361,12 +361,6 @@ function ChatPosts({
     className: "post_quote",
     src: "../images/v2/icons/quote_hover.png",
     onClick: () => quotePost(post.id)
-  })), isModerator && /*#__PURE__*/React.createElement("div", {
-    className: "post_delete_wrapper"
-  }, /*#__PURE__*/React.createElement("img", {
-    className: "post_delete",
-    src: "../images/v2/icons/delete_hover.png",
-    onClick: () => deletePost(post.id)
   })), /*#__PURE__*/React.createElement("div", {
     className: "post_report_wrapper"
   }, /*#__PURE__*/React.createElement("a", {
@@ -375,7 +369,13 @@ function ChatPosts({
   }, /*#__PURE__*/React.createElement("img", {
     className: "post_report",
     src: "../images/v2/icons/report_hover.png"
-  })))), /*#__PURE__*/React.createElement("div", {
+  }))), isModerator && /*#__PURE__*/React.createElement("div", {
+    className: "post_delete_wrapper"
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "post_delete",
+    src: "../images/v2/icons/delete_hover.png",
+    onClick: () => deletePost(post.id)
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "post_timestamp"
   }, /*#__PURE__*/React.createElement("div", {
     style: {
