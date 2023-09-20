@@ -211,7 +211,11 @@ export function TopbarNotification({
                 <a href={notification.action_url}
                     className="topbar_notification_wrapper"
                     data-content={notification.message}
-                    data-time={timeRemainingDisplay}
+                data-time={timeRemainingDisplay}
+                onClick={(e) => {
+                    e.preventDefault();
+                    closeNotification(notification.notification_id, notification.action_url);
+                }}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -222,7 +226,7 @@ export function TopbarNotification({
                         className="topbar_close_notification"
                         onClick={(e) => {
                             e.preventDefault();
-                            closeNotification(notification.notification_id)
+                            closeNotification(notification.notification_id);
                         }}
                     >X</label>
                 </a>
@@ -272,7 +276,11 @@ function SpecialMissionNotification({
                     <a href={notification.action_url}
                        className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                        data-content={notification.message}
-                       data-time={timeRemainingDisplay}
+                    data-time={timeRemainingDisplay}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        closeNotification(notification.notification_id, notification.action_url);
+                    }}
                     >
                         <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                             <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -284,7 +292,7 @@ function SpecialMissionNotification({
                             className="topbar_close_notification"
                             onClick={(e) => {
                                 e.preventDefault();
-                                closeNotification(notification.notification_id)
+                                closeNotification(notification.notification_id);
                             }}
                         >X</label>
                     </a>
@@ -295,7 +303,11 @@ function SpecialMissionNotification({
                     <a href={notification.action_url}
                        className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                        data-content={notification.message}
-                       data-time={timeRemainingDisplay}
+                    data-time={timeRemainingDisplay}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        closeNotification(notification.notification_id, notification.action_url);
+                    }}
                     >
                         <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                             <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -307,7 +319,7 @@ function SpecialMissionNotification({
                             className="topbar_close_notification"
                             onClick={(e) => {
                                 e.preventDefault();
-                                closeNotification(notification.notification_id)
+                                closeNotification(notification.notification_id);
                             }}
                         >X</label>
                     </a>
@@ -353,7 +365,11 @@ function TrainingNotification({
                     <a href={notification.action_url}
                        className="topbar_notification_wrapper_training_complete"
                        data-content={notification.message}
-                       data-time={formatTimeRemaining(timeRemaining)}
+                    data-time={formatTimeRemaining(timeRemaining)}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        closeNotification(notification.notification_id, notification.action_url);
+                    }}
                     >
                         <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                             <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -365,7 +381,7 @@ function TrainingNotification({
                             className="topbar_close_notification"
                             onClick={(e) => {
                                 e.preventDefault();
-                                closeNotification(notification.notification_id)
+                                closeNotification(notification.notification_id);
                             }}
                         >X</label>
                     </a>

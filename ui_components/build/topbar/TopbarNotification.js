@@ -10,7 +10,6 @@ export function TopbarNotification({
         notification: notification,
         closeNotification: closeNotification
       });
-
     case "specialmission":
     case "specialmission_complete":
     case "specialmission_failed":
@@ -18,11 +17,9 @@ export function TopbarNotification({
         notification: notification,
         closeNotification: closeNotification
       });
-
     default:
       break;
   }
-
   const timeRemainingDisplay = formatTimeRemaining(calculateTimeRemaining(notification.created, notification.duration));
   return /*#__PURE__*/React.createElement(React.Fragment, null, notification.type === "mission" && /*#__PURE__*/React.createElement("a", {
     href: notification.action_url,
@@ -354,7 +351,11 @@ export function TopbarNotification({
     href: notification.action_url,
     className: "topbar_notification_wrapper",
     "data-content": notification.message,
-    "data-time": timeRemainingDisplay
+    "data-time": timeRemainingDisplay,
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id, notification.action_url);
+    }
   }, /*#__PURE__*/React.createElement("svg", {
     className: "topbar_notification_svg",
     width: "40",
@@ -409,7 +410,6 @@ export function TopbarNotification({
     className: "topbar_notification_important"
   }, "!"))));
 }
-
 function SpecialMissionNotification({
   notification,
   closeNotification
@@ -443,7 +443,11 @@ function SpecialMissionNotification({
     href: notification.action_url,
     className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
     "data-content": notification.message,
-    "data-time": timeRemainingDisplay
+    "data-time": timeRemainingDisplay,
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id, notification.action_url);
+    }
   }, /*#__PURE__*/React.createElement("svg", {
     className: "topbar_notification_svg",
     width: "40",
@@ -478,7 +482,11 @@ function SpecialMissionNotification({
     href: notification.action_url,
     className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
     "data-content": notification.message,
-    "data-time": timeRemainingDisplay
+    "data-time": timeRemainingDisplay,
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id, notification.action_url);
+    }
   }, /*#__PURE__*/React.createElement("svg", {
     className: "topbar_notification_svg",
     width: "40",
@@ -511,7 +519,6 @@ function SpecialMissionNotification({
     }
   }, "X"))));
 }
-
 function TrainingNotification({
   notification,
   closeNotification
@@ -554,7 +561,11 @@ function TrainingNotification({
     href: notification.action_url,
     className: "topbar_notification_wrapper_training_complete",
     "data-content": notification.message,
-    "data-time": formatTimeRemaining(timeRemaining)
+    "data-time": formatTimeRemaining(timeRemaining),
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id, notification.action_url);
+    }
   }, /*#__PURE__*/React.createElement("svg", {
     className: "topbar_notification_svg",
     width: "40",
@@ -615,19 +626,17 @@ function TrainingNotification({
     y: "27.5%",
     href: "images/v2/icons/timer.png"
   }))));
-} // Utilities
+}
 
-
+// Utilities
 function calculateTimeRemaining(created, duration) {
   const currentTimeTicks = new Date().getTime();
   return created + duration - currentTimeTicks / 1000;
 }
-
 function formatTimeRemaining(seconds) {
   if (seconds <= 0) {
     return "Complete";
   }
-
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor(seconds % 3600 / 60);
   seconds = Math.floor(seconds % 60);
