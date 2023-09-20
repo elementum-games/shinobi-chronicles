@@ -351,11 +351,7 @@ export function TopbarNotification({
     href: notification.action_url,
     className: "topbar_notification_wrapper",
     "data-content": notification.message,
-    "data-time": timeRemainingDisplay,
-    onClick: e => {
-      e.preventDefault();
-      closeNotification(notification.notification_id, notification.action_url);
-    }
+    "data-time": timeRemainingDisplay
   }, /*#__PURE__*/React.createElement("svg", {
     className: "topbar_notification_svg",
     width: "40",

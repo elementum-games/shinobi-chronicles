@@ -212,10 +212,6 @@ export function TopbarNotification({
                     className="topbar_notification_wrapper"
                     data-content={notification.message}
                 data-time={timeRemainingDisplay}
-                onClick={(e) => {
-                    e.preventDefault();
-                    closeNotification(notification.notification_id, notification.action_url);
-                }}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
