@@ -359,7 +359,7 @@ class BattleEffectsManager {
             $attack_jutsu_color = BattleManager::getJutsuTextColor($effect->damage_type);
 
             if($residual_damage_resisted > 0) {
-                $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($damage) . "</span>" . " residual damage (resists " . round($residual_damage_resisted) . " residual damage)");
+                $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($damage) . "</span>" . " residual damage (resists " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($residual_damage_resisted) . "</span>" . " residual damage)");
             } else {
                 $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($damage) . "</span>" . " residual damage");
             }
