@@ -296,9 +296,13 @@ body {
     background: url("/images/v2/decorations/barbigbutton.png") no-repeat;
     background-position: center;
 }
-.button-bar_large:active {
-    background-size: 98%;
-}
+    .button-bar_large:hover {
+        background: url("/images/v2/decorations/barbigbutton.png") no-repeat;
+        background-position: center;
+    }
+    .button-bar_large:active {
+        background-size: 98%;
+    }
 
 #footer {
     font-family: var(--font-primary);

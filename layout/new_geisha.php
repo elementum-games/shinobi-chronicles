@@ -4,13 +4,11 @@ function getNewGeishaLayout(System $system, bool $enable_mobile_layout): Layout 
     $react_dev_tags = <<<HTML
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js" crossorigin></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js" crossorigin></script>
-<script src="https://unpkg.com/react-transition-group/dist/react-transition-group.js" crossorigin></script>
 HTML;
 
     $react_prod_tags = <<<HTML
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js" crossorigin></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-transition-group/dist/react-transition-group.js" crossorigin></script>
 HTML;
 
     if($system->isDevEnvironment()) {
@@ -40,6 +38,7 @@ HTML;
 	{$react_tags}
 	<script type='text/javascript' src="./scripts/functions.js"></script>
 	<script type='text/javascript' src="./scripts/timer.js"></script>
+    <script type='text/javascript' src='./scripts/react-transition-group.js'></script>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="keywords" content="naruto, rpg, online, game, anime, manga, mmorpg" />
 	<meta name="description" content="Shinobi Chronicles: An online browser-based RPG inspired by the anime/manga Naruto." />

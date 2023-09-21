@@ -25,7 +25,7 @@ function Topbar({
       response.data.userNotifications.forEach(notification => checkNotificationAlert(notification));
     });
   }
-  function closeNotification(notificationId) {
+  function closeNotification(notificationId, actionUrl) {
     apiFetch(links.notification_api, {
       request: 'closeNotification',
       notification_id: notificationId
@@ -33,6 +33,9 @@ function Topbar({
       if (response.errors.length) {
         handleErrors(response.errors);
         return;
+      }
+      if (actionUrl !== undefined) {
+        window.location.href = actionUrl;
       }
       getNotificationData();
     });

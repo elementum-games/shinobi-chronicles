@@ -28,7 +28,8 @@ if($battle->battle_text) {
 ?>
 
 <script type='text/javascript'>
-    var apiUrl = `api/battle.php?check_turn=true`;
+    let battle_id = <?=  $battle->battle_id ?>;
+    var apiUrl = `api/battle.php?check_turn=` + battle_id;
     let turn_count = <?= $battle->turn_count ?>;
     let prep_time_remaining = <?= $battle->prepTimeRemaining() ?>;
     let player1_submitted = <?= (int)isset($battle->fighter_actions[$battle->player1->combat_id]) ?>;
@@ -37,7 +38,7 @@ if($battle->battle_text) {
     let player2_time = <?= $battle->timeRemaining($battle->player2_id) ?>;
     let refreshInterval = setInterval(() => checkTurn(), 1000);
     function checkTurn() {
-        if (prep_time_remaining > 0 && turn_count == 1) {
+        if (prep_time_remaining > 0 && turn_count == 0) {
             prep_time_remaining--;
             $("#prep_time_remaining").text(prep_time_remaining);
             if (prep_time_remaining == 0) {
