@@ -209,13 +209,14 @@
     right: 0;
     margin: 0 auto;
     display: flex;
-    flex-flow: row wrap;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 20;
 }
 
 #content .travel-buttons .button {
+    min-width: 100px;
     font-family: sans-serif;
     text-transform: none;
     font-size: 12px;
