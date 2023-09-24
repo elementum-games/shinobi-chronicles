@@ -181,8 +181,6 @@ function bloodline() {
 			if(isset($boosts[$boost['effect']]['amount_multiplier'])) {
 				$replace_array[2] *= $boosts[$boost['effect']]['amount_multiplier'];
 			}
-			$replace_array[1] = round($replace_array[1], 2);
-			$replace_array[2] = round($replace_array[2], 2);
 
 			switch($boost['effect']) {
 				case 'ninjutsu_boost':
@@ -212,6 +210,10 @@ function bloodline() {
                     );
 					break;
             }
+
+            $replace_array[1] = round($replace_array[1], 3);
+            $replace_array[2] = round($replace_array[2], 0);
+
 			echo "<label style='width:9em;'>" . ucwords(str_replace('_', ' ', $boost['effect'])) . ":</label>" .
 				str_replace($search_array, $replace_array, $boosts[$boost['effect']]['text']) . "<br />";
 		}
