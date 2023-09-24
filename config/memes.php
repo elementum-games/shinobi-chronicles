@@ -765,4 +765,22 @@ return [
         'text' => ':applecat:',
         'public' => true,
     ],
+    [
+        'code' => ':happybee:',
+        'image' => "<img src='./images/memes/happybee.png' />",
+        'text' => ':happybee:',
+        'public' => true,
+    ],
+    [
+        'code' => ':sadbee:',
+        'image' => "<img src='./images/memes/sadbee.png' />",
+        'text' => ':sadbee:',
+        'public' => true,
+    ],
+    [
+        'code' => ':angrybee:',
+        'image' => "<img src='./images/memes/angrybee.png' />",
+        'text' => ':angrybee:',
+        'public' => true,
+    ],    
 ];
