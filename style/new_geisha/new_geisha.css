@@ -771,14 +771,14 @@ select {
     border-color: var(--font-color-3);
 }
 #content .button, .contentDiv button {
-    background: var(--content-background-color);
-    color: var(--font-color-3);
-    border-color: var(--font-color-3);
+    background: #343d77;
+    color: var(--font-color-2);
+    border-color: #151822;
 }
     #content .button:hover, .contentDiv button:hover {
-        background: var(--box-color-default);
+        background: #68293f;
         color: var(--font-color-2);
-        border-color: var(--font-color-2);
+        border-color: #1e161f;
     }
 button {
     background: var(--content-background-color);

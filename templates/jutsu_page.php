@@ -34,8 +34,8 @@ $rank_names = RankManager::fetchNames($system);
         justify-content: center;
     }
     .jutsu_select {
-        width:200px;
-        height:60px;
+        width:210px;
+        height:55px;
         outline: none;
         border: 0px;
         text-align: center;
