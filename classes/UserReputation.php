@@ -119,7 +119,7 @@ class UserReputation {
     ];
 
     // Limits
-    const ARENA_MISSION_CD = 30;
+    const ARENA_MISSION_CD = 5;
     const MISSION_GAINS = [
         Mission::RANK_D => 1,
         Mission::RANK_C => 2,
