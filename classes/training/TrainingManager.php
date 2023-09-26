@@ -70,7 +70,7 @@ class TrainingManager {
         $this->base_jutsu_train_length = self::BASE_TRAIN_TIME;
 	    $this->jutsu_train_gain = User::$jutsu_train_gain;
 
-	    // 56.25% of standard
+        // 56.25% of standard
 	    $this->stat_long_train_length = self::BASE_TRAIN_TIME * 4;
 	    $this->stat_long_train_gain = $this->stat_train_gain * 2.25;
 
@@ -213,6 +213,9 @@ class TrainingManager {
                 // Clan boost
                 if ($clan_boost) {
                     $len *= 1 - ($clan_boost / 100);
+                }
+                if ($this->reputation->benefits[UserReputation::BENEFIT_JUTSU_TRAINING_BONUS]) {
+                    $len = round($len * (100 / (100 + UserReputation::JUTSU_TRAINING_BONUS)));
                 }
                 return ($in_mins) ? $len/60 : $len;
             }

@@ -102,6 +102,15 @@ class PremiumShopManager {
         $this->expedited_stat_transfer_points_per_yen = round($this->stat_transfer_points_per_ak / 1000, 5);
 
         // Free stat transfers
+        $base_free_stat_change = $this->max_free_stat_change_amount;
+        if ($this->player->rank_num >= 3) {
+            $this->max_free_stat_change_amount = floor($this->player->rank->stat_cap / 100);
+            $base_free_stat_change = $this->max_free_stat_change_amount;
+        }
+        if ($this->player->reputation->benefits[UserReputation::BENEFIT_FREE_TRANSFER_BONUS]) {
+            $this->max_free_stat_change_amount += floor($base_free_stat_change * UserReputation::FREE_TRANSFER_BONUS / 100);
+        }
+        $this->max_free_stat_change_amount += floor($base_free_stat_change * $this->player->forbidden_seal->free_transfer_bonus / 100);
         self::$free_stat_change_cooldown_hours = self::$free_stat_change_cooldown / 3600;
 
         $this->free_stat_change_cooldown_left = $this->player->last_free_stat_change - (time() - self::$free_stat_change_cooldown);
