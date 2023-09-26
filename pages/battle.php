@@ -134,7 +134,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->last_pvp_ms = System::currentTimeMs();
 
         // prevent chain sniping the same player
-        if ($battle->player_side == Battle::TEAM1) {
+        if ($battle->player_side == Battle::TEAM2) {
             $player->pvp_immunity_ms = System::currentTimeMs() + (5 * 1000);
         }
 
