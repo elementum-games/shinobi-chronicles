@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/BattleEffectsManager.php';
 require_once __DIR__ . '/BattleLog.php';
+require_once __DIR__ . '/../war/Operation.php';
 
 class Battle {
     const TYPE_AI_ARENA = 1;
@@ -70,6 +71,8 @@ class Battle {
     // transient instance var - more convenient to interface with log this way for the moment
     public string $battle_text;
 
+    public ?int $patrol_id;
+
     /**
      * @param System  $system
      * @param Fighter $player1
@@ -79,7 +82,7 @@ class Battle {
      * @throws RuntimeException
      */
     public static function start(
-        System $system, Fighter $player1, Fighter $player2, int $battle_type
+        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null
     ) {
         $json_empty_array = '[]';
 
@@ -122,7 +125,8 @@ class Battle {
                 `active_genjutsu` = '" . $json_empty_array . "',
                 `jutsu_cooldowns` = '" . $json_empty_array . "',
                 `fighter_jutsu_used` = '" . $json_empty_array . "',
-                `is_retreat` = '" . (int)false . "'
+                `is_retreat` = '" . (int)false . "',
+                `patrol_id` = '" . $patrol_id . "'
                 "
         );
         $battle_id = $system->db->last_insert_id;
@@ -130,12 +134,23 @@ class Battle {
         if($player1 instanceof User) {
             $player1->battle_id = $battle_id;
             if ($battle_type == self::TYPE_FIGHT) {
-                $player1->last_death_ms = 0;
+                $player1->pvp_immunity_ms = 0; // if attacking lose immunity
+                $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player1->user_id}");
             }
+            if ($player1->operation > 0) {
+                Operation::cancelOperation($system, $player1);
+            }
+
             $player1->updateData();
         }
         if($player2 instanceof User) {
             $player2->battle_id = $battle_id;
+            if ($battle_type == self::TYPE_FIGHT) {
+                $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player2->user_id}");
+            }
+            if ($player2->operation > 0) {
+                Operation::cancelOperation($system, $player2);
+            }
             $player2->updateData();
         }
 
@@ -221,6 +236,8 @@ class Battle {
         $this->jutsu_cooldowns = json_decode($battle['jutsu_cooldowns'] ?? "[]", true);
 
         $this->fighter_jutsu_used = json_decode($battle['fighter_jutsu_used'], true);
+
+        $this->patrol_id = $battle['patrol_id'];
 
         // lo9g
         $last_turn_log = BattleLog::getLastTurn($this->system, $this->battle_id);

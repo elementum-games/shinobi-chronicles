@@ -48,6 +48,8 @@ function displayBattle(): bool
 }
 
 function processWarBattleEnd($battle, $player): string {
+    global $system;
+
     // Base chance at 100, goes down if fight is too short/lower level AI
     $stat_gain_chance = 100;
 
@@ -102,6 +104,11 @@ function processWarBattleEnd($battle, $player): string {
         if ($stat_gain_display) {
             $battle_result .= $stat_gain_display;
         }
+
+        // handle patrol logic
+        $patrol_id = $battle->getPatrolId();
+        $warManager = new WarManager($system, $player);
+        $warManager->handlePatrolDefeat($patrol_id);
 
         $player->ai_wins++;
         $player->battle_id = 0;

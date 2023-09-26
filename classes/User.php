@@ -286,6 +286,8 @@ class User extends Fighter {
     public ?int $sensei_id = null;
     public bool $accept_students;
 
+    public int $pvp_immunity_ms;
+
     /** @var PlayerAchievement[]  */
     public array $achievements = [];
 
@@ -535,6 +537,7 @@ class User extends Fighter {
         $this->last_free_stat_change = $user_data['last_free_stat_change'];
         $this->last_pvp_ms = $user_data['last_pvp_ms'];
         $this->last_death_ms = $user_data['last_death_ms'];
+        $this->pvp_immunity_ms = $user_data['pvp_immunity_ms'];
 
         $this->layout = $user_data['layout'];
 
@@ -1805,7 +1808,8 @@ class User extends Fighter {
 		`last_ai_ms` = '$this->last_ai_ms',
 		`last_free_stat_change` = '{$this->last_free_stat_change}',
 		`last_pvp_ms` = '$this->last_pvp_ms',
-		`last_death_ms` = '$this->last_death_ms',";
+		`last_death_ms` = '$this->last_death_ms',
+        `pvp_immunity_ms` = '$this->pvp_immunity_ms',";
 
         $forbidden_seal = $this->forbidden_seal->dbEncode();
 

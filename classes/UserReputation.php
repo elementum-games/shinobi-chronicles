@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . "/war/Operation.php";
+
 class UserReputation {
     public static array $VillageRep = [
         1 => [
@@ -123,6 +125,12 @@ class UserReputation {
         SpecialMission::DIFFICULTY_HARD => 6,
         SpecialMission::DIFFICULTY_NIGHTMARE => 8,
     ];
+    const OPERATION_GAINS = [
+        Operation::OPERATION_REINFORCE => 3,
+        Operation::OPERATION_INFILTRATE => 4,
+        Operation::OPERATION_RAID => 5,
+        Operation::OPERATION_LOOT => 1,
+    ];
 
     const DAILY_TASK_REWARDS = [
         DailyTask::DIFFICULTY_EASY => [
@@ -147,6 +155,7 @@ class UserReputation {
             DailyTask::ACTIVITY_PVP => 20,
         ],
     ];
+
     const DAILY_TASK_PVP_WIN_MOD = 5; // Increase rep by this amount for tasks requiring pvp wins (harder than completes)f
     const DAILY_TASK_BYPASS_CAP = false;
 

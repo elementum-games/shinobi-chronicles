@@ -80,6 +80,8 @@ export const Map = ({
   }), /*#__PURE__*/React.createElement(MapGutterY, {
     stageHeight: stage_height,
     stageOffsetY: stage_offset_y
+  }), /*#__PURE__*/React.createElement(LootDisplay, {
+    mapData: mapData
   }), /*#__PURE__*/React.createElement("div", {
     className: "travel_map_stage"
   }, /*#__PURE__*/React.createElement("div", {
@@ -124,7 +126,9 @@ export const Map = ({
     objectives: mapData.region_objectives || [],
     tileWidth: tile_width,
     tileHeight: tile_height,
-    strategicView: strategicView
+    strategicView: strategicView,
+    player_x: mapData.player_x,
+    player_y: mapData.player_y
   }), /*#__PURE__*/React.createElement(MapNearbyPlayers, {
     scoutData: scoutData || [],
     tileWidth: tile_width,
@@ -284,7 +288,9 @@ function RegionObjectives({
   objectives,
   tileWidth,
   tileHeight,
-  strategicView
+  strategicView,
+  player_x,
+  player_y
 }) {
   function getVillageIcon(village_id) {
     switch (village_id) {
@@ -322,7 +328,7 @@ function RegionObjectives({
   }, /*#__PURE__*/React.createElement("div", {
     className: "region_objective_tooltip",
     style: {
-      display: strategicView ? 'flex' : 'none'
+      display: strategicView || objective.x == player_x && objective.y == player_y ? 'flex' : 'none'
     }
   }, /*#__PURE__*/React.createElement("span", {
     className: "region_objective_tooltip_name"
@@ -333,11 +339,10 @@ function RegionObjectives({
   }, objective.defense), /*#__PURE__*/React.createElement("img", {
     className: "region_objective_tooltip_village",
     src: getVillageIcon(objective.village_id)
-  }))), objective.objective_health && objective.objective_max_health > 0 && (() => {
+  }))), objective.objective_health !== undefined && objective.objective_max_health > 0 && (() => {
     const percentage = objective.objective_health / objective.objective_max_health * 100;
     let barColor;
     let strokeColor = '#2b2c2c';
-    let strokeColor2 = '#3c2b2bcc';
     if (percentage > 50) {
       barColor = '#00b044';
     } else if (percentage > 25) {
@@ -345,7 +350,7 @@ function RegionObjectives({
     } else {
       barColor = 'red';
     }
-    return percentage < 100 || strategicView ? /*#__PURE__*/React.createElement("div", {
+    return percentage < 100 || strategicView || objective.x == player_x && objective.y == player_y ? /*#__PURE__*/React.createElement("div", {
       className: "region_objective_health"
     }, /*#__PURE__*/React.createElement("svg", {
       width: "60",
@@ -455,7 +460,16 @@ function MapNearbyPlayers({
     className: "map_location_tooltip"
   }, player.user_name), /*#__PURE__*/React.createElement("div", {
     className: alignmentClassPlayer(player.alignment, player.village_id) + visibilityClass(player.invulnerable)
-  }))));
+  }), player.loot_count > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
+    className: "loot_icon_1",
+    src: "/../images/map/icons/loot1.png"
+  })), player.loot_count > 5 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
+    className: "loot_icon_2",
+    src: "/../images/map/icons/loot1.png"
+  })), player.loot_count > 10 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
+    className: "loot_icon_3",
+    src: "/../images/map/icons/loot1.png"
+  })))));
 }
 function MapNearbyPatrols({
   patrolData,
@@ -476,7 +490,7 @@ function MapNearbyPatrols({
   }, /*#__PURE__*/React.createElement("div", {
     className: "map_location_tooltip"
   }, patrol.patrol_name), /*#__PURE__*/React.createElement("div", {
-    className: alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type
+    className: alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type + ' tier_' + patrol.tier
   }))));
 }
 function Player({
@@ -541,6 +555,15 @@ function Player({
     strokeDashoffset: 100 - 100 / 100 * mapData.operation_interval,
     transform: "rotate(-90, 24.5, 24)"
   })))));
+}
+function LootDisplay({
+  mapData
+}) {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, mapData.loot_count > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "loot_display"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "loot_count"
+  }, mapData.loot_count)));
 }
 const visibilityClass = invulnerable => {
   if (invulnerable) {

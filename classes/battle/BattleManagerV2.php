@@ -1008,4 +1008,7 @@ class BattleManagerV2 {
         return $default_attacks;
     }
 
+    public function getPatrolId(): int {
+        return $this->battle->patrol_id;
+    }
 }

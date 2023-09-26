@@ -5,6 +5,7 @@ require_once __DIR__ . '/../classes/System.php';
 require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/War/WarManager.php';
+require_once __DIR__ . '/../classes/travel/Patrol.php';
 
 $system = new System();
 $system->db->connect();
@@ -22,6 +23,10 @@ if (isset($_SESSION['user_id'])) {
     if ($player->staff_manager->isHeadAdmin()) {
         if (isset($_GET['run_script']) && $_GET['run_script'] == 'true') {
             if ($system->environment === System::ENVIRONMENT_PROD) {
+                $debug = false;
+                if (isset($_GET['debug'])) {
+                    $debug = $system->db->clean($_GET['debug']);
+                }
                 if (!isset($_POST['confirm']) || $_POST['confirm'] !== $production_key) {
                     echo "WARNING PRODUCTION ENVIRONMENT! Confirm you would like to run this adhoc on <b>PRODUCTION ENVIRONMENT</b>!!!<br />
                 To confirm, type the following (case sensitive): $production_key<br />
@@ -29,23 +34,25 @@ if (isset($_SESSION['user_id'])) {
                     <input type='text' name='confirm' /><input type='submit' value='Run Script' />
                 </form>";
                 } else {
-                    hourlyCaravan($system);
+                    hourlyCaravan($system, $debug);
                     $player->staff_manager->staffLog(
                         StaffManager::STAFF_LOG_ADMIN,
                         "{$player->user_name}({$player->user_id}) manually ran caravan cron."
                     );
-                    echo "Script ran.";
                 }
             } else {
-                hourlyCaravan($system);
+                $debug = false;
+                if (isset($_GET['debug'])) {
+                    $debug = $system->db->clean($_GET['debug']);
+                }
+                hourlyCaravan($system, $debug);
                 $player->staff_manager->staffLog(
                     StaffManager::STAFF_LOG_ADMIN,
                     "{$player->user_name}({$player->user_id}) manually ran caravan cron."
                 );
-                echo "Script ran.";
             }
         } else {
-            echo "You can run the caravan cron script Adhoc. This is not reversible. <a href='{$system->router->base_url}/cron_jobs/caravan_cron.php?run_script=true'>Run</a>.";
+            echo "You can run the caravan cron script Adhoc. This is not reversible.<br><a href='{$system->router->base_url}/cron_jobs/caravan_cron.php?run_script=true'>Run</a><br><a href='{$system->router->base_url}/cron_jobs/caravan_cron.php?run_script=true&debug=true'>Debug</a>";
         }
     }
 } else {
@@ -98,6 +105,7 @@ function hourlyCaravan(System $system, $debug = true): void
 
     /* step 3: generate new caravans */
 
+    $queries = [];
     // get regions
     $region_result = $system->db->query("SELECT * FROM `regions` WHERE `region_id` > 5");
     $region_result = $system->db->fetch_all($region_result);
@@ -109,21 +117,37 @@ function hourlyCaravan(System $system, $debug = true): void
         // add resources to region caravan
         foreach ($region_location_result as $region_location) {
             if (!empty($caravan_resources[$region_location['resource_id']])) {
-                $caravan_resources[$region_location['resource_id']] += ($region_location['resource_production'] - $region_location['resource_penalty']);
+                $caravan_resources[$region_location['resource_id']] += $region_location['resource_count'];
             } else {
-                $caravan_resources[$region_location['resource_id']] = ($region_location['resource_production'] - $region_location['resource_penalty']);
+                $caravan_resources[$region_location['resource_id']] = ($region_location['resource_count']);
             }
         }
         // create new caravan for region
-        $start_time = time();
+        // caravans will spawn from now until the next caravan tick, also giving enough buffer so that they reach their destination before the next tick
+        $start_time = rand(time(), time() + (WarManager::CARAVAN_TIMER_HOURS * 60 * 60) - (WarManager::BASE_CARAVAN_TIME_MS / 1000));
         $travel_time = WarManager::BASE_CARAVAN_TIME_MS;
         $region_id = $region['region_id'];
         $village_id = $region['village'];
         $caravan_type = Patrol::CARAVAN_TYPE_RESOURCE;
         $resources = json_encode($caravan_resources);
         $name = $villages[$region['village']]->name . " Caravan";
-        $system->db->query("INSERT INTO `caravans` (`start_time`, `travel_time`, `region_id`, `village_id`, `caravan_type`, `resources`, `name`)
-            VALUES ('{$start_time}', '{$travel_time}', '{$region_id}', '{$village_id}', '{$caravan_type}', '{$resources}', '{$name}')
-        ");
+        $queries[] = "INSERT INTO `caravans` (`start_time`, `travel_time`, `region_id`, `village_id`, `caravan_type`, `resources`, `name`)
+            VALUES ('{$start_time}', '{$travel_time}', '{$region_id}', '{$village_id}', '{$caravan_type}', '{$resources}', '{$name}')";
+    }
+
+    if ($debug) {
+        echo "Debug running...<br>";
+        foreach ($queries as $query) {
+            echo $query . "<br />";
+        }
+        echo "Debug complete";
+    } else {
+        echo "Script running...<br>";
+        foreach ($queries as $query) {
+            $system->db->query("LOCK TABLES `caravans` WRITE;");
+            $system->db->query($query);
+            $system->db->query("UNLOCK TABLES;");
+        }
+        echo "Script complete";
     }
 }

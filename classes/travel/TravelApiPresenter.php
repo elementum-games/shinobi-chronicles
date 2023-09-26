@@ -16,7 +16,7 @@ class TravelApiPresenter {
         $current_location_portal = $travelManager->fetchCurrentLocationPortal();
         $location_action = $travelManager->getMapLocationAction($locations, $player);
         $regions = $travelManager->getRegions($player);
-        $travelManager->checkOperation($player->operation);
+        $travelManager->checkOperation();
         $operation = $player->operation > 0 ? $travelManager->warManager->getOperationById($player->operation) : null;
         return [
             'player_x'          => $player->location->x,
@@ -39,7 +39,7 @@ class TravelApiPresenter {
             'tile_height'       => $travelManager->map_data['tile_height'],
             'action_url'        => $location_action->action_url,
             'action_message'    => $location_action->action_message,
-            'invulnerable'      => ($player->last_death_ms > System::currentTimeMs() - (300 * 1000)),
+            'invulnerable'      => ($player->pvp_immunity_ms > System::currentTimeMs()),
             'regions'           => $regions,
             'region_coords'     => $travelManager->getCoordsByRegion($regions),
             'spar_link'         => $system->router->getUrl('spar'),
@@ -51,6 +51,7 @@ class TravelApiPresenter {
             'operation_type'    => $operation ? System::unSlug(Operation::OPERATION_TYPE_DESCRIPTOR[$operation->type]) : null,
             'operation_progress'=> $operation ? $operation->progress : null,
             'operation_interval'=> $operation ? $operation->interval_progress : null,
+            'loot_count'        => $travelManager->getPlayerLootCount(),
         ];
     }
 
@@ -75,6 +76,7 @@ class TravelApiPresenter {
                     'invulnerable'  => $nearbyPlayer->invulnerable,
                     'distance'      => $nearbyPlayer->distance,
                     'village_id'    => $nearbyPlayer->village_id,
+                    'loot_count'    => $nearbyPlayer->loot_count,
                 ];
             },
             $travelManager->fetchNearbyPlayers()
@@ -94,6 +96,7 @@ class TravelApiPresenter {
                     'patrol_type' => $nearbyPatrol->patrol_type,
                     'alignment' => $nearbyPatrol->alignment,
                     'village_id' => $nearbyPatrol->village_id,
+                    'tier' => $nearbyPatrol->tier,
                 ];
             },
             $travelManager->fetchNearbyPatrols()

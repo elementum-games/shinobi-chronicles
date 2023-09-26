@@ -21,6 +21,7 @@ class Patrol {
     public ?int $ai_id = null;
     public string $patrol_type;
     public string $alignment;
+    public ?int $tier = null;
     const DESTINATION_BUFFER_MS = 5000; // duration non-looped patrols should appear at their destination
     public function __construct(array $row, string $patrol_type) {
         foreach ($row as $key => $value) {
