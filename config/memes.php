@@ -782,5 +782,11 @@ return [
         'image' => "<img src='./images/memes/angrybee.png' />",
         'text' => ':angrybee:',
         'public' => true,
-    ],    
+    ],   
+    [
+        'code' => ':hatarena:',
+        'image' => "<img src='./images/memes/hat-arena.png' />",
+        'text' => ':hatarena:',
+        'public' => true,
+    ],       
 ];
