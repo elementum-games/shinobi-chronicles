@@ -19,5 +19,6 @@ class NearbyPlayerDto {
         public bool $invulnerable = false,
         public int $distance = 0,
         public int $village_id,
+        public int $loot_count = 0,
     ) {}
 }

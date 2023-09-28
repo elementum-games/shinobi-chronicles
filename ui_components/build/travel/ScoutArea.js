@@ -59,7 +59,7 @@ export const QuickScout = ({
     }
   }, scoutData && scoutData.find(user => ranksToView[parseInt(user.rank_num)] === true && user.user_id !== playerId && user.alignment !== "Ally") && /*#__PURE__*/React.createElement(QuickScoutInner, {
     key: scoutData[0].user_id,
-    player_data: scoutData.find(user => ranksToView[parseInt(user.rank_num)] === true && user.user_id !== playerId),
+    player_data: scoutData.find(user => ranksToView[parseInt(user.rank_num)] === true && user.user_id !== playerId && user.alignment !== "Ally"),
     attackPlayer: attackPlayer,
     sparPlayer: sparPlayer,
     colosseumCoords: mapData ? mapData.colosseum_coords : null,

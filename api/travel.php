@@ -78,6 +78,11 @@ try {
             $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
             break;
 
+        case 'ClaimLoot':
+            $success = $TravelManager->claimLoot();
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
+            break;
+
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
     }

@@ -91,6 +91,9 @@ export const Map = ({ mapData, scoutData, patrolData, playerId, ranksToView, str
                 stageHeight={stage_height}
                 stageOffsetY={stage_offset_y}
             />
+            <LootDisplay
+                mapData={mapData}
+            />
             <div className='travel_map_stage'>
                 <div className='travel_map_content'
                      style={{
@@ -135,6 +138,8 @@ export const Map = ({ mapData, scoutData, patrolData, playerId, ranksToView, str
                         tileWidth={tile_width}
                         tileHeight={tile_height}
                         strategicView={strategicView}
+                        player_x={mapData.player_x}
+                        player_y={mapData.player_y}
                     />
                     <MapNearbyPlayers
                         scoutData={scoutData || []}
@@ -318,7 +323,7 @@ function MapObjectives({ objectives, tileWidth, tileHeight }) {
 }
 
 
-function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView }) {
+function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, player_x, player_y }) {
     function getVillageIcon(village_id) {
         switch (village_id) {
             case 1:
@@ -355,19 +360,18 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView }) 
                                 filter: "blur(0)",
                             }}
                         >
-                            <div className='region_objective_tooltip' style={{ display: strategicView ? 'flex' : 'none' }}>
+                            <div className='region_objective_tooltip' style={{ display: strategicView || (objective.x == player_x && objective.y == player_y) ? 'flex' : 'none' }}>
                                 <span className='region_objective_tooltip_name'>{objective.name}</span>
                                 <div className='region_objective_tooltip_tags'>
                                     <span className='region_objective_tooltip_defense'>{objective.defense}</span>
                                     <img className='region_objective_tooltip_village' src={getVillageIcon(objective.village_id)}/>
                                 </div>
                             </div>
-                            {objective.objective_health && objective.objective_max_health > 0 &&
+                            {objective.objective_health !== undefined && objective.objective_max_health > 0 &&
                                 (() => {
                                     const percentage = (objective.objective_health / objective.objective_max_health) * 100;
                                     let barColor;
                                     let strokeColor = '#2b2c2c';
-                                    let strokeColor2 = '#3c2b2bcc';
                                     if (percentage > 50) {
                                         barColor = '#00b044';
                                     } else if (percentage > 25) {
@@ -376,7 +380,7 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView }) 
                                         barColor = 'red';
                                 }
 
-                                return (percentage < 100 || strategicView ? (
+                                return (percentage < 100 || strategicView || (objective.x == player_x && objective.y == player_y) ? (
                                     <div className='region_objective_health'>
                                         <svg width="60" height="9">
                                             <g transform="skewX(-25)">
@@ -421,6 +425,21 @@ function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId, ranksToV
                         }}>
                         <div className='map_location_tooltip'>{player.user_name}</div>
                         <div className={alignmentClassPlayer(player.alignment, player.village_id) + visibilityClass(player.invulnerable)}></div>
+                        {player.loot_count > 0 &&
+                            <>
+                                <img className='loot_icon_1' src='/../images/map/icons/loot1.png' />
+                            </>
+                        }
+                        {player.loot_count > 5 &&
+                            <>
+                                <img className='loot_icon_2' src='/../images/map/icons/loot1.png' />
+                            </>
+                        }
+                        {player.loot_count > 10 &&
+                            <>
+                                <img className='loot_icon_3' src='/../images/map/icons/loot1.png' />
+                            </>
+                        }
                     </div>
                 ))}
         </div>
@@ -440,7 +459,7 @@ function MapNearbyPatrols({ patrolData, tileWidth, tileHeight }) {
                             backfaceVisibility: "hidden",
                         }}>
                         <div className='map_location_tooltip'>{patrol.patrol_name}</div>
-                        <div className={alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type}></div>
+                        <div className={alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type + ' tier_' + patrol.tier}></div>
                     </div>
                 ))}
         </div>
@@ -510,6 +529,18 @@ function Player({ mapData, playerStyle }) {
                 </>
             }
         </div>
+    );
+}
+
+function LootDisplay({ mapData }) {
+    return (
+        <>
+            {mapData.loot_count > 0 &&
+                <div className='loot_display'>
+                    <span className='loot_count'>{mapData.loot_count}</span>
+                </div>
+            }
+        </>
     );
 }
 

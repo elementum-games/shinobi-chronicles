@@ -32,12 +32,13 @@ import { ScoutArea } from "./ScoutArea.js";
     colosseum_coords:    object,
     region_objectives:   object,
     map_objectives:      object,
-    battle_url:          boolean,
+    battle_url:          string,
     operations:          object,
     operation_type:      string,
     operation_progress:  int,
     operation_interval:  int,
     travel_message:      string,
+    loot_count:          int,
  * }} mapData
  *
  * @param {{
@@ -251,7 +252,7 @@ function Travel({
     function handleErrors(errors) {
         console.warn(errors);
         setFeedback(null);
-        setFeedback([errors, 'info']);
+        debug([errors]);
     }
 
     const AttackPlayer = (target) => {
@@ -296,6 +297,25 @@ function Travel({
             travelAPILink,
             {
                 request: 'CancelOperation',
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            if (response.data.travel_message) {
+                setFeedback(null);
+                setFeedback([response.data.travel_message, 'info']);
+            }
+            setMapData(response.data.mapData);
+        });
+    }
+
+    const ClaimLoot = () => {
+        apiFetch(
+            travelAPILink,
+            {
+                request: 'ClaimLoot',
             }
         ).then((response) => {
             if (response.errors.length) {
@@ -447,6 +467,9 @@ function Travel({
                                         {`${value}`}
                                     </button>
                                 ))
+                            )}
+                            {(mapData && mapData.in_village && mapData.loot_count > 0) && (
+                                <button className='button' onClick={() => ClaimLoot()}>Claim Loot</button>
                             )}
                         </div>
                         {feedback && (

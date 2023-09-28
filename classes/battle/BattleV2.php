@@ -4,6 +4,7 @@ use JetBrains\PhpStorm\Pure;
 
 require_once __DIR__ . '/BattleEffectsManagerV2.php';
 require_once __DIR__ . '/BattleLogV2.php';
+require_once __DIR__ . '/../war/Operation.php';
 
 class BattleV2 {
     const TYPE_AI_ARENA = 1;
@@ -73,6 +74,8 @@ class BattleV2 {
     // transient instance var - more convenient to interface with log this way for the moment
     public string $battle_text;
 
+    public ?int $patrol_id;
+
     /**
      * @param System  $system
      * @param Fighter $player1
@@ -82,7 +85,7 @@ class BattleV2 {
      * @throws RuntimeException
      */
     public static function start(
-        System $system, Fighter $player1, Fighter $player2, int $battle_type
+        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null
     ): int {
         $json_empty_array = '[]';
 
@@ -108,9 +111,9 @@ class BattleV2 {
         ];
 
         $initial_field = BattleField::getInitialFieldExport($player1, $player2, $battle_type);
-        
+
         $system->db->query(
-            "INSERT INTO `battles` SET 
+            "INSERT INTO `battles` SET
                 `battle_type` = '" . $battle_type . "',
                 `start_time` = '" . time() . "',
                 `turn_time` = '" . (time() + self::PREP_LENGTH - 5) . "',
@@ -125,17 +128,31 @@ class BattleV2 {
                 `active_effects` = '" . $json_empty_array . "',
                 `active_genjutsu` = '" . $json_empty_array . "',
                 `jutsu_cooldowns` = '" . $json_empty_array . "',
-                `fighter_jutsu_used` = '" . $json_empty_array . "'
+                `fighter_jutsu_used` = '" . $json_empty_array . "',
+                `patrol_id` = '" . $patrol_id . "',
                 "
         );
         $battle_id = $system->db->last_insert_id;
 
         if($player1 instanceof User) {
             $player1->battle_id = $battle_id;
+            if ($battle_type == self::TYPE_FIGHT) {
+                $player1->pvp_immunity_ms = 0; // if attacking lose immunity
+                $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player1->user_id}");
+            }
+            if ($player1->operation > 0) {
+                Operation::cancelOperation($system, $player1);
+            }
             $player1->updateData();
         }
         if($player2 instanceof User) {
             $player2->battle_id = $battle_id;
+            if ($battle_type == self::TYPE_FIGHT) {
+                $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player2->user_id}");
+            }
+            if ($player2->operation > 0) {
+                Operation::cancelOperation($system, $player2);
+            }
             $player2->updateData();
         }
 
@@ -185,6 +202,8 @@ class BattleV2 {
 
         $battle->fighter_jutsu_used = json_decode($battle_data['fighter_jutsu_used'], true);
 
+        $battle->patrol_id = $battle_data['patrol_id'];
+
         // log
         $previous_turn_log = BattleLogV2::getTurn($battle->system, $battle->battle_id, $battle->turn_count - 1);
         if($previous_turn_log != null) {
@@ -208,7 +227,7 @@ class BattleV2 {
 
         return $battle;
     }
-    
+
     /**
      * BattleV2 constructor.
      * @param System $system
@@ -331,20 +350,20 @@ class BattleV2 {
                 `turn_count` = {$this->turn_count},
                 `turn_type` = '{$this->turn_type}',
                 `winner` = '{$this->winner}',
-        
+
                 `fighter_health` = '" . json_encode($this->fighter_health) . "',
                 `fighter_actions` = '" . json_encode($this->fighter_actions) . "',
-                
+
                 `field` = '" . $this->raw_field . "',
-    
+
                 `active_effects` = '" . $this->raw_active_effects . "',
                 `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
-    
+
                 `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
                 `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
         );
-        
+
         BattleLogV2::addOrUpdateTurnLog($this->system, $this->current_turn_log);
 
         $this->system->db->query("COMMIT;");

@@ -1175,4 +1175,8 @@ class BattleManager {
             Jutsu::ELEMENT_NONE
         );
     }
+
+    public function getPatrolId(): int {
+        return $this->battle->patrol_id;
+    }
 }
