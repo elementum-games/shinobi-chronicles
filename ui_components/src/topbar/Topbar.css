@@ -39,8 +39,8 @@
     position: absolute;
     transform: translate(10px, 5px);
     z-index: 1000;
-    background-color: #141317;
-    border-color: #575749;
+    background-color: var(--notification-background-color);
+    border-color: var(--notification-background-border);
     color: var(--font-color-6);
     font-family: var(--font-secondary);
     font-size: 12px;
@@ -57,8 +57,8 @@
     position: absolute;
     transform: translate(10px, 5px);
     z-index: 1000;
-    background-color: #141317;
-    border-color: #575749;
+    background-color: var(--notification-background-color);
+    border-color: var(--notification-background-border);
     color: var(--font-color-6);
     font-family: var(--font-secondary);
     font-size: 12px;
@@ -79,8 +79,8 @@
     position: absolute;
     z-index: 1000;
     transform: translate(-17px, -10px);
-    background-color: #141317;
-    border-color: #575749;
+    background-color: var(--notification-background-color);
+    border-color: var(--notification-background-border);
     color: var(--font-color-6);
     font-family: var(--font-secondary);
     font-size: 12px;
@@ -147,26 +147,25 @@
     cursor: pointer;
     position: relative;
 }
-
-.topbar_notification_wrapper_report::after {
-    content: attr(data-content);
-    position: absolute;
-    z-index: 1000;
-    transform: translate(-17px, -10px);
-    background-color: #141317;
-    border-color: #575749;
-    color: var(--font-color-6);
-    font-family: var(--font-secondary);
-    font-size: 12px;
-    font-style: italic;
-    border-width: 1.75px;
-    border-style: solid;
-    padding: 5px;
-    white-space: nowrap;
-    font-weight: bold;
-    top: 100%;
-    transform: translate(calc(-100% - 20px), 0%);
-}
+    .topbar_notification_wrapper_report::after {
+        content: attr(data-content);
+        position: absolute;
+        z-index: 1000;
+        transform: translate(-17px, -10px);
+        background-color: var(--notification-background-color);
+        border-color: var(--notification-background-border);
+        color: var(--font-color-6);
+        font-family: var(--font-secondary);
+        font-size: 12px;
+        font-style: italic;
+        border-width: 1.75px;
+        border-style: solid;
+        padding: 5px;
+        white-space: nowrap;
+        font-weight: bold;
+        top: 100%;
+        transform: translate(calc(-100% - 20px), 0%);
+    }
 
 /* Mobile Overrides */
 @media screen and (max-width: 999px) {

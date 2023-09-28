@@ -78,8 +78,8 @@ class UserApiPresenter {
             'stamina' => (int) $player->stamina,
             'max_stamina' => $player->max_stamina,
             'regen_cut' => $regen_cut,
-            'health_regen' => ($player->regen_rate + $player->regen_boost - $regen_cut) * USER::$HEAL_REGEN_MULTIPLIER[$player->rank_num],
-            'pool_regen' => $player->regen_rate + $player->regen_boost - $regen_cut,
+            'health_regen' => round(($player->regen_rate + $player->regen_boost - $regen_cut) * USER::$HEAL_REGEN_MULTIPLIER[$player->rank_num]),
+            'pool_regen' => round($player->regen_rate + $player->regen_boost - $regen_cut),
         ];
     }
 

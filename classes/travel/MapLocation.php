@@ -9,12 +9,9 @@ class MapLocation {
     public int $y;
     public string $background_image;
     public string $background_color;
-    public string $objective_image = "";
+    public string $location_type;
     public string $action_url = "";
     public string $action_message = "";
-    public ?int $objective_health = null;
-    public ?int $objective_max_health = null;
-    public ?string $objective_type = null;
     public int $pvp_allowed;
     public int $ai_allowed;
     public int $regen;

@@ -34,7 +34,7 @@
             This is <b>free.</b><br/>
             <form action='<?= $self_link ?>&view=character_changes' method='post'>
                 <!--suppress HtmlFormInputWithoutLabel -->
-                <select id='statResetSelect' name='stat' style='margin:6px 0 8px;'>
+                <select id='statResetSelect' name='stat' style='margin:5px 0 5px;'>
                     <?php foreach($player->stats as $stat): ?>
                         <option value='<?= $stat ?>'><?= ucwords(str_replace('_', ' ', $stat)) ?></option>';
                     <?php endforeach; ?>
@@ -98,7 +98,7 @@
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </select><br/>
-                <input type='submit' name='change_gender' value='Change Gender'/>
+                <input type='submit' style='margin-top: 5px' name='change_gender' value='Change Gender'/>
             </form>
         </td>
     </tr>
@@ -201,7 +201,7 @@
                         </div>
                     </div>
                     <span id='statAllocateCost'></span><br/>
-                    <input type='submit' name='stat_allocate' value='Transfer Stat Points'/>
+                    <input type='submit' style='margin-top: 5px; margin-bottom: 2px' name='stat_allocate' value='Transfer Stat Points'/>
                 </form>
             <?php endif; ?>
         </td>
@@ -322,7 +322,7 @@
                             <option value='<?= $new_element ?>'><?= $new_element ?></option>
                         <?php endforeach; ?>
                     </select><br/>
-                    <input type='submit' name='change_element' value='Change Element'/>
+                    <input type='submit' style='margin-top: 5px' name='change_element' value='Change Element'/>
                 </form>
             </td>
         </tr>
@@ -387,7 +387,7 @@
                             <option value='<?= $village ?>'><?= $village ?></option>
                         <?php endforeach; ?>
                     </select><br/>
-                    <input type='submit' name='change_village' value='Change Village'/>
+                    <input type='submit' style='margin-top: 5px' name='change_village' value='Change Village'/>
                 </form>
             </td>
         </tr>

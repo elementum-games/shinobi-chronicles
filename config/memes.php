@@ -735,4 +735,52 @@ return [
         'text' => ':cooljojo:',
         'public' => true,
     ],
+    [
+        'code' => ':bink:',
+        'image' => "<img src='./images/memes/bink.png' />",
+        'text' => ':bink:',
+        'public' => true,
+    ],
+    [
+        'code' => ':lyin:',
+        'image' => "<img src='./images/memes/lyin.png' />",
+        'text' => ':lyin:',
+        'public' => true,
+    ],
+    [
+        'code' => ':gojo:',
+        'image' => "<img src='./images/memes/gojo.png' />",
+        'text' => ':gojo:',
+        'public' => true,
+    ],
+    [
+        'code' => ':sadgies:',
+        'image' => "<img src='./images/memes/sadgies.png' />",
+        'text' => ':sadgies:',
+        'public' => true,
+    ],
+    [
+        'code' => ':applecat:',
+        'image' => "<img src='./images/memes/applecat.gif' />",
+        'text' => ':applecat:',
+        'public' => true,
+    ],
+    [
+        'code' => ':happybee:',
+        'image' => "<img src='./images/memes/happybee.png' />",
+        'text' => ':happybee:',
+        'public' => true,
+    ],
+    [
+        'code' => ':sadbee:',
+        'image' => "<img src='./images/memes/sadbee.png' />",
+        'text' => ':sadbee:',
+        'public' => true,
+    ],
+    [
+        'code' => ':angrybee:',
+        'image' => "<img src='./images/memes/angrybee.png' />",
+        'text' => ':angrybee:',
+        'public' => true,
+    ],    
 ];

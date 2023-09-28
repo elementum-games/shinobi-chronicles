@@ -10,18 +10,18 @@
     --avatar-frame-border-width-small: 2px;
     /* General Config */
     --border-color-default: #939cb6;
-    --box-color-default: #b2b4b9;
+    --box-color-default: #b9bfcc;
     --main-background-color: #898fa1;
-    --content-background-color: #272733;
-    --content-background-gradient: linear-gradient(to bottom, #c6c4c4, #c6c4c4);
-    --content-outline-color: #1f212a;
-    --content-border-color: #14131a;
+    --content-background-color: #b5bdd4;
+    --content-background-gradient: linear-gradient(to bottom, #c3c9d7, #c3c9d7);
+    --content-outline-color: #777f95;
+    --content-border-color: #898fa1;
     --footer-background-color: #0E0D0E;
     --footer-font-color: #423f39;
     --regentimer-color: #7C88C3;
     /* Content colors */
-    --daily-task-active-bg-color: #a4a5ab;
-    --daily-task-complete-bg-color: #1e222c;
+    --daily-task-active-bg-color: #d2d6df;
+    --daily-task-complete-bg-color: #ae9aa5;
     --exp-bar-bg-color: #383838;
     --exp-bar-fill-color: #6e0e11;
     --progress-bar-bg-color: #383838;
@@ -41,13 +41,15 @@
     --font-primary-variant: small-caps;
     --font-secondary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --font-secondary-variant: small-caps;
-    --font-color-1: #232020;
-    --font-color-2: #232020;
-    --font-color-3: #232020;
+    --font-color-1: #383838; /* Bold headers/titles */
+    --font-color-2: #3e424d; /* Inverted headers/titles */
+    --font-color-3: #232020; /* Softer general text */
     --font-color-4: #232020;
-    --font-color-5: #232020;
+    --font-color-5: #b5bdd4; /* Header links */
     --font-color-6: #232020;
     --font-color-7: #232020;
+    --font-link: #b33737;
+    --font-link-hover: #676d91;
     --font-min: 12px;
     --font-small: 13px;
     --font-default: 14px;
@@ -60,13 +62,13 @@
     --resource-bar-width: 300px;
     --resource-bar-height: 21px;
     --resource-bar-inner-height: 19px;
-    --health-fill: linear-gradient(to right, #4c2626, #7c2d2d 15%);
+    --health-fill: linear-gradient(to right, #b54246, #c77578 100%);
     --health-preview: #4c2626;
     --health-highlight: #9d5454;
-    --chakra-fill: linear-gradient(to right, #242639, #3F4979 15%);
+    --chakra-fill: linear-gradient(to right, #3b5cb6, #7d8dbc 100%);
     --chakra-preview: #242639;
     --chakra-highlight: #7782ba;
-    --stamina-fill: linear-gradient(to right, #2e362c, #2a5e3c 15%);
+    --stamina-fill: linear-gradient(to right, #4a6c42, #91b49d 100%);
     --stamina-preview: #2e362c;
     --stamina-highlight: #7f9d89;
     /* Hotbar Config */
@@ -75,20 +77,35 @@
     --hotbar-keybind-modal-width: 700px;
     --hotbar-keybind-modal-height: 400px;
     /* Sidebar Config */
-    --sidebar-header-background-color: #8c7b58;
+    --sidebar-header-background: #7f869a;
     --sidebar-header-height: 23px;
-    --sidebar-button-background-color: #1a191d;
-    --sidebar-button-background-hover: linear-gradient(to bottom, #262631 50%, #22222a 50%);
-    --sidebar-button-border-color: #20222b;
+    --sidebar-button-background-color: #c3c9d7;
+    --sidebar-button-background-hover: #474b58;
+    --sidebar-button-border-color: #7f869a;
     /* Header Config */
     --header-background-color: #151417;
     --header-border-color: #0c0d0e;
     --header-border-height: 3px;
     --header-logout-color: #e6a0a0;
     /* Chat Config */
-    --chat-secondary-background-color: #1a1921;
+    --chat-secondary-background-color: #c8c4d2;
     /* Style helpers */
     --clip-tall-hexagon: polygon(50% 0%,95% 20%,95% 80%,50% 100%,5% 80%,5% 20%);
+    /* Travel Config */
+    --travel-ui-color: #c3c9d7;
+    --travel-button-hover: #7f869a;
+    --travel-background-color: #7f869a;
+    --travel-scout-background: rgba(195, 201, 215, 0.65);
+    /* Battle Config */
+    --ninjutsu-text-color: #324EB0;
+    --taijutsu-text-color: #B03232;
+    --genjutsu-text-color: #8032B0;
+    --heal-text-color: #2A8A48;
+    --hand-seal-highlight: #474b58;
+    --hand-seal-text: white;
+    /* Notification Config */
+    --notification-background-color: #c3c9d7;
+    --notification-background-border: #767b91;
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */
@@ -173,7 +190,7 @@
 
 body {
     background-color: var(--main-background-color);
-    background-image: linear-gradient(to right, var(--main-background-color) 0%, transparent 17%, transparent 83%, var(--main-background-color) 100%), url(../../images/v2/decorations/Banner1.jpg);
+    background-image: url(../../images/v2/sumu/background.jpg);
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
@@ -193,7 +210,7 @@ body {
         height: 100%;
         left: 50%;
         transform: translate(-50%, calc(-1 * var(--header-height) - var(--header-border-height)));
-        background: linear-gradient(to right, transparent 0%, var(--main-background-color) 1%, var(--main-background-color) 99%, transparent 100%);
+
         z-index: -1;
     }
 
@@ -242,17 +259,31 @@ body {
 #content {
     width: 100%;
     background-image: var(--content-background-gradient);
-    border-width: 0px;
+    border-width: 2px;
     border-color: var(--content-border-color);
     border-style: solid;
-    outline: 0px;
+    outline: 5px;
     outline-color: var(--content-outline-color);
-    outline-offset: 0;
+    outline-offset: 0px;
     outline-style: solid;
     min-height: 500px;
     padding-bottom: 5px;
     margin: 0;
+    margin-top: 14px;
 }
+    #content::after {
+        pointer-events: none;
+        content: "";
+        display: block;
+        position: absolute;
+        top: -38px;
+        left: -33px;
+        width: 996px;
+        height: 144px;
+        background: url(../../images/v2/sumu/topframe.png) no-repeat top center;
+        background-size: cover; /* Adjust as needed */
+        z-index: 1; /* Ensure the image is positioned above the #content */
+    }
 
 .main_logo {
     height: 30px;
@@ -361,6 +392,13 @@ body {
     left: 0;
 }
 
+/* Travel */
+.systemMessage-new-info {
+    background: var(--travel-ui-color);
+    border: 1px solid var(--travel-background-color);
+    color: var(--font-color-3);
+}
+
 /* Avatar styles */
 .avy_none {
     display: none !important;
@@ -456,10 +494,10 @@ body {
 
     /* Corners in clockwise direction */
     background-image:
-            url(/images/v2/decorations/necorner.png),
-            url(/images/v2/decorations/secorner.png),
-            url(/images/v2/decorations/swcorner.png),
-            url(/images/v2/decorations/nwcorner.png);
+            url(/images/v2/sumu/necorner.png),
+            url(/images/v2/sumu/secorner.png),
+            url(/images/v2/sumu/swcorner.png),
+            url(/images/v2/sumu/nwcorner.png);
     background-repeat:
             no-repeat,
             no-repeat,
@@ -494,10 +532,17 @@ h3 {
     color: var(--font-color-1);
 }
 
+input[type=checkbox] {
+    outline: none;
+    accent-color: #9a1c1d;
+}
+
 /* Compatibility */
 .systemMessage {
     width: 100%;
-    top: 5px;
+    top: 15px;
+    color: #b75353;
+    font-weight: bold;
 }
 
 /* User Colors */
@@ -506,10 +551,10 @@ a.userLink:hover {
 }
 /* Blue */
 a.blue, a.blue:hover {
-    color: #92c0ff !important;
+    color: #3b5cb6 !important;
 }
 .post_user_avatar_wrapper.blue, .avatar_frame.blue, .avatar_frame.visited {
-    background: linear-gradient(0deg, rgba(87, 130, 188, 1) 0%, rgba(146, 192, 255, 1) 100%);
+    background: linear-gradient(0deg, #3b5cb6 0%, #3b5cb6 100%);
 }
 
 /* Pink */
@@ -522,48 +567,524 @@ a.pink, a.pink:hover {
 
 /* Gold */
 a.chat_user_name.gold, a.gold:hover, a.gold:visited {
-    color: #c6ab5c !important;
+    color: #c7a417 !important;
 }
 .post_user_avatar_wrapper.gold, .avatar_frame.gold {
-    background: linear-gradient(0deg, rgba(126, 103, 50, 1) 0%, rgba(198, 171, 92, 1) 100%);
+    background: linear-gradient(0deg, #c7a417 0%, #c7a417 100%);
 }
 
 /* Moderator */
 a.chat_user_name.moderator, a.moderator:hover, a.moderator:visited {
-    color: #67d18c !important;
+    color: #31a759 !important;
 }
 .post_user_avatar_wrapper.moderator, .avatar_frame.moderator {
-    background: linear-gradient(0deg, rgba(64, 124, 78, 1) 0%, rgba(103, 209, 140, 1) 100%);
+    background: linear-gradient(0deg, #31a759 0%, #31a759 100%);
 }
 
 /* Head Moderator */
 a.headModerator, a.headModerator:hover, a.headModerator:visited {
-    color: #83ddea !important;
+    color: #34a3b3 !important;
 }
 .post_user_avatar_wrapper.headModerator, .avatar_frame.headModerator {
-    background: linear-gradient(0deg, rgba(82, 133, 129, 1) 0%, rgba(131, 221, 234, 1) 100%);
+    background: linear-gradient(0deg, #34a3b3 0%, #34a3b3 100%);
 }
 
 /* Content Admin */
 a.contentAdmin, a.contentAdmin:hover, a.contentAdmin:visited {
-    color: #c3afff !important;
+    color: #6140c1 !important;
 }
 .post_user_avatar_wrapper.contentAdmin, .avatar_frame.contentAdmin {
-    background: linear-gradient(0deg, rgba(103, 89, 176, 1) 0%, rgba(195, 175, 255, 1) 100%);
+    background: linear-gradient(0deg, #6140c1 0%, #6140c1 100%);
 }
 
 /* Administrator */
 a.administrator, a.administrator:hover, a.administrator:visited {
-    color: #f57677 !important;
+    color: #d73839 !important;
 }
 .post_user_avatar_wrapper.administrator, .avatar_frame.administrator {
-    background: linear-gradient(0deg, rgba(177, 69, 66, 1) 0%, rgba(245, 118, 119, 1) 100%);
+    background: linear-gradient(0deg, #d73839 0%, #d73839 100%);
 }
 
 /* Default User */
 a.normalUser, a.normalUser:hover, a.normalUser:visited {
-    color: #c5baa3 !important;
+    color: #383838 !important;
 }
 .post_user_avatar_wrapper.normalUser, .avatar_frame.normalUser {
-    background: var(--avatar-frame-border_gradient) !important;
+    background: #383838 !important;
+}
+
+/* Sumu Sidebar Header Override */
+.sb_header_bar {
+    background: linear-gradient(var(--sidebar-header-background) 0%, var(--sidebar-header-background) 100%) !important;
+    position: relative;
+}
+    .sb_header_bar::after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: -3px;
+        left: -12px;
+        width: 173px;
+        height: 28px;
+        background: url(../../../images/v2/sumu/cloud.png) no-repeat top center;
+        background-size: cover; /* Adjust as needed */
+        z-index: 1; /* Ensure the image is positioned above the #content */
+    }
+.sb_header_line {
+    display: none;
+}
+.sb_header_image_wrapper {
+    display: none !important;
+}
+.sb_header_text_wrapper {
+    padding-top: 4px;
+    z-index: 2;
+    left: 5px !important;
+    text-shadow: none !important;
+    font-family: StickRice;
+    color: #3e424d;
+    font-size: 21px;
+    text-transform: uppercase;
+    font-weight: normal !important;
+}
+
+/* Sumu Profile Override */
+.skills .badge {
+    background-image: url(../../../images/v2/sumu/redplate.png) !important;
+}
+.attributes .badge {
+    background-image: url(../../../images/v2/sumu/blueplate.png) !important;
+}
+.profile_row_third {
+    background: url(../../../images/v2/sumu/nwbigcorner.png) no-repeat top left, url(../../../images/v2/sumu/sebigcorner.png) no-repeat bottom right !important;
+}
+.reputation_indicator {
+    background: #8690ac !important;
+}
+.bloodline_mastery_indicator {
+    background: #8690ac !important;
+}
+
+/* Sumu Travel Override */
+.travel-scout-attack span.direction {
+    background-image: url(../../../images/icons/right_hover.png) !important;
+}
+.quick-scout span.direction {
+    background-image: url(../../../images/icons/right_hover.png) !important;
+}
+
+/* Sumu Topbar Override */
+.main_logo {
+    background: url(../../../images/v2/sumu/sumulogo.png) no-repeat center !important;
+}
+
+/* Sumu Chat Override */
+.post_staff_title {
+    color: white !important;
+}
+.chat_pagination {
+    color: #5c73b3 !important;
+}
+    .chat_pagination:hover {
+        color: #939cb6 !important;
+    }
+.post_controls_container {
+    border: 1px solid #abb3c7 !important;
+    border-left: none !important;
+}
+.post_message_container {
+    border: 1px solid #abb3c7 !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+.meme_toggle {
+    background: url(../../../images/v2/sumu/memeframe.png) no-repeat center !important;
+    height: 33px !important;
+    padding-bottom: 4px !important;
+}
+    .meme_toggle:hover {
+        background: url(../../../images/v2/sumu/memeframe_hover.png) no-repeat center !important;
+        color: #9a1c1d;
+    }
+.meme_close {
+    background: url(../../../images/v2/sumu/memeframe.png) no-repeat center !important;
+    height: 33px !important;
+    padding-bottom: 4px !important;
+}
+    .meme_close:hover {
+        background: url(../../../images/v2/sumu/memeframe_hover.png) no-repeat center !important;
+        color: #9a1c1d;
+    }
+.chat_submit_button {
+    background: url(../../../images/v2/sumu/sendframe.png) no-repeat center !important;
+    height: 33px !important;
+    padding-bottom: 4px !important;
+}
+    .chat_submit_button:hover {
+        background: url(../../../images/v2/sumu/sendframe_hover.png) no-repeat center !important;
+        color: #9a1c1d;
+    }
+#chat_input_box {
+    background-image: url(../../../images/v2/sumu/nwbigcorner.png), url(../../../images/v2/sumu/nebigcorner.png), url(../../../images/v2/sumu/sebigcorner.png), url(../../../images/v2/sumu/swbigcorner.png) !important;
+    background-position: top 0 left 0, top 0 right 0, bottom 0 right 0, bottom 0 left 0;
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+}
+.quick_reply_box {
+    outline: none !important;
+    accent-color: #9a1c1d !important;
+}
+
+/* Content Header Overrides */
+.contentHeaderDivider > svg > line {
+    display: none;
+}
+
+/* Special Mission Override */
+#spec_miss_wrapper {
+    background: var(--sidebar-button-background-color);
+}
+.spec_miss_log_entry_text {
+    color: var(--font-color-3) !important;
+}
+.spec_miss_log_entry_timestamp {
+    color: var(--font-color-3) !important;
+}
+.spec_miss_log_entry_timestamp_wraooer {
+    color: var(--font-color-3) !important;
+}
+.spec_miss_page_warning {
+    color: var(--font-color-3) !important;
+}
+a#spec_miss_cancel {
+    color: var(--font-color-3) !important;
+}
+
+/* Inbox Override */
+#inbox_convo_list_title_container {
+    background: var(--sidebar-header-background);
+    border-bottom: 1px solid var(--sidebar-header-background);
+}
+#inbox_convo_main_controls_container {
+    background: var(--sidebar-header-background);
+}
+#inbox_convo_list, #inbox_convo_container, #inbox_convo_details_container {
+    scrollbar-color: var(--sidebar-button-border-color);
+}
+#inbox_container {
+    background: var(--sidebar-button-background-color);
+    border: 1px solid var(--sidebar-button-border-color);
+}
+#content #inbox_new {
+    background: var(--sidebar-header-background);
+    border-color: var(--sidebar-header-background);
+}
+#inbox_convo_list_title {
+    color: var(--font-color-2);
+}
+#inbox_convo_list_count {
+    color: var(--font-color-2);
+}
+#inbox_convo_textbox {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+.inbox_convo_list_container_selected {
+    background: var(--content-background-color);
+}
+.inbox_convo_title {
+    color: var(--font-color-3);
+}
+.inbox_convo_list_container {
+    border-color: var(--sidebar-header-background);
+}
+#content #inbox_new span {
+    color: var(--font-color-2);
+}
+.inbox_message {
+    border-color: var(--sidebar-header-background);
+}
+#inbox_convo_textbox_characters_remaining {
+    color: var(--font-color-2);
+}
+.inbox_message_timestamp, .inbox_message_report {
+    color: var(--font-color-3);
+}
+#content .inbox_message_report a {
+    color: var(--font-color-3);
+}
+.inbox_message_self::before {
+    background: none;
+}
+#inbox_convo_details_container, #inbox_new_convo_container {
+    background: var(--sidebar-button-background-color);
+}
+.inbox_convo_details_title {
+    background: var(--sidebar-header-background);
+    color: var(--font-color-2);
+}
+
+/* Mobile Overrides */
+@media screen and (max-width: 999px) {
+    #container {
+        flex-direction: column !important;
+        padding-bottom: 0px;
+        width: 100%;
+    }
+
+    #footer {
+        display: none;
+    }
+
+    #hotbar {
+        display: none;
+    }
+
+    #content_wrapper {
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 0;
+        width: 100%;
+    }
+
+    #container::before {
+        display: none;
+    }
+
+    #content {
+        width: 100%;
+    }
+
+    .sb_header_bar::after {
+        display: none;
+    }
+}
+
+/* Geisha Overrides */
+.contentDivHeader {
+    color: var(--text-hover) !important;
+    background: var(--sidebar-header-background);
+    border-radius: 0px;
+}
+#content {
+    color: var(--font-color-3);
+    font-family: var(--font-secondary);
+}
+.contentDiv, .contentDivMed {
+    background: var(--sidebar-button-background-color);
+}
+#content table.table th {
+    color: var(--text-hover);
+    background: var(--sidebar-header-background);
+    text-shadow: 0 1px 0 #000000;
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+    font-size: var(--font-medium);
+}
+#content table.table {
+    background-color: var(--sidebar-button-background-color);
+    border-radius: 0px;
+    font-size: var(--font-default);
+    border: none;
+}
+#content td a {
+    color: var(--font-link);
+}
+#content a, a:visited {
+    color: var(--font-link);
+}
+#content table.table td.row1 {
+    background-color: var(--sidebar-button-background-color);
+}
+#content table.table td.row2 {
+    background: var(--content-background-color);
+}
+#content table.table td {
+    border: 1px solid var(--sidebar-button-border-color);
+}
+input {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--sidebar-button-border-color);
+}
+textarea {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--sidebar-button-border-color);
+}
+select {
+    background: white;
+    color: var(--font-color-3);
+    border-color: var(--sidebar-button-border-color);
+}
+#content .button, .contentDiv button {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--sidebar-button-border-color);
+}
+    #content .button:hover, .contentDiv button:hover {
+        background: var(--box-color-default);
+        color: var(--font-color-2);
+        border-color: var(--font-color-2);
+    }
+button {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--sidebar-button-border-color);
+}
+    button:hover {
+        background: var(--box-color-default);
+        color: var(--font-color-2);
+        border-color: var(--font-color-2);
+    }
+#jutsu .jutsuName {
+    background: var(--content-background-color) !important;
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+    #jutsu .jutsuName:hover {
+        background: var(--box-color-default) !important;
+    }
+    #jutsu .jutsuName.selected_jutsu {
+        border-color: var(--font-color-2);
+        color: var(--font-color-2);
+        background: var(--box-color-default) !important;
+    }
+.weapon {
+    background: var(--content-background-color) !important;
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+    .weapon:hover {
+        background: var(--box-color-default) !important;
+    }
+    .weapon.selected_weapon {
+    border-color: var(--font-color-2);
+    color: var(--font-color-2);
+    background: var(--box-color-default) !important;
+}
+#content ul.submenu {
+    background: var(--sidebar-header-color);
+    border: none;
+}
+    #content ul.submenu li {
+        background: var(--sidebar-header-background);
+    }
+    #content ul.submenu a {
+        color: var(--text-hover);
+        text-shadow: 0 1px 0 #000000;
+        font-family: var(--font-primary);
+        font-variant: var(--font-primary-variant);
+        font-size: var(--font-medium);
+    }
+        #content ul.submenu a:hover {
+            text-shadow: none;
+        }
+#content table.table tr:first-child td:last-child, #content table.table tr:first-child th:last-child {
+    border-top-right-radius: 0px;
+}
+#content table.table tr:first-child td:first-child, #content table.table tr:first-child th:first-child {
+    border-top-left-radius: 0px;
+}
+.healthFill {
+    background: var(--health-fill) !important;
+}
+.resourceFill.health {
+    background: var(--health-fill) !important;
+}
+.healthPreview {
+    background: var(--health-preview) !important;
+}
+.staminaFill {
+    background: var(--stamina-fill) !important;
+}
+.staminaPreview {
+    background: var(--stamina-preview) !important;
+}
+.chakraFill {
+    background: var(--chakra-fill) !important;
+}
+.chakraPreview {
+    background: var(--chakra-preview) !important;
+}
+.battle_text_ninjutsu {
+    color: var(--ninjutsu-text-color) !important;
+}
+.battle_text_taijutsu {
+    color: var(--taijutsu-text-color) !important;
+}
+.battle_text_genjutsu {
+    color: var(--genjutsu-text-color) !important;
+}
+.battle_text_heal {
+    color: var(--heal-text-color) !important;
+}
+#content table.table th a {
+    color: var(--text-hover);
+}
+#content table.table th a:hover {
+    color: var(--font-color-4);
+}
+.jutsu_filter_button {
+    background-color: var(--sidebar-button-background-color) !important;
+    color: var(--font-color-3) !important;
+    border-color: var(--sidebar-button-border-color) !important;
+}
+    .jutsu_filter_button.active {
+        background-color: var(--sidebar-button-background-hover) !important;
+        color: var(--font-color-2) !important;
+        border-color: var(--sidebar-button-border-color) !important;
+    }
+.kunaiPack {
+    background: var(--content-background-color) !important;
+    color: black !important;
+}
+#content table.table td.newsFooter {
+    background-color: var(--sidebar-header-background);
+}
+.jutsu_select_wrapper {
+    border-color: var(--sidebar-button-border-color) !important;
+}
+#handSeals p[data-selected="yes"] img {
+    border-color: var(--hand-seal-highlight) !important;
+}
+#handSeals .handsealNumber {
+    background-color: var(--hand-seal-highlight) !important;
+    color: var(--hand-seal-text);
+}
+#handseal_1 img {
+    content: url(../../images/v2/sumu/Seal1.png) !important;
+}
+#handseal_2 img {
+    content: url(../../images/v2/sumu/Seal2.png) !important;
+}
+#handseal_3 img {
+    content: url(../../images/v2/sumu/Seal3.png) !important;
+}
+#handseal_4 img {
+    content: url(../../images/v2/sumu/Seal4.png) !important;
+}
+#handseal_5 img {
+    content: url(../../images/v2/sumu/Seal5.png) !important;
+}
+#handseal_6 img {
+    content: url(../../images/v2/sumu/Seal6.png) !important;
+}
+#handseal_7 img {
+    content: url(../../images/v2/sumu/Seal7.png) !important;
+}
+#handseal_8 img {
+    content: url(../../images/v2/sumu/Seal8.png) !important;
+}
+#handseal_9 img {
+    content: url(../../images/v2/sumu/Seal9.png) !important;
+}
+#handseal_10 img {
+    content: url(../../images/v2/sumu/Seal10.png) !important;
+}
+#handseal_11 img {
+    content: url(../../images/v2/sumu/Seal11.png) !important;
+}
+#handseal_12 img {
+    content: url(../../images/v2/sumu/Seal12.png) !important;
 }

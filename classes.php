@@ -58,6 +58,7 @@ require_once __DIR__ . "/classes/travel/MapLocation.php";
 require_once __DIR__ . "/classes/travel/NearbyPlayers.php";
 require_once __DIR__ . "/classes/travel/Region.php";
 require_once __DIR__ . "/classes/travel/RegionCoords.php";
+require_once __DIR__ . "/classes/travel/Patrol.php";
 require_once __DIR__ . "/classes/travel/Travel.php";
 require_once __DIR__ . "/classes/travel/TravelAPIResponse.php";
 require_once __DIR__ . "/classes/travel/TravelApiPresenter.php";
@@ -70,3 +71,8 @@ require_once __DIR__ . "/classes/user/UserAPIResponse.php";
 
 require_once __DIR__ . "/classes/forbidden_shop/ForbiddenShopAPIPresenter.php";
 require_once __DIR__ . "/classes/forbidden_shop/ForbiddenShopManager.php";
+
+require_once __DIR__ . "/classes/village/VillageRelation.php";
+
+require_once __DIR__ . "/classes/war/WarManager.php";
+require_once __DIR__ . "/classes/war/Operation.php";

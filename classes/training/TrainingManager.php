@@ -289,8 +289,8 @@ class TrainingManager {
         if(str_contains($type, "jutsu:")) {
             $gain = $this->getTrainingAmount($length, $type);
 
-            return "Takes " . $this->getTrainingLength($length, true, true) . " or more depending on level, "
-                . "gives $gain level" . ($gain > 1 ? 's' : '');
+            return "Takes " . $this->getTrainingLength($length, true, true) . " or more minutes depending on level, "
+                . "increases level by $gain";
         }
         else {
             switch ($length) {
@@ -307,12 +307,16 @@ class TrainingManager {
     }
 
     public function trainingDisplay() {
+        $train_gain = $this->train_gain;
+        if (!empty($this->system->event) && $this->system->event instanceof DoubleExpEvent) {
+            $train_gain *= DoubleExpEvent::exp_modifier;
+        }
         if(str_contains($this->train_type, 'jutsu:')) {
             return "You will gain " . User::$jutsu_train_gain . " jutsu levels once training is complete!";
         }
         else {
-            $display = "You will gain {$this->train_gain} {$this->trainType()} skill point";
-            if($this->train_gain > 1) {
+            $display = "You will gain {$train_gain} {$this->trainType()} skill point";
+            if($train_gain > 1) {
                 $display .= "s";
             }
             $display .= " once you have completed training.";
