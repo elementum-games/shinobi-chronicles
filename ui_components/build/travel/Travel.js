@@ -205,7 +205,7 @@ function Travel({
   };
   function handleErrors(errors) {
     console.warn(errors);
-    setFeedback(null);
+    setFeedback([errors, 'info']);
     debug([errors]);
   }
   const AttackPlayer = target => {
