@@ -298,9 +298,9 @@
                 A gift offering of <?= $premiumShopManager->costs['element_change'] ?> Ancient Kunai is required.
                 <br/>
                 <br/>
-                <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original element you
-                    will have to pay another fee. You will forget any elemental jutsu you currently have of this
-                    nature.)</b>
+                <b>(IMPORTANT: This is non-reversable once completed<br />If you want to return to your original element you
+                    will have to pay another fee.<br />You will forget any elemental jutsu you currently have of this
+                    nature.)</b><br />
 
                 <br/>Choose your element to reattune:
                 <br/>
@@ -343,10 +343,8 @@
                         required.
                     </p>
                     <p>
-                        <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original
-                            village you
-                            will have to pay a higher transfer fee. Furthermore, you'll be removed from any clan
-                            office.)</b>
+                        <b>(IMPORTANT: This is non-reversable once completed<br />If you want to return to your original
+                            village you will have to pay a higher transfer fee.<br />Furthermore, you'll be removed from any clanoffice.)</b><br />
                         <br/>Select the clan below:
                     </p>
                 </td>
@@ -376,10 +374,11 @@
                 own village.
                 However to get the other village to accept you, you must offer them <?= $premiumShopManager->costs['village_change'] ?>
                 Ancient Kunai.<br/>
+                <p>You will lose 1 Reputation tier for all village changes after the first (you can not fall below Shinobi).</p>
                 <br/>
-                <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village you
+                <b>(IMPORTANT: This is non-reversable once completed<br />If you want to return to your original village you
                     will have to pay
-                    a higher transfer fee)</b><br/>
+                    a higher transfer fee)</b><br/><br />
                 <form action='<?= $self_link ?>' method='post'>
                     <select name='new_village'>
                         <?php foreach(System::$villages as $village): ?>

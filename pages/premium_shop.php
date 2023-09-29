@@ -627,7 +627,7 @@ function premiumShop(): void {
                 $confirmation_string = "Are you sure you want to move from the {$player->village->name} village to the $village
                 village?"
                     . (!$player->clan->bloodline_only ? " You will be kicked out of your clan and placed in a random clan in the new village." : "")
-                    . "<br />
+                    . "<br />You will lose 1 Reputation tier for all village changes after the first (you can not fall below Shinobi).<br />
                 <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village
                 you will have to pay a higher transfer fee)</b>";
 
@@ -651,17 +651,23 @@ function premiumShop(): void {
                     } else if ($player->clan->elder_2_id == $player->user_id) {
                         $system->db->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                     }
-                    //Remove clan seat from player if they hold seat
+                    // Remove clan seat from player if they hold seat
                     if ($player->clan_office) {
                         $player->clan_office = 0;
                     }
                 }
 
-                //Remove active student applications
+                // Remove active student applications
                 if (SenseiManager::isSensei($player->user_id, $system)) {
                     SenseiManager::closeApplicationsBySensei($player->user_id, $system);
                 } else if ($player->rank_num < 3) {
                     SenseiManager::closeApplicationsByStudent($player->user_id, $system);
+                }
+
+                // Lose rep tier for subsequent village changes (5k minimum rep)
+                if ($player->village_changes > 0 && $player->reputation->rank >= 3) {
+                    $new_tier = max($player->reputation->rank - 1, 3);
+                    $player->village_rep = UserReputation::$VillageRep[$new_tier]['min_rep'];
                 }
 
                 // Cost
