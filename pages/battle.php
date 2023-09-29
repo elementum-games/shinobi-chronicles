@@ -179,7 +179,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         }
         // Loot
         $player->system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}");
-        if ($player->system->db->last_num_rows > 0) {
+        if ($player->system->db->last_affected_rows > 0) {
             $result .= "You have claimed the loot being carried by your opponent.[br]";
         }
 
