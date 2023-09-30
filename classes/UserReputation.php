@@ -348,7 +348,6 @@ class UserReputation {
                 $benefits[self::BENEFIT_CONSUMABLE_DISCOUNT] = true;
                 $benefits[self::BENEFIT_JUTSU_SCROLL_DISCOUNT] = true;
             case 1: // baseline
-                $benefits[self::BENEFIT_PARTIAL_TRAINING_GAINS] = true;
         }
 
         return $benefits;
