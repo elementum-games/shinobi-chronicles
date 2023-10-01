@@ -15,6 +15,8 @@ class VillageRelation {
     public int $relation_id;
     public int $village1_id;
     public int $village2_id;
+    public string $village1_name;
+    public string $village2_name;
     public int $relation_type;
     public string $relation_name;
     public ?int $relation_start;

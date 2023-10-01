@@ -637,6 +637,11 @@
     width: 18px;
     margin-left: 2px;
 }
+.region_objective_tooltip_resource {
+    height: 18px;
+    width: 18px;
+    margin-left: 2px;
+}
 .map_objective_tooltip {
     display: none;
     position: absolute;

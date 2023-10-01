@@ -79,6 +79,7 @@ function hourlyRegion(System $system, $debug = true): void
     $region_result = $system->db->fetch_all($region_result);
     $queries = [];
     // get villages
+    $village_resource_production = [];
     $village_result = $system->db->query("SELECT * FROM `villages`");
     $village_result = $system->db->fetch_all($village_result);
     $villages = [];
@@ -95,9 +96,13 @@ function hourlyRegion(System $system, $debug = true): void
             // if one of the home regions, collect resources bypassing caravans
             if ($region['region_id'] <= 5) {
                 $villages[$region['village']]->addResource($region_location['resource_id'], $region_location['resource_count']);
+                $queries[] = "INSERT INTO `resource_logs`
+                    (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                    VALUES ({$region['village']}, {$region_location['resource_id']}, " . Village::RESOURCE_LOG_COLLECTION . ", {$region_location['resource_count']}, " . time() . ")";
                 $region_location['resource_count'] = 0;
             }
             $region_location['resource_count'] += WarManager::BASE_RESOURCE_PRODUCTION;
+            !empty($village_resource_production[$region['village']][$region_location['resource_id']]) ? $village_resource_production[$region['village']][$region_location['resource_id']] += WarManager::BASE_RESOURCE_PRODUCTION : $village_resource_production[$region['village']][$region_location['resource_id']] = WarManager::BASE_RESOURCE_PRODUCTION;
             unset($region_location);
         }
 
@@ -164,8 +169,14 @@ function hourlyRegion(System $system, $debug = true): void
 
     /* update villages */
     foreach ($villages as $village) {
-        $resources = json_encode($village->resources);
-        $queries[] = "UPDATE `villages` SET `resources` = '{$resources}' WHERE `village_id` = {$village->village_id}";
+        $queries[] = $village->updateResources(false);
+        if (!empty($village_resource_production[$village->village_id])) {
+            foreach ($village_resource_production[$village->village_id] as $key => $value) {
+                $queries[] = "INSERT INTO `resource_logs`
+                    (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                    VALUES ({$village->village_id}, {$key}, " . Village::RESOURCE_LOG_PRODUCTION . ", " . $value . ", " . time() . ")";
+            }
+        }
     }
 
     if ($debug) {
@@ -177,7 +188,7 @@ function hourlyRegion(System $system, $debug = true): void
     } else {
         echo "Script running...<br>";
         foreach ($queries as $query) {
-            $system->db->query("LOCK TABLES `region_locations` WRITE, `villages` WRITE;");
+            $system->db->query("LOCK TABLES `region_locations` WRITE, `villages` WRITE, `resource_logs` WRITE;");
             $system->db->query($query);
             $system->db->query("UNLOCK TABLES;");
         }

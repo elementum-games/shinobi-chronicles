@@ -106,6 +106,13 @@
     /* Notification Config */
     --notification-background-color: #141317;
     --notification-background-border: #575749;
+    /* VillageHQ Config */
+    --village-text-color-1: #eee1c8;
+    --village-text-color-2: #c0c7dc;
+    --diplomacy-background-neutral: #2B2A1D;
+    --diplomacy-background-alliance: #242b29;
+    --diplomacy-background-war: #1f1619;
+    --diplomacy-item-border: #373131;
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */

@@ -1,0 +1,588 @@
+.navigation_row {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+.nav_button {
+    width: 130px;
+    height: 30px;
+    background: linear-gradient(to bottom, #3b4176 50%, #2f345e 50%);
+    line-height: 25px;
+    font-variant: small-caps;
+    text-align: center;
+    color: #ccc1af;
+    cursor: pointer;
+    user-select: none;
+    font-size: 14px;
+}
+    .nav_button:hover {
+        color: white;
+        background: linear-gradient(to bottom, #6f3043 50%, #622231 50%);
+    }
+    .nav_button.disabled {
+        opacity: 30%;
+    }
+        .nav_button.disabled:hover {
+            color: #ccc1af;
+            background: linear-gradient(to bottom, #3b4176 50%, #2f345e 50%);
+            cursor: default;
+        }
+
+.header {
+    font-size: 16px;
+    font-weight: bold;
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+    color: var(--font-color-1);
+    margin-bottom: 15px;
+}
+
+.content {
+    background-color: var(--box-color-default);
+    margin-bottom: 15px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.hq_container {
+    margin-top: 15px;
+    margin-left: 25px;
+    margin-right: 25px;
+    color: var(--village-text-color-1);
+}
+    .hq_container .row.first {
+        margin-bottom: 8px;
+    }
+    .hq_container .row.first .column.first {
+        display: flex;
+        flex-direction: column;
+        flex-basis: 35%;
+        width: 100%;
+    }
+    .hq_container .row.first .column.second {
+        display: flex;
+        flex-direction: column;
+        flex-basis: 30%;
+        width: 100%;
+    }
+    .hq_container .row.first .column.third {
+        display: flex;
+        flex-direction: column;
+        flex-basis: 35%;
+        width: 100%;
+    }
+    .hq_container .row.second {
+        gap: 15px;
+    }
+        .hq_container .row.second .column.first {
+            flex-basis: 50%;
+            width: 100%;
+        }
+        .hq_container .row.second .column.second {
+            flex-basis: 50%;
+            width: 100%;
+        }
+
+.boost_container .content {
+    height: 100px;
+}
+
+.population_container .content {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 120px;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    padding: 10px;
+    padding-top: 15px;
+}
+.population_item_count {
+    text-align: center;
+}
+.population_item_header {
+    color: var(--village-text-color-2);
+    font-size: 13px;
+    text-transform: uppercase;
+    font-family: var(--font-primary);
+    text-align: center;
+}
+
+.diplomatic_status_container .content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+}
+.diplomacy_item {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    border: 1px solid var(--diplomacy-item-border);
+    border-radius: 3px;
+    background-color: var(--box-color-default);
+    align-items: center;
+    height: 28px;
+}
+.diplomacy_village_icon {
+    height: 20px;
+    width: 20px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.diplomacy_item_name {
+    flex-basis: 20%;
+    text-align: left;
+    width: 100%;
+    font-variant: small-caps;
+    display: flex;
+    align-items: center;
+}
+    .diplomacy_item_name span {
+        box-sizing: border-box;
+        padding-bottom: 2px;
+    }
+.diplomacy_item_points {
+    flex-basis: 20%;
+    color: var(--village-text-color-2);
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+    padding-bottom: 2px;
+}
+.diplomacy_item_villagers {
+    flex-basis: 20%;
+    color: var(--village-text-color-2);
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+    padding-bottom: 2px;
+}
+.diplomacy_item_relation {
+    flex-basis: 40%;
+    flex-shrink: 0;
+    margin-right: 1px;
+    text-align: center;
+    height: calc(100% - 2px);
+    line-height: 26px;
+    text-transform: uppercase;
+    font-size: 12px;
+    position: relative;
+    margin-left: 15px;
+}
+    .diplomacy_item_relation.neutral {
+        background-color: var(--diplomacy-background-neutral);
+    }
+    .diplomacy_item_relation.alliance {
+        background-color: var(--diplomacy-background-alliance);
+    }
+        .diplomacy_item_relation.alliance::before {
+            content: '';
+            position: absolute;
+            background: url("../../../images/icons/ally.png") repeat;
+            width: 30px;
+            height: 30px;
+            left: -7%;
+        }
+    .diplomacy_item_relation.war {
+        background-color: var(--diplomacy-background-war);
+    }
+        .diplomacy_item_relation.war::before {
+            content: '';
+            position: absolute;
+            background: url("../../../images/icons/war.png") repeat;
+            width: 30px;
+            height: 30px;
+            left: -7%;
+        }
+.diplomacy_header_row {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    margin-top: -12px;
+}
+    .diplomacy_header_row div {
+        text-align: center;
+        color: var(--village-text-color-2);
+        font-size: 12px;
+        flex-basis: 20%;
+        font-variant: small-caps;
+    }
+    .diplomacy_header_row .last {
+        flex-basis: 40%;
+        margin-left: 23px;
+    }
+
+.resources_container .content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-sizing: border-box;
+    padding-top: 15px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 5px;
+    margin-top: 20px;
+}
+.resources_container .header span {
+    margin-left: 31.5%;
+    color: var(--village-text-color-2);
+    font-size: 14px;
+    font-family: var(--font-secondary);
+    font-variant: small-caps;
+}
+.resource_item {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-variant: small-caps;
+    text-transform: capitalize;
+    max-width: 100%;
+    gap: 10px;
+}
+    .resource_item div {
+        text-align: center;
+        box-sizing: border-box;
+        padding-bottom: 3px;
+    }
+.resources_header_row {
+    display: flex;
+    width: 100%;
+    margin-top: -12px;
+}
+    .resources_header_row div {
+        text-align: center;
+        color: var(--village-text-color-2);
+        font-size: 12px;
+        font-variant: small-caps;
+        margin-left: 63%;
+    }
+.resources_inner_header {
+    display: flex;
+    width: 100%;
+    margin-top: -12px;
+    gap: 10px;
+    box-sizing: border-box;
+}
+    .resources_inner_header div {
+        flex-grow: 1;
+        color: var(--village-text-color-2);
+        font-size: 12px;
+        font-variant: small-caps;
+        text-align: center;
+        width: 52px;
+    }
+    .resources_inner_header .first {
+        min-width: 62px;
+    }
+        .resources_inner_header .first a {
+            color: #bfb7e0 !important;
+            text-decoration: underline;
+            cursor: pointer;
+            user-select: none;
+        }
+        .resources_inner_header .first a:hover {
+            color: var(--font-color-2) !important;
+        }
+    .resources_inner_header .second {
+        min-width: 100px;
+    }
+.resource_name {
+    text-align: left;
+    width: 62px;
+    min-width: 62px;
+}
+.resource_count {
+    width: 100px;
+    min-width: 100px;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    background-color: var(--content-background-color);
+    padding-bottom: 1px !important;
+}
+.resource_produced {
+    min-width: 52px;
+    color: #aaff9c;
+}
+.resource_claimed {
+    min-width: 52px;
+    color: #aaff9c;
+}
+.resource_lost {
+    min-width: 52px;
+    color: #ffa0a0;
+}
+.resource_spent {
+    min-width: 52px;
+    color: #ffa0a0;
+}
+
+.clan_container .content {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    height: 100px;
+    box-sizing: border-box;
+    padding-bottom: 10px;
+    padding-top: 5px;
+}
+.clan_item {
+    flex: 0 0 calc(100% / 3);
+    box-sizing: border-box;
+    height: calc(100% / 3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-variant: small-caps;
+    text-decoration: underline;
+    text-decoration-color: #4e4535;
+    text-underline-offset: 4px;
+}
+.clan_item_header {
+    text-align: center;
+}
+
+.kage_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    margin-bottom: 5px;
+}
+    .kage_container .header {
+        margin-bottom: 0px;
+        margin-top: -18px;
+        width: 200px;
+    }
+.kage_avatar_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 200px;
+}
+.kage_avatar {
+    max-width: 200px;
+    max-height: 200px;
+}
+.kage_nameplate_wrapper {
+    background-color: var(--box-color-default);
+    text-align: center;
+    height: 70px;
+    width: 225px;
+    margin-top: 15px;
+    position: relative;
+}
+.kage_name {
+    margin-top: 8px;
+    color: #d0c5ff;
+    font-size: 16px;
+    font-weight: bold;
+}
+.kage_title {
+    text-transform: lowercase;
+    font-variant: small-caps;
+    color: #b6bdd0;
+}
+.kage_nameplate_decoration {
+    background: #23232c;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+}
+    .kage_nameplate_decoration.nw {
+        left: 0;
+        top: 0;
+        border-bottom-right-radius: 10px;
+    }
+    .kage_nameplate_decoration.ne {
+        right: 0;
+        top: 0;
+        border-bottom-left-radius: 10px;
+    }
+    .kage_nameplate_decoration.se {
+        right: 0;
+        bottom: 0;
+        border-top-left-radius: 10px;
+    }
+    .kage_nameplate_decoration.sw {
+        left: 0;
+        bottom: 0;
+        border-top-right-radius: 10px;
+    }
+.kage_claim_button {
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    width: 75px;
+    height: 25px;
+    background: linear-gradient(to bottom, #3b4176 50%, #2f345e 50%);
+    line-height: 20px;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 7px);
+    font-variant: small-caps;
+    color: #ccc1af;
+    cursor: pointer;
+    user-select: none;
+}
+    .kage_claim_button:hover {
+        color: white;
+    }
+.kage_challenge_button {
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    width: 75px;
+    height: 25px;
+    background: linear-gradient(to bottom, #6a5c3f 50%, #4e4535 50%);
+    line-height: 20px;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 7px);
+    font-variant: small-caps;
+    color: #ccc1af;
+    cursor: default;
+    user-select: none;
+    opacity: 30%;
+}
+.kage_resign_button {
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    width: 75px;
+    height: 25px;
+    background: linear-gradient(to bottom, #6f3043 50%, #622231 50%);
+    line-height: 20px;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 7px);
+    font-variant: small-caps;
+    color: #f3c4bc;
+    cursor: pointer;
+    user-select: none;
+}
+    .kage_resign_button:hover {
+        color: white;
+    }
+
+.elders_container {
+    margin-bottom: 15px;
+}
+.elder_list {
+    display: flex;
+    flex-direction: row;
+}
+.elder_item {
+    flex-basis: 33%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.elder_avatar_wrapper {
+    clip-path: circle(50% at 50% 50%);
+    height: 85px;
+    width: 85px;
+    background: #17161b;
+    padding: 2px;
+    position: relative;
+    display: flex;
+}
+.elder_avatar {
+    position: relative;
+    clip-path: circle(50% at 50% 50%);
+    max-width: 85px;
+    max-height: 85px;
+}
+.elder_avatar_fill {
+    background: #1c1a25; 
+    height: 85px;
+    width: 85px;
+}
+.elder_name {
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    color: #bfb7e0;
+    background: #1c1a25;
+    width: 100%;
+    text-align: center;
+    margin-top: -3px;
+    font-size: 10px;
+    font-weight: bold;
+    height: 20px;
+    line-height: 20px;
+}
+.elder_claim_button {
+    margin-top: 15px;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    width: 75px;
+    height: 25px;
+    background: linear-gradient(to bottom, #3b4176 50%, #2f345e 50%);
+    line-height: 20px;
+    font-variant: small-caps;
+    text-align: center;
+    color: #ccc1af;
+    cursor: pointer;
+    user-select: none;
+}
+    .elder_claim_button:hover {
+        color: white;
+    }
+    .elder_claim_button.disabled {
+        cursor: default;
+        opacity: 30%;
+    }
+        .elder_claim_button.disabled:hover {
+            opacity: 30%;
+            color: #ccc1af;
+        }
+.elder_challenge_button {
+    margin-top: 15px;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    width: 75px;
+    height: 25px;
+    background: linear-gradient(to bottom, #6a5c3f 50%, #4e4535 50%);
+    line-height: 20px;
+    font-variant: small-caps;
+    text-align: center;
+    color: #ccc1af;
+    cursor: default;
+    user-select: none;
+    opacity: 30%;
+}
+.elder_resign_button {
+    margin-top: 15px;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    width: 75px;
+    height: 25px;
+    background: linear-gradient(to bottom, #6f3043 50%, #622231 50%);
+    line-height: 20px;
+    font-variant: small-caps;
+    text-align: center;
+    color: #f3c4bc;
+    cursor: pointer;
+    user-select: none;
+}
+    .elder_resign_button:hover {
+        color: white;
+    }
+
+.points_container .content {
+    display: flex;
+    height: 70px;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: row;
+}
+.points_label {
+    font-variant: small-caps;
+    text-transform: capitalize;
+    text-align: center;
+    margin-bottom: 5px;
+    margin-top: -8px;
+}
+.points_total {
+    width: 100px;
+    min-width: 100px;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    background-color: var(--content-background-color);
+    text-align: center;
+}
