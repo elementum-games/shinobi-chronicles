@@ -23,6 +23,7 @@ try {
     $VillageAPIResponse = new VillageAPIResponse();
 
     switch($request) {
+        /*
         case 'LoadVillageData':
             $VillageAPIResponse->response = [
                 'policyData' => VillageApiPresenter::boostDataResponse($system, $player),
@@ -33,7 +34,7 @@ try {
                 'resourceData' => VillageApiPresenter::resourceDataResponse($system, $player, 7),
                 'clanData' => VillageApiPresenter::clanDataResponse($system, $player),
             ];
-            break;
+            break;*/
         case 'LoadResourceData':
             $days = $system->db->clean($_POST['days']);
             $VillageAPIResponse->response = VillageApiPresenter::resourceDataResponse($system, $player, $days);
