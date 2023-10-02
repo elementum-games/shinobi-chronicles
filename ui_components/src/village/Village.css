@@ -352,13 +352,19 @@
     align-items: center;
     flex-direction: column;
     height: 100%;
-    margin-bottom: 5px;
+    margin-bottom: 25px;
 }
     .kage_container .header {
         margin-bottom: 0px;
-        margin-top: -18px;
-        width: 200px;
     }
+.kage_header {
+    display: flex;
+    justify-content: space-between;
+    width: 175px;
+}
+.kage_kanji {
+    color: #9498a9;
+}
 .kage_avatar_wrapper {
     display: flex;
     justify-content: center;
@@ -432,6 +438,14 @@
     .kage_claim_button:hover {
         color: white;
     }
+    .kage_claim_button.disabled {
+        cursor: default;
+        opacity: 30%;
+    }
+        .kage_claim_button.disabled:hover {
+            opacity: 30%;
+            color: #ccc1af;
+        }
 .kage_challenge_button {
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
     width: 75px;
@@ -464,6 +478,20 @@
     .kage_resign_button:hover {
         color: white;
     }
+.kage_avatar_wrapper_empty {
+    clip-path: circle(50% at 50% 50%);
+    height: 200px;
+    width: 200px;
+    background: #17161b;
+    padding: 2px;
+    position: relative;
+    display: flex;
+}
+.kage_avatar_fill {
+    background: #1c1a25;
+    height: 200px;
+    width: 200px;
+}
 
 .elders_container {
     margin-bottom: 15px;
@@ -586,3 +614,104 @@
     background-color: var(--content-background-color);
     text-align: center;
 }
+
+.hq_modal {
+    width: 400px;
+    height: 150px;
+    background-color: #141317;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+    box-sizing: border-box;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 15px;
+    border: 1px solid #4d4434;
+    outline: 1px solid #25232d;
+    outline-offset: 1px;
+}
+.hq_modal_header {
+    width: 100%;
+    text-align: left;
+    border-bottom: 1px solid #141317;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+    color: var(--font-color-1);
+    margin-bottom: 11px;
+}
+.hq_modal_text {
+    height: 100%;
+    border-top: 1px solid #1e1d23;
+    padding-top: 25px;
+    text-align: center;
+    color: var(--village-text-color-1);
+}
+.modal_cancel_button {
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    width: 75px;
+    height: 25px;
+    background: linear-gradient(to bottom, #6f3043 50%, #622231 50%);
+    line-height: 20px;
+    font-variant: small-caps;
+    text-align: center;
+    color: #f3c4bc;
+    cursor: pointer;
+    user-select: none;
+    position: absolute;
+    right: 25%;
+    bottom: -15px;
+}
+    .modal_cancel_button {
+        color: white;
+    }
+.modal_close_button {
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    width: 75px;
+    height: 25px;
+    background: linear-gradient(to bottom, #6f3043 50%, #622231 50%);
+    line-height: 20px;
+    font-variant: small-caps;
+    text-align: center;
+    color: #f3c4bc;
+    cursor: pointer;
+    user-select: none;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -15px;
+}
+    .modal_close_button {
+        color: white;
+    }
+.confirm_resign_button {
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    width: 75px;
+    height: 25px;
+    background: linear-gradient(to bottom, #3b4176 50%, #2f345e 50%);
+    line-height: 20px;
+    font-variant: small-caps;
+    text-align: center;
+    color: #ccc1af;
+    cursor: pointer;
+    user-select: none;
+    position: absolute;
+    left: 25%;
+    bottom: -15px;
+}
+    .confirm_resign_button {
+        color: white;
+    }
+    .hq_modal_backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+        z-index: 1000; /* Assuming your modal has a higher z-index */
+        filter: blur(5px); /* Add blur effect */
+    }

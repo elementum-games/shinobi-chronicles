@@ -51,7 +51,7 @@ final class ThirdWarMigration extends AbstractMigration
     {
         $this->execute("
             -- Alter loot table
-            ALTER TABLE `loot` DROP COLUMN `claimed_date`;
+            ALTER TABLE `loot` DROP COLUMN `claimed_time`;
 
             -- Update region_locations table
             UPDATE region_locations SET `resource_id` = 4 WHERE `region_id` = 6 and `type` = 'castle';
@@ -69,6 +69,9 @@ final class ThirdWarMigration extends AbstractMigration
             UPDATE region_locations SET `resource_id` = 8 WHERE `region_id` = 18 and `type` = 'castle';
             UPDATE region_locations SET `resource_id` = 8 WHERE `region_id` = 19 and `type` = 'castle';
             UPDATE region_locations SET `resource_id` = 8 WHERE `region_id` = 20 and `type` = 'castle';
+
+            -- Add resource_log table
+            DROP TABLE `resource_log`;
         ");
     }
 }

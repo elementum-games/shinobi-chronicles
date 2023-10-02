@@ -22,12 +22,17 @@ class Village {
         2 => 'Raikage',
         3 => 'Hokage',
         4 => 'Kazekage',
-        5 => 'Tsuchikage',
+        5 => 'Mizukage',
     ];
 
     const RESOURCE_LOG_PRODUCTION = 1;
     const RESOURCE_LOG_COLLECTION = 2;
     const RESOURCE_LOG_EXPENDITURE = 3;
+
+    const MIN_KAGE_CLAIM_TIER = 5;
+    const MIN_KAGE_CHALLENGE_TIER = 6;
+    const MIN_ELDER_CLAIM_TIER = 4;
+    const MIN_ELDER_CHALLENGE_TIER = 5;
 
     // to-do: we should restructure how village data is being saved
     // player village should reference the village ID and this constructor should get row by ID
@@ -175,13 +180,19 @@ class Village {
     public static function claimSeat(System $system, User $player, string $seat_type): string {
         switch ($seat_type) {
             case 'kage':
+                // Temp disable
+                return "Not yet available.";
+                // check rank
+                if ($player->rank_num < 4) {
+                    return "Insufficient rank!";
+                }
                 // check seat available
                 $result = $system->db->query("SELECT * FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `seat_end` IS NULL LIMIT 1");
                 if ($system->db->last_num_rows > 0) {
                     return "Seat is occupied!";
                 }
                 // check tier
-                if (!$player->reputation->rank >= 5) {
+                if ($player->reputation->rank < self::MIN_KAGE_CLAIM_TIER) {
                     return "You do not meet the reputation requirements!";
                 }
                 // check if has existing seat
@@ -191,16 +202,32 @@ class Village {
                 }
                 // claim
                 $time = time();
-                $result = $system->db->query("SELECT COUNT(DISTINCT `user_id`) as 'kage_count' FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}'");
+                $reclaim = false;
+                $result = $system->db->query("SELECT `seat_title` from `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` = {$player->user_id} LIMIT 1");
                 $result = $system->db->fetch($result);
-                $seat_title = self::getOrdinal($result['kage_count'] + 1) . " " . self::KAGE_NAMES[$player->village->village_id];
+                if (!empty($result)) {
+                    $seat_title = $result['seat_title'];
+                    $reclaim = true;
+                } else {
+                    $result = $system->db->query("SELECT COUNT(DISTINCT `user_id`) as 'kage_count' FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` != {$player->user_id}");
+                    $result = $system->db->fetch($result);
+                    $seat_title = self::getOrdinal($result['kage_count'] + 1) . " " . self::KAGE_NAMES[$player->village->village_id];
+                }
                 $system->db->query("INSERT INTO `village_seats`
                     (`user_id`, `village_id`, `seat_type`, `seat_title`, `seat_start`)
                     VALUES ({$player->user_id}, {$player->village->village_id}, '{$seat_type}', '{$seat_title}', {$time})
                 ");
-                return "You have claimed the Kage seat!";
+                if ($reclaim) {
+                    return "You have reclaimed the title of {$seat_title}!";
+                } else {
+                    return "You have claimed the title of {$seat_title}!";
+                }
                 break;
             case 'elder':
+                // check rank
+                if ($player->rank_num < 4) {
+                    return "Insufficient rank!";
+                }
                 // check seat available
                 $result = $system->db->query("SELECT COUNT(*) as 'elder_count' FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `seat_end` IS NULL LIMIT 1");
                 $result = $system->db->fetch($result);
@@ -208,7 +235,7 @@ class Village {
                     return "No seats available to claim!";
                 }
                 // check tier
-                if (!$player->reputation->rank >= 4) {
+                if ($player->reputation->rank < self::MIN_ELDER_CLAIM_TIER) {
                     return "You do not meet the reputation requirements!";
                 }
                 // check if has existing seat
@@ -223,7 +250,7 @@ class Village {
                     (`user_id`, `village_id`, `seat_type`, `seat_title`, `seat_start`)
                     VALUES ({$player->user_id}, {$player->village->village_id}, '{$seat_type}', '{$seat_title}', {$time})
                 ");
-                return "You have claimed the Elder seat!";
+                return "You have become an Elder of {$player->village->name}!";
                 break;
         }
     }
@@ -236,7 +263,7 @@ class Village {
         $time = time();
         $result = $system->db->query("UPDATE `village_seats` SET `seat_end` = {$time} WHERE `seat_end` IS NULL AND `user_id` = {$player->user_id}");
         if ($system->db->last_affected_rows > 0) {
-            return "You have resigned!";
+            return "You have resigned from your position!";
         } else {
             return "Something went wrong!";
         }

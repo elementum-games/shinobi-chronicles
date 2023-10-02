@@ -1,4 +1,4 @@
-import { apiFetch } from "../utils/network.js";
+﻿import { apiFetch } from "../utils/network.js";
 
 function Village({
     playerSeat,
@@ -15,8 +15,11 @@ function Village({
     const [seatDataState, setSeatDataState] = React.useState(seatData);
     const [resourceDataState, setResourceDataState] = React.useState(resourceData);
     const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
+    const [modalState, setModalState] = React.useState("closed");
     const resourceDays = React.useRef(1);
     const resourceDaysDisplay = React.useRef("daily");
+    const modalText = React.useRef(null);
+
     const FetchResources = () => {
         apiFetch(
             villageAPI,
@@ -60,25 +63,44 @@ function Village({
             }
             setSeatDataState(response.data.seatData);
             setPlayerSeatState(response.data.playerSeat);
+            modalText.current = response.data.response_message;
+            setModalState("response_message");
         });
     }
     const Resign = () => {
-        apiFetch(
-            villageAPI,
-            {
-                request: 'Resign',
-            }
-        ).then((response) => {
-            if (response.errors.length) {
-                handleErrors(response.errors);
-                return;
-            }
-            setSeatDataState(response.data.seatData);
-            setPlayerSeatState(response.data.playerSeat);
-        });
+        if (modalState == "confirm_resign") {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'Resign',
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setSeatDataState(response.data.seatData);
+                setPlayerSeatState(response.data.playerSeat);
+                modalText.current = response.data.response_message;
+                setModalState("response_message");
+            });
+        }
+        else {
+            setModalState("confirm_resign");
+            modalText.current = "Are you sure you wish to resign from your current position?";
+        }
     }
     function handleErrors(errors) {
         console.warn(errors);
+    }
+    function getKageKanji(village_id) {
+        switch (village_id) {
+            case 'Stone': return '土影';
+            case 'Cloud': return '雷影';
+            case 'Leaf': return '火影';
+            case 'Sand': return '風影';
+            case 'Mist': return '水影';
+        }
     }
     const totalPopulation = populationData.reduce((acc, rank) => acc + rank.count, 0);
     const kage = seatDataState.find(seat => seat.seat_type === 'kage');
@@ -91,6 +113,24 @@ function Village({
                 <div className="nav_button disabled">members & teams</div>
                 <div className="nav_button disabled">kage's quarters</div>
             </div>
+            {modalState !== "closed" &&
+                <>
+                <div className="hq_modal_backdrop"></div>
+                <div className="hq_modal">
+                    <div className="hq_modal_header">Confirmation</div>
+                    <div className="hq_modal_text">{modalText.current}</div>
+                    {modalState == "confirm_resign" &&
+                        <>
+                        <div className="confirm_resign_button" onClick={() => Resign()}>Confirm</div>
+                        <div className="modal_cancel_button" onClick={() => setModalState("closed")}>Cancel</div>
+                        </>
+                    }
+                    {modalState == "response_message" &&
+                        <div className="modal_close_button" onClick={() => setModalState("closed")}>Close</div>
+                    }
+                </div>
+                </>
+            }
             <div className="hq_container">
                 <div className="row first">
                     <div className="column first">
@@ -124,10 +164,21 @@ function Village({
                     </div>
                     <div className="column second">
                         <div className="kage_container">
-                            <div className="header">Kage</div>
-                            <div className="kage_avatar_wrapper">
-                                <img className="kage_avatar" src={kage.avatar_link}/>
+                            <div className="kage_header">
+                                <div className="header">Kage</div>
+                                <div className="kage_kanji">{getKageKanji(villageName)}</div>
                             </div>
+                            
+                            {kage.avatar_link &&
+                                <div className="kage_avatar_wrapper">
+                                    <img className="kage_avatar" src={kage.avatar_link} />
+                                </div>
+                            }
+                            {!kage.avatar_link &&
+                                <div className="kage_avatar_wrapper_empty">
+                                    <div className="kage_avatar_fill"></div>
+                                </div>
+                            }
                             <div className="kage_nameplate_wrapper">
                                 <div className="kage_nameplate_decoration nw"></div>
                                 <div className="kage_nameplate_decoration ne"></div>
@@ -135,11 +186,11 @@ function Village({
                                 <div className="kage_nameplate_decoration sw"></div>
                                 <div className="kage_name">{kage.user_name ? kage.user_name : "---"}</div>
                                 <div className="kage_title">{kage.seat_title + " of " + villageName + " village"}</div>
-                                {kage.seat_id == playerSeatState.seat_id &&
+                                {kage.seat_id && kage.seat_id == playerSeatState.seat_id &&
                                     <div className="kage_resign_button" onClick={() => Resign()}>resign</div>
                                 }
                                 {!kage.seat_id &&
-                                    <div className="kage_claim_button" onClick={() => ClaimSeat("kage")}>claim</div>
+                                    <div className="kage_claim_button disabled">claim</div>
                                 }
                                 {(kage.seat_id && kage.seat_id != playerSeatState.seat_id) &&
                                     <div className="kage_challenge_button">challenge</div>
@@ -164,7 +215,7 @@ function Village({
                                                 <div className="elder_resign_button" onClick={() => Resign()}>resign</div>
                                             }
                                             {!elder.seat_id &&
-                                                <div className={playerSeatState.seat_id ? "elder_claim_button disabled" : "elder_claim_button"} onClick={() => ClaimSeat("elder")}>claim</div>
+                                                <div className={playerSeatState.seat_id ? "elder_claim_button disabled" : "elder_claim_button"} onClick={playerSeatState.seat_id ? null : () => ClaimSeat("elder")}>claim</div>
                                             }
                                             {(elder.seat_id && elder.seat_id != playerSeatState.seat_id) &&
                                                 <div className="elder_challenge_button">challenge</div>

@@ -26,7 +26,7 @@ try {
         case 'LoadVillageData':
             $VillageAPIResponse->response = [
                 'policyData' => VillageApiPresenter::boostDataResponse($system, $player),
-                'populationData' => VillageApiPresenter::populationDataResponse($$system, $player),
+                'populationData' => VillageApiPresenter::populationDataResponse($system, $player),
                 'seatData' => VillageApiPresenter::seatDataResponse($system, $player),
                 'pointsData' => VillageApiPresenter::pointsDataResponse($system, $player),
                 'diplomacyData' => VillageApiPresenter::diplomacyDataResponse($system, $player),
@@ -40,17 +40,19 @@ try {
             break;
         case 'ClaimSeat':
             $seat_type = $system->db->clean($_POST['seat_type']);
-            Village::claimSeat($system, $player, $seat_type);
+            $message = Village::claimSeat($system, $player, $seat_type);
             $VillageAPIResponse->response = [
                 'seatData' => VillageApiPresenter::seatDataResponse($system, $player),
                 'playerSeat' => Village::getPlayerSeat($system, $player->user_id),
+                'response_message' => $message,
             ];
             break;
         case 'Resign':
-            Village::resign($system, $player);
+            $message = Village::resign($system, $player);
             $VillageAPIResponse->response = [
                 'seatData' => VillageApiPresenter::seatDataResponse($system, $player),
                 'playerSeat' => Village::getPlayerSeat($system, $player->user_id),
+                'response_message' => $message,
             ];
             break;
         default:
