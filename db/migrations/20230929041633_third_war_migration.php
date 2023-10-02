@@ -40,6 +40,14 @@ final class ThirdWarMigration extends AbstractMigration
               `quantity` int(11) NOT NULL,
               `time` int(11) NOT NULL,
               PRIMARY KEY (`log_id`));
+
+            -- Cleanup tables
+            DELETE FROM caravans;
+            DELETE FROM loot;
+            UPDATE `region_locations` set `resource_count` = 0;
+            UPDATE `villages` set `resources` = '[]';
+            UPDATE `region_locations` set `health` = 5000 WHERE `type` = 'village';
+            UPDATE `region_locations` set `health` = 15000 WHERE `type` = 'castle';
         ");
     }
 
