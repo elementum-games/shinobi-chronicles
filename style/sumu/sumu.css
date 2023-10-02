@@ -1117,3 +1117,12 @@ button {
 .kage_nameplate_decoration {
     background: #c3c9d7 !important;
 }
+.kage_avatar_fill {
+    background: var(--avatar-frame-border_gradient) !important;
+}
+.elder_avatar_fill {
+    background: var(--avatar-frame-border_gradient) !important;
+}
+.elder_name {
+    background: var(--avatar-frame-border_gradient) !important;
+}
