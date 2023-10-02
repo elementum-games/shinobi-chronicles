@@ -119,6 +119,7 @@ class TravelApiPresenter {
                     'defense' => $regionObjective->defense,
                     'objective_type' => $regionObjective->objective_type,
                     'village_id' => $regionObjective->village_id,
+                    'resource_id' => $regionObjective->resource_id,
                 ];
             },
             $travelManager->fetchRegionObjectives()

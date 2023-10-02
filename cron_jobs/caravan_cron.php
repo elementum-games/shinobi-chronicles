@@ -74,11 +74,13 @@ if (isset($_SESSION['user_id'])) {
 
 function hourlyCaravan(System $system, $debug = true): void
 {
+    $queries = [];
     /* step 1: update village resources */
 
     // get villages
     $village_result = $system->db->query("SELECT * FROM `villages`");
     $village_result = $system->db->fetch_all($village_result);
+    $village_resource_gain = [];
     $villages = [];
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);
@@ -92,11 +94,20 @@ function hourlyCaravan(System $system, $debug = true): void
         // add resource to village
         foreach ($caravan_resources as $resource_id => $quantity) {
             $villages[$caravan['village_id']]->addResource($resource_id, $quantity);
+            // track totals for logging
+            !empty($village_resource_gain[$caravan['village_id']][$resource_id]) ? $village_resource_gain[$caravan['village_id']][$resource_id] += $quantity : $village_resource_gain[$caravan['village_id']][$resource_id] = $quantity;
         }
     }
     // update resources
     foreach ($villages as $village) {
-        $village->updateResources();
+        $queries[] = $village->updateResources(false);
+        if (!empty($village_resource_gain[$village->village_id])) {
+            foreach ($village_resource_gain[$village->village_id] as $key => $value) {
+                $queries[] = "INSERT INTO `resource_logs`
+                    (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                    VALUES ({$village->village_id}, {$key}, " . Village::RESOURCE_LOG_COLLECTION . ", {$value}, " . time() . ")";
+            }
+        }
     }
 
     /* step 2: delete old caravans */
@@ -105,7 +116,6 @@ function hourlyCaravan(System $system, $debug = true): void
 
     /* step 3: generate new caravans */
 
-    $queries = [];
     // get regions
     $region_result = $system->db->query("SELECT * FROM `regions` WHERE `region_id` > 5");
     $region_result = $system->db->fetch_all($region_result);
@@ -135,6 +145,9 @@ function hourlyCaravan(System $system, $debug = true): void
             VALUES ('{$start_time}', '{$travel_time}', '{$region_id}', '{$village_id}', '{$caravan_type}', '{$resources}', '{$name}')";
     }
 
+    // all regions_locations should be emptied
+    $queries[] = "UPDATE `region_locations` SET `resource_count` = 0 WHERE `region_id` > 5";
+
     if ($debug) {
         echo "Debug running...<br>";
         foreach ($queries as $query) {
@@ -144,7 +157,7 @@ function hourlyCaravan(System $system, $debug = true): void
     } else {
         echo "Script running...<br>";
         foreach ($queries as $query) {
-            $system->db->query("LOCK TABLES `caravans` WRITE;");
+            $system->db->query("LOCK TABLES `caravans` WRITE, `region_locations` WRITE, `resource_logs` WRITE, `villages` WRITE;");
             $system->db->query($query);
             $system->db->query("UNLOCK TABLES;");
         }

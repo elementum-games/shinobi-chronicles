@@ -60,7 +60,8 @@ export function Rules() {
                     <li>Account limits: 2 accounts</li>
                     <li>Attacking your own account is not allowed.</li>
                     <li>Account sharing is not allowed.</li>
-                    <li>Impersonating staff is forbidden</li>
+                    <li>Impersonating staff is forbidden.</li>
+                    <li>You may only hold 1 village seat (Kage/Elder) across all accounts.</li>
                 </ul>
             </div>
 

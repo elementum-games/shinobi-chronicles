@@ -322,7 +322,6 @@ function MapObjectives({ objectives, tileWidth, tileHeight }) {
     );
 }
 
-
 function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, player_x, player_y }) {
     function getVillageIcon(village_id) {
         switch (village_id) {
@@ -336,6 +335,18 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, pl
                 return '/images/village_icons/sand.png';
             case 5:
                 return '/images/village_icons/mist.png';
+            default:
+                return null;
+        }
+    }
+    function getResourceIcon(resource_id) {
+        switch (resource_id) {
+            case 1:
+                return '/images/map/icons/materials.png';
+            case 2:
+                return '/images/map/icons/food.png';
+            case 3:
+                return '/images/map/icons/wealth.png';
             default:
                 return null;
         }
@@ -354,7 +365,7 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, pl
                             style={{
                                 cursor: "pointer",
                                 backgroundColor: "#" + objective.background_color,
-                                backgroundImage: objective.image ? (objective.objective_type == 'village' && !strategicView ? 'url(/images/map/icons/village.png)' : `url(${objective.image})`) : null,
+                                backgroundImage: `url(${objective.image})`,
                                 transform: `translate3d(${(objective.x - 1) * tileWidth}px, ${(objective.y - 1) * tileHeight}px, 0)`,
                                 backfaceVisibility: "hidden",
                                 filter: "blur(0)",
@@ -364,7 +375,8 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, pl
                                 <span className='region_objective_tooltip_name'>{objective.name}</span>
                                 <div className='region_objective_tooltip_tags'>
                                     <span className='region_objective_tooltip_defense'>{objective.defense}</span>
-                                    <img className='region_objective_tooltip_village' src={getVillageIcon(objective.village_id)}/>
+                                    <img className='region_objective_tooltip_village' src={getVillageIcon(objective.village_id)} />
+                                    <img className='region_objective_tooltip_resource' src={getResourceIcon(objective.resource_id)} />
                                 </div>
                             </div>
                             {objective.objective_health !== undefined && objective.objective_max_health > 0 &&

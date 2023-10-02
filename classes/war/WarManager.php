@@ -16,11 +16,11 @@ class WarManager {
         1 => 'materials',
         2 => 'food',
         3 => 'wealth',
-        4 => 'adamantine',
+        /*4 => 'adamantine',
         5 => 'quicksilver',
         6 => 'elderwood',
-        7 => 'ironsand',
-        8 => 'obsidian',
+        7 => 'iron_sand',
+        8 => 'obsidian',*/
     ];
     const PATROL_NAMES = [
         1 => "Patrol",
@@ -286,7 +286,8 @@ class WarManager {
         $this->user->village->updateResources();
         $message .= "!";
         // update loot table
-        $this->system->db->query("UPDATE `loot` SET `claimed_village_id` = {$this->user->village->village_id} WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL");
+        $time = time();
+        $this->system->db->query("UPDATE `loot` SET `claimed_village_id` = {$this->user->village->village_id}, `claimed_time` = {$time} WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL");
         return $message;
     }
 

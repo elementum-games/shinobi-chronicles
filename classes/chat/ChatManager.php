@@ -256,6 +256,10 @@ class ChatManager {
             }
 
             $title = $this->player->rank->name;
+            $seat = Village::getPlayerSeat($this->system, $this->player->user_id);
+            if (!empty($seat)) {
+                $title = $seat['seat_title'];
+            }
             $staff_level = $this->player->staff_level;
             $supported_colors = $this->player->getNameColors();
 

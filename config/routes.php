@@ -150,7 +150,7 @@ return $routes = [
         village_ok: Route::ONLY_IN_VILLAGE,
     ),
     9 => new Route(
-        file_name: 'villageHQ.php',
+        file_name: 'villageHQ_v2.php',
         title: 'Village HQ',
         function_name: 'villageHQ',
         menu: Route::MENU_VILLAGE,
