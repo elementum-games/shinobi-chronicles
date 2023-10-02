@@ -39,8 +39,7 @@ final class ThirdWarMigration extends AbstractMigration
               `type` int(11) NOT NULL,
               `quantity` int(11) NOT NULL,
               `time` int(11) NOT NULL,
-              PRIMARY KEY (`id`));
-            )
+              PRIMARY KEY (`log_id`));
         ");
     }
 
