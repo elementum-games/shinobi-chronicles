@@ -106,6 +106,13 @@
     /* Notification Config */
     --notification-background-color: #c3c9d7;
     --notification-background-border: #767b91;
+    /* VillageHQ Config */
+    --village-text-color-1: #383838;
+    --village-text-color-2: #383838;
+    /* --diplomacy-background-neutral: #2B2A1D;
+    --diplomacy-background-alliance: #242b29;
+    --diplomacy-background-war: #1f1619; */
+    --diplomacy-item-border: #373131;
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */
@@ -1087,4 +1094,26 @@ button {
 }
 #handseal_12 img {
     content: url(../../images/v2/sumu/Seal12.png) !important;
+}
+
+.kage_name {
+    color: black !important;
+}
+.kage_title {
+    color: black !important;
+}
+.resource_produced {
+    color: #2A8A48 !important;
+}
+.resource_claimed {
+    color: #2A8A48 !important;
+}
+.resource_lost {
+    color: #B03232 !important;
+}
+.resource_spent {
+    color: #B03232 !important;
+}
+.kage_nameplate_decoration {
+    background: #c3c9d7 !important;
 }
