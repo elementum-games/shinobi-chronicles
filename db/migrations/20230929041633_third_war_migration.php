@@ -31,8 +31,8 @@ final class ThirdWarMigration extends AbstractMigration
             UPDATE region_locations SET `resource_id` = 2 WHERE `region_id` = 19 and `type` = 'castle';
             UPDATE region_locations SET `resource_id` = 1 WHERE `region_id` = 20 and `type` = 'castle';
 
-            -- Add resource_log table
-            CREATE TABLE `resource_log` (
+            -- Add resource_logs table
+            CREATE TABLE `resource_logs` (
               `log_id` int(11) NOT NULL AUTO_INCREMENT,
               `village_id` int(11) NOT NULL,
               `resource_id` int(11) NOT NULL,
@@ -70,8 +70,8 @@ final class ThirdWarMigration extends AbstractMigration
             UPDATE region_locations SET `resource_id` = 8 WHERE `region_id` = 19 and `type` = 'castle';
             UPDATE region_locations SET `resource_id` = 8 WHERE `region_id` = 20 and `type` = 'castle';
 
-            -- Add resource_log table
-            DROP TABLE `resource_log`;
+            -- Add resource_logs table
+            DROP TABLE `resource_logs`;
         ");
     }
 }
