@@ -14,8 +14,10 @@ function Village({
   const [seatDataState, setSeatDataState] = React.useState(seatData);
   const [resourceDataState, setResourceDataState] = React.useState(resourceData);
   const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
+  const [modalState, setModalState] = React.useState("closed");
   const resourceDays = React.useRef(1);
   const resourceDaysDisplay = React.useRef("daily");
+  const modalText = React.useRef(null);
   const FetchResources = () => {
     apiFetch(villageAPI, {
       request: 'LoadResourceData',
@@ -53,22 +55,45 @@ function Village({
       }
       setSeatDataState(response.data.seatData);
       setPlayerSeatState(response.data.playerSeat);
+      modalText.current = response.data.response_message;
+      setModalState("response_message");
     });
   };
   const Resign = () => {
-    apiFetch(villageAPI, {
-      request: 'Resign'
-    }).then(response => {
-      if (response.errors.length) {
-        handleErrors(response.errors);
-        return;
-      }
-      setSeatDataState(response.data.seatData);
-      setPlayerSeatState(response.data.playerSeat);
-    });
+    if (modalState == "confirm_resign") {
+      apiFetch(villageAPI, {
+        request: 'Resign'
+      }).then(response => {
+        if (response.errors.length) {
+          handleErrors(response.errors);
+          return;
+        }
+        setSeatDataState(response.data.seatData);
+        setPlayerSeatState(response.data.playerSeat);
+        modalText.current = response.data.response_message;
+        setModalState("response_message");
+      });
+    } else {
+      setModalState("confirm_resign");
+      modalText.current = "Are you sure you wish to resign from your current position?";
+    }
   };
   function handleErrors(errors) {
     console.warn(errors);
+  }
+  function getKageKanji(village_id) {
+    switch (village_id) {
+      case 'Stone':
+        return '土影';
+      case 'Cloud':
+        return '雷影';
+      case 'Leaf':
+        return '火影';
+      case 'Sand':
+        return '風影';
+      case 'Mist':
+        return '水影';
+    }
   }
   const totalPopulation = populationData.reduce((acc, rank) => acc + rank.count, 0);
   const kage = seatDataState.find(seat => seat.seat_type === 'kage');
@@ -84,7 +109,24 @@ function Village({
     className: "nav_button disabled"
   }, "members & teams"), /*#__PURE__*/React.createElement("div", {
     className: "nav_button disabled"
-  }, "kage's quarters")), /*#__PURE__*/React.createElement("div", {
+  }, "kage's quarters")), modalState !== "closed" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "hq_modal_backdrop"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "hq_modal"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "hq_modal_header"
+  }, "Confirmation"), /*#__PURE__*/React.createElement("div", {
+    className: "hq_modal_text"
+  }, modalText.current), modalState == "confirm_resign" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "confirm_resign_button",
+    onClick: () => Resign()
+  }, "Confirm"), /*#__PURE__*/React.createElement("div", {
+    className: "modal_cancel_button",
+    onClick: () => setModalState("closed")
+  }, "Cancel")), modalState == "response_message" && /*#__PURE__*/React.createElement("div", {
+    className: "modal_close_button",
+    onClick: () => setModalState("closed")
+  }, "Close"))), /*#__PURE__*/React.createElement("div", {
     className: "hq_container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "row first"
@@ -128,12 +170,20 @@ function Village({
   }, /*#__PURE__*/React.createElement("div", {
     className: "kage_container"
   }, /*#__PURE__*/React.createElement("div", {
+    className: "kage_header"
+  }, /*#__PURE__*/React.createElement("div", {
     className: "header"
   }, "Kage"), /*#__PURE__*/React.createElement("div", {
+    className: "kage_kanji"
+  }, getKageKanji(villageName))), kage.avatar_link && /*#__PURE__*/React.createElement("div", {
     className: "kage_avatar_wrapper"
   }, /*#__PURE__*/React.createElement("img", {
     className: "kage_avatar",
     src: kage.avatar_link
+  })), !kage.avatar_link && /*#__PURE__*/React.createElement("div", {
+    className: "kage_avatar_wrapper_empty"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kage_avatar_fill"
   })), /*#__PURE__*/React.createElement("div", {
     className: "kage_nameplate_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
@@ -148,12 +198,11 @@ function Village({
     className: "kage_name"
   }, kage.user_name ? kage.user_name : "---"), /*#__PURE__*/React.createElement("div", {
     className: "kage_title"
-  }, kage.seat_title + " of " + villageName + " village"), kage.seat_id == playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
+  }, kage.seat_title + " of " + villageName + " village"), kage.seat_id && kage.seat_id == playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
     className: "kage_resign_button",
     onClick: () => Resign()
   }, "resign"), !kage.seat_id && /*#__PURE__*/React.createElement("div", {
-    className: "kage_claim_button",
-    onClick: () => ClaimSeat("kage")
+    className: "kage_claim_button disabled"
   }, "claim"), kage.seat_id && kage.seat_id != playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
     className: "kage_challenge_button"
   }, "challenge")))), /*#__PURE__*/React.createElement("div", {
@@ -181,7 +230,7 @@ function Village({
     onClick: () => Resign()
   }, "resign"), !elder.seat_id && /*#__PURE__*/React.createElement("div", {
     className: playerSeatState.seat_id ? "elder_claim_button disabled" : "elder_claim_button",
-    onClick: () => ClaimSeat("elder")
+    onClick: playerSeatState.seat_id ? null : () => ClaimSeat("elder")
   }, "claim"), elder.seat_id && elder.seat_id != playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
     className: "elder_challenge_button"
   }, "challenge"))))), /*#__PURE__*/React.createElement("div", {
