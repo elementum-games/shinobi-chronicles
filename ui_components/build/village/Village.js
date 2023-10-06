@@ -15,30 +15,30 @@ function Village({
   const [resourceDataState, setResourceDataState] = React.useState(resourceData);
   const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
   const [modalState, setModalState] = React.useState("closed");
-  const resourceDays = React.useRef(1);
-  const resourceDaysDisplay = React.useRef("daily");
+  const [resourceDays, setResourceDays] = React.useState(1);
+  const [resourceDaysDisplay, setResourceDaysDisplay] = React.useState("daily");
   const modalText = React.useRef(null);
   const FetchNextIntervalTypeResources = () => {
     apiFetch(villageAPI, {
       request: 'LoadResourceData',
-      days: resourceDays.current
+      days: resourceDays
     }).then(response => {
       if (response.errors.length) {
         handleErrors(response.errors);
         return;
       }
-      switch (resourceDays.current) {
+      switch (resourceDays) {
         case 1:
-          resourceDays.current = 7;
-          resourceDaysDisplay.current = "weekly";
+          setResourceDays(7);
+          setResourceDaysDisplay("weekly");
           break;
         case 7:
-          resourceDays.current = 30;
-          resourceDaysDisplay.current = "monthly";
+          setResourceDays(30);
+          setResourceDaysDisplay("monthly");
           break;
         case 30:
-          resourceDays.current = 1;
-          resourceDaysDisplay.current = "daily";
+          setResourceDays(1);
+          setResourceDaysDisplay("daily");
           break;
       }
       setResourceDataState(response.data);
@@ -293,7 +293,7 @@ function Village({
     className: "first"
   }, /*#__PURE__*/React.createElement("a", {
     onClick: () => FetchNextIntervalTypeResources()
-  }, resourceDaysDisplay.current)), /*#__PURE__*/React.createElement("div", {
+  }, resourceDaysDisplay)), /*#__PURE__*/React.createElement("div", {
     className: "second"
   }, "current"), /*#__PURE__*/React.createElement("div", null, "produced"), /*#__PURE__*/React.createElement("div", null, "claimed"), /*#__PURE__*/React.createElement("div", null, "lost"), /*#__PURE__*/React.createElement("div", null, "spent")), resourceDataState.map((resource, index) => /*#__PURE__*/React.createElement("div", {
     key: resource.resource_id,

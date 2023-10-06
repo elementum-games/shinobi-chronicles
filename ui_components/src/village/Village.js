@@ -16,8 +16,8 @@ function Village({
     const [resourceDataState, setResourceDataState] = React.useState(resourceData);
     const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
     const [modalState, setModalState] = React.useState("closed");
-    const resourceDays = React.useRef(1);
-    const resourceDaysDisplay = React.useRef("daily");
+    const [resourceDays, setResourceDays] = React.useState(1);
+    const [resourceDaysDisplay, setResourceDaysDisplay] = React.useState("daily");
     const modalText = React.useRef(null);
 
     const FetchNextIntervalTypeResources = () => {
@@ -25,25 +25,25 @@ function Village({
             villageAPI,
             {
                 request: 'LoadResourceData',
-                days: resourceDays.current,
+                days: resourceDays,
             }
         ).then((response) => {
             if (response.errors.length) {
                 handleErrors(response.errors);
                 return;
             }
-            switch (resourceDays.current) {
+            switch (resourceDays) {
                 case 1:
-                    resourceDays.current = 7;
-                    resourceDaysDisplay.current = "weekly";
+                    setResourceDays(7);
+                    setResourceDaysDisplay("weekly");
                     break;
                 case 7:
-                    resourceDays.current = 30;
-                    resourceDaysDisplay.current = "monthly";
+                    setResourceDays(30);
+                    setResourceDaysDisplay("monthly");
                     break;
                 case 30:
-                    resourceDays.current = 1;
-                    resourceDaysDisplay.current = "daily";
+                    setResourceDays(1);
+                    setResourceDaysDisplay("daily");
                     break;
             }
             setResourceDataState(response.data);
@@ -270,7 +270,7 @@ function Village({
                             <div className="header">Resources overview</div>
                             <div className="content box-primary">
                                 <div className="resources_inner_header">
-                                    <div className="first"><a onClick={() => FetchNextIntervalTypeResources()}>{resourceDaysDisplay.current}</a></div>
+                                    <div className="first"><a onClick={() => FetchNextIntervalTypeResources()}>{resourceDaysDisplay}</a></div>
                                     <div className="second">current</div>
                                     <div>produced</div>
                                     <div>claimed</div>
