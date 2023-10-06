@@ -103,7 +103,11 @@ class VillageManager {
                 return "Not yet available.";
                 // check rank
                 if ($player->rank_num < 4) {
-                    return "Insufficient rank!";
+                    return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_KAGE_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_KAGE_CLAIM_TIER]['min_rep'] . " Reputation";
+                }
+                // check tier
+                if ($player->reputation->rank < self::MIN_KAGE_CLAIM_TIER) {
+                    return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_KAGE_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_KAGE_CLAIM_TIER]['min_rep'] . " Reputation";
                 }
                 // check seat available
                 $result = $system->db->query("SELECT `leader` FROM `villages` WHERE `village_id` = {$player->village->village_id}");
@@ -111,10 +115,6 @@ class VillageManager {
                 //$result = $system->db->query("SELECT * FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `seat_end` IS NULL LIMIT 1");
                 if ($result['leader'] > 0) {
                     return "Seat is occupied!";
-                }
-                // check tier
-                if ($player->reputation->rank < self::MIN_KAGE_CLAIM_TIER) {
-                    return "You do not meet the reputation requirements!";
                 }
                 // check if has existing seat
                 $seat = self::getPlayerSeat($system, $player->user_id);
@@ -146,24 +146,24 @@ class VillageManager {
                 }
                 break;
             case 'elder':
+                // check if has existing seat
+                $seat = self::getPlayerSeat($system, $player->user_id);
+                if (!empty($seat)) {
+                    return "You already have a seat in this village!";
+                }
                 // check rank
                 if ($player->rank_num < 4) {
-                    return "Insufficient rank!";
+                    return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_ELDER_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_ELDER_CLAIM_TIER]['min_rep'] . " Reputation";
+                }
+                // check tier
+                if ($player->reputation->rank < self::MIN_ELDER_CLAIM_TIER) {
+                    return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_ELDER_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_ELDER_CLAIM_TIER]['min_rep'] . " Reputation";
                 }
                 // check seat available
                 $result = $system->db->query("SELECT COUNT(*) as 'elder_count' FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `seat_end` IS NULL LIMIT 1");
                 $result = $system->db->fetch($result);
                 if ($result['elder_count'] == 3) {
                     return "No seats available to claim!";
-                }
-                // check tier
-                if ($player->reputation->rank < self::MIN_ELDER_CLAIM_TIER) {
-                    return "You do not meet the reputation requirements!";
-                }
-                // check if has existing seat
-                $seat = self::getPlayerSeat($system, $player->user_id);
-                if (!empty($seat)) {
-                    return "You already have a seat in this village!";
                 }
                 // claim
                 $time = time();

@@ -656,6 +656,7 @@
     padding-top: 25px;
     text-align: center;
     color: var(--village-text-color-1);
+    white-space: pre;
 }
 .modal_cancel_button {
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
