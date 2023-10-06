@@ -1,7 +1,6 @@
 <?php
 
 class WarManager {
-
     const BASE_RESOURCE_PRODUCTION = 25; // 25/hour, 600/village/day, 1800/region/day, 7200/faction/day (assuming 4 regions)
     const BASE_CARAVAN_TIME_MS = 300000; // 5 minute travel time
     const CARAVAN_TIMER_HOURS = 6; // 24m average caravan spawn timer, so 19 minute average downtime

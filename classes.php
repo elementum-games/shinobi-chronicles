@@ -18,7 +18,6 @@ require_once __DIR__ . "/classes/SpecialMission.php";
 require_once __DIR__ . "/classes/SupportManager.php";
 require_once __DIR__ . "/classes/System.php";
 require_once __DIR__ . "/classes/User.php";
-require_once __DIR__ . "/classes/Village.php";
 
 require_once __DIR__ . "/classes/battle/Battle.php";
 require_once __DIR__ . "/classes/battle/BattleManager.php";
@@ -72,7 +71,9 @@ require_once __DIR__ . "/classes/user/UserAPIResponse.php";
 require_once __DIR__ . "/classes/forbidden_shop/ForbiddenShopAPIPresenter.php";
 require_once __DIR__ . "/classes/forbidden_shop/ForbiddenShopManager.php";
 
+require_once __DIR__ . "/classes/Village.php";
 require_once __DIR__ . "/classes/village/VillageRelation.php";
+require_once __DIR__ . "/classes/village/VillageManager.php";
 require_once __DIR__ . "/classes/village/VillageAPIResponse.php";
 require_once __DIR__ . "/classes/village/VillageApiPresenter.php";
 

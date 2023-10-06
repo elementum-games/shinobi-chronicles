@@ -18,7 +18,7 @@ function Village({
   const resourceDays = React.useRef(1);
   const resourceDaysDisplay = React.useRef("daily");
   const modalText = React.useRef(null);
-  const FetchResources = () => {
+  const FetchNextIntervalTypeResources = () => {
     apiFetch(villageAPI, {
       request: 'LoadResourceData',
       days: resourceDays.current
@@ -164,7 +164,7 @@ function Village({
   }, /*#__PURE__*/React.createElement("div", {
     className: "population_item_header"
   }, "total"), /*#__PURE__*/React.createElement("div", {
-    className: "population_item_count"
+    className: "population_item_count last"
   }, totalPopulation))))), /*#__PURE__*/React.createElement("div", {
     className: "column second"
   }, /*#__PURE__*/React.createElement("div", {
@@ -292,7 +292,7 @@ function Village({
   }, /*#__PURE__*/React.createElement("div", {
     className: "first"
   }, /*#__PURE__*/React.createElement("a", {
-    onClick: () => FetchResources()
+    onClick: () => FetchNextIntervalTypeResources()
   }, resourceDaysDisplay.current)), /*#__PURE__*/React.createElement("div", {
     className: "second"
   }, "current"), /*#__PURE__*/React.createElement("div", null, "produced"), /*#__PURE__*/React.createElement("div", null, "claimed"), /*#__PURE__*/React.createElement("div", null, "lost"), /*#__PURE__*/React.createElement("div", null, "spent")), resourceDataState.map((resource, index) => /*#__PURE__*/React.createElement("div", {

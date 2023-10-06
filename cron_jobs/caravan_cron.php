@@ -105,7 +105,7 @@ function hourlyCaravan(System $system, $debug = true): void
             foreach ($village_resource_gain[$village->village_id] as $key => $value) {
                 $queries[] = "INSERT INTO `resource_logs`
                     (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                    VALUES ({$village->village_id}, {$key}, " . Village::RESOURCE_LOG_COLLECTION . ", {$value}, " . time() . ")";
+                    VALUES ({$village->village_id}, {$key}, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$value}, " . time() . ")";
             }
         }
     }

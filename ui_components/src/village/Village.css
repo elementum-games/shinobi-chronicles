@@ -104,12 +104,17 @@
 .population_item_count {
     text-align: center;
 }
+    .population_item_count.last {
+        margin-left: auto;
+        margin-right: auto;
+    }
 .population_item_header {
-    color: var(--village-text-color-2);
-    font-size: 13px;
-    text-transform: uppercase;
     font-family: var(--font-primary);
     text-align: center;
+    font-variant: small-caps;
+    text-transform: capitalize;
+    color: var(--village-text-color-2);
+    margin-bottom: 5px;
 }
 
 .diplomatic_status_container .content {
@@ -148,7 +153,7 @@
     }
 .diplomacy_item_points {
     flex-basis: 20%;
-    color: var(--village-text-color-2);
+    color: var(--village-text-color-1);
     width: 100%;
     text-align: center;
     box-sizing: border-box;
@@ -156,7 +161,7 @@
 }
 .diplomacy_item_villagers {
     flex-basis: 20%;
-    color: var(--village-text-color-2);
+    color: var(--village-text-color-1);
     width: 100%;
     text-align: center;
     box-sizing: border-box;
@@ -301,7 +306,7 @@
     width: 100px;
     min-width: 100px;
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
-    background-color: var(--content-background-color);
+    background-color: var(--hq-number-background-color);
     padding-bottom: 1px !important;
 }
 .resource_produced {
@@ -338,9 +343,7 @@
     align-items: center;
     justify-content: center;
     font-variant: small-caps;
-    text-decoration: underline;
-    text-decoration-color: #4e4535;
-    text-underline-offset: 4px;
+    color: var(--hq-clan-name-color);
 }
 .clan_item_header {
     text-align: center;
@@ -491,6 +494,7 @@
     background: #1c1a25;
     height: 200px;
     width: 200px;
+    clip-path: circle(50% at 50% 50%);
 }
 
 .elders_container {
@@ -522,9 +526,10 @@
     max-height: 85px;
 }
 .elder_avatar_fill {
-    background: #1c1a25; 
+    background: #1c1a25;
     height: 85px;
     width: 85px;
+    clip-path: circle(50% at 50% 50%);
 }
 .elder_name {
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
@@ -606,13 +611,15 @@
     text-align: center;
     margin-bottom: 5px;
     margin-top: -8px;
+    color: var(--village-text-color-2);
 }
 .points_total {
     width: 100px;
     min-width: 100px;
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
-    background-color: var(--content-background-color);
+    background-color: var(--hq-number-background-color);
     text-align: center;
+    padding-bottom: 1px !important;
 }
 
 .hq_modal {

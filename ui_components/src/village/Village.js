@@ -20,7 +20,7 @@ function Village({
     const resourceDaysDisplay = React.useRef("daily");
     const modalText = React.useRef(null);
 
-    const FetchResources = () => {
+    const FetchNextIntervalTypeResources = () => {
         apiFetch(
             villageAPI,
             {
@@ -157,7 +157,7 @@ function Village({
                                     ))}
                                 <div className="population_item" style={{width: "100%"}}>
                                     <div className="population_item_header">total</div>
-                                    <div className="population_item_count">{totalPopulation}</div>
+                                    <div className="population_item_count last">{totalPopulation}</div>
                                 </div>
                             </div>
                         </div>
@@ -270,7 +270,7 @@ function Village({
                             <div className="header">Resources overview</div>
                             <div className="content box-primary">
                                 <div className="resources_inner_header">
-                                    <div className="first"><a onClick={() => FetchResources()}>{resourceDaysDisplay.current}</a></div>
+                                    <div className="first"><a onClick={() => FetchNextIntervalTypeResources()}>{resourceDaysDisplay.current}</a></div>
                                     <div className="second">current</div>
                                     <div>produced</div>
                                     <div>claimed</div>

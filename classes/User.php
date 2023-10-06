@@ -647,7 +647,7 @@ class User extends Fighter {
         $this->clan_changes = $user_data['clan_changes'];
 
         // Village
-        $this->village_location = Village::getLocation($this->system, $this->village->village_id);
+        $this->village_location = VillageManager::getLocation($this->system, $this->village->village_id);
         /** @noinspection PhpConditionAlreadyCheckedInspection */
         $this->in_village = $this->village_location !== null && $this->location->equals($this->village_location);
 

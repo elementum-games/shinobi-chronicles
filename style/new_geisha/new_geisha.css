@@ -113,6 +113,8 @@
     --diplomacy-background-alliance: #242b29;
     --diplomacy-background-war: #1f1619;
     --diplomacy-item-border: #373131;
+    --hq-number-background-color: #272733;
+    --hq-clan-name-color: #eee1c8;
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */
