@@ -119,6 +119,8 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
          "student",
          "inbox",
          "chat",
+         "caravan",
+         "raid",
          "event"
     ];
 
