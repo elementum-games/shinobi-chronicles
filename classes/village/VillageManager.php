@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . "/VillageSeatDto.php";
+
 class VillageManager {
     const KAGE_NAMES = [
         1 => 'Tsuchikage',
@@ -118,8 +120,13 @@ class VillageManager {
                 }
                 // check if has existing seat
                 $seat = self::getPlayerSeat($system, $player->user_id);
-                if (!empty($seat) && $seat['seat_type'] == 'elder') {
-                    self::resign($system, $player);
+                if (!empty($seat->seat_id)) {
+                    if ($seat->seat_type == 'elder') {
+                        self::resign($system, $player);
+                    }
+                    else {
+                        return "You already have a seat in this village!";
+                    }
                 }
                 // claim
                 $time = time();
@@ -148,7 +155,7 @@ class VillageManager {
             case 'elder':
                 // check if has existing seat
                 $seat = self::getPlayerSeat($system, $player->user_id);
-                if (!empty($seat)) {
+                if (!empty($seat->seat_id)) {
                     return "You already have a seat in this village!";
                 }
                 // check rank
@@ -206,31 +213,31 @@ class VillageManager {
             switch ($seat['seat_type']) {
                 case 'kage':
                     $has_kage = true;
-                    $seats['kage'] = [
-                        "seat_key" => 'kage',
-                        "seat_id" => $seat['seat_id'],
-                        "user_id" => $seat['user_id'],
-                        "village_id" => $seat['village_id'],
-                        "seat_type" => $seat['seat_type'],
-                        "seat_title" => $seat['seat_title'],
-                        "seat_start" => $seat['seat_start'],
-                        "user_name" => $seat['user_name'],
-                        "avatar_link" => $seat['avatar_link'],
-                    ];
+                    $seats[] = new VillageSeatDto(
+                        seat_key: 'kage',
+                        seat_id: $seat['seat_id'],
+                        user_id: $seat['user_id'],
+                        village_id: $seat['village_id'],
+                        seat_type: $seat['seat_type'],
+                        seat_title: $seat['seat_title'],
+                        seat_start: $seat['seat_start'],
+                        user_name: $seat['user_name'],
+                        avatar_link: $seat['avatar_link'],
+                    );
                     break;
                 case 'elder':
                     $elder_count++;
-                    $seats['elder_' . $elder_count] = [
-                        "seat_key" => 'elder_' . $elder_count,
-                        "seat_id" => $seat['seat_id'],
-                        "user_id" => $seat['user_id'],
-                        "village_id" => $seat['village_id'],
-                        "seat_type" => $seat['seat_type'],
-                        "seat_title" => $seat['seat_title'],
-                        "seat_start" => $seat['seat_start'],
-                        "user_name" => $seat['user_name'],
-                        "avatar_link" => $seat['avatar_link'],
-                    ];
+                    $seats[] = new VillageSeatDto(
+                        seat_key: 'elder_' . $elder_count,
+                        seat_id: $seat['seat_id'],
+                        user_id: $seat['user_id'],
+                        village_id: $seat['village_id'],
+                        seat_type: $seat['seat_type'],
+                        seat_title: $seat['seat_title'],
+                        seat_start: $seat['seat_start'],
+                        user_name: $seat['user_name'],
+                        avatar_link: $seat['avatar_link'],
+                    );
                     break;
                 default:
                     break;
@@ -238,31 +245,31 @@ class VillageManager {
         }
         if (!$has_kage) {
             // add empty kage seat to list
-            $seats['kage'] = [
-                "seat_key" => 'kage',
-                "seat_id" => null,
-                "user_id" => null,
-                "village_id" => null,
-                "seat_type" => 'kage',
-                "seat_title" => self::KAGE_NAMES[$village_id],
-                "seat_start" => null,
-                "user_name" => null,
-                "avatar_link" => null,
-            ];
+            $seats[] = new VillageSeatDto(
+                seat_key: 'kage',
+                seat_id: null,
+                user_id: null,
+                village_id: null,
+                seat_type: 'kage',
+                seat_title: self::KAGE_NAMES[$village_id],
+                seat_start:  null,
+                user_name: null,
+                avatar_link: null,
+            );
         }
         for ($i = 3; $i > $elder_count; $i--) {
             // add empty elder seat to list
-            $seats['elder_' . $i] = [
-                "seat_key" => 'elder_' . $i,
-                "seat_id" => null,
-                "user_id" => null,
-                "village_id" => null,
-                "seat_type" => 'elder',
-                "seat_title" => 'Elder',
-                "seat_start" => null,
-                "user_name" => null,
-                "avatar_link" => null,
-            ];
+            $seats[] = new VillageSeatDto(
+                seat_key: 'elder_' . $i,
+                seat_id: null,
+                user_id: null,
+                village_id: null,
+                seat_type: 'elder',
+                seat_title: 'Elder',
+                seat_start: null,
+                user_name: null,
+                avatar_link: null,
+            );
         }
         return $seats;
     }
@@ -344,19 +351,38 @@ class VillageManager {
     }
 
     /**
-     * @return array
+     * @return VillageSeatDto
      */
-    public static function getPlayerSeat(System $system, int $player_id): array
+    public static function getPlayerSeat(System $system, int $player_id): VillageSeatDto
     {
         $result = $system->db->query("SELECT * FROM `village_seats` WHERE `user_id` = {$player_id} AND `seat_end` IS NULL LIMIT 1");
         $result = $system->db->fetch($result);
         if (empty($result)) {
-            return [];
+            $seat = new VillageSeatDto(
+                seat_key: null,
+                seat_id: null,
+                user_id: null,
+                village_id: null,
+                seat_type: null,
+                seat_title: null,
+                seat_start: null,
+                user_name: null,
+                avatar_link: null,
+            );
+            return $seat;
         }
-        if (!empty($result) && $result['seat_type'] == 'kage') {
-            $result['default_title'] = self::KAGE_NAMES[$result['village_id']];
-        }
-        return $result;
+        $seat = new VillageSeatDto(
+            seat_key: null,
+            seat_id: $result['seat_id'],
+            user_id: $player_id,
+            village_id: $result['village_id'],
+            seat_type: $result['seat_type'],
+            seat_title: $result['seat_title'],
+            seat_start: $result['seat_start'],
+            user_name: null,
+            avatar_link: null,
+        );
+        return $seat;
     }
 
     private static function getOrdinal($number) {

@@ -12,7 +12,22 @@ class VillageApiPresenter {
     }
     public static function seatDataResponse(System $system, User $player): array
     {
-        return array_values(VillageManager::getVillageSeats($system, $player->village->village_id));
+        return array_map(
+            function (VillageSeatDto $seat) {
+                return [
+                    "seat_key" => $seat->seat_key,
+                    "seat_id" => $seat->seat_id,
+                    "user_id" => $seat->user_id,
+                    "village_id" => $seat->village_id,
+                    "seat_type" => $seat->seat_type,
+                    "seat_title" => $seat->seat_title,
+                    "seat_start" => $seat->seat_start,
+                    "user_name" => $seat->user_name,
+                    "avatar_link" => $seat->avatar_link,
+                ];
+            },
+            VillageManager::getVillageSeats($system, $player->village->village_id)
+        );
     }
     public static function pointsDataResponse(System $system, User $player): array
     {

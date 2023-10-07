@@ -295,10 +295,10 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         rewards: $seat_rewards[FIRST_TSUCHIKAGE],
         criteria_check_closure: function (System $system, User $player) {
             $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_title'] != "1st " . VillageManager::KAGE_NAMES[1]) {
+            if ($player_seat->seat_title != "1st " . VillageManager::KAGE_NAMES[1]) {
                 return false;
             }
             return !AchievementsManager::isWorldFirstAlreadyAchieved($system, FIRST_TSUCHIKAGE);
@@ -313,10 +313,10 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         rewards: $seat_rewards[FIRST_RAIKAGE],
         criteria_check_closure: function (System $system, User $player) {
             $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_title'] != "1st " . VillageManager::KAGE_NAMES[2]) {
+            if ($player_seat->seat_title != "1st " . VillageManager::KAGE_NAMES[2]) {
                 return false;
             }
 
@@ -332,10 +332,10 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         rewards: $seat_rewards[FIRST_HOKAGE],
         criteria_check_closure: function (System $system, User $player) {
             $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_title'] != "1st " . VillageManager::KAGE_NAMES[3]) {
+            if ($player_seat->seat_title != "1st " . VillageManager::KAGE_NAMES[3]) {
                 return false;
             }
 
@@ -351,10 +351,10 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         rewards: $seat_rewards[FIRST_KAZEKAGE],
         criteria_check_closure: function (System $system, User $player) {
             $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_title'] != "1st " . VillageManager::KAGE_NAMES[4]) {
+            if ($player_seat->seat_title != "1st " . VillageManager::KAGE_NAMES[4]) {
                 return false;
             }
 
@@ -370,10 +370,10 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         rewards: $seat_rewards[FIRST_MIZUKAGE],
         criteria_check_closure: function (System $system, User $player) {
             $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_title'] != "1st " . VillageManager::KAGE_NAMES[5]) {
+            if ($player_seat->seat_title != "1st " . VillageManager::KAGE_NAMES[5]) {
                 return false;
             }
 
@@ -389,10 +389,10 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         rewards: $seat_rewards[CLAIM_KAGE],
         criteria_check_closure: function (System $system, User $player) {
             $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_type'] != "kage") {
+            if ($player_seat->seat_type != "kage") {
                 return false;
             }
             return true;
@@ -406,10 +406,10 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         rewards: $seat_rewards[CLAIM_ELDER],
         criteria_check_closure: function (System $system, User $player) {
             $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_type'] != "elder") {
+            if ($player_seat->seat_type != "elder") {
                 return false;
             }
             return true;
