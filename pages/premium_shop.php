@@ -657,6 +657,9 @@ function premiumShop(): void {
                     }
                 }
 
+                // Remove held village seats
+                VillageManager::resign($system, $player);
+
                 // Remove active student applications
                 if (SenseiManager::isSensei($player->user_id, $system)) {
                     SenseiManager::closeApplicationsBySensei($player->user_id, $system);

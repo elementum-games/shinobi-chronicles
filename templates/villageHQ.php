@@ -15,7 +15,7 @@
     window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(Village, {
-                playerSeat: <?= json_encode(Village::getPlayerSeat($system, $player->user_id)) ?>,
+                playerSeat: <?= json_encode(VillageManager::getPlayerSeat($system, $player->user_id)) ?>,
                 villageName: "<?= $player->village->name ?>",
                 villageAPI: "<?= $system->router->api_links['village'] ?>",
                 policyData: <?= json_encode(VillageApiPresenter::policyDataResponse($system, $player)) ?>,

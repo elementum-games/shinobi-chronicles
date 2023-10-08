@@ -16,34 +16,46 @@ function Village({
     const [resourceDataState, setResourceDataState] = React.useState(resourceData);
     const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
     const [modalState, setModalState] = React.useState("closed");
-    const resourceDays = React.useRef(1);
-    const resourceDaysDisplay = React.useRef("daily");
+    const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
     const modalText = React.useRef(null);
 
-    const FetchResources = () => {
+    const DisplayFromDays = (days) => {
+        switch (days) {
+            case 1:
+                return 'daily';
+                break;
+            case 7:
+                return 'weekly';
+                break;
+            case 30:
+                return 'monthly';
+                break;
+            default:
+                return days;
+                break;
+        }
+    }
+    const FetchNextIntervalTypeResources = () => {
         apiFetch(
             villageAPI,
             {
                 request: 'LoadResourceData',
-                days: resourceDays.current,
+                days: resourceDaysToShow,
             }
         ).then((response) => {
             if (response.errors.length) {
                 handleErrors(response.errors);
                 return;
             }
-            switch (resourceDays.current) {
+            switch (resourceDaysToShow) {
                 case 1:
-                    resourceDays.current = 7;
-                    resourceDaysDisplay.current = "weekly";
+                    setResourceDaysToShow(7);
                     break;
                 case 7:
-                    resourceDays.current = 30;
-                    resourceDaysDisplay.current = "monthly";
+                    setResourceDaysToShow(30);
                     break;
                 case 30:
-                    resourceDays.current = 1;
-                    resourceDaysDisplay.current = "daily";
+                    setResourceDaysToShow(1);
                     break;
             }
             setResourceDataState(response.data);
@@ -157,7 +169,7 @@ function Village({
                                     ))}
                                 <div className="population_item" style={{width: "100%"}}>
                                     <div className="population_item_header">total</div>
-                                    <div className="population_item_count">{totalPopulation}</div>
+                                    <div className="population_item_count last">{totalPopulation}</div>
                                 </div>
                             </div>
                         </div>
@@ -270,7 +282,7 @@ function Village({
                             <div className="header">Resources overview</div>
                             <div className="content box-primary">
                                 <div className="resources_inner_header">
-                                    <div className="first"><a onClick={() => FetchResources()}>{resourceDaysDisplay.current}</a></div>
+                                    <div className="first"><a onClick={() => FetchNextIntervalTypeResources()}>{DisplayFromDays(resourceDaysToShow)}</a></div>
                                     <div className="second">current</div>
                                     <div>produced</div>
                                     <div>claimed</div>

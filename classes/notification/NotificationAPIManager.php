@@ -356,7 +356,43 @@ class NotificationAPIManager {
                 alert: false,
             );
         }
-
+        //Caravan
+        $time = time();
+        $result = $this->system->db->query("SELECT `caravans`.*, `regions`.`name` as 'region_name' FROM `caravans` INNER JOIN `regions` on `caravans`.`region_id` = `regions`.`region_id` WHERE `start_time` < {$time}");
+        $result = $this->system->db->fetch_all($result);
+        foreach ($result as $row) {
+            // if travel time is set then only display if active
+            if (!empty($row['travel_time'])) {
+                if ($row['travel_time'] + ($row['start_time'] * 1000) + Patrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
+                    $notifications[] = new NotificationDto(
+                        action_url: $this->system->router->getUrl('travel'),
+                        type: "caravan",
+                        message: "{$row['name']} is active near {$row['region_name']}",
+                        user_id: $this->player->user_id,
+                        created: time(),
+                        alert: false,
+                    );
+                }
+            }
+        }
+        //Raid
+        $result = $this->system->db->query("SELECT `operations`.*, `region_locations`.`x`, `region_locations`.`y`, `region_locations`.`map_id`, `region_locations`.`name` FROM `operations`
+            INNER JOIN `region_locations` ON `region_locations`.`id` = `operations`.`target_id`
+            WHERE (`user_village` = {$this->player->village->village_id} OR `target_village` = {$this->player->village->village_id})
+            AND `status` = " . Operation::OPERATION_ACTIVE .
+            " AND `operations`.`type` = " . Operation::OPERATION_RAID);
+        $result = $this->system->db->fetch_all($result);
+        foreach ($result as $row) {
+            $location = new TravelCoords($row['x'], $row['y'], $row['map_id']);
+            $notifications[] = new NotificationDto(
+                action_url: $this->system->router->getUrl('travel'),
+                type: "raid",
+                message: $row['user_village'] == $this->player->village->village_id ? "An ally is attacking {$row['name']} at {$location->displayString()}!" : "{$row['name']} is under attack at {$location->displayString()}!",
+                user_id: $this->player->user_id,
+                created: time(),
+                alert: false,
+            );
+        }
         return $notifications;
     }
 

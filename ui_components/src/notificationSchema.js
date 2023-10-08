@@ -26,6 +26,8 @@ export type NotificationType = {|
         | "student"
         | "inbox"
         | "chat"
+        | "caravan"
+        | "raid"
         | "event",
     +message: string,
     +notification_id: number,
