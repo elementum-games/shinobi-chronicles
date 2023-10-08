@@ -1,10 +1,25 @@
 <?php
 session_start();
 
+/**
+ * Caravan Cron Job
+ **
+ *  This should be processed every hour.
+ *
+ *  Caravan Cron does the following:
+ *      Processes caravans from the previous job
+ *          Moves remaining resources from caravans into village
+ *          Deletes old caravans
+ *      Creates new caravans for each region (excluding home region)
+ *          Moves resources from all region_locations in region to caravan
+ *      Sets start_time of caravans randomly across next 6 hours
+ *      Creates resource logs
+ */
+
 require_once __DIR__ . '/../classes/System.php';
 require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
-require_once __DIR__ . '/../classes/War/WarManager.php';
+require_once __DIR__ . '/../classes/war/WarManager.php';
 require_once __DIR__ . '/../classes/travel/Patrol.php';
 
 $system = new System();

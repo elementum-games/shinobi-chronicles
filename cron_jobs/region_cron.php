@@ -1,10 +1,23 @@
 <?php
 session_start();
 
+/**
+ * Region Cron Job
+ **
+ *  This should be processed every hour.
+ *
+ *  Region Cron does the following:
+ *      Collects home region resources
+ *      Increases resource count of each region by production rate (25)
+ *      Increases/Decreases region_location defense value by 1 toward baseline
+ *      Applies region_location regen, bonus for castles based on local village health
+ *      Creates resource logs
+ */
+
 require_once __DIR__ . '/../classes/System.php';
 require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
-require_once __DIR__ . '/../classes/War/WarManager.php';
+require_once __DIR__ . '/../classes/war/WarManager.php';
 require_once __DIR__ . '/../classes/travel/Patrol.php';
 
 $system = new System();
