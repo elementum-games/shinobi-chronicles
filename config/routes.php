@@ -38,7 +38,6 @@ return $routes = [
         function_name: 'bloodline',
         menu: 'conditional',
         battle_ok: false,
-        village_ok: Route::IN_VILLAGE_OKAY,
     ),
     6 => new Route(
         file_name: 'members.php',
