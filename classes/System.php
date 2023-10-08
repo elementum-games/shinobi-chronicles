@@ -821,4 +821,23 @@ class System {
         return max(min($number, $max), $min);
     }
 
+    /**
+     * Example:
+     * php -f somefile.php a=1 b[]=2 b[]=3
+     *
+     * This will return an an array of
+     * [
+     *   'a' => '1',
+     *   'b' => ['2', '3']
+     * ]
+     *
+     * @return array
+     */
+    public static function parseCommandLineArgs(): array {
+        $result = [];
+
+        parse_str(implode('&', array_slice($_SERVER['argv'], 1)), $result);
+
+        return $result;
+    }
 }

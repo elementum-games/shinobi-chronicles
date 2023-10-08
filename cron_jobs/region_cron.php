@@ -78,7 +78,7 @@ if (isset($_SESSION['user_id'])) {
     }
 
     if ($run_ok) {
-        hourlyRegion($system);
+        hourlyRegion($system, debug: false);
         $system->log('cron', 'Hourly Region', "Regions have been processed.");
     } else {
         $system->log('cron', 'Invalid access', "Attempted access by " . $_SERVER['REMOTE_ADDR']);

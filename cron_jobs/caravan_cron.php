@@ -70,7 +70,8 @@ if (isset($_SESSION['user_id'])) {
             echo "You can run the caravan cron script Adhoc. This is not reversible.<br><a href='{$system->router->base_url}/cron_jobs/caravan_cron.php?run_script=true'>Run</a><br><a href='{$system->router->base_url}/cron_jobs/caravan_cron.php?run_script=true&debug=true'>Debug</a>";
         }
     }
-} else {
+}
+else {
     // Check for verify to run cron
     $run_ok = false;
     if (php_sapi_name() == 'cli') {
@@ -80,7 +81,7 @@ if (isset($_SESSION['user_id'])) {
     }
 
     if ($run_ok) {
-        hourlyCaravan($system);
+        hourlyCaravan(system: $system, debug: false);
         $system->log('cron', 'Hourly Caravan', "Caravans and resources have been processed.");
     } else {
         $system->log('cron', 'Invalid access', "Attempted access by " . $_SERVER['REMOTE_ADDR']);
