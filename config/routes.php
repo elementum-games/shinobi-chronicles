@@ -153,7 +153,7 @@ return $routes = [
         title: 'Village HQ',
         function_name: 'villageHQ',
         menu: Route::MENU_VILLAGE,
-        village_ok: Route::ONLY_IN_VILLAGE,
+        battle_ok: false,
     ),
     20 => new Route(
         file_name: 'clan.php',
