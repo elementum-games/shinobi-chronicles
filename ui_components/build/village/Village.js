@@ -15,30 +15,42 @@ function Village({
   const [resourceDataState, setResourceDataState] = React.useState(resourceData);
   const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
   const [modalState, setModalState] = React.useState("closed");
-  const [resourceDays, setResourceDays] = React.useState(1);
-  const [resourceDaysDisplay, setResourceDaysDisplay] = React.useState("daily");
+  const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
   const modalText = React.useRef(null);
+  const DisplayFromDays = days => {
+    switch (days) {
+      case 1:
+        return 'daily';
+        break;
+      case 7:
+        return 'weekly';
+        break;
+      case 30:
+        return 'monthly';
+        break;
+      default:
+        return days;
+        break;
+    }
+  };
   const FetchNextIntervalTypeResources = () => {
     apiFetch(villageAPI, {
       request: 'LoadResourceData',
-      days: resourceDays
+      days: resourceDaysToShow
     }).then(response => {
       if (response.errors.length) {
         handleErrors(response.errors);
         return;
       }
-      switch (resourceDays) {
+      switch (resourceDaysToShow) {
         case 1:
-          setResourceDays(7);
-          setResourceDaysDisplay("weekly");
+          setResourceDaysToShow(7);
           break;
         case 7:
-          setResourceDays(30);
-          setResourceDaysDisplay("monthly");
+          setResourceDaysToShow(30);
           break;
         case 30:
-          setResourceDays(1);
-          setResourceDaysDisplay("daily");
+          setResourceDaysToShow(1);
           break;
       }
       setResourceDataState(response.data);
@@ -293,7 +305,7 @@ function Village({
     className: "first"
   }, /*#__PURE__*/React.createElement("a", {
     onClick: () => FetchNextIntervalTypeResources()
-  }, resourceDaysDisplay)), /*#__PURE__*/React.createElement("div", {
+  }, DisplayFromDays(resourceDaysToShow))), /*#__PURE__*/React.createElement("div", {
     className: "second"
   }, "current"), /*#__PURE__*/React.createElement("div", null, "produced"), /*#__PURE__*/React.createElement("div", null, "claimed"), /*#__PURE__*/React.createElement("div", null, "lost"), /*#__PURE__*/React.createElement("div", null, "spent")), resourceDataState.map((resource, index) => /*#__PURE__*/React.createElement("div", {
     key: resource.resource_id,
