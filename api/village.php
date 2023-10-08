@@ -41,18 +41,18 @@ try {
             break;
         case 'ClaimSeat':
             $seat_type = $system->db->clean($_POST['seat_type']);
-            $message = Village::claimSeat($system, $player, $seat_type);
+            $message = VillageManager::claimSeat($system, $player, $seat_type);
             $VillageAPIResponse->response = [
                 'seatData' => VillageApiPresenter::seatDataResponse($system, $player),
-                'playerSeat' => Village::getPlayerSeat($system, $player->user_id),
+                'playerSeat' => VillageManager::getPlayerSeat($system, $player->user_id),
                 'response_message' => $message,
             ];
             break;
         case 'Resign':
-            $message = Village::resign($system, $player);
+            $message = VillageManager::resign($system, $player);
             $VillageAPIResponse->response = [
                 'seatData' => VillageApiPresenter::seatDataResponse($system, $player),
-                'playerSeat' => Village::getPlayerSeat($system, $player->user_id),
+                'playerSeat' => VillageManager::getPlayerSeat($system, $player->user_id),
                 'response_message' => $message,
             ];
             break;

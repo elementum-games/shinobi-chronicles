@@ -91,7 +91,7 @@ function Topbar({
 
   // Display
   const leftNotificationTypes = ["training", "training_complete", "stat_transfer"];
-  const rightNotificationTypes = ["specialmission", "specialmission_complete", "specialmission_failed", "mission", "mission_team", "mission_clan", "rank", "system", "warning", "report", "battle", "challenge", "team", "marriage", "student", "inbox", "chat", "event"];
+  const rightNotificationTypes = ["specialmission", "specialmission_complete", "specialmission_failed", "mission", "mission_team", "mission_clan", "rank", "system", "warning", "report", "battle", "challenge", "team", "marriage", "student", "inbox", "chat", "caravan", "raid", "event"];
   return /*#__PURE__*/React.createElement("div", {
     id: "topbar",
     className: "d-flex"

@@ -98,7 +98,7 @@ function hourlyRegion(System $system, $debug = true): void
                 $villages[$region['village']]->addResource($region_location['resource_id'], $region_location['resource_count']);
                 $queries[] = "INSERT INTO `resource_logs`
                     (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                    VALUES ({$region['village']}, {$region_location['resource_id']}, " . Village::RESOURCE_LOG_COLLECTION . ", {$region_location['resource_count']}, " . time() . ")";
+                    VALUES ({$region['village']}, {$region_location['resource_id']}, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$region_location['resource_count']}, " . time() . ")";
                 $region_location['resource_count'] = 0;
             }
             $region_location['resource_count'] += WarManager::BASE_RESOURCE_PRODUCTION;
@@ -174,7 +174,7 @@ function hourlyRegion(System $system, $debug = true): void
             foreach ($village_resource_production[$village->village_id] as $key => $value) {
                 $queries[] = "INSERT INTO `resource_logs`
                     (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                    VALUES ({$village->village_id}, {$key}, " . Village::RESOURCE_LOG_PRODUCTION . ", " . $value . ", " . time() . ")";
+                    VALUES ({$village->village_id}, {$key}, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", " . $value . ", " . time() . ")";
             }
         }
     }

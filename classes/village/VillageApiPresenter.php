@@ -8,11 +8,26 @@ class VillageApiPresenter {
     }
     public static function populationDataResponse(System $system, User $player): array
     {
-        return Village::getVillagePopulation($system, $player->village->name);
+        return VillageManager::getVillagePopulation($system, $player->village->name);
     }
     public static function seatDataResponse(System $system, User $player): array
     {
-        return array_values(Village::getVillageSeats($system, $player->village->village_id));
+        return array_map(
+            function (VillageSeatDto $seat) {
+                return [
+                    "seat_key" => $seat->seat_key,
+                    "seat_id" => $seat->seat_id,
+                    "user_id" => $seat->user_id,
+                    "village_id" => $seat->village_id,
+                    "seat_type" => $seat->seat_type,
+                    "seat_title" => $seat->seat_title,
+                    "seat_start" => $seat->seat_start,
+                    "user_name" => $seat->user_name,
+                    "avatar_link" => $seat->avatar_link,
+                ];
+            },
+            VillageManager::getVillageSeats($system, $player->village->village_id)
+        );
     }
     public static function pointsDataResponse(System $system, User $player): array
     {
@@ -24,8 +39,8 @@ class VillageApiPresenter {
     {
         return array_map(
             function ($key, VillageRelation $relation) use ($system, $player) {
-                $village = Village::getVillageByID($system, $key);
-                $villager_count = Village::getVillagePopulationTotal($system, $village->name);
+                $village = VillageManager::getVillageByID($system, $key);
+                $villager_count = VillageManager::getVillagePopulationTotal($system, $village->name);
                 return [
                     "village_id" => $key,
                     "village_name" => $village->name,
@@ -41,8 +56,8 @@ class VillageApiPresenter {
     }
     public static function resourceDataResponse(System $system, User $player, int $days): array
     {
-        $resources = Village::getResources($system, $player->village->village_id);
-        $resource_history = Village::getResourceHistory($system, $player->village->village_id, $days);
+        $resources = VillageManager::getResources($system, $player->village->village_id);
+        $resource_history = VillageManager::getResourceHistory($system, $player->village->village_id, $days);
         return array_map(
             function ($key, $value) use ($resources, $resource_history) {
                 return [
@@ -62,6 +77,6 @@ class VillageApiPresenter {
     }
     public static function clanDataResponse(System $system, User $player): array
     {
-        return Village::getClans($system, $player->village->name);
+        return VillageManager::getClans($system, $player->village->name);
     }
 }
