@@ -382,7 +382,8 @@ class NotificationAPIManager {
             WHERE (`user_village` = {$this->player->village->village_id} OR `target_village` = {$this->player->village->village_id})
             AND `last_update` > {$time}
             AND `status` = " . Operation::OPERATION_ACTIVE .
-            " AND `operations`.`type` = " . Operation::OPERATION_RAID);
+            " AND `operations`.`type` = " . Operation::OPERATION_RAID
+            . " GROUP BY `region_locations`.`id`");
         $result = $this->system->db->fetch_all($result);
         foreach ($result as $row) {
             $location = new TravelCoords($row['x'], $row['y'], $row['map_id']);
