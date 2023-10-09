@@ -117,12 +117,12 @@ function processWarBattleEnd($battle, $player): string {
         $battle_result .= "You have been defeated.";
         $player->health = 5;
         $player->ai_losses++;
-        $player->moveToVillage();
+        //$player->moveToVillage();
         $player->battle_id = 0;
         $player->last_pvp_ms = System::currentTimeMs();
         $battle_result .= $warManager->handlePatrolWin($patrol_id);
     } else if ($battle->isDraw()) {
-        $battle_result .= "The battle ended in a draw. You receive no reward.";
+        $battle_result .= "The battle ended in a draw.";
         $player->health = 5;
         $player->moveToVillage();
         $player->battle_id = 0;
