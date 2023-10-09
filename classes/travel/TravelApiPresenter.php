@@ -47,7 +47,7 @@ class TravelApiPresenter {
             'region_objectives' => TravelApiPresenter::regionObjectiveResponse($travelManager),
             'map_objectives'    => $travelManager->fetchMapObjectives(),
             'battle_url'        => $travelManager->getPlayerBattleUrl(),
-            'operations'        => $travelManager->warManager->getValidOperations(),
+            'operations'        => $travelManager->warManager->getValidOperations(for_display: true),
             'operation_type'    => $operation ? System::unSlug(Operation::OPERATION_TYPE_DESCRIPTOR[$operation->type]) : null,
             'operation_progress'=> $operation ? $operation->progress : null,
             'operation_interval'=> $operation ? $operation->interval_progress : null,
@@ -120,6 +120,8 @@ class TravelApiPresenter {
                     'objective_type' => $regionObjective->objective_type,
                     'village_id' => $regionObjective->village_id,
                     'resource_id' => $regionObjective->resource_id,
+                    'resource_count' => $regionObjective->resource_count,
+                    'resource_name' => WarManager::RESOURCE_NAMES[$regionObjective->resource_id],
                 ];
             },
             $travelManager->fetchRegionObjectives()

@@ -383,11 +383,14 @@ function Travel({
   }, "Cancel"), mapData && mapData.operations && !mapData.operation_type && typeof mapData.operations_type === 'undefined' && Object.entries(mapData.operations).map(([key, value], index) => /*#__PURE__*/React.createElement("button", {
     key: index,
     onClick: () => BeginOperation(key),
-    className: "button"
-  }, `${value}`)), mapData && mapData.in_village && mapData.loot_count > 0 && /*#__PURE__*/React.createElement("button", {
+    className: "button",
+    dangerouslySetInnerHTML: {
+      __html: value
+    }
+  })), mapData && mapData.in_village && mapData.loot_count > 0 && /*#__PURE__*/React.createElement("button", {
     className: "button",
     onClick: () => ClaimLoot()
-  }, "Claim Loot")), feedback && /*#__PURE__*/React.createElement("div", {
+  }, "Deposit Resources")), feedback && /*#__PURE__*/React.createElement("div", {
     className: "travel-messages"
   }, /*#__PURE__*/React.createElement(Message, {
     message: feedback[0],

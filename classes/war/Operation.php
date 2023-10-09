@@ -49,8 +49,10 @@ class Operation
     const BASE_OPERATION_INTERVAL = 12; // time per interval
     const BASE_OPERATION_COST = 150; // chakra/stam cost per interval, 750 total
     /* 100 / 20 * 12s = 60s */
-    const LOOT_GAIN = 2;
+    const LOOT_GAIN = 1;
     const LOOT_OPERATION_SPEED = 100; // eat loot action is only 1 interval
+    const LOOT_OPERATION_INTERVAL = 6; // takes half time as normal
+    const LOOT_OPERATION_COST = 75; // takes half pool cost
 
     private System $system;
     private User $user;
@@ -94,9 +96,17 @@ class Operation
     public function progressActiveOperation(): string
     {
         $message = '';
+        if ($this->type == self::OPERATION_LOOT) {
+            $interval = self::LOOT_OPERATION_INTERVAL;
+            $cost = self::LOOT_OPERATION_COST;
+            $speed = self::LOOT_OPERATION_SPEED;
+        } else {
+            $interval = self::BASE_OPERATION_INTERVAL;
+            $cost = self::BASE_OPERATION_COST;
+            $speed = self::BASE_OPERATION_SPEED;
+        }
         // only progress if active and interval time has passed
-        if ($this->status == self::OPERATION_ACTIVE && time() > $this->last_update + Operation::BASE_OPERATION_INTERVAL) {
-
+        if ($this->status == self::OPERATION_ACTIVE && time() > $this->last_update + $interval) {
             if ($this->type == self::OPERATION_LOOT) {
                 $caravan_target = $this->system->db->query("SELECT * FROM `caravans` WHERE `id` = {$this->target_id} LIMIT 1");
                 $caravan_target = $this->system->db->fetch($caravan_target);
@@ -106,24 +116,20 @@ class Operation
             }
 
             //check pools
-            if ($this->user->chakra < self::BASE_OPERATION_COST || $this->user->stamina < self::BASE_OPERATION_COST) {
-                $this->user->chakra = max($this->user->chakra - self::BASE_OPERATION_COST, 0);
-                $this->user->stamina = max($this->user->stamina - self::BASE_OPERATION_COST, 0);
+            if ($this->user->chakra < $cost || $this->user->stamina < $cost) {
+                $this->user->chakra = max($this->user->chakra - $cost, 0);
+                $this->user->stamina = max($this->user->stamina - $cost, 0);
                 $message .= "You exhausted yourself while " . self::OPERATION_TYPE_DESCRIPTOR[$this->type] . " and were forced to retreat!";
                 $this->status = self::OPERATION_FAILED;
                 $this->handleFailure();
                 return $message;
             }
 
-            $this->user->chakra = max($this->user->chakra - self::BASE_OPERATION_COST, 0);
-            $this->user->stamina = max($this->user->stamina - self::BASE_OPERATION_COST, 0);
+            $this->user->chakra = max($this->user->chakra - $cost, 0);
+            $this->user->stamina = max($this->user->stamina - $cost, 0);
 
             // add progress
-            if ($this->type == Operation::OPERATION_LOOT) {
-                $this->progress += self::LOOT_OPERATION_SPEED;
-            } else {
-                $this->progress += self::BASE_OPERATION_SPEED;
-            }
+            $this->progress += $speed;
 
             $early_completion = false;
             switch ($this->type) {
@@ -268,7 +274,7 @@ class Operation
                 $message .= "\nGained " . $rep_gain . " village reputation!";
             }
         }
-        // Add stats
+        /* Add stats
         $stat_to_gain = $this->user->getTrainingStatForArena();
         $stat_gain = self::OPERATION_STAT_GAIN[$this->type];
         if ($stat_to_gain != null && $stat_gain > 0) {
@@ -277,7 +283,7 @@ class Operation
                 $message .= "\n" . $stat_gained;
             }
         }
-        $message .= '!';
+        $message .= '!';*/
         $this->user->operation = 0;
         return $message;
     }

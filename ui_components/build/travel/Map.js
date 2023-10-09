@@ -354,7 +354,19 @@ function RegionObjectives({
   }), /*#__PURE__*/React.createElement("img", {
     className: "region_objective_tooltip_resource",
     src: getResourceIcon(objective.resource_id)
-  }))), objective.objective_health !== undefined && objective.objective_max_health > 0 && (() => {
+  }))), strategicView && /*#__PURE__*/React.createElement("div", {
+    className: "region_objective_details"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "region_objective_details_resource"
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "region_objective_details_resource_icon",
+    src: getResourceIcon(objective.resource_id)
+  }), "  ", objective.resource_count, " ", objective.resource_name), /*#__PURE__*/React.createElement("div", {
+    className: "region_objective_details_health"
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "region_objective_details_health_icon",
+    src: objective.image
+  }), "  ", objective.objective_health, " / ", objective.objective_max_health)), objective.objective_health !== undefined && objective.objective_max_health > 0 && (() => {
     const percentage = objective.objective_health / objective.objective_max_health * 100;
     let barColor;
     let strokeColor = '#2b2c2c';

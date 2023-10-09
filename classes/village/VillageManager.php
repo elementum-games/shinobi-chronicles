@@ -289,7 +289,7 @@ class VillageManager {
     public static function getResourceHistory(System $system, int $village_id, int $days): array
     {
         $resource_history = [];
-        $time = time() - $days * 86400;
+        $time = time() - ($days * 86400);
         foreach (array_keys(WarManager::RESOURCE_NAMES) as $resource_id) {
             // get produced
             $result = $system->db->query("SELECT SUM(`quantity`) as 'produced' FROM `resource_logs` WHERE `resource_id` = {$resource_id} AND `village_id` = {$village_id} AND `type` = " . self::RESOURCE_LOG_PRODUCTION . " AND `time` > {$time}");

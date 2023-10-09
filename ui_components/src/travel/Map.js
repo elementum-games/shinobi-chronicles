@@ -379,6 +379,22 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, pl
                                     <img className='region_objective_tooltip_resource' src={getResourceIcon(objective.resource_id)} />
                                 </div>
                             </div>
+                            {strategicView &&
+                                <div className='region_objective_details'>
+                                    {/*<div className='region_objective_details_name'>
+                                        <img className='region_objective_details_village_icon' src={getVillageIcon(objective.village_id)} />  {objective.name}
+                                    </div>*/}
+                                    <div className='region_objective_details_resource'>
+                                        <img className='region_objective_details_resource_icon' src={getResourceIcon(objective.resource_id)} />  {objective.resource_count} {objective.resource_name}
+                                    </div>
+                                    {/*<div className='region_objective_details_defense'>
+                                        <span className='region_objective_details_defense_icon'>{objective.defense}</span>  defense
+                                    </div>*/}
+                                    <div className='region_objective_details_health'>
+                                        <img className='region_objective_details_health_icon' src={objective.image} />  {objective.objective_health} / {objective.objective_max_health}
+                                    </div>
+                                </div>
+                            }
                             {objective.objective_health !== undefined && objective.objective_max_health > 0 &&
                                 (() => {
                                     const percentage = (objective.objective_health / objective.objective_max_health) * 100;

@@ -126,8 +126,8 @@ class Battle {
                 `jutsu_cooldowns` = '" . $json_empty_array . "',
                 `fighter_jutsu_used` = '" . $json_empty_array . "',
                 `is_retreat` = '" . (int)false . "',
-                `patrol_id` = " . ($patrol_id || 'NULL')
-        );
+                `patrol_id` = " . (!empty($patrol_id) ? $patrol_id : "NULL") . "
+        ");
         $battle_id = $system->db->last_insert_id;
 
         if($player1 instanceof User) {

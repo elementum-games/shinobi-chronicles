@@ -463,13 +463,12 @@ function Travel({
                             )}
                             {((mapData && mapData.operations && !mapData.operation_type) && typeof mapData.operations_type === 'undefined') && (
                                 Object.entries(mapData.operations).map(([key, value], index) => (
-                                    <button key={index} onClick={() => BeginOperation(key)} className='button'>
-                                        {`${value}`}
+                                    <button key={index} onClick={() => BeginOperation(key)} className='button' dangerouslySetInnerHTML={{ __html: value }}>
                                     </button>
                                 ))
                             )}
                             {(mapData && mapData.in_village && mapData.loot_count > 0) && (
-                                <button className='button' onClick={() => ClaimLoot()}>Claim Loot</button>
+                                <button className='button' onClick={() => ClaimLoot()}>Deposit Resources</button>
                             )}
                         </div>
                         {feedback && (

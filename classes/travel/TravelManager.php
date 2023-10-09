@@ -322,7 +322,7 @@ class TravelManager {
 
         // Add more users for display
         if ($this->system->isDevEnvironment()) {
-            $placeholder_coords = new TravelCoords(15, 15, 1);
+            $placeholder_coords = new TravelCoords(19, 14, 1);
 
             for ($i = 0; $i < 2; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
@@ -881,7 +881,7 @@ class TravelManager {
         $objectives = [];
 
         // Get Region Objectives
-        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `type`, `x`, `y`, `resource_id`, `defense`, `village`, `villages`.`name` as `village_name`, `villages`.`village_id` FROM `region_locations`
+        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `type`, `x`, `y`, `resource_id`, `resource_count`, `defense`, `village`, `villages`.`name` as `village_name`, `villages`.`village_id` FROM `region_locations`
             INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
             INNER JOIN `villages` ON `regions`.`village` = `villages`.`village_id`");
         $region_objectives = $this->system->db->fetch_all($region_result);
@@ -910,6 +910,7 @@ class TravelManager {
                             image: $image,
                             village_id: $obj['village_id'],
                             resource_id: $obj['resource_id'],
+                            resource_count: $obj['resource_count'],
                         );
                         break;
                     case "tower":
@@ -928,6 +929,7 @@ class TravelManager {
                             image: $image,
                             village_id: $obj['village_id'],
                             resource_id: $obj['resource_id'],
+                            resource_count: $obj['resource_count'],
                         );
                     case "village":
                         if ($distance <= $this->user->scout_range || $obj['village_name'] == $this->user->village->name) {
@@ -945,6 +947,7 @@ class TravelManager {
                                 image: $image,
                                 village_id: $obj['village_id'],
                                 resource_id: $obj['resource_id'],
+                                resource_count: $obj['resource_count'],
                             );
                         }
                         break;
