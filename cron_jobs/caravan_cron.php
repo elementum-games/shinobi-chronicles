@@ -142,10 +142,15 @@ function hourlyCaravan(System $system, $debug = true): void
         $caravan_resources = [];
         // add resources to region caravan
         foreach ($region_location_result as $region_location) {
+            // take half resources, rounding up
+            $resources_taken = round($region_location['resource_count'] / 2);
+            $resources_remaining = $region_location['resource_count'] - $resources_taken;
             if (!empty($caravan_resources[$region_location['resource_id']])) {
-                $caravan_resources[$region_location['resource_id']] += $region_location['resource_count'];
+                $caravan_resources[$region_location['resource_id']] += $resources_taken;
+                $queries[] = "UPDATE `region_locations` SET `resource_count` = {$resources_remaining} WHERE `id` = {$region_location['id']}";
             } else {
-                $caravan_resources[$region_location['resource_id']] = ($region_location['resource_count']);
+                $caravan_resources[$region_location['resource_id']] = $resources_taken;
+                $queries[] = "UPDATE `region_locations` SET `resource_count` = {$resources_remaining} WHERE `id` = {$region_location['id']}";
             }
         }
         // create new caravan for region
@@ -160,9 +165,6 @@ function hourlyCaravan(System $system, $debug = true): void
         $queries[] = "INSERT INTO `caravans` (`start_time`, `travel_time`, `region_id`, `village_id`, `caravan_type`, `resources`, `name`)
             VALUES ('{$start_time}', '{$travel_time}', '{$region_id}', '{$village_id}', '{$caravan_type}', '{$resources}', '{$name}')";
     }
-
-    // all regions_locations should be emptied
-    $queries[] = "UPDATE `region_locations` SET `resource_count` = 0 WHERE `region_id` > 5";
 
     if ($debug) {
         echo "Debug running...<br>";
