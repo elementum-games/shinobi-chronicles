@@ -135,7 +135,7 @@ class Operation
             switch ($this->type) {
                 case self::OPERATION_INFILTRATE:
                     if ($location_target['resource_count'] > 0) {
-                        $this->system->db->query("INSERT INTO `loot` (`user_id`, `resource_id`) VALUES ({$this->user_id}, {$location_target['resource_id']})");
+                        $this->system->db->query("INSERT INTO `loot` (`user_id`, `resource_id`, `target_village_id`, `target_location_id`) VALUES ({$this->user_id}, {$location_target['resource_id']}, {$this->target_village}, {$this->target_id})");
                         $message .= "Stole 1 " . System::unSlug(WarManager::RESOURCE_NAMES[$location_target['resource_id']]) . "!";
                         $location_target['resource_count']--;
 
@@ -186,7 +186,7 @@ class Operation
                             if ($caravan_resources[$random_resource] == 0) {
                                 unset($caravan_resources[$random_resource]);
                             }
-                            $this->system->db->query("INSERT INTO `loot` (`user_id`, `resource_id`) VALUES ({$this->user_id}, {$random_resource})");
+                            $this->system->db->query("INSERT INTO `loot` (`user_id`, `resource_id`, `target_village_id`) VALUES ({$this->user_id}, {$random_resource}, {$this->target_village})");
                             $message .= "Stole 1 " . System::unSlug(WarManager::RESOURCE_NAMES[$random_resource]) . "! ";
                         } else {
                             $message .= "Target has run out of resources!";
