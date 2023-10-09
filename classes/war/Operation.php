@@ -75,7 +75,12 @@ class Operation
         }
         $this->system = $system;
         $this->user = $user;
-        $this->interval_progress = ((time() - $this->last_update) / self::BASE_OPERATION_INTERVAL) * 100;
+        if ($this->type == self::OPERATION_LOOT) {
+            $interval = self::LOOT_OPERATION_INTERVAL;
+        } else {
+            $interval = self::BASE_OPERATION_INTERVAL;
+        }
+        $this->interval_progress = ((time() - $this->last_update) / $interval) * 100;
     }
 
     public function updateData() {
