@@ -102,6 +102,9 @@ class WarManager {
      * @throws RuntimeException
      */
     public function beginOperation(int $operation_type, int $target_id, Patrol $patrol = null) {
+        if ($this->user->rank_num <= 2) {
+            throw new RuntimeException("Invalid rank!");
+        }
         if ($this->user->battle_id > 0) {
             throw new RuntimeException("You are currently in battle!");
         }
@@ -218,6 +221,10 @@ class WarManager {
 
         // exit if war disabled
         if (!$this->system->war_enabled) {
+            return $valid_operations;
+        }
+        // exit if rank below Chuunin
+        if ($this->user->rank_num <= 2) {
             return $valid_operations;
         }
 
