@@ -131,9 +131,22 @@ class Operation
             // add progress
             $this->progress += $speed;
 
+            // get current loot count
+            $loot_count = 0;
+            $max_loot = WarManager::BASE_LOOT_CAPACITY;
+            $loot_result = $this->system->db->query("SELECT COUNT(*) as `count` FROM `loot` WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL LIMIT 1");
+            if ($this->system->db->last_num_rows > 0) {
+                $loot_result = $this->system->db->fetch($loot_result);
+                $loot_count = $loot_result['count'];
+            }
+
             $early_completion = false;
             switch ($this->type) {
                 case self::OPERATION_INFILTRATE:
+                    if ($loot_count >= $max_loot) {
+                        $message .= "You cannot carry any more loot!";
+                        break;
+                    }
                     if ($location_target['resource_count'] > 0) {
                         $this->system->db->query("INSERT INTO `loot` (`user_id`, `resource_id`, `target_village_id`, `target_location_id`) VALUES ({$this->user_id}, {$location_target['resource_id']}, {$this->target_village}, {$this->target_id})");
                         $message .= "Stole 1 " . System::unSlug(WarManager::RESOURCE_NAMES[$location_target['resource_id']]) . "!";
@@ -178,6 +191,10 @@ class Operation
                     }
                     break;
                 case self::OPERATION_LOOT:
+                    if ($loot_count >= $max_loot) {
+                        $message .= "You cannot carry any more loot!";
+                        break;
+                    }
                     $caravan_resources = json_decode($caravan_target['resources'], true);
                     for ($i = 0; $i < self::LOOT_GAIN; $i++) {
                         if (!empty($caravan_resources)) {
