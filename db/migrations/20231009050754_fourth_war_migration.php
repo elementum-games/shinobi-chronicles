@@ -38,5 +38,6 @@ final class FourthWarMigration extends AbstractMigration
             -- Alter loot table
             ALTER TABLE `loot` DROP COLUMN `target_village_id`;
             ALTER TABLE `loot` DROP COLUMN `target_location_id`;
+        ");
     }
 }
