@@ -128,7 +128,7 @@ function hourlyRegion(System $system, $debug = true): void
                     // increase health, cap at max
                     $region_location['health'] = min($region_location['health'] + WarManager::BASE_CASTLE_REGEN, WarManager::BASE_CASTLE_HEALTH);
                     // get castle reference
-                    $castle = $region_location;
+                    $castle = &$region_location;
                     break;
                 case 'village';
                     // give a bonus to castle regen based on village HP
@@ -144,6 +144,7 @@ function hourlyRegion(System $system, $debug = true): void
         // if castle exists, add bonus regen from villages
         if (!empty($castle)) {
             $castle['health'] = min($castle['health'] + $village_regen_share, WarManager::BASE_CASTLE_HEALTH);
+            unset($castle);
         }
 
         /* step 3: update defense */
