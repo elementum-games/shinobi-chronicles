@@ -15,30 +15,42 @@ function Village({
   const [resourceDataState, setResourceDataState] = React.useState(resourceData);
   const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
   const [modalState, setModalState] = React.useState("closed");
-  const resourceDays = React.useRef(1);
-  const resourceDaysDisplay = React.useRef("daily");
+  const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
   const modalText = React.useRef(null);
-  const FetchResources = () => {
+  const DisplayFromDays = days => {
+    switch (days) {
+      case 1:
+        return 'daily';
+        break;
+      case 7:
+        return 'weekly';
+        break;
+      case 30:
+        return 'monthly';
+        break;
+      default:
+        return days;
+        break;
+    }
+  };
+  const FetchNextIntervalTypeResources = () => {
     apiFetch(villageAPI, {
       request: 'LoadResourceData',
-      days: resourceDays.current
+      days: resourceDaysToShow
     }).then(response => {
       if (response.errors.length) {
         handleErrors(response.errors);
         return;
       }
-      switch (resourceDays.current) {
+      switch (resourceDaysToShow) {
         case 1:
-          resourceDays.current = 7;
-          resourceDaysDisplay.current = "weekly";
+          setResourceDaysToShow(7);
           break;
         case 7:
-          resourceDays.current = 30;
-          resourceDaysDisplay.current = "monthly";
+          setResourceDaysToShow(30);
           break;
         case 30:
-          resourceDays.current = 1;
-          resourceDaysDisplay.current = "daily";
+          setResourceDaysToShow(1);
           break;
       }
       setResourceDataState(response.data);
@@ -164,7 +176,7 @@ function Village({
   }, /*#__PURE__*/React.createElement("div", {
     className: "population_item_header"
   }, "total"), /*#__PURE__*/React.createElement("div", {
-    className: "population_item_count"
+    className: "population_item_count last"
   }, totalPopulation))))), /*#__PURE__*/React.createElement("div", {
     className: "column second"
   }, /*#__PURE__*/React.createElement("div", {
@@ -292,8 +304,8 @@ function Village({
   }, /*#__PURE__*/React.createElement("div", {
     className: "first"
   }, /*#__PURE__*/React.createElement("a", {
-    onClick: () => FetchResources()
-  }, resourceDaysDisplay.current)), /*#__PURE__*/React.createElement("div", {
+    onClick: () => FetchNextIntervalTypeResources()
+  }, DisplayFromDays(resourceDaysToShow))), /*#__PURE__*/React.createElement("div", {
     className: "second"
   }, "current"), /*#__PURE__*/React.createElement("div", null, "produced"), /*#__PURE__*/React.createElement("div", null, "claimed"), /*#__PURE__*/React.createElement("div", null, "lost"), /*#__PURE__*/React.createElement("div", null, "spent")), resourceDataState.map((resource, index) => /*#__PURE__*/React.createElement("div", {
     key: resource.resource_id,

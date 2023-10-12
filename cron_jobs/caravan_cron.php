@@ -1,10 +1,25 @@
 <?php
 session_start();
 
+/**
+ * Caravan Cron Job
+ **
+ *  This should be processed every hour.
+ *
+ *  Caravan Cron does the following:
+ *      Processes caravans from the previous job
+ *          Moves remaining resources from caravans into village
+ *          Deletes old caravans
+ *      Creates new caravans for each region (excluding home region)
+ *          Moves resources from all region_locations in region to caravan
+ *      Sets start_time of caravans randomly across next 6 hours
+ *      Creates resource logs
+ */
+
 require_once __DIR__ . '/../classes/System.php';
 require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
-require_once __DIR__ . '/../classes/War/WarManager.php';
+require_once __DIR__ . '/../classes/war/WarManager.php';
 require_once __DIR__ . '/../classes/travel/Patrol.php';
 
 $system = new System();
@@ -55,7 +70,8 @@ if (isset($_SESSION['user_id'])) {
             echo "You can run the caravan cron script Adhoc. This is not reversible.<br><a href='{$system->router->base_url}/cron_jobs/caravan_cron.php?run_script=true'>Run</a><br><a href='{$system->router->base_url}/cron_jobs/caravan_cron.php?run_script=true&debug=true'>Debug</a>";
         }
     }
-} else {
+}
+else {
     // Check for verify to run cron
     $run_ok = false;
     if (php_sapi_name() == 'cli') {
@@ -65,7 +81,7 @@ if (isset($_SESSION['user_id'])) {
     }
 
     if ($run_ok) {
-        hourlyCaravan($system);
+        hourlyCaravan(system: $system, debug: false);
         $system->log('cron', 'Hourly Caravan', "Caravans and resources have been processed.");
     } else {
         $system->log('cron', 'Invalid access', "Attempted access by " . $_SERVER['REMOTE_ADDR']);
@@ -105,7 +121,7 @@ function hourlyCaravan(System $system, $debug = true): void
             foreach ($village_resource_gain[$village->village_id] as $key => $value) {
                 $queries[] = "INSERT INTO `resource_logs`
                     (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                    VALUES ({$village->village_id}, {$key}, " . Village::RESOURCE_LOG_COLLECTION . ", {$value}, " . time() . ")";
+                    VALUES ({$village->village_id}, {$key}, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$value}, " . time() . ")";
             }
         }
     }

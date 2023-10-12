@@ -38,7 +38,6 @@ return $routes = [
         function_name: 'bloodline',
         menu: 'conditional',
         battle_ok: false,
-        village_ok: Route::IN_VILLAGE_OKAY,
     ),
     6 => new Route(
         file_name: 'members.php',
@@ -154,7 +153,7 @@ return $routes = [
         title: 'Village HQ',
         function_name: 'villageHQ',
         menu: Route::MENU_VILLAGE,
-        village_ok: Route::ONLY_IN_VILLAGE,
+        battle_ok: false,
     ),
     20 => new Route(
         file_name: 'clan.php',

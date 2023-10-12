@@ -108,11 +108,13 @@
     --notification-background-border: #767b91;
     /* VillageHQ Config */
     --village-text-color-1: #383838;
-    --village-text-color-2: #383838;
-    /* --diplomacy-background-neutral: #2B2A1D;
-    --diplomacy-background-alliance: #242b29;
-    --diplomacy-background-war: #1f1619; */
-    --diplomacy-item-border: #373131;
+    --village-text-color-2: #6e0e11;
+    --diplomacy-background-neutral: rgba(245, 204, 39, 0.2);
+    --diplomacy-background-alliance: rgba(0, 221, 14, 0.17);
+    --diplomacy-background-war: rgba(245, 39, 39, 0.13);
+    --diplomacy-item-border: #8a91ae;
+    --hq-number-background-color: #d2d6df;
+    --hq-clan-name-color: #6e0e11;
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */
@@ -1096,8 +1098,10 @@ button {
     content: url(../../images/v2/sumu/Seal12.png) !important;
 }
 
+/* VillageHQ Overrides */
 .kage_name {
-    color: black !important;
+    color: #6e0e11 !important;
+    font-size: 17px !important;
 }
 .kage_title {
     color: black !important;
@@ -1118,11 +1122,25 @@ button {
     background: #c3c9d7 !important;
 }
 .kage_avatar_fill {
-    background: var(--avatar-frame-border_gradient) !important;
+    background: #9aa2b4 !important;
 }
 .elder_avatar_fill {
-    background: var(--avatar-frame-border_gradient) !important;
+    background: #9aa2b4 !important;
 }
 .elder_name {
-    background: var(--avatar-frame-border_gradient) !important;
+    background: #9aa2b4 !important;
+    color: var(--font-link) !important;
+}
+.elder_claim_button, .kage_claim_button {
+    background: linear-gradient(to bottom, #404f76 50%, #26355c 50%) !important;
+    color: #d2d6df !important;
+}
+    .elder_claim_button:hover, .kage_claim_button:hover {
+        color: white !important;
+    }
+.elder_avatar_wrapper, .kage_avatar_wrapper_empty {
+    background: #536184 !important;
+}
+.kage_kanji {
+    color: #536184 !important;
 }
