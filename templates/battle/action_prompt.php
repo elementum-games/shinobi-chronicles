@@ -187,6 +187,11 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                 id = 'handseal_' + hand_seals[x];
                 $('#' + id).children('.handsealNumber').text((parseInt(x) + 1));
             }
+
+            // Reset jutsu state on selecting handseal
+            display_state = '';
+            $('#jutsuType').val('ninjutsu');
+            $('#jutsuID').val('0');
         });
 
         var currentlySelectedJutsu = false;

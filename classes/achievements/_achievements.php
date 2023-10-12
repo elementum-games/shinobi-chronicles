@@ -4,6 +4,7 @@ require_once __DIR__ . '/AchievementsManager.php';
 require_once __DIR__ . '/AchievementReward.php';
 require_once __DIR__ . '/../event/LanternEvent.php';
 require_once __DIR__ . '/../UserReputation.php';
+require_once __DIR__ . '/../village/VillageManager.php';
 
 /*
  * REPUTATION ACHIEVEMENTS
@@ -289,15 +290,15 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
     FIRST_TSUCHIKAGE => new Achievement(
         id: FIRST_TSUCHIKAGE,
         rank: Achievement::RANK_LEGENDARY,
-        name: 'First ' . Village::KAGE_NAMES[1],
-        prompt: "Become the first player to claim " . Village::KAGE_NAMES[1] . " of Stone",
+        name: 'First ' . VillageManager::KAGE_NAMES[1],
+        prompt: "Become the first player to claim " . VillageManager::KAGE_NAMES[1] . " of Stone",
         rewards: $seat_rewards[FIRST_TSUCHIKAGE],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = Village::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_title'] != "1st " . Village::KAGE_NAMES[1]) {
+            if ($player_seat->seat_title != "1st " . VillageManager::KAGE_NAMES[1]) {
                 return false;
             }
             return !AchievementsManager::isWorldFirstAlreadyAchieved($system, FIRST_TSUCHIKAGE);
@@ -307,15 +308,15 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
     FIRST_RAIKAGE => new Achievement(
         id: FIRST_RAIKAGE,
         rank: Achievement::RANK_LEGENDARY,
-        name: 'First ' . Village::KAGE_NAMES[2],
-        prompt: "Become the first player to claim " . Village::KAGE_NAMES[2] . " of Cloud",
+        name: 'First ' . VillageManager::KAGE_NAMES[2],
+        prompt: "Become the first player to claim " . VillageManager::KAGE_NAMES[2] . " of Cloud",
         rewards: $seat_rewards[FIRST_RAIKAGE],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = Village::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_title'] != "1st " . Village::KAGE_NAMES[2]) {
+            if ($player_seat->seat_title != "1st " . VillageManager::KAGE_NAMES[2]) {
                 return false;
             }
 
@@ -326,15 +327,15 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
     FIRST_HOKAGE => new Achievement(
         id: FIRST_HOKAGE,
         rank: Achievement::RANK_LEGENDARY,
-        name: 'First ' . Village::KAGE_NAMES[3],
-        prompt: "Become the first player to claim " . Village::KAGE_NAMES[3] . " of Leaf",
+        name: 'First ' . VillageManager::KAGE_NAMES[3],
+        prompt: "Become the first player to claim " . VillageManager::KAGE_NAMES[3] . " of Leaf",
         rewards: $seat_rewards[FIRST_HOKAGE],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = Village::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_title'] != "1st " . Village::KAGE_NAMES[3]) {
+            if ($player_seat->seat_title != "1st " . VillageManager::KAGE_NAMES[3]) {
                 return false;
             }
 
@@ -345,15 +346,15 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
     FIRST_KAZEKAGE => new Achievement(
         id: FIRST_KAZEKAGE,
         rank: Achievement::RANK_LEGENDARY,
-        name: 'First ' . Village::KAGE_NAMES[4],
-        prompt: "Become the first player to claim " . Village::KAGE_NAMES[4] . " of Sand",
+        name: 'First ' . VillageManager::KAGE_NAMES[4],
+        prompt: "Become the first player to claim " . VillageManager::KAGE_NAMES[4] . " of Sand",
         rewards: $seat_rewards[FIRST_KAZEKAGE],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = Village::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_title'] != "1st " . Village::KAGE_NAMES[4]) {
+            if ($player_seat->seat_title != "1st " . VillageManager::KAGE_NAMES[4]) {
                 return false;
             }
 
@@ -364,15 +365,15 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
     FIRST_MIZUKAGE => new Achievement(
         id: FIRST_MIZUKAGE,
         rank: Achievement::RANK_LEGENDARY,
-        name: 'First ' . Village::KAGE_NAMES[5],
-        prompt: "Become the first player to claim " . Village::KAGE_NAMES[5] . " of Mist",
+        name: 'First ' . VillageManager::KAGE_NAMES[5],
+        prompt: "Become the first player to claim " . VillageManager::KAGE_NAMES[5] . " of Mist",
         rewards: $seat_rewards[FIRST_MIZUKAGE],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = Village::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_title'] != "1st " . Village::KAGE_NAMES[5]) {
+            if ($player_seat->seat_title != "1st " . VillageManager::KAGE_NAMES[5]) {
                 return false;
             }
 
@@ -387,11 +388,11 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         prompt: 'Claim the position of Kage',
         rewards: $seat_rewards[CLAIM_KAGE],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = Village::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_type'] != "kage") {
+            if ($player_seat->seat_type != "kage") {
                 return false;
             }
             return true;
@@ -404,11 +405,11 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         prompt: 'Claim the position of Elder',
         rewards: $seat_rewards[CLAIM_ELDER],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = Village::getPlayerSeat($system, $player->user_id);
-            if (empty($player_seat)) {
+            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            if (empty($player_seat->seat_id)) {
                 return false;
             }
-            if ($player_seat['seat_type'] != "elder") {
+            if ($player_seat->seat_type != "elder") {
                 return false;
             }
             return true;

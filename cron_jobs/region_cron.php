@@ -1,10 +1,23 @@
 <?php
 session_start();
 
+/**
+ * Region Cron Job
+ **
+ *  This should be processed every hour.
+ *
+ *  Region Cron does the following:
+ *      Collects home region resources
+ *      Increases resource count of each region by production rate (25)
+ *      Increases/Decreases region_location defense value by 1 toward baseline
+ *      Applies region_location regen, bonus for castles based on local village health
+ *      Creates resource logs
+ */
+
 require_once __DIR__ . '/../classes/System.php';
 require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
-require_once __DIR__ . '/../classes/War/WarManager.php';
+require_once __DIR__ . '/../classes/war/WarManager.php';
 require_once __DIR__ . '/../classes/travel/Patrol.php';
 
 $system = new System();
@@ -65,7 +78,7 @@ if (isset($_SESSION['user_id'])) {
     }
 
     if ($run_ok) {
-        hourlyRegion($system);
+        hourlyRegion($system, debug: false);
         $system->log('cron', 'Hourly Region', "Regions have been processed.");
     } else {
         $system->log('cron', 'Invalid access', "Attempted access by " . $_SERVER['REMOTE_ADDR']);
@@ -98,7 +111,7 @@ function hourlyRegion(System $system, $debug = true): void
                 $villages[$region['village']]->addResource($region_location['resource_id'], $region_location['resource_count']);
                 $queries[] = "INSERT INTO `resource_logs`
                     (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                    VALUES ({$region['village']}, {$region_location['resource_id']}, " . Village::RESOURCE_LOG_COLLECTION . ", {$region_location['resource_count']}, " . time() . ")";
+                    VALUES ({$region['village']}, {$region_location['resource_id']}, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$region_location['resource_count']}, " . time() . ")";
                 $region_location['resource_count'] = 0;
             }
             $region_location['resource_count'] += WarManager::BASE_RESOURCE_PRODUCTION;
@@ -174,7 +187,7 @@ function hourlyRegion(System $system, $debug = true): void
             foreach ($village_resource_production[$village->village_id] as $key => $value) {
                 $queries[] = "INSERT INTO `resource_logs`
                     (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                    VALUES ({$village->village_id}, {$key}, " . Village::RESOURCE_LOG_PRODUCTION . ", " . $value . ", " . time() . ")";
+                    VALUES ({$village->village_id}, {$key}, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", " . $value . ", " . time() . ")";
             }
         }
     }
