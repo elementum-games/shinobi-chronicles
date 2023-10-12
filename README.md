@@ -143,6 +143,12 @@ https://book.cakephp.org/phinx/0/en/migrations.html
 See `/db/SampleSQLMigration.php` for a simple example of creating a migration that uses raw SQL queries.
 
 ### Docker compose
+To get started you will need to have Docker installed. Easiest way is to install the Docker Desktop app via https://www.docker.com/products/docker-desktop/
+Once installed you will need to have the Docker Desktop app running to start the Docker Engine (this isn't needed if you install docker separately)
+
+#### Notes about Docker Desktop:
+This app provides an easy way to see what containers are currently running on your system and what images are downloaded. If you are not using an IDE with built in Docker support (such as PHPStorm) this makes the process a little more GUI driven.
+
 Before starting docker, it's recommended to install dependencies with `composer install` (step 9 at the beginning of this readme).
 Otherwise, they'll be re-installed every time you destroy the docker image or upgrade a dependency version.
 
