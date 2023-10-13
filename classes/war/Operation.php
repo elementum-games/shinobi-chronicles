@@ -50,7 +50,7 @@ class Operation
     const BASE_OPERATION_COST = 150; // chakra/stam cost per interval, 750 total
     /* 100 / 20 * 12s = 60s */
     const LOOT_GAIN = 1;
-    const LOOT_OPERATION_SPEED = 100; // eat loot action is only 1 interval
+    const LOOT_OPERATION_SPEED = 100; // each loot action is only 1 interval
     const LOOT_OPERATION_INTERVAL = 6; // takes half time as normal
     const LOOT_OPERATION_COST = 75; // takes half pool cost
 
