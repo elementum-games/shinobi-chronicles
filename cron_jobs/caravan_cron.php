@@ -142,8 +142,7 @@ function hourlyCaravan(System $system, $debug = true): void
         $caravan_resources = [];
         // add resources to region caravan
         foreach ($region_location_result as $region_location) {
-            // take half resources, rounding up
-            $resources_taken = round($region_location['resource_count'] / 2);
+            $resources_taken = $region_location['resource_count'];
             $resources_remaining = $region_location['resource_count'] - $resources_taken;
             if (!empty($caravan_resources[$region_location['resource_id']])) {
                 $caravan_resources[$region_location['resource_id']] += $resources_taken;
