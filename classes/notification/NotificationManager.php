@@ -7,6 +7,20 @@ class NotificationManager {
     const UPDATE_UNIQUE = 1;
     const UPDATE_MULTIPLE = 2;
 
+    const NOTIFICATION_RAID_ALLY = "raid_ally";
+    const NOTIFICATION_RAID_ENEMY = "raid_enemy";
+    const NOTIFICATION_CARAVAN = "caravan";
+    const NOTIFICATION_SEAT_CHALLENGE = "seat_challenge";
+    const NOTIFICATION_LOCK_CHALLENGE = "lock_challenge";
+    const NOTIFICATION_PROPOSAL_CREATED = "proposal_created";
+    const NOTIFICATION_PROPOSAL_PASSED = "proposal_passed";
+    const NOTIFICATION_PROPOSAL_CANCELED = "proposal_canceled";
+    const NOTIFICATION_PROPOSAL_EXPIRED = "proposal_canceled";
+    const NOTIFICATION_WAR = "declare_war";
+    const NOTIFICATION_ALLY = "form_alliance";
+    const NOTIFICATION_END_WAR = "end_war";
+    const NOTIFICATION_BREAK_ALLIANCE = "end_alliance";
+
     public static function createNotification(NotificationDto $notification, System $system, int $UPDATE, int $limit = 5): bool {
         $db_modified = false;
         $attributes = json_encode($notification->getAttributes(), JSON_FORCE_OBJECT);

@@ -1024,41 +1024,69 @@ function KageQuarters({
                                 strategicInfoData={strategicDisplayLeft}
                             />
                             <div className="strategic_info_navigation">
-                                {villageName != "Stone" &&
-                                    <div className="strategic_info_nav_button_wrapper stone" onClick={() => setStrategicDisplayRight(strategicDataState[0])}>
-                                        <div className="strategic_info_nav_button_inner">
-                                            <img src={getVillageIcon(1)} className="strategic_info_nav_button_icon" />
+                                <div className="strategic_info_navigation_diplomacy_buttons">
+                                    {strategicDisplayLeft.enemies.find(enemy => enemy != strategicDisplayRight.village.name) ?
+                                        <div className="diplomacy_action_button_wrapper war" onClick={() => setStrategicDisplayRight(strategicDataState[0])}>
+                                            <div className="diplomacy_action_button_inner">
+                                                <img src="/images/icons/war.png" className="diplomacy_action_button_icon" />
+                                            </div>
                                         </div>
-                                    </div>
-                                }
-                                {villageName != "Cloud" &&
-                                    <div className="strategic_info_nav_button_wrapper cloud" onClick={() => setStrategicDisplayRight(strategicDataState[1])}>
-                                        <div className="strategic_info_nav_button_inner">
-                                            <img src={getVillageIcon(2)} className="strategic_info_nav_button_icon" />
+                                        :
+                                        <div className="diplomacy_action_button_wrapper war cancel" onClick={() => setStrategicDisplayRight(strategicDataState[0])}>
+                                            <div className="diplomacy_action_button_inner">
+                                            </div>
                                         </div>
-                                    </div>
-                                }
-                                {villageName != "Leaf" &&
-                                    <div className="strategic_info_nav_button_wrapper leaf" onClick={() => setStrategicDisplayRight(strategicDataState[2])}>
-                                        <div className="strategic_info_nav_button_inner">
-                                            <img src={getVillageIcon(3)} className="strategic_info_nav_button_icon" />
+                                    }
+                                    {strategicDisplayLeft.allies.find(ally => ally != strategicDisplayRight.village.name) ?
+                                        <div className="diplomacy_action_button_wrapper alliance" onClick={() => setStrategicDisplayRight(strategicDataState[0])}>
+                                            <div className="diplomacy_action_button_inner">
+                                                <img src="/images/icons/ally.png" className="diplomacy_action_button_icon" />
+                                            </div>
                                         </div>
-                                    </div>
-                                }
-                                {villageName != "Sand" &&
-                                    <div className="strategic_info_nav_button_wrapper sand" onClick={() => setStrategicDisplayRight(strategicDataState[3])}>
-                                        <div className="strategic_info_nav_button_inner">
-                                            <img src={getVillageIcon(4)} className="strategic_info_nav_button_icon" />
+                                        :
+                                        <div className="diplomacy_action_button_wrapper alliance cancel" onClick={() => setStrategicDisplayRight(strategicDataState[0])}>
+                                            <div className="diplomacy_action_button_inner">
+                                            </div>
                                         </div>
-                                    </div>
-                                }
-                                {villageName != "Mist" &&
-                                    <div className="strategic_info_nav_button_wrapper mist" onClick={() => setStrategicDisplayRight(strategicDataState[4])}>
-                                        <div className="strategic_info_nav_button_inner">
-                                            <img src={getVillageIcon(5)} className="strategic_info_nav_button_icon" />
+                                    }
+                                </div>
+                                <div className="strategic_info_navigation_village_buttons">
+                                    {villageName != "Stone" &&
+                                        <div className={strategicDisplayRight.village.village_id == 1 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setStrategicDisplayRight(strategicDataState[0])}>
+                                            <div className="strategic_info_nav_button_inner">
+                                                <img src={getVillageIcon(1)} className="strategic_info_nav_button_icon" />
+                                            </div>
                                         </div>
-                                    </div>
-                                }
+                                    }
+                                    {villageName != "Cloud" &&
+                                        <div className={strategicDisplayRight.village.village_id == 2 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setStrategicDisplayRight(strategicDataState[1])}>
+                                            <div className="strategic_info_nav_button_inner">
+                                                <img src={getVillageIcon(2)} className="strategic_info_nav_button_icon" />
+                                            </div>
+                                        </div>
+                                    }
+                                    {villageName != "Leaf" &&
+                                        <div className={strategicDisplayRight.village.village_id == 3 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setStrategicDisplayRight(strategicDataState[2])}>
+                                            <div className="strategic_info_nav_button_inner">
+                                                <img src={getVillageIcon(3)} className="strategic_info_nav_button_icon" />
+                                            </div>
+                                        </div>
+                                    }
+                                    {villageName != "Sand" &&
+                                        <div className={strategicDisplayRight.village.village_id == 4 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setStrategicDisplayRight(strategicDataState[3])}>
+                                            <div className="strategic_info_nav_button_inner">
+                                                <img src={getVillageIcon(4)} className="strategic_info_nav_button_icon" />
+                                            </div>
+                                        </div>
+                                    }
+                                    {villageName != "Mist" &&
+                                        <div className={strategicDisplayRight.village.village_id == 5 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setStrategicDisplayRight(strategicDataState[4])}>
+                                            <div className="strategic_info_nav_button_inner">
+                                                <img src={getVillageIcon(5)} className="strategic_info_nav_button_icon" />
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
                             </div>
                             <StrategicInfoItem
                                 strategicInfoData={strategicDisplayRight}
@@ -1138,8 +1166,8 @@ function StrategicInfoItem({ strategicInfoData }) {
                         <div className="strategic_info_label">at war with <img className="strategic_info_war_icon" src="/images/icons/war.png" /></div>
                         <div className="strategic_info_relations">
                             {strategicInfoData.enemies
-                                .map((ally, index) => (
-                                    <div key={index} className="strategic_info_relation_item">{ally}</div>
+                                .map((enemy, index) => (
+                                    <div key={index} className="strategic_info_relation_item">{enemy}</div>
                                 ))}
                         </div>
                     </div>

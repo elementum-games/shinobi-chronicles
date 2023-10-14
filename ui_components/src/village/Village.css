@@ -1292,8 +1292,8 @@
     text-transform: capitalize;
 }
 .strategic_info_war_icon, .strategic_info_ally_icon {
-    height: 20px;
-    width: 20px;
+    max-height: 20px;
+    max-width: 20px;
     position: absolute;
     padding-left: 4px;
 }
@@ -1306,9 +1306,25 @@
 .strategic_info_navigation {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    width: 53px;
+    gap: 30px;
+}
+.strategic_info_navigation_village_buttons {
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 53px;
+    flex-shrink: 0;
+}
+.strategic_info_navigation_diplomacy_buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 53px;
+    height: 125px;
     flex-shrink: 0;
 }
 .strategic_info_nav_button_wrapper {
@@ -1334,36 +1350,78 @@
     justify-content: center;
 }
 .strategic_info_nav_button_icon {
-    height: 28px;
-    width: 28px;
+    max-height: 28px;
+    max-width: 28px;
 }
-.strategic_info_nav_button_wrapper.stone {
-    background-color: #4e4535;
-}
-    .strategic_info_nav_button_wrapper.stone .strategic_info_nav_button_inner {
-        background: linear-gradient(to bottom, #ad9357 50%, #877556 50%);
-    }
-.strategic_info_nav_button_wrapper.cloud {
+.strategic_info_nav_button_wrapper {
     background-color: #343d77;
 }
-    .strategic_info_nav_button_wrapper.cloud .strategic_info_nav_button_inner {
+    .strategic_info_nav_button_wrapper .strategic_info_nav_button_inner {
         background: linear-gradient(to bottom, #5964a6 50%, #414b8c 50%);
     }
-.strategic_info_nav_button_wrapper.leaf {
+.strategic_info_nav_button_wrapper:hover {
     background-color: #68293f;
 }
-    .strategic_info_nav_button_wrapper.leaf .strategic_info_nav_button_inner {
+    .strategic_info_nav_button_wrapper:hover .strategic_info_nav_button_inner {
         background: linear-gradient(to bottom, #903d5b 50%, #7a314b 50%);
     }
-.strategic_info_nav_button_wrapper.sand {
+.strategic_info_nav_button_wrapper.selected {
     background-color: #4e4535;
 }
-    .strategic_info_nav_button_wrapper.sand .strategic_info_nav_button_inner {
+    .strategic_info_nav_button_wrapper.selected .strategic_info_nav_button_inner {
         background: linear-gradient(to bottom, #ad9357 50%, #877556 50%);
     }
-.strategic_info_nav_button_wrapper.mist {
-    background-color: #343d77;
+
+.diplomacy_action_button_wrapper {
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    height: 35px;
+    width: 35px;
+    padding: 3px;
+    display: flex;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    position: relative;
 }
-    .strategic_info_nav_button_wrapper.mist .strategic_info_nav_button_inner {
-        background: linear-gradient(to bottom, #5964a6 50%, #414b8c 50%);
+    .diplomacy_action_button_wrapper:hover {
+        padding: 5px;
+        margin-top: 5px;
+        margin-bottom: 5px;
     }
+.diplomacy_action_button_inner {
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    height: 35px;
+    width: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diplomacy_action_button_icon {
+    max-height: 24px;
+    max-width: 24px;
+}
+.diplomacy_action_button_wrapper.war {
+    background-color: #5e1f23;
+}
+    .diplomacy_action_button_wrapper.war .diplomacy_action_button_inner {
+        background: linear-gradient(to bottom, #823239 50%, #711e25 50%);
+    }
+.diplomacy_action_button_wrapper.alliance {
+    background-color: #1b3e2a;
+}
+    .diplomacy_action_button_wrapper.alliance .diplomacy_action_button_inner {
+        background: linear-gradient(to bottom, #316849 50%, #275f40 50%);
+    }
+.diplomacy_action_button_wrapper.cancel::before {
+    content: '';
+    background-image: url('../../../images/v2/icons/novote.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    filter: url("#red_glow");
+}

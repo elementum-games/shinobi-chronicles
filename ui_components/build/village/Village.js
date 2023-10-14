@@ -1090,8 +1090,38 @@ function KageQuarters({
     strategicInfoData: strategicDisplayLeft
   }), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_navigation"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "strategic_info_navigation_diplomacy_buttons"
+  }, strategicDisplayLeft.enemies.find(enemy => enemy != strategicDisplayRight.village.name) ? /*#__PURE__*/React.createElement("div", {
+    className: "diplomacy_action_button_wrapper war",
+    onClick: () => setStrategicDisplayRight(strategicDataState[0])
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "diplomacy_action_button_inner"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/icons/war.png",
+    className: "diplomacy_action_button_icon"
+  }))) : /*#__PURE__*/React.createElement("div", {
+    className: "diplomacy_action_button_wrapper war cancel",
+    onClick: () => setStrategicDisplayRight(strategicDataState[0])
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "diplomacy_action_button_inner"
+  })), strategicDisplayLeft.allies.find(ally => ally != strategicDisplayRight.village.name) ? /*#__PURE__*/React.createElement("div", {
+    className: "diplomacy_action_button_wrapper alliance",
+    onClick: () => setStrategicDisplayRight(strategicDataState[0])
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "diplomacy_action_button_inner"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/icons/ally.png",
+    className: "diplomacy_action_button_icon"
+  }))) : /*#__PURE__*/React.createElement("div", {
+    className: "diplomacy_action_button_wrapper alliance cancel",
+    onClick: () => setStrategicDisplayRight(strategicDataState[0])
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "diplomacy_action_button_inner"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "strategic_info_navigation_village_buttons"
   }, villageName != "Stone" && /*#__PURE__*/React.createElement("div", {
-    className: "strategic_info_nav_button_wrapper stone",
+    className: strategicDisplayRight.village.village_id == 1 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
     onClick: () => setStrategicDisplayRight(strategicDataState[0])
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_nav_button_inner"
@@ -1099,7 +1129,7 @@ function KageQuarters({
     src: getVillageIcon(1),
     className: "strategic_info_nav_button_icon"
   }))), villageName != "Cloud" && /*#__PURE__*/React.createElement("div", {
-    className: "strategic_info_nav_button_wrapper cloud",
+    className: strategicDisplayRight.village.village_id == 2 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
     onClick: () => setStrategicDisplayRight(strategicDataState[1])
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_nav_button_inner"
@@ -1107,7 +1137,7 @@ function KageQuarters({
     src: getVillageIcon(2),
     className: "strategic_info_nav_button_icon"
   }))), villageName != "Leaf" && /*#__PURE__*/React.createElement("div", {
-    className: "strategic_info_nav_button_wrapper leaf",
+    className: strategicDisplayRight.village.village_id == 3 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
     onClick: () => setStrategicDisplayRight(strategicDataState[2])
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_nav_button_inner"
@@ -1115,7 +1145,7 @@ function KageQuarters({
     src: getVillageIcon(3),
     className: "strategic_info_nav_button_icon"
   }))), villageName != "Sand" && /*#__PURE__*/React.createElement("div", {
-    className: "strategic_info_nav_button_wrapper sand",
+    className: strategicDisplayRight.village.village_id == 4 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
     onClick: () => setStrategicDisplayRight(strategicDataState[3])
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_nav_button_inner"
@@ -1123,14 +1153,14 @@ function KageQuarters({
     src: getVillageIcon(4),
     className: "strategic_info_nav_button_icon"
   }))), villageName != "Mist" && /*#__PURE__*/React.createElement("div", {
-    className: "strategic_info_nav_button_wrapper mist",
+    className: strategicDisplayRight.village.village_id == 5 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
     onClick: () => setStrategicDisplayRight(strategicDataState[4])
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_nav_button_inner"
   }, /*#__PURE__*/React.createElement("img", {
     src: getVillageIcon(5),
     className: "strategic_info_nav_button_icon"
-  })))), /*#__PURE__*/React.createElement(StrategicInfoItem, {
+  }))))), /*#__PURE__*/React.createElement(StrategicInfoItem, {
     strategicInfoData: strategicDisplayRight
   }))))));
   function cyclePolicy(direction) {
@@ -1221,10 +1251,10 @@ function StrategicInfoItem({
     src: "/images/icons/war.png"
   })), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_relations"
-  }, strategicInfoData.enemies.map((ally, index) => /*#__PURE__*/React.createElement("div", {
+  }, strategicInfoData.enemies.map((enemy, index) => /*#__PURE__*/React.createElement("div", {
     key: index,
     className: "strategic_info_relation_item"
-  }, ally))))), /*#__PURE__*/React.createElement("div", {
+  }, enemy))))), /*#__PURE__*/React.createElement("div", {
     className: "column"
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_population_wrapper"

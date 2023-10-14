@@ -316,7 +316,7 @@ class ChatManager {
                             alert: false,
                             post_id: $new_post_id,
                         );
-                        NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_MULTIPLE);
+                        NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_MULTIPLE, limit: 3);
                     }
                 }
             }
@@ -359,7 +359,7 @@ class ChatManager {
                         alert: false,
                         post_id: $new_post_id,
                     );
-                    NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_MULTIPLE);
+                    NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_MULTIPLE, limit: 3);
                 }
             }
 
