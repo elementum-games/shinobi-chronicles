@@ -11,5 +11,6 @@ class VillageSeatDto {
         public ?int $seat_start,
         public ?string $user_name,
         public ?string $avatar_link,
+        public ?bool $is_provisional,
     ) {}
 }

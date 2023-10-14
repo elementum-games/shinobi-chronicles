@@ -1,6 +1,8 @@
 <?php
 
 require_once __DIR__ . "/VillageSeatDto.php";
+require_once __DIR__ . "/VillageProposalDto.php";
+require_once __DIR__ . "/VillageStrategicInfoDto.php";
 
 class VillageManager {
     const KAGE_NAMES = [
@@ -19,6 +21,77 @@ class VillageManager {
     const MIN_KAGE_CHALLENGE_TIER = 6;
     const MIN_ELDER_CLAIM_TIER = 4;
     const MIN_ELDER_CHALLENGE_TIER = 5;
+
+    const POLICY_GROWTH = 1;
+    const POLICY_ESPIONAGE = 2;
+    const POLICY_DEFENSE = 3;
+    const POLICY_WAR = 4;
+    const POLICY_PROSPERITY = 5;
+
+    const POLICY_NAMES = [
+        self::POLICY_GROWTH => "From the Ashes",
+        self::POLICY_ESPIONAGE => "Eye of the Storm",
+        self::POLICY_DEFENSE => "Fortress of Solitude",
+        self::POLICY_WAR => "Forged in Flames",
+        self::POLICY_PROSPERITY => "The Gilded Hand",
+    ];
+
+    const POLICY_BONUS_TRAINING_SPEED = "TRAINING_SPEED";
+    const POLICY_BONUS_FREE_TRANSFER = "FREE_TRANSFER";
+    const POLICY_BONUS_HOME_PRODUCTION_BOOST = "HOME_PRODUCTION_BOOST";
+    const POLICY_BONUS_CARAVAN_SPEED = "CARAVAN_SPEED";
+    const POLICY_BONUS_INFILTRATE_SPEED = "INFILTRATE_SPEED";
+    const POLICY_BONUS_INFILTRATE_LOOT = "INFILTRATE_LOOT";
+    const POLICY_BONUS_STEALTH = "STEALTH";
+    const POLICY_BONUS_LOOT_CAPACITY = "LOOT_CAPACITY";
+    const POLICY_BONUS_REINFORCE_SPEED = "REINFORCE_SPEED";
+    const POLICY_BONUS_REINFORCE_DEFENSE = "REINFORCE_DEFENSE";
+    const POLICY_BONUS_SCOUTING = "SCOUTING";
+    const POLICY_BONUS_PATROL_TIER = "PATROL_TIER";
+    const POLICY_BONUS_RAID_SPEED = "RAID_SPEED";
+    const POLICY_BONUS_RAID_DEFENSE = "RAID_DEFENSE";
+    const POLICY_BONUS_PVP_VILLAGE_POINT = "PVP_VILLAGE_POINT";
+    const POLICY_BONUS_PATROL_RESPAWN = "PATROL_RESPAWN";
+
+    const POLICY_BONUS = [
+        POLICY_GROWTH => [
+            self::POLICY_BONUS_TRAINING_SPEED => 10,
+            self::POLICY_BONUS_FREE_TRANSFER => true,
+            self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 100,
+            self::POLICY_BONUS_CARAVAN_SPEED => 25,
+        ],
+        POLICY_ESPIONAGE => [
+            self::POLICY_BONUS_INFILTRATE_SPEED => 25,
+            self::POLICY_BONUS_INFILTRATE_LOOT => 1,
+            self::POLICY_BONUS_STEALTH => 1,
+            self::POLICY_BONUS_LOOT_CAPACITY => 5,
+        ],
+        POLICY_DEFENSE => [
+            self::POLICY_BONUS_REINFORCE_SPEED => 25,
+            self::POLICY_BONUS_REINFORCE_DEFENSE => 1,
+            self::POLICY_BONUS_SCOUTING => 1,
+            self::POLICY_BONUS_PATROL_TIER => 1,
+        ],
+        POLICY_WAR => [
+            self::POLICY_BONUS_RAID_SPEED => 25,
+            self::POLICY_BONUS_RAID_DEFENSE => 1,
+            self::POLICY_BONUS_PVP_VILLAGE_POINT => 1,
+            self::POLICY_BONUS_PATROL_RESPAWN => 25,
+        ],
+    ];
+
+    //const PROPOSAL_VOTE_HOURS = 72;
+    //const PROPOSAL_ENACT_HOURS = 24;
+    //const PROPOSAL_COOLDOWN_HOURS = 24;
+    const PROPOSAL_VOTE_HOURS = 1;
+    const PROPOSAL_ENACT_HOURS = 1;
+    const PROPOSAL_COOLDOWN_HOURS = 0;
+    const KAGE_PROVISIONAL_DAYS = 7;
+    const POLICY_CHANGE_COOLDOWN_DAYS = 0;
+
+    const VOTE_NO = 0;
+    const VOTE_YES = 1;
+    const VOTE_BOOST_COST = 500;
 
     public static function getLocation(System $system, string $village_id): ?TravelCoords {
         $result = $system->db->query(
@@ -44,9 +117,19 @@ class VillageManager {
     public static function getRelations(System $system, int $village_id): array {
         $relations = [];
         $relations_result = $system->db->query(
-            "SELECT `village_relations`.* FROM `village_relations`
-                WHERE `relation_end` IS NULL
-                AND (`village1_id` = {$village_id} OR `village2_id` = {$village_id});
+            "SELECT
+                `village_relations`.*,
+                `v1`.`name` AS `village1_name`,
+                `v2`.`name` AS `village2_name`
+            FROM
+                `village_relations`
+            INNER JOIN
+                `villages` AS `v1` ON `village_relations`.`village1_id` = `v1`.`village_id`
+            INNER JOIN
+                `villages` AS `v2` ON `village_relations`.`village2_id` = `v2`.`village_id`
+            WHERE
+                `village_relations`.`relation_end` IS NULL
+                AND (`village_relations`.`village1_id` = {$village_id} OR `village_relations`.`village2_id` = {$village_id});
             ");
         $relations_result = $system->db->fetch_all($relations_result);
         foreach ($relations_result as $relation) {
@@ -102,7 +185,9 @@ class VillageManager {
         switch ($seat_type) {
             case 'kage':
                 // Temp disable
-                return "Not yet available.";
+                if (!$system->isDevEnvironment()) {
+                    return "Not yet available!";
+                }
                 // check rank
                 if ($player->rank_num < 4) {
                     return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_KAGE_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_KAGE_CLAIM_TIER]['min_rep'] . " Reputation";
@@ -119,7 +204,7 @@ class VillageManager {
                     return "Seat is occupied!";
                 }
                 // check if has existing seat
-                $seat = self::getPlayerSeat($system, $player->user_id);
+                $seat = $player->village_seat;
                 if (!empty($seat->seat_id)) {
                     if ($seat->seat_type == 'elder') {
                         self::resign($system, $player);
@@ -131,19 +216,19 @@ class VillageManager {
                 // claim
                 $time = time();
                 $reclaim = false;
-                $result = $system->db->query("SELECT `seat_title` from `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` = {$player->user_id} LIMIT 1");
+                $is_provisional = 1;
+                $result = $system->db->query("SELECT `seat_title`, `is_provisional` from `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` = {$player->user_id} AND `is_provisional` = 0 LIMIT 1");
                 $result = $system->db->fetch($result);
                 if (!empty($result)) {
                     $seat_title = $result['seat_title'];
+                    $is_provisional = $result['is_provisional'];
                     $reclaim = true;
                 } else {
-                    $result = $system->db->query("SELECT COUNT(DISTINCT `user_id`) as 'kage_count' FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` != {$player->user_id}");
-                    $result = $system->db->fetch($result);
-                    $seat_title = self::getOrdinal($result['kage_count'] + 1) . " " . self::KAGE_NAMES[$player->village->village_id];
+                    $seat_title = "Provisional " . self::KAGE_NAMES[$player->village->village_id];
                 }
                 $system->db->query("INSERT INTO `village_seats`
-                    (`user_id`, `village_id`, `seat_type`, `seat_title`, `seat_start`)
-                    VALUES ({$player->user_id}, {$player->village->village_id}, '{$seat_type}', '{$seat_title}', {$time})
+                    (`user_id`, `village_id`, `seat_type`, `seat_title`, `seat_start`, `is_provisional`)
+                    VALUES ({$player->user_id}, {$player->village->village_id}, '{$seat_type}', '{$seat_title}', {$time}, {$is_provisional})
                 ");
                 $system->db->query("UPDATE `villages` SET `leader` = {$player->user_id} WHERE `village_id` = {$player->village->village_id}");
                 if ($reclaim) {
@@ -154,7 +239,7 @@ class VillageManager {
                 break;
             case 'elder':
                 // check if has existing seat
-                $seat = self::getPlayerSeat($system, $player->user_id);
+                $seat = $player->village_seat;
                 if (!empty($seat->seat_id)) {
                     return "You already have a seat in this village!";
                 }
@@ -190,7 +275,13 @@ class VillageManager {
     public static function resign(System $system, User $player): string
     {
         $time = time();
+        $player_seat = $player->village_seat;
+        // clear active votes
+        $system->db->query("DELETE `vote_logs` FROM `vote_logs` INNER JOIN `proposals` on `vote_logs`.`proposal_id` = `proposals`.`proposal_id` WHERE `vote_logs`.`user_id` = {$player->user_id} AND `proposals`.`end_time` IS NULL");
         $result = $system->db->query("UPDATE `village_seats` SET `seat_end` = {$time} WHERE `seat_end` IS NULL AND `user_id` = {$player->user_id}");
+        if ($player_seat->seat_type == "kage") {
+            $result = $system->db->query("UPDATE `villages` SET `leader` = 0 WHERE `village_id` = {$player->village->village_id}");
+        }
         if ($system->db->last_affected_rows > 0) {
             return "You have resigned from your position!";
         } else {
@@ -223,6 +314,7 @@ class VillageManager {
                         seat_start: $seat['seat_start'],
                         user_name: $seat['user_name'],
                         avatar_link: $seat['avatar_link'],
+                        is_provisional: $seat['is_provisional']
                     );
                     break;
                 case 'elder':
@@ -237,6 +329,7 @@ class VillageManager {
                         seat_start: $seat['seat_start'],
                         user_name: $seat['user_name'],
                         avatar_link: $seat['avatar_link'],
+                        is_provisional: $seat['is_provisional']
                     );
                     break;
                 default:
@@ -255,6 +348,7 @@ class VillageManager {
                 seat_start:  null,
                 user_name: null,
                 avatar_link: null,
+                is_provisional: null
             );
         }
         for ($i = 3; $i > $elder_count; $i--) {
@@ -269,6 +363,8 @@ class VillageManager {
                 seat_start: null,
                 user_name: null,
                 avatar_link: null,
+                is_provisional: null
+
             );
         }
         return $seats;
@@ -354,6 +450,8 @@ class VillageManager {
                 seat_start: null,
                 user_name: null,
                 avatar_link: null,
+                is_provisional: null
+
             );
             return $seat;
         }
@@ -367,6 +465,7 @@ class VillageManager {
             seat_start: $result['seat_start'],
             user_name: null,
             avatar_link: null,
+            is_provisional: $result['is_provisional']
         );
         return $seat;
     }
@@ -378,5 +477,389 @@ class VillageManager {
         } else {
             return $number . $ends[$number % 10];
         }
+    }
+
+    /**
+     * @return array
+     */
+    public static function getProposalHistory(System $system, int $village_id, bool $active_only = true): array {
+        $proposal_history = [];
+        if ($active_only) {
+            $proposal_result = $system->db->query("SELECT * FROM `proposals` WHERE `village_id` = {$village_id} AND `end_time` IS NULL");
+        } else {
+            $proposal_result = $system->db->query("SELECT * FROM `proposals` WHERE `village_id` = {$village_id}");
+        }
+        $proposal_result = $system->db->fetch_all($proposal_result);
+        foreach ($proposal_result as &$proposal) {
+            // special - if end_time unset and past vote + enact period, cancel
+            if ($proposal['end_time'] == null) {
+                if ($proposal['start_time'] + (self::PROPOSAL_VOTE_HOURS * 3600) + (self::PROPOSAL_ENACT_HOURS * 3600) < time()) {
+                    $time = time();
+                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'expired' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    unset($proposal);
+                    continue;
+                }
+            }
+            $vote_result = $system->db->query("SELECT * FROM `vote_logs` WHERE `proposal_id` = {$proposal['proposal_id']}");
+            $vote_result = $system->db->fetch_all($vote_result);
+            $proposal['votes'] = $vote_result;
+            // get vote time
+            $seconds_remaining = max(0, (self::PROPOSAL_VOTE_HOURS * 3600) + $proposal['start_time'] - time());
+            if ($seconds_remaining > 0) {
+                $hours = floor($seconds_remaining / 3600);
+                $minutes = floor(($seconds_remaining % 3600) / 60);
+                $proposal['vote_time_remaining'] = "Time left to vote: " . ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute " : $minutes . " minutes");
+                $proposal['enact_time_remaining'] = null;
+            } else {
+                $proposal['vote_time_remaining'] = null;
+                $seconds_remaining = max(0, (self::PROPOSAL_VOTE_HOURS * 3600) + (self::PROPOSAL_ENACT_HOURS * 3600) + $proposal['start_time'] - time());
+                if ($seconds_remaining > 0) {
+                    $hours = floor($seconds_remaining / 3600);
+                    $minutes = floor(($seconds_remaining % 3600) / 60);
+                    $proposal['enact_time_remaining'] = "Time left to enact: " . ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute " : $minutes . " minutes");
+                } else {
+                    $proposal['enact_time_remaining'] = null;
+                }
+            }
+            //get enact time
+
+
+            $proposal_history[] = new VillageProposalDto(
+                proposal_id: $proposal['proposal_id'],
+                village_id: $proposal['village_id'],
+                user_id: $proposal['user_id'],
+                start_time: $proposal['start_time'],
+                end_time: $proposal['end_time'],
+                name: $proposal['name'],
+                result: $proposal['result'],
+                type: $proposal['type'],
+                target_village_id: $proposal['target_village_id'],
+                policy_id: $proposal['policy_id'],
+                vote_time_remaining: $proposal['vote_time_remaining'],
+                enact_time_remaining: $proposal['enact_time_remaining'],
+                votes: $proposal['votes'],
+            );
+            unset($proposal);
+        }
+        return $proposal_history;
+    }
+
+    /**
+     * @return string
+     */
+    public static function createPolicyProposal(System $system, User $player, int $policy_id): string {
+        // check player permissions
+        $seat = $player->village_seat;
+        if ($seat->seat_type != "kage") {
+            return "You do not meet the seat requirements.";
+        }
+        // check cooldown on policy
+        $query = $system->db->query("SELECT `start_time` FROM `policy_logs` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} LIMIT 1");
+        $last_change = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            if ($last_change['start_time'] + self::POLICY_CHANGE_COOLDOWN_DAYS * 86400 > time()) {
+                $seconds_remaining = (self::POLICY_CHANGE_COOLDOWN_DAYS * 86400) + $last_change['start_time'] - time();
+                $hours = floor($seconds_remaining / 3600);
+                $minutes = floor(($seconds_remaining % 3600) / 60);
+                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
+                return "Cannot change policy until for " . $time_remaining . ".";
+            }
+        }
+        // check different policy than current
+        if ($policy_id == $player->village->policy) {
+            return "Selected policy is the same.";
+        }
+        // check no pending proposal of same type
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'policy' LIMIT 1");
+        $last_change = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            return "There is already a pending proposal of the same type.";
+        }
+        // check player cooldown on submit proposal
+        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
+        $last_proposal = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
+                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
+                $hours = floor($seconds_remaining / 3600);
+                $minutes = floor(($seconds_remaining % 3600) / 60);
+                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
+                return "Cannot submit another proposal for " . $time_remaining . ".";
+            }
+        }
+        // insert into DB
+        $time = time();
+        $name = "Change Policy: " . self::POLICY_NAMES[$policy_id];
+        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `policy_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'change_policy', '{$name}', {$policy_id})");
+        return "Proposal created!";
+    }
+
+    /**
+     * @return string
+     */
+    public static function cancelProposal(System $system, User $player, int $proposal_id): string {
+        // check player permissions
+        $seat = $player->village_seat;
+        if ($seat->seat_type != "kage") {
+            return "You do not meet the seat requirements.";
+        }
+        $time = time();
+        $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal_id} AND `village_id` = {$player->village->village_id} AND `end_time` IS NULL");
+        if ($system->db->last_affected_rows > 0) {
+            return "Proposal canceled.";
+        } else {
+            return "Invalid proposal.";
+        }
+    }
+
+    public static function updateProvisionalKageStatus(System $system, User $player) {
+        if (!empty($player->village_seat->seat_id)) {
+            if ($player->village_seat->seat_type == "kage" && $player->village_seat->is_provisional) {
+                if ($player->village_seat->seat_start + (VillageManager::KAGE_PROVISIONAL_DAYS * 86400) < time()) {
+                    // get new title, base on number of previous unique, non-provisional kage in same village
+                    $result = $system->db->query("SELECT COUNT(DISTINCT `user_id`) as 'kage_count' FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` != {$player->user_id} AND `is_provisional` = 0");
+                    $result = $system->db->fetch($result);
+                    $seat_title = self::getOrdinal($result['kage_count'] + 1) . " " . self::KAGE_NAMES[$player->village->village_id];
+                    // update seat
+                    $system->db->query("UPDATE `village_seats` SET `is_provisional` = 0, `seat_title` = '{$seat_title}' WHERE `seat_id` = {$player->village_seat->seat_id}");
+                }
+            }
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public static function submitProposalVote(System $system, User $player, int $vote, int $proposal_id): string {
+        // check if voting period valid
+        $proposal = $system->db->query("SELECT * FROM `proposals` WHERE `proposal_id` = {$proposal_id} LIMIT 1");
+        $proposal = $system->db->fetch($proposal);
+        $seconds_remaining = max(0, (self::PROPOSAL_VOTE_HOURS * 3600) + $proposal['start_time'] - time());
+        if ($seconds_remaining == 0) {
+            return "Voting period expired.";
+        }
+        // create vote
+        $time = time();
+        $system->db->query("INSERT INTO `vote_logs` (`user_id`, `proposal_id`, `vote`, `rep_adjustment`, `vote_time`) VALUES ({$player->user_id}, {$proposal_id}, {$vote}, 0, {$time})");
+        if ($system->db->last_affected_rows > 0) {
+            return "Vote success.";
+        }
+        return "Something went wrong.";
+    }
+
+    /**
+     * @return string
+     */
+    public static function cancelProposalVote(System $system, User $player, int $proposal_id): string {
+        // check if voting period valid
+        $proposal = $system->db->query("SELECT * FROM `proposals` WHERE `proposal_id` = {$proposal_id} LIMIT 1");
+        $proposal = $system->db->fetch($proposal);
+        $seconds_remaining = max(0, (self::PROPOSAL_VOTE_HOURS * 3600) + $proposal['start_time'] - time());
+        if ($seconds_remaining == 0) {
+            return "Voting period expired.";
+        }
+        // cancel vote
+        $system->db->query("DELETE FROM `vote_logs` WHERE `user_id` = {$player->user_id} AND `proposal_id` = {$proposal_id}");
+        if ($system->db->last_affected_rows > 0) {
+            return "Vote canceled.";
+        }
+        return "Something went wrong.";
+    }
+
+    /**
+     * @return string
+     */
+    public static function boostProposalVote(System $system, User $player, int $proposal_id): string {
+        // check if voting period valid
+        $proposal = $system->db->query("SELECT * FROM `proposals` WHERE `proposal_id` = {$proposal_id} LIMIT 1");
+        $proposal = $system->db->fetch($proposal);
+        $seconds_remaining = max(0, (self::PROPOSAL_VOTE_HOURS * 3600) + $proposal['start_time'] - time());
+        if ($seconds_remaining == 0) {
+            return "Voting period expired.";
+        }
+        // check if vote already boosted
+        $vote = $system->db->query("SELECT * FROM `vote_logs` WHERE `proposal_id` = {$proposal_id} AND `user_id` = {$player->user_id} LIMIT 1");
+        $vote = $system->db->fetch($vote);
+        if ($vote['rep_adjustment'] > 0) {
+            return "You have already boosted this vote.";
+        }
+        // boost vote
+        if ($vote['vote'] == self::VOTE_YES) {
+            $adjustment = self::VOTE_BOOST_COST;
+        } else {
+            $adjustment = -(self::VOTE_BOOST_COST);
+        }
+        $system->db->query("UPDATE `vote_logs` SET `rep_adjustment` = {$adjustment} WHERE `vote_id` = {$vote['vote_id']}");
+        return "Vote boosted successfully.";
+    }
+
+    /**
+     * @return string
+     */
+    public static function enactProposal(System $system, User $player, int $proposal_id): string
+    {
+        // check if kage
+        $seat = $player->village_seat;
+        if ($seat->seat_type != "kage") {
+            return "You do not meet the seat requirements.";
+        }
+        $proposal = $system->db->query("SELECT * FROM `proposals` WHERE `proposal_id` = {$proposal_id} AND `village_id` = {$player->village->village_id} AND `end_time` IS NULL LIMIT 1");
+        $proposal = $system->db->fetch($proposal);
+        if ($system->db->last_num_rows == 0) {
+            return "Proposal not found.";
+        }
+        $votes = $system->db->query("SELECT * FROM `vote_logs` WHERE `proposal_id` = {$proposal_id}");
+        $votes = $system->db->fetch_all($votes);
+        // if vote time remaining
+        $vote_seconds_remaining = max(0, (self::PROPOSAL_VOTE_HOURS * 3600) + $proposal['start_time'] - time());
+        $enact_seconds_remaining = max(0, (self::PROPOSAL_VOTE_HOURS * 3600) + (self::PROPOSAL_ENACT_HOURS * 3600) + $proposal['start_time'] - time());
+        if ($vote_seconds_remaining > 0) {
+            $elder_count = $system->db->query("SELECT COUNT(*) as `count` FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_end` IS NULL AND `seat_type` = 'elder'");
+            $elder_count = $system->db->fetch($elder_count);
+            if (count($votes) < $elder_count['count']) {
+                return "All votes must be submitted to enact proposal during voting period.";
+            } else {
+                // if provisional, all votes must be yes
+                if ($player->village_seat->is_provisional) {
+                    $can_enact = true;
+                    foreach ($votes as $vote) {
+                        if ($vote['vote'] != 1) {
+                            $can_enact = false;
+                        }
+                    }
+                    if (!$can_enact) {
+                        return "All Elders must vote yes to pass proposal during provisional period.";
+                    }
+                }
+            }
+        }
+        // if enact time remaining
+        else if ($enact_seconds_remaining > 0) {
+            // if provisional, all votes must be yes
+            if ($player->village_seat->is_provisional) {
+                $can_enact = true;
+                foreach ($votes as $vote) {
+                    if ($vote['vote'] != 1) {
+                        $can_enact = false;
+                    }
+                }
+                if (!$can_enact) {
+                    return "All Elders must vote yes to pass proposal during provisional period.";
+                }
+            }
+        } else {
+            return "Proposal expired.";
+        }
+        // get reputation change
+
+        // switch for type
+        $message;
+        switch ($proposal['type']) {
+            case 'change_policy':
+                // update village policy
+                $system->db->query("UPDATE `villages` SET `policy` = {$proposal['policy_id']} WHERE `village_id` = {$proposal['village_id']}");
+                // update policy log
+                $time = time();
+                $system->db->query("UPDATE `policy_logs` SET `end_time` = {$time} WHERE `village_id` = {$proposal['village_id']} AND `end_time` IS NULL");
+                $system->db->query("INSERT INTO `policy_logs` (`village_id`, `policy`, `start_time`) VALUES ({$proposal['village_id']}, {$proposal['policy_id']}, {$time})");
+                // update proposals
+                $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                $message = "Set village policy: " . self::POLICY_NAMES[$proposal['policy_id']] . ".";
+                break;
+            case 'declare_war':
+                break;
+            case 'form_alliance':
+                break;
+            case 'end_war':
+                break;
+            case 'end_alliance':
+                break;
+            default:
+                return "Invalid proposal type.";
+                break;
+        }
+        // process reputation change
+        $rep_adjustment = 0;
+        foreach ($votes as $vote) {
+            if ($vote['rep_adjustment'] != 0) {
+                $rep_adjustment += $vote['rep_adjustment'];
+                $user = User::loadFromId($system, $vote['user_id']);
+                $user->loadData();
+                $user->reputation->subtractRep($vote['rep_adjustment'], false);
+                $user->updateData();
+            }
+        }
+        if ($rep_adjustment > 0) {
+            $player->reputation->addRep($rep_adjustment, bypass_weekly_cap: true);
+            $message .= "\n You have gained {$rep_adjustment} Reputation!";
+            $player->updateData();
+        } else if ($rep_adjustment < 0) {
+            $player->reputation->subtractRep($rep_adjustment, false);
+            $message .= "\n You have lost {$rep_adjustment} Reputation!";
+            $player->updateData();
+        }
+
+        return $message;
+    }
+
+    /**
+     * @return VillageStrategicInfoDto[]
+     */
+    public static function getVillageStrategicInfo($system): array {
+        $strategic_info = [];
+        for ($i = 1; $i <= 5; $i++) {
+            // get village
+            $village = $system->db->query("SELECT * FROM `villages` WHERE `village_id` = {$i}");
+            $village = $system->db->fetch($village);
+            $village = new Village($system, village_row: $village);
+            // get population
+            $population_data = self::getVillagePopulation($system, $village->name);
+            // get seat holders
+            $seats = self::getVillageSeats($system, $i);
+            // get regions
+            $regions = $system->db->query("SELECT `name` FROM `regions` WHERE `village` = {$i}");
+            $regions = $system->db->fetch_all($regions);
+            // get supply points
+            $supply_points = [];
+            $resource_counts = $system->db->query("SELECT `region_locations`.`resource_id`, COUNT(`region_locations`.`resource_id`) AS `supply_points` FROM `region_locations` INNER JOIN `regions` ON `region_locations`.`region_id` = `regions`.`region_id` WHERE `regions`.`village` = {$i} GROUP BY `region_locations`.`resource_id`");
+            $resource_data = [];
+            while ($row = $system->db->fetch($resource_counts)) {
+                $resource_data[$row['resource_id']] = $row['supply_points'];
+            }
+            foreach (WarManager::RESOURCE_NAMES as $key => $name) {
+                $supply_points[$key] = [
+                    "name" => $name,
+                    "count" => isset($resource_data[$key]) ? $resource_data[$key] : 0,
+                ];
+            }
+            $allies = [];
+            $enemies = [];
+            foreach ($village->relations as $relation) {
+                if ($relation->relation_type == VillageRelation::RELATION_ALLIANCE) {
+                    if ($relation->village1_id != $village->village_id) {
+                        $allies[] = $relation->village1_name;
+                    } else {
+                        $allies[] = $relation->village2_name;
+                    }
+                }
+                else if ($relation->relation_type == VillageRelation::RELATION_WAR) {
+                    if ($relation->village1_id != $village->village_id) {
+                        $enemies[] = $relation->village1_name;
+                    } else {
+                        $enemies[] = $relation->village2_name;
+                    }
+                }
+            }
+            $strategic_info[] = new VillageStrategicInfoDto(
+                village: $village,
+                seats: $seats,
+                population: $population_data,
+                regions: $regions,
+                supply_points: $supply_points,
+                allies: $allies,
+                enemies: $enemies
+            );
+        }
+        return $strategic_info;
     }
 }

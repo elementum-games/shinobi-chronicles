@@ -282,10 +282,12 @@ class UserReputation {
      * Decreases user rep by amount provided
      * If $decrement_weekly is enabled, this will also decrease weekly rep allowing for restricted methods to allow gains again
      */
-    public function subtractRep(int $amount): void {
+    public function subtractRep(int $amount, bool $decrement_weekly = true): void {
         $this->rep -= $amount;
-        $this->weekly_pvp_rep -= $amount;
-        $this->weekly_pvp_rep = max(0, $this->weekly_pvp_rep);
+        if ($decrement_weekly) {
+            $this->weekly_pvp_rep -= $amount;
+            $this->weekly_pvp_rep = max(0, $this->weekly_pvp_rep);
+        }
         //TODO: TEMPORARY! Remove with negative reputation (outlaw update)
         if($this->rep < 0) {
             $this->rep = 0;

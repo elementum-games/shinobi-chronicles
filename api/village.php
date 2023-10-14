@@ -44,7 +44,7 @@ try {
             $message = VillageManager::claimSeat($system, $player, $seat_type);
             $VillageAPIResponse->response = [
                 'seatData' => VillageApiPresenter::seatDataResponse($system, $player),
-                'playerSeat' => VillageManager::getPlayerSeat($system, $player->user_id),
+                'playerSeat' => $player->village_seat,
                 'response_message' => $message,
             ];
             break;
@@ -52,7 +52,64 @@ try {
             $message = VillageManager::resign($system, $player);
             $VillageAPIResponse->response = [
                 'seatData' => VillageApiPresenter::seatDataResponse($system, $player),
-                'playerSeat' => VillageManager::getPlayerSeat($system, $player->user_id),
+                'playerSeat' => $player->village_seat,
+                'response_message' => $message,
+            ];
+            break;
+        case 'CreateProposal':
+            $type = $system->db->clean($_POST['type']);
+            switch ($type) {
+                case "policy":
+                    $policy_id = $system->db->clean($_POST['policy_id']);
+                    $message = VillageManager::createPolicyProposal($system, $player, $policy_id);
+                    break;
+                default:
+                    break;
+            }
+            $VillageAPIResponse->response = [
+                'proposalData' => VillageApiPresenter::proposalDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'CancelProposal':
+            $proposal_id = $system->db->clean($_POST['proposal_id']);
+            $message = VillageManager::cancelProposal($system, $player, $proposal_id);
+            $VillageAPIResponse->response = [
+                'proposalData' => VillageApiPresenter::proposalDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'SubmitVote':
+            $proposal_id = $system->db->clean($_POST['proposal_id']);
+            $vote = $system->db->clean($_POST['vote']);
+            $message = VillageManager::submitProposalVote($system, $player, $vote, $proposal_id);
+            $VillageAPIResponse->response = [
+                'proposalData' => VillageApiPresenter::proposalDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'CancelVote':
+            $proposal_id = $system->db->clean($_POST['proposal_id']);
+            $message = VillageManager::cancelProposalVote($system, $player, $proposal_id);
+            $VillageAPIResponse->response = [
+                'proposalData' => VillageApiPresenter::proposalDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'BoostVote':
+            $proposal_id = $system->db->clean($_POST['proposal_id']);
+            $message = VillageManager::boostProposalVote($system, $player, $proposal_id);
+            $VillageAPIResponse->response = [
+                'proposalData' => VillageApiPresenter::proposalDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'EnactProposal':
+            $proposal_id = $system->db->clean($_POST['proposal_id']);
+            $message = VillageManager::enactProposal($system, $player, $proposal_id);
+            $VillageAPIResponse->response = [
+                'proposalData' => VillageApiPresenter::proposalDataResponse($system, $player),
+                'policyData' => VillageApiPresenter::policyDataResponse($system, $player),
                 'response_message' => $message,
             ];
             break;

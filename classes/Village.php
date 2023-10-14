@@ -16,6 +16,7 @@ class Village {
     public string $kage_name;
     public array $resources = [];
     public array $relations = [];
+    public int $policy = 0;
 
     // to-do: we should restructure how village data is being saved
     // player village should reference the village ID and this constructor should get row by ID
@@ -55,6 +56,8 @@ class Village {
         $this->village_id = $result['village_id'];
         $this->points = $result['points'];
         $this->resources = json_decode($result['resources'], true);
+        $this->policy = $result['policy'];
+        $this->leader = $result['leader'];
     }
 
     public function addResource(int $resource_id, int $quantity) {

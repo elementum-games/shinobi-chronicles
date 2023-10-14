@@ -11,14 +11,200 @@ function Village({
     diplomacyData,
     resourceData,
     clanData,
+    proposalData,
+    strategicData,
 }) {
-    const [seatDataState, setSeatDataState] = React.useState(seatData);
-    const [resourceDataState, setResourceDataState] = React.useState(resourceData);
     const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
+    const [policyDataState, setPolicyDataState] = React.useState(policyData);
+    const [seatDataState, setSeatDataState] = React.useState(seatData);
+    const [pointsDataState, setPointsDataState] = React.useState(pointsData);
+    const [diplomacyDataState, setDiplomacyDataState] = React.useState(diplomacyData);
+    const [resourceDataState, setResourceDataState] = React.useState(resourceData);
+    const [proposalDataState, setProposalDataState] = React.useState(proposalData);
+    const [strategicDataState, setStrategicDataState] = React.useState(strategicData);
+    const [villageTab, setVillageTab] = React.useState("villageHQ");
+
+    function handleErrors(errors) {
+        console.warn(errors);
+    }
+    function getKageKanji(village_id) {
+        switch (village_id) {
+            case 'Stone': return '土影';
+            case 'Cloud': return '雷影';
+            case 'Leaf': return '火影';
+            case 'Sand': return '風影';
+            case 'Mist': return '水影';
+        }
+    }
+    function getVillageIcon(village_id) {
+        switch (village_id) {
+            case 1:
+                return '/images/village_icons/stone.png';
+            case 2:
+                return '/images/village_icons/cloud.png';
+            case 3:
+                return '/images/village_icons/leaf.png';
+            case 4:
+                return '/images/village_icons/sand.png';
+            case 5:
+                return '/images/village_icons/mist.png';
+            default:
+                return null;
+        }
+    }
+    function getPolicyDisplayData(policy_id) {
+        let data = {
+            banner: "",
+            name: "",
+            phrase: "",
+            description: "",
+            bonuses: [],
+            penalties: [],
+            glowClass: ""
+        };
+
+        switch (policy_id) {
+            case 0:
+                data.banner = "";
+                data.name = "Inactive Policy";
+                data.phrase = "";
+                data.description = "";
+                data.bonuses = [];
+                data.penalties = [];
+                data.glowClass = "";
+                break;
+            case 1:
+                data.banner = "/images/v2/decorations/policy_banners/growthpolicy.png";
+                data.name = "From the Ashes";
+                data.phrase = "bonds forged, courage shared.";
+                data.description = "In unity, find the strength to overcome.\nOne village, one heart, one fight.";
+                data.bonuses = ["25% increased Caravan speed", "+5% training speed", "+100% resource production for home region", "Free incoming village transfer"];
+                data.penalties = ["Cannot declare War", "-25 Food/hour"];
+                data.glowClass = "growth_glow";
+                break;
+            case 2:
+                data.banner = "/images/v2/decorations/policy_banners/espionagepolicy.png";
+                data.name = "Eye of the Storm";
+                data.phrase = "half truths, all lies.";
+                data.description = "Become informants dealing in truths and lies.\nDeceive, divide and destroy.";
+                data.bonuses = ["25% increased Infiltrate speed", "+1 Loot gain from Infiltrate", "+1 Stealth", "+5 Loot Capacity"];
+                data.penalties = ["-25 Wealth/hour"];
+                data.glowClass = "espionage_glow";
+                break;
+            case 3:
+                data.banner = "/images/v2/decorations/policy_banners/defensepolicy.png";
+                data.name = "Fortress of Solitude";
+                data.phrase = "vigilant minds, enduring hearts.";
+                data.description = "Show the might of will unyielding.\nPrepare, preserve, prevail.";
+                data.bonuses = ["25% increased Reinforce speed", "+1 Defense gain from Reinforce", "+1 Scouting", "Increased Patrol strength"];
+                data.penalties = ["-25 Materials/hour"];
+                data.glowClass = "defense_glow";
+                break;
+            case 4:
+                data.banner = "/images/v2/decorations/policy_banners/warpolicy.png";
+                data.name = "Forged in Flames";
+                data.phrase = "blades sharp, minds sharper.";
+                data.description = "Lead your village on the path of a warmonger.\nFeel no fear, no hesitation, no doubt.";
+                data.bonuses = ["25% increased Raid speed", "+1 Defense damage from Raid", "+1 Village Point from PvP", "Faster Patrol respawn"];
+                data.penalties = ["Cannot form Alliances", "-25 Materials/hour"];
+                data.glowClass = "war_glow";
+                break;
+            case 5:
+                data.banner = "/images/v2/decorations/policy_banners/prosperitypolicy.png";
+                data.name = "The Gilded Hand";
+                data.phrase = "";
+                data.description = "";
+                data.bonuses = [];
+                data.penalties = [];
+                data.glowClass = "prosperity_glow";
+                break;
+        }
+
+        return data;
+    }
+
+    return (
+        <>
+            <div className="navigation_row">
+                <div className="nav_button" onClick={() => setVillageTab("villageHQ")}>village hq</div>
+                <div className="nav_button disabled">world info</div>
+                <div className="nav_button disabled">war table</div>
+                <div className="nav_button disabled">members & teams</div>
+                <div className={playerSeatState.seat_id != null ? "nav_button" : "nav_button disabled"} onClick={() => setVillageTab("kageQuarters")}>kage's quarters</div>
+            </div>
+            {villageTab == "villageHQ" &&
+                <VillageHQ
+                playerSeatState={playerSeatState}
+                setPlayerSeatState={setPlayerSeatState}
+                villageName={villageName}
+                villageAPI={villageAPI}
+                policyDataState={policyDataState}
+                populationData={populationData}
+                seatDataState={seatDataState}
+                setSeatDataState={setSeatDataState}
+                pointsDataState={pointsDataState}
+                diplomacyDataState={diplomacyDataState}
+                resourceDataState={resourceDataState}
+                setResourceDataState={setResourceDataState}
+                clanData={clanData}
+                handleErrors={handleErrors}
+                getKageKanji={getKageKanji}
+                getVillageIcon={getVillageIcon}
+                getPolicyDisplayData={getPolicyDisplayData}
+                />
+            }
+            {villageTab == "kageQuarters" &&
+                <KageQuarters
+                playerSeatState={playerSeatState}
+                setPlayerSeatState={setPlayerSeatState}
+                villageName={villageName}
+                villageAPI={villageAPI}
+                policyDataState={policyDataState}
+                setPolicyDataState={setPolicyDataState}
+                seatDataState={seatDataState}
+                pointsDataState={pointsDataState}
+                setPointsDataState={setPointsDataState}
+                diplomacyDataState={diplomacyDataState}
+                setDiplomacyDataState={setDiplomacyDataState}
+                resourceDataState={resourceDataState}
+                setResourceDataState={setResourceDataState}
+                proposalDataState={proposalDataState}
+                setProposalDataState={setProposalDataState}
+                strategicDataState={strategicDataState}
+                handleErrors={handleErrors}
+                getKageKanji={getKageKanji}
+                getVillageIcon={getVillageIcon}
+                getPolicyDisplayData={getPolicyDisplayData}
+                StrategicInfoItem={StrategicInfoItem}
+                />
+            }
+        </>
+    );
+}
+
+function VillageHQ({
+    playerSeatState,
+    setPlayerSeatState,
+    villageName,
+    villageAPI,
+    policyDataState,
+    populationData,
+    seatDataState,
+    setSeatDataState,
+    pointsDataState,
+    diplomacyDataState,
+    resourceDataState,
+    setResourceDataState,
+    clanData,
+    handleErrors,
+    getKageKanji,
+    getVillageIcon,
+    getPolicyDisplayData
+}) {
     const [modalState, setModalState] = React.useState("closed");
     const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
+    const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
     const modalText = React.useRef(null);
-
     const DisplayFromDays = (days) => {
         switch (days) {
             case 1:
@@ -104,45 +290,26 @@ function Village({
             modalText.current = "Are you sure you wish to resign from your current position?";
         }
     }
-    function handleErrors(errors) {
-        console.warn(errors);
-    }
-    function getKageKanji(village_id) {
-        switch (village_id) {
-            case 'Stone': return '土影';
-            case 'Cloud': return '雷影';
-            case 'Leaf': return '火影';
-            case 'Sand': return '風影';
-            case 'Mist': return '水影';
-        }
-    }
     const totalPopulation = populationData.reduce((acc, rank) => acc + rank.count, 0);
     const kage = seatDataState.find(seat => seat.seat_type === 'kage');
     return (
         <>
-            <div className="navigation_row">
-                <div className="nav_button">village hq</div>
-                <div className="nav_button disabled">world info</div>
-                <div className="nav_button disabled">war table</div>
-                <div className="nav_button disabled">members & teams</div>
-                <div className="nav_button disabled">kage's quarters</div>
-            </div>
             {modalState !== "closed" &&
                 <>
-                <div className="hq_modal_backdrop"></div>
-                <div className="hq_modal">
-                    <div className="hq_modal_header">Confirmation</div>
-                    <div className="hq_modal_text">{modalText.current}</div>
-                    {modalState == "confirm_resign" &&
-                        <>
-                        <div className="confirm_resign_button" onClick={() => Resign()}>Confirm</div>
-                        <div className="modal_cancel_button" onClick={() => setModalState("closed")}>Cancel</div>
-                        </>
-                    }
-                    {modalState == "response_message" &&
-                        <div className="modal_close_button" onClick={() => setModalState("closed")}>Close</div>
-                    }
-                </div>
+                    <div className="modal_backdrop"></div>
+                    <div className="modal">
+                        <div className="modal_header">Confirmation</div>
+                        <div className="modal_text">{modalText.current}</div>
+                        {modalState == "confirm_resign" &&
+                            <>
+                                <div className="modal_confirm_button" onClick={() => Resign()}>confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "response_message" &&
+                            <div className="modal_close_button" onClick={() => setModalState("closed")}>close</div>
+                        }
+                    </div>
                 </>
             }
             <div className="hq_container">
@@ -169,7 +336,7 @@ function Village({
                                             <div className="population_item_count">{rank.count}</div>
                                         </div>
                                     ))}
-                                <div className="population_item" style={{width: "100%"}}>
+                                <div className="population_item" style={{ width: "100%" }}>
                                     <div className="population_item_header">total</div>
                                     <div className="population_item_count last">{totalPopulation}</div>
                                 </div>
@@ -182,7 +349,7 @@ function Village({
                                 <div className="header">Kage</div>
                                 <div className="kage_kanji">{getKageKanji(villageName)}</div>
                             </div>
-                            
+
                             {kage.avatar_link &&
                                 <div className="kage_avatar_wrapper">
                                     <img className="kage_avatar" src={kage.avatar_link} />
@@ -199,12 +366,12 @@ function Village({
                                 <div className="kage_nameplate_decoration se"></div>
                                 <div className="kage_nameplate_decoration sw"></div>
                                 <div className="kage_name">{kage.user_name ? kage.user_name : "---"}</div>
-                                <div className="kage_title">{kage.seat_title + " of " + villageName + " village"}</div>
+                                <div className="kage_title">{kage.seat_title + " of " + villageName}</div>
                                 {kage.seat_id && kage.seat_id == playerSeatState.seat_id &&
                                     <div className="kage_resign_button" onClick={() => Resign()}>resign</div>
                                 }
                                 {!kage.seat_id &&
-                                    <div className="kage_claim_button disabled">claim</div>
+                                    <div className="kage_claim_button" onClick={() => ClaimSeat("kage")}>claim</div>
                                 }
                                 {(kage.seat_id && kage.seat_id != playerSeatState.seat_id) &&
                                     <div className="kage_challenge_button">challenge</div>
@@ -243,17 +410,56 @@ function Village({
                             <div className="content box-primary">
                                 <div className="points_item">
                                     <div className="points_label">total</div>
-                                    <div className="points_total">{pointsData.points}</div>
+                                    <div className="points_total">{pointsDataState.points}</div>
                                 </div>
                                 <div className="points_item">
                                     <div className="points_label">monthly</div>
-                                    <div className="points_total">{pointsData.points}</div>
-                                </div> 
+                                    <div className="points_total">{pointsDataState.points}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="row second">
+                    <div className="column first">
+                        <div className="header">Village policy</div>
+                        <div className="village_policy_container">
+                            <div className="village_policy_bonus_container">
+                                {policyDisplay.bonuses.map((bonus, index) => (
+                                    <div key={index} className="policy_bonus_item">
+                                        <svg width="16" height="16" viewBox="0 0 100 100">
+                                            <polygon points="25,20 50,45 25,70 0,45" fill="#4a5e45" />
+                                            <polygon points="25,0 50,25 25,50 0,25" fill="#6ab352" />
+                                        </svg>
+                                        <div className="policy_bonus_text">{bonus}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="village_policy_main_container">
+                                <div className="village_policy_main_inner">
+                                    <div className="village_policy_banner" style={{ backgroundImage: "url(" + policyDisplay.banner + ")" }}></div>
+                                    <div className="village_policy_name_container">
+                                        <div className={"village_policy_name " + policyDisplay.glowClass}>{policyDisplay.name}</div>
+                                    </div>
+                                    <div className="village_policy_phrase">{policyDisplay.phrase}</div>
+                                    <div className="village_policy_description">{policyDisplay.description}</div>
+                                </div>
+                            </div>
+                            <div className="village_policy_penalty_container">
+                                {policyDisplay.penalties.map((penalty, index) => (
+                                    <div key={index} className="policy_penalty_item">
+                                        <svg width="16" height="16" viewBox="0 0 100 100">
+                                            <polygon points="25,20 50,45 25,70 0,45" fill="#4f1e1e" />
+                                            <polygon points="25,0 50,25 25,50 0,25" fill="#ad4343" />
+                                        </svg>
+                                        <div className="policy_penalty_text">{penalty}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="row third">
                     <div className="column first">
                         <div className="diplomatic_status_container">
                             <div className="header">Diplomatic status</div>
@@ -264,7 +470,7 @@ function Village({
                                 <div className="last"></div>
                             </div>
                             <div className="content">
-                                {diplomacyData
+                                {diplomacyDataState
                                     .map((village, index) => (
                                         <div key={village.village_name} className="diplomacy_item">
                                             <div className="diplomacy_item_name">
@@ -309,22 +515,683 @@ function Village({
             </div>
         </>
     );
-    function getVillageIcon(village_id) {
-        switch (village_id) {
-            case 1:
-                return '/images/village_icons/stone.png';
-            case 2:
-                return '/images/village_icons/cloud.png';
-            case 3:
-                return '/images/village_icons/leaf.png';
-            case 4:
-                return '/images/village_icons/sand.png';
-            case 5:
-                return '/images/village_icons/mist.png';
-            default:
-                return null;
+}
+
+function KageQuarters({
+    playerSeatState,
+    villageName,
+    villageAPI,
+    policyDataState,
+    setPolicyDataState,
+    seatDataState,
+    pointsDataState,
+    setPointsDataState,
+    diplomacyDataState,
+    resourceDataState,
+    setResourceDataState,
+    proposalDataState,
+    setProposalDataState,
+    strategicDataState,
+    handleErrors,
+    getKageKanji,
+    getVillageIcon,
+    getPolicyDisplayData,
+    StrategicInfoItem
+}) {
+    const kage = seatDataState.find(seat => seat.seat_type === 'kage');
+    const [currentProposal, setCurrentProposal] = React.useState(null);
+    const [currentProposalKey, setCurrentProposalKey] = React.useState(null);
+    const [displayPolicyID, setDisplayPolicyID] = React.useState(policyDataState.policy_id);
+    const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(displayPolicyID));
+    const [proposalRepAdjustment, setProposalRepAdjustment] = React.useState(0);
+    const [strategicDisplayLeft, setStrategicDisplayLeft] = React.useState(strategicDataState.find(item => item.village.name == villageName));
+    const [strategicDisplayRight, setStrategicDisplayRight] = React.useState(strategicDataState.find(item => item.village.name != villageName));
+    const [modalState, setModalState] = React.useState("closed");
+    const modalText = React.useRef(null);
+    const ChangePolicy = () => {
+        if (modalState == "confirm_policy") {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'CreateProposal',
+                    type: 'policy',
+                    policy_id: displayPolicyID,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setProposalDataState(response.data.proposalData);
+                modalText.current = response.data.response_message;
+                setModalState("response_message");
+            });
+        }
+        else {
+            setModalState("confirm_policy");
+            modalText.current = "Are you sure you want to change policies? You will be unable to select a new policy for 14 days.";
         }
     }
+    const CancelProposal = () => {
+        if (modalState == "confirm_cancel_proposal") {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'CancelProposal',
+                    proposal_id: currentProposal.proposal_id,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setProposalDataState(response.data.proposalData);
+                setCurrentProposal(null);
+                setCurrentProposalKey(null);
+                modalText.current = response.data.response_message;
+                setModalState("response_message");
+            });
+        }
+        else {
+            setModalState("confirm_cancel_proposal");
+            modalText.current = "Are you sure you want to cancel this proposal?";
+        }
+    }
+    const EnactProposal = () => {
+        if (modalState == "confirm_enact_proposal") {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'EnactProposal',
+                    proposal_id: currentProposal.proposal_id,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setProposalDataState(response.data.proposalData);
+                if (response.data.proposalData) {
+                    setCurrentProposal(response.data.proposalData[0]);
+                    setCurrentProposalKey(0);
+                } else {
+                    setCurrentProposal(null);
+                    setCurrentProposalKey(null);
+                }
+                setPolicyDataState(response.data.policyData);
+                setDisplayPolicyID(response.data.policyData.policy_id);
+                setPolicyDisplay(getPolicyDisplayData(response.data.policyData.policy_id));
+                modalText.current = response.data.response_message;
+                setModalState("response_message");
+            });
+        }
+        else {
+            setModalState("confirm_enact_proposal");
+            modalText.current = "Are you sure you want to enact this proposal?";
+        }
+    }
+    const BoostVote = () => {
+        if (modalState == "confirm_boost_vote") {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'BoostVote',
+                    proposal_id: currentProposal.proposal_id,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setProposalDataState(response.data.proposalData);
+                setCurrentProposal(response.data.proposalData[currentProposalKey]);
+                modalText.current = response.data.response_message;
+                setModalState("response_message");
+            });
+        }
+        else {
+            setModalState("confirm_boost_vote");
+            modalText.current = "Are you sure you wish to boost this vote?\nThe Kage will gain/lose 500 Reputation based on their decision. This will cost 500 Reputation when the proposal is enacted.";
+        }
+    }
+    const CancelVote = () => {
+        if (modalState == "confirm_cancel_vote") {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'CancelVote',
+                    proposal_id: currentProposal.proposal_id,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setProposalDataState(response.data.proposalData);
+                setCurrentProposal(response.data.proposalData[currentProposalKey]);
+                modalText.current = response.data.response_message;
+                setModalState("response_message");
+            });
+        }
+        else {
+            setModalState("confirm_cancel_vote");
+            modalText.current = "Are you sure you wish to cancel your vote for this proposal?";
+        }
+    }
+    const SubmitVote = (vote) => {
+        apiFetch(
+            villageAPI,
+            {
+                request: 'SubmitVote',
+                proposal_id: currentProposal.proposal_id,
+                vote: vote,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setProposalDataState(response.data.proposalData);
+            setCurrentProposal(response.data.proposalData[currentProposalKey]);
+        });
+    }
+    React.useEffect(() => {
+        if (proposalDataState.length && currentProposal === null) {
+            setCurrentProposal(proposalDataState[0]);
+            setCurrentProposalKey(0);
+            setProposalRepAdjustment(proposalDataState[0].votes.reduce((acc, vote) => acc + parseInt(vote.rep_adjustment), 0));
+        }
+    }, [proposalDataState]);
+    return (
+        <>
+            {modalState !== "closed" &&
+                <>
+                    <div className="modal_backdrop"></div>
+                    <div className="modal">
+                        <div className="modal_header">Confirmation</div>
+                        <div className="modal_text">{modalText.current}</div>
+                        {modalState == "confirm_policy" &&
+                            <>
+                                <div className="modal_confirm_button" onClick={() => ChangePolicy()}>Confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "confirm_cancel_proposal" &&
+                            <>
+                                <div className="modal_confirm_button" onClick={() => CancelProposal()}>Confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "confirm_enact_proposal" &&
+                            <>
+                                <div className="modal_confirm_button" onClick={() => EnactProposal()}>Confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "confirm_boost_vote" &&
+                            <>
+                                <div className="modal_confirm_button" onClick={() => BoostVote()}>Confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "confirm_cancel_vote" &&
+                            <>
+                                <div className="modal_confirm_button" onClick={() => CancelVote()}>Confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "response_message" &&
+                            <div className="modal_close_button" onClick={() => setModalState("closed")}>close</div>
+                        }
+                    </div>
+                </>
+            }
+            <div className="kq_container">
+                <div className="row first">
+                    <div className="column first">
+                        <div className="kage_container">
+                            <div className="kage_header">
+                                <div className="header">Kage</div>
+                                <div className="kage_kanji">{getKageKanji(villageName)}</div>
+                            </div>
+
+                            {kage.avatar_link &&
+                                <div className="kage_avatar_wrapper">
+                                    <img className="kage_avatar" src={kage.avatar_link} />
+                                </div>
+                            }
+                            {!kage.avatar_link &&
+                                <div className="kage_avatar_wrapper_empty">
+                                    <div className="kage_avatar_fill"></div>
+                                </div>
+                            }
+                            <div className="kage_nameplate_wrapper">
+                                <div className="kage_nameplate_decoration nw"></div>
+                                <div className="kage_nameplate_decoration ne"></div>
+                                <div className="kage_nameplate_decoration se"></div>
+                                <div className="kage_nameplate_decoration sw"></div>
+                                <div className="kage_name">{kage.user_name ? kage.user_name : "---"}</div>
+                                <div className="kage_title">{kage.seat_title + " of " + villageName}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="column second">
+                        <div className="proposal_container">
+                            <div className="header">Proposals</div>
+                            <div className="content">
+                                <div className="proposal_container_top">
+                                    <div className="proposal_container_left">
+                                        <svg className="previous_proposal_button" width="25" height="25" viewBox="0 0 100 100" onClick={() => cycleProposal("decrement")}>
+                                            <polygon className="previous_proposal_triangle_inner" points="100,0 100,100 35,50" />
+                                            <polygon className="previous_proposal_triangle_outer" points="65,0 65,100 0,50" />
+                                        </svg>
+                                        <div className="previous_proposal_button_label">previous</div>
+                                    </div>
+                                    <div className="proposal_container_middle">
+                                        {currentProposalKey !== null &&
+                                            <div className="proposal_count">
+                                                PROPOSAL {currentProposalKey + 1} OUT OF {proposalDataState.length}
+                                            </div>
+                                        }
+                                        {currentProposalKey === null &&
+                                            <div className="proposal_count">
+                                                PROPOSAL 0 OUT OF {proposalDataState.length}
+                                            </div>
+                                        }
+                                        <div className="active_proposal_name_container">
+                                            <div className="active_proposal_name">
+                                                {currentProposal ? currentProposal.name : "NO ACTIVE PROPOSALs"}
+                                            </div>
+                                        </div>
+                                        <div className="active_proposal_timer">
+                                            {(currentProposal && currentProposal.vote_time_remaining !== null) && currentProposal.vote_time_remaining}
+                                            {(currentProposal && currentProposal.enact_time_remaining !== null) && currentProposal.enact_time_remaining}
+                                        </div>
+                                    </div>
+                                    <div className="proposal_container_right">
+                                        <svg className="next_proposal_button" width="25" height="25" viewBox="0 0 100 100" onClick={() => cycleProposal("increment")}>
+                                            <polygon className="next_proposal_triangle_inner" points="0,0 0,100 65,50" />
+                                            <polygon className="next_proposal_triangle_outer" points="35,0 35,100 100,50" />
+                                        </svg>
+                                        <div className="next_proposal_button_label">next</div>
+                                    </div>
+                                </div>
+                                <div className="proposal_container_bottom">
+                                    {playerSeatState.seat_type == "kage" &&
+                                        <>
+                                        <div className="proposal_cancel_button_wrapper">
+                                            <div className={currentProposal ? "proposal_cancel_button" : "proposal_cancel_button disabled"} onClick={() => CancelProposal()}>cancel proposal</div>
+                                        </div>
+                                        <div className="proposal_enact_button_wrapper">
+                                            <div className={(currentProposal && (currentProposal.enact_time_remaining !== null ||
+                                                currentProposal.votes.length == seatDataState.filter(seat => seat.seat_type == "elder" && seat.seat_id != null).length
+                                            )) ? "proposal_enact_button" : "proposal_enact_button disabled"} onClick={() => EnactProposal()}>enact proposal</div>
+                                            {proposalRepAdjustment > 0 &&
+                                                <div className="rep_change positive">REPUATION GAIN: +{proposalRepAdjustment}</div>
+                                            }
+                                            {proposalRepAdjustment < 0 &&
+                                                <div className="rep_change negative">REPUTATION LOSS: {proposalRepAdjustment}</div>
+                                            }
+                                        </div>
+                                        </>
+                                    }
+                                    {playerSeatState.seat_type == "elder" &&
+                                        <>
+                                        {!currentProposal &&
+                                            <>
+                                                <div className="proposal_yes_button_wrapper">
+                                                    <div className="proposal_yes_button disabled">vote in favor</div>
+                                                </div>
+                                                <div className="proposal_no_button_wrapper">
+                                                    <div className="proposal_no_button disabled">vote against</div>
+                                                </div>
+                                            </>
+                                        }
+                                        {(currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
+                                            <>
+                                                <div className="proposal_yes_button_wrapper">
+                                                    <div className="proposal_yes_button" onClick={() => SubmitVote(1)}>vote in favor</div>
+                                                </div>
+                                                <div className="proposal_no_button_wrapper">
+                                                    <div className="proposal_no_button" onClick={() => SubmitVote(0)}>vote against</div>
+                                                </div>
+                                            </>
+                                        }
+                                        {(currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
+                                            <>
+                                                <div className="proposal_yes_button_wrapper">
+                                                    <div className="proposal_yes_button disabled">vote in favor</div>
+                                                </div>
+                                                <div className="proposal_no_button_wrapper">
+                                                    <div className="proposal_no_button disabled">vote against</div>
+                                                </div>
+                                            </>
+                                        }
+                                        {(currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
+                                            <>
+                                                <div className="proposal_cancel_vote_button_wrapper">
+                                                <div className="proposal_cancel_vote_button" onClick={() => CancelVote()}>change vote</div>
+                                                </div>
+                                                <div className="proposal_boost_vote_button_wrapper">
+                                                <div className="proposal_boost_vote_button" onClick={() => BoostVote()}>boost vote</div>
+                                                </div>
+                                            </>
+                                        }
+                                        {(currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
+                                            <>
+                                                <div className="proposal_cancel_vote_button_wrapper">
+                                                    <div className="proposal_cancel_vote_button disabled">cancel vote</div>
+                                                </div>
+                                                <div className="proposal_boost_vote_button_wrapper">
+                                                    <div className="proposal_boost_vote_button disabled">boost vote</div>
+                                                </div>
+                                            </>
+                                        }
+                                        </>
+                                    }
+                                </div>
+                            </div>
+                            <div className="proposal_elder_header">Elders</div>
+                            <div className="elder_list">
+                                <svg height="0" width="0">
+                                    <defs>
+                                        <filter id="green_glow">
+                                            <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                                            <feFlood floodColor="green" result="floodColor" />
+                                            <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                                                <feFuncA type="linear" slope="3" />
+                                            </feComponentTransfer>
+                                            <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                                            <feMerge>
+                                                <feMergeNode in="coloredBlur" />
+                                                <feMergeNode in="SourceGraphic" />
+                                            </feMerge>
+                                        </filter>
+                                        <filter id="red_glow">
+                                            <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                                            <feFlood floodColor="red" result="floodColor" />
+                                            <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                                                <feFuncA type="linear" slope="2" />
+                                            </feComponentTransfer>
+                                            <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                                            <feMerge>
+                                                <feMergeNode in="coloredBlur" />
+                                                <feMergeNode in="SourceGraphic" />
+                                            </feMerge>
+                                        </filter>
+                                    </defs>
+                                </svg>
+                                {seatDataState
+                                    .filter(elder => elder.seat_type === 'elder')
+                                    .map((elder, index) => (
+                                        <div key={elder.seat_key} className="elder_item">
+                                            <div className="elder_vote_wrapper" style={{visibility: (currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id )) ? null : "hidden"}}>
+                                                <div className="elder_vote">
+                                                    {(currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id && vote.vote == 1 && parseInt(vote.rep_adjustment) > 0)) &&
+                                                        <img className="vote_yes_image glow" src="/images/v2/icons/yesvote.png" />
+                                                    }
+                                                    {(currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id && vote.vote == 0 && parseInt(vote.rep_adjustment) < 0)) &&
+                                                        <img className="vote_no_image glow" src="/images/v2/icons/novote.png" />
+                                                    }
+                                                    {(currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id && vote.vote == 1 && parseInt(vote.rep_adjustment) == 0)) &&
+                                                        <img className="vote_yes_image" src="/images/v2/icons/yesvote.png"/>
+                                                    }
+                                                    {(currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id && vote.vote == 0 && parseInt(vote.rep_adjustment)  == 0)) &&
+                                                        <img className="vote_no_image" src="/images/v2/icons/novote.png" />
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div className="elder_avatar_wrapper">
+                                                {elder.avatar_link && <img className="elder_avatar" src={elder.avatar_link} />}
+                                                {!elder.avatar_link && <div className="elder_avatar_fill"></div>}
+                                            </div>
+                                            <div className="elder_name">{elder.user_name ? elder.user_name : "---"}</div>
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="row second">
+                    <div className="column first">
+                        <div className="header">Village policy</div>
+                        <div className="village_policy_container">
+                            <div className="village_policy_bonus_container">
+                                {policyDisplay.bonuses.map((bonus, index) => (
+                                    <div key={index} className="policy_bonus_item">
+                                        <svg width="16" height="16" viewBox="0 0 100 100">
+                                            <polygon points="25,20 50,45 25,70 0,45" fill="#4a5e45" />
+                                            <polygon points="25,0 50,25 25,50 0,25" fill="#6ab352" />
+                                        </svg>
+                                        <div className="policy_bonus_text">{bonus}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            {displayPolicyID != policyDataState.policy_id &&
+                                <div className={playerSeatState.seat_type == "kage" ? "village_policy_change_button" : "village_policy_change_button disabled"} onClick={() => ChangePolicy()}>change policy</div>
+                            }
+                            <div className="village_policy_main_container">
+                                <div className="village_policy_main_inner">
+                                    <div className="village_policy_banner" style={{ backgroundImage: "url(" + policyDisplay.banner + ")" }}></div>
+                                    <div className="village_policy_name_container">
+                                        <div className={"village_policy_name " + policyDisplay.glowClass}>{policyDisplay.name}</div>
+                                    </div>
+                                    <div className="village_policy_phrase">{policyDisplay.phrase}</div>
+                                    <div className="village_policy_description">{policyDisplay.description}</div>
+                                    {displayPolicyID > 1 &&
+                                        <div className="village_policy_previous_wrapper">
+                                            <svg className="previous_policy_button" width="20" height="20" viewBox="0 0 100 100" onClick={() => cyclePolicy("decrement")}>
+                                                <polygon className="previous_policy_triangle_inner" points="100,0 100,100 35,50" />
+                                                <polygon className="previous_policy_triangle_outer" points="65,0 65,100 0,50" />
+                                            </svg>
+                                        </div>
+                                    }
+                                    {displayPolicyID < 4 &&
+                                        <div className="village_policy_next_wrapper">
+                                            <svg className="next_policy_button" width="20" height="20" viewBox="0 0 100 100" onClick={() => cyclePolicy("increment")}>
+                                                <polygon className="next_policy_triangle_inner" points="0,0 0,100 65,50" />
+                                                <polygon className="next_policy_triangle_outer" points="35,0 35,100 100,50" />
+                                            </svg>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div className="village_policy_penalty_container">
+                                {policyDisplay.penalties.map((penalty, index) => (
+                                    <div key={index} className="policy_penalty_item">
+                                        <svg width="16" height="16" viewBox="0 0 100 100">
+                                            <polygon points="25,20 50,45 25,70 0,45" fill="#4f1e1e" />
+                                            <polygon points="25,0 50,25 25,50 0,25" fill="#ad4343" />
+                                        </svg>
+                                        <div className="policy_penalty_text">{penalty}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="row third">
+                    <div className="column first">
+                        <div className="kq_navigation_row">
+                            <div className="header">Strategic information</div>
+                        </div>
+                    </div>
+                </div>
+                <div className="row fourth">
+                    <div className="column first">
+                        <div className="strategic_info_container">
+                            <StrategicInfoItem
+                                strategicInfoData={strategicDisplayLeft}
+                            />
+                            <div className="strategic_info_navigation">
+                                {villageName != "Stone" &&
+                                    <div className="strategic_info_nav_button_wrapper stone" onClick={() => setStrategicDisplayRight(strategicDataState[0])}>
+                                        <div className="strategic_info_nav_button_inner">
+                                            <img src={getVillageIcon(1)} className="strategic_info_nav_button_icon" />
+                                        </div>
+                                    </div>
+                                }
+                                {villageName != "Cloud" &&
+                                    <div className="strategic_info_nav_button_wrapper cloud" onClick={() => setStrategicDisplayRight(strategicDataState[1])}>
+                                        <div className="strategic_info_nav_button_inner">
+                                            <img src={getVillageIcon(2)} className="strategic_info_nav_button_icon" />
+                                        </div>
+                                    </div>
+                                }
+                                {villageName != "Leaf" &&
+                                    <div className="strategic_info_nav_button_wrapper leaf" onClick={() => setStrategicDisplayRight(strategicDataState[2])}>
+                                        <div className="strategic_info_nav_button_inner">
+                                            <img src={getVillageIcon(3)} className="strategic_info_nav_button_icon" />
+                                        </div>
+                                    </div>
+                                }
+                                {villageName != "Sand" &&
+                                    <div className="strategic_info_nav_button_wrapper sand" onClick={() => setStrategicDisplayRight(strategicDataState[3])}>
+                                        <div className="strategic_info_nav_button_inner">
+                                            <img src={getVillageIcon(4)} className="strategic_info_nav_button_icon" />
+                                        </div>
+                                    </div>
+                                }
+                                {villageName != "Mist" &&
+                                    <div className="strategic_info_nav_button_wrapper mist" onClick={() => setStrategicDisplayRight(strategicDataState[4])}>
+                                        <div className="strategic_info_nav_button_inner">
+                                            <img src={getVillageIcon(5)} className="strategic_info_nav_button_icon" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <StrategicInfoItem
+                                strategicInfoData={strategicDisplayRight}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+    function cyclePolicy(direction) {
+        var newPolicyID;
+        switch (direction) {
+            case "increment":
+                newPolicyID = Math.min(4, displayPolicyID + 1);
+                setDisplayPolicyID(newPolicyID);
+                setPolicyDisplay(getPolicyDisplayData(newPolicyID));
+                setProposalRepAdjustment(proposalDataState[newPolicyID].votes.reduce((acc, vote) => acc + vote.rep_adjustment, 0));
+                break;
+            case "decrement":
+                newPolicyID = Math.max(1, displayPolicyID - 1);
+                setDisplayPolicyID(newPolicyID);
+                setPolicyDisplay(getPolicyDisplayData(newPolicyID));
+                setProposalRepAdjustment(proposalDataState[newPolicyID].votes.reduce((acc, vote) => acc + vote.rep_adjustment, 0));
+                break;
+        }
+    }
+    function cycleProposal(direction) {
+        if (proposalDataState.length == 0) {
+            return;
+        }
+        var newProposalKey;
+        switch (direction) {
+            case "increment":
+                newProposalKey = Math.min(activeProposals.length - 1, currentProposalKey + 1);
+                setCurrentProposalKey(newProposalKey);
+                setCurrentProposal(activeProposals[newProposalKey]);
+                break;
+            case "decrement":
+                newProposalKey = Math.max(0, currentProposalKey - 1);
+                setCurrentProposalKey(newProposalKey);
+                setCurrentProposal(activeProposals[newProposalKey]);
+                break;
+        }
+    }
+}
+function StrategicInfoItem({ strategicInfoData }) {
+    return (
+        <div className="strategic_info_item">
+            <div className="strategic_info_banner"></div>
+            <div className="strategic_info_name">{strategicInfoData.village.name}</div>
+            <div className="strategic_info_top">
+                <div className="column">
+                    <div className="strategic_info_kage_wrapper">
+                        <div className="strategic_info_label">kage:</div>
+                        {strategicInfoData.seats.find(seat => seat.seat_type == "kage").user_name ?
+                            <div className="strategic_info_seat"><a href={"/?id=6&user=" + strategicInfoData.seats.find(seat => seat.seat_type == "kage").user_name}>{strategicInfoData.seats.find(seat => seat.seat_type == "kage").user_name}</a></div> :
+                            <div className="strategic_info_seat">-None-</div>
+                        }
+                    </div>
+                    <div className="strategic_info_elder_wrapper">
+                        <div className="strategic_info_label">elders:</div>
+                        <div className="strategic_info_elders">
+                            {strategicInfoData.seats.filter(seat => seat.seat_type == "elder")
+                                .map((elder, index) => (
+                                    elder.user_name ?
+                                        <div key={elder.seat_key} className="strategic_info_seat"><a href={"/?id=6&user=" + elder.user_name}>{elder.user_name}</a></div> :
+                                        <div key={elder.seat_key} className="strategic_info_seat">-None-</div>
+                                ))}
+                        </div>
+                    </div>
+                    <div className="strategic_info_points_wrapper">
+                        <div className="strategic_info_label">points:</div>
+                        <div className="strategic_info_points">{strategicInfoData.village.points}</div>
+                    </div>
+                    <div className="strategic_info_enemy_wrapper">
+                        <div className="strategic_info_label">at war with <img className="strategic_info_war_icon" src="/images/icons/war.png" /></div>
+                        <div className="strategic_info_relations">
+                            {strategicInfoData.enemies
+                                .map((ally, index) => (
+                                    <div key={index} className="strategic_info_relation_item">{ally}</div>
+                                ))}
+                        </div>
+                    </div>
+                </div>
+                <div className="column">
+                    <div className="strategic_info_population_wrapper">
+                        <div className="strategic_info_label">village ninja:</div>
+                        <div className="strategic_info_population">
+                            {strategicInfoData.population
+                                .map((rank, index) => (
+                                    <div key={rank.rank} className="strategic_info_population_item">{rank.count + " " + rank.rank}</div>
+                                ))}
+                            <div className="strategic_info_population_item total">{strategicInfoData.population.reduce((acc, rank) => acc + rank.count, 0)} total</div>
+                        </div>
+                    </div>
+                    <div className="strategic_info_ally_wrapper">
+                        <div className="strategic_info_label">allied with <img className="strategic_info_war_icon" src="/images/icons/ally.png" /></div>
+                        <div className="strategic_info_relations">
+                            {strategicInfoData.allies
+                                .map((ally, index) => (
+                                    <div key={index} className="strategic_info_relation_item">{ally}</div>
+                                ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="strategic_info_bottom">
+                <div className="column">
+                    <div className="strategic_info_region_wrapper">
+                        <div className="strategic_info_label">regions owned:</div>
+                        <div className="strategic_info_regions">
+                        {strategicInfoData.regions
+                            .map((region, index) => (
+                                <div key={region.name} className="strategic_info_region_item">{region.name}</div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                <div className="column">
+                    <div className="strategic_info_resource_wrapper">
+                        <div className="strategic_info_label">resource points:</div>
+                        <div className="strategic_info_supply_points">
+                        {Object.values(strategicInfoData.supply_points)
+                            .map((supply_point, index) => (
+                                <div key={index} className="strategic_info_supply_item"><span className="supply_point_name">{supply_point.name}</span> x{supply_point.count}</div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 window.Village = Village;

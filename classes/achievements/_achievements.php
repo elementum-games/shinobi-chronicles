@@ -294,7 +294,7 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         prompt: "Become the first player to claim " . VillageManager::KAGE_NAMES[1] . " of Stone",
         rewards: $seat_rewards[FIRST_TSUCHIKAGE],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            $player_seat = $player->village_seat;
             if (empty($player_seat->seat_id)) {
                 return false;
             }
@@ -312,7 +312,7 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         prompt: "Become the first player to claim " . VillageManager::KAGE_NAMES[2] . " of Cloud",
         rewards: $seat_rewards[FIRST_RAIKAGE],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            $player_seat = $player->village_seat;
             if (empty($player_seat->seat_id)) {
                 return false;
             }
@@ -331,7 +331,7 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         prompt: "Become the first player to claim " . VillageManager::KAGE_NAMES[3] . " of Leaf",
         rewards: $seat_rewards[FIRST_HOKAGE],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            $player_seat = $player->village_seat;
             if (empty($player_seat->seat_id)) {
                 return false;
             }
@@ -350,7 +350,7 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         prompt: "Become the first player to claim " . VillageManager::KAGE_NAMES[4] . " of Sand",
         rewards: $seat_rewards[FIRST_KAZEKAGE],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            $player_seat = $player->village_seat;
             if (empty($player_seat->seat_id)) {
                 return false;
             }
@@ -369,7 +369,7 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         prompt: "Become the first player to claim " . VillageManager::KAGE_NAMES[5] . " of Mist",
         rewards: $seat_rewards[FIRST_MIZUKAGE],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            $player_seat = $player->village_seat;
             if (empty($player_seat->seat_id)) {
                 return false;
             }
@@ -388,8 +388,11 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         prompt: 'Claim the position of Kage',
         rewards: $seat_rewards[CLAIM_KAGE],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            $player_seat = $player->village_seat;
             if (empty($player_seat->seat_id)) {
+                return false;
+            }
+            if ($player_seat->is_provisional) {
                 return false;
             }
             if ($player_seat->seat_type != "kage") {
@@ -405,7 +408,7 @@ $VILLAGE_SEAT_ACHIEVEMENTS = [
         prompt: 'Claim the position of Elder',
         rewards: $seat_rewards[CLAIM_ELDER],
         criteria_check_closure: function (System $system, User $player) {
-            $player_seat = VillageManager::getPlayerSeat($system, $player->user_id);
+            $player_seat = $player->village_seat;
             if (empty($player_seat->seat_id)) {
                 return false;
             }

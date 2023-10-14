@@ -304,6 +304,8 @@ class User extends Fighter {
         'willpower'
     ];
 
+    public VillageSeatDto $village_seat;
+
     /**
      * User constructor.
      * @param System $system
@@ -894,6 +896,9 @@ class User extends Fighter {
 
         // Load training manager
         $this->loadTrainingManager();
+
+        // Get village seat
+        $this->village_seat = VillageManager::getPlayerSeat($this->system, $this->user_id);
 
         return;
     }
@@ -1869,10 +1874,13 @@ class User extends Fighter {
             );
         }
 
-        //Update Daily Tasks
+        // Update Daily Tasks
         if($this->daily_tasks->tasks) {
             $this->daily_tasks->update();
         }
+
+        // Check provisional kage status
+        VillageManager::updateProvisionalKageStatus($this->system, $this);
     }
 
     public function updateLastActive() {

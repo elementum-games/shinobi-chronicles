@@ -256,7 +256,7 @@ class ChatManager {
             }
 
             $title = $this->player->rank->name;
-            $seat = VillageManager::getPlayerSeat($this->system, $this->player->user_id);
+            $seat = $this->player->village_seat;
             if (!empty($seat->seat_title)) {
                 $title = $seat->seat_title;
             }
