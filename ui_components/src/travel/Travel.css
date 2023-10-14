@@ -13,7 +13,7 @@
 
 :root {
     --scout-container-side-width: 230px;
-    --travel-button-size: 30px;
+    --travel-button-size: 42px;
 }
 
 .travel-filter {
@@ -208,13 +208,15 @@
     right: 0;
     margin: 0 auto;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     z-index: 20;
+    gap: 10px;
 }
 
 #content .travel-buttons .button {
+    height: var(--travel-button-size);
     min-width: 100px;
     font-family: sans-serif;
     text-transform: none;
@@ -1197,25 +1199,25 @@
 }
 
 .loot_icon_1 {
-    height: 18px;
-    width: 18px;
+    height: 12px;
+    width: 12px;
     position: absolute;
-    right: 67%;
-    top: 60%;
+    right: 64%;
+    top: 75%;
 }
 .loot_icon_2 {
-    height: 18px;
-    width: 18px;
+    height: 12px;
+    width: 12px;
     position: absolute;
-    left: 70%;
-    top: 60%;
+    left: 63%;
+    top: 75%;
 }
 .loot_icon_3 {
-    height: 18px;
-    width: 18px;
+    height: 12px;
+    width: 12px;
     position: absolute;
-    left: 50%;
-    top: 75%;
+    left: 51%;
+    top: 82%;
     transform: translateX(-50%);
 }
 .loot_display {
@@ -1241,3 +1243,83 @@
     text-shadow: 1.5px 1.5px 1px #564d3e;
 }
 
+.reinforce_button_text {
+    text-transform: uppercase;
+    font-size: smaller;
+    color: var(--heal-text-color);
+}
+.raid_button_text {
+    text-transform: uppercase;
+    font-size: smaller;
+    color: var(--taijutsu-text-color);
+}
+
+.region_objective_details {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    position: absolute;
+    bottom: -65px;
+    left: 50%;
+    right: 0;
+    transform: translateX(-50%);
+    margin: 0 auto;
+    padding: 5px 10px;
+    text-align: center;
+    width: fit-content;
+    white-space: pre;
+    background: #3c2b2bcc;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.46);
+    font-family: sans-serif;
+    color: #fff6e0;
+    z-index: 3;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 1px 0px 2px black;
+    gap: 2px;
+}
+.region_objective:hover .region_objective_details {
+    display: flex;
+}
+.region_objective_details_name {
+    line-height: 18px;
+    display: flex;
+}
+.region_objective_details_village_icon {
+    height: 18px;
+    width: 18px;
+}
+.region_objective_details_resource {
+    line-height: 18px;
+    display: flex;
+    text-transform: capitalize;
+}
+.region_objective_details_resource_icon {
+    height: 18px;
+    width: 18px;
+}
+.region_objective_details_defense {
+    display: flex;
+    line-height: 18px;
+    text-transform: capitalize;
+}
+.region_objective_details_defense_icon {
+    display: inline-block;
+    height: 18px;
+    width: 18px;
+    background-image: url('/images/map/icons/shield.png');
+    background-size: cover;
+    line-height: 17px;
+    font-size: smaller;
+    box-sizing: border-box;
+    padding-right: 1px;
+}
+.region_objective_details_health {
+    line-height: 18px;
+    display: flex;
+}
+.region_objective_details_health_icon {
+    height: 18px;
+    width: 18px;
+}

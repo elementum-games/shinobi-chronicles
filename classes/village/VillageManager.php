@@ -289,7 +289,7 @@ class VillageManager {
     public static function getResourceHistory(System $system, int $village_id, int $days): array
     {
         $resource_history = [];
-        $time = time() - $days * 86400;
+        $time = time() - ($days * 86400);
         foreach (array_keys(WarManager::RESOURCE_NAMES) as $resource_id) {
             // get produced
             $result = $system->db->query("SELECT SUM(`quantity`) as 'produced' FROM `resource_logs` WHERE `resource_id` = {$resource_id} AND `village_id` = {$village_id} AND `type` = " . self::RESOURCE_LOG_PRODUCTION . " AND `time` > {$time}");
@@ -304,26 +304,12 @@ class VillageManager {
             $result = $system->db->fetch($result);
             $resource_history[$resource_id]['claimed'] = (int)$result['claimed'];
             // get lost (lol)
-            // can determine resources lost based on difference of produced and collected
-            $resource_history[$resource_id]['lost'] = $resource_history[$resource_id]['produced'] - $resource_history[$resource_id]['collected'];
-            // factor in resources which haven't been collected from regions
-            $result = $system->db->query("SELECT SUM(`resource_count`) as 'quantity' FROM `region_locations` INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id` WHERE `resource_id` = {$resource_id} AND `village` = {$village_id}");
+            $result = $system->db->query("SELECT COUNT(*) as 'lost' FROM `loot` WHERE `resource_id` = {$resource_id} AND `target_village_id` = {$village_id} AND (`claimed_village_id` != {$village_id} OR `claimed_village_id` IS NULL) AND (`claimed_time` > {$time} OR `claimed_time` IS NULL)");
             $result = $system->db->fetch($result);
-            $resource_history[$resource_id]['lost'] -= (int) $result['quantity'];
+            $resource_history[$resource_id]['lost'] = (int) $result['lost'];
             // get upkeep - WIP
             $resource_history[$resource_id]['spent'] = 0;
         }
-        // extra step to calculate lost resources: don't include resources which haven't been collected from caravans as lost
-        $caravan_result = $system->db->query("SELECT * FROM `caravans` where `village_id` = {$village_id}");
-        $caravan_result = $system->db->fetch_all($caravan_result);
-        foreach ($caravan_result as $caravan) {
-            $caravan_resources = json_decode($caravan['resources'], true);
-            // reduce resource from lost count
-            foreach ($caravan_resources as $resource_id => $quantity) {
-                $resource_history[$resource_id]['lost'] -= $quantity;
-            }
-        }
-
         return $resource_history;
     }
 

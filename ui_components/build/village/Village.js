@@ -34,25 +34,27 @@ function Village({
     }
   };
   const FetchNextIntervalTypeResources = () => {
+    var days;
+    switch (resourceDaysToShow) {
+      case 1:
+        days = 7;
+        break;
+      case 7:
+        days = 30;
+        break;
+      case 30:
+        days = 1;
+        break;
+    }
     apiFetch(villageAPI, {
       request: 'LoadResourceData',
-      days: resourceDaysToShow
+      days: days
     }).then(response => {
       if (response.errors.length) {
         handleErrors(response.errors);
         return;
       }
-      switch (resourceDaysToShow) {
-        case 1:
-          setResourceDaysToShow(7);
-          break;
-        case 7:
-          setResourceDaysToShow(30);
-          break;
-        case 30:
-          setResourceDaysToShow(1);
-          break;
-      }
+      setResourceDaysToShow(days);
       setResourceDataState(response.data);
     });
   };

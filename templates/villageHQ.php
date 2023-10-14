@@ -23,7 +23,7 @@
                 seatData: <?= json_encode(VillageApiPresenter::seatDataResponse($system, $player)) ?>,
                 pointsData: <?= json_encode(VillageApiPresenter::pointsDataResponse($system, $player)) ?>,
                 diplomacyData: <?= json_encode(VillageApiPresenter::diplomacyDataResponse($system, $player)) ?>,
-                resourceData: <?= json_encode(VillageApiPresenter::resourceDataResponse($system, $player, 7)) ?>,
+                resourceData: <?= json_encode(VillageApiPresenter::resourceDataResponse($system, $player, 1)) ?>,
                 clanData: <?= json_encode(VillageApiPresenter::clanDataResponse($system, $player)) ?>,
             }),
             villageContainer

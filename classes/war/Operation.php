@@ -49,8 +49,10 @@ class Operation
     const BASE_OPERATION_INTERVAL = 12; // time per interval
     const BASE_OPERATION_COST = 150; // chakra/stam cost per interval, 750 total
     /* 100 / 20 * 12s = 60s */
-    const LOOT_GAIN = 2;
-    const LOOT_OPERATION_SPEED = 100; // eat loot action is only 1 interval
+    const LOOT_GAIN = 1;
+    const LOOT_OPERATION_SPEED = 100; // each loot action is only 1 interval
+    const LOOT_OPERATION_INTERVAL = 6; // takes half time as normal
+    const LOOT_OPERATION_COST = 75; // takes half pool cost
 
     private System $system;
     private User $user;
@@ -73,7 +75,12 @@ class Operation
         }
         $this->system = $system;
         $this->user = $user;
-        $this->interval_progress = ((time() - $this->last_update) / self::BASE_OPERATION_INTERVAL) * 100;
+        if ($this->type == self::OPERATION_LOOT) {
+            $interval = self::LOOT_OPERATION_INTERVAL;
+        } else {
+            $interval = self::BASE_OPERATION_INTERVAL;
+        }
+        $this->interval_progress = ((time() - $this->last_update) / $interval) * 100;
     }
 
     public function updateData() {
@@ -94,9 +101,17 @@ class Operation
     public function progressActiveOperation(): string
     {
         $message = '';
+        if ($this->type == self::OPERATION_LOOT) {
+            $interval = self::LOOT_OPERATION_INTERVAL;
+            $cost = self::LOOT_OPERATION_COST;
+            $speed = self::LOOT_OPERATION_SPEED;
+        } else {
+            $interval = self::BASE_OPERATION_INTERVAL;
+            $cost = self::BASE_OPERATION_COST;
+            $speed = self::BASE_OPERATION_SPEED;
+        }
         // only progress if active and interval time has passed
-        if ($this->status == self::OPERATION_ACTIVE && time() > $this->last_update + Operation::BASE_OPERATION_INTERVAL) {
-
+        if ($this->status == self::OPERATION_ACTIVE && time() > $this->last_update + $interval) {
             if ($this->type == self::OPERATION_LOOT) {
                 $caravan_target = $this->system->db->query("SELECT * FROM `caravans` WHERE `id` = {$this->target_id} LIMIT 1");
                 $caravan_target = $this->system->db->fetch($caravan_target);
@@ -106,30 +121,39 @@ class Operation
             }
 
             //check pools
-            if ($this->user->chakra < self::BASE_OPERATION_COST || $this->user->stamina < self::BASE_OPERATION_COST) {
-                $this->user->chakra = max($this->user->chakra - self::BASE_OPERATION_COST, 0);
-                $this->user->stamina = max($this->user->stamina - self::BASE_OPERATION_COST, 0);
+            if ($this->user->chakra < $cost || $this->user->stamina < $cost) {
+                $this->user->chakra = max($this->user->chakra - $cost, 0);
+                $this->user->stamina = max($this->user->stamina - $cost, 0);
                 $message .= "You exhausted yourself while " . self::OPERATION_TYPE_DESCRIPTOR[$this->type] . " and were forced to retreat!";
                 $this->status = self::OPERATION_FAILED;
                 $this->handleFailure();
                 return $message;
             }
 
-            $this->user->chakra = max($this->user->chakra - self::BASE_OPERATION_COST, 0);
-            $this->user->stamina = max($this->user->stamina - self::BASE_OPERATION_COST, 0);
+            $this->user->chakra = max($this->user->chakra - $cost, 0);
+            $this->user->stamina = max($this->user->stamina - $cost, 0);
 
             // add progress
-            if ($this->type == Operation::OPERATION_LOOT) {
-                $this->progress += self::LOOT_OPERATION_SPEED;
-            } else {
-                $this->progress += self::BASE_OPERATION_SPEED;
+            $this->progress += $speed;
+
+            // get current loot count
+            $loot_count = 0;
+            $max_loot = WarManager::BASE_LOOT_CAPACITY;
+            $loot_result = $this->system->db->query("SELECT COUNT(*) as `count` FROM `loot` WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL LIMIT 1");
+            if ($this->system->db->last_num_rows > 0) {
+                $loot_result = $this->system->db->fetch($loot_result);
+                $loot_count = $loot_result['count'];
             }
 
             $early_completion = false;
             switch ($this->type) {
                 case self::OPERATION_INFILTRATE:
+                    if ($loot_count >= $max_loot) {
+                        $message .= "You cannot carry any more loot!";
+                        break;
+                    }
                     if ($location_target['resource_count'] > 0) {
-                        $this->system->db->query("INSERT INTO `loot` (`user_id`, `resource_id`) VALUES ({$this->user_id}, {$location_target['resource_id']})");
+                        $this->system->db->query("INSERT INTO `loot` (`user_id`, `resource_id`, `target_village_id`, `target_location_id`) VALUES ({$this->user_id}, {$location_target['resource_id']}, {$this->target_village}, {$this->target_id})");
                         $message .= "Stole 1 " . System::unSlug(WarManager::RESOURCE_NAMES[$location_target['resource_id']]) . "!";
                         $location_target['resource_count']--;
 
@@ -172,6 +196,10 @@ class Operation
                     }
                     break;
                 case self::OPERATION_LOOT:
+                    if ($loot_count >= $max_loot) {
+                        $message .= "You cannot carry any more loot!";
+                        break;
+                    }
                     $caravan_resources = json_decode($caravan_target['resources'], true);
                     for ($i = 0; $i < self::LOOT_GAIN; $i++) {
                         if (!empty($caravan_resources)) {
@@ -180,7 +208,7 @@ class Operation
                             if ($caravan_resources[$random_resource] == 0) {
                                 unset($caravan_resources[$random_resource]);
                             }
-                            $this->system->db->query("INSERT INTO `loot` (`user_id`, `resource_id`) VALUES ({$this->user_id}, {$random_resource})");
+                            $this->system->db->query("INSERT INTO `loot` (`user_id`, `resource_id`, `target_village_id`) VALUES ({$this->user_id}, {$random_resource}, {$this->target_village})");
                             $message .= "Stole 1 " . System::unSlug(WarManager::RESOURCE_NAMES[$random_resource]) . "! ";
                         } else {
                             $message .= "Target has run out of resources!";
@@ -268,7 +296,7 @@ class Operation
                 $message .= "\nGained " . $rep_gain . " village reputation!";
             }
         }
-        // Add stats
+        /* Add stats
         $stat_to_gain = $this->user->getTrainingStatForArena();
         $stat_gain = self::OPERATION_STAT_GAIN[$this->type];
         if ($stat_to_gain != null && $stat_gain > 0) {
@@ -277,7 +305,7 @@ class Operation
                 $message .= "\n" . $stat_gained;
             }
         }
-        $message .= '!';
+        $message .= '!';*/
         $this->user->operation = 0;
         return $message;
     }

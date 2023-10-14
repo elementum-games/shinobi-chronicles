@@ -14,5 +14,6 @@ class RegionObjective {
         public ?string $objective_type = null,
         public int $village_id,
         public int $resource_id,
+        public int $resource_count,
     ) {}
 }

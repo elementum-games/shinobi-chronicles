@@ -120,7 +120,8 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
          "inbox",
          "chat",
          "caravan",
-         "raid",
+         "raid_ally",
+         "raid_enemy",
          "event"
     ];
 

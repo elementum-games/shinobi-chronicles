@@ -226,7 +226,7 @@ class TravelManager {
      */
     #[Trace]
     public function fetchNearbyPlayers(): array {
-        $sql = "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`village`, `users`.`rank`, `users`.`stealth`,
+        $sql = "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`village`, `users`.`rank`, `users`.`stealth`, `users`.`operation`,
                 `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`, `users`.`pvp_immunity_ms`, `villages`.`village_id`
                 FROM `users`
                 INNER JOIN `ranks`
@@ -266,13 +266,26 @@ class TravelManager {
                 }
             }
 
-            // only display attack links if the same rank
+            // loot count
+            $loot_count = 0;
+            $loot_result = $this->system->db->query("SELECT COUNT(*) as `count` FROM `loot` WHERE `user_id` = {$user['user_id']} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL LIMIT 1");
+            if ($this->system->db->last_num_rows > 0) {
+                $loot_result = $this->system->db->fetch($loot_result);
+                $loot_count = $loot_result['count'];
+            }
+
+            // only display attack links if the same rank OR carrying loot OR in war action
             $can_attack = false;
-            if ((int)$user['rank'] === $this->user->rank_num
-                && $this->user->location->equals(TravelCoords::fromDbString($user['location']))
+            if ($this->user->location->equals(TravelCoords::fromDbString($user['location']))
                 && $user['user_id'] != $this->user->user_id
                 && $user['village'] !== $this->user->village->name) {
-                $can_attack = true;
+                if ((int)$user['rank'] === $this->user->rank_num) {
+                    $can_attack = true;
+                } else if ($user['operation'] > 0) {
+                    $can_attack = true;
+                } else if ($loot_count > 0) {
+                    $can_attack = true;
+                }
             }
 
             // calculate direction
@@ -288,13 +301,6 @@ class TravelManager {
             // determine if vulnerable to attack
             if ($user['pvp_immunity_ms'] > System::currentTimeMs()) {
                 $invulnerable = true;
-            }
-
-            $loot_count = 0;
-            $loot_result = $this->system->db->query("SELECT COUNT(*) as `count` FROM `loot` WHERE `user_id` = {$user['user_id']} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL LIMIT 1");
-            if ($this->system->db->last_num_rows > 0) {
-                $loot_result = $this->system->db->fetch($loot_result);
-                $loot_count = $loot_result['count'];
             }
 
             // add to return
@@ -322,7 +328,7 @@ class TravelManager {
 
         // Add more users for display
         if ($this->system->isDevEnvironment()) {
-            $placeholder_coords = new TravelCoords(15, 15, 1);
+            $placeholder_coords = new TravelCoords(19, 14, 1);
 
             for ($i = 0; $i < 2; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
@@ -552,8 +558,19 @@ class TravelManager {
             throw new RuntimeException("You cannot attack people Chuunin rank and higher!");
         }
 
+        // bypass rank restruction if target taking war action or carrying loot
         if ($user->rank_num !== $this->user->rank_num) {
-            throw new RuntimeException("You can only attack people of the same rank!");
+            if ($user->operation == 0) {
+                $loot_count = 0;
+                $loot_result = $this->system->db->query("SELECT COUNT(*) as `count` FROM `loot` WHERE `user_id` = {$user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL LIMIT 1");
+                if ($this->system->db->last_num_rows > 0) {
+                    $loot_result = $this->system->db->fetch($loot_result);
+                    $loot_count = $loot_result['count'];
+                }
+                if ($loot_count == 0) {
+                    throw new RuntimeException("You can only attack people of the same rank!");
+                }
+            }
         }
 
         if (!$user->location->equals($this->user->location)) {
@@ -881,7 +898,7 @@ class TravelManager {
         $objectives = [];
 
         // Get Region Objectives
-        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `type`, `x`, `y`, `resource_id`, `defense`, `village`, `villages`.`name` as `village_name`, `villages`.`village_id` FROM `region_locations`
+        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `type`, `x`, `y`, `resource_id`, `resource_count`, `defense`, `village`, `villages`.`name` as `village_name`, `villages`.`village_id` FROM `region_locations`
             INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
             INNER JOIN `villages` ON `regions`.`village` = `villages`.`village_id`");
         $region_objectives = $this->system->db->fetch_all($region_result);
@@ -910,6 +927,7 @@ class TravelManager {
                             image: $image,
                             village_id: $obj['village_id'],
                             resource_id: $obj['resource_id'],
+                            resource_count: $obj['resource_count'],
                         );
                         break;
                     case "tower":
@@ -928,6 +946,7 @@ class TravelManager {
                             image: $image,
                             village_id: $obj['village_id'],
                             resource_id: $obj['resource_id'],
+                            resource_count: $obj['resource_count'],
                         );
                     case "village":
                         if ($distance <= $this->user->scout_range || $obj['village_name'] == $this->user->village->name) {
@@ -945,6 +964,7 @@ class TravelManager {
                                 image: $image,
                                 village_id: $obj['village_id'],
                                 resource_id: $obj['resource_id'],
+                                resource_count: $obj['resource_count'],
                             );
                         }
                         break;

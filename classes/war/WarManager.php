@@ -40,6 +40,7 @@ class WarManager {
         4 => 0,
     ];
     const PATROL_RESPAWN_TIME = 600;
+    const BASE_LOOT_CAPACITY = 15;
 
     private System $system;
     private User $user;
@@ -73,8 +74,14 @@ class WarManager {
         if (!empty($status)) {
             $operation->status = $status;
         }
+        // check operation target valid
         switch ($operation->status) {
             case Operation::OPERATION_ACTIVE:
+                if (!$this->checkOperationValid($operation)) {
+                    $message = "Operation no longer valid!";
+                    $this->cancelOperation();
+                    break;
+                }
                 $message = $operation->progressActiveOperation();
                 break;
             case Operation::OPERATION_COMPLETE:
@@ -95,6 +102,9 @@ class WarManager {
      * @throws RuntimeException
      */
     public function beginOperation(int $operation_type, int $target_id, Patrol $patrol = null) {
+        if ($this->user->rank_num <= 2) {
+            throw new RuntimeException("Invalid rank!");
+        }
         if ($this->user->battle_id > 0) {
             throw new RuntimeException("You are currently in battle!");
         }
@@ -147,6 +157,58 @@ class WarManager {
         }
     }
 
+    /**
+     * @throws RuntimeException
+     */
+    public function checkOperationValid(Operation $operation): bool {
+        if ($this->user->battle_id > 0) {
+            return false;
+        }
+        if ($operation->type != Operation::OPERATION_LOOT) {
+            $target = $this->system->db->query("SELECT `region_locations`.*, `regions`.`village` FROM `region_locations`
+            INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+            WHERE `id` = {$operation->target_id} LIMIT 1");
+            if ($this->system->db->last_num_rows == 0) {
+                return false;
+            }
+            $target = $this->system->db->fetch($target);
+            // must be at target location
+            $target_location = new TravelCoords($target['x'], $target['y'], $target['map_id']);
+            if ($this->user->location->fetchString() != $target_location->fetchString()) {
+                return false;
+            }
+        }
+        switch ($operation->type) {
+            case Operation::OPERATION_INFILTRATE:
+                // must be neutral or at war
+                if ($this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_NEUTRAL && $this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_WAR) {
+                    return false;
+                }
+                break;
+            case Operation::OPERATION_REINFORCE:
+                // must be owned or ally
+                if ($target['village'] != $this->user->village->village_id && $this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_ALLIANCE) {
+                    return false;
+                }
+                break;
+            case Operation::OPERATION_RAID:
+                // must be at war
+                if ($this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_WAR) {
+                    return false;
+                }
+                break;
+            case Operation::OPERATION_LOOT:
+                // must be neutral or at war
+                if ($this->user->village->relations[$operation->target_village]->relation_type != VillageRelation::RELATION_NEUTRAL && $this->user->village->relations[$patrol->village_id]->relation_type != VillageRelation::RELATION_WAR) {
+                    return false;
+                }
+                break;
+            default:
+                return false;
+        }
+        return true;
+    }
+
     public function cancelOperation() {
         Operation::cancelOperation($this->system, $this->user);
     }
@@ -154,11 +216,15 @@ class WarManager {
     /**
      * @return array
      */
-    public function getValidOperations(): array {
+    public function getValidOperations(bool $for_display = false): array {
         $valid_operations = [];
 
         // exit if war disabled
         if (!$this->system->war_enabled) {
+            return $valid_operations;
+        }
+        // exit if rank below Chuunin
+        if ($this->user->rank_num <= 2) {
             return $valid_operations;
         }
 
@@ -175,6 +241,10 @@ class WarManager {
                 $valid_operations = [
                     Operation::OPERATION_REINFORCE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_REINFORCE]),
                 ];
+                if ($for_display) {
+                    $health_gain = floor($this->user->level / 2);
+                    $valid_operations[Operation::OPERATION_REINFORCE] .= "<br><span class='reinforce_button_text'>{$health_gain} health</span>";
+                }
             } else {
                 switch ($this->user->village->relations[$target_location['village']]->relation_type) {
                     case VillageRelation::RELATION_NEUTRAL:
@@ -186,12 +256,20 @@ class WarManager {
                         $valid_operations = [
                             Operation::OPERATION_REINFORCE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_REINFORCE])
                         ];
+                        if ($for_display) {
+                            $health_gain = floor($this->user->level / 2);
+                            $valid_operations[Operation::OPERATION_REINFORCE] .= "<br><span class='reinforce_button_text'>{$health_gain} health</span>";
+                        }
                         break;
                     case VillageRelation::RELATION_WAR:
                         $valid_operations = [
                             Operation::OPERATION_INFILTRATE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_INFILTRATE]),
                             Operation::OPERATION_RAID => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_RAID]),
                         ];
+                        if ($for_display) {
+                            $damage = max(0, $this->user->level - $target_location['defense']);
+                            $valid_operations[Operation::OPERATION_RAID] .= "<br><span class='raid_button_text'>{$damage} damage</span>";
+                        }
                         break;
                     case 'default':
                         break;
@@ -274,7 +352,7 @@ class WarManager {
         $first = true;
         foreach ($loot_gained as $resource_id => $count) {
             if ($first) {
-                $message .= "Claimed";
+                $message .= "Deposited";
                 $first = false;
             } else {
                 $message .= ",";
@@ -307,5 +385,38 @@ class WarManager {
         }
         $respawn_time = time() + self::PATROL_RESPAWN_TIME;
         $this->system->db->query("UPDATE `patrols` SET `start_time` = {$respawn_time}, `name` = '{$name}', `ai_id` = {$ai_id}, `tier` = {$tier} WHERE `id` = {$patrol_id}");
+    }
+
+    public function handlePatrolWin(int $patrol_id): string
+    {
+        $message = '';
+        // get patrol
+        $result = $this->system->db->query("SELECT * FROM `patrols` WHERE `id` = {$patrol_id} LIMIT 1");
+        $patrol = $this->system->db->fetch($result);
+        $village = VillageManager::getVillageByID($this->system, $patrol['village_id']);
+        // get loot
+        $loot_result = $this->system->db->query("SELECT * FROM `loot` WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL");
+        $loot_result = $this->system->db->fetch_all($loot_result);
+        if ($this->system->db->last_num_rows > 0) {
+            $message .= "<br>Your loot was taken by the enemy patrol and returned to their village.";
+        }
+        $loot_gained = [];
+        foreach ($loot_result as $loot) {
+            // count loot totals
+            if (empty($loot_gained[$loot['resource_id']])) {
+                $loot_gained[$loot['resource_id']] = 1;
+            } else {
+                $loot_gained[$loot['resource_id']] += 1;
+            }
+        }
+        // update village resources
+        foreach ($loot_gained as $resource_id => $count) {
+            $village->addResource($resource_id, $count);
+        }
+        $village->updateResources();
+        // update loot table
+        $time = time();
+        $this->system->db->query("UPDATE `loot` SET `claimed_village_id` = {$village->village_id}, `claimed_time` = {$time}, `battle_id` = NULL, `user_id` = 0 WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL");
+        return $message;
     }
 }
