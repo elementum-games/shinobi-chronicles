@@ -1,5 +1,5 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
-
+import RadarNinjaChart from '../charts/Chart.js';
 function Profile({
   links,
   playerData,
@@ -8,6 +8,20 @@ function Profile({
   playerDailyTasks,
   playerAchievements
 }) {
+  //Chart.js variables
+  const [showChart, setShowChart] = React.useState(false);
+  function handleShowGraph() {
+    setShowChart(!showChart);
+  }
+  //marginRight temp fix for wrapping to same row as chart when window width changes
+  let showChartButtonStyle = {
+    display: 'block',
+    marginRight: '75%',
+    backgroundColor: 'rgb(20, 19, 23)',
+    color: 'rgb(209, 197, 173)',
+    borderRadius: '12px 12px 0 0',
+    marginTop: '10px'
+  };
   return /*#__PURE__*/React.createElement("div", {
     className: "profile_container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -16,10 +30,15 @@ function Profile({
     playerData: playerData,
     links: links,
     playerSettings: playerSettings
-  })), /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement("button", {
+    style: showChartButtonStyle,
+    onClick: handleShowGraph
+  }, !showChart ? "Show Graph" : "Show Stats"), /*#__PURE__*/React.createElement("div", {
     className: "profile_row_second"
-  }, /*#__PURE__*/React.createElement(PlayerStats, {
+  }, !showChart ? /*#__PURE__*/React.createElement(PlayerStats, {
     playerData: playerData,
+    playerStats: playerStats
+  }) : /*#__PURE__*/React.createElement(RadarNinjaChart, {
     playerStats: playerStats
   }), /*#__PURE__*/React.createElement("div", {
     className: "profile_row_second_col2"
@@ -37,7 +56,6 @@ function Profile({
     playerAchievements: playerAchievements
   })));
 }
-
 function StatusAttributes({
   playerData,
   playerSettings,
@@ -107,7 +125,6 @@ function StatusAttributes({
     href: links.team
   }, playerData.teamName)))))));
 }
-
 function PlayerStats({
   playerData,
   playerStats
@@ -182,7 +199,6 @@ function PlayerStats({
     className: "ft-c3"
   })))));
 }
-
 function PlayerBloodline({
   playerData,
   bloodlinePageUrl,
@@ -204,7 +220,6 @@ function PlayerBloodline({
     href: buyBloodlineUrl
   }, "None")));
 }
-
 function PlayerUserRep({
   playerData
 }) {
@@ -225,7 +240,6 @@ function PlayerUserRep({
     className: "weekly_reputation"
   }, playerData.weeklyRep, "/", playerData.maxWeeklyRep, " PvE \xA0|\xA0\xA0", playerData.weeklyPvpRep, "/", playerData.maxWeeklyPvpRep, " PvP")));
 }
-
 function DailyTasks({
   dailyTasks
 }) {
@@ -256,7 +270,6 @@ function DailyTasks({
     }
   }, dailyTask.progressCaption)))));
 }
-
 function PlayerAchievements({
   playerAchievements
 }) {
@@ -282,5 +295,4 @@ function PlayerAchievements({
     className: "progress_label"
   }, achievement.progressLabel)))));
 }
-
 window.Profile = Profile;

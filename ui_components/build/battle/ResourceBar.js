@@ -39,22 +39,20 @@ export function ResourceBar({
 }) {
   const resource_percent = Math.round(currentAmount / maxAmount * 100);
   let resourceFillStyle = {};
-
   switch (resourceType) {
     case 'health':
       resourceFillStyle = styles.healthFill;
       break;
-
     case 'chakra':
       resourceFillStyle = styles.chakraFill;
       break;
   }
-
   return /*#__PURE__*/React.createElement("div", {
     className: "resourceBarOuter",
     style: styles.resourceBarOuter
   }, /*#__PURE__*/React.createElement("div", {
-    style: { ...styles.resourceFill,
+    style: {
+      ...styles.resourceFill,
       ...resourceFillStyle,
       width: `${resource_percent}%`
     }

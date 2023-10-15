@@ -14,19 +14,16 @@ export default function BattleField({
   debug('--- render(BattleField) ---');
   const [containerSize, setContainerSize] = React.useState(null);
   const containerRef = React.useRef(null);
-
   const setContainerRef = el => {
     if (el == null || containerRef.current === el) {
       return;
     }
-
     containerRef.current = el;
     setContainerSize({
       width: containerRef.current.offsetWidth,
       height: containerRef.current.offsetHeight
     });
   };
-
   const tileSize = 80;
   return /*#__PURE__*/React.createElement("div", {
     className: `battleFieldContainer`,
@@ -47,7 +44,6 @@ export default function BattleField({
     onTileSelect: onTileSelect
   }));
 }
-
 function BattleFieldContent({
   containerSize,
   tileSize,
@@ -61,25 +57,23 @@ function BattleFieldContent({
   onTileSelect
 }) {
   const tilesContainerEdgeBuffer = tileSize * 5;
+
   /*
    Why a ref for tilesToDisplay? We need to use latest tilesToDisplay value inside the tile transition hook without
    re-triggering the transition when tilesToDisplay gets set to an intermediate state during the transition process.
    */
-
   const [tilesToDisplay, _setTilesToDisplay] = React.useState(tiles);
   const latestTilesToDisplayRef = React.useRef(tilesToDisplay);
-
   function setTilesToDisplay(newTilesToDisplay) {
     _setTilesToDisplay(newTilesToDisplay);
-
     latestTilesToDisplayRef.current = newTilesToDisplay;
   }
-
   const [leftmostVisibleTileIndex, setLeftmostVisibleTileIndex] = React.useState(tiles[0].index);
   const [numVisibleTiles, setNumVisibleTiles] = React.useState(tiles.length);
   const [manualCameraTilesOffset, setManualCameraTilesOffset] = React.useState(0);
   const [disableTransitions, setDisableTransitions] = React.useState(false);
   debug('----------------');
+
   /* Transition tile display
         Example 1:
           Starting tiles
@@ -102,21 +96,19 @@ function BattleFieldContent({
             Disable transitions and update to tiles
           | 1 2 3 4 5 6 |
    */
-
   React.useEffect(() => {
     const latestTilesToDisplay = latestTilesToDisplayRef.current;
     debug('transition tiles', latestTilesToDisplay, tiles);
-
     if (JSON.stringify(tiles) === JSON.stringify(latestTilesToDisplay)) {
       debug('tiles and tilesToDisplay are the same');
       return;
     }
-
     let leftIndex = latestTilesToDisplay[0].index;
     let rightIndex = latestTilesToDisplay.slice(-1)[0].index;
     let newLeftIndex = tiles[0].index;
-    let newRightIndex = tiles.slice(-1)[0].index; // Add new tiles
+    let newRightIndex = tiles.slice(-1)[0].index;
 
+    // Add new tiles
     if (newLeftIndex < leftIndex) {
       let newTiles = tiles.slice(0, leftIndex - newLeftIndex);
       debug('newTiles (left)', newTiles);
@@ -130,16 +122,17 @@ function BattleFieldContent({
       debug('indexes are the same');
       setTilesToDisplay(tiles);
       return;
-    } // Animated scroll container to show new tiles
+    }
 
-
+    // Animated scroll container to show new tiles
     const scrollContainerDelay = transitionTimeMs + 100;
     setTimeout(() => {
       debug('Scroll container to new tiles', leftIndex, newLeftIndex);
       setManualCameraTilesOffset(newLeftIndex - leftIndex);
       setNumVisibleTiles(tiles.length);
-    }, scrollContainerDelay); // Turn off transitions and snap battlefield to new state
+    }, scrollContainerDelay);
 
+    // Turn off transitions and snap battlefield to new state
     setTimeout(() => {
       debug('Switch visible tiles to new visible set', leftIndex, newLeftIndex);
       setDisableTransitions(true);
@@ -155,19 +148,14 @@ function BattleFieldContent({
   }, [tiles]);
   const freeWidth = containerSize.width - tileSize * numVisibleTiles;
   const freeHeight = containerSize.height - tileSize;
-
   if (freeWidth < 0) {
     throw new Error("Rendering too many tiles!");
   }
-
   if (freeHeight < 0) {
     throw new Error("Container is not tall enough!");
   }
-
   const tileHorizontalGap = freeWidth / (numVisibleTiles + 1); // + 1 so we have an equal margin to the right of the last tile
-
   const offsetPerTile = tileHorizontalGap + tileSize;
-
   function getBoundingRectForTile(tileIndex) {
     /* Display index is based on which tiles are displayed, while tile index is the absolute index
      if the fighters have moved to the right a few times, we might display tile indexes 4-9 like this:
@@ -183,7 +171,6 @@ function BattleFieldContent({
       left: tilesContainerEdgeBuffer + leftOffset
     };
   }
-
   const offset = manualCameraTilesOffset * offsetPerTile;
   const leftCameraPosition = (tilesContainerEdgeBuffer + offset) * -1;
   return /*#__PURE__*/React.createElement("div", {
@@ -214,7 +201,6 @@ function BattleFieldContent({
     getBoundingRectForTile: getBoundingRectForTile
   }));
 }
-
 function BattleFieldTiles({
   tilesToDisplay,
   getBoundingRectForTile,
@@ -225,16 +211,13 @@ function BattleFieldTiles({
   onTileSelect
 }) {
   const [hoveredTile, setHoveredTile] = React.useState(null);
-
   function distanceToPlayer(tileIndex) {
     return Math.abs(tileIndex - playerLocation);
   }
-
   function shouldShowAttackTarget(tile) {
     if (selectedJutsu == null) {
       return false;
     }
-
     if (selectedJutsu.targetType === "tile") {
       return selectedJutsu ? distanceToPlayer(tile.index) <= selectedJutsu.range : false;
     } else if (selectedJutsu.targetType === "fighter_id") {
@@ -243,25 +226,19 @@ function BattleFieldTiles({
       if (tile.index === playerLocation) {
         return false;
       }
-
       return selectedJutsu ? distanceToPlayer(tile.index) <= selectedJutsu.range : false;
     }
-
     return false;
   }
-
   function shouldShowAttackPreview(tile) {
     if (selectedJutsu == null || selectedJutsu.targetType !== "direction") {
       return false;
     }
-
     if (hoveredTile == null) {
       return false;
     }
-
     return distanceToPlayer(tile.index) <= selectedJutsu.range && distanceToPlayer(hoveredTile) <= selectedJutsu.range && (hoveredTile > playerLocation && tile.index > playerLocation || hoveredTile < playerLocation && tile.index < playerLocation);
   }
-
   return /*#__PURE__*/React.createElement(React.Fragment, null, tilesToDisplay.map(tile => {
     const tileBoundingRect = getBoundingRectForTile(tile.index);
     return /*#__PURE__*/React.createElement("div", {
@@ -276,9 +253,7 @@ function BattleFieldTiles({
       }
     }, /*#__PURE__*/React.createElement(BattleFieldTile, {
       index: tile.index,
-      canMoveTo: isMovementPhase
-      /* && !tile.fighterIds.includes(player.id)*/
-      ,
+      canMoveTo: isMovementPhase /* && !tile.fighterIds.includes(player.id)*/,
       showAttackTarget: shouldShowAttackTarget(tile),
       showAttackPreview: shouldShowAttackPreview(tile),
       onSelect: () => onTileSelect(tile.index),
@@ -287,7 +262,6 @@ function BattleFieldTiles({
     }));
   }));
 }
-
 function BattleFieldTile({
   index,
   canMoveTo,
@@ -298,19 +272,15 @@ function BattleFieldTile({
   onMouseLeave
 }) {
   const classes = ['tile'];
-
   if (canMoveTo) {
     classes.push('movementTarget');
   }
-
   if (showAttackTarget) {
     classes.push('attackTarget');
   }
-
   if (showAttackPreview) {
     classes.push('attackPreview');
   }
-
   return /*#__PURE__*/React.createElement("div", {
     className: classes.join(' '),
     onClick: canMoveTo || showAttackTarget ? onSelect : null,
@@ -320,7 +290,6 @@ function BattleFieldTile({
     className: "tileIndex"
   }, index));
 }
-
 function BattleFieldFighters({
   tileSize,
   fighters,
@@ -329,29 +298,27 @@ function BattleFieldFighters({
   getBoundingRectForTile
 }) {
   const fighterDisplaySize = 30;
-
   const fightersForIds = ids => {
     return ids.map(id => fighters[id]).filter(Boolean);
   };
-
   function distributeFightersOnTile(fightersOnTile) {
     const allyFighters = fightersOnTile.filter(fighter => fighter.isAlly);
     const enemyFighters = fightersOnTile.filter(fighter => !fighter.isAlly);
     const fighterLocationsOnTile = {};
     const spacingWhenTwoFighters = (tileSize - fighterDisplaySize * 2) / 3;
-    const spacingWhenOneFighter = (tileSize - fighterDisplaySize) / 2; // Two teams, spread horizontally
+    const spacingWhenOneFighter = (tileSize - fighterDisplaySize) / 2;
 
+    // Two teams, spread horizontally
     let allyLeftPosition, enemyLeftPosition;
-
     if (allyFighters.length > 0 && enemyFighters.length > 0) {
       allyLeftPosition = spacingWhenTwoFighters;
       enemyLeftPosition = spacingWhenTwoFighters + fighterDisplaySize + spacingWhenTwoFighters;
-    } // One team, center horizontally
+    }
+    // One team, center horizontally
     else {
       allyLeftPosition = spacingWhenOneFighter;
       enemyLeftPosition = spacingWhenOneFighter;
     }
-
     if (allyFighters.length === 2) {
       fighterLocationsOnTile[allyFighters[0].id] = {
         top: spacingWhenTwoFighters,
@@ -367,7 +334,6 @@ function BattleFieldFighters({
         left: allyLeftPosition
       };
     }
-
     if (enemyFighters.length === 2) {
       fighterLocationsOnTile[enemyFighters[0].id] = {
         top: spacingWhenTwoFighters,
@@ -383,29 +349,23 @@ function BattleFieldFighters({
         left: enemyLeftPosition
       };
     }
-
     return fighterLocationsOnTile;
   }
-
   const fighterIdsByTile = {};
   Object.keys(fighterLocations).forEach(fighterId => {
     const tileIndex = fighterLocations[fighterId];
-
     if (fighterIdsByTile[tileIndex] == null) {
       fighterIdsByTile[tileIndex] = [];
     }
-
     fighterIdsByTile[tileIndex].push(fighterId);
   });
   const fighterPositions = {};
   Object.keys(fighterIdsByTile).forEach(tileIndexStr => {
     const tileIndex = parseInt(tileIndexStr);
     const fightersOnTile = fightersForIds(fighterIdsByTile[tileIndex]);
-
     if (fightersOnTile.length > 4) {
       throw new Error(`Too many fighters on tile ${tileIndex}!`);
     }
-
     const tileBoundingRect = getBoundingRectForTile(tileIndex);
     const fighterPositionsOnTile = distributeFightersOnTile(fightersOnTile);
     fightersOnTile.forEach(fighter => {
@@ -416,10 +376,11 @@ function BattleFieldFighters({
         height: fighterDisplaySize
       };
     });
-  }); // We want to ensure fighters always render in the same order so each fighter has a stable DOM element. This means
+  });
+
+  // We want to ensure fighters always render in the same order so each fighter has a stable DOM element. This means
   // when they move, the CSS transition will smoothly move them to the new position instead of them switching to a new
   // DOM element and snapping to the new location
-
   const fighterIds = Object.keys(fighters).sort();
   return /*#__PURE__*/React.createElement(React.Fragment, null, fighterIds.map(fighterId => {
     const fighter = fighters[fighterId];
@@ -427,7 +388,8 @@ function BattleFieldFighters({
     return /*#__PURE__*/React.createElement("div", {
       key: `fighter:${fighterId}`,
       className: `tileFighter ${fighter.isAlly ? 'ally' : 'enemy'}`,
-      style: { ...fighterPositions[fighter.id],
+      style: {
+        ...fighterPositions[fighter.id],
         transition: transition
       }
     }, /*#__PURE__*/React.createElement(FighterAvatar, {
@@ -439,8 +401,8 @@ function BattleFieldFighters({
     }));
   }));
 }
-
 function debug(...contents) {
   //if(window.debug) {
-  console.log(...contents); // }
+  console.log(...contents);
+  // }
 }

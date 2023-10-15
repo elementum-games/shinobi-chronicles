@@ -9,6 +9,12 @@
 <link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/profile/Profile.css") ?>" />
 <div id="profileReactContainer"></div>
 <script type="module" src="<?= $system->getReactFile("profile/Profile") ?>"></script>
+
+<!-- Chart.js - required for {MyChart} Component in Profile.js -->
+<script src="
+https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js
+"></script>
+
 <!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->
 <script type="text/javascript">
     const profileContainer = document.querySelector("#profileReactContainer");

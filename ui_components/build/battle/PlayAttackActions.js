@@ -7,27 +7,23 @@ export function PlayAttackActions({
   const turnNumber = lastTurnLog?.turnNumber || 0;
   const [prevTurnNumber, setPrevTurnNumber] = React.useState(turnNumber);
   const [attacksToRender, setAttacksToRender] = React.useState([]);
-
   if (lastTurnLog == null) {
     return null;
   }
-
   function addAttackToRender(attack) {
     setAttacksToRender(prevValue => [...prevValue, attack]);
   }
-
   window.addAttackToRender = addAttackToRender;
-
   if (prevTurnNumber !== turnNumber) {
     setPrevTurnNumber(turnNumber);
     setAttacksToRender([]);
-
     if (lastTurnLog.isAttackPhase) {
       Object.keys(lastTurnLog.fighterActions).forEach(key => {
         addAttackToRender(lastTurnLog.fighterActions[key]);
       });
     }
   }
+
   /*React.useEffect(() => {
       let testAttack = {
           "fighterId": "T1:U:1",
@@ -57,7 +53,6 @@ export function PlayAttackActions({
         setTimeout(() => addAttackToRender(testAttack), 500);
   }, []);*/
 
-
   console.log('attacksToRender', attacksToRender);
   return /*#__PURE__*/React.createElement(React.Fragment, null, attacksToRender.map((attack, i) => {
     if (attack.jutsuUseType === 'projectile') {
@@ -81,7 +76,6 @@ export function PlayAttackActions({
     }
   }));
 }
-
 function ProjectileAttack({
   attackIndex,
   attack,
@@ -95,8 +89,9 @@ function ProjectileAttack({
   const endingTileIndex = attack.pathSegments[attack.pathSegments.length - 1].tileIndex;
   const startingTileRect = getBoundingRectForTile(startingTileIndex);
   const endingTileRect = getBoundingRectForTile(endingTileIndex);
-  const direction = startingTileIndex > fighterLocations[attack.fighterId] ? "right" : "left"; // move attack start 0.5 tile closer to caster
+  const direction = startingTileIndex > fighterLocations[attack.fighterId] ? "right" : "left";
 
+  // move attack start 0.5 tile closer to caster
   const leftOffset = (fighterLocations[attack.fighterId] - startingTileIndex) * 0.5 * tileSize;
   const leftDifference = endingTileRect.left - (startingTileRect.left + leftOffset);
   const durationMs = initialTravelTime + Math.abs(endingTileIndex - startingTileIndex) * travelTimePerTile;
@@ -109,7 +104,8 @@ function ProjectileAttack({
     "Lightning": '/images/battle/lightning_hori_wave.gif',
     "None": '/images/battle/chakra_ball.gif'
   };
-  const attackImage = ninjutsuElementImages[attack.jutsuElement]; // TODO: Taijutsu/Genjutsu
+  const attackImage = ninjutsuElementImages[attack.jutsuElement];
+  // TODO: Taijutsu/Genjutsu
 
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("style", null, `
                 @keyframes attack_${attackIndex} {
@@ -153,7 +149,6 @@ function ProjectileAttack({
     className: `projectile ${direction}`
   })));
 }
-
 function PhysicalAttack({
   attackIndex,
   attack,
@@ -167,8 +162,9 @@ function PhysicalAttack({
   const endingTileIndex = attack.pathSegments[attack.pathSegments.length - 1].tileIndex;
   const startingTileRect = getBoundingRectForTile(startingTileIndex);
   const endingTileRect = getBoundingRectForTile(endingTileIndex);
-  const direction = startingTileIndex > fighterLocations[attack.fighterId] ? "right" : "left"; // move attack start 0.5 tile closer to caster
+  const direction = startingTileIndex > fighterLocations[attack.fighterId] ? "right" : "left";
 
+  // move attack start 0.5 tile closer to caster
   const leftOffset = (fighterLocations[attack.fighterId] - startingTileIndex) * 0.5 * tileSize;
   const leftDifference = endingTileRect.left - (startingTileRect.left + leftOffset);
   const durationMs = initialTravelTime + Math.abs(endingTileIndex - startingTileIndex) * travelTimePerTile;
@@ -176,8 +172,8 @@ function PhysicalAttack({
     "Punch": '/images/battle/taijutsu/fist1.png',
     "Kick": '/images/battle/taijutsu/foot1.png'
   };
-  /*const attackImage = images[attack.jutsuElement];*/
 
+  /*const attackImage = images[attack.jutsuElement];*/
   const attackImage = images["Kick"];
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("style", null, `
                 @keyframes attack_${attackIndex} {
