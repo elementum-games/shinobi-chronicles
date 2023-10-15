@@ -181,25 +181,25 @@ class WarManager {
         switch ($operation->type) {
             case Operation::OPERATION_INFILTRATE:
                 // must be neutral or at war
-                if ($this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_NEUTRAL && $this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_WAR) {
+                if ($this->user->village->isAlly($target['village'])) {
                     return false;
                 }
                 break;
             case Operation::OPERATION_REINFORCE:
                 // must be owned or ally
-                if ($target['village'] != $this->user->village->village_id && $this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_ALLIANCE) {
+                if ($target['village'] != $this->user->village->village_id && !$this->user->village->isAlly($target['village'])) {
                     return false;
                 }
                 break;
             case Operation::OPERATION_RAID:
                 // must be at war
-                if ($this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_WAR) {
+                if (!$this->user->village->isEnemy($target['village'])) {
                     return false;
                 }
                 break;
             case Operation::OPERATION_LOOT:
                 // must be neutral or at war
-                if ($this->user->village->relations[$operation->target_village]->relation_type != VillageRelation::RELATION_NEUTRAL && $this->user->village->relations[$patrol->village_id]->relation_type != VillageRelation::RELATION_WAR) {
+                if ($this->user->village->isAlly($operation->target_village)) {
                     return false;
                 }
                 break;

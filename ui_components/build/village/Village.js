@@ -129,7 +129,8 @@ function Village({
     className: "nav_button",
     onClick: () => setVillageTab("villageHQ")
   }, "village hq"), /*#__PURE__*/React.createElement("div", {
-    className: "nav_button disabled"
+    className: "nav_button",
+    onClick: () => setVillageTab("worldInfo")
   }, "world info"), /*#__PURE__*/React.createElement("div", {
     className: "nav_button disabled"
   }, "war table"), /*#__PURE__*/React.createElement("div", {
@@ -177,6 +178,12 @@ function Village({
     getVillageIcon: getVillageIcon,
     getPolicyDisplayData: getPolicyDisplayData,
     StrategicInfoItem: StrategicInfoItem
+  }), villageTab == "worldInfo" && /*#__PURE__*/React.createElement(WorldInfo, {
+    villageName: villageName,
+    strategicDataState: strategicDataState,
+    getVillageIcon: getVillageIcon,
+    StrategicInfoItem: StrategicInfoItem,
+    getPolicyDisplayData: getPolicyDisplayData
   }));
 }
 function VillageHQ({
@@ -633,11 +640,11 @@ function KageQuarters({
       modalText.current = "Are you sure you want to offer peace with " + strategicDisplayRight.village.name + "?";
     }
   };
-  const FormAlliance = () => {
+  const OfferAlliance = () => {
     if (modalState == "confirm_form_alliance") {
       apiFetch(villageAPI, {
         request: 'CreateProposal',
-        type: 'form_alliance',
+        type: 'offer_alliance',
         target_village_id: strategicDisplayRight.village.village_id
       }).then(response => {
         if (response.errors.length) {
@@ -836,7 +843,7 @@ function KageQuarters({
     onClick: () => setModalState("closed")
   }, "cancel")), modalState == "confirm_form_alliance" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "modal_confirm_button",
-    onClick: () => FormAlliance()
+    onClick: () => OfferAlliance()
   }, "Confirm"), /*#__PURE__*/React.createElement("div", {
     className: "modal_cancel_button",
     onClick: () => setModalState("closed")
@@ -1191,7 +1198,8 @@ function KageQuarters({
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_container"
   }, /*#__PURE__*/React.createElement(StrategicInfoItem, {
-    strategicInfoData: strategicDisplayLeft
+    strategicInfoData: strategicDisplayLeft,
+    getPolicyDisplayData: getPolicyDisplayData
   }), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_navigation"
   }, /*#__PURE__*/React.createElement("div", {
@@ -1211,7 +1219,7 @@ function KageQuarters({
     className: "diplomacy_action_button_inner"
   })), strategicDisplayLeft.allies.find(ally => ally != strategicDisplayRight.village.name) ? /*#__PURE__*/React.createElement("div", {
     className: "diplomacy_action_button_wrapper alliance",
-    onClick: () => FormAlliance()
+    onClick: () => OfferAlliance()
   }, /*#__PURE__*/React.createElement("div", {
     className: "diplomacy_action_button_inner"
   }, /*#__PURE__*/React.createElement("img", {
@@ -1265,7 +1273,8 @@ function KageQuarters({
     src: getVillageIcon(5),
     className: "strategic_info_nav_button_icon"
   }))))), /*#__PURE__*/React.createElement(StrategicInfoItem, {
-    strategicInfoData: strategicDisplayRight
+    strategicInfoData: strategicDisplayRight,
+    getPolicyDisplayData: getPolicyDisplayData
   }))))));
   function cyclePolicy(direction) {
     var newPolicyID;
@@ -1291,28 +1300,126 @@ function KageQuarters({
     var newProposalKey;
     switch (direction) {
       case "increment":
-        newProposalKey = Math.min(activeProposals.length - 1, currentProposalKey + 1);
+        newProposalKey = Math.min(proposalDataState.length - 1, currentProposalKey + 1);
         setCurrentProposalKey(newProposalKey);
-        setCurrentProposal(activeProposals[newProposalKey]);
+        setCurrentProposal(proposalDataState[newProposalKey]);
         break;
       case "decrement":
         newProposalKey = Math.max(0, currentProposalKey - 1);
         setCurrentProposalKey(newProposalKey);
-        setCurrentProposal(activeProposals[newProposalKey]);
+        setCurrentProposal(proposalDataState[newProposalKey]);
         break;
     }
   }
 }
-function StrategicInfoItem({
-  strategicInfoData
+function WorldInfo({
+  villageName,
+  strategicDataState,
+  getVillageIcon,
+  StrategicInfoItem,
+  getPolicyDisplayData
 }) {
+  const [strategicDisplayLeft, setStrategicDisplayLeft] = React.useState(strategicDataState.find(item => item.village.name == villageName));
+  const [strategicDisplayRight, setStrategicDisplayRight] = React.useState(strategicDataState.find(item => item.village.name != villageName));
+  return /*#__PURE__*/React.createElement("div", {
+    className: "worldInfo_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row first"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "column first"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "Strategic information"), /*#__PURE__*/React.createElement("div", {
+    className: "strategic_info_container"
+  }, /*#__PURE__*/React.createElement(StrategicInfoItem, {
+    strategicInfoData: strategicDisplayLeft,
+    getPolicyDisplayData: getPolicyDisplayData
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "strategic_info_navigation",
+    style: {
+      marginTop: "155px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "strategic_info_navigation_village_buttons"
+  }, villageName != "Stone" && /*#__PURE__*/React.createElement("div", {
+    className: strategicDisplayRight.village.village_id == 1 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
+    onClick: () => setStrategicDisplayRight(strategicDataState[0])
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "strategic_info_nav_button_inner"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: getVillageIcon(1),
+    className: "strategic_info_nav_button_icon"
+  }))), villageName != "Cloud" && /*#__PURE__*/React.createElement("div", {
+    className: strategicDisplayRight.village.village_id == 2 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
+    onClick: () => setStrategicDisplayRight(strategicDataState[1])
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "strategic_info_nav_button_inner"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: getVillageIcon(2),
+    className: "strategic_info_nav_button_icon"
+  }))), villageName != "Leaf" && /*#__PURE__*/React.createElement("div", {
+    className: strategicDisplayRight.village.village_id == 3 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
+    onClick: () => setStrategicDisplayRight(strategicDataState[2])
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "strategic_info_nav_button_inner"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: getVillageIcon(3),
+    className: "strategic_info_nav_button_icon"
+  }))), villageName != "Sand" && /*#__PURE__*/React.createElement("div", {
+    className: strategicDisplayRight.village.village_id == 4 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
+    onClick: () => setStrategicDisplayRight(strategicDataState[3])
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "strategic_info_nav_button_inner"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: getVillageIcon(4),
+    className: "strategic_info_nav_button_icon"
+  }))), villageName != "Mist" && /*#__PURE__*/React.createElement("div", {
+    className: strategicDisplayRight.village.village_id == 5 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
+    onClick: () => setStrategicDisplayRight(strategicDataState[4])
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "strategic_info_nav_button_inner"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: getVillageIcon(5),
+    className: "strategic_info_nav_button_icon"
+  }))))), /*#__PURE__*/React.createElement(StrategicInfoItem, {
+    strategicInfoData: strategicDisplayRight,
+    getPolicyDisplayData: getPolicyDisplayData
+  })))));
+}
+function StrategicInfoItem({
+  strategicInfoData,
+  getPolicyDisplayData
+}) {
+  function getStrategicInfoBanner(village_id) {
+    switch (village_id) {
+      case 1:
+        return '/images/v2/decorations/strategic_banners/stratbannerstone.png';
+      case 2:
+        return '/images/v2/decorations/strategic_banners/stratbannercloud.png';
+      case 3:
+        return '/images/v2/decorations/strategic_banners/stratbannerleaf.png';
+      case 4:
+        return '/images/v2/decorations/strategic_banners/stratbannersand.png';
+      case 5:
+        return '/images/v2/decorations/strategic_banners/stratbannermist.png';
+      default:
+        return null;
+    }
+  }
   return /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_item"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "strategic_info_banner"
-  }), /*#__PURE__*/React.createElement("div", {
+    className: "strategic_info_name_wrapper"
+  }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_name"
   }, strategicInfoData.village.name), /*#__PURE__*/React.createElement("div", {
+    className: "strategic_info_policy"
+  }, getPolicyDisplayData(strategicInfoData.village.policy).name)), /*#__PURE__*/React.createElement("div", {
+    className: "strategic_info_banner",
+    style: {
+      backgroundImage: "url(" + getStrategicInfoBanner(strategicInfoData.village.village_id) + ")"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_top"
   }, /*#__PURE__*/React.createElement("div", {
     className: "column"

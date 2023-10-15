@@ -127,7 +127,7 @@ function Village({
         <>
             <div className="navigation_row">
                 <div className="nav_button" onClick={() => setVillageTab("villageHQ")}>village hq</div>
-                <div className="nav_button disabled">world info</div>
+                <div className="nav_button" onClick={() => setVillageTab("worldInfo")}>world info</div>
                 <div className="nav_button disabled">war table</div>
                 <div className="nav_button disabled">members & teams</div>
                 <div className={playerSeatState.seat_id != null ? "nav_button" : "nav_button disabled"} onClick={() => setVillageTab("kageQuarters")}>kage's quarters</div>
@@ -176,6 +176,15 @@ function Village({
                 getVillageIcon={getVillageIcon}
                 getPolicyDisplayData={getPolicyDisplayData}
                 StrategicInfoItem={StrategicInfoItem}
+                />
+            }
+            {villageTab == "worldInfo" &&
+                <WorldInfo
+                villageName={villageName}
+                strategicDataState={strategicDataState}
+                getVillageIcon={getVillageIcon}
+                StrategicInfoItem={StrategicInfoItem}
+                getPolicyDisplayData={getPolicyDisplayData}
                 />
             }
         </>
@@ -620,13 +629,13 @@ function KageQuarters({
             modalText.current = "Are you sure you want to offer peace with " + strategicDisplayRight.village.name + "?";
         }
     }
-    const FormAlliance = () => {
+    const OfferAlliance = () => {
         if (modalState == "confirm_form_alliance") {
             apiFetch(
                 villageAPI,
                 {
                     request: 'CreateProposal',
-                    type: 'form_alliance',
+                    type: 'offer_alliance',
                     target_village_id: strategicDisplayRight.village.village_id,
                 }
             ).then((response) => {
@@ -850,7 +859,7 @@ function KageQuarters({
                         }
                         {modalState == "confirm_form_alliance" &&
                         <>
-                                <div className="modal_confirm_button" onClick={() => FormAlliance()}>Confirm</div>
+                                <div className="modal_confirm_button" onClick={() => OfferAlliance()}>Confirm</div>
                                 <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
                             </>
                         }
@@ -1142,6 +1151,7 @@ function KageQuarters({
                         <div className="strategic_info_container">
                             <StrategicInfoItem
                                 strategicInfoData={strategicDisplayLeft}
+                                getPolicyDisplayData={getPolicyDisplayData}
                             />
                             <div className="strategic_info_navigation">
                                 <div className="strategic_info_navigation_diplomacy_buttons">
@@ -1158,7 +1168,7 @@ function KageQuarters({
                                         </div>
                                     }
                                     {strategicDisplayLeft.allies.find(ally => ally != strategicDisplayRight.village.name) ?
-                                        <div className="diplomacy_action_button_wrapper alliance" onClick={() => FormAlliance()}>
+                                        <div className="diplomacy_action_button_wrapper alliance" onClick={() => OfferAlliance()}>
                                             <div className="diplomacy_action_button_inner">
                                                 <img src="/images/icons/ally.png" className="diplomacy_action_button_icon" />
                                             </div>
@@ -1210,6 +1220,7 @@ function KageQuarters({
                             </div>
                             <StrategicInfoItem
                                 strategicInfoData={strategicDisplayRight}
+                                getPolicyDisplayData={getPolicyDisplayData}
                             />
                         </div>
                     </div>
@@ -1241,23 +1252,112 @@ function KageQuarters({
         var newProposalKey;
         switch (direction) {
             case "increment":
-                newProposalKey = Math.min(activeProposals.length - 1, currentProposalKey + 1);
+                newProposalKey = Math.min(proposalDataState.length - 1, currentProposalKey + 1);
                 setCurrentProposalKey(newProposalKey);
-                setCurrentProposal(activeProposals[newProposalKey]);
+                setCurrentProposal(proposalDataState[newProposalKey]);
                 break;
             case "decrement":
                 newProposalKey = Math.max(0, currentProposalKey - 1);
                 setCurrentProposalKey(newProposalKey);
-                setCurrentProposal(activeProposals[newProposalKey]);
+                setCurrentProposal(proposalDataState[newProposalKey]);
                 break;
         }
     }
 }
-function StrategicInfoItem({ strategicInfoData }) {
+
+function WorldInfo({
+    villageName,
+    strategicDataState,
+    getVillageIcon,
+    StrategicInfoItem,
+    getPolicyDisplayData
+}) {
+    const [strategicDisplayLeft, setStrategicDisplayLeft] = React.useState(strategicDataState.find(item => item.village.name == villageName));
+    const [strategicDisplayRight, setStrategicDisplayRight] = React.useState(strategicDataState.find(item => item.village.name != villageName));
+    return (
+        <div className="worldInfo_container">
+            <div className="row first">
+                <div className="column first">
+                    <div className="header">Strategic information</div>
+                    <div className="strategic_info_container">
+                        <StrategicInfoItem
+                            strategicInfoData={strategicDisplayLeft}
+                            getPolicyDisplayData={getPolicyDisplayData}
+                        />
+                        <div className="strategic_info_navigation" style={{marginTop: "155px"}}>
+                            <div className="strategic_info_navigation_village_buttons">
+                                {villageName != "Stone" &&
+                                    <div className={strategicDisplayRight.village.village_id == 1 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setStrategicDisplayRight(strategicDataState[0])}>
+                                        <div className="strategic_info_nav_button_inner">
+                                            <img src={getVillageIcon(1)} className="strategic_info_nav_button_icon" />
+                                        </div>
+                                    </div>
+                                }
+                                {villageName != "Cloud" &&
+                                    <div className={strategicDisplayRight.village.village_id == 2 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setStrategicDisplayRight(strategicDataState[1])}>
+                                        <div className="strategic_info_nav_button_inner">
+                                            <img src={getVillageIcon(2)} className="strategic_info_nav_button_icon" />
+                                        </div>
+                                    </div>
+                                }
+                                {villageName != "Leaf" &&
+                                    <div className={strategicDisplayRight.village.village_id == 3 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setStrategicDisplayRight(strategicDataState[2])}>
+                                        <div className="strategic_info_nav_button_inner">
+                                            <img src={getVillageIcon(3)} className="strategic_info_nav_button_icon" />
+                                        </div>
+                                    </div>
+                                }
+                                {villageName != "Sand" &&
+                                    <div className={strategicDisplayRight.village.village_id == 4 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setStrategicDisplayRight(strategicDataState[3])}>
+                                        <div className="strategic_info_nav_button_inner">
+                                            <img src={getVillageIcon(4)} className="strategic_info_nav_button_icon" />
+                                        </div>
+                                    </div>
+                                }
+                                {villageName != "Mist" &&
+                                    <div className={strategicDisplayRight.village.village_id == 5 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setStrategicDisplayRight(strategicDataState[4])}>
+                                        <div className="strategic_info_nav_button_inner">
+                                            <img src={getVillageIcon(5)} className="strategic_info_nav_button_icon" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <StrategicInfoItem
+                            strategicInfoData={strategicDisplayRight}
+                            getPolicyDisplayData={getPolicyDisplayData}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function StrategicInfoItem({ strategicInfoData, getPolicyDisplayData }) {
+    function getStrategicInfoBanner(village_id) {
+        switch (village_id) {
+            case 1:
+                return '/images/v2/decorations/strategic_banners/stratbannerstone.png';
+            case 2:
+                return '/images/v2/decorations/strategic_banners/stratbannercloud.png';
+            case 3:
+                return '/images/v2/decorations/strategic_banners/stratbannerleaf.png';
+            case 4:
+                return '/images/v2/decorations/strategic_banners/stratbannersand.png';
+            case 5:
+                return '/images/v2/decorations/strategic_banners/stratbannermist.png';
+            default:
+                return null;
+        }
+    }
     return (
         <div className="strategic_info_item">
-            <div className="strategic_info_banner"></div>
-            <div className="strategic_info_name">{strategicInfoData.village.name}</div>
+            <div className="strategic_info_name_wrapper">
+                <div className="strategic_info_name">{strategicInfoData.village.name}</div>
+                <div className="strategic_info_policy">{getPolicyDisplayData(strategicInfoData.village.policy).name}</div>
+            </div>
+            <div className="strategic_info_banner" style={{ backgroundImage: "url(" + getStrategicInfoBanner(strategicInfoData.village.village_id) + ")" }}></div>
             <div className="strategic_info_top">
                 <div className="column">
                     <div className="strategic_info_kage_wrapper">

@@ -71,7 +71,7 @@ try {
                     $target_village_id = $system->db->clean($_POST['target_village_id']);
                     $message = VillageManager::createPeaceProposal($system, $player, $target_village_id);
                     break;
-                case "form_alliance":
+                case "offer_alliance":
                     $target_village_id = $system->db->clean($_POST['target_village_id']);
                     $message = VillageManager::createAllianceProposal($system, $player, $target_village_id);
                     break;

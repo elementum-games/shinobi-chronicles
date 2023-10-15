@@ -87,14 +87,11 @@ class VillageManager {
         ],
     ];
 
-    //const PROPOSAL_VOTE_HOURS = 72;
-    //const PROPOSAL_ENACT_HOURS = 24;
-    //const PROPOSAL_COOLDOWN_HOURS = 24;
-    const PROPOSAL_VOTE_HOURS = 1;
-    const PROPOSAL_ENACT_HOURS = 1;
-    const PROPOSAL_COOLDOWN_HOURS = 0;
-    const KAGE_PROVISIONAL_DAYS = 7;
-    const POLICY_CHANGE_COOLDOWN_DAYS = 0;
+    const PROPOSAL_VOTE_HOURS = 0; // 72
+    const PROPOSAL_ENACT_HOURS = 1; // 24
+    const PROPOSAL_COOLDOWN_HOURS = 0; // 24
+    const KAGE_PROVISIONAL_DAYS = 7; // 7
+    const POLICY_CHANGE_COOLDOWN_DAYS = 0; // 14
 
     const VOTE_NO = 0;
     const VOTE_YES = 1;
@@ -757,29 +754,102 @@ class VillageManager {
         } else {
             return "Proposal expired.";
         }
-        // get reputation change
 
         // switch for type
         $message;
+        $time = time();
         switch ($proposal['type']) {
             case 'change_policy':
                 // update village policy
                 $system->db->query("UPDATE `villages` SET `policy` = {$proposal['policy_id']} WHERE `village_id` = {$proposal['village_id']}");
                 // update policy log
-                $time = time();
                 $system->db->query("UPDATE `policy_logs` SET `end_time` = {$time} WHERE `village_id` = {$proposal['village_id']} AND `end_time` IS NULL");
                 $system->db->query("INSERT INTO `policy_logs` (`village_id`, `policy`, `start_time`) VALUES ({$proposal['village_id']}, {$proposal['policy_id']}, {$time})");
-                // update proposals
+                // update proposal
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 $message = "Set village policy: " . self::POLICY_NAMES[$proposal['policy_id']] . ".";
                 break;
             case 'declare_war':
+                // check neutral
+                if (!$player->village->isNeutral($proposal['target_village_id'])) {
+                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    return "Proposal canceled. Villages must be neutral to declare war.";
+                }
+                // update relation
+                self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_WAR);
+                // clear active proposals
+                self::clearDiplomaticProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
+                // update proposal
+                $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                $message = "Declared war on " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
                 break;
-            case 'form_alliance':
+            case 'offer_peace':
+                // check at war
+                if (!$player->village->isEnemy($proposal['target_village_id'])) {
+                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    return "Proposal canceled. Villages must be at war to offer peace.";
+                }
+                // create new proposal for target village
+                $name = "Accept Peace: " . VillageManager::VILLAGE_NAMES[$player->village->village_id];
+                $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$proposal['target_village_id']}, {$player->user_id}, {$time}, 'accept_peace', '{$name}', {$player->village->village_id})");
+                // update proposal
+                $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                $message = "Peace offer sent to " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
                 break;
-            case 'end_war':
+            case 'offer_alliance':
+                // check neutral
+                if (!$player->village->isNeutral($proposal['target_village_id'])) {
+                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    return "Proposal canceled. Villages must be neutral to offer alliance.";
+                }
+                // create new proposal for target village
+                $name = "Accept Alliance: " . VillageManager::VILLAGE_NAMES[$player->village->village_id];
+                $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$proposal['target_village_id']}, {$player->user_id}, {$time}, 'accept_alliance', '{$name}', {$player->village->village_id})");
+                // update proposal
+                $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                $message = "Alliance offer sent to " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
                 break;
-            case 'end_alliance':
+            case 'break_alliance':
+                // check allied
+                if (!$player->village->isAlly($proposal['target_village_id'])) {
+                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    return "Proposal canceled. Villages must be allied to break alliance.";
+                }
+                // update relation
+                self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_ALLIANCE);
+                // clear active proposals
+                self::clearDiplomaticProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
+                // update proposal
+                $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                $message = "Broke alliance with " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                break;
+            case 'accept_peace':
+                // check at war
+                if (!$player->village->isEnemy($proposal['target_village_id'])) {
+                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    return "Proposal canceled. Villages must be at war to enter peace.";
+                }
+                // update relation
+                self::setNewRelations($system, $proposal['target_village_id'], $proposal['village_id'], VillageRelation::RELATION_NEUTRAL);
+                // clear active proposals
+                self::clearDiplomaticProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
+                // update proposal
+                $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                $message = "Accepted peace offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                break;
+            case 'accept_alliance':
+                // check neutral
+                if (!$player->village->isNeutral($proposal['target_village_id'])) {
+                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    return "Proposal canceled. Villages must be neutral to form alliance.";
+                }
+                // update relation
+                self::setNewRelations($system, $proposal['target_village_id'], $proposal['village_id'], VillageRelation::RELATION_NEUTRAL);
+                // clear active proposals
+                self::clearDiplomaticProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
+                // update proposal
+                $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                $message = "Accepted alliance offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
                 break;
             default:
                 return "Invalid proposal type.";
@@ -886,7 +956,7 @@ class VillageManager {
             return "There is already a pending proposal of the same type.";
         }
         // check no alliance proposal outgoing
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'form_alliance' LIMIT 1");
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'offer_alliance' LIMIT 1");
         $last_change = $system->db->fetch($query);
         if ($system->db->last_num_rows > 0) {
             return "There is already a proposal to form alliance.";
@@ -933,8 +1003,13 @@ class VillageManager {
         if (!$player->village->isEnemy($target_village_id)) {
             return "Village must be at war to offer peace.";
         }
-        // also check not pending on receiving village
         // also check war duration requirement
+        // also check not pending on receiving village
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$target_village_id} AND `target_village_id` = {$player->village->village_id} AND `type` = 'accept_peace' LIMIT 1");
+        $last_change = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            return "There is already a pending proposal of the same type.";
+        }
         // check player cooldown on submit proposal
         $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
         $last_proposal = $system->db->fetch($query);
@@ -964,7 +1039,7 @@ class VillageManager {
             return "You do not meet the seat requirements.";
         }
         // check no pending proposal of same type
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'form_alliance' LIMIT 1");
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'offer_alliance' LIMIT 1");
         $last_change = $system->db->fetch($query);
         if ($system->db->last_num_rows > 0) {
             return "There is already a pending proposal of the same type.";
@@ -980,6 +1055,11 @@ class VillageManager {
             return "Village must be neutral to form alliance.";
         }
         // also check not pending on receiving village
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$target_village_id} AND `target_village_id` = {$player->village->village_id} AND `type` = 'accept_alliance' LIMIT 1");
+        $last_change = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            return "There is already a pending proposal of the same type.";
+        }
         // check player cooldown on submit proposal
         $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
         $last_proposal = $system->db->fetch($query);
@@ -995,7 +1075,7 @@ class VillageManager {
         // insert into DB
         $time = time();
         $name = "Form Alliance: " . VillageManager::VILLAGE_NAMES[$target_village_id];
-        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'form_alliance', '{$name}', {$target_village_id})");
+        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'offer_alliance', '{$name}', {$target_village_id})");
         return "Proposal created!";
     }
 
@@ -1036,5 +1116,41 @@ class VillageManager {
         $name = "Break Alliance: " . VillageManager::VILLAGE_NAMES[$target_village_id];
         $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'break_alliance', '{$name}', {$target_village_id})");
         return "Proposal created!";
+    }
+
+    private static function clearDiplomaticProposals(System $system, int $village1_id, int $village2_id, int $proposal_id) {
+        $time = time();
+        $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` =  'canceled' WHERE
+            ((`village_id` = {$village1_id} OR `village_id` = {$village2_id})
+            AND (`target_village_id` = {$village1_id} OR `target_village_id` = {$village2_id}))
+            AND `type` IN ('offer_alliance', 'offer_peace', 'accept_alliance', 'accept_peace', 'declare_war', 'break_alliance')
+            AND `proposal_id` != {$proposal_id}");
+    }
+
+    private static function setNewRelations(System $system, int $initiator_village_id, int $recipient_village_id, int $relation_type, ?string $relation_name = null) {
+        // determine relation name
+        if ($relation_name == null) {
+            switch ($relation_type) {
+                case VillageRelation::RELATION_NEUTRAL:
+                    $relation_name = "Neutral";
+                    break;
+                case VillageRelation::RELATION_ALLIANCE:
+                    $relation_name = VillageManager::VILLAGE_NAMES[$initiator_village_id] . "-" . VillageManager::VILLAGE_NAMES[$recipient_village_id] . " Alliance";
+                    break;
+                case VillageRelation::RELATION_WAR:
+                    $relation_name = VillageManager::VILLAGE_NAMES[$initiator_village_id] . "-" . VillageManager::VILLAGE_NAMES[$recipient_village_id] . " War";
+                    break;
+                default:
+                    break;
+            }
+        }
+        $time = time();
+        // end old relation
+        $system->db->query("UPDATE `village_relations` SET `relation_end` = {$time}
+        WHERE `relation_end` IS NULL
+        AND ((`village1_id` = {$initiator_village_id} OR `village1_id` = {$recipient_village_id})
+        AND (`village2_id` = {$initiator_village_id} OR `village2_id` = {$recipient_village_id}))");
+        // insert new relation
+        $system->db->query("INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`) VALUES ({$initiator_village_id}, {$recipient_village_id}, '{$relation_type}', '{$relation_name}', {$time})");
     }
 }
