@@ -90,7 +90,7 @@ return $routes = [
         village_ok: Route::NOT_IN_VILLAGE,
     ),
     13 => new Route(
-        file_name: 'training_v2.php',
+        file_name: 'training.php',
         title: 'Training',
         function_name: 'training',
         menu: Route::MENU_ACTIVITY,
