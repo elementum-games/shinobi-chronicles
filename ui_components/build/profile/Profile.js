@@ -1,5 +1,6 @@
-import { CharacterAvatar } from "../CharacterAvatar.js";
 import RadarNinjaChart from '../charts/Chart.js';
+import { CharacterAvatar } from "../CharacterAvatar.js";
+
 function Profile({
   links,
   playerData,
