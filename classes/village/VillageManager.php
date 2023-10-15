@@ -87,7 +87,8 @@ class VillageManager {
         ],
     ];
 
-    const PROPOSAL_VOTE_HOURS = 0; // 72
+    // Set these to correct values for release
+    const PROPOSAL_VOTE_HOURS = 1; // 72
     const PROPOSAL_ENACT_HOURS = 1; // 24
     const PROPOSAL_COOLDOWN_HOURS = 0; // 24
     const KAGE_PROVISIONAL_DAYS = 7; // 7
