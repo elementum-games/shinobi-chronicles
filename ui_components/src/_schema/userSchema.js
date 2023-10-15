@@ -91,7 +91,7 @@ export type DailyTaskType = {|
 |};
 
 export type PlayerAchievementsType = {|
-    +completedAchievements: {|
+    +completedAchievements: $ReadOnlyArray<{|
         +id: string,
         +achievedAt: number,
         +rank: "Legendary" | "Elite" | "Greater" | "Common",
@@ -103,7 +103,7 @@ export type PlayerAchievementsType = {|
         |}>,
         +progressLabel: string,
         +progressPercent: number,
-    |};
+    |}>;
 |};
 
 // UserApiPresenter::playerInventoryResponse

@@ -1,7 +1,8 @@
-import RadarNinjaChart from '../charts/Chart.js';
 import { CharacterAvatar } from "../CharacterAvatar.js";
+import RadarNinjaChart from '../charts/Chart.js';
 
 function Profile({
+  isDevEnvironment,
   links,
   playerData,
   playerStats,
@@ -11,10 +12,12 @@ function Profile({
 }) {
   //Chart.js variables
   const [showChart, setShowChart] = React.useState(false);
+
   function handleShowGraph() {
     setShowChart(!showChart);
-  }
-  //marginRight temp fix for wrapping to same row as chart when window width changes
+  } //marginRight temp fix for wrapping to same row as chart when window width changes
+
+
   let showChartButtonStyle = {
     display: 'block',
     marginRight: '75%',
@@ -31,7 +34,7 @@ function Profile({
     playerData: playerData,
     links: links,
     playerSettings: playerSettings
-  })), /*#__PURE__*/React.createElement("button", {
+  })), isDevEnvironment && /*#__PURE__*/React.createElement("button", {
     style: showChartButtonStyle,
     onClick: handleShowGraph
   }, !showChart ? "Show Graph" : "Show Stats"), /*#__PURE__*/React.createElement("div", {
@@ -57,6 +60,7 @@ function Profile({
     playerAchievements: playerAchievements
   })));
 }
+
 function StatusAttributes({
   playerData,
   playerSettings,
@@ -126,6 +130,7 @@ function StatusAttributes({
     href: links.team
   }, playerData.teamName)))))));
 }
+
 function PlayerStats({
   playerData,
   playerStats
@@ -200,6 +205,7 @@ function PlayerStats({
     className: "ft-c3"
   })))));
 }
+
 function PlayerBloodline({
   playerData,
   bloodlinePageUrl,
@@ -221,6 +227,7 @@ function PlayerBloodline({
     href: buyBloodlineUrl
   }, "None")));
 }
+
 function PlayerUserRep({
   playerData
 }) {
@@ -241,6 +248,7 @@ function PlayerUserRep({
     className: "weekly_reputation"
   }, playerData.weeklyRep, "/", playerData.maxWeeklyRep, " PvE \xA0|\xA0\xA0", playerData.weeklyPvpRep, "/", playerData.maxWeeklyPvpRep, " PvP")));
 }
+
 function DailyTasks({
   dailyTasks
 }) {
@@ -271,6 +279,7 @@ function DailyTasks({
     }
   }, dailyTask.progressCaption)))));
 }
+
 function PlayerAchievements({
   playerAchievements
 }) {
@@ -296,4 +305,5 @@ function PlayerAchievements({
     className: "progress_label"
   }, achievement.progressLabel)))));
 }
+
 window.Profile = Profile;

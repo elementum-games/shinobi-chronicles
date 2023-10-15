@@ -12,6 +12,7 @@ import type {
 import RadarNinjaChart from '../charts/Chart.js';
 
 type Props = {|
+    +isDevEnvironment: boolean,
     +links: {|
         +clan: string,
         +team: string,
@@ -26,6 +27,7 @@ type Props = {|
     +playerAchievements: PlayerAchievementsType,
 |};
 function Profile({
+    isDevEnvironment,
     links,
     playerData,
     playerStats,
@@ -53,7 +55,11 @@ function Profile({
                 />
             </div>
 
-            <button style={showChartButtonStyle} onClick={handleShowGraph}>{(!showChart) ? "Show Graph": "Show Stats"}</button>
+            {isDevEnvironment &&
+                <button style={showChartButtonStyle} onClick={handleShowGraph}>
+                    {(!showChart) ? "Show Graph" : "Show Stats"}
+                </button>
+            }
             
             {/* Second row */}
             <div className="profile_row_second">

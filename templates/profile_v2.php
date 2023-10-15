@@ -22,6 +22,7 @@ https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js
     window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(Profile, {
+                isDevEnvironment: Boolean(<?= (int)$system->isDevEnvironment() ?>),
                 links: {
                     clan: "<?= $system->router->getUrl('clan') ?>",
                     team: "<?= $system->router->getUrl('team') ?>",
