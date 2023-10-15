@@ -219,12 +219,17 @@ class NPC extends Fighter {
     }
 
     public function chooseAttack(): Jutsu {
-        if(!$_SESSION['ai_logic']['special_move_used'] && $this->jutsu[1]) {
+        // if special move not used
+        if (!$_SESSION['ai_logic']['special_move_used'] && $this->jutsu[1]) {
             $this->current_move =& $this->jutsu[0];
             $_SESSION['ai_logic']['special_move_used'] = true;
         }
+        // if only special move plus standard strike
+        else if (count($this->jutsu) == 2) {
+            $this->current_move =& $this->jutsu[1];
+        }
         else {
-            $randMove = rand(1, (count($this->jutsu) - 1));
+            $randMove = rand(1, (count($this->jutsu) - 2));
             $this->current_move =& $this->jutsu[$randMove];
         }
 

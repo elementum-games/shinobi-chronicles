@@ -23,11 +23,19 @@ function userSettings() {
         $max_journal_length = $player->forbidden_seal->journal_size;
 	}
 
-    $layouts = array('shadow_ribbon', 'geisha', 'new_geisha', 'classic_blue', 'blue_scroll', 'rainbow_road');
-	if($system->environment == 'dev') {
+    $layouts = array('new_geisha', 'sumu', 'shadow_ribbon', 'geisha', 'classic_blue', 'blue_scroll', 'rainbow_road');
+	/*if($system->environment == 'dev') {
 	    $layouts[] = 'cextralite';
-		$layouts[] = 'sumu';
-	}
+	}*/
+    $layout_names = [
+        'new_geisha' => 'New Geisha',
+        'sumu' => 'Sumu [Beta]',
+        'shadow_ribbon' => 'Shadow Ribbon [Legacy]',
+        'geisha' => 'Geisha [Legacy]',
+        'classic_blue' => 'Classic Blue [Legacy]',
+        'blue_scroll' => 'Blue Scroll [Legacy]',
+        'rainbow_road' => 'Rainbow Road [Legacy]',
+    ];
 
     if (!empty($_POST['change_avatar'])) {
         $avatar_link = trim($_POST['avatar_link']);
@@ -323,6 +331,8 @@ function userSettings() {
             }
         }
     }
+
+    $current_layout = $system->setLayoutByName($player->layout);
 
 	// Temp settings
     $sidebar_position = $player->getSidebarPosition();

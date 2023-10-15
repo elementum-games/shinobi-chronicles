@@ -30,8 +30,8 @@ function battle(): bool {
         $battle->renderBattle();
 
         if($battle->isComplete()) {
-            $player->battle_id = 0;
             $result = processBattleFightEnd($battle, $player);
+            $player->battle_id = 0;
 
 			echo "<table class='table'>
                 <tr><th>Battle complete</th></tr>
@@ -132,6 +132,12 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->pvp_wins++;
         $player->monthly_pvp++;
         $player->last_pvp_ms = System::currentTimeMs();
+
+        /* prevent chain sniping the same player
+        if ($battle->player_side == Battle::TEAM2) {
+            $player->pvp_immunity_ms = System::currentTimeMs() + (5 * 1000);
+        }*/
+
         $village_point_gain = 1;
         $team_point_gain = 1;
 
@@ -151,6 +157,11 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                     $result .= "You have earned $rep_gained village reputation.[br]";
                 }
             }
+            // Loot - winner takes half loser's if retreat, which is all remaining since loser has left battle in order to flag as retreat
+            $player->system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}");
+            if ($player->system->db->last_affected_rows > 0) {
+                //$result .= "You have claimed half the loot being carried by your opponent.[br]";
+            }
         } else {
             // Calculate rep gains
             if ($player->reputation->canGain(check_mission_cd: false, check_pvp: true) && UserReputation::PVP_REP_ENABLED) {
@@ -158,6 +169,11 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                 if ($rep_gained > 0) {
                     $result .= "You have earned $rep_gained village reputation.[br]";
                 }
+            }
+            // Loot
+            $player->system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}");
+            if ($player->system->db->last_affected_rows > 0) {
+                //$result .= "You have claimed the loot being carried by your opponent.[br]";
             }
         }
 
@@ -177,6 +193,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->pvp_losses++;
         $player->last_pvp_ms = System::currentTimeMs();
         $player->last_death_ms = System::currentTimeMs();
+        $player->pvp_immunity_ms = System::currentTimeMs() + (5 * 60 * 1000); // 5 minutes
 
         if ($battle->is_retreat) {
             $player->health = 5;
@@ -186,6 +203,16 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                 $rep_lost = $player->reputation->handlePvPLoss($player, $battle->opponent, true);
                 if ($rep_lost > 0) {
                     $result .= "You have lost $rep_lost village reputation.[br]";
+                }
+                // Loot - winner takes half loser's if retreat
+                $loot_result = $player->system->db->query("SELECT COUNT(*) as total_loot FROM `loot` WHERE `user_id` = {$player->user_id} AND `battle_id` = {$player->battle_id}");
+                $loot_result = $player->system->db->fetch($loot_result);
+                if ($player->system->db->last_num_rows > 0) {
+                    $total_loot = $loot_result['total_loot'];
+                    $half_loot = floor($total_loot / 2);
+                    $query = "UPDATE `loot` SET `battle_id` = NULL WHERE `battle_id` = {$player->battle_id} ORDER BY `id` ASC LIMIT $half_loot";
+                    $player->system->db->query($query);
+                    //$result .= "Half of your loot was claimed by your opponent.[br]";
                 }
             }
         } else {
@@ -224,8 +251,14 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
             $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1, DailyTask::SUB_TASK_COMPLETE);
         }
+
+        // Loot
+        $player->system->db->query("UPDATE `loot` SET `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}"); // clear hold on loot
     }
     else {
+        // Loot
+        $player->system->db->query("UPDATE `loot` SET `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}"); // clear hold on loot
+
         $result .= "Battle Stopped.[br]";
     }
 

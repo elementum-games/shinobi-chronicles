@@ -143,20 +143,22 @@ https://book.cakephp.org/phinx/0/en/migrations.html
 See `/db/SampleSQLMigration.php` for a simple example of creating a migration that uses raw SQL queries.
 
 ### Docker compose
+To get started you will need to have Docker installed. Easiest way is to install the Docker Desktop app via https://www.docker.com/products/docker-desktop/
+Once installed you will need to have the Docker Desktop app running to start the Docker Engine (this isn't needed if you install docker separately)
+
+#### Notes about Docker Desktop:
+This app provides an easy way to see what containers are currently running on your system and what images are downloaded. If you are not using an IDE with built in Docker support (such as PHPStorm) this makes the process a little more GUI driven.
+
 Before starting docker, it's recommended to install dependencies with `composer install` (step 9 at the beginning of this readme).
 Otherwise, they'll be re-installed every time you destroy the docker image or upgrade a dependency version.
 
-If you want to use docker before starting php set up your database with 
-```
-docker compose up -d
-```
+Update environment variables inside /docker/.env these will be used for the creation of database and automatically updated in the SC Files.
+Once updated, run the docker stack by running the command ```docker compose --env-file ./docker/.env up -d```
 
-This will set up mysql and perform database migration in order to initialize database with needed data.
+After the stack is built and running, you can navigate to http://localhost/ (default port is 80, this can be modified in the docker compose file) to access the SC game.
+Additionally, you can navigate to http://localhost:8080 to access phpmyadmin (a sql browser/editor) then log in with the db credentials you provided in the .env file. 
 
-Note that if you have some code that relies on Composer's `vendor/autoload.php` and you're getting
-`Class or interface "MyNewClass" does not exist` errors, you may need to run 
-`composer dump-autoload`. If that does not resolve it, you may need to add its directory to
-the `classmap` in `composer.json`.
+NOTICE: The docker stack *ALWAYS* runs the seed and migrations for the database after start up. This means if you don't create a user after the first startup it's possible the seed will run again. 
 
 ### Installing Required PHP Extensions
 This varies by system, but generally:

@@ -20,7 +20,8 @@ function forbiddenShop(): void {
 
     if ($index !== null) {
         if ($player->location->x == $locations[$index]['x'] && $player->location->y == $locations[$index]['y']) {
-            $system->event != null ? throw new RuntimeException("The abyss is silent...") : require 'templates/forbiddenShop.php';
+            //$system->event != null ? throw new RuntimeException("The abyss is silent...") : require 'templates/forbiddenShop.php';
+            require 'templates/forbiddenShop.php';
         } else {
             throw new RuntimeException("Invalid location!");
         }

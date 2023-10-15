@@ -1,8 +1,8 @@
 /* Layout */
 #travelContainer {
     display: flex;
-    flex-flow: row wrap;
-    align-items: flex-start;
+    flex-flow: column;
+    align-items: center;
     justify-content: center;
     gap: 10px;
     margin: 20px auto 0 auto;
@@ -13,34 +13,42 @@
 
 :root {
     --scout-container-side-width: 230px;
-    --travel-button-size: 30px;
+    --travel-button-size: 42px;
 }
 
 .travel-filter {
-    width: 95%;
+    width: 93%;
     max-width: calc(1000px);
-
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
     justify-content: flex-start;
-
-    background: var(--theme-content-bg-color);
+    background: var(--travel-ui-color);
     border: 1px solid rgba(0, 0, 0, 0.12);
 }
 .travel-wrapper {
     width: 95%;
-
+    display: flex;
+    gap: 5px;
+    flex-direction: row;
     flex-grow: 0;
     position: relative;
-    padding: var(--travel-button-size);
+}
+.travel-panel {
+    width: 100%;
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: column;
+    flex-basis: 100%;
+    align-items: center;
 }
 
 #travel-container {
-    height: 600px;
+    height: 450px;
+    width: 98%;
 }
 
-@media (max-height: 1200px) {
+/*@media (max-height: 1200px) {
     #travel-container {
         height: 550px;
     }
@@ -64,41 +72,51 @@
     #travel-container {
         height: 350px;
     }
+}*/
+
+.travel-scout-container.allies {
+    left: 44px;
 }
-
+.travel-scout-container.allies .travel-scout-entry {
+    flex-direction: row;
+}
 .travel-scout-container {
-    width: 95%;
-
+    width: 180px;
+    max-height: 412px;
     flex-grow: 0;
     display: flex;
+    border: 1px solid var(--border-color-default);
+    position: absolute;
+    right: 44px;
+    top: 35px;
+    overflow-y: clip;
 }
 .travel-scout {
     width: 100%;
     display: flex;
-    flex-flow: row wrap;
-    justify-content: space-between;
-    gap: 6px 0;
+    flex-direction: column;
+    gap: 3px 0;
+    z-index: 10;
+    position: relative;
 }
 .travel-scout-entry {
-    width: 49.5%;
-
+    width: 100%;
+    height: 36px;
     display: flex;
-    flex-flow: row wrap;
+    flex-direction: row-reverse;
     align-items: center;
-    justify-content: space-between;
     position: relative;
-    padding: 8px 0 8px 8px;
-
-    background: var(--theme-content-bg-color);
+    background: var(--travel-scout-background);
     border: 1px solid rgba(0, 0, 0, 0.12);
+    clip-path: polygon(0% 5px, 5px 5px, 5px 0%, calc(100% - 5px) 0%, calc(100% - 5px) 5px, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 5px calc(100% - 5px), 0% calc(100% - 5px));
 }
 
+/* Slightly bigger buttons for small touchscreens
 @media (max-width: 1200px) {
-    /* Slightly bigger buttons for small touchscreens */
     .travel-wrapper {
         padding: 40px;
     }
-}
+}*/
 @media (max-width: 600px) {
     .travel-wrapper {
         width: calc(95% - 10px - var(--scout-container-side-width));
@@ -119,7 +137,7 @@
     margin: 0 auto;
     padding: 5px 10px;
 
-    color: var(--theme-text-color-normal);
+    color: var(--font-color-1);
     font-family: sans-serif;
     font-weight: bold;
 
@@ -135,7 +153,7 @@
     margin: 0 10px 0 0;
 
     text-indent: 3px;
-    color: var(--theme-text-color-light);
+    color: var(--font-color-1) !important;
     text-transform: uppercase;
     font-size: 0.8em;
     font-family: sans-serif;
@@ -148,17 +166,22 @@
 
 /* Misc */
 #travel-container .systemMessage-new {
-    max-width: 85%;
+    max-width: 100%;
+    opacity: 1;
+    animation-name: fadeOut;
+    animation-duration: 2s;
+    animation-timing-function: ease-out;
+    animation-delay: 5s;
+    animation-fill-mode: forwards;
+    white-space: pre;
 }
 
-
 .travel-messages {
-    width: 100%;
-    height: 40px;
     position: absolute;
-    bottom: 0;
+    bottom: 10px;
     left: 50px;
     z-index: 10000;
+    pointer-events: none;
 }
 
 .travel-message {
@@ -170,17 +193,12 @@
     color: var(--theme-text-color-normal);
 }
 
-
-
-
 .travel-actions {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
+    width: 98%;
+    height: 225px;
     display: flex;
     flex-flow: row wrap;
+    position: relative;
 }
 
 .travel-buttons {
@@ -190,33 +208,54 @@
     right: 0;
     margin: 0 auto;
     display: flex;
-    flex-flow: row wrap;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     z-index: 20;
+    gap: 10px;
 }
 
 #content .travel-buttons .button {
+    height: var(--travel-button-size);
+    min-width: 100px;
     font-family: sans-serif;
     text-transform: none;
-}
-
-.travel-actions a {
-    flex-grow: 1;
-    display: block;
-    width: 33.333%;
-    height: 33.333%;
-    z-index: 1;
-    position: relative;
-
+    font-size: 12px;
+    color: #eee1c8;
+    font-weight: bold;
+    text-shadow: 1px 2px 1px #1b1424;
+    display: inline-block;
+    padding: 5px 7px;
+    margin-bottom: 10px;
     cursor: pointer;
-    user-select: none;
-    touch-action: none;
-    -webkit-tap-highlight-color: transparent;
-
-    background: var(--theme-content-darker2-bg-color);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12) inset;
+    background: radial-gradient(var(--sidebar-button-background-color) 0%, var(--sidebar-button-border-color) 10%);
+    border: 1px solid #2f2e5b;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 0 4px 0 rgba(0,0,0,0);
 }
+    #content .travel-buttons .button:hover {
+        color: white;
+    }
+    #content .travel-buttons .button:active {
+        color: #eee1c8;
+        background: radial-gradient(var(--sidebar-button-border-color) 0%, var(--sidebar-button-background-color) 10%);
+    }
+
+    .travel-actions a {
+        flex-grow: 1;
+        display: block;
+        width: 33.333%;
+        height: 33.333%;
+        z-index: 1;
+        position: relative;
+        cursor: pointer;
+        user-select: none;
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+        background: var(--travel-ui-color);
+        box-shadow: 0 0 0 1px var(--travel-background-color) inset;
+    }
 
 :root {
     --travel-arrow-size: 16px;
@@ -231,7 +270,7 @@
 
     height: var(--travel-arrow-size);
     width: var(--travel-arrow-size);
-    color: var(--theme-text-color-normal);
+    color: var(--font-color-3);
 }
 .travel-actions a.north::before {
     top: var(--travel-arrow-half-size);
@@ -284,11 +323,11 @@
     flex-grow: 2;
 }
 .travel-actions a.active, .travel-actions a.active:hover {
-    background: var(--theme-content-bg-color);
+    background: var(--travel-button-hover);
 }
 @media(hover: hover) {
     .travel-actions a:hover {
-        background: var(--theme-content-darker-bg-color);
+        background: var(--travel-button-hover);
         transition: background-color 200ms ease-in-out;
     }
 }
@@ -296,13 +335,11 @@
 #travel-container {
     display: flex;
     flex-flow: row wrap;
-    align-self: flex-start;
     justify-content: flex-start;
     position: relative;
     z-index: 10;
-
     background: var(--theme-content-darker-bg-color);
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--travel-background-color);
 }
 
 #travel-x-container {
@@ -315,9 +352,8 @@
     justify-content: flex-start;
     align-self: flex-start;
     overflow: hidden;
-
-    background: var(--theme-content-darker2-bg-color);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    background: var(--travel-ui-color);
+    border-bottom: 1px solid var(--travel-background-color);
 }
 
 #travel-y-container {
@@ -329,9 +365,8 @@
     justify-content: flex-start;
     align-items: flex-start;
     overflow: hidden;
-
-    background: var(--theme-content-darker-bg-color);
-    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    background: var(--travel-ui-color);
+    border-right: 1px solid var(--travel-background-color);
 }
 
 .travel-gutter-grid {
@@ -341,26 +376,24 @@
     flex-flow: column nowrap;
     align-items: center;
     justify-content: center;
-
     font-family: sans-serif;
-    color: var(--theme-text-color-normal);
-
-    background: var(--theme-content-darker-bg-color);
+    color: var(--font-color-3);
+    background: var(--travel-ui-color);
 }
 
 .travel-gutter-grid-x {
-    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    border-right: 1px solid var(--travel-background-color);
 }
-.travel-gutter-grid-x:first-of-type {
-    border-left: 1px solid rgba(0, 0, 0, 0.12);
-}
+    .travel-gutter-grid-x:first-of-type {
+        border-left: 1px solid var(--travel-background-color);
+    }
 
 .travel-gutter-grid-x:last-of-type {
     border-right: 0;
 }
 
 .travel-gutter-grid-y {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid var(--travel-background-color);
 }
 .travel-gutter-grid-y:last-of-type {
     border-bottom: 0;
@@ -436,25 +469,27 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.19);
 }
 
+/* Map Locations */
+
 .map_locations {
     width: 100%;
     height: 100%;
     position: absolute;
     top: 0;
     left: 0;
+    pointer-events: none;
 }
-
 .map_location {
     width: 32px;
     height: 32px;
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 3;
-
     background-repeat: no-repeat;
     background-position: center;
     background-size: auto 100%;
+    cursor: pointer;
+    pointer-events: auto;
 }
     .map_location.key_location {
         height: 48px;
@@ -470,18 +505,8 @@
     background-position: center;
     background-size: auto 100%;
 }
-    .map_location_objective.castle {
-        position: absolute;
-        height: 64px;
-        width: 64px;
-        left: -16px;
-        top: -32px;
-    }
-.map_location_objective_health {
-    display: none;
-}
 
-.map_locations_tooltip {
+.map_location_tooltip {
     display: none;
     position: absolute;
     bottom: 110%;
@@ -493,20 +518,163 @@
     text-align: center;
     width: fit-content;
     white-space: pre;
-
-    background: var(--theme-content-bg-color);
+    background: #3c2b2bcc;
     border-radius: 4px;
-    box-shadow: 0 0 2px rgba(38, 35, 30, 0.46);
-
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.46);
     font-family: sans-serif;
-    color: var(--theme-text-color-normal);
-
+    color: #fff6e0;
     z-index: 3;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 1px 0px 2px black;
 }
-
-.map_locations > div:hover .map_locations_tooltip {
+.map_location:hover .map_location_tooltip {
     display: block;
 }
+
+/* Objectives */
+.region_objective.castle {
+    position: absolute;
+    height: 64px;
+    width: 64px;
+    left: -16px;
+    top: -32px;
+}
+.map_objective.target {
+    position: absolute;
+    height: 48px;
+    width: 48px;
+    left: -8px;
+    top: -8px;
+}
+.map_objectives {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+.region_objectives {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+.map_objective {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: auto 100%;
+    cursor: pointer;
+    pointer-events: auto;
+}
+.region_objective {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: auto 100%;
+    cursor: pointer;
+    pointer-events: auto;
+}
+.region_objective:hover .region_objective_tooltip {
+    display: flex !important;
+}
+.map_objective:hover .map_objective_tooltip {
+    display: block;
+}
+.region_objective_tooltip {
+    align-items: center;
+    position: absolute;
+    bottom: 105%;
+    left: 50%;
+    right: 0;
+    transform: translateX(-50%);
+    margin: 0 auto;
+    padding: 5px 10px;
+    text-align: center;
+    width: fit-content;
+    white-space: pre;
+    background: #3c2b2bcc;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.46);
+    font-family: sans-serif;
+    color: #fff6e0;
+    z-index: 3;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 1px 0px 2px black;
+}
+.region_objective_tooltip_tags {
+    position: absolute;
+    display: flex;
+    height: 32px;
+    gap: 1px;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%)
+}
+.region_objective_tooltip_defense {
+    height: 18px;
+    width: 18px;
+    background-image: url('/images/map/icons/shield.png');
+    background-size: cover;
+    line-height: 17px;
+    font-size: smaller;
+    box-sizing: border-box;
+    padding-right: 1px;
+}
+.region_objective_tooltip_village {
+    height: 18px;
+    width: 18px;
+    margin-left: 2px;
+}
+.region_objective_tooltip_resource {
+    height: 18px;
+    width: 18px;
+    margin-left: 2px;
+}
+.map_objective_tooltip {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    right: 0;
+    transform: translateX(-50%);
+    margin: 0 auto;
+    padding: 5px 10px;
+    text-align: center;
+    width: fit-content;
+    white-space: pre;
+    background: #3c2b2bcc;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.46);
+    font-family: sans-serif;
+    color: #fff6e0;
+    z-index: 3;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 1px 0px 2px black;
+}
+.region_objective_health {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    bottom: -14px;
+}
+
+/* Player */
 
 #map_player {
     width: 32px;
@@ -521,63 +689,114 @@
     background-size: 80% auto;
 }
 
-.travel-scout-entry::before {
+/* Scout Report */
+.travel-scout-ally .travel-scout-attack {
+    margin-right: 7px;
+    margin-left: 0;
+}
+.travel-scout-ally .travel-scout-faction {
+    margin-right: 0;
+    margin-left: 7px;
+}
+.travel-scout-entry.travel-scout-ally::before {
     content: '';
-    width: 2px;
-    height: 80%;
+    width: 4px;
+    height: 60%;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    left: 4px;
+    right: 0px;
+    border-radius: 2px;
+}
+.travel-scout-entry.travel-scout-enemy::before, .travel-scout-entry.travel-scout-neutral::before {
+    content: '';
+    width: 4px;
+    height: 60%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0px;
+    border-radius: 2px;
+}
+.travel-scout-entry.travel-scout-ally::after {
+    content: '';
+    width: 4px;
+    height: 60%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0px;
+    border-radius: 2px;
+}
+.travel-scout-entry.travel-scout-enemy::after, .travel-scout-entry.travel-scout-neutral::after {
+    content: '';
+    width: 4px;
+    height: 60%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0px;
     border-radius: 2px;
 }
 
-.travel-scout-ally::before {
-    background: #58ce58;
+.travel-scout-ally::before, .travel-scout-ally::after {
+    background: #49b677;
 }
-
-.travel-scout-neutral::before {
+.travel-scout-neutral::before, .travel-scout-neutral::after {
     background: #c6ce58;
 }
-
-.travel-scout-enemy::before {
-    background: #ff0000;
+.travel-scout-enemy::before, .travel-scout-enemy::after {
+    background: #ff5555;
 }
+/*
+.travel-scout-ally {
+    background: linear-gradient(to right, var(--travel-scout-background) 70%, rgba(0, 85, 0, 0.86) 100%);
+}
+.travel-scout-neutral {
+    background: linear-gradient(to left, var(--travel-scout-background) 70%, rgba(85, 85, 0, 0.85) 100%);
+}
+.travel-scout-enemy {
+    background: linear-gradient(to left, var(--travel-scout-background) 70%, rgba(85, 0, 0, 0.85) 100%);
+}*/
 
+.travel-scout-player {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 2;
+    max-width: 90px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.travel-scout-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px !important;
+}
 .travel-scout-name {
-    min-width: 190px;
     word-break: break-all;
+    text-align: center;
     display: flex;
     flex-flow: row nowrap;
-    text-indent: 5px;
-
-    padding-right: 5px;
-
+    white-space: nowrap;
     flex-grow: 2;
-    align-items: center;
+    align-items: baseline;
 }
 #content .travel-scout-name a {
     width: 100%;
     text-decoration: none;
-    color: var(--theme-text-color-normal);
+    color: var(--font-color-3);
     font-size: 1em;
     font-family: sans-serif;
     font-weight: 600;
 }
-#content .travel-scout-name.invulnerable a {
-    color: rgba(0, 0, 0, 0.5);
-}
 #content .travel-scout-name a:hover {
-    color: var(--theme-text-color-light);
+    color: var(--font-color-2);
 }
 .travel-scout-name span {
     width: 65%;
-    min-width: 100px;
-
-    color: var(--theme-text-color-light);
+    color: var(--font-color-3) !important;
     font-size: 1em;
     font-family: sans-serif;
-
 }
 
 @media (max-width: 600px) {
@@ -588,8 +807,12 @@
 
 
 .travel-scout-faction {
-    margin: 0 5px;
-
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 7px;
     /*box-shadow: 0 0 2px #000000 inset;*/
     /*background: rgba(10, 10, 12, 0.7);*/
     /*border-radius: 100%;*/
@@ -602,12 +825,19 @@
     max-height: 20px;
 }
 
+.travel-scout-level {
+    justify-self: flex-end;
+    text-align: center;
+    color: var(--font-color-3);
+    font-family: sans-serif;
+    font-size: 1em;
+}
+
 .travel-scout-location {
     justify-self: flex-end;
-    width: 55px;
     text-align: center;
 
-    color: var(--theme-text-color-light);
+    color: var(--font-color-3);
     font-family: sans-serif;
     font-size: 1em;
 }
@@ -615,6 +845,7 @@
 .travel-scout-attack {
     width: 30px;
     height: 30px;
+    margin-left: 7px;
 }
 
 .travel-scout-attack a {
@@ -623,14 +854,14 @@
     height: 100%;
     cursor: pointer;
 
-    background-image: url("../../../images/map/icons/attack-off.png");
-    background-size: 20px auto;
+    background-image: url("../../../images/map/icons/attackglow.png");
+    background-size: 32px auto;
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .travel-scout-attack a:hover {
-    background-image: url("../../../images/map/icons/attack-on.png");
+    background-image: url("../../../images/map/icons/attackhoverglow.png");
 }
 
 .travel-scout-attack span.in-battle {
@@ -649,7 +880,7 @@
     width: 100%;
     height: 100%;
 
-    background-image: url("../../../images/icons/right.png");
+    background-image: url("../../../images/icons/right_white.png");
     background-size: 50% auto;
     background-repeat: no-repeat;
     background-position: center;
@@ -704,26 +935,391 @@
 #scout_locations .map_location {
     transition: all 0.45s linear;
     z-index: 4;
+    animation: none;
 }
 
-.map_location.player_ally {
-    background: url(../../../images/ninja_head.png), radial-gradient(circle, green 70%, transparent 75%);
+#patrol_locations .map_location {
+    transition: all 2s linear;
+    z-index: 4;
+}
+
+/* Icon Classes */
+
+.player_ally {
+    height: 32px;
+    width: 32px;
+    background: url(../../../images/ninja_head.png);
     background-size: 25px 25px;
     background-repeat: no-repeat;
     background-position: center;
+    filter: url("#ally_glow");
 }
-
-.map_location.player_enemy {
-    background: url(../../../images/ninja_head.png), radial-gradient(circle, red 70%, transparent 75%);
+.player_neutral {
+    height: 32px;
+    width: 32px;
+    background: url(../../../images/ninja_head.png);
     background-size: 25px 25px;
     background-repeat: no-repeat;
     background-position: center;
+    filter: url("#neutral_glow");
 }
-
-.map_location.player_ally.invulnerable {
+.player_enemy {
+    height: 32px;
+    width: 32px;
+    background: url(../../../images/ninja_head.png);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: url("#enemy_glow");
+}
+.invulnerable {
     opacity: 0.5;
 }
+.patrol, .caravan {
+    height: 32px;
+    width: 32px;
+    background-size: 25px 25px !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+}
+    .patrol.tier_1 {
+        background: url(../../../images/map/icons/patrol1.png);
+        background-size: 20px !important;
+    }
+    .patrol.tier_2 {
+        background: url(../../../images/map/icons/patrol2.png);
+        background-size: 26px !important;
+    }
+    .patrol.tier_3 {
+        background: url(../../../images/map/icons/patrol3.png);
+        background-size: 32px !important;
+    }
+.caravan {
+    background: url(../../../images/map/icons/caravan.png);
+}
+.patrol_stone {
+    filter: url("#stone_glow");
+}
+.patrol_cloud {
+    filter: url("#cloud_glow");
+}
+.patrol_leaf {
+    filter: url("#leaf_glow");
+}
+.patrol_sand {
+    filter: url("#sand_glow");
+}
+.patrol_mist {
+    filter: url("#mist_glow");
+}
+.patrol_ally {
+    filter: url("#ally_glow");
+}
+.patrol_neutral {
+    filter: url("#neutral_glow");
+}
+.patrol_enemy {
+    filter: url("#enemy_glow");
+}
 
-.map_location.player_enemy.invulnerable {
+/* Transition Animation Logic */
+.fade-enter {
+    opacity: 0;
+}
+
+.fade-enter-active {
+    opacity: 1;
+    transition: opacity 0.5s ease-in; /* Match the timeout value in CSSTransition */
+}
+
+.fade-exit {
+    opacity: 1;
+}
+
+.fade-exit-active {
+    opacity: 0;
+    transition: opacity 0.5s ease-out; /* Match the timeout value in CSSTransition */
+}
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Quick Scout */
+.quick-scout-contrainer {
+    position: absolute;
+    height: 75px;
+    width: 75px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, calc(-50% - 1px));
+    cursor: pointer;
+    z-index: 10;
+    background: var(--travel-ui-color);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    box-shadow: 0 0 0 1px var(--sidebar-button-border-color) inset;
+    user-select: none;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.quick-scout span.direction {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background-image: url("../../../images/icons/right_white.png");
+    background-size: 50% auto;
+    background-repeat: no-repeat;
+    background-position: center;
     opacity: 0.5;
+}
+.quick-scout {
+    width: 75px;
+    height: 75px;
+}
+    .quick-scout a {
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        background-image: url("../../../images/map/icons/attack-off-glow.png");
+        background-size: 50px auto;
+        background-repeat: no-repeat;
+        background-position: center;
+        user-select: none;
+        touch-action: none;
+    }
+    .quick-scout a:hover {
+        background-image: url("../../../images/map/icons/attack-on-glow.png");
+        background-size: 50px auto;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    .quick-scout a::before {
+        content: none;
+        display: none;
+    }
+    .quick-scout span.in-battle {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background-image: url("../../../images/map/icons/in-battle.png");
+        background-size: 50px auto;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    .quick-scout:hover {
+        background: var(--travel-button-hover);
+    }
+.quick-scout span.north {
+    transform: rotate(-90deg);
+}
+.quick-scout span.northeast {
+    transform: rotate(-45deg) translate(5px, 0px);
+}
+.quick-scout span.east {
+    transform: rotate(0deg);
+}
+.quick-scout span.southeast {
+    transform: rotate(45deg) translate(5px, 0px);
+}
+.quick-scout span.south {
+    transform: rotate(90deg);
+}
+.quick-scout span.southwest {
+    transform: rotate(135deg) translate(5px, 0px);
+}
+.quick-scout span.west {
+    transform: rotate(180deg);
+}
+.quick-scout span.northwest {
+    transform: rotate(-135deg) translate(5px, 0px);
+}
+
+.operation_text {
+    color: #ffecd4;
+    font-family: 'Segoe UI';
+    font-style: italic;
+    font-weight: 600;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -26px;
+    position: absolute;
+    animation: glow 3s ease-in-out infinite;
+}
+
+@-webkit-keyframes glow {
+    50% {
+        color: white;
+        text-shadow: 0 0 1px #fff, 0 0 2px #402727, 0 0 3px #402727, 0 0 4px #d60808, 0 0 5px #d60808, 0 0 6px #d60808, 0 0 7px #d60808;
+    }
+
+    0%, 100% {
+        color: #ffecd4;
+        text-shadow: 0 0 0px #402727, 0 0 1px #402727, 0 0 2px #402727, 0 0 3px #402727, 0 0 4px #402727, 0 0 5px #402727, 0 0 6px #402727, 0 0 7px #b10000, 0 0 8px #b10000, 0 0 9px #b10000;
+    }
+}
+
+#operation_progress_bar {
+    top: 1px;
+    position: absolute;
+}
+
+#operation_progress_circle_background {
+    transition-property: stroke-dashoffset;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
+}
+
+#operation_progress_circle {
+    transition-property: stroke-dashoffset;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
+}
+
+#operation_interval_circle {
+    transition-property: stroke-dashoffset;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-out;
+}
+
+.loot_icon_1 {
+    height: 12px;
+    width: 12px;
+    position: absolute;
+    right: 64%;
+    top: 75%;
+}
+.loot_icon_2 {
+    height: 12px;
+    width: 12px;
+    position: absolute;
+    left: 63%;
+    top: 75%;
+}
+.loot_icon_3 {
+    height: 12px;
+    width: 12px;
+    position: absolute;
+    left: 51%;
+    top: 82%;
+    transform: translateX(-50%);
+}
+.loot_display {
+    z-index: 1;
+    position: absolute;
+    right: 40px;
+    bottom: 10px;
+    background: url('/../../../images/map/icons/loot1.png');
+    user-select: none;
+    background-size: cover;
+    background-position: center;
+    height: 32px;
+    width: 32px;
+}
+.loot_count {
+    font-size: 14px;
+    color: var(--font-color-2);
+    font-weight: bold;
+    position: absolute;
+    left: 50%;
+    top: 60%;
+    transform: translate(-50%, -50%);
+    text-shadow: 1.5px 1.5px 1px #564d3e;
+}
+
+.reinforce_button_text {
+    text-transform: uppercase;
+    font-size: smaller;
+    color: var(--heal-text-color);
+}
+.raid_button_text {
+    text-transform: uppercase;
+    font-size: smaller;
+    color: var(--taijutsu-text-color);
+}
+
+.region_objective_details {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    position: absolute;
+    bottom: -65px;
+    left: 50%;
+    right: 0;
+    transform: translateX(-50%);
+    margin: 0 auto;
+    padding: 5px 10px;
+    text-align: center;
+    width: fit-content;
+    white-space: pre;
+    background: #3c2b2bcc;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.46);
+    font-family: sans-serif;
+    color: #fff6e0;
+    z-index: 3;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 1px 0px 2px black;
+    gap: 2px;
+}
+.region_objective:hover .region_objective_details {
+    display: flex;
+}
+.region_objective_details_name {
+    line-height: 18px;
+    display: flex;
+}
+.region_objective_details_village_icon {
+    height: 18px;
+    width: 18px;
+}
+.region_objective_details_resource {
+    line-height: 18px;
+    display: flex;
+    text-transform: capitalize;
+}
+.region_objective_details_resource_icon {
+    height: 18px;
+    width: 18px;
+}
+.region_objective_details_defense {
+    display: flex;
+    line-height: 18px;
+    text-transform: capitalize;
+}
+.region_objective_details_defense_icon {
+    display: inline-block;
+    height: 18px;
+    width: 18px;
+    background-image: url('/images/map/icons/shield.png');
+    background-size: cover;
+    line-height: 17px;
+    font-size: smaller;
+    box-sizing: border-box;
+    padding-right: 1px;
+}
+.region_objective_details_health {
+    line-height: 18px;
+    display: flex;
+}
+.region_objective_details_health_icon {
+    height: 18px;
+    width: 18px;
 }

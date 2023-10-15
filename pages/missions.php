@@ -14,6 +14,12 @@ function missions(): bool {
 
     $RANK_NAMES = RankManager::fetchNames($system);
 
+    if ($player->operation > 0) {
+        $system->message("You cannot access this page while in an operation!");
+        $system->printMessage();
+        return false;
+    }
+
 	if($player->mission_id) {
         runActiveMission();
         return true;

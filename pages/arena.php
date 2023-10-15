@@ -16,6 +16,11 @@ function arena(): bool {
 		$system->printMessage();
 		return false;
 	}
+    if ($player->operation > 0) {
+        $system->message("You cannot access this page while in an operation!");
+        $system->printMessage();
+        return false;
+    }
 
 	if($player->battle_id) {
         arenaFight();
@@ -257,7 +262,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
 
         $player->health = 5;
         $player->ai_losses++;
-        $player->moveToVillage();
+        //$player->moveToVillage();
         $player->battle_id = 0;
         $player->last_pvp_ms = System::currentTimeMs();
     }
@@ -265,7 +270,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         $battle_result .= "The battle ended in a draw. You receive no reward.";
 
         $player->health = 5;
-        $player->moveToVillage();
+        //$player->moveToVillage();
         $player->battle_id = 0;
         $player->last_pvp_ms = System::currentTimeMs();
     }

@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+
 /* Class:		Mission
 */
 class Mission {
@@ -147,6 +149,41 @@ class Mission {
                 );
             }
             $this->player->mission_stage = $this->current_stage;
+
+            //notifications
+            $mission_result = $this->system->db->query("SELECT * FROM `missions` where `mission_id` = {$this->player->mission_id} LIMIT 1");
+            $mission_result = $this->system->db->fetch($mission_result);
+            $notification_rank = '';
+            $notification_type = '';
+            switch ($mission_result['mission_type']) {
+                case 2:
+                    $notification_rank = 'C';
+                    $notification_type = 'mission_clan';
+                    break;
+                case 6:
+                    $notification_rank = 'E';
+                    $notification_type = 'mission';
+                    break;
+                case 7:
+                    $notification_rank = 'F';
+                    $notification_type = 'mission';
+                    break;
+                default:
+                    $notification_rank = Mission::$rank_names[$mission_result['rank']];
+                    $notification_type = 'mission';
+                    break;
+
+            }
+            $new_notification = new MissionNotificationDto(
+                type: $notification_type,
+                message: $this->current_stage['description'],
+                user_id: $this->player->user_id,
+                created: time(),
+                mission_rank: $notification_rank,
+                alert: false,
+            );
+            NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+
             return Mission::STATUS_IN_PROGRESS;
         }
 
@@ -181,8 +218,8 @@ class Mission {
 
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
             for($i = 0; $i < 3; $i++) {
-                // if location is specified
-                if (isset($this->current_stage['action_data']) && $this->current_stage['action_data'] != '0') {
+                // if location is specified and not multi-stage
+                if (isset($this->current_stage['action_data']) && $this->current_stage['action_data'] != '0' && $new_stage == true) {
                     $location = TravelCoords::fromDbString($this->current_stage['action_data']);
                 }
                 // if target type is set
@@ -220,7 +257,10 @@ class Mission {
                 else if ($stage_id == 1 && $this->mission_type != $this::TYPE_EVENT) {
                     $location = $this->rollLocation($this->player->village_location);
                 }
-
+                // if last_location is set, use last_location
+                else if (!empty($this->current_stage['last_location'])) {
+                    $location = $this->rollLocation(TravelCoords::fromDbString($this->current_stage['last_location']));
+                }
                 // otherwise, use player current location
                 else {
                     $location = $this->rollLocation($this->player->location);
@@ -230,7 +270,11 @@ class Mission {
                 }
             }
 
-            $this->current_stage['last_location'] = $last_location;
+            // if not multi-stage, update last location
+            if ($new_stage) {
+                $this->current_stage['last_location'] = $last_location;
+            }
+
             $this->current_stage['action_data'] = $location->fetchString();
         }
 
@@ -240,6 +284,56 @@ class Mission {
         $this->current_stage['description'] = str_replace($search_array, $replace_array, $this->current_stage['description']);
 
         $this->player->mission_stage = $this->current_stage;
+
+        //notifications
+        if ($this->player->mission_id > 0) {
+            $mission_result = $this->system->db->query("SELECT * FROM `missions` where `mission_id` = {$this->player->mission_id} LIMIT 1");
+            $mission_result = $this->system->db->fetch($mission_result);
+            $notification_rank = '';
+            $notification_type = '';
+            switch ($mission_result['mission_type']) {
+                case 2:
+                    $notification_rank = 'C';
+                    $notification_type = 'mission_clan';
+                    break;
+                case 6:
+                    $notification_rank = 'E';
+                    $notification_type = 'mission';
+                    break;
+                case 7:
+                    $notification_rank = 'F';
+                    $notification_type = 'mission';
+                    break;
+                default:
+                    $notification_rank = Mission::$rank_names[$mission_result['rank']];
+                    $notification_type = 'mission';
+                    break;
+
+            }
+            if ($this->player->mission_stage['action_type'] == 'travel') {
+                $mission_location = TravelCoords::fromDbString($this->player->mission_stage['action_data']);
+                $new_notification = new MissionNotificationDto(
+                    type: $notification_type,
+                    message: $mission_result['name'] . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                    user_id: $this->player->user_id,
+                    created: time(),
+                    mission_rank: $notification_rank,
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+            } else {
+                $new_notification = new MissionNotificationDto(
+                    type: $notification_type,
+                    message: $mission_result['name'] . " in progress",
+                    user_id: $this->player->user_id,
+                    created: time(),
+                    mission_rank: $notification_rank,
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+            }
+        }
+
         return Mission::STATUS_IN_PROGRESS;
     }
 
@@ -300,6 +394,18 @@ class Mission {
                 );
             }
             $this->player->mission_stage = $this->current_stage;
+
+            //notifications
+            $new_notification = new MissionNotificationDto(
+                type: "mission_team",
+                message: $this->current_stage['description'],
+                user_id: $this->player->user_id,
+                created: time(),
+                mission_rank: 'T',
+                alert: false,
+            );
+            NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+
             return Mission::STATUS_IN_PROGRESS;
         }
 
@@ -348,6 +454,35 @@ class Mission {
         $this->current_stage['description'] = str_replace($search_array, $replace_array, $this->current_stage['description']);
 
         $this->player->mission_stage = $this->current_stage;
+
+        //notifications
+        if ($this->player->mission_id > 0) {
+            $mission_result = $this->system->db->query("SELECT * FROM `missions` where `mission_id` = {$this->player->mission_id} LIMIT 1");
+            $mission_result = $this->system->db->fetch($mission_result);
+            if ($this->player->mission_stage['action_type'] == 'travel') {
+                $mission_location = TravelCoords::fromDbString($this->player->mission_stage['action_data']);
+                $new_notification = new MissionNotificationDto(
+                    type: "mission_team",
+                    message: $mission_result['name'] . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                    user_id: $this->player->user_id,
+                    created: time(),
+                    mission_rank: 'T',
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+            } else {
+                $new_notification = new MissionNotificationDto(
+                    type: "mission_team",
+                    message: $mission_result['name'] . " in progress",
+                    user_id: $this->player->user_id,
+                    created: time(),
+                    mission_rank: 'T',
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+            }
+        }
+
         return Mission::STATUS_IN_PROGRESS;
     }
 

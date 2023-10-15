@@ -404,7 +404,88 @@ export function TopbarNotification({
     x: "40%",
     y: "70%",
     className: "topbar_notification_important"
-  }, "!"))));
+  }, "!"))), notification.type === "caravan" && /*#__PURE__*/React.createElement("a", {
+    href: notification.action_url,
+    className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+    "data-content": notification.message,
+    "data-time": timeRemainingDisplay
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "topbar_notification_svg",
+    width: "40",
+    height: "40",
+    viewBox: "0 0 100 100"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "8px",
+    stroke: "#5d5c4b",
+    fill: "#B09A65"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "2px",
+    stroke: "#000000",
+    fill: "#B09A65"
+  }), /*#__PURE__*/React.createElement("image", {
+    className: "topbar_notification_icon",
+    height: "48",
+    width: "48",
+    x: "26%",
+    y: "30%",
+    href: "images/v2/icons/caravan_notifbright.png"
+  }))), notification.type === "raid_ally" && /*#__PURE__*/React.createElement("a", {
+    href: notification.action_url,
+    className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+    "data-content": notification.message,
+    "data-time": timeRemainingDisplay
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "topbar_notification_svg",
+    width: "40",
+    height: "40",
+    viewBox: "0 0 100 100"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "8px",
+    stroke: "#5d5c4b",
+    fill: "#B09A65"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "2px",
+    stroke: "#000000",
+    fill: "#B09A65"
+  }), /*#__PURE__*/React.createElement("image", {
+    className: "topbar_notification_icon",
+    height: "50",
+    width: "50",
+    x: "24%",
+    y: "21%",
+    href: "images/v2/icons/raid.png"
+  }))), notification.type === "raid_enemy" && /*#__PURE__*/React.createElement("a", {
+    href: notification.action_url,
+    className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+    "data-content": notification.message,
+    "data-time": timeRemainingDisplay
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "topbar_notification_svg",
+    width: "40",
+    height: "40",
+    viewBox: "0 0 100 100"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "8px",
+    stroke: "#4c1f1f",
+    fill: "#eb4648"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "2px",
+    stroke: "#000000",
+    fill: "#eb4648"
+  }), /*#__PURE__*/React.createElement("image", {
+    className: "topbar_notification_icon",
+    height: "50",
+    width: "50",
+    x: "24%",
+    y: "21%",
+    href: "images/v2/icons/raid.png"
+  }))));
 }
 function SpecialMissionNotification({
   notification,
@@ -439,7 +520,11 @@ function SpecialMissionNotification({
     href: notification.action_url,
     className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
     "data-content": notification.message,
-    "data-time": timeRemainingDisplay
+    "data-time": timeRemainingDisplay,
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id, notification.action_url);
+    }
   }, /*#__PURE__*/React.createElement("svg", {
     className: "topbar_notification_svg",
     width: "40",
@@ -474,7 +559,11 @@ function SpecialMissionNotification({
     href: notification.action_url,
     className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
     "data-content": notification.message,
-    "data-time": timeRemainingDisplay
+    "data-time": timeRemainingDisplay,
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id, notification.action_url);
+    }
   }, /*#__PURE__*/React.createElement("svg", {
     className: "topbar_notification_svg",
     width: "40",
@@ -549,7 +638,11 @@ function TrainingNotification({
     href: notification.action_url,
     className: "topbar_notification_wrapper_training_complete",
     "data-content": notification.message,
-    "data-time": formatTimeRemaining(timeRemaining)
+    "data-time": formatTimeRemaining(timeRemaining),
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id, notification.action_url);
+    }
   }, /*#__PURE__*/React.createElement("svg", {
     className: "topbar_notification_svg",
     width: "40",

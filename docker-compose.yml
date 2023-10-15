@@ -1,13 +1,17 @@
 version: '3'
 services:
-  # Standard Mysql Box, we have to add tricky things else logging by workbench is hard
   shinobi-chronicles-db:
     image: mysql
-    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    env_file:
-      - infra/database.env
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     ports:
       - "3306:3306"
+    volumes:
+      - sc_db:/var/lib/mysql
     healthcheck:
       test: [ "CMD-SHELL", "nc -z 127.0.0.1 3306 || exit 1" ]
       interval: 1m30s
@@ -15,23 +19,36 @@ services:
       retries: 6
     hostname: shinobi-chronicles-db
 
-  # Flyway is best for mysql schema migration history.
-  database-migration:
-    image: flyway/flyway
-    command:  migrate
-    volumes:
-      - "./db/migrations:/flyway/sql"
-      - "./flyway.conf:/flyway/conf/flyway.conf"
+  # Web DB Tool
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: shinobi-chronicles-db
+      PMA_PORT: "3306"
+
+  # PHP server
+  web_server:
+    build:
+      dockerfile: docker/Dockerfile
+      context: "."
+      args:
+        ENV: ${ENV}
+        WEB_URL: ${WEB_URL}
+        DB_HOST: shinobi-chronicles-db
+        DB_NAME: ${DB_NAME}
+        DB_USER: ${DB_USER}
+        DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "80:80"
+    image: shinobi_chronicles_web_app
+#    volumes:
+#      - sc_app:/var/www/html
     depends_on:
       - shinobi-chronicles-db
-      
-  # PHP server
-  server:
-    build:
-      dockerfile: infra/server/Dockerfile
-      context: "."
-    image: server
-    ports:
-    - 80:80
-    volumes:
-    - ./:/var/www/html
+
+volumes:
+  sc_db:
+  sc_app:

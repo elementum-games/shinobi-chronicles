@@ -39,6 +39,7 @@ class Router {
         'account_record' => 34,
         'send_money' => 35,
         'forbiddenShop' => 36,
+        'war' => 37,
     ];
 
     /** @var Route[] $routes */
@@ -70,6 +71,7 @@ class Router {
         $this->api_links['chat'] = $this->base_url . 'api/chat.php';
         $this->api_links['news'] = $this->base_url . 'api/news.php';
         $this->api_links['forbidden_shop'] = $this->base_url . 'api/forbidden_shop.php';
+        $this->api_links['village'] = $this->base_url . 'api/village.php';
     }
 
     /**

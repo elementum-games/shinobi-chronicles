@@ -281,11 +281,10 @@ function sparFightAPI(System $system, User $player): BattlePageAPIResponse {
 }
 
 function isReputationEligible(BattleManager $battle, User $player, System $system): bool {
-	// if at Underground Arena
-    $result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
-    $location_result = $system->db->fetch($result);
-    $arena_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
-    if (!$player->location->equals($arena_coords)) {
+	// if at Underground Colosseum or Village
+    $travelManager = new TravelManager($system, $player);
+    $arena_coords = $travelManager->getColosseumCoords();
+    if (!$player->location->equals($arena_coords) && !$player->location->equals($player->village_location)) {
         return false;
     }
 

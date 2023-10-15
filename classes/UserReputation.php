@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . "/war/Operation.php";
+
 class UserReputation {
     public static array $VillageRep = [
         1 => [
@@ -14,7 +16,7 @@ class UserReputation {
         2 => [
             'title' => 'Aspiring Shinobi',
             'outlaw_title' => 'Thief',
-            'min_rep' => 500,
+            'min_rep' => 2500,
             'weekly_cap' => 1250,
             'weekly_pvp_cap' => 1000,
             'base_pvp_rep_reward' => 2,
@@ -23,7 +25,7 @@ class UserReputation {
         3 => [
             'title' => 'Shinobi',
             'outlaw_title' => 'Bandit',
-            'min_rep' => 2500,
+            'min_rep' => 5000,
             'weekly_cap' => 1250,
             'weekly_pvp_cap' => 1000,
             'base_pvp_rep_reward' => 2,
@@ -32,34 +34,34 @@ class UserReputation {
         4 => [
             'title' => 'Experienced Shinobi',
             'outlaw_title' => 'Raider',
-            'min_rep' => 5000,
-            'weekly_cap' => 1250,
-            'weekly_pvp_cap' => 1000,
-            'base_pvp_rep_reward' => 3,
-            'base_decay' => 125,
-        ],
-        5 => [
-            'title' => 'Veteran Shinobi',
-            'outlaw_title' => 'Marauder',
             'min_rep' => 7500,
             'weekly_cap' => 1250,
             'weekly_pvp_cap' => 1000,
             'base_pvp_rep_reward' => 3,
             'base_decay' => 250,
         ],
-        6 => [
-            'title' => 'Expert Shinobi',
-            'outlaw_title' => 'Rogue',
+        5 => [
+            'title' => 'Veteran Shinobi',
+            'outlaw_title' => 'Marauder',
             'min_rep' => 10000,
             'weekly_cap' => 1250,
             'weekly_pvp_cap' => 1000,
             'base_pvp_rep_reward' => 3,
             'base_decay' => 500,
         ],
+        6 => [
+            'title' => 'Expert Shinobi',
+            'outlaw_title' => 'Rogue',
+            'min_rep' => 15000,
+            'weekly_cap' => 1250,
+            'weekly_pvp_cap' => 1000,
+            'base_pvp_rep_reward' => 3,
+            'base_decay' => 750,
+        ],
         7 => [
             'title' => 'Elite Shinobi',
             'outlaw_title' => 'Notorious Rogue',
-            'min_rep' => 12500,
+            'min_rep' => 22500,
             'weekly_cap' => 1250,
             'weekly_pvp_cap' => 1000,
             'base_pvp_rep_reward' => 4,
@@ -68,7 +70,7 @@ class UserReputation {
         8 => [
             'title' => 'Master Shinobi',
             'outlaw_title' => 'Infamous Rogue',
-            'min_rep' => 25000,
+            'min_rep' => 35000,
             'weekly_cap' => 1250,
             'weekly_pvp_cap' => 1000,
             'base_pvp_rep_reward' => 4,
@@ -86,7 +88,7 @@ class UserReputation {
     ];
 
     // Shop benefits
-    const ITEM_SHOP_DISCOUNT_RATE = 5;
+    const ITEM_SHOP_DISCOUNT_RATE = 10;
     const BENEFIT_CONSUMABLE_DISCOUNT = 'consumable_discount';
     const BENEFIT_GEAR_DISCOUNT = 'gear_discount';
     const BENEFIT_JUTSU_SCROLL_DISCOUNT = 'scroll_discount';
@@ -94,9 +96,15 @@ class UserReputation {
     // Training benefits
     const EFFICIENT_LONG_INCREASE = 5;
     const EFFICIENT_EXTENDED_INCREASE = 6.25;
+    const JUTSU_TRAINING_BONUS = 25;
     const BENEFIT_EFFICIENT_LONG = 'efficient_long';
     const BENEFIT_EFFICIENT_EXTENDED = 'efficient_extended';
     const BENEFIT_PARTIAL_TRAINING_GAINS = 'partial_trains';
+    const BENEFIT_JUTSU_TRAINING_BONUS = 'jutsu_bonus';
+
+    // Other benefits
+    const FREE_TRANSFER_BONUS = 50;
+    const BENEFIT_FREE_TRANSFER_BONUS = 'free_transfer_bonus';
 
     // Benefits array, add all benefits as inactive and turn them on in loadBenefits() as appropriate
     public static array $Benefits = [
@@ -106,22 +114,30 @@ class UserReputation {
         self::BENEFIT_EFFICIENT_LONG => false,
         self::BENEFIT_EFFICIENT_EXTENDED => false,
         self::BENEFIT_PARTIAL_TRAINING_GAINS => false,
+        self::BENEFIT_JUTSU_TRAINING_BONUS => false,
+        self::BENEFIT_FREE_TRANSFER_BONUS => false,
     ];
 
     // Limits
-    const ARENA_MISSION_CD = 60;
+    const ARENA_MISSION_CD = 0;
     const MISSION_GAINS = [
         Mission::RANK_D => 1,
         Mission::RANK_C => 2,
-        Mission::RANK_B => 3,
-        Mission::RANK_A => 4,
-        Mission::RANK_S => 5
+        Mission::RANK_B => 4,
+        Mission::RANK_A => 6,
+        Mission::RANK_S => 8
     ];
     const SPECIAL_MISSION_REP_GAINS = [
         SpecialMission::DIFFICULTY_EASY => 2,
         SpecialMission::DIFFICULTY_NORMAL => 4,
         SpecialMission::DIFFICULTY_HARD => 6,
         SpecialMission::DIFFICULTY_NIGHTMARE => 8,
+    ];
+    const OPERATION_GAINS = [
+        Operation::OPERATION_REINFORCE => 3,
+        Operation::OPERATION_INFILTRATE => 4,
+        Operation::OPERATION_RAID => 5,
+        Operation::OPERATION_LOOT => 1,
     ];
 
     const DAILY_TASK_REWARDS = [
@@ -147,6 +163,7 @@ class UserReputation {
             DailyTask::ACTIVITY_PVP => 20,
         ],
     ];
+
     const DAILY_TASK_PVP_WIN_MOD = 5; // Increase rep by this amount for tasks requiring pvp wins (harder than completes)f
     const DAILY_TASK_BYPASS_CAP = false;
 
@@ -169,9 +186,9 @@ class UserReputation {
     // Only being killed within last 30 minutes will mitigate pvp rep losses (further chainkill mitigation)
     const RECENTLY_KILLED_BY_THRESHOLD = 1800;
 
-    const SPAR_REP_LOSS = 2;
-    const SPAR_REP_DRAW = 3;
-    const SPAR_REP_WIN = 5;
+    const SPAR_REP_LOSS = 3;
+    const SPAR_REP_DRAW = 5;
+    const SPAR_REP_WIN = 7;
 
     protected int $rep;
     protected int $weekly_rep;
@@ -315,21 +332,22 @@ class UserReputation {
 
         // Active benefits based on rank
         switch($this->rank) {
-            case 9:
-            case 8:
-            case 7:
-                $benefits[self::BENEFIT_PARTIAL_TRAINING_GAINS] = true;
-            case 6:
+            case 9: // 50000 Reputation
+            case 8: // 35000 Reputation
+            case 7: // 22500 Reputation
+            case 6: // 15000 Reputation
+            case 5: // 10000 Reputation
+                $benefits[self::BENEFIT_FREE_TRANSFER_BONUS] = true;
+            case 4: // 7500 Reputation
+                $benefits[self::BENEFIT_JUTSU_TRAINING_BONUS] = true;
+            case 3: // 5000 Reputation
                 $benefits[self::BENEFIT_EFFICIENT_LONG] = true;
                 $benefits[self::BENEFIT_EFFICIENT_EXTENDED] = true;
-            case 5:
-                $benefits[self::BENEFIT_JUTSU_SCROLL_DISCOUNT] = true;
-            case 4:
+            case 2: // 2500 Reputation
                 $benefits[self::BENEFIT_GEAR_DISCOUNT] = true;
-            case 3:
                 $benefits[self::BENEFIT_CONSUMABLE_DISCOUNT] = true;
-            case 2:
-            case 1:
+                $benefits[self::BENEFIT_JUTSU_SCROLL_DISCOUNT] = true;
+            case 1: // baseline
         }
 
         return $benefits;

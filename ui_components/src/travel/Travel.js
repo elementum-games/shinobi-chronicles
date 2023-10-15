@@ -1,6 +1,7 @@
+import { QuickScout } from "./ScoutArea.js";
 import { apiFetch } from "../utils/network.js";
 import { Map } from "./Map.js";
-import { ScoutArea} from "./ScoutArea.js";
+import { ScoutArea } from "./ScoutArea.js";
 
 /**
  * @param {{
@@ -29,6 +30,15 @@ import { ScoutArea} from "./ScoutArea.js";
     region_coords:       object,
     spar_link:           string,
     colosseum_coords:    object,
+    region_objectives:   object,
+    map_objectives:      object,
+    battle_url:          string,
+    operations:          object,
+    operation_type:      string,
+    operation_progress:  int,
+    operation_interval:  int,
+    travel_message:      string,
+    loot_count:          int,
  * }} mapData
  *
  * @param {{
@@ -92,6 +102,7 @@ function Travel({
 
     const [mapData, setMapData] = React.useState(null);
     const [scoutData, setScoutData] = React.useState(null);
+    const [patrolData, setPatrolData] = React.useState(null);
 
     const [ranksToView, setRanksToView] = React.useState({
         1: false,
@@ -125,15 +136,23 @@ function Travel({
                 request: 'LoadTravelData'
             }
         ).then((response) => {
+            if (response.data.mapData.battle_url) {
+                window.location.href = response.data.mapData.battle_url;
+            }
             if (response.errors.length) {
                 handleErrors(response.errors);
                 return;
+            }
+            if (response.data.travel_message) {
+                setFeedback(null);
+                setFeedback([response.data.travel_message, 'info']);
             }
             setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
             setStrategicView(response.data.mapData.player_filters.strategic_view === "true");
             setDisplayGrid(response.data.mapData.player_filters.display_grid === "true");
             setMapData(response.data.mapData);
             setScoutData(response.data.nearbyPlayers);
+            setPatrolData(response.data.nearbyPatrols);
         });
     }
 
@@ -171,6 +190,7 @@ function Travel({
                 lastTravelSuccessTime.current = requestEnd;
                 setMapData(response.data.mapData);
                 setScoutData(response.data.nearbyPlayers);
+                setPatrolData(response.data.nearbyPatrols);
             }
             else {
                 debug('Cannot move player.');
@@ -221,6 +241,9 @@ function Travel({
             }
 
             debug('Filters updated!');
+            setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
+            setStrategicView(response.data.mapData.player_filters.strategic_view === "true");
+            setDisplayGrid(response.data.mapData.player_filters.display_grid === "true");
             setMapData(response.data.mapData);
             setScoutData(response.data.nearbyPlayers);
         });
@@ -229,6 +252,7 @@ function Travel({
     function handleErrors(errors) {
         console.warn(errors);
         setFeedback([errors, 'info']);
+        debug([errors]);
     }
 
     const AttackPlayer = (target) => {
@@ -245,6 +269,64 @@ function Travel({
             }
 
             window.location.href = response.data.redirect;
+        });
+    }
+
+    const BeginOperation = (type) => {
+        apiFetch(
+            travelAPILink,
+            {
+                request: 'BeginOperation',
+                operation_type: type,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            if (response.data.travel_message) {
+                setFeedback(null);
+                setFeedback([response.data.travel_message, 'info']);
+            }
+            setMapData(response.data.mapData);
+        });
+    }
+
+    const CancelOperation = () => {
+        apiFetch(
+            travelAPILink,
+            {
+                request: 'CancelOperation',
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            if (response.data.travel_message) {
+                setFeedback(null);
+                setFeedback([response.data.travel_message, 'info']);
+            }
+            setMapData(response.data.mapData);
+        });
+    }
+
+    const ClaimLoot = () => {
+        apiFetch(
+            travelAPILink,
+            {
+                request: 'ClaimLoot',
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            if (response.data.travel_message) {
+                setFeedback(null);
+                setFeedback([response.data.travel_message, 'info']);
+            }
+            setMapData(response.data.mapData);
         });
     }
 
@@ -298,12 +380,10 @@ function Travel({
     }
 
     function updateStrategicView(value) {
-        setStrategicView(value);
         UpdateFilter("strategic_view", value);
     }
 
     function updateDisplayGrid(value) {
-        setDisplayGrid(value);
         UpdateFilter("display_grid", value);
     }
 
@@ -359,57 +439,93 @@ function Travel({
                 updateDisplayGrid={updateDisplayGrid}
             />
             <div className='travel-wrapper'>
-                <TravelActions
-                    travelPageLink={travelPageLink}
-                    travelCooldownMs={travelCooldownMs}
-                    updateMovementDirection={changeMovementDirection}
-                    movePlayer={MovePlayer}
-                />
-                <div id='travel-container' className='travel-container'>
-                    <div className='travel-buttons'>
-                        {mapData?.current_portal?.portal_id != null && (
-                            <button className='button'
+                <div className="travel-panel">
+                    <div id='travel-container' className='travel-container'>
+                        <div className='travel-buttons'>
+                            {mapData?.current_portal?.portal_id != null && (
+                                <button className='button'
                                     onClick={() => EnterPortal(mapData.current_portal.portal_id)}>
-                                Go to {mapData.current_portal.entrance_name}
-                            </button>
-                        )}
-                        {(mapData && mapData.current_mission) && (
-                         <a href={missionLink}>
-                             <button className='button'>Go to Mission Location</button>
-                         </a>
-                        )}
-                        {(mapData && mapData.action_url) && (
-                            <a href={mapData.action_url}>
-                                <button className='button'>{mapData.action_message}</button>
-                            </a>
-                        )}
-                    </div>
-                    {feedback && (
-                        <div className='travel-messages'>
-                            <Message message={feedback[0]} messageType={feedback[1]} />
+                                    Go to {mapData.current_portal.entrance_name}
+                                </button>
+                            )}
+                            {(mapData && mapData.current_mission) && (
+                                <a href={missionLink}>
+                                    <button className='button'>Go to Mission Location</button>
+                                </a>
+                            )}
+                            {(mapData && mapData.action_url) && (
+                                <a href={mapData.action_url}>
+                                    <button className='button'>{mapData.action_message}</button>
+                                </a>
+                            )}
+                            {(mapData && mapData.operation_type) && (
+                                <button className='button' onClick={() => CancelOperation()}>Cancel</button>
+                            )}
+                            {((mapData && mapData.operations && !mapData.operation_type) && typeof mapData.operations_type === 'undefined') && (
+                                Object.entries(mapData.operations).map(([key, value], index) => (
+                                    <button key={index} onClick={() => BeginOperation(key)} className='button' dangerouslySetInnerHTML={{ __html: value }}>
+                                    </button>
+                                ))
+                            )}
+                            {(mapData && mapData.in_village && mapData.loot_count > 0) && (
+                                <button className='button' onClick={() => ClaimLoot()}>Deposit Resources</button>
+                            )}
                         </div>
-                    )}
-                    {(mapData && scoutData) &&
-                        (<Map mapData={mapData}
-                            scoutData={scoutData}
-                            playerId={playerId}
-                            ranksToView={ranksToView}
-                            strategicView={strategicView}
-                            displayGrid={displayGrid}
-                        />)}
+                        {feedback && (
+                            <div className='travel-messages'>
+                                <Message message={feedback[0]} messageType={feedback[1]} />
+                            </div>
+                        )}
+                        {(mapData && scoutData) &&
+                            (<Map mapData={mapData}
+                                scoutData={scoutData}
+                                patrolData={patrolData}
+                                playerId={playerId}
+                                ranksToView={ranksToView}
+                                strategicView={strategicView}
+                                displayGrid={displayGrid}
+                            />)}
+                    </div>
+                    <TravelActions
+                        travelPageLink={travelPageLink}
+                        travelCooldownMs={travelCooldownMs}
+                        updateMovementDirection={changeMovementDirection}
+                        movePlayer={MovePlayer}
+                        mapData={mapData}
+                        scoutData={scoutData}
+                        attackPlayer={AttackPlayer}
+                        sparPlayer={SparPlayer}
+                        ranksToView={ranksToView}
+                        playerId={playerId}
+                    />
                 </div>
+                {(mapData && scoutData) && (
+                    <ScoutArea
+                        mapData={mapData}
+                        scoutData={scoutData}
+                        membersLink={membersLink}
+                        attackPlayer={AttackPlayer}
+                        sparPlayer={SparPlayer}
+                        ranksToView={ranksToView}
+                        playerId={playerId}
+                        displayAllies={true}
+                    />
+                )}
+                {(mapData && scoutData) && (
+                    <ScoutArea
+                        mapData={mapData}
+                        scoutData={scoutData}
+                        membersLink={membersLink}
+                        attackPlayer={AttackPlayer}
+                        sparPlayer={SparPlayer}
+                        ranksToView={ranksToView}
+                        playerId={playerId}
+                        displayAllies={false}
+                    />
+                )}
+
             </div>
-            {(mapData && scoutData) && (
-                <ScoutArea
-                    mapData={mapData}
-                    scoutData={scoutData}
-                    membersLink={membersLink}
-                    attackPlayer={AttackPlayer}
-                    sparPlayer={SparPlayer}
-                    ranksToView={ranksToView}
-                    playerId={playerId}
-                />
-            )}
+            <GlowFilters/>
         </>
     );
 }
@@ -475,7 +591,16 @@ function TravelFilters({ ranksToView, updateRanksToView, strategicView, updateSt
     );
 }
 
-function TravelActions({ travelPageLink, updateMovementDirection }) {
+function TravelActions({
+    travelPageLink,
+    updateMovementDirection,
+    mapData,
+    scoutData,
+    attackPlayer,
+    sparPlayer,
+    ranksToView,
+    playerId,
+}) {
     // If player presses one key, wait a short amount before updating the direction in case they press a second key
     const inputBufferMs = 25;
 
@@ -652,15 +777,23 @@ function TravelActions({ travelPageLink, updateMovementDirection }) {
                     onPointerUp={handlePointerUp}
                     onPointerLeave={handlePointerUp}
                     onContextMenu={e => {
-                        if(e.nativeEvent.pointerType === "touch") {
-                            e.preventDefault();
-                        }
+                        e.preventDefault();
                     }}
                     onClick={e => {
                         e.preventDefault();
                     }}
                 ></a>
             ))}
+            <QuickScout
+                mapData={mapData}
+                scoutData={scoutData}
+                attackPlayer={attackPlayer}
+                sparPlayer={sparPlayer}
+                ranksToView={ranksToView}
+                playerId={playerId}
+                updateMovementDirection={updateMovementDirection}
+            />
+
         </div>
     )
 }
@@ -702,6 +835,111 @@ function directionFromKeysPressed(directionKeysPressed) {
     }
 
     return direction;
+}
+
+function GlowFilters() {
+    return (
+        <svg height="0" width="0">
+            <defs>
+                <filter id="ally_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="green" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="3" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="neutral_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="#ffb600" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="3" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="enemy_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="red" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="2" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="stone_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="green" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="3" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="cloud_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="yellow" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="2" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="leaf_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="red" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="2" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="sand_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="orange" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="2" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="mist_glow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feFlood floodColor="blue" result="floodColor" />
+                    <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                        <feFuncA type="linear" slope="1" />
+                    </feComponentTransfer>
+                    <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+        </svg>
+    );
 }
 
 window.Travel = Travel;

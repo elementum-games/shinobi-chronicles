@@ -211,7 +211,7 @@ export function TopbarNotification({
                 <a href={notification.action_url}
                     className="topbar_notification_wrapper"
                     data-content={notification.message}
-                    data-time={timeRemainingDisplay}
+                data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -222,7 +222,7 @@ export function TopbarNotification({
                         className="topbar_close_notification"
                         onClick={(e) => {
                             e.preventDefault();
-                            closeNotification(notification.notification_id)
+                            closeNotification(notification.notification_id);
                         }}
                     >X</label>
                 </a>
@@ -237,6 +237,45 @@ export function TopbarNotification({
                     <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#38a774" />
                     <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#38a774" />
                         <text x="40%" y="70%" className="topbar_notification_important">!</text>
+                    </svg>
+                </a>
+            }
+            {notification.type === "caravan" &&
+                <a href={notification.action_url}
+                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
+                    data-content={notification.message}
+                    data-time={timeRemainingDisplay}
+                >
+                    <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#B09A65" />
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#B09A65" />
+                    <image className="topbar_notification_icon" height="48" width="48" x="26%" y="30%" href="images/v2/icons/caravan_notifbright.png" />
+                    </svg>
+                </a>
+            }
+            {notification.type === "raid_ally" &&
+                <a href={notification.action_url}
+                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
+                    data-content={notification.message}
+                    data-time={timeRemainingDisplay}
+                >
+                    <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#B09A65" />
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#B09A65" />
+                        <image className="topbar_notification_icon" height="50" width="50" x="24%" y="21%" href="images/v2/icons/raid.png" />
+                    </svg>
+                </a>
+            }
+            {notification.type === "raid_enemy" &&
+                <a href={notification.action_url}
+                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
+                    data-content={notification.message}
+                    data-time={timeRemainingDisplay}
+                >
+                    <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#4c1f1f" fill="#eb4648" />
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#eb4648" />
+                        <image className="topbar_notification_icon" height="50" width="50" x="24%" y="21%" href="images/v2/icons/raid.png" />
                     </svg>
                 </a>
             }
@@ -272,7 +311,11 @@ function SpecialMissionNotification({
                     <a href={notification.action_url}
                        className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                        data-content={notification.message}
-                       data-time={timeRemainingDisplay}
+                    data-time={timeRemainingDisplay}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        closeNotification(notification.notification_id, notification.action_url);
+                    }}
                     >
                         <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                             <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -284,7 +327,7 @@ function SpecialMissionNotification({
                             className="topbar_close_notification"
                             onClick={(e) => {
                                 e.preventDefault();
-                                closeNotification(notification.notification_id)
+                                closeNotification(notification.notification_id);
                             }}
                         >X</label>
                     </a>
@@ -295,7 +338,11 @@ function SpecialMissionNotification({
                     <a href={notification.action_url}
                        className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                        data-content={notification.message}
-                       data-time={timeRemainingDisplay}
+                    data-time={timeRemainingDisplay}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        closeNotification(notification.notification_id, notification.action_url);
+                    }}
                     >
                         <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                             <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -307,7 +354,7 @@ function SpecialMissionNotification({
                             className="topbar_close_notification"
                             onClick={(e) => {
                                 e.preventDefault();
-                                closeNotification(notification.notification_id)
+                                closeNotification(notification.notification_id);
                             }}
                         >X</label>
                     </a>
@@ -353,7 +400,11 @@ function TrainingNotification({
                     <a href={notification.action_url}
                        className="topbar_notification_wrapper_training_complete"
                        data-content={notification.message}
-                       data-time={formatTimeRemaining(timeRemaining)}
+                    data-time={formatTimeRemaining(timeRemaining)}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        closeNotification(notification.notification_id, notification.action_url);
+                    }}
                     >
                         <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                             <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -365,7 +416,7 @@ function TrainingNotification({
                             className="topbar_close_notification"
                             onClick={(e) => {
                                 e.preventDefault();
-                                closeNotification(notification.notification_id)
+                                closeNotification(notification.notification_id);
                             }}
                         >X</label>
                     </a>

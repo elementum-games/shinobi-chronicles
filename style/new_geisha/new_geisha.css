@@ -48,6 +48,8 @@
     --font-color-5: #a3a3c5;
     --font-color-6: #a59e8d;
     --font-color-7: #948768;
+    --font-link: #9e97ba;
+    --font-link-hover: #bdb3e3;
     --font-min: 12px;
     --font-small: 13px;
     --font-default: 14px;
@@ -75,7 +77,7 @@
     --hotbar-keybind-modal-width: 700px;
     --hotbar-keybind-modal-height: 400px;
     /* Sidebar Config */
-    --sidebar-header-background-color: #8c7b58;
+    --sidebar-header-background: #8c7b58;
     --sidebar-header-height: 23px;
     --sidebar-button-background-color: #1a191d;
     --sidebar-button-background-hover: linear-gradient(to bottom, #262631 50%, #22222a 50%);
@@ -89,6 +91,30 @@
     --chat-secondary-background-color: #1a1921;
     /* Style helpers */
     --clip-tall-hexagon: polygon(50% 0%,95% 20%,95% 80%,50% 100%,5% 80%,5% 20%);
+    /* Travel Config */
+    --travel-ui-color: #1a191d;
+    --travel-button-hover: #262631;
+    --travel-background-color: #20222b;
+    --travel-scout-background: rgba(26, 25, 29, 0.85);
+    /* Battle Config */
+    --ninjutsu-text-color: #4C8CFF;
+    --taijutsu-text-color: #FF4C4C;
+    --genjutsu-text-color: #B54CFF;
+    --heal-text-color: #4CFF70;
+    --hand-seal-highlight: #d1c5ad;
+    --hand-seal-text: black;
+    /* Notification Config */
+    --notification-background-color: #141317;
+    --notification-background-border: #575749;
+    /* VillageHQ Config */
+    --village-text-color-1: #eee1c8;
+    --village-text-color-2: #c0c7dc;
+    --diplomacy-background-neutral: #2B2A1D;
+    --diplomacy-background-alliance: #242b29;
+    --diplomacy-background-war: #1f1619;
+    --diplomacy-item-border: #373131;
+    --hq-number-background-color: #272733;
+    --hq-clan-name-color: #eee1c8;
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */
@@ -173,7 +199,7 @@
 
 body {
     background-color: var(--main-background-color);
-    background-image: linear-gradient(to right, var(--main-background-color) 0%, transparent 17%, transparent 83%, var(--main-background-color) 100%), url(../../images/v2/decorations/Banner1.jpg);
+    background-image: linear-gradient(to right, var(--main-background-color) 0%, transparent 17%, transparent 83%, var(--main-background-color) 100%), url(../../images/v2/new_geisha/background_ng_1.jpg);
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
@@ -279,9 +305,13 @@ body {
     background: url("/images/v2/decorations/barbigbutton.png") no-repeat;
     background-position: center;
 }
-.button-bar_large:active {
-    background-size: 98%;
-}
+    .button-bar_large:hover {
+        background: url("/images/v2/decorations/barbigbutton.png") no-repeat;
+        background-position: center;
+    }
+    .button-bar_large:active {
+        background-size: 98%;
+    }
 
 #footer {
     font-family: var(--font-primary);
@@ -359,6 +389,13 @@ body {
     position: absolute;
     bottom: 0;
     left: 0;
+}
+
+/* Travel */
+.systemMessage-new-info {
+    background: var(--travel-ui-color);
+    border: 1px solid var(--travel-background-color);
+    color: var(--font-color-3);
 }
 
 /* Avatar styles */
@@ -494,10 +531,16 @@ h3 {
     color: var(--font-color-1);
 }
 
+input[type=checkbox] {
+    outline: 1px solid var(--font-color-1);
+    accent-color: var(--box-color-default);
+}
+
 /* Compatibility */
 .systemMessage {
     width: 100%;
     top: 5px;
+    color: #d1beef;
 }
 
 /* User Colors */
@@ -568,6 +611,90 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
     background: var(--avatar-frame-border_gradient) !important;
 }
 
+/* Special Mission Override */
+#spec_miss_wrapper {
+    background: var(--sidebar-button-background-color);
+}
+.spec_miss_log_entry_text {
+    color: var(--font-color-3) !important;
+}
+.spec_miss_log_entry_timestamp {
+    color: var(--font-color-3) !important;
+}
+.spec_miss_log_entry_timestamp_wraooer {
+    color: var(--font-color-3) !important;
+}
+.spec_miss_page_warning {
+    color: var(--font-color-3) !important;
+}
+a#spec_miss_cancel {
+    color: var(--font-color-3) !important;
+}
+
+/* Inbox Override */
+#inbox_convo_list_title_container {
+    background: var(--sidebar-header-background);
+    border-bottom: 1px solid var(--sidebar-header-background);
+}
+#inbox_convo_main_controls_container {
+    background: var(--sidebar-header-background);
+}
+#inbox_convo_list, #inbox_convo_container, #inbox_convo_details_container {
+    scrollbar-color: var(--sidebar-button-border-color);
+}
+#inbox_container {
+    background: var(--sidebar-button-background-color);
+    border: 1px solid var(--sidebar-button-border-color);
+}
+#content #inbox_new {
+    background: var(--sidebar-header-background);
+    border-color: var(--sidebar-header-background);
+}
+#inbox_convo_list_title {
+    color: var(--font-color-2);
+}
+#inbox_convo_list_count {
+    color: var(--font-color-2);
+}
+#inbox_convo_textbox {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+.inbox_convo_list_container_selected {
+    background: var(--content-background-color);
+}
+.inbox_convo_title {
+    color: var(--font-color-3);
+}
+.inbox_convo_list_container {
+    border-color: var(--sidebar-header-background);
+}
+#content #inbox_new span {
+    color: var(--font-color-2);
+}
+.inbox_message {
+    border-color: var(--sidebar-header-background);
+}
+#inbox_convo_textbox_characters_remaining {
+    color: var(--font-color-2);
+}
+.inbox_message_timestamp, .inbox_message_report {
+    color: var(--font-color-3);
+}
+#content .inbox_message_report a {
+    color: var(--font-color-3);
+}
+.inbox_message_self::before {
+    background: none;
+}
+#inbox_convo_details_container, #inbox_new_convo_container {
+    background: var(--sidebar-button-background-color);
+}
+.inbox_convo_details_title {
+    background: var(--sidebar-header-background);
+    color: var(--font-color-2);
+}
 /* Mobile Overrides */
 @media screen and (max-width: 999px) {
     #container {
@@ -593,4 +720,197 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
     #content {
         width: 100%;
     }
+}
+
+/* Geisha Overrides */
+.contentDivHeader {
+    color: var(--font-color-2) !important;
+    background: var(--sidebar-header-background);
+    border-radius: 0px;
+}
+#content {
+    color: var(--font-color-3);
+    font-family: var(--font-secondary);
+}
+.contentDiv, .contentDivMed {
+    background: var(--sidebar-button-background-color);
+}
+#content table.table th {
+    color: var(--font-color-2);
+    background: var(--sidebar-header-background);
+    text-shadow: 0 1px 0 #000000;
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+    font-size: var(--font-medium);
+}
+#content table.table {
+    background-color: var(--sidebar-button-background-color);
+    border-radius: 0px;
+    font-size: var(--font-default);
+    border: none;
+}
+#content td a {
+    color: var(--font-link);
+}
+#content a, a:visited {
+    color: var(--font-link);
+}
+#content table.table td.row1 {
+    background-color: var(--sidebar-button-background-color);
+}
+#content table.table td.row2 {
+    background: var(--sidebar-button-background-hover);
+}
+#content table.table td {
+    border: 1px solid var(--sidebar-button-border-color);
+}
+input {
+    background: var(--sidebar-button-background-hover);
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+textarea {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+select {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+#content .button, .contentDiv button {
+    background: #343d77;
+    color: var(--font-color-2);
+    border-color: #151822;
+}
+    #content .button:hover, .contentDiv button:hover {
+        background: #68293f;
+        color: var(--font-color-2);
+        border-color: #1e161f;
+    }
+button {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+    button:hover {
+        background: var(--box-color-default);
+        color: var(--font-color-2);
+        border-color: var(--font-color-2);
+    }
+#jutsu .jutsuName {
+    background: var(--content-background-color) !important;
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+    #jutsu .jutsuName:hover {
+        background: var(--box-color-default) !important;
+    }
+    #jutsu .jutsuName.selected_jutsu {
+        border-color: var(--font-color-2);
+        color: var(--font-color-2);
+        background: var(--box-color-default) !important;
+    }
+.weapon {
+    background: var(--content-background-color) !important;
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+    .weapon:hover {
+        background: var(--box-color-default) !important;
+    }
+    .weapon.selected_weapon {
+    border-color: var(--font-color-2);
+    color: var(--font-color-2);
+    background: var(--box-color-default) !important;
+}
+#content ul.submenu {
+    background: var(--sidebar-header-color);
+    border: none;
+}
+    #content ul.submenu li {
+        background: var(--sidebar-header-background);
+    }
+    #content ul.submenu a {
+        color: var(--font-color-2);
+        text-shadow: 0 1px 0 #000000;
+        font-family: var(--font-primary);
+        font-variant: var(--font-primary-variant);
+        font-size: var(--font-medium);
+    }
+        #content ul.submenu a:hover {
+            text-shadow: none;
+        }
+#content table.table tr:first-child td:last-child, #content table.table tr:first-child th:last-child {
+    border-top-right-radius: 0px;
+}
+#content table.table tr:first-child td:first-child, #content table.table tr:first-child th:first-child {
+    border-top-left-radius: 0px;
+}
+.healthFill {
+    background: var(--health-fill) !important;
+}
+.resourceFill.health {
+    background: var(--health-fill) !important;
+}
+.healthPreview {
+    background: var(--health-preview) !important;
+}
+.staminaFill {
+    background: var(--stamina-fill) !important;
+}
+.staminaPreview {
+    background: var(--stamina-preview) !important;
+}
+.chakraFill {
+    background: var(--chakra-fill) !important;
+}
+.chakraPreview {
+    background: var(--chakra-preview) !important;
+}
+.battle_text_ninjutsu {
+    color: var(--ninjutsu-text-color) !important;
+}
+.battle_text_taijutsu {
+    color: var(--taijutsu-text-color) !important;
+}
+.battle_text_genjutsu {
+    color: var(--genjutsu-text-color) !important;
+}
+.battle_text_heal {
+    color: var(--heal-text-color) !important;
+}
+#content table.table th a {
+    color: var(--font-color-2);
+}
+#content table.table th a:hover {
+    color: var(--font-color-4);
+}
+.jutsu_filter_button {
+    background-color: var(--sidebar-button-background-color) !important;
+    color: var(--font-color-3) !important;
+    border-color: var(--sidebar-button-border-color) !important;
+}
+    .jutsu_filter_button.active {
+        background-color: var(--sidebar-button-background-hover) !important;
+        color: var(--font-color-2) !important;
+        border-color: var(--sidebar-button-border-color) !important;
+    }
+.kunaiPack {
+    background: var(--avatar-frame-border_gradient) !important;
+    color: black !important;
+}
+#content table.table td.newsFooter {
+    background-color: var(--sidebar-header-background);
+}
+.jutsu_select_wrapper {
+    border-color: var(--sidebar-button-border-color) !important;
+}
+#handSeals p[data-selected="yes"] img {
+    border-color: var(--hand-seal-highlight) !important;
+}
+#handSeals .handsealNumber {
+    background-color: var(--hand-seal-highlight) !important;
+    color: var(--hand-seal-text);
 }

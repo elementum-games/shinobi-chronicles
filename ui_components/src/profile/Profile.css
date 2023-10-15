@@ -123,12 +123,13 @@
 
 /* Reusable */
 #content .profile_container a {
-    color: #9e97ba;
+    color: var(--font-link);
     text-decoration: none;
     font-weight: normal;
+    text-decoration: underline;
 }
 #content .profile_container a:hover {
-    color: #bdb3e3;
+    color: var(--font-link-hover);
 }
 
 .progress_bar_container {
@@ -318,7 +319,12 @@
     align-items: center;
     justify-content: center;
 
+    font-weight: bold;
+
     z-index: 1;
+}
+#content .bloodline_name a {
+    font-weight: bold;
 }
 .bloodline_name::before {
     content: '';

@@ -70,7 +70,7 @@ class TrainingManager {
         $this->base_jutsu_train_length = self::BASE_TRAIN_TIME;
 	    $this->jutsu_train_gain = User::$jutsu_train_gain;
 
-	    // 56.25% of standard
+        // 56.25% of standard
 	    $this->stat_long_train_length = self::BASE_TRAIN_TIME * 4;
 	    $this->stat_long_train_gain = $this->stat_train_gain * 2.25;
 
@@ -214,6 +214,9 @@ class TrainingManager {
                 if ($clan_boost) {
                     $len *= 1 - ($clan_boost / 100);
                 }
+                if ($this->reputation->benefits[UserReputation::BENEFIT_JUTSU_TRAINING_BONUS]) {
+                    $len = round($len * (100 / (100 + UserReputation::JUTSU_TRAINING_BONUS)));
+                }
                 return ($in_mins) ? $len/60 : $len;
             }
             // Used for basic display in training menu
@@ -289,8 +292,8 @@ class TrainingManager {
         if(str_contains($type, "jutsu:")) {
             $gain = $this->getTrainingAmount($length, $type);
 
-            return "Takes " . $this->getTrainingLength($length, true, true) . " or more depending on level, "
-                . "gives $gain level" . ($gain > 1 ? 's' : '');
+            return "Takes " . $this->getTrainingLength($length, true, true) . " or more minutes depending on level, "
+                . "increases level by $gain";
         }
         else {
             switch ($length) {
@@ -307,12 +310,16 @@ class TrainingManager {
     }
 
     public function trainingDisplay() {
+        $train_gain = $this->train_gain;
+        if (!empty($this->system->event) && $this->system->event instanceof DoubleExpEvent) {
+            $train_gain *= DoubleExpEvent::exp_modifier;
+        }
         if(str_contains($this->train_type, 'jutsu:')) {
             return "You will gain " . User::$jutsu_train_gain . " jutsu levels once training is complete!";
         }
         else {
-            $display = "You will gain {$this->train_gain} {$this->trainType()} skill point";
-            if($this->train_gain > 1) {
+            $display = "You will gain {$train_gain} {$this->trainType()} skill point";
+            if($train_gain > 1) {
                 $display .= "s";
             }
             $display .= " once you have completed training.";

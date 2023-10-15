@@ -29,7 +29,7 @@ HTML;
 <html lang="en">
 <head>
 	<title>Shinobi Chronicles RPG</title>
-	
+
 	<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/geisha/geisha.css")}' />
 	<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/sumu/sumu.css")}' />
 	<link rel="icon" href="images/icons/favicon.ico" type="image/x-icon" />
@@ -38,6 +38,7 @@ HTML;
 	{$react_tags}
 	<script type='text/javascript' src="./scripts/functions.js"></script>
 	<script type='text/javascript' src="./scripts/timer.js"></script>
+    <script type='text/javascript' src='./scripts/react-transition-group.js'></script>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="keywords" content="naruto, rpg, online, game, anime, manga, mmorpg" />
 	<meta name="description" content="Shinobi Chronicles: An online browser-based RPG inspired by the anime/manga Naruto." />
