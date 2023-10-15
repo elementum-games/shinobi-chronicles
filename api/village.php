@@ -63,6 +63,22 @@ try {
                     $policy_id = $system->db->clean($_POST['policy_id']);
                     $message = VillageManager::createPolicyProposal($system, $player, $policy_id);
                     break;
+                case "declare_war":
+                    $target_village_id = $system->db->clean($_POST['target_village_id']);
+                    $message = VillageManager::createWarProposal($system, $player, $target_village_id);
+                    break;
+                case "offer_peace":
+                    $target_village_id = $system->db->clean($_POST['target_village_id']);
+                    $message = VillageManager::createPeaceProposal($system, $player, $target_village_id);
+                    break;
+                case "form_alliance":
+                    $target_village_id = $system->db->clean($_POST['target_village_id']);
+                    $message = VillageManager::createAllianceProposal($system, $player, $target_village_id);
+                    break;
+                case "break_alliance":
+                    $target_village_id = $system->db->clean($_POST['target_village_id']);
+                    $message = VillageManager::createBreakAllianceProposal($system, $player, $target_village_id);
+                    break;
                 default:
                     break;
             }
