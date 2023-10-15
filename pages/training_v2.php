@@ -167,9 +167,9 @@ function training() {
 
     $system->printMessage();
 
-    if(!$use_new_layout){
-        require 'templates/training.php';
-    } else {
+    if($use_new_layout && $system->isDevEnvironment()){
         require 'templates/training_v2.php';
+    } else {
+        require 'templates/training.php';
     }
 }
