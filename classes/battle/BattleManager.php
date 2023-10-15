@@ -9,8 +9,8 @@ require_once __DIR__ . '/BattleAttack.php';
 require_once __DIR__ . '/LegacyFighterAction.php';
 
 class BattleManager {
-    const SPEED_DAMAGE_REDUCTION_RATIO = 0.4;
-    const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 0.4;
+    const SPEED_DAMAGE_REDUCTION_RATIO = 0.47;
+    const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 0.47;
     const MAX_EVASION_DAMAGE_REDUCTION = 0.35;
 
     private System $system;
@@ -212,7 +212,7 @@ class BattleManager {
 
                             $this->player->updateData();
                             $this->player->updateInventory();
-                            $this->battle->battle_text .= sprintf("%s used a %s and healed for %.2f[br]", $this->player->user_name, $item->name, $item->effect_amount);
+                            $this->battle->battle_text .= sprintf("%s used a %s and healed for %.0f[br]", $this->player->user_name, $item->name, $item->effect_amount);
                             $this->updateData();
                         }
                     }
@@ -474,7 +474,7 @@ class BattleManager {
         );
     }
 
-    private static function getJutsuTextColor($jutsu_type): string {
+    public static function getJutsuTextColor($jutsu_type): string {
         switch ($jutsu_type) {
             case Jutsu::TYPE_NINJUTSU:
                 return "blue";
@@ -561,7 +561,7 @@ class BattleManager {
             $collision_text = $this->parseCombatText($collision_text, $this->battle->player1, $this->battle->player2);
             $this->battle->battle_text .= '[br][hr]' . $this->system->db->clean($collision_text);
         }
-        $this->battle->battle_text .= '[br][hr]';
+        $this->battle->battle_text .= '[br][hr][br]';
 
         // Apply damage/effects and set display
         if($player2_attack) {
@@ -589,6 +589,13 @@ class BattleManager {
         $this->turn_count = $this->battle->turn_count;
 
         $this->battle->fighter_actions = [];
+
+        if ($this->battle->player1->health > $this->battle->player1->max_health) {
+            $this->battle->player1->health = $this->battle->player1->max_health;
+        }
+        if ($this->battle->player2->health > $this->battle->player2->max_health) {
+            $this->battle->player2->health = $this->battle->player2->max_health;
+        }
 
         $this->battle->fighter_health[$this->battle->player1->combat_id] = $this->battle->player1->health;
         $this->battle->fighter_health[$this->battle->player2->combat_id] = $this->battle->player2->health;
@@ -708,13 +715,11 @@ class BattleManager {
                 $attack->raw_damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
             }
             // Set effect in jutsu
-            else {
-                $attack->jutsu->setWeapon(
-                    $action->weapon_id,
-                    $fighter->items[$action->weapon_id]->effect,
-                    $fighter->items[$action->weapon_id]->effect_amount,
-                );
-            }
+            $attack->jutsu->setWeapon(
+                $action->weapon_id,
+                $fighter->items[$action->weapon_id]->effect,
+                $fighter->items[$action->weapon_id]->effect_amount,
+            );
         }
 
         if($attack->jutsu->isAllyTargetType()) {
@@ -746,8 +751,8 @@ class BattleManager {
         }
 
         // Weapon effect for taijutsu (IN PROGRESS)
-        if($attack->jutsu->weapon_id) {
-            if($user->items[$attack->jutsu->weapon_id]->effect != 'diffuse') {
+        if($attack->jutsu->weapon_id && !empty($user->items[$attack->jutsu->weapon_id])) {
+            if($user->items[$attack->jutsu->weapon_id]->effect != 'diffuse' && $user->items[$attack->jutsu->weapon_id]->effect != 'element') {
                 $this->effects->setEffect(
                     $user,
                     $target->combat_id,
@@ -779,8 +784,16 @@ class BattleManager {
             );
         }
 
-        $text = $attack->jutsu->battle_text;
+        $text = '';
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
+        if (!$user instanceof NPC) {
+            if ($attack->jutsu->weapon_id) {
+                $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . " / " . System::unSlug($user->items[$attack->jutsu->weapon_id]->name) . "</br>" . '</i></span></b>';
+            } else {
+                $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
+            }
+        }
+        $text .= $attack->jutsu->battle_text;
         $has_element = ($attack->jutsu->element != Jutsu::ELEMENT_NONE && $attack->jutsu->element != "none");
         $element_text = ' with ' . $attack->jutsu->element;
 
@@ -788,22 +801,22 @@ class BattleManager {
               if($damage_resisted > 0 ) {
                     $text .= "<p style=\"font-weight:bold;\">
                             {$user->getName()} deals
-                                <span style=\"color:{$attack_jutsu_color}\">
-                                    " . sprintf('%.2f', $attack_damage) . " damage
+                                <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
+                                    " . sprintf('%.0f', $attack_damage) . " damage
                                 </span>
                                     to {$target->getName()}" . ($has_element ? $element_text : "") . ".
                                 <span style=\"font-weight:bold;\">
                                     (resists
-                                 <span style=\"color:{$attack_jutsu_color}\">
-                                    " . sprintf('%.2f', $damage_resisted) . "
+                                 <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
+                                    " . sprintf('%.0f', $damage_resisted) . "
                                 </span>
                                  damage)
                             </p>"; }
                 else {
                         $text .= "<p style=\"font-weight:bold;\">
                             {$user->getName()} deals
-                                <span style=\"color:{$attack_jutsu_color}\">
-                                    " . sprintf('%.2f', $attack_damage) . " damage
+                                <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
+                                    " . sprintf('%.0f', $attack_damage) . " damage
                                 </span>
                                     to {$target->getName()}" . ($has_element ? $element_text : "") . ".
                                 </p>"; }
@@ -1006,7 +1019,7 @@ class BattleManager {
                     $collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
                 }
                 else {
-                    $collision_text .= "[player] cast [gender2] jutsu before [opponent] cast, negating " .
+                    $collision_text .= "[player] cast [gender2] jutsu before [opponent], negating " .
                         ($damage_reduction * 100) . "% of [opponent]'s damage!";
                 }
             }
@@ -1028,7 +1041,7 @@ class BattleManager {
                     $collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
                 }
                 else {
-                    $collision_text .= "[opponent] cast [targetGender2] jutsu before [player] cast, negating " .
+                    $collision_text .= "[opponent] cast [targetGender2] jutsu before [player], negating " .
                         ($damage_reduction * 100) . "% of [player]'s damage!";
                 }
             }
@@ -1161,5 +1174,9 @@ class BattleManager {
             0,
             Jutsu::ELEMENT_NONE
         );
+    }
+
+    public function getPatrolId(): int {
+        return $this->battle->patrol_id;
     }
 }

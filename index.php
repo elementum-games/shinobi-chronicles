@@ -374,6 +374,7 @@ address and requested a password reset. If this is not your account, please disr
 
             $village_coords = new TravelCoords($villages[$village]['x'], $villages[$village]['y'], $villages[$village]['map_id']);
 
+            // TEMP FIX - AUTOMATICALLY VERIFIES - DO NOT FORGET TO CHANGE LATER
             User::create(
                 $system,
                 $user_name,
@@ -397,7 +398,7 @@ address and requested a password reset. If this is not your account, please disr
             }
             else {
                 $system->message("There was a problem sending the email to the address provided: $email. If you are unable to log in please submit a ticket or contact a staff member on discord for manual activation.");
-                $login_message_text = "There was a problem sending the email to the address provided: $email. If you are unable to log in please submit a ticket or contact a staff member on discord for manual activation.";
+                $login_message_text = "Account created! Log in to continue.";
             }
         } catch (Exception $e) {
             $system->db->rollbackTransaction();

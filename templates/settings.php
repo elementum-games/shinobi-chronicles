@@ -8,6 +8,8 @@
  * @var string $journal
  * @var string $list
  *
+ * @var Layout $current_layout
+ *
  * @var array $layouts
  *
  * @var int $max_journal_length
@@ -134,15 +136,15 @@
     <tr>
         <td colspan='2'>
             <form action='<?=$self_link?>' method='post'>
-                <div style="margin-left:145px;">
+                <div style="text-align: center">
                     <label for='current_password' style='width:150px;margin-bottom:5px;'>Current password:</label>
                     <input type='password' name='current_password' /><br />
                     <label for='new_password' style='width:150px;margin-bottom:5px;'>New password:</label>
                     <input type='password' name='new_password' /><br />
-                    <label for='confirm_new_password' style='width:150px;margin-bottom:5px;'>Confirm new password:</label>
+                    <label for='confirm_new_password' style='width:150px;margin-bottom:0px;'>Confirm new password:</label>
                     <input type='password' name='confirm_new_password' />
                 </div>
-                <p style='text-align:center;margin:0;'>
+                <p style='text-align:center;'>
                     <input type='submit' name='change_password' value='Change' />
                 </p>
             </form>
@@ -159,7 +161,7 @@
             <form action="<?=$self_link?>" method="post">
                 Allow level up<input type="checkbox" name="level_up" <?=($player->level_up ? "checked='checked'" : "")?> /><br />
                 Allow rank up<input type="checkbox" name="rank_up" <?=($player->rank_up ? "checked='checked'" : "")?> /><br />
-                <input type="submit" name="level_rank_up" value="Update" />
+                <input type="submit" style='margin-top: 5px' name="level_rank_up" value="Update" />
             </form>
         </td>
         <td style="text-align: center;">
@@ -167,12 +169,13 @@
             <form action='<?=$self_link?>' method='post'>
                 <select name='layout'>";
                     <?php foreach($layouts as $layout):?>
-                        <option value='<?=$layout?>' <?=($player->layout == $layout ? "selected='selected'" : "")?>><?=ucwords(str_replace("_", " ", $layout))?></option>
+                        <option value='<?=$layout?>' <?=($player->layout == $layout ? "selected='selected'" : "")?>><?=ucwords(str_replace("_", " ", $layout_names[$layout]))?></option>
                     <?php endforeach ?>
                 </select>
                 <input type='submit' name='change_layout' value='Change' />
             </form>
-            <?php if($player->layout == "new_geisha"): ?>
+            <span><i>Note: Legacy layouts may not be compatible with all pages</i></span>
+            <?php if($current_layout->usesV2Interface()): ?>
             <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap">
                 <div>
                     <label>Avatar Style</label>
@@ -183,7 +186,7 @@
                             <?php endforeach; ?>
                         </select>
                         <br />
-                        <input type='submit' name='change_avatar_style' value='Change' />
+                        <input type='submit' style='margin-top: 7px' name='change_avatar_style' value='Change' />
                     </form>
                 </div>
                 <div>
@@ -195,7 +198,7 @@
                             <?php endforeach; ?>
                         </select>
                         <br />
-                        <input type='submit' name='change_avatar_frame' value='Change' />
+                        <input type='submit' style='margin-top: 5px' name='change_avatar_frame' value='Change' />
                     </form>
                 </div>
                 <div>
@@ -206,7 +209,7 @@
                             <option value='right' <?=($sidebar_position == "right" ? "selected='selected'" : "")?>>Right</option>
                         </select>
                         <br />
-                        <input type='submit' name='change_sidebar_position' value='Change' />
+                        <input type='submit' style='margin-top: 5px' name='change_sidebar_position' value='Change' />
                     </form>
                 </div>
                 <div>
@@ -217,7 +220,7 @@
                             <option value='0' <?=($enable_alerts == false ? "selected='selected'" : "")?>>False</option>
                         </select>
                         <br />
-                        <input type='submit' name='change_enable_alerts' value='Change' />
+                        <input type='submit' style='margin-top: 5px' name='change_enable_alerts' value='Change' />
                     </form>
                 </div>
                 <div>
@@ -228,7 +231,7 @@
                             <option value='open' <?=($sidebar_collapse == "open" ? "selected='selected'" : "")?>>Open</option>
                         </select>
                         <br />
-                        <input type='submit' name='change_sidebar_collapse' value='Change' />
+                        <input type='submit' style='margin-top: 5px' name='change_sidebar_collapse' value='Change' />
                     </form>
                 </div>
             </div>

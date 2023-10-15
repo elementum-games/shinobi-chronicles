@@ -541,3 +541,113 @@ $clan_positions = [
         }, 1000);
     </script>
 </div>
+
+<!-- Chart.js library necessary for {Chart.js Graph}-->
+<script src="
+https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js
+"></script>
+
+<!-- Chart.js logic -->
+<script>
+    window.addEventListener("load", (e) => {
+        const canvasElement = document.getElementById('chart');
+        const context = canvasElement.getContext('2d');
+
+        const normalizeValue = (value, minValue, maxValue) => {
+        return (value - minValue) / (maxValue - minValue) * 100;
+        };
+
+        const bloodline = <?= (isset($player->bloodline_skill)) ? $player->bloodline_skill : 0 ?>;
+        const castSpeed =  <?= (isset($player->cast_speed)) ? $player->cast_speed : 0 ?>;
+        const genjutsu =  <?= (isset($player->genjutsu_skill)) ? $player->genjutsu_skill : 0 ?>;
+        // const intelligence = playerStats.intelligence;
+        const ninjutsu =  <?= (isset($player->ninjutsu_skill)) ? $player->ninjutsu_skill : 0 ?>;
+        const speed =  <?= (isset($player->speed)) ? $player->speed : 0 ?>;
+        const taijutsu =  <?= (isset($player->taijutsu_skill)) ? $player->taijutsu_skill : 0 ?>;
+        // const willpower = playerStats.willpower;
+
+        let playerData = [genjutsu, taijutsu, speed, bloodline, ninjutsu, castSpeed];
+        let skill_labels = ['Genjutsu', 'Taijutsu', 'Speed', 'Bloodline', 'Ninjutsu', 'Cast Speed'] 
+
+        if(bloodline <= 0){
+        playerData = [genjutsu, taijutsu, speed, ninjutsu, castSpeed];
+        skill_labels = ['Genjutsu', 'Taijutsu', 'Speed', 'Ninjutsu', 'Cast Speed']
+        }  
+
+        const skillValues = Object.values(playerData);
+        const minValue = Math.min(...skillValues);
+        const maxValue = Math.max(...skillValues);
+
+        const normalizedStats = {}; //skill value holder
+        //for each item in playerData -> normalize[skill] = 0...5;
+        for (const [skill, value] of Object.entries(playerData)) {
+        normalizedStats[skill] = Math.round(normalizeValue(value, minValue, maxValue));
+        }
+
+        //object -> array
+        const normalizedStatsArray = Object.values(normalizedStats);  
+
+        const myChart = new Chart(context, {
+        type: 'radar',
+
+        data: {
+            labels: skill_labels,
+            datasets: [{
+            data: normalizedStatsArray,
+            backgroundColor: 'rgba(20, 20, 70, 1)',
+            borderColor: 'rgba(100, 270, 240, 0.95)',
+            borderWidth: 1
+            }]
+        },
+
+        options: {
+            animations: {
+            tension: {
+                duration: 2100,
+                easing: 'easeOutQuad',
+                from: 0.25,
+                to: 0,
+                loop: false
+            }
+            },
+            elements: {
+            line: {
+                spanGaps: true
+            }
+            },
+            plugins: {
+            legend: {
+                display: false
+            }
+            },
+            tooltips: {
+            enabled: false
+            },
+            scales: {
+            r: {
+                angleLines: {
+                color: 'rgba(255, 255, 255, 0.55)'
+                },
+                grid: {
+                color: 'rgba(255, 255, 255, 0.10)'
+                },
+                pointLabels: {
+                color: 'white'
+                },
+                ticks: {
+                display: false
+                }
+            }
+            }
+        }
+        });
+    })
+</script>
+
+<!--Chart.js Graph-->
+<div class='contentDiv' style="max-width: 60%">
+    <h2 class='contentDivHeader'>Stat Graph</h2>
+    <div className="stats_container" style=" padding: 15px; border-radius: 0 0 8px 8px; background-color: rgba(5,20,50, 0.75)">
+        <canvas id="chart"></canvas>
+    </div>
+</div>

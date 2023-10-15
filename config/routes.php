@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../classes/Route.php';
 
 // KEEP IDS IN SYNC WITH Router::PAGE_IDS
-// NEXT ID: 37 (i.e. if you add 28, update this to 29 to help other contributors)
+// NEXT ID: 38 (i.e. if you add 28, update this to 29 to help other contributors)
 return $routes = [
     // User Menu
     1 => new Route(
@@ -23,7 +23,7 @@ return $routes = [
         title: 'Jutsu',
         function_name: 'jutsu',
         menu: Route::MENU_USER,
-        battle_ok: false,
+        battle_ok: true,
     ),
     5 => new Route(
         file_name: 'gear.php',
@@ -38,7 +38,6 @@ return $routes = [
         function_name: 'bloodline',
         menu: 'conditional',
         battle_ok: false,
-        village_ok: Route::IN_VILLAGE_OKAY,
     ),
     6 => new Route(
         file_name: 'members.php',
@@ -150,11 +149,11 @@ return $routes = [
         village_ok: Route::ONLY_IN_VILLAGE,
     ),
     9 => new Route(
-        file_name: 'villageHQ.php',
+        file_name: 'villageHQ_v2.php',
         title: 'Village HQ',
         function_name: 'villageHQ',
         menu: Route::MENU_VILLAGE,
-        village_ok: Route::ONLY_IN_VILLAGE,
+        battle_ok: false,
     ),
     20 => new Route(
         file_name: 'clan.php',
@@ -263,5 +262,12 @@ return $routes = [
         title: "???",
         function_name: 'forbiddenShop',
         menu: Route::MENU_NONE,
+    ),
+    37 => new Route(
+        file_name: 'war.php',
+        title: "War",
+        function_name: 'war',
+        menu: Route::MENU_NONE,
+        battle_type: Battle::TYPE_AI_WAR,
     ),
 ];

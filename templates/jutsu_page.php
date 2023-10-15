@@ -17,7 +17,7 @@ $rank_names = RankManager::fetchNames($system);
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-        gap: 0px;
+        gap: 8px;
         align-items: center;
         justify-content: center;
     }
@@ -34,8 +34,8 @@ $rank_names = RankManager::fetchNames($system);
         justify-content: center;
     }
     .jutsu_select {
-        width:200px;
-        height:60px;
+        width:210px;
+        height:55px;
         outline: none;
         border: 0px;
         text-align: center;
@@ -44,7 +44,6 @@ $rank_names = RankManager::fetchNames($system);
     }
     .jutsu_select_wrapper {
         border-radius: 36px;
-        border-color: var(--theme-content-darker2-bg-color) !important;
         display:inline-block;
         margin: 10px;
         overflow:hidden;
@@ -64,7 +63,7 @@ $rank_names = RankManager::fetchNames($system);
     }
 
     .jutsu_block_table {
-        flex-basis: 170px;
+        flex-basis: 200px;
         margin: 2px 2px !important;
         border-radius: 10px !important;
         cursor: grab;
@@ -78,6 +77,7 @@ $rank_names = RankManager::fetchNames($system);
     }
     .jutsu_block_title th {
         border-radius: 10px 10px 0px 0px !important;
+        font-size: 14px !important;
     }
     .jutsu_block_table tr {
         text-align: center;
@@ -202,6 +202,7 @@ $rank_names = RankManager::fetchNames($system);
             }
             else {
                 $(".jutsu_details_table").show();
+                $('.jutsu_details_table').get(0).scrollIntoView({behavior: 'smooth'});
                 // only display child jutsu if set
                 $("#" + $(this).attr("data-target")).attr("data-jutsu_child") == "None" ? $("#jutsu_details_child_row").hide() : $("#jutsu_details_child_row").show();
                 // populate details modal with jutsu data
@@ -474,7 +475,7 @@ $rank_names = RankManager::fetchNames($system);
                     <table class="table jutsu_block_table" title="<?= $jutsu->name ?> (<?= $jutsu->level ?>)" draggable="true" data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>" data-jutsu_effect="<?= System::unSlug($jutsu->effect) ?>" data-jutsu_select="<?= $jutsu->jutsu_type . '-' . $jutsu->id ?>">
                         <tr class="jutsu_block_title">
                             <th colspan="2">
-                                <?= strlen($jutsu->name) > 21 ? substr($jutsu->name,0,19)."..." : $jutsu->name; ?>
+                                <?= strlen($jutsu->name) > 20 ? substr($jutsu->name,0,18)."..." : $jutsu->name; ?>
                                 <!--data attributes used to populate details modal-->
                                 <div id="jutsu_<?=  $jutsu->id?>" class="jutsu_data" 
                                      data-jutsu_id="<?= $jutsu->id ?>"

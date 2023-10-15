@@ -53,20 +53,18 @@
                 <th>Purchase New Bloodline</th>
             </tr>
             <tr>
-                <td style='text-align:center;'>A researcher from the village will implant another clan's DNA into
-                    you in exchange for Ancient Kunai, allowing you to use a new bloodline
-                    <?= ($player->bloodline_id ? ' instead of your own' : '') ?>.<br/><br/>
-                    <?php if($player->bloodline_skill > 10): ?>
+                <td style='text-align:center;'>Researchers from the village will implant another clan's genetic material into
+                    your body in exchange for Ancient Kunai.
+                    <?= ($player->bloodline_id ? '<br/>This will replace your existing bloodline.' : '') ?><br/><br/>
+                    <?php if($player->bloodline_skill > 10 && Bloodline::SKILL_REDUCTION_ON_CHANGE > 0): ?>
                     <b>Warning: Your bloodline skill will be reduced by <?= (Bloodline::SKILL_REDUCTION_ON_CHANGE * 100) ?>% as
                         you must
                         re-adjust to your new bloodline!</b><br/>
                     <?php endif; ?>
-                    <br/>
-
                     <?php foreach(Bloodline::$public_ranks as $rank_id => $rank): ?>
-                        <?php if(empty($bloodlines[$rank_id])) continue; ?>
+                        <?php if(empty($bloodlines[$rank_id]) || $rank_id > 2) continue; ?>
                         <?= $rank ?> Bloodlines (<?= $premiumShopManager->costs['bloodline'][$rank_id] ?> Ancient Kunai)<br/>
-                        <form action='<?= $self_link ?>&view=bloodlines' method='post'>
+                        <form style='margin-bottom: 7px' action='<?= $self_link ?>&view=bloodlines' method='post'>
                             <select name='bloodline_id'>
                                 <?php foreach($bloodlines[$rank_id] as $bloodline_id => $bloodline): ?>
                                     <!-- Need to keep bloodline in the bloodlines array for bloodline list-->
@@ -79,7 +77,30 @@
                     <?php endforeach; ?>
                 </td>
             </tr>
-
+        </table>
+        <table class='table'>
+            <tr>
+                <th>Awaken Bloodline (Random)</th>
+            </tr>
+            <tr>
+                <td style='text-align:center;'>Researchers from the village will awaken a dormant bloodline within your lineage 
+                    in exchange for Ancient Kunai.
+                    <?= ($player->bloodline_id ? '<br/>This will replace your existing bloodline.' : '') ?><br/><br/>
+                    <?php if($player->bloodline_skill > 10 && Bloodline::SKILL_REDUCTION_ON_CHANGE > 0): ?>
+                    <b>Warning: Your bloodline skill will be reduced by <?= (Bloodline::SKILL_REDUCTION_ON_CHANGE * 100) ?>% as
+                        you must
+                        re-adjust to your new bloodline!</b><br/>
+                    <?php endif; ?>
+                    <?php foreach(Bloodline::$public_ranks as $rank_id => $rank): ?>
+                        <?php if(empty($bloodlines[$rank_id]) || $rank_id > 2) continue; ?>
+                        <?= $rank ?> Bloodline (<?= $premiumShopManager->costs['bloodline_random'][$rank_id] ?> Ancient Kunai)<br/>
+                        <form style='margin-bottom: 7px' action='<?= $self_link ?>&view=bloodlines' method='post'>
+                            <input type='submit' name='purchase_bloodline_random' value='Awaken <?= $rank ?> Bloodline'/>
+                            <input type='hidden' name='bloodline_rank' value=<?=$rank_id?>/>
+                        </form>
+                    <?php endforeach; ?>
+                </td>
+            </tr>
         </table>
         <?php include('templates/bloodlineList.php') ?>
     <?php else: ?>
@@ -126,7 +147,7 @@
                             <input type="radio" name="chat_effect" value="sparkles" <?= ($player->chat_effect == "sparkles" ? "checked='checked'" : "") ?> />On
                         <?php endif ?>
                         <br />
-                        <input type='submit' name='change_color' value='Change Name Color'/>
+                        <input type='submit' style='margin-top: 5px' name='change_color' value='Change Name Color'/>
                     </form>
                 <?php endif; ?>
             </td>
@@ -136,13 +157,13 @@
             <th id='premium_fourDragonSeal_header'><?=ForbiddenSeal::$forbidden_seal_names[2]?></th>
         </tr>
         <tr>
-            <td id='premium_twinSparrowSeal_data' style='width:50%;vertical-align:top;'>
+            <td id='premium_twinSparrowSeal_data' style='width:50%;vertical-align:top;text-align:center;'>
                 <p style='font-weight:bold;text-align:center;'>
                     <?= $premiumShopManager->costs['forbidden_seal_monthly_cost'][1] ?> Ancient Kunai / 30 days</p>
                 <br/>
                 +<?=$twinSeal->regen_boost?>% regen rate<br/>
                 <?=$twinSeal->name_color_display?> username color in chat<br/>
-                Additional avatar styles (new layout)<br/>
+                Additional avatar styles<br/>
                 Larger avatar (<?=$baseDisplay['avatar_size_display']?> -> <?=$twinSeal->avatar_size_display?>)<br/>
                 Larger inbox (<?=$baseDisplay['inbox_size']?> -> <?=$twinSeal->inbox_size?> messages)<br/>
                 Longer journal (<?=$baseDisplay['journal_size']?> -> <?=$twinSeal->journal_size?> characters)<br/>
@@ -150,6 +171,7 @@
                 Longer chat posts (<?=$baseDisplay['chat_post_size']?> -> <?=$twinSeal->chat_post_size?> characters)<br/>
                 Longer PMs (<?=$baseDisplay['pm_size']?> -> <?=$twinSeal->pm_size?> characters)<br/>
                 Cheaper stat transfers +<?= $twinSeal->extra_stat_transfer_points_per_ak ?> stat points per AK<br />
+                Increased free stat transfer limit (+<?= $twinSeal->free_transfer_bonus ?>%)<br />
                 View logs of your last <?= $twinSeal->max_battle_history_view ?> battles
                 <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
                     <p style='width:100%;text-align:center;margin: 1em 0 0;'>
@@ -159,11 +181,11 @@
                                 <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> AK)</option>
                             <?php endforeach ?>
                         </select><br/>
-                        <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 1 ? 'Extend' : 'Purchase') ?>' />
+                        <input type='submit' style='margin-top: 5px' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 1 ? 'Extend' : 'Purchase') ?>' />
                     </p>
                 </form>
             </td>
-            <td id='premium_fourDragonSeal_data' style='width:50%;vertical-align:top;'>
+            <td id='premium_fourDragonSeal_data' style='width:50%;vertical-align:top;text-align:center;'>
                 <p style='font-weight:bold;text-align:center;'>
                     <?= $premiumShopManager->costs['forbidden_seal_monthly_cost'][2] ?> Ancient Kunai / 30 days</p>
                 <br/>
@@ -176,8 +198,9 @@
                 Longer journal (<?=$baseDisplay['journal_size']?> -> <?=$fourDragonSeal->journal_size?> characters)<br/>
                 Enhanced long trainings (<?=$fourDragonSeal->long_training_time?>x length, <?=$fourDragonSeal->long_training_gains?>x gains)<br/>
                 Enhanced extended trainings (<?=$fourDragonSeal->extended_training_time?>x length, <?=$fourDragonSeal->extended_training_gains?>x gains)<br/>
-                Faster stat transfers (+<?=$fourDragonSeal->stat_transfer_boost?>/minute)<br />
                 Cheaper stat transfers +<?= $fourDragonSeal->extra_stat_transfer_points_per_ak ?> stat points per AK<br />
+                Increased free stat transfer limit (+<?= $fourDragonSeal->free_transfer_bonus ?>%)<br />
+                Faster stat transfers (+<?=$fourDragonSeal->stat_transfer_boost?>/minute)<br />
                 View logs of your last <?= $fourDragonSeal->max_battle_history_view ?> battles
                 <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
                     <p style='width:100%;text-align:center;margin: 2.2em 0 0;'>
@@ -187,7 +210,7 @@
                                 <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> AK)</option>
                             <?php endforeach ?>
                         </select><br/>
-                        <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 2 ? 'Extend' : 'Purchase') ?>' />
+                        <input type='submit' style='margin-top: 5px' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 2 ? 'Extend' : 'Purchase') ?>' />
                     </p>
                 </form>
             </td>

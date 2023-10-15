@@ -7,6 +7,7 @@ function Home({
   isLoggedIn,
   isAdmin,
   version,
+  versionNumber,
   initialView,
   loginErrorText,
   registerErrorText,
@@ -57,7 +58,9 @@ function Home({
     isAdmin: isAdmin,
     version: version,
     homeLinks: homeLinks
-  })), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(FooterSection, null));
+  })), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(FooterSection, {
+    version: versionNumber
+  }));
 }
 function MainBannerSection({
   homeLinks,
@@ -435,12 +438,15 @@ function ContactSection({
     className: "home_form_container"
   }));
 }
-function FooterSection({}) {
+
+function FooterSection({
+  version
+}) {
   return /*#__PURE__*/React.createElement("div", {
     className: "home_section footer_section"
   }, /*#__PURE__*/React.createElement("div", {
     className: "footer_text"
-  }, "SHINOBI CHRONICLES V0.9.0 COPYRIGHT \xA9 LM VISIONS"));
+  }, "SHINOBI CHRONICLES V", version, " COPYRIGHT \xA9 LM VISIONS"));
 }
 function LoginButton({
   onCLick

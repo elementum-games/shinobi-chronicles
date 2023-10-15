@@ -16,6 +16,11 @@ function arena(): bool {
 		$system->printMessage();
 		return false;
 	}
+    if ($player->operation > 0) {
+        $system->message("You cannot access this page while in an operation!");
+        $system->printMessage();
+        return false;
+    }
 
 	if($player->battle_id) {
         arenaFight();

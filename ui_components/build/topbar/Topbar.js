@@ -25,7 +25,7 @@ function Topbar({
       response.data.userNotifications.forEach(notification => checkNotificationAlert(notification));
     });
   }
-  function closeNotification(notificationId) {
+  function closeNotification(notificationId, actionUrl) {
     apiFetch(links.notification_api, {
       request: 'closeNotification',
       notification_id: notificationId
@@ -33,6 +33,9 @@ function Topbar({
       if (response.errors.length) {
         handleErrors(response.errors);
         return;
+      }
+      if (actionUrl !== undefined) {
+        window.location.href = actionUrl;
       }
       getNotificationData();
     });
@@ -88,7 +91,7 @@ function Topbar({
 
   // Display
   const leftNotificationTypes = ["training", "training_complete", "stat_transfer"];
-  const rightNotificationTypes = ["specialmission", "specialmission_complete", "specialmission_failed", "mission", "mission_team", "mission_clan", "rank", "system", "warning", "report", "battle", "challenge", "team", "marriage", "student", "inbox", "chat", "event"];
+  const rightNotificationTypes = ["specialmission", "specialmission_complete", "specialmission_failed", "mission", "mission_team", "mission_clan", "rank", "system", "warning", "report", "battle", "challenge", "team", "marriage", "student", "inbox", "chat", "caravan", "raid_ally", "raid_enemy", "event"];
   return /*#__PURE__*/React.createElement("div", {
     id: "topbar",
     className: "d-flex"

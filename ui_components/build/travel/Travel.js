@@ -1,3 +1,4 @@
+import { QuickScout } from "./ScoutArea.js";
 import { apiFetch } from "../utils/network.js";
 import { Map } from "./Map.js";
 import { ScoutArea } from "./ScoutArea.js";
@@ -29,6 +30,15 @@ import { ScoutArea } from "./ScoutArea.js";
     region_coords:       object,
     spar_link:           string,
     colosseum_coords:    object,
+    region_objectives:   object,
+    map_objectives:      object,
+    battle_url:          string,
+    operations:          object,
+    operation_type:      string,
+    operation_progress:  int,
+    operation_interval:  int,
+    travel_message:      string,
+    loot_count:          int,
  * }} mapData
  *
  * @param {{
@@ -77,6 +87,7 @@ function Travel({
   const [feedback, setFeedback] = React.useState(null);
   const [mapData, setMapData] = React.useState(null);
   const [scoutData, setScoutData] = React.useState(null);
+  const [patrolData, setPatrolData] = React.useState(null);
   const [ranksToView, setRanksToView] = React.useState({
     1: false,
     2: false,
@@ -102,15 +113,23 @@ function Travel({
     apiFetch(travelAPILink, {
       request: 'LoadTravelData'
     }).then(response => {
+      if (response.data.mapData.battle_url) {
+        window.location.href = response.data.mapData.battle_url;
+      }
       if (response.errors.length) {
         handleErrors(response.errors);
         return;
+      }
+      if (response.data.travel_message) {
+        setFeedback(null);
+        setFeedback([response.data.travel_message, 'info']);
       }
       setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
       setStrategicView(response.data.mapData.player_filters.strategic_view === "true");
       setDisplayGrid(response.data.mapData.player_filters.display_grid === "true");
       setMapData(response.data.mapData);
       setScoutData(response.data.nearbyPlayers);
+      setPatrolData(response.data.nearbyPatrols);
     });
   };
   const MovePlayer = direction => {
@@ -139,6 +158,7 @@ function Travel({
         lastTravelSuccessTime.current = requestEnd;
         setMapData(response.data.mapData);
         setScoutData(response.data.nearbyPlayers);
+        setPatrolData(response.data.nearbyPatrols);
       } else {
         debug('Cannot move player.');
       }
@@ -176,6 +196,9 @@ function Travel({
         return;
       }
       debug('Filters updated!');
+      setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
+      setStrategicView(response.data.mapData.player_filters.strategic_view === "true");
+      setDisplayGrid(response.data.mapData.player_filters.display_grid === "true");
       setMapData(response.data.mapData);
       setScoutData(response.data.nearbyPlayers);
     });
@@ -183,6 +206,7 @@ function Travel({
   function handleErrors(errors) {
     console.warn(errors);
     setFeedback([errors, 'info']);
+    debug([errors]);
   }
   const AttackPlayer = target => {
     apiFetch(travelAPILink, {
@@ -194,6 +218,52 @@ function Travel({
         return;
       }
       window.location.href = response.data.redirect;
+    });
+  };
+  const BeginOperation = type => {
+    apiFetch(travelAPILink, {
+      request: 'BeginOperation',
+      operation_type: type
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      if (response.data.travel_message) {
+        setFeedback(null);
+        setFeedback([response.data.travel_message, 'info']);
+      }
+      setMapData(response.data.mapData);
+    });
+  };
+  const CancelOperation = () => {
+    apiFetch(travelAPILink, {
+      request: 'CancelOperation'
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      if (response.data.travel_message) {
+        setFeedback(null);
+        setFeedback([response.data.travel_message, 'info']);
+      }
+      setMapData(response.data.mapData);
+    });
+  };
+  const ClaimLoot = () => {
+    apiFetch(travelAPILink, {
+      request: 'ClaimLoot'
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      if (response.data.travel_message) {
+        setFeedback(null);
+        setFeedback([response.data.travel_message, 'info']);
+      }
+      setMapData(response.data.mapData);
     });
   };
   const SparPlayer = target => {
@@ -237,11 +307,9 @@ function Travel({
     MovePlayer(movementDirection.current);
   }
   function updateStrategicView(value) {
-    setStrategicView(value);
     UpdateFilter("strategic_view", value);
   }
   function updateDisplayGrid(value) {
-    setDisplayGrid(value);
     UpdateFilter("display_grid", value);
   }
 
@@ -291,12 +359,9 @@ function Travel({
     updateDisplayGrid: updateDisplayGrid
   }), /*#__PURE__*/React.createElement("div", {
     className: "travel-wrapper"
-  }, /*#__PURE__*/React.createElement(TravelActions, {
-    travelPageLink: travelPageLink,
-    travelCooldownMs: travelCooldownMs,
-    updateMovementDirection: changeMovementDirection,
-    movePlayer: MovePlayer
-  }), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "travel-panel"
+  }, /*#__PURE__*/React.createElement("div", {
     id: "travel-container",
     className: "travel-container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -312,7 +377,20 @@ function Travel({
     href: mapData.action_url
   }, /*#__PURE__*/React.createElement("button", {
     className: "button"
-  }, mapData.action_message))), feedback && /*#__PURE__*/React.createElement("div", {
+  }, mapData.action_message)), mapData && mapData.operation_type && /*#__PURE__*/React.createElement("button", {
+    className: "button",
+    onClick: () => CancelOperation()
+  }, "Cancel"), mapData && mapData.operations && !mapData.operation_type && typeof mapData.operations_type === 'undefined' && Object.entries(mapData.operations).map(([key, value], index) => /*#__PURE__*/React.createElement("button", {
+    key: index,
+    onClick: () => BeginOperation(key),
+    className: "button",
+    dangerouslySetInnerHTML: {
+      __html: value
+    }
+  })), mapData && mapData.in_village && mapData.loot_count > 0 && /*#__PURE__*/React.createElement("button", {
+    className: "button",
+    onClick: () => ClaimLoot()
+  }, "Deposit Resources")), feedback && /*#__PURE__*/React.createElement("div", {
     className: "travel-messages"
   }, /*#__PURE__*/React.createElement(Message, {
     message: feedback[0],
@@ -320,19 +398,41 @@ function Travel({
   })), mapData && scoutData && /*#__PURE__*/React.createElement(Map, {
     mapData: mapData,
     scoutData: scoutData,
+    patrolData: patrolData,
     playerId: playerId,
     ranksToView: ranksToView,
     strategicView: strategicView,
     displayGrid: displayGrid
-  }))), mapData && scoutData && /*#__PURE__*/React.createElement(ScoutArea, {
+  })), /*#__PURE__*/React.createElement(TravelActions, {
+    travelPageLink: travelPageLink,
+    travelCooldownMs: travelCooldownMs,
+    updateMovementDirection: changeMovementDirection,
+    movePlayer: MovePlayer,
+    mapData: mapData,
+    scoutData: scoutData,
+    attackPlayer: AttackPlayer,
+    sparPlayer: SparPlayer,
+    ranksToView: ranksToView,
+    playerId: playerId
+  })), mapData && scoutData && /*#__PURE__*/React.createElement(ScoutArea, {
     mapData: mapData,
     scoutData: scoutData,
     membersLink: membersLink,
     attackPlayer: AttackPlayer,
     sparPlayer: SparPlayer,
     ranksToView: ranksToView,
-    playerId: playerId
-  }));
+    playerId: playerId,
+    displayAllies: true
+  }), mapData && scoutData && /*#__PURE__*/React.createElement(ScoutArea, {
+    mapData: mapData,
+    scoutData: scoutData,
+    membersLink: membersLink,
+    attackPlayer: AttackPlayer,
+    sparPlayer: SparPlayer,
+    ranksToView: ranksToView,
+    playerId: playerId,
+    displayAllies: false
+  })), /*#__PURE__*/React.createElement(GlowFilters, null));
 }
 function TravelFilters({
   ranksToView,
@@ -391,7 +491,13 @@ function TravelFilters({
 }
 function TravelActions({
   travelPageLink,
-  updateMovementDirection
+  updateMovementDirection,
+  mapData,
+  scoutData,
+  attackPlayer,
+  sparPlayer,
+  ranksToView,
+  playerId
 }) {
   // If player presses one key, wait a short amount before updating the direction in case they press a second key
   const inputBufferMs = 25;
@@ -549,7 +655,15 @@ function TravelActions({
     onClick: e => {
       e.preventDefault();
     }
-  })));
+  })), /*#__PURE__*/React.createElement(QuickScout, {
+    mapData: mapData,
+    scoutData: scoutData,
+    attackPlayer: attackPlayer,
+    sparPlayer: sparPlayer,
+    ranksToView: ranksToView,
+    playerId: playerId,
+    updateMovementDirection: updateMovementDirection
+  }));
 }
 const Message = ({
   message,
@@ -579,5 +693,203 @@ function directionFromKeysPressed(directionKeysPressed) {
     direction = 'north';
   }
   return direction;
+}
+function GlowFilters() {
+  return /*#__PURE__*/React.createElement("svg", {
+    height: "0",
+    width: "0"
+  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("filter", {
+    id: "ally_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "green",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "3"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "neutral_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "#ffb600",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "3"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "enemy_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "red",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "2"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "stone_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "green",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "3"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "cloud_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "yellow",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "2"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "leaf_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "red",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "2"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "sand_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "orange",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "2"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))), /*#__PURE__*/React.createElement("filter", {
+    id: "mist_glow"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "blue",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "1"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  })))));
 }
 window.Travel = Travel;
