@@ -69,6 +69,7 @@ function training() {
 
                 //Set training
                 $player->trainingManager->setTraining($stat, $train_length, $train_amount);
+                $player->log(User::LOG_TRAINING, "Type: {$stat} / Length: {$train_length}");
                 $system->message(System::unSlug($stat) . " training started!");
 
                 // Training notification
@@ -116,6 +117,7 @@ function training() {
                 $train_gain = $jutsu_id;
                 $train_length = $player->trainingManager->getTrainingLength(TrainingManager::BASE_TRAIN_TIME, $jutsu);
                 $player->trainingManager->setTraining($train_type, $train_length, $train_gain);
+                $player->log(User::LOG_TRAINING, "Jutsu #{$jutsu_id} / Length: {$train_length}");
                 $system->message("Started training {$jutsu->name}!");
 
                 // Set notification
