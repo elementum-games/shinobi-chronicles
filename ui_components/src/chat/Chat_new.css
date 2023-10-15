@@ -83,13 +83,13 @@
 }
 .meme_select {
     cursor: pointer;
-    flex-basis: 40px;
+    flex-basis: 30px;
     min-width: 0;
-    padding: 4px;
+    padding: 5px;
 }
 .meme_select img {
-    max-width: 40px !important;
-    max-height: 40px !important;
+    max-width: 30px !important;
+    max-height: 30px !important;
 }
 .hidden {
     display: none !important;
