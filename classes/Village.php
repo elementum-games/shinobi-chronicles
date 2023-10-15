@@ -84,4 +84,14 @@ class Village {
         }
         return $query;
     }
+
+    public function isAlly(int $target_village_id): bool {
+        return ($this->relations[$target_village_id]->relation_type == VillageRelation::RELATION_ALLIANCE);
+    }
+    public function isEnemy(int $target_village_id): bool {
+        return ($this->relations[$target_village_id]->relation_type == VillageRelation::RELATION_WAR);
+    }
+    public function isNeutral(int $target_village_id): bool {
+        return ($this->relations[$target_village_id]->relation_type == VillageRelation::RELATION_NEUTRAL);
+    }
 }

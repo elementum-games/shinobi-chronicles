@@ -572,6 +572,102 @@ function KageQuarters({
             modalText.current = "Are you sure you want to change policies? You will be unable to select a new policy for 14 days.";
         }
     }
+    const DeclareWar = () => {
+        if (modalState == "confirm_declare_war") {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'CreateProposal',
+                    type: 'declare_war',
+                    target_village_id: strategicDisplayRight.village.village_id,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setProposalDataState(response.data.proposalData);
+                modalText.current = response.data.response_message;
+                setModalState("response_message");
+            });
+        }
+        else {
+            setModalState("confirm_declare_war");
+            modalText.current = "Are you sure you declare war with " + strategicDisplayRight.village.name + "?";
+        }
+    }
+    const OfferPeace = () => {
+        if (modalState == "confirm_offer_peace") {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'CreateProposal',
+                    type: 'offer_peace',
+                    target_village_id: strategicDisplayRight.village.village_id,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setProposalDataState(response.data.proposalData);
+                modalText.current = response.data.response_message;
+                setModalState("response_message");
+            });
+        }
+        else {
+            setModalState("confirm_offer_peace");
+            modalText.current = "Are you sure you want to offer peace with " + strategicDisplayRight.village.name + "?";
+        }
+    }
+    const FormAlliance = () => {
+        if (modalState == "confirm_form_alliance") {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'CreateProposal',
+                    type: 'form_alliance',
+                    target_village_id: strategicDisplayRight.village.village_id,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setProposalDataState(response.data.proposalData);
+                modalText.current = response.data.response_message;
+                setModalState("response_message");
+            });
+        }
+        else {
+            setModalState("confirm_form_alliance");
+            modalText.current = "Are you sure you want to form an alliance with " + strategicDisplayRight.village.name + "?";
+        }
+    }
+    const BreakAlliance = () => {
+        if (modalState == "confirm_break_alliance") {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'CreateProposal',
+                    type: 'break_alliance',
+                    target_village_id: strategicDisplayRight.village.village_id,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setProposalDataState(response.data.proposalData);
+                modalText.current = response.data.response_message;
+                setModalState("response_message");
+            });
+        }
+        else {
+            setModalState("confirm_break_alliance");
+            modalText.current = "Are you sure you want break an alliance " + strategicDisplayRight.village.name + "?";
+        }
+    }
     const CancelProposal = () => {
         if (modalState == "confirm_cancel_proposal") {
             apiFetch(
@@ -737,6 +833,30 @@ function KageQuarters({
                         {modalState == "confirm_cancel_vote" &&
                             <>
                                 <div className="modal_confirm_button" onClick={() => CancelVote()}>Confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "confirm_declare_war" &&
+                            <>
+                                <div className="modal_confirm_button" onClick={() => DeclareWar()}>Confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "confirm_offer_peace" &&
+                        <>
+                                <div className="modal_confirm_button" onClick={() => OfferPeace()}>Confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "confirm_form_alliance" &&
+                        <>
+                                <div className="modal_confirm_button" onClick={() => FormAlliance()}>Confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "confirm_break_alliance" &&
+                        <>
+                            <div className="modal_confirm_button" onClick={() => BreakAlliance()}>Confirm</div>
                                 <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
                             </>
                         }
@@ -1026,25 +1146,25 @@ function KageQuarters({
                             <div className="strategic_info_navigation">
                                 <div className="strategic_info_navigation_diplomacy_buttons">
                                     {strategicDisplayLeft.enemies.find(enemy => enemy != strategicDisplayRight.village.name) ?
-                                        <div className="diplomacy_action_button_wrapper war" onClick={() => setStrategicDisplayRight(strategicDataState[0])}>
+                                        <div className="diplomacy_action_button_wrapper war" onClick={() => DeclareWar()}>
                                             <div className="diplomacy_action_button_inner">
                                                 <img src="/images/icons/war.png" className="diplomacy_action_button_icon" />
                                             </div>
                                         </div>
                                         :
-                                        <div className="diplomacy_action_button_wrapper war cancel" onClick={() => setStrategicDisplayRight(strategicDataState[0])}>
+                                        <div className="diplomacy_action_button_wrapper war cancel" onClick={() => OfferPeace()}>
                                             <div className="diplomacy_action_button_inner">
                                             </div>
                                         </div>
                                     }
                                     {strategicDisplayLeft.allies.find(ally => ally != strategicDisplayRight.village.name) ?
-                                        <div className="diplomacy_action_button_wrapper alliance" onClick={() => setStrategicDisplayRight(strategicDataState[0])}>
+                                        <div className="diplomacy_action_button_wrapper alliance" onClick={() => FormAlliance()}>
                                             <div className="diplomacy_action_button_inner">
                                                 <img src="/images/icons/ally.png" className="diplomacy_action_button_icon" />
                                             </div>
                                         </div>
                                         :
-                                        <div className="diplomacy_action_button_wrapper alliance cancel" onClick={() => setStrategicDisplayRight(strategicDataState[0])}>
+                                        <div className="diplomacy_action_button_wrapper alliance cancel" onClick={() => BreakAlliance()}>
                                             <div className="diplomacy_action_button_inner">
                                             </div>
                                         </div>

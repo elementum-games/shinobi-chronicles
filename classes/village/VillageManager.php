@@ -12,6 +12,13 @@ class VillageManager {
         4 => 'Kazekage',
         5 => 'Mizukage',
     ];
+    const VILLAGE_NAMES = [
+        1 => 'Stone',
+        2 => 'Cloud',
+        3 => 'Leaf',
+        4 => 'Sand',
+        5 => 'Mist',
+    ];
 
     const RESOURCE_LOG_PRODUCTION = 1;
     const RESOURCE_LOG_COLLECTION = 2;
@@ -861,5 +868,173 @@ class VillageManager {
             );
         }
         return $strategic_info;
+    }
+
+    /**
+     * @return string
+     */
+    public static function createWarProposal(System $system, User $player, int $target_village_id): string {
+        // check player permissions
+        $seat = $player->village_seat;
+        if ($seat->seat_type != "kage") {
+            return "You do not meet the seat requirements.";
+        }
+        // check no pending proposal of same type
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'declare_war' LIMIT 1");
+        $last_change = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            return "There is already a pending proposal of the same type.";
+        }
+        // check no alliance proposal outgoing
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'form_alliance' LIMIT 1");
+        $last_change = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            return "There is already a proposal to form alliance.";
+        }
+        // only allow if neutral
+        if (!$player->village->isNeutral($target_village_id)) {
+            return "Village must be neutral to declare war.";
+        }
+        // check player cooldown on submit proposal
+        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
+        $last_proposal = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
+                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
+                $hours = floor($seconds_remaining / 3600);
+                $minutes = floor(($seconds_remaining % 3600) / 60);
+                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
+                return "Cannot submit another proposal for " . $time_remaining . ".";
+            }
+        }
+        // insert into DB
+        $time = time();
+        $name = "Declare War: " . VillageManager::VILLAGE_NAMES[$target_village_id];
+        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'declare_war', '{$name}', {$target_village_id})");
+        return "Proposal created!";
+    }
+
+    /**
+     * @return string
+     */
+    public static function createPeaceProposal(System $system, User $player, int $target_village_id): string {
+        // check player permissions
+        $seat = $player->village_seat;
+        if ($seat->seat_type != "kage") {
+            return "You do not meet the seat requirements.";
+        }
+        // check no pending proposal of same type
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'offer_peace' LIMIT 1");
+        $last_change = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            return "There is already a pending proposal of the same type.";
+        }
+        // also check at war
+        if (!$player->village->isEnemy($target_village_id)) {
+            return "Village must be at war to offer peace.";
+        }
+        // also check not pending on receiving village
+        // also check war duration requirement
+        // check player cooldown on submit proposal
+        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
+        $last_proposal = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
+                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
+                $hours = floor($seconds_remaining / 3600);
+                $minutes = floor(($seconds_remaining % 3600) / 60);
+                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
+                return "Cannot submit another proposal for " . $time_remaining . ".";
+            }
+        }
+        // insert into DB
+        $time = time();
+        $name = "Offer Peace: " . VillageManager::VILLAGE_NAMES[$target_village_id];
+        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'offer_peace', '{$name}', {$target_village_id})");
+        return "Proposal created!";
+    }
+
+    /**
+     * @return string
+     */
+    public static function createAllianceProposal(System $system, User $player, int $target_village_id): string {
+        // check player permissions
+        $seat = $player->village_seat;
+        if ($seat->seat_type != "kage") {
+            return "You do not meet the seat requirements.";
+        }
+        // check no pending proposal of same type
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'form_alliance' LIMIT 1");
+        $last_change = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            return "There is already a pending proposal of the same type.";
+        }
+        // check no war proposal outgoing
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'declare_war' LIMIT 1");
+        $last_change = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            return "There is already a proposal to declare war.";
+        }
+        // check not at war or allied
+        if (!$player->village->isNeutral($target_village_id)) {
+            return "Village must be neutral to form alliance.";
+        }
+        // also check not pending on receiving village
+        // check player cooldown on submit proposal
+        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
+        $last_proposal = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
+                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
+                $hours = floor($seconds_remaining / 3600);
+                $minutes = floor(($seconds_remaining % 3600) / 60);
+                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
+                return "Cannot submit another proposal for " . $time_remaining . ".";
+            }
+        }
+        // insert into DB
+        $time = time();
+        $name = "Form Alliance: " . VillageManager::VILLAGE_NAMES[$target_village_id];
+        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'form_alliance', '{$name}', {$target_village_id})");
+        return "Proposal created!";
+    }
+
+    /**
+     * @return string
+     */
+    public static function createBreakAllianceProposal(System $system, User $player, int $target_village_id): string {
+        // check player permissions
+        $seat = $player->village_seat;
+        if ($seat->seat_type != "kage") {
+            return "You do not meet the seat requirements.";
+        }
+        // check no pending proposal of same type
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'break_alliance' LIMIT 1");
+        $last_change = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            return "There is already a pending proposal of the same type.";
+        }
+        // also check in alliance
+        if (!$player->village->isAlly($target_village_id)) {
+            return "Village must be allied to break alliance.";
+        }
+        // also check alliance duration requirement
+        // check player cooldown on submit proposal
+        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
+        $last_proposal = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
+                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
+                $hours = floor($seconds_remaining / 3600);
+                $minutes = floor(($seconds_remaining % 3600) / 60);
+                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
+                return "Cannot submit another proposal for " . $time_remaining . ".";
+            }
+        }
+        // insert into DB
+        $time = time();
+        $name = "Break Alliance: " . VillageManager::VILLAGE_NAMES[$target_village_id];
+        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'break_alliance', '{$name}', {$target_village_id})");
+        return "Proposal created!";
     }
 }
