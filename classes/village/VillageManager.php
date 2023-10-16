@@ -185,6 +185,26 @@ class VillageManager {
     }
 
     /**
+     * @return array
+     */
+    public static function getVillagePoints(System $system, string $village_id): int
+    {
+        $points_result = $system->db->query("SELECT `points` FROM `villages` WHERE `village_id` = {$village_id}");
+        $points_result = $system->db->fetch($points_result);
+        return $points_result['points'];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getVillagePolicy(System $system, string $village_id): int
+    {
+        $policy_result = $system->db->query("SELECT `policy` FROM `villages` WHERE `village_id` = {$village_id}");
+        $policy_result = $system->db->fetch($policy_result);
+        return $policy_result['policy'];
+    }
+
+    /**
      * @return bool
      */
     public static function claimSeat(System $system, User $player, string $seat_type): string {

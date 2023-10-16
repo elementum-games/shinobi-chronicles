@@ -4,7 +4,7 @@ class VillageApiPresenter {
     public static function policyDataResponse(System $system, User $player): array
     {
         return [
-            "policy_id" => $player->village->policy,
+            "policy_id" => VillageManager::getVillagePolicy($system, $player->village->village_id),
         ];
     }
     public static function populationDataResponse(System $system, User $player): array
@@ -33,7 +33,7 @@ class VillageApiPresenter {
     public static function pointsDataResponse(System $system, User $player): array
     {
         return [
-            "points" => $player->village->points,
+            "points" => VillageManager::getVillagePoints($system, $player->village->village_id),
         ];
     }
     public static function diplomacyDataResponse(System $system, User $player): array
