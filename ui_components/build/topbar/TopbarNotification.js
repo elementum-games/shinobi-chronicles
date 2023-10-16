@@ -485,7 +485,139 @@ export function TopbarNotification({
     x: "24%",
     y: "21%",
     href: "images/v2/icons/raid.png"
-  }))));
+  }))), notification.type === "proposal_created" && /*#__PURE__*/React.createElement("a", {
+    href: notification.action_url,
+    className: "topbar_notification_wrapper",
+    "data-content": notification.message,
+    "data-time": timeRemainingDisplay
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "topbar_notification_svg",
+    width: "40",
+    height: "40",
+    viewBox: "0 0 100 100"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "8px",
+    stroke: "#5d5c4b",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "2px",
+    stroke: "#000000",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("image", {
+    className: "topbar_notification_icon",
+    x: "20",
+    y: "14",
+    width: "60",
+    height: "72.5",
+    href: "images/v2/icons/proposal.png"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "topbar_close_notification",
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id);
+    }
+  }, "X")), notification.type === "proposal_canceled" && /*#__PURE__*/React.createElement("a", {
+    href: notification.action_url,
+    className: "topbar_notification_wrapper",
+    "data-content": notification.message,
+    "data-time": timeRemainingDisplay
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "topbar_notification_svg",
+    width: "40",
+    height: "40",
+    viewBox: "0 0 100 100"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "8px",
+    stroke: "#5d5c4b",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "2px",
+    stroke: "#000000",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("image", {
+    className: "topbar_notification_icon",
+    height: "77.5",
+    width: "72.5",
+    x: "20",
+    y: "11.25",
+    href: "images/v2/icons/proposalcanceled.png"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "topbar_close_notification",
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id);
+    }
+  }, "X")), notification.type === "proposal_expired" && /*#__PURE__*/React.createElement("a", {
+    href: notification.action_url,
+    className: "topbar_notification_wrapper",
+    "data-content": notification.message,
+    "data-time": timeRemainingDisplay
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "topbar_notification_svg",
+    width: "40",
+    height: "40",
+    viewBox: "0 0 100 100"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "8px",
+    stroke: "#5d5c4b",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "2px",
+    stroke: "#000000",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("image", {
+    className: "topbar_notification_icon",
+    height: "85",
+    width: "77.5",
+    x: "20",
+    y: "7.5",
+    href: "images/v2/icons/proposalexpired.png"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "topbar_close_notification",
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id);
+    }
+  }, "X")), notification.type === "proposal_passed" && /*#__PURE__*/React.createElement("a", {
+    href: notification.action_url,
+    className: "topbar_notification_wrapper",
+    "data-content": notification.message,
+    "data-time": timeRemainingDisplay
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "topbar_notification_svg",
+    width: "40",
+    height: "40",
+    viewBox: "0 0 100 100"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "8px",
+    stroke: "#5d5c4b",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "2px",
+    stroke: "#000000",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("image", {
+    className: "topbar_notification_icon",
+    height: "80",
+    width: "75",
+    x: "20",
+    y: "10",
+    href: "images/v2/icons/proposalpassed.png"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "topbar_close_notification",
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id);
+    }
+  }, "X")));
 }
 function SpecialMissionNotification({
   notification,

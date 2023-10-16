@@ -14,7 +14,7 @@ export type NotificationType = {|
         | "specialmission_failed"
         | "mission"
         | "mission_team"
-        | "mission_clain"
+        | "mission_clan"
         | "rank"
         | "system"
         | "warning"
@@ -26,15 +26,26 @@ export type NotificationType = {|
         | "student"
         | "inbox"
         | "chat"
-        | "caravan"
         | "raid_ally"
         | "raid_enemy"
-        | "event",
+        | "caravan"
+        | "seat_challenge"
+        | "lock_challenge"
+        | "proposal_created"
+        | "proposal_passed"
+        | "proposal_canceled"
+        | "proposal_expired"
+        | "policy_change"
+        | "declare_war"
+        | "form_alliance"
+        | "end_war"
+        | "end_alliance",
     +message: string,
     +notification_id: number,
     +user_id: number,
     +created: number,
     +duration: number,
+    +expires: number,
     +alert: boolean,
 |};
 

@@ -7,6 +7,27 @@ class NotificationManager {
     const UPDATE_UNIQUE = 1;
     const UPDATE_MULTIPLE = 2;
 
+    const NOTIFICATION_TRAINING = "training";
+    const NOTIFICATION_TRAINING_COMPLETE = "training_complete";
+    const NOTIFICATION_STAT_TRANSFER = "stat_transfer";
+    const NOTIFICATION_SPECIALMISSION = "specialmission";
+    const NOTIFICATION_SPECIALMISSION_COMPLETE = "specialmission_complete";
+    const NOTIFICATION_SPECIALMISSION_FAILED = "specialmission_failed";
+    const NOTIFICATION_MISSION = "mission";
+    const NOTIFICATION_MISSION_TEAM = "mission_team";
+    const NOTIFICATION_MISSION_CLAN = "mission_clan";
+    const NOTIFICATION_RANK = "rank";
+    const NOTIFICATION_SYSTEM = "system";
+    const NOTIFICATION_WARNING = "warning";
+    const NOTIFICATION_REPORT = "report";
+    const NOTIFICATION_BATTLE = "battle";
+    const NOTIFICATION_CHALLENGE = "challenge";
+    const NOTIFICATION_TEAM = "team";
+    const NOTIFICATION_MARRIAGE = "marriage";
+    const NOTIFICATION_STUDENT = "student";
+    const NOTIFICATION_INBOX = "inbox";
+    const NOTIFICATION_CHAT = "chat";
+    const NOTIFICATION_EVENT = "event";
     const NOTIFICATION_RAID_ALLY = "raid_ally";
     const NOTIFICATION_RAID_ENEMY = "raid_enemy";
     const NOTIFICATION_CARAVAN = "caravan";
@@ -15,11 +36,22 @@ class NotificationManager {
     const NOTIFICATION_PROPOSAL_CREATED = "proposal_created";
     const NOTIFICATION_PROPOSAL_PASSED = "proposal_passed";
     const NOTIFICATION_PROPOSAL_CANCELED = "proposal_canceled";
-    const NOTIFICATION_PROPOSAL_EXPIRED = "proposal_canceled";
+    const NOTIFICATION_PROPOSAL_EXPIRED = "proposal_expired";
+    const NOTIFICATION_POLICY_CHANGE = "policy_chage";
     const NOTIFICATION_WAR = "declare_war";
     const NOTIFICATION_ALLY = "form_alliance";
     const NOTIFICATION_END_WAR = "end_war";
-    const NOTIFICATION_BREAK_ALLIANCE = "end_alliance";
+    const NOTIFICATION_END_ALLIANCE = "end_alliance";
+    const NOTIFICATION_NEWS = "news";
+
+    const ACTIVE_PLAYER_DAYS_LAST_ACTIVE = 14;
+
+    const NOTIFICATION_EXPIRATION_DAYS_POLICY = 7;
+    const NOTIFICATION_EXPIRATION_DAYS_PROPOSAL = 7;
+    const NOTIFICATION_EXPIRATION_DAYS_DIPLOMATIC = 7;
+    const NOTIFICATION_EXPIRATION_DAYS_NEWS = 14;
+    const NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION = 1;
+    const NOTIFICATION_EXPIRATION_DAYS_TRAINING = 1;
 
     public static function createNotification(NotificationDto $notification, System $system, int $UPDATE, int $limit = 5): bool {
         $db_modified = false;
@@ -28,8 +60,8 @@ class NotificationManager {
         if ($UPDATE == self::UPDATE_UNIQUE) {
             $system->db->query(
                 "INSERT INTO `notifications`
-                (`notification_id`, `user_id`, `type`, `message`, `alert`, `created`, `duration`, `attributes`)
-                SELECT '{$notification->notification_id}', '{$notification->user_id}', '{$notification->type}', '{$notification->message}', " . (int)$notification->alert . ", '{$notification->created}', '{$notification->duration}', '{$attributes}' FROM DUAL
+                (`notification_id`, `user_id`, `type`, `message`, `alert`, `created`, `duration`, `attributes`, `expires`)
+                SELECT '{$notification->notification_id}', '{$notification->user_id}', '{$notification->type}', '{$notification->message}', " . (int)$notification->alert . ", '{$notification->created}', '{$notification->duration}', '{$attributes}', " . (!empty($notification->expires) ? $notification->expires : "NULL") . " FROM DUAL
                 WHERE NOT EXISTS (SELECT 1 FROM `notifications` WHERE `type` = '{$notification->type}' AND `user_id` = '{$notification->user_id}')"
             );
             if ($system->db->last_num_rows > 0) {
@@ -42,16 +74,16 @@ class NotificationManager {
             NotificationManager::closeNotificationByType($notification->type, $notification->user_id, $system);
             $system->db->query(
                 "INSERT INTO `notifications`
-                (`notification_id`, `user_id`, `type`, `message`, `alert`, `created`, `duration`, `attributes`)
-                VALUES ('{$notification->notification_id}', '{$notification->user_id}', '{$notification->type}', '{$notification->message}', " . (int) $notification->alert . ", '{$notification->created}', '{$notification->duration}', '{$attributes}')"
+                (`notification_id`, `user_id`, `type`, `message`, `alert`, `created`, `duration`, `attributes`, `expires`)
+                VALUES ('{$notification->notification_id}', '{$notification->user_id}', '{$notification->type}', '{$notification->message}', " . (int) $notification->alert . ", '{$notification->created}', '{$notification->duration}', '{$attributes}', " . (!empty($notification->expires) ? $notification->expires : "NULL") . ")"
             );
         }
 
         if ($UPDATE == self::UPDATE_MULTIPLE) {
             $system->db->query(
                 "INSERT INTO `notifications`
-                (`notification_id`, `user_id`, `type`, `message`, `alert`, `created`, `duration`, `attributes`)
-                VALUES ('{$notification->notification_id}', '{$notification->user_id}', '{$notification->type}', '{$notification->message}', " . (int) $notification->alert . ", '{$notification->created}', '{$notification->duration}', '{$attributes}')"
+                (`notification_id`, `user_id`, `type`, `message`, `alert`, `created`, `duration`, `attributes`, `expires`)
+                VALUES ('{$notification->notification_id}', '{$notification->user_id}', '{$notification->type}', '{$notification->message}', " . (int) $notification->alert . ", '{$notification->created}', '{$notification->duration}', '{$attributes}', " . (!empty($notification->expires) ? $notification->expires : "NULL") . ")"
             );
             NotificationManager::closeOldestNotificationByType($notification->type, $notification->user_id, $system, $limit);
         }

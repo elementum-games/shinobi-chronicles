@@ -3,6 +3,7 @@
 require_once __DIR__ . "/VillageSeatDto.php";
 require_once __DIR__ . "/VillageProposalDto.php";
 require_once __DIR__ . "/VillageStrategicInfoDto.php";
+require_once __DIR__ . "/../notification/NotificationManager.php";
 
 class VillageManager {
     const KAGE_NAMES = [
@@ -88,7 +89,7 @@ class VillageManager {
     ];
 
     // Set these to correct values for release
-    const PROPOSAL_VOTE_HOURS = 1; // 72
+    const PROPOSAL_VOTE_HOURS = 0; // 72
     const PROPOSAL_ENACT_HOURS = 1; // 24
     const PROPOSAL_COOLDOWN_HOURS = 0; // 24
     const KAGE_PROVISIONAL_DAYS = 7; // 7
@@ -501,6 +502,8 @@ class VillageManager {
                 if ($proposal['start_time'] + (self::PROPOSAL_VOTE_HOURS * 3600) + (self::PROPOSAL_ENACT_HOURS * 3600) < time()) {
                     $time = time();
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'expired' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    // create notification
+                    self::createProposalNotification($system, $village_id, NotificationManager::NOTIFICATION_PROPOSAL_EXPIRED, $proposal['name']);
                     unset($proposal);
                     continue;
                 }
@@ -596,6 +599,10 @@ class VillageManager {
         $time = time();
         $name = "Change Policy: " . self::POLICY_NAMES[$policy_id];
         $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `policy_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'change_policy', '{$name}', {$policy_id})");
+
+        // create notification
+        self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
+
         return "Proposal created!";
     }
 
@@ -608,9 +615,13 @@ class VillageManager {
         if ($seat->seat_type != "kage") {
             return "You do not meet the seat requirements.";
         }
+        $proposal = $system->db->query("SELECT * FROM `proposals` WHERE `proposal_id` =  {$proposal_id} LIMIT 1");
+        $proposal = $system->db->fetch($proposal);
         $time = time();
         $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal_id} AND `village_id` = {$player->village->village_id} AND `end_time` IS NULL");
         if ($system->db->last_affected_rows > 0) {
+            // create notification
+            self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CANCELED, $proposal['name']);
             return "Proposal canceled.";
         } else {
             return "Invalid proposal.";
@@ -769,6 +780,8 @@ class VillageManager {
                 // update proposal
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 $message = "Set village policy: " . self::POLICY_NAMES[$proposal['policy_id']] . ".";
+                // create notification
+                self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
             case 'declare_war':
                 // check neutral
@@ -783,6 +796,8 @@ class VillageManager {
                 // update proposal
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 $message = "Declared war on " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                // create notification
+                self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
             case 'offer_peace':
                 // check at war
@@ -793,9 +808,13 @@ class VillageManager {
                 // create new proposal for target village
                 $name = "Accept Peace: " . VillageManager::VILLAGE_NAMES[$player->village->village_id];
                 $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$proposal['target_village_id']}, {$player->user_id}, {$time}, 'accept_peace', '{$name}', {$player->village->village_id})");
+                // create notification
+                self::createProposalNotification($system, $proposal['target_village_id'], NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
                 // update proposal
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 $message = "Peace offer sent to " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                // create notification
+                self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
             case 'offer_alliance':
                 // check neutral
@@ -806,9 +825,13 @@ class VillageManager {
                 // create new proposal for target village
                 $name = "Accept Alliance: " . VillageManager::VILLAGE_NAMES[$player->village->village_id];
                 $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$proposal['target_village_id']}, {$player->user_id}, {$time}, 'accept_alliance', '{$name}', {$player->village->village_id})");
+                // create notification
+                self::createProposalNotification($system, $proposal['target_village_id'], NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
                 // update proposal
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 $message = "Alliance offer sent to " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                // create notification
+                self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
             case 'break_alliance':
                 // check allied
@@ -817,12 +840,14 @@ class VillageManager {
                     return "Proposal canceled. Villages must be allied to break alliance.";
                 }
                 // update relation
-                self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_ALLIANCE);
+                self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_NEUTRAL);
                 // clear active proposals
                 self::clearDiplomaticProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
                 // update proposal
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 $message = "Broke alliance with " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                // create notification
+                self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
             case 'accept_peace':
                 // check at war
@@ -837,6 +862,8 @@ class VillageManager {
                 // update proposal
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 $message = "Accepted peace offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                // create notification
+                self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
             case 'accept_alliance':
                 // check neutral
@@ -845,12 +872,14 @@ class VillageManager {
                     return "Proposal canceled. Villages must be neutral to form alliance.";
                 }
                 // update relation
-                self::setNewRelations($system, $proposal['target_village_id'], $proposal['village_id'], VillageRelation::RELATION_NEUTRAL);
+                self::setNewRelations($system, $proposal['target_village_id'], $proposal['village_id'], VillageRelation::RELATION_ALLIANCE);
                 // clear active proposals
                 self::clearDiplomaticProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
                 // update proposal
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 $message = "Accepted alliance offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                // create notification
+                self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
             default:
                 return "Invalid proposal type.";
@@ -982,6 +1011,10 @@ class VillageManager {
         $time = time();
         $name = "Declare War: " . VillageManager::VILLAGE_NAMES[$target_village_id];
         $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'declare_war', '{$name}', {$target_village_id})");
+
+        // create notification
+        self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
+
         return "Proposal created!";
     }
 
@@ -1027,6 +1060,10 @@ class VillageManager {
         $time = time();
         $name = "Offer Peace: " . VillageManager::VILLAGE_NAMES[$target_village_id];
         $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'offer_peace', '{$name}', {$target_village_id})");
+
+        // create notification
+        self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
+
         return "Proposal created!";
     }
 
@@ -1077,6 +1114,10 @@ class VillageManager {
         $time = time();
         $name = "Form Alliance: " . VillageManager::VILLAGE_NAMES[$target_village_id];
         $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'offer_alliance', '{$name}', {$target_village_id})");
+
+        // create notification
+        self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
+
         return "Proposal created!";
     }
 
@@ -1116,6 +1157,10 @@ class VillageManager {
         $time = time();
         $name = "Break Alliance: " . VillageManager::VILLAGE_NAMES[$target_village_id];
         $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'break_alliance', '{$name}', {$target_village_id})");
+
+        // create notification
+        self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
+
         return "Proposal created!";
     }
 
@@ -1153,5 +1198,40 @@ class VillageManager {
         AND (`village2_id` = {$initiator_village_id} OR `village2_id` = {$recipient_village_id}))");
         // insert new relation
         $system->db->query("INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`) VALUES ({$initiator_village_id}, {$recipient_village_id}, '{$relation_type}', '{$relation_name}', {$time})");
+    }
+
+    private static function createProposalNotification(System $system, $village_id, $notification_type, $proposal_name) {
+        // get elders
+        $user_ids = $system->db->query("SELECT `user_id` FROM `village_seats` WHERE `village_id` = {$village_id} AND `seat_end` IS NULL");
+        $user_ids = $system->db->fetch_all($user_ids);
+        // loop create notifs
+        $message;
+        switch ($notification_type) {
+            case NotificationManager::NOTIFICATION_PROPOSAL_CREATED:
+                $message = "New Proposal: " . $proposal_name;
+                break;
+            case NotificationManager::NOTIFICATION_PROPOSAL_PASSED:
+                $message = "Proposal Passed: " . $proposal_name;
+                break;
+            case NotificationManager::NOTIFICATION_PROPOSAL_CANCELED:
+                $message = "Proposal Canceled: " . $proposal_name;
+                break;
+            case NotificationManager::NOTIFICATION_PROPOSAL_EXPIRED:
+                $message = "Proposal Expired: " . $proposal_name;
+                break;
+            default:
+                break;
+        }
+        foreach ($user_ids as $user) {
+            $new_notification = new NotificationDto(
+                type: $notification_type,
+                message: $message,
+                user_id: $user['user_id'],
+                created: time(),
+                expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_PROPOSAL * 86400),
+                alert: false,
+            );
+            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_MULTIPLE);
+        }
     }
 }

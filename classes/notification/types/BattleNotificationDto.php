@@ -11,6 +11,7 @@ class BattleNotificationDto extends NotificationDto {
         int $user_id = 0,
         int $created = 0,
         int $duration = 0,
+        ?int $expires = null,
         bool $alert = false,
         int $battle_id = 0,
     ) {
@@ -22,6 +23,7 @@ class BattleNotificationDto extends NotificationDto {
             $user_id,
             $created,
             $duration,
+            $expires,
             $alert,
         );
         $this->battle_id = $battle_id;
@@ -36,6 +38,7 @@ class BattleNotificationDto extends NotificationDto {
         $notification->user_id = $row['user_id'];
         $notification->created = $row['created'];
         $notification->duration = $row['duration'];
+        $notification->expires = $row['expires'];
         $notification->alert = $row['alert'];
         $notification->action_url = $action_url;
         $notification->battle_id = $attributes['battle_id'];

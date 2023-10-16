@@ -90,7 +90,7 @@ function training() {
                 // Create notification
                 if (!$notification_created) {
                     $new_notification = new NotificationDto(
-                        type: "training",
+                        type: NotificationManager::NOTIFICATION_TRAINING,
                         message: "Training " . System::unSlug($player->jutsu[$jutsu_id]->name),
                         user_id: $player->user_id,
                         created: time(),
@@ -123,7 +123,7 @@ function training() {
                 // Create notification
                 if (!$notification_created) {
                     $new_notification = new NotificationDto(
-                        type: "training",
+                        type: NotificationManager::NOTIFICATION_TRAINING,
                         message: "Training " . System::unSlug($player->bloodline->jutsu[$jutsu_id]->name),
                         user_id: $player->user_id,
                         created: time(),
@@ -167,7 +167,7 @@ function training() {
 			// Create notification
             if (!$notification_created) {
                 $new_notification = new NotificationDto(
-                    type: "training",
+                    type: NotificationManager::NOTIFICATION_TRAINING,
                     message: "Training " . System::unSlug($train_type),
                     user_id: $player->user_id,
                     created: time(),

@@ -49,6 +49,9 @@ final class KageMigration extends AbstractMigration
 
             -- Alter table player_seats
             ALTER TABLE `village_seats` ADD `is_provisional` TINYINT(1) NOT NULL DEFAULT 0;
+
+            -- Alter table notifications
+            ALTER TABLE `notifications` ADD `expires` INT(11) NULL DEFAULT NULL;
         ");
     }
 
@@ -72,6 +75,9 @@ final class KageMigration extends AbstractMigration
 
             -- Drop column is_provisional from village_seats;
             ALTER TABLE `village_seats` DROP COLUMN `is_provisional`;
+
+            -- Drop column `expires` from notifications
+            ALTERT TABLE `notifications` DROP COLUMN `expires`;
         ");
     }
 }

@@ -712,13 +712,8 @@ function KageQuarters({
           return;
         }
         setProposalDataState(response.data.proposalData);
-        if (response.data.proposalData) {
-          setCurrentProposal(response.data.proposalData[0]);
-          setCurrentProposalKey(0);
-        } else {
-          setCurrentProposal(null);
-          setCurrentProposalKey(null);
-        }
+        setCurrentProposal(null);
+        setCurrentProposalKey(null);
         setPolicyDataState(response.data.policyData);
         setDisplayPolicyID(response.data.policyData.policy_id);
         setPolicyDisplay(getPolicyDisplayData(response.data.policyData.policy_id));

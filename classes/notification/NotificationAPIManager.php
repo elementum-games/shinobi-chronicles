@@ -33,8 +33,12 @@ class NotificationAPIManager {
         );
         while ($row = $this->system->db->fetch($notification_table_result)) {
             // If notification not valid mark for deletion and go to next loop, otherwise add to list
+            if ($this->checkExpiration($row['expires'])) {
+                $notification_ids_to_delete[] = $row['notification_id'];
+                continue;
+            }
             switch ($row['type']) {
-                case "training":
+                case NotificationManager::NOTIFICATION_TRAINING:
                     if ($this->player->train_time <= 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -43,7 +47,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("training"));
                     }
                     break;
-                case "training_complete":
+                case NotificationManager::NOTIFICATION_TRAINING_COMPLETE:
                     if ($this->player->train_time > 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -52,7 +56,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("training"));
                     }
                     break;
-                case "stat_transfer":
+                case NotificationManager::NOTIFICATION_STAT_TRANSFER:
                     if ($this->player->stat_transfer_completion_time <= 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -61,7 +65,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("profile"));
                     }
                     break;
-                case "specialmission":
+                case NotificationManager::NOTIFICATION_SPECIALMISSION:
                     if ($this->player->special_mission == 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -69,7 +73,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("specialmissions"));
                     }
                     break;
-                case "specialmission_complete":
+                case NotificationManager::NOTIFICATION_SPECIALMISSION_COMPLETE:
                     if ($this->player->special_mission != 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -77,7 +81,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("specialmissions"));
                     }
                     break;
-                case "specialmission_failed":
+                case NotificationManager::NOTIFICATION_SPECIALMISSION_FAILED:
                     if ($this->player->special_mission != 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -85,7 +89,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("specialmissions"));
                     }
                     break;
-                case "mission":
+                case NotificationManager::NOTIFICATION_MISSION:
                     if ($this->player->mission_id == 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -93,7 +97,7 @@ class NotificationAPIManager {
                         $notifications[] = MissionNotificationDto::fromDb($row, $this->system->router->getUrl("mission"));
                     }
                     break;
-                case "mission_team":
+                case NotificationManager::NOTIFICATION_MISSION_TEAM:
                     if ($this->player->mission_id == 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -101,7 +105,7 @@ class NotificationAPIManager {
                         $notifications[] = MissionNotificationDto::fromDb($row, $this->system->router->getUrl("team"));
                     }
                     break;
-                case "mission_clan":
+                case NotificationManager::NOTIFICATION_MISSION_CLAN:
                     if ($this->player->mission_id == 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -109,7 +113,7 @@ class NotificationAPIManager {
                         $notifications[] = MissionNotificationDto::fromDb($row, $this->system->router->getUrl("clan"));
                     }
                     break;
-                case "rank":
+                case NotificationManager::NOTIFICATION_RANK:
                     if (!($this->player->level >= $this->player->rank->max_level && $this->player->exp >= $this->player->expForNextLevel() && $this->player->rank_num < System::SC_MAX_RANK && $this->player->rank_up)) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -117,7 +121,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("profile"));
                     }
                     break;
-                case "system":
+                case NotificationManager::NOTIFICATION_SYSTEM:
                     if (false) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -125,7 +129,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl(""));
                     }
                     break;
-                case "warning":
+                case NotificationManager::NOTIFICATION_WARNING:
                     if (!($this->player->getOfficialWarnings(true))) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -133,7 +137,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl('account_record'));
                     }
                     break;
-                case "report":
+                case NotificationManager::NOTIFICATION_REPORT:
                     if (!($this->player->staff_manager->isModerator() && $reportManager->getActiveReports(true))) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -141,7 +145,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl('report', ['page' => 'view_all_reports']));
                     }
                     break;
-                case "battle":
+                case NotificationManager::NOTIFICATION_BATTLE:
                     if (json_decode($row['attributes'], true)['battle_id'] != $this->player->battle_id) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -150,7 +154,7 @@ class NotificationAPIManager {
                         // to-do switch for URL based on battle type
                     }
                     break;
-                case "challenge":
+                case NotificationManager::NOTIFICATION_CHALLENGE:
                     if (!($this->player->challenge)) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -158,7 +162,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("spar"));
                     }
                     break;
-                case "team":
+                case NotificationManager::NOTIFICATION_TEAM:
                     if (!($this->player->team_invite)) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -166,7 +170,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("team"));
                     }
                     break;
-                case "marriage":
+                case NotificationManager::NOTIFICATION_MARRIAGE:
                     if (!($this->player->spouse < 0)) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -174,7 +178,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("marriage"));
                     }
                     break;
-                case "student":
+                case NotificationManager::NOTIFICATION_STUDENT:
                     if (!(SenseiManager::hasApplications($this->player->user_id, $this->system))) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -182,7 +186,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl('academy'));
                     }
                     break;
-                case "inbox":
+                case NotificationManager::NOTIFICATION_INBOX:
                     if (!($playerInbox->checkIfUnreadMessages() || $playerInbox->checkIfUnreadAlerts())) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -190,7 +194,7 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("inbox"));
                     }
                     break;
-                case "chat":
+                case NotificationManager::NOTIFICATION_CHAT:
                     if (false) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -202,12 +206,23 @@ class NotificationAPIManager {
                         $notifications[] = $chat_notification;
                     }
                     break;
-                case "event":
+                case NotificationManager::NOTIFICATION_EVENT:
                     if (false) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("event"));
+                    }
+                    break;
+                case NotificationManager::NOTIFICATION_PROPOSAL_CREATED:
+                case NotificationManager::NOTIFICATION_PROPOSAL_PASSED:
+                case NotificationManager::NOTIFICATION_PROPOSAL_CANCELED:
+                case NotificationManager::NOTIFICATION_PROPOSAL_EXPIRED:
+                    if (false) {
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
+                    } else {
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("villageHQ"));
                     }
                     break;
                 default:
@@ -256,7 +271,7 @@ class NotificationAPIManager {
                 if ($link) {
                     $notifications[] = new NotificationDto(
                         action_url: $link,
-                        type: "battle",
+                        type: NotificationManager::NOTIFICATION_BATTLE,
                         message: "In battle!",
                         user_id: $this->player->user_id,
                         created: time(),
@@ -269,7 +284,7 @@ class NotificationAPIManager {
         if ($playerInbox->checkIfUnreadMessages() || $playerInbox->checkIfUnreadAlerts()) {
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('inbox'),
-                type: "inbox",
+                type: NotificationManager::NOTIFICATION_INBOX,
                 message: "You have unread PM(s)",
                 user_id: $this->player->user_id,
                 created: time(),
@@ -280,7 +295,7 @@ class NotificationAPIManager {
         if ($this->player->getOfficialWarnings(true)) {
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('account_record'),
-                type: "warning",
+                type: NotificationManager::NOTIFICATION_WARNING,
                 message: "Official Warning(s)!",
                 user_id: $this->player->user_id,
                 created: time(),
@@ -291,7 +306,7 @@ class NotificationAPIManager {
         if ($this->player->staff_manager->isModerator() && $reportManager->getActiveReports(true)) {
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('report', ['page' => 'view_all_reports']),
-                type: "report",
+                type: NotificationManager::NOTIFICATION_REPORT,
                 message: "New Report(s)!",
                 user_id: $this->player->user_id,
                 created: time(),
@@ -302,7 +317,7 @@ class NotificationAPIManager {
         if ($this->player->challenge) {
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('spar'),
-                type: "challenge",
+                type: NotificationManager::NOTIFICATION_CHALLENGE,
                 message: "Challenged!",
                 user_id: $this->player->user_id,
                 created: time(),
@@ -313,7 +328,7 @@ class NotificationAPIManager {
         if ($this->player->team_invite) {
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('team'),
-                type: "team",
+                type: NotificationManager::NOTIFICATION_TEAM,
                 message: "Invited to team!",
                 user_id: $this->player->user_id,
                 created: time(),
@@ -324,7 +339,7 @@ class NotificationAPIManager {
         if ($this->player->spouse < 0) {
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('marriage'),
-                type: "marriage",
+                type: NotificationManager::NOTIFICATION_MARRIAGE,
                 message: "Proposal received!",
                 user_id: $this->player->user_id,
                 created: time(),
@@ -336,7 +351,7 @@ class NotificationAPIManager {
             if (SenseiManager::hasApplications($this->player->user_id, $this->system)) {
                 $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('academy'),
-                type: "student",
+                type: NotificationManager::NOTIFICATION_STUDENT,
                 message: "Application received!",
                 user_id: $this->player->user_id,
                 created: time(),
@@ -348,7 +363,7 @@ class NotificationAPIManager {
         if (isset($this->system->event)) {
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('event'),
-                type: "event",
+                type: NotificationManager::NOTIFICATION_EVENT,
                 message: $this->system->event->name . " is active! " .
                     $this->system->time_remaining($this->system->event->end_time->getTimestamp() - time()),
                 user_id: $this->player->user_id,
@@ -366,7 +381,7 @@ class NotificationAPIManager {
                 if ($row['travel_time'] + ($row['start_time'] * 1000) + Patrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
                     $notifications[] = new NotificationDto(
                         action_url: $this->system->router->getUrl('travel'),
-                        type: "caravan",
+                        type: NotificationManager::NOTIFICATION_CARAVAN,
                         message: "{$row['name']} is active near {$row['region_name']}",
                         user_id: $this->player->user_id,
                         created: time(),
@@ -389,7 +404,7 @@ class NotificationAPIManager {
             $location = new TravelCoords($row['x'], $row['y'], $row['map_id']);
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('travel'),
-                type: $row['user_village'] == $this->player->village->village_id ? "raid_ally" : "raid_enemy",
+                type: $row['user_village'] == $this->player->village->village_id ? NotificationManager::NOTIFICATION_RAID_ALLY : NotificationManager::NOTIFICATION_RAID_ENEMY,
                 message: $row['user_village'] == $this->player->village->village_id ? "An ally is attacking {$row['name']} at {$location->displayString()}!" : "{$row['name']} is under attack at {$location->displayString()}!",
                 user_id: $this->player->user_id,
                 created: time(),
@@ -407,5 +422,15 @@ class NotificationAPIManager {
     public function clearNotificationAlert(int $notification_id): bool {
         $this->system->db->query("UPDATE `notifications` set `alert` = 0 WHERE `notification_id` = {$notification_id}");
         return $this->system->db->last_affected_rows > 0 ? true : false;
+    }
+
+    public function checkExpiration(?int $expires): bool {
+        if (!isset($expires)) {
+            return false;
+        }
+        if ($expires < time()) {
+            return true;
+        }
+        return false;
     }
 }
