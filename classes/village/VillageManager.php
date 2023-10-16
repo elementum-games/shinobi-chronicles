@@ -822,6 +822,17 @@ class VillageManager {
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
                     return "Proposal canceled. Villages must be neutral to offer alliance.";
                 }
+                // neither village can have an existing ally
+                $alliance_type = VillageRelation::RELATION_ALLIANCE;
+                $system->db->query("SELECT COUNT(*) FROM `village_relations`
+                    WHERE `relation_type` = {$alliance_type}
+                    AND `relation_end` IS NULL
+                    AND ((`village1_id` = {$proposal['village_id']} OR `village1_id` = {$proposal['target_village_id']})
+                    OR (`village2_id` = {$proposal['village_id']} OR `village2_id` = {$proposal['target_village_id']})) LIMIT 1");
+                if ($system->db->last_num_rows > 0) {
+                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    return "Proposal canceled. Neither village can be in an existing Alliance.";
+                }
                 // create new proposal for target village
                 $name = "Accept Alliance: " . VillageManager::VILLAGE_NAMES[$player->village->village_id];
                 $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$proposal['target_village_id']}, {$player->user_id}, {$time}, 'accept_alliance', '{$name}', {$player->village->village_id})");
@@ -1110,8 +1121,18 @@ class VillageManager {
                 return "Cannot submit another proposal for " . $time_remaining . ".";
             }
         }
-        // insert into DB
+        // check neither village has existing alliance
         $time = time();
+        $alliance_type = VillageRelation::RELATION_ALLIANCE;
+        $system->db->query("SELECT COUNT(*) FROM `village_relations`
+            WHERE `relation_type` = {$alliance_type}
+            AND `relation_end` IS NULL
+            AND ((`village1_id` = {$player->village->village_id} OR `village1_id` = {$target_village_id})
+            OR (`village2_id` = {$player->village->village_id} OR `village2_id` = {$target_village_id})) LIMIT 1");
+        if ($system->db->last_num_rows > 0) {
+            return "Neither village can be in an existing Alliance.";
+        }
+        // insert into DB
         $name = "Form Alliance: " . VillageManager::VILLAGE_NAMES[$target_village_id];
         $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'offer_alliance', '{$name}', {$target_village_id})");
 
@@ -1248,16 +1269,16 @@ class VillageManager {
         $message;
         switch ($notification_type) {
             case NotificationManager::NOTIFICATION_PROPOSAL_CREATED:
-                $message = "New Proposal: " . $proposal_name;
+                $message = "[New Proposal] - " . $proposal_name;
                 break;
             case NotificationManager::NOTIFICATION_PROPOSAL_PASSED:
-                $message = "Proposal Passed: " . $proposal_name;
+                $message = "[Passed] - " . $proposal_name;
                 break;
             case NotificationManager::NOTIFICATION_PROPOSAL_CANCELED:
-                $message = "Proposal Canceled: " . $proposal_name;
+                $message = "[Canceled] - " . $proposal_name;
                 break;
             case NotificationManager::NOTIFICATION_PROPOSAL_EXPIRED:
-                $message = "Proposal Expired: " . $proposal_name;
+                $message = "[Expired] - " . $proposal_name;
                 break;
             default:
                 break;

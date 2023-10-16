@@ -467,7 +467,6 @@
     left: 50%;
     transform: translate(-50%, 7px);
     font-variant: small-caps;
-    color: #ccc1af;
     cursor: default;
     user-select: none;
     opacity: 30%;
@@ -551,6 +550,9 @@
     height: 20px;
     line-height: 20px;
 }
+    .elder_name a {
+        text-decoration: none;
+    }
 .elder_claim_button {
     margin-top: 15px;
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
@@ -585,7 +587,6 @@
     line-height: 20px;
     font-variant: small-caps;
     text-align: center;
-    color: #ccc1af;
     cursor: default;
     user-select: none;
     opacity: 30%;
@@ -1010,6 +1011,7 @@
     background-color: #141114;
     line-height: 31px;
     clip-path: polygon(9px 0%, calc(100% - 9px) 0%, 100% 7px, 100% calc(100% - 7px), calc(100% - 9px) 100%, 9px 100%, 0% calc(100% - 7px), 0% 7px);
+    user-select: none;
 }
 .village_policy_phrase {
     margin-top: 3px;
@@ -1018,6 +1020,7 @@
     color: #c7b070;
     font-size: 14px;
     font-style: italic;
+    user-select: none;
 }
 .village_policy_description {
     margin-top: 6px;
@@ -1026,6 +1029,7 @@
     font-size: 12px;
     white-space: pre;
     text-align: center;
+    user-select: none;
 }
 .growth_glow {
     text-shadow: 0 0 0px #192b2a, 0 0 1px #192b2a, 0 0 2px #192b2a, 0 0 3px #192b2a, 0 0 4px #549d57, 0 0 5px #192b2a, 0 0 6px #192b2a, 0 0 7px #192b2a, 0 0 8px #192b2a;
@@ -1129,7 +1133,6 @@
     line-height: 21px;
     font-variant: small-caps;
     text-align: center;
-    color: #f3c4bc;
     cursor: pointer;
     user-select: none;
 }

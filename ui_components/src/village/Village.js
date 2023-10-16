@@ -171,6 +171,7 @@ function Village({
                 proposalDataState={proposalDataState}
                 setProposalDataState={setProposalDataState}
                 strategicDataState={strategicDataState}
+                setStrategicDataState={setStrategicDataState}
                 handleErrors={handleErrors}
                 getKageKanji={getKageKanji}
                 getVillageIcon={getVillageIcon}
@@ -400,7 +401,7 @@ function VillageHQ({
                                                 {elder.avatar_link && <img className="elder_avatar" src={elder.avatar_link} />}
                                                 {!elder.avatar_link && <div className="elder_avatar_fill"></div>}
                                             </div>
-                                            <div className="elder_name">{elder.user_name ? elder.user_name : "---"}</div>
+                                            <div className="elder_name">{elder.user_name ? <a href={"/?id=6&user=" + elder.user_name}>{elder.user_name}</a> : "---"}</div>
                                             {(elder.seat_id && elder.seat_id == playerSeatState.seat_id) &&
                                                 <div className="elder_resign_button" onClick={() => Resign()}>resign</div>
                                             }
@@ -541,6 +542,7 @@ function KageQuarters({
     proposalDataState,
     setProposalDataState,
     strategicDataState,
+    setStrategicDataState,
     handleErrors,
     getKageKanji,
     getVillageIcon,
@@ -650,7 +652,7 @@ function KageQuarters({
         }
         else {
             setModalState("confirm_form_alliance");
-            modalText.current = "Are you sure you want to form an alliance with " + strategicDisplayRight.village.name + "?";
+            modalText.current = "Are you sure you want to form an alliance with " + strategicDisplayRight.village.name + "?\nYou can be a member of only one Alliance at any given time.";
         }
     }
     const BreakAlliance = () => {
@@ -674,7 +676,7 @@ function KageQuarters({
         }
         else {
             setModalState("confirm_break_alliance");
-            modalText.current = "Are you sure you want break an alliance " + strategicDisplayRight.village.name + "?";
+            modalText.current = "Are you sure you want break an alliance with " + strategicDisplayRight.village.name + "?";
         }
     }
     const CancelProposal = () => {
@@ -721,6 +723,9 @@ function KageQuarters({
                 setPolicyDataState(response.data.policyData);
                 setDisplayPolicyID(response.data.policyData.policy_id);
                 setPolicyDisplay(getPolicyDisplayData(response.data.policyData.policy_id));
+                setStrategicDataState(response.data.strategicData);
+                setStrategicDisplayLeft(response.data.strategicData.find(item => item.village.name == villageName));
+                setStrategicDisplayRight(response.data.strategicData.find(item => item.village.name == strategicDisplayRight.village.name));
                 modalText.current = response.data.response_message;
                 setModalState("response_message");
             });
@@ -902,7 +907,7 @@ function KageQuarters({
                     <div className="column second">
                         <div className="proposal_container">
                             <div className="header">Proposals</div>
-                            <div className="content">
+                            <div className="content box-primary">
                                 <div className="proposal_container_top">
                                     <div className="proposal_container_left">
                                         <svg className="previous_proposal_button" width="25" height="25" viewBox="0 0 100 100" onClick={() => cycleProposal("decrement")}>
@@ -1069,7 +1074,7 @@ function KageQuarters({
                                                 {elder.avatar_link && <img className="elder_avatar" src={elder.avatar_link} />}
                                                 {!elder.avatar_link && <div className="elder_avatar_fill"></div>}
                                             </div>
-                                            <div className="elder_name">{elder.user_name ? elder.user_name : "---"}</div>
+                                            <div className="elder_name">{elder.user_name ? <a href={"/?id=6&user=" + elder.user_name}>{elder.user_name}</a> : "---"}</div>
                                         </div>
                                     ))}
                             </div>
@@ -1150,27 +1155,27 @@ function KageQuarters({
                             />
                             <div className="strategic_info_navigation">
                                 <div className="strategic_info_navigation_diplomacy_buttons">
-                                    {strategicDisplayLeft.enemies.find(enemy => enemy != strategicDisplayRight.village.name) ?
+                                    {strategicDisplayLeft.enemies.find(enemy => enemy == strategicDisplayRight.village.name) ?
+                                        <div className="diplomacy_action_button_wrapper war cancel" onClick={() => OfferPeace()}>
+                                            <div className="diplomacy_action_button_inner">
+                                            </div>
+                                        </div>
+                                        :
                                         <div className="diplomacy_action_button_wrapper war" onClick={() => DeclareWar()}>
                                             <div className="diplomacy_action_button_inner">
                                                 <img src="/images/icons/war.png" className="diplomacy_action_button_icon" />
                                             </div>
                                         </div>
-                                        :
-                                        <div className="diplomacy_action_button_wrapper war cancel" onClick={() => OfferPeace()}>
+                                    }
+                                    {strategicDisplayLeft.allies.find(ally => ally == strategicDisplayRight.village.name) ?
+                                        <div className="diplomacy_action_button_wrapper alliance cancel" onClick={() => BreakAlliance()}>
                                             <div className="diplomacy_action_button_inner">
                                             </div>
                                         </div>
-                                    }
-                                    {strategicDisplayLeft.allies.find(ally => ally != strategicDisplayRight.village.name) ?
+                                        :
                                         <div className="diplomacy_action_button_wrapper alliance" onClick={() => OfferAlliance()}>
                                             <div className="diplomacy_action_button_inner">
                                                 <img src="/images/icons/ally.png" className="diplomacy_action_button_icon" />
-                                            </div>
-                                        </div>
-                                        :
-                                        <div className="diplomacy_action_button_wrapper alliance cancel" onClick={() => BreakAlliance()}>
-                                            <div className="diplomacy_action_button_inner">
                                             </div>
                                         </div>
                                     }
@@ -1230,13 +1235,11 @@ function KageQuarters({
                 newPolicyID = Math.min(4, displayPolicyID + 1);
                 setDisplayPolicyID(newPolicyID);
                 setPolicyDisplay(getPolicyDisplayData(newPolicyID));
-                setProposalRepAdjustment(proposalDataState[newPolicyID].votes.reduce((acc, vote) => acc + vote.rep_adjustment, 0));
                 break;
             case "decrement":
                 newPolicyID = Math.max(1, displayPolicyID - 1);
                 setDisplayPolicyID(newPolicyID);
                 setPolicyDisplay(getPolicyDisplayData(newPolicyID));
-                setProposalRepAdjustment(proposalDataState[newPolicyID].votes.reduce((acc, vote) => acc + vote.rep_adjustment, 0));
                 break;
         }
     }
@@ -1250,11 +1253,13 @@ function KageQuarters({
                 newProposalKey = Math.min(proposalDataState.length - 1, currentProposalKey + 1);
                 setCurrentProposalKey(newProposalKey);
                 setCurrentProposal(proposalDataState[newProposalKey]);
+                setProposalRepAdjustment(proposalDataState[newProposalKey].votes.reduce((acc, vote) => acc + vote.rep_adjustment, 0));
                 break;
             case "decrement":
                 newProposalKey = Math.max(0, currentProposalKey - 1);
                 setCurrentProposalKey(newProposalKey);
                 setCurrentProposal(proposalDataState[newProposalKey]);
+                setProposalRepAdjustment(proposalDataState[newProposalKey].votes.reduce((acc, vote) => acc + vote.rep_adjustment, 0));
                 break;
         }
     }

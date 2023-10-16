@@ -126,6 +126,7 @@ try {
             $VillageAPIResponse->response = [
                 'proposalData' => VillageApiPresenter::proposalDataResponse($system, $player),
                 'policyData' => VillageApiPresenter::policyDataResponse($system, $player),
+                'strategicData' => VillageApiPresenter::strategicDataResponse($system),
                 'response_message' => $message,
             ];
             break;

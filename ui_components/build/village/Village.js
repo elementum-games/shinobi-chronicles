@@ -173,6 +173,7 @@ function Village({
     proposalDataState: proposalDataState,
     setProposalDataState: setProposalDataState,
     strategicDataState: strategicDataState,
+    setStrategicDataState: setStrategicDataState,
     handleErrors: handleErrors,
     getKageKanji: getKageKanji,
     getVillageIcon: getVillageIcon,
@@ -403,7 +404,9 @@ function VillageHQ({
     className: "elder_avatar_fill"
   })), /*#__PURE__*/React.createElement("div", {
     className: "elder_name"
-  }, elder.user_name ? elder.user_name : "---"), elder.seat_id && elder.seat_id == playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
+  }, elder.user_name ? /*#__PURE__*/React.createElement("a", {
+    href: "/?id=6&user=" + elder.user_name
+  }, elder.user_name) : "---"), elder.seat_id && elder.seat_id == playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
     className: "elder_resign_button",
     onClick: () => Resign()
   }, "resign"), !elder.seat_id && /*#__PURE__*/React.createElement("div", {
@@ -564,6 +567,7 @@ function KageQuarters({
   proposalDataState,
   setProposalDataState,
   strategicDataState,
+  setStrategicDataState,
   handleErrors,
   getKageKanji,
   getVillageIcon,
@@ -657,7 +661,7 @@ function KageQuarters({
       });
     } else {
       setModalState("confirm_form_alliance");
-      modalText.current = "Are you sure you want to form an alliance with " + strategicDisplayRight.village.name + "?";
+      modalText.current = "Are you sure you want to form an alliance with " + strategicDisplayRight.village.name + "?\nYou can be a member of only one Alliance at any given time.";
     }
   };
   const BreakAlliance = () => {
@@ -677,7 +681,7 @@ function KageQuarters({
       });
     } else {
       setModalState("confirm_break_alliance");
-      modalText.current = "Are you sure you want break an alliance " + strategicDisplayRight.village.name + "?";
+      modalText.current = "Are you sure you want break an alliance with " + strategicDisplayRight.village.name + "?";
     }
   };
   const CancelProposal = () => {
@@ -717,6 +721,9 @@ function KageQuarters({
         setPolicyDataState(response.data.policyData);
         setDisplayPolicyID(response.data.policyData.policy_id);
         setPolicyDisplay(getPolicyDisplayData(response.data.policyData.policy_id));
+        setStrategicDataState(response.data.strategicData);
+        setStrategicDisplayLeft(response.data.strategicData.find(item => item.village.name == villageName));
+        setStrategicDisplayRight(response.data.strategicData.find(item => item.village.name == strategicDisplayRight.village.name));
         modalText.current = response.data.response_message;
         setModalState("response_message");
       });
@@ -895,7 +902,7 @@ function KageQuarters({
   }, /*#__PURE__*/React.createElement("div", {
     className: "header"
   }, "Proposals"), /*#__PURE__*/React.createElement("div", {
-    className: "content"
+    className: "content box-primary"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_container_top"
   }, /*#__PURE__*/React.createElement("div", {
@@ -1088,7 +1095,9 @@ function KageQuarters({
     className: "elder_avatar_fill"
   })), /*#__PURE__*/React.createElement("div", {
     className: "elder_name"
-  }, elder.user_name ? elder.user_name : "---"))))))), /*#__PURE__*/React.createElement("div", {
+  }, elder.user_name ? /*#__PURE__*/React.createElement("a", {
+    href: "/?id=6&user=" + elder.user_name
+  }, elder.user_name) : "---"))))))), /*#__PURE__*/React.createElement("div", {
     className: "row second"
   }, /*#__PURE__*/React.createElement("div", {
     className: "column first"
@@ -1199,7 +1208,12 @@ function KageQuarters({
     className: "strategic_info_navigation"
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_navigation_diplomacy_buttons"
-  }, strategicDisplayLeft.enemies.find(enemy => enemy != strategicDisplayRight.village.name) ? /*#__PURE__*/React.createElement("div", {
+  }, strategicDisplayLeft.enemies.find(enemy => enemy == strategicDisplayRight.village.name) ? /*#__PURE__*/React.createElement("div", {
+    className: "diplomacy_action_button_wrapper war cancel",
+    onClick: () => OfferPeace()
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "diplomacy_action_button_inner"
+  })) : /*#__PURE__*/React.createElement("div", {
     className: "diplomacy_action_button_wrapper war",
     onClick: () => DeclareWar()
   }, /*#__PURE__*/React.createElement("div", {
@@ -1207,12 +1221,12 @@ function KageQuarters({
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/icons/war.png",
     className: "diplomacy_action_button_icon"
-  }))) : /*#__PURE__*/React.createElement("div", {
-    className: "diplomacy_action_button_wrapper war cancel",
-    onClick: () => OfferPeace()
+  }))), strategicDisplayLeft.allies.find(ally => ally == strategicDisplayRight.village.name) ? /*#__PURE__*/React.createElement("div", {
+    className: "diplomacy_action_button_wrapper alliance cancel",
+    onClick: () => BreakAlliance()
   }, /*#__PURE__*/React.createElement("div", {
     className: "diplomacy_action_button_inner"
-  })), strategicDisplayLeft.allies.find(ally => ally != strategicDisplayRight.village.name) ? /*#__PURE__*/React.createElement("div", {
+  })) : /*#__PURE__*/React.createElement("div", {
     className: "diplomacy_action_button_wrapper alliance",
     onClick: () => OfferAlliance()
   }, /*#__PURE__*/React.createElement("div", {
@@ -1220,12 +1234,7 @@ function KageQuarters({
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/icons/ally.png",
     className: "diplomacy_action_button_icon"
-  }))) : /*#__PURE__*/React.createElement("div", {
-    className: "diplomacy_action_button_wrapper alliance cancel",
-    onClick: () => BreakAlliance()
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "diplomacy_action_button_inner"
-  }))), /*#__PURE__*/React.createElement("div", {
+  })))), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_navigation_village_buttons"
   }, villageName != "Stone" && /*#__PURE__*/React.createElement("div", {
     className: strategicDisplayRight.village.village_id == 1 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
@@ -1278,13 +1287,11 @@ function KageQuarters({
         newPolicyID = Math.min(4, displayPolicyID + 1);
         setDisplayPolicyID(newPolicyID);
         setPolicyDisplay(getPolicyDisplayData(newPolicyID));
-        setProposalRepAdjustment(proposalDataState[newPolicyID].votes.reduce((acc, vote) => acc + vote.rep_adjustment, 0));
         break;
       case "decrement":
         newPolicyID = Math.max(1, displayPolicyID - 1);
         setDisplayPolicyID(newPolicyID);
         setPolicyDisplay(getPolicyDisplayData(newPolicyID));
-        setProposalRepAdjustment(proposalDataState[newPolicyID].votes.reduce((acc, vote) => acc + vote.rep_adjustment, 0));
         break;
     }
   }
@@ -1298,11 +1305,13 @@ function KageQuarters({
         newProposalKey = Math.min(proposalDataState.length - 1, currentProposalKey + 1);
         setCurrentProposalKey(newProposalKey);
         setCurrentProposal(proposalDataState[newProposalKey]);
+        setProposalRepAdjustment(proposalDataState[newProposalKey].votes.reduce((acc, vote) => acc + vote.rep_adjustment, 0));
         break;
       case "decrement":
         newProposalKey = Math.max(0, currentProposalKey - 1);
         setCurrentProposalKey(newProposalKey);
         setCurrentProposal(proposalDataState[newProposalKey]);
+        setProposalRepAdjustment(proposalDataState[newProposalKey].votes.reduce((acc, vote) => acc + vote.rep_adjustment, 0));
         break;
     }
   }
