@@ -157,6 +157,12 @@ function MainBannerSection({
             break;
     }
 
+    React.useEffect(() => {
+        if (initialView === "news" && newsRef.current) {
+            scrollTo(newsRef.current);
+        }
+    }, [initialView]);
+
     return (
         <div className="home_section main_banner_section">
             <div className="main_banner_container">

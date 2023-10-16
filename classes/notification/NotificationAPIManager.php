@@ -218,11 +218,23 @@ class NotificationAPIManager {
                 case NotificationManager::NOTIFICATION_PROPOSAL_PASSED:
                 case NotificationManager::NOTIFICATION_PROPOSAL_CANCELED:
                 case NotificationManager::NOTIFICATION_PROPOSAL_EXPIRED:
+                case NotificationManager::NOTIFICATION_DIPLOMACY_WAR:
+                case NotificationManager::NOTIFICATION_DIPLOMACY_ALLIANCE:
+                case NotificationManager::NOTIFICATION_DIPLOMACY_END_WAR:
+                case NotificationManager::NOTIFICATION_DIPLOMACY_END_ALLIANCE:
                     if (false) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("villageHQ"));
+                    }
+                    break;
+                case NotificationManager::NOTIFICATION_NEWS:
+                    if (false) {
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
+                    } else {
+                        $notifications[] = NotificationDto::fromDb($row, "/?home&view=news");
                     }
                     break;
                 default:
@@ -371,46 +383,50 @@ class NotificationAPIManager {
                 alert: false,
             );
         }
-        //Caravan
-        $time = time();
-        $result = $this->system->db->query("SELECT `caravans`.*, `regions`.`name` as 'region_name' FROM `caravans` INNER JOIN `regions` on `caravans`.`region_id` = `regions`.`region_id` WHERE `start_time` < {$time}");
-        $result = $this->system->db->fetch_all($result);
-        foreach ($result as $row) {
-            // if travel time is set then only display if active
-            if (!empty($row['travel_time'])) {
-                if ($row['travel_time'] + ($row['start_time'] * 1000) + Patrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
-                    $notifications[] = new NotificationDto(
-                        action_url: $this->system->router->getUrl('travel'),
-                        type: NotificationManager::NOTIFICATION_CARAVAN,
-                        message: "{$row['name']} is active near {$row['region_name']}",
-                        user_id: $this->player->user_id,
-                        created: time(),
-                        alert: false,
-                    );
+        //War Notifs
+        if ($this->player->rank_num > 2) {
+            //Caravan
+            $time = time();
+            $result = $this->system->db->query("SELECT `caravans`.*, `regions`.`name` as 'region_name' FROM `caravans` INNER JOIN `regions` on `caravans`.`region_id` = `regions`.`region_id` WHERE `start_time` < {$time}");
+            $result = $this->system->db->fetch_all($result);
+            foreach ($result as $row) {
+                // if travel time is set then only display if active
+                if (!empty($row['travel_time'])) {
+                    if ($row['travel_time'] + ($row['start_time'] * 1000) + Patrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
+                        $notifications[] = new NotificationDto(
+                            action_url: $this->system->router->getUrl('travel'),
+                            type: NotificationManager::NOTIFICATION_CARAVAN,
+                            message: "{$row['name']} is active near {$row['region_name']}",
+                            user_id: $this->player->user_id,
+                            created: time(),
+                            alert: false,
+                        );
+                    }
                 }
             }
-        }
-        //Raid
-        $time = time() - 60; // only get recently updated raids, prevent something like starting a raid and logging out = perpetual notif
-        $result = $this->system->db->query("SELECT `operations`.*, `region_locations`.`x`, `region_locations`.`y`, `region_locations`.`map_id`, `region_locations`.`name` FROM `operations`
+            //Raid
+            $time = time() - 60; // only get recently updated raids, prevent something like starting a raid and logging out = perpetual notif
+            $result = $this->system->db->query("SELECT `operations`.*, `region_locations`.`x`, `region_locations`.`y`, `region_locations`.`map_id`, `region_locations`.`name` FROM `operations`
             INNER JOIN `region_locations` ON `region_locations`.`id` = `operations`.`target_id`
             WHERE (`user_village` = {$this->player->village->village_id} OR `target_village` = {$this->player->village->village_id})
             AND `last_update` > {$time}
             AND `status` = " . Operation::OPERATION_ACTIVE .
-            " AND `operations`.`type` = " . Operation::OPERATION_RAID
-            . " GROUP BY `region_locations`.`id`");
-        $result = $this->system->db->fetch_all($result);
-        foreach ($result as $row) {
-            $location = new TravelCoords($row['x'], $row['y'], $row['map_id']);
-            $notifications[] = new NotificationDto(
-                action_url: $this->system->router->getUrl('travel'),
-                type: $row['user_village'] == $this->player->village->village_id ? NotificationManager::NOTIFICATION_RAID_ALLY : NotificationManager::NOTIFICATION_RAID_ENEMY,
-                message: $row['user_village'] == $this->player->village->village_id ? "An ally is attacking {$row['name']} at {$location->displayString()}!" : "{$row['name']} is under attack at {$location->displayString()}!",
-                user_id: $this->player->user_id,
-                created: time(),
-                alert: false,
-            );
+                " AND `operations`.`type` = " . Operation::OPERATION_RAID
+                . " GROUP BY `region_locations`.`id`");
+            $result = $this->system->db->fetch_all($result);
+            foreach ($result as $row) {
+                $location = new TravelCoords($row['x'], $row['y'], $row['map_id']);
+                $notifications[] = new NotificationDto(
+                    action_url: $this->system->router->getUrl('travel'),
+                    type: $row['user_village'] == $this->player->village->village_id ? NotificationManager::NOTIFICATION_RAID_ALLY : NotificationManager::NOTIFICATION_RAID_ENEMY,
+                    message: $row['user_village'] == $this->player->village->village_id ? "An ally is attacking {$row['name']} at {$location->displayString()}!" : "{$row['name']} is under attack at {$location->displayString()}!",
+                    user_id: $this->player->user_id,
+                    created: time(),
+                    alert: false,
+                );
+            }
         }
+
         return $notifications;
     }
 

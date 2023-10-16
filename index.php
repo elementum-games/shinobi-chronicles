@@ -615,20 +615,20 @@ if($LOGGED_IN) {
         }
     }
     else if (isset($_GET['home'])) {
-        $home_view = "default";
+        $initial_home_view = "default";
         if (isset($_GET['view'])) {
             switch ($_GET['view']) {
                 case "news":
-                    $home_view = "news";
+                    $initial_home_view = "news";
                     break;
                 case "contact":
-                    $home_view = "contact";
+                    $initial_home_view = "contact";
                     break;
                 case "rules":
-                    $home_view = "rules";
+                    $initial_home_view = "rules";
                     break;
                 case "terms":
-                    $home_view = "terms";
+                    $initial_home_view = "terms";
                     break;
             }
         }

@@ -768,7 +768,7 @@ class VillageManager {
         }
 
         // switch for type
-        $message;
+        $message = '';
         $time = time();
         switch ($proposal['type']) {
             case 'change_policy':
@@ -790,7 +790,7 @@ class VillageManager {
                     return "Proposal canceled. Villages must be neutral to declare war.";
                 }
                 // update relation
-                self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_WAR);
+                self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_WAR, $proposal['type']);
                 // clear active proposals
                 self::clearDiplomaticProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
                 // update proposal
@@ -840,7 +840,7 @@ class VillageManager {
                     return "Proposal canceled. Villages must be allied to break alliance.";
                 }
                 // update relation
-                self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_NEUTRAL);
+                self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_NEUTRAL, $proposal['type']);
                 // clear active proposals
                 self::clearDiplomaticProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
                 // update proposal
@@ -856,7 +856,7 @@ class VillageManager {
                     return "Proposal canceled. Villages must be at war to enter peace.";
                 }
                 // update relation
-                self::setNewRelations($system, $proposal['target_village_id'], $proposal['village_id'], VillageRelation::RELATION_NEUTRAL);
+                self::setNewRelations($system, $proposal['target_village_id'], $proposal['village_id'], VillageRelation::RELATION_NEUTRAL, $proposal['type']);
                 // clear active proposals
                 self::clearDiplomaticProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
                 // update proposal
@@ -872,7 +872,7 @@ class VillageManager {
                     return "Proposal canceled. Villages must be neutral to form alliance.";
                 }
                 // update relation
-                self::setNewRelations($system, $proposal['target_village_id'], $proposal['village_id'], VillageRelation::RELATION_ALLIANCE);
+                self::setNewRelations($system, $proposal['target_village_id'], $proposal['village_id'], VillageRelation::RELATION_ALLIANCE, $proposal['type']);
                 // clear active proposals
                 self::clearDiplomaticProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
                 // update proposal
@@ -1173,7 +1173,7 @@ class VillageManager {
             AND `proposal_id` != {$proposal_id}");
     }
 
-    private static function setNewRelations(System $system, int $initiator_village_id, int $recipient_village_id, int $relation_type, ?string $relation_name = null) {
+    private static function setNewRelations(System $system, int $initiator_village_id, int $recipient_village_id, int $relation_type, string $proposal_type, ?string $relation_name = null) {
         // determine relation name
         if ($relation_name == null) {
             switch ($relation_type) {
@@ -1198,6 +1198,46 @@ class VillageManager {
         AND (`village2_id` = {$initiator_village_id} OR `village2_id` = {$recipient_village_id}))");
         // insert new relation
         $system->db->query("INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`) VALUES ({$initiator_village_id}, {$recipient_village_id}, '{$relation_type}', '{$relation_name}', {$time})");
+        // get list of users to notify
+        $initator_village_name = self::VILLAGE_NAMES[$initiator_village_id];
+        $recipient_village_name = self::VILLAGE_NAMES[$recipient_village_id];
+        $active_threshold = time() - (NotificationManager::ACTIVE_PLAYER_DAYS_LAST_ACTIVE * 86400);
+        $user_ids = $system->db->query("SELECT `user_id` FROM `users` WHERE (`village` = '{$initator_village_name}' OR `village` = '{$recipient_village_name}') AND `last_login` > {$active_threshold}");
+        $user_ids = $system->db->fetch_all($user_ids);
+        // create notifcations
+        $message;
+        $notification_type;
+        switch ($proposal_type) {
+            case 'break_alliance':
+                $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_END_ALLIANCE;
+                $message = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " has ended and Alliance with " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
+                break;
+            case 'accept_peace':
+                $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_END_WAR;
+                $message = VillageManager::VILLAGE_NAMES[$recipient_village_id] . " has negotiated peace with " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
+                break;
+            case 'accept_alliance':
+                $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_ALLIANCE;
+                $message = VillageManager::VILLAGE_NAMES[$recipient_village_id] . " has formed an Alliance with " . VillageManager::VILLAGE_NAMES[$initiator_village_id] . "!";
+                break;
+            case 'declare_war':
+                $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_WAR;
+                $message = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " has declared War on " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
+                break;
+            default:
+                break;
+        }
+        foreach ($user_ids as $user) {
+            $new_notification = new NotificationDto(
+                type: $notification_type,
+                message: $message,
+                user_id: $user['user_id'],
+                created: time(),
+                expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_DIPLOMACY * 86400),
+                alert: false,
+            );
+            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_MULTIPLE);
+        }
     }
 
     private static function createProposalNotification(System $system, $village_id, $notification_type, $proposal_name) {

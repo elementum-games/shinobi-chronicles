@@ -117,6 +117,11 @@ function MainBannerSection({
       }, /*#__PURE__*/React.createElement(Terms, null));
       break;
   }
+  React.useEffect(() => {
+    if (initialView === "news" && newsRef.current) {
+      scrollTo(newsRef.current);
+    }
+  }, [initialView]);
   return /*#__PURE__*/React.createElement("div", {
     className: "home_section main_banner_section"
   }, /*#__PURE__*/React.createElement("div", {
@@ -129,23 +134,7 @@ function MainBannerSection({
     src: "/images/v2/decorations/homepagelogo.png"
   }), /*#__PURE__*/React.createElement("div", {
     className: "title_version"
-  }, version)), /*#__PURE__*/React.createElement("div", {
-    className: "home_lantern lantern_1"
-  }, /*#__PURE__*/React.createElement("img", {
-    src: "/images/v2/decorations/lanternbig.png"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "home_lantern lantern_2"
-  }, /*#__PURE__*/React.createElement("img", {
-    src: "/images/v2/decorations/lanternbig.png"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "home_lantern lantern_3"
-  }, /*#__PURE__*/React.createElement("img", {
-    src: "/images/v2/decorations/lanternsmall.png"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "home_lantern lantern_4"
-  }, /*#__PURE__*/React.createElement("img", {
-    src: "/images/v2/decorations/lanternsmall.png"
-  })), activeModal, /*#__PURE__*/React.createElement("div", {
+  }, version)), activeModal, /*#__PURE__*/React.createElement("div", {
     className: "login_container",
     style: activeModal != null ? {
       visibility: "hidden"

@@ -37,21 +37,21 @@ class NotificationManager {
     const NOTIFICATION_PROPOSAL_PASSED = "proposal_passed";
     const NOTIFICATION_PROPOSAL_CANCELED = "proposal_canceled";
     const NOTIFICATION_PROPOSAL_EXPIRED = "proposal_expired";
-    const NOTIFICATION_POLICY_CHANGE = "policy_chage";
-    const NOTIFICATION_WAR = "declare_war";
-    const NOTIFICATION_ALLY = "form_alliance";
-    const NOTIFICATION_END_WAR = "end_war";
-    const NOTIFICATION_END_ALLIANCE = "end_alliance";
+    const NOTIFICATION_POLICY_CHANGE = "policy_change";
+    const NOTIFICATION_DIPLOMACY_WAR = "diplomacy_war";
+    const NOTIFICATION_DIPLOMACY_ALLIANCE = "diplomacy_alliance";
+    const NOTIFICATION_DIPLOMACY_END_WAR = "diplomacy_end_war";
+    const NOTIFICATION_DIPLOMACY_END_ALLIANCE = "diplomacy_end_alliance";
     const NOTIFICATION_NEWS = "news";
 
     const ACTIVE_PLAYER_DAYS_LAST_ACTIVE = 14;
 
-    const NOTIFICATION_EXPIRATION_DAYS_POLICY = 7;
-    const NOTIFICATION_EXPIRATION_DAYS_PROPOSAL = 7;
-    const NOTIFICATION_EXPIRATION_DAYS_DIPLOMATIC = 7;
+    const NOTIFICATION_EXPIRATION_DAYS_POLICY = 3;
+    const NOTIFICATION_EXPIRATION_DAYS_PROPOSAL = 3;
+    const NOTIFICATION_EXPIRATION_DAYS_DIPLOMACY = 3;
     const NOTIFICATION_EXPIRATION_DAYS_NEWS = 14;
-    const NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION = 1;
-    const NOTIFICATION_EXPIRATION_DAYS_TRAINING = 1;
+    //const NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION = 1;
+    //const NOTIFICATION_EXPIRATION_DAYS_TRAINING = 1;
 
     public static function createNotification(NotificationDto $notification, System $system, int $UPDATE, int $limit = 5): bool {
         $db_modified = false;

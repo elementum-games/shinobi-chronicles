@@ -617,6 +617,72 @@ export function TopbarNotification({
       e.preventDefault();
       closeNotification(notification.notification_id);
     }
+  }, "X")), notification.type === "policy_change" && /*#__PURE__*/React.createElement("a", {
+    href: notification.action_url,
+    className: "topbar_notification_wrapper",
+    "data-content": notification.message,
+    "data-time": timeRemainingDisplay
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "topbar_notification_svg",
+    width: "40",
+    height: "40",
+    viewBox: "0 0 100 100"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "8px",
+    stroke: "#5d5c4b",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "2px",
+    stroke: "#000000",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("image", {
+    className: "topbar_notification_icon",
+    height: "80",
+    width: "75",
+    x: "20",
+    y: "10",
+    href: "images/v2/icons/proposalpassed.png"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "topbar_close_notification",
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id);
+    }
+  }, "X")), notification.type === "diplomacy" && /*#__PURE__*/React.createElement("a", {
+    href: notification.action_url,
+    className: "topbar_notification_wrapper",
+    "data-content": notification.message,
+    "data-time": timeRemainingDisplay
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "topbar_notification_svg",
+    width: "40",
+    height: "40",
+    viewBox: "0 0 100 100"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "8px",
+    stroke: "#5d5c4b",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "2px",
+    stroke: "#000000",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("image", {
+    className: "topbar_notification_icon",
+    height: "80",
+    width: "75",
+    x: "20",
+    y: "10",
+    href: "images/v2/icons/proposalpassed.png"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "topbar_close_notification",
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id);
+    }
   }, "X")));
 }
 function SpecialMissionNotification({
