@@ -972,6 +972,7 @@ class User extends Fighter {
 
         // Load benefits
         $this->forbidden_seal->setBenefits();
+        $this->reputation->setBonusRep($this->forbidden_seal->bonus_reputation);
     }
 
     /**

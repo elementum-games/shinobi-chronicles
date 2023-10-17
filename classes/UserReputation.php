@@ -202,6 +202,8 @@ class UserReputation {
     public int $weekly_cap;
     public int $weekly_pvp_cap;
 
+    protected int $bonus_rep; // Use only for forbidden_seal bonuses!
+
     // TODO: Make recent_killed private
     public ?string $recent_players_killed_ids;
     public array $recent_players_killed_ids_array;
@@ -219,6 +221,7 @@ class UserReputation {
         $this->weekly_rep = &$player_weekly_rep;
         $this->mission_cd = $mission_cd;
         $this->rank = self::tierByRepAmount($this->rep);
+        $this->bonus_rep = 0;
 
         //PvP data
         $this->weekly_pvp_rep = &$player_pvp_rep;
@@ -252,6 +255,14 @@ class UserReputation {
      * Returns amount of reputation awarded for display/data confirmation purposes
      */
     public function addRep(int $amount, bool $bypass_weekly_cap = false, bool $increment_pvp = false): int {
+        // Double repuation
+        if (!empty($this->event) && $this->event instanceof DoubleReputation) {
+            $amount *= DoubleReputation::rep_modifier;
+        }
+
+        //Bonus seal reputation, 0 by default no need to check, bonus rep amounts are set by seal loading
+        $amount += $this->bonus_rep;
+
         //Adjust reputation gain if gain goes above cap
         if(!$bypass_weekly_cap) {
             $new_rep = $this->rep + $amount;
@@ -265,11 +276,6 @@ class UserReputation {
                 $amount = $weekly_cap - $this->weekly_rep;
             }
             $this->weekly_rep += $amount;
-        }
-
-        //Double reputation
-        if (!empty($this->event) && $this->event instanceof DoubleReputation) {
-            $amount *= DoubleReputation::rep_modifier;
         }
 
         // Increment Pvp rep
@@ -301,6 +307,11 @@ class UserReputation {
         if($this->rep < 0) {
             $this->rep = 0;
         }
+    }
+
+    // Set bonus reputation from seal
+    public function setBonusRep($amount) {
+        $this->bonus_rep = $amount;
     }
 
     public function resetPvpRep(): void {
