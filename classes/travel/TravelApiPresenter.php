@@ -97,6 +97,7 @@ class TravelApiPresenter {
                     'alignment' => $nearbyPatrol->alignment,
                     'village_id' => $nearbyPatrol->village_id,
                     'tier' => $nearbyPatrol->tier,
+                    'resources' => $nearbyPatrol->resources,
                 ];
             },
             $travelManager->fetchNearbyPatrols()

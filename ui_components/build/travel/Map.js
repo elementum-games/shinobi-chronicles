@@ -503,6 +503,7 @@ function MapNearbyPatrols({
   tileWidth,
   tileHeight
 }) {
+  console.log(patrolData);
   return /*#__PURE__*/React.createElement("div", {
     id: "patrol_locations",
     className: "map_locations"
@@ -518,7 +519,24 @@ function MapNearbyPatrols({
     className: "map_location_tooltip"
   }, patrol.patrol_name), /*#__PURE__*/React.createElement("div", {
     className: alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type + ' tier_' + patrol.tier
-  }))));
+  }), patrol.resources.length !== 0 && /*#__PURE__*/React.createElement("div", {
+    className: "patrol_details"
+  }, patrol.resources[1] && /*#__PURE__*/React.createElement("div", {
+    className: "patrol_details_resource"
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "patrol_details_resource_icon",
+    src: "/images/map/icons/materials.png"
+  }), "  ", patrol.resources[1], " Materials"), patrol.resources[2] && /*#__PURE__*/React.createElement("div", {
+    className: "patrol_details_resource"
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "patrol_details_resource_icon",
+    src: "/images/map/icons/food.png"
+  }), "  ", patrol.resources[2], " Food"), patrol.resources[3] && /*#__PURE__*/React.createElement("div", {
+    className: "patrol_details_resource"
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "patrol_details_resource_icon",
+    src: "/images/map/icons/wealth.png"
+  }), "  ", patrol.resources[3], " Wealth")))));
 }
 function Player({
   mapData,

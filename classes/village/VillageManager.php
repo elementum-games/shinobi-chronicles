@@ -197,6 +197,14 @@ class VillageManager {
     const VOTE_YES = 1;
     const VOTE_BOOST_COST = 500;
 
+    const PROPOSAL_TYPE_CHANGE_POLICY = "change_policy";
+    const PROPOSAL_TYPE_DECLARE_WAR = "declare_war";
+    const PROPOSAL_TYPE_OFFER_ALLIANCE = "offer_alliance";
+    const PROPOSAL_TYPE_OFFER_PEACE = "offer_peace";
+    const PROPOSAL_TYPE_ACCEPT_ALLIANCE = "accept_alliance";
+    const PROPOSAL_TYPE_ACCEPT_PEACE = "accept_peace";
+    const PROPOSAL_TYPE_BREAK_ALLIANCE = "break_alliance";
+
     public static function getLocation(System $system, string $village_id): ?TravelCoords {
         $result = $system->db->query(
             "SELECT `maps_locations`.`x`, `maps_locations`.`y`, `maps_locations`.`map_id` FROM `villages`
@@ -716,7 +724,8 @@ class VillageManager {
         // insert into DB
         $time = time();
         $name = "Change Policy: " . self::POLICY_NAMES[$policy_id];
-        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `policy_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'change_policy', '{$name}', {$policy_id})");
+        $type = self::PROPOSAL_TYPE_CHANGE_POLICY;
+        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `policy_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$type}', '{$name}', {$policy_id})");
 
         // create notification
         self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
@@ -889,7 +898,7 @@ class VillageManager {
         $message = '';
         $time = time();
         switch ($proposal['type']) {
-            case 'change_policy':
+            case self::PROPOSAL_TYPE_CHANGE_POLICY:
                 // update village policy
                 $system->db->query("UPDATE `villages` SET `policy` = {$proposal['policy_id']} WHERE `village_id` = {$proposal['village_id']}");
                 // update policy log
@@ -901,7 +910,7 @@ class VillageManager {
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
-            case 'declare_war':
+            case self::PROPOSAL_TYPE_DECLARE_WAR:
                 // check neutral
                 if (!$player->village->isNeutral($proposal['target_village_id'])) {
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
@@ -917,7 +926,7 @@ class VillageManager {
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
-            case 'offer_peace':
+            case self::PROPOSAL_TYPE_OFFER_PEACE:
                 // check at war
                 if (!$player->village->isEnemy($proposal['target_village_id'])) {
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
@@ -934,7 +943,7 @@ class VillageManager {
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
-            case 'offer_alliance':
+            case self::PROPOSAL_TYPE_OFFER_ALLIANCE:
                 // check neutral
                 if (!$player->village->isNeutral($proposal['target_village_id'])) {
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
@@ -962,7 +971,7 @@ class VillageManager {
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
-            case 'break_alliance':
+            case self::PROPOSAL_TYPE_BREAK_ALLIANCE:
                 // check allied
                 if (!$player->village->isAlly($proposal['target_village_id'])) {
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
@@ -978,7 +987,7 @@ class VillageManager {
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
-            case 'accept_peace':
+            case self::PROPOSAL_TYPE_ACCEPT_PEACE:
                 // check at war
                 if (!$player->village->isEnemy($proposal['target_village_id'])) {
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
@@ -994,7 +1003,7 @@ class VillageManager {
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
-            case 'accept_alliance':
+            case self::PROPOSAL_TYPE_ACCEPT_ALLIANCE:
                 // check neutral
                 if (!$player->village->isNeutral($proposal['target_village_id'])) {
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
@@ -1109,13 +1118,15 @@ class VillageManager {
             return "You do not meet the seat requirements.";
         }
         // check no pending proposal of same type
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'declare_war' LIMIT 1");
+        $type = self::PROPOSAL_TYPE_DECLARE_WAR;
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = '{$type}' LIMIT 1");
         $last_change = $system->db->fetch($query);
         if ($system->db->last_num_rows > 0) {
             return "There is already a pending proposal of the same type.";
         }
         // check no alliance proposal outgoing
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'offer_alliance' LIMIT 1");
+        $type = self::PROPOSAL_TYPE_OFFER_ALLIANCE;
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = '{$type}' LIMIT 1");
         $last_change = $system->db->fetch($query);
         if ($system->db->last_num_rows > 0) {
             return "There is already a proposal to form alliance.";
@@ -1139,7 +1150,8 @@ class VillageManager {
         // insert into DB
         $time = time();
         $name = "Declare War: " . VillageManager::VILLAGE_NAMES[$target_village_id];
-        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'declare_war', '{$name}', {$target_village_id})");
+        $type = self::PROPOSAL_TYPE_DECLARE_WAR;
+        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$type}', '{$name}', {$target_village_id})");
 
         // create notification
         self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
@@ -1157,7 +1169,8 @@ class VillageManager {
             return "You do not meet the seat requirements.";
         }
         // check no pending proposal of same type
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'offer_peace' LIMIT 1");
+        $type = self::PROPOSAL_TYPE_OFFER_PEACE;
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = '{$type}' LIMIT 1");
         $last_change = $system->db->fetch($query);
         if ($system->db->last_num_rows > 0) {
             return "There is already a pending proposal of the same type.";
@@ -1166,9 +1179,9 @@ class VillageManager {
         if (!$player->village->isEnemy($target_village_id)) {
             return "Village must be at war to offer peace.";
         }
-        // also check war duration requirement
         // also check not pending on receiving village
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$target_village_id} AND `target_village_id` = {$player->village->village_id} AND `type` = 'accept_peace' LIMIT 1");
+        $type = self::PROPOSAL_TYPE_ACCEPT_PEACE;
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$target_village_id} AND `target_village_id` = {$player->village->village_id} AND `type` = '{$type}' LIMIT 1");
         $last_change = $system->db->fetch($query);
         if ($system->db->last_num_rows > 0) {
             return "There is already a pending proposal of the same type.";
@@ -1188,7 +1201,8 @@ class VillageManager {
         // insert into DB
         $time = time();
         $name = "Offer Peace: " . VillageManager::VILLAGE_NAMES[$target_village_id];
-        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'offer_peace', '{$name}', {$target_village_id})");
+        $type = self::PROPOSAL_TYPE_OFFER_PEACE;
+        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$type}', '{$name}', {$target_village_id})");
 
         // create notification
         self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
@@ -1206,13 +1220,15 @@ class VillageManager {
             return "You do not meet the seat requirements.";
         }
         // check no pending proposal of same type
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'offer_alliance' LIMIT 1");
+        $type = self::PROPOSAL_TYPE_OFFER_ALLIANCE;
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = '{$type}' LIMIT 1");
         $last_change = $system->db->fetch($query);
         if ($system->db->last_num_rows > 0) {
             return "There is already a pending proposal of the same type.";
         }
         // check no war proposal outgoing
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = 'declare_war' LIMIT 1");
+        $type = self::PROPOSAL_TYPE_DECLARE_WAR;
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = '{$type}' LIMIT 1");
         $last_change = $system->db->fetch($query);
         if ($system->db->last_num_rows > 0) {
             return "There is already a proposal to declare war.";
@@ -1222,7 +1238,8 @@ class VillageManager {
             return "Village must be neutral to form alliance.";
         }
         // also check not pending on receiving village
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$target_village_id} AND `target_village_id` = {$player->village->village_id} AND `type` = 'accept_alliance' LIMIT 1");
+        $type = self::PROPOSAL_TYPE_ACCEPT_ALLIANCE;
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$target_village_id} AND `target_village_id` = {$player->village->village_id} AND `type` = '{$type}' LIMIT 1");
         $last_change = $system->db->fetch($query);
         if ($system->db->last_num_rows > 0) {
             return "There is already a pending proposal of the same type.";
@@ -1252,7 +1269,8 @@ class VillageManager {
         }
         // insert into DB
         $name = "Form Alliance: " . VillageManager::VILLAGE_NAMES[$target_village_id];
-        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'offer_alliance', '{$name}', {$target_village_id})");
+        $type = self::PROPOSAL_TYPE_OFFER_ALLIANCE;
+        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$type}', '{$name}', {$target_village_id})");
 
         // create notification
         self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
@@ -1295,7 +1313,8 @@ class VillageManager {
         // insert into DB
         $time = time();
         $name = "Break Alliance: " . VillageManager::VILLAGE_NAMES[$target_village_id];
-        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, 'break_alliance', '{$name}', {$target_village_id})");
+        $type = self::PROPOSAL_TYPE_BREAK_ALLIANCE;
+        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$type}', '{$name}', {$target_village_id})");
 
         // create notification
         self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
@@ -1347,19 +1366,19 @@ class VillageManager {
         $message;
         $notification_type;
         switch ($proposal_type) {
-            case 'break_alliance':
+            case self::PROPOSAL_TYPE_BREAK_ALLIANCE:
                 $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_END_ALLIANCE;
                 $message = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " has ended and Alliance with " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
                 break;
-            case 'accept_peace':
+            case self::PROPOSAL_TYPE_ACCEPT_PEACE:
                 $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_END_WAR;
                 $message = VillageManager::VILLAGE_NAMES[$recipient_village_id] . " has negotiated peace with " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
                 break;
-            case 'accept_alliance':
+            case self::PROPOSAL_TYPE_ACCEPT_ALLIANCE:
                 $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_ALLIANCE;
                 $message = VillageManager::VILLAGE_NAMES[$recipient_village_id] . " has formed an Alliance with " . VillageManager::VILLAGE_NAMES[$initiator_village_id] . "!";
                 break;
-            case 'declare_war':
+            case self::PROPOSAL_TYPE_DECLARE_WAR:
                 $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_WAR;
                 $message = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " has declared War on " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
                 break;

@@ -1196,7 +1196,7 @@
 }
 .strategic_info_container {
     padding: 16px 20px 20px;
-    background: url(/images/v2/decorations/nwbigcorner.png) no-repeat top left, url(/images/v2/decorations/sebigcorner.png) no-repeat bottom right;
+    background: url(/images/v2/decorations/nwbigcorner.png) no-repeat top left, url(/images/v2/decorations/sebigcorner.png) no-repeat bottom right, url(/images/v2/decorations/swbigcorner.png) no-repeat bottom left, url(/images/v2/decorations/nebigcorner.png) no-repeat top right;
     display: flex;
     justify-content: space-between;
     gap: 19px;

@@ -22,10 +22,15 @@ class Patrol {
     public string $patrol_type;
     public string $alignment;
     public ?int $tier = null;
+    public array $resources = [];
     const DESTINATION_BUFFER_MS = 5000; // duration non-looped patrols should appear at their destination
     public function __construct(array $row, string $patrol_type) {
         foreach ($row as $key => $value) {
-            $this->$key = $value;
+            if ($key == 'resources') {
+                $this->$key = json_decode($value, true);
+            } else {
+                $this->$key = $value;
+            }
         }
         $this->patrol_type = $patrol_type;
     }
@@ -228,7 +233,7 @@ class Patrol {
 
             $elapsedTime += $segmentTimes[$i];
         }
-        
+
         // Fail-safe if no conditions met, returns first point.
         return ['x' => $points[0]['x'], 'y' => $points[0]['y']];
     }
