@@ -975,6 +975,9 @@ class TravelManager {
         return $objectives;
     }
 
+    /**
+     * @return string
+     */
     function getPlayerBattleUrl(): ?string {
         $link = null;
         if ($this->user->battle_id > 0) {
@@ -1008,6 +1011,9 @@ class TravelManager {
         return $link;
     }
 
+    /**
+     * @return bool
+     */
     function beginOperation($operation_type): bool {
         $message = '';
         if ($operation_type == Operation::OPERATION_LOOT) {
@@ -1045,6 +1051,9 @@ class TravelManager {
         }
     }
 
+    /**
+     * @return bool
+     */
     function cancelOperation(): bool {
         $message = '';
         $this->warManager->cancelOperation();
@@ -1071,6 +1080,9 @@ class TravelManager {
         $this->setTravelMessage($message);
     }
 
+    /**
+     * @return bool
+     */
     function claimLoot(): bool
     {
         $message = '';
@@ -1090,6 +1102,9 @@ class TravelManager {
         }
     }
 
+    /**
+     * @return int
+     */
     function getPlayerLootCount(): int {
         $loot_count = 0;
         $loot_result = $this->system->db->query("SELECT COUNT(*) as `count` FROM `loot` WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL LIMIT 1");

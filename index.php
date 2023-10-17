@@ -538,7 +538,7 @@ if($LOGGED_IN) {
                 $location_name = $player->current_location->location_id
                     ? ' ' . ' <div id="contentHeaderLocation">' . " | " . $player->current_location->name . '</div>'
                     : null;
-                $location_coords = "<div id='contentHeaderCoords'>" . " (" . $player->location->x . "." . $player->location->y . ")" . '</div>';
+                $location_coords = "<div id='contentHeaderCoords'>" . " | " . $player->region->name . " (" . $player->location->x . "." . $player->location->y . ")" . '</div>';
                 $content_header_divider = '<div class="contentHeaderDivider"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#77694e" stroke-width="1"></line></svg></div>';
             } else {
                 $location_name = $player->current_location->location_id

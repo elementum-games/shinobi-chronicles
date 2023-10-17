@@ -305,6 +305,7 @@ class User extends Fighter {
     ];
 
     public VillageSeatDto $village_seat;
+    public Region $region;
 
     /**
      * User constructor.
@@ -899,6 +900,9 @@ class User extends Fighter {
 
         // Get village seat
         $this->village_seat = VillageManager::getPlayerSeat($this->system, $this->user_id);
+
+        // Get current region
+        $this->region = $this->getCurrentRegion();
 
         return;
     }
@@ -2509,7 +2513,7 @@ class User extends Fighter {
 
     /**
      * @return bool
-     * checks if PvP battle is complete, used to redirect playuer
+     * checks if PvP battle is complete, used to redirect player
      */
     public function checkPvPComplete(): bool {
         $complete = false;
@@ -2525,5 +2529,22 @@ class User extends Fighter {
             }
         }
         return $complete;
+    }
+
+    /**
+     * @return Region
+     */
+    public function getCurrentRegion(): Region {
+        $result = $this->system->db->query("SELECT * FROM `regions`");
+        foreach ($this->system->db->fetch_all($result) as $region) {
+            //return Region::fromDb($region, get_coordinates: false);
+            $region_vertices = json_decode($region['vertices']);
+            foreach ($region_vertices as $vertex) {
+                $coord = new RegionCoords($this->location->x, $this->location->y, $this->location->map_id);
+                if (Region::coordInRegion($coord, $region_vertices)) {
+                    return Region::fromDb($region, get_coordinates: false);
+                }
+            }
+        }
     }
 }

@@ -40,7 +40,7 @@ class TravelApiPresenter {
             'action_url'        => $location_action->action_url,
             'action_message'    => $location_action->action_message,
             'invulnerable'      => ($player->pvp_immunity_ms > System::currentTimeMs()),
-            'regions'           => $regions,
+            'region'            => $player->region,
             'region_coords'     => $travelManager->getCoordsByRegion($regions),
             'spar_link'         => $system->router->getUrl('spar'),
             'colosseum_coords'  => $travelManager->getColosseumCoords(),

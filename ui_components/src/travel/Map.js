@@ -476,7 +476,6 @@ function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId, ranksToV
 }
 
 function MapNearbyPatrols({ patrolData, tileWidth, tileHeight, strategicView }) {
-    console.log(patrolData);
     return (
         <div id="patrol_locations" className='map_locations'>
             {patrolData

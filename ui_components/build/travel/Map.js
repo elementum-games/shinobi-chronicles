@@ -505,7 +505,6 @@ function MapNearbyPatrols({
   tileHeight,
   strategicView
 }) {
-  console.log(patrolData);
   return /*#__PURE__*/React.createElement("div", {
     id: "patrol_locations",
     className: "map_locations"

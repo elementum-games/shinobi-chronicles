@@ -153,7 +153,7 @@ function Travel({
         //console.log("Response Time: " + response.data.time);
         debug(`Move completed ${requestEnd - lastTravelSuccessTime.current} ms after last move`);
         if (headerCoords.current !== null) {
-          headerCoords.current.innerHTML = " (" + response.data.mapData.player_x + "." + response.data.mapData.player_y + ")";
+          headerCoords.current.innerHTML = " | " + response.data.mapData.region.name + " (" + response.data.mapData.player_x + "." + response.data.mapData.player_y + ")";
         }
         lastTravelSuccessTime.current = requestEnd;
         setMapData(response.data.mapData);
