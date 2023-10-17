@@ -154,6 +154,7 @@ export const Map = ({ mapData, scoutData, patrolData, playerId, ranksToView, str
                         tileHeight={tile_height}
                         playerId={playerId}
                         ranksToView={ranksToView}
+                        strategicView={strategicView}
                     />
                     <Player
                         playerStyle={PlayerStyle}
@@ -474,7 +475,7 @@ function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId, ranksToV
     );
 }
 
-function MapNearbyPatrols({ patrolData, tileWidth, tileHeight }) {
+function MapNearbyPatrols({ patrolData, tileWidth, tileHeight, strategicView }) {
     console.log(patrolData);
     return (
         <div id="patrol_locations" className='map_locations'>
@@ -489,7 +490,7 @@ function MapNearbyPatrols({ patrolData, tileWidth, tileHeight }) {
                         }}>
                         <div className='map_location_tooltip'>{patrol.patrol_name}</div>
                         <div className={alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type + ' tier_' + patrol.tier}></div>
-                        {patrol.resources.length !== 0 &&
+                        {(patrol.resources.length !== 0 && strategicView) &&
                             <div className='patrol_details'>
                             {patrol.resources[1] &&
                                 <div className='patrol_details_resource'>

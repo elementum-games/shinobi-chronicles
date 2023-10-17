@@ -1329,7 +1329,7 @@
     flex-direction: column;
     align-items: flex-start;
     position: absolute;
-    bottom: -65px;
+    top: 105%;
     left: 50%;
     right: 0;
     transform: translateX(-50%);

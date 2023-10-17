@@ -140,7 +140,8 @@ export const Map = ({
     tileWidth: tile_width,
     tileHeight: tile_height,
     playerId: playerId,
-    ranksToView: ranksToView
+    ranksToView: ranksToView,
+    strategicView: strategicView
   }), /*#__PURE__*/React.createElement(Player, {
     playerStyle: PlayerStyle,
     mapData: mapData
@@ -501,7 +502,8 @@ function MapNearbyPlayers({
 function MapNearbyPatrols({
   patrolData,
   tileWidth,
-  tileHeight
+  tileHeight,
+  strategicView
 }) {
   console.log(patrolData);
   return /*#__PURE__*/React.createElement("div", {
@@ -519,7 +521,7 @@ function MapNearbyPatrols({
     className: "map_location_tooltip"
   }, patrol.patrol_name), /*#__PURE__*/React.createElement("div", {
     className: alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type + ' tier_' + patrol.tier
-  }), patrol.resources.length !== 0 && /*#__PURE__*/React.createElement("div", {
+  }), patrol.resources.length !== 0 && strategicView && /*#__PURE__*/React.createElement("div", {
     className: "patrol_details"
   }, patrol.resources[1] && /*#__PURE__*/React.createElement("div", {
     className: "patrol_details_resource"
