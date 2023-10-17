@@ -190,6 +190,8 @@ class UserReputation {
     const SPAR_REP_DRAW = 5;
     const SPAR_REP_WIN = 7;
 
+    protected ?Event $event;
+
     protected int $rep;
     protected int $weekly_rep;
     protected int $weekly_pvp_rep;
@@ -209,6 +211,9 @@ class UserReputation {
     public array $benefits;
 
     public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$last_pvp_kills, &$last_killer_ids, $mission_cd, $event) {
+        //System data
+        $this->event = $event;
+
         //Player data
         $this->rep = &$player_rep;
         $this->weekly_rep = &$player_weekly_rep;
@@ -261,7 +266,13 @@ class UserReputation {
             }
             $this->weekly_rep += $amount;
         }
-        // Pvp rep
+
+        //Double reputation
+        if (!empty($this->event) && $this->event instanceof DoubleReputation) {
+            $amount *= DoubleReputation::rep_modifier;
+        }
+
+        // Increment Pvp rep
         if($increment_pvp) {
             if($this->weekly_pvp_rep + $amount > $this->weekly_pvp_cap) {
                 $amount = $this->weekly_pvp_cap - $this->weekly_pvp_rep;

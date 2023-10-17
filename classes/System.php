@@ -9,6 +9,7 @@ require_once __DIR__ . '/Layout.php';
 require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/Route.php';
 require_once __DIR__ . '/../classes/event/DoubleExpEvent.php';
+require_once __DIR__ . '/../classes/event/DoubleReputation.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -603,25 +604,42 @@ class System {
         return $this->environment == System::ENVIRONMENT_DEV;
     }
 
+    // Note: The system can currently only support one event type
     public function checkForActiveEvent(): void {
+        // Base data
         $current_datetime = new DateTimeImmutable();
         $this->event = null;
-        // July 2023 Lantern Event
-        $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
-        $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
-        $september_2023_double_exp_start_time = new DateTimeImmutable('2023-09-19');
-        $september_2023_double_exp_end_time = new DateTimeImmutable('2023-10-4');
+
+        // Dev Environment Event start times
         if($this->isDevEnvironment()) {
             $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-15');
-            $september_2023_double_exp_start_time = new DateTimeImmutable('2023-09-13');
+            $double_exp_start_time = new DateTimeImmutable('2023-09-13');
+            $double_reputation_start_time = new DateTimeImmutable('2023-10-16');
+        }
+        // Production Event start times
+        else {
+            $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
+            $double_exp_start_time = new DateTimeImmutable('2023-09-19');
+            $double_reputation_start_time = new DateTimeImmutable('2023-10-18');
+        }
+        /*****CORE EVENTS*****/
+        // TODO: Make core events more manageable
+        // Double exp gains
+        $double_exp_end_time = new DateTimeImmutable('2023-10-4');
+        if($current_datetime > $double_exp_start_time && $current_datetime < $double_exp_end_time) {
+            $this->event = new DoubleExpEvent($double_exp_end_time);
+        }
+        // Double reputation gains
+        $double_reputation_end_time = new DateTimeImmutable('2023-10-28');
+        if($current_datetime > $double_reputation_start_time && $current_datetime < $double_reputation_end_time) {
+            $this->event = new DoubleReputation($double_reputation_end_time);
         }
 
+        /*****LIMITED TIME EVENTS*****/
+        // July 2023 Lantern Event
+        $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
         if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
             $this->event = new LanternEvent($july_2023_lantern_event_end_time);
-        }
-
-        if ($current_datetime > $september_2023_double_exp_start_time && $current_datetime < $september_2023_double_exp_end_time) {
-            $this->event = new DoubleExpEvent($september_2023_double_exp_end_time);
         }
     }
 
