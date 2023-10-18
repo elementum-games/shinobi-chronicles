@@ -99,7 +99,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_CARAVAN_SPEED => 25,
                 self::POLICY_BONUS_PATROL_RESPAWN => 0,
                 self::POLICY_BONUS_PATROL_TIER => 0,
-                self::POLICY_BONUS_TRAINING_SPEED => 10,
+                self::POLICY_BONUS_TRAINING_SPEED => 5,
                 self::POLICY_BONUS_FREE_TRANSFER => true,
                 self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 100,
                 self::POLICY_BONUS_SCOUTING => 0,
