@@ -111,7 +111,7 @@ class Operation
                 $speed = self::LOOT_OPERATION_SPEED;
                 break;
             case self::OPERATION_INFILTRATE:
-                $interval = self::BASE_OPERATION_INTERVAL * 1000;
+                $interval = self::BASE_OPERATION_INTERVAL;
                 $interval = round($interval * (100 / (100 + $this->user->village->policy->infiltrate_speed)), 1);
                 $cost = self::BASE_OPERATION_COST;
                 $speed = self::BASE_OPERATION_SPEED;
@@ -174,7 +174,7 @@ class Operation
             switch ($this->type) {
                 case self::OPERATION_INFILTRATE:
                     if ($loot_count >= $max_loot) {
-                        $message .= "You cannot carry any more loot!";
+                        $message .= "You cannot carry any more resources!";
                         break;
                     }
                     if ($location_target['resource_count'] > 0) {
@@ -222,11 +222,16 @@ class Operation
                     break;
                 case self::OPERATION_LOOT:
                     if ($loot_count >= $max_loot) {
-                        $message .= "You cannot carry any more loot!";
+                        $message .= "You cannot carry any more resources!";
                         break;
                     }
                     $caravan_resources = json_decode($caravan_target['resources'], true);
+                    $stolen_resources = [];
                     for ($i = 0; $i < self::LOOT_GAIN; $i++) {
+                        if ($loot_count >= $max_loot) {
+                            $message .= "You cannot carry any more resources!";
+                            break;
+                        }
                         if (!empty($caravan_resources)) {
                             $random_resource = array_rand($caravan_resources);
                             $caravan_resources[$random_resource]--;
@@ -234,11 +239,25 @@ class Operation
                                 unset($caravan_resources[$random_resource]);
                             }
                             $this->system->db->query("INSERT INTO `loot` (`user_id`, `resource_id`, `target_village_id`) VALUES ({$this->user_id}, {$random_resource}, {$this->target_village})");
-                            $message .= "Stole 1 " . System::unSlug(WarManager::RESOURCE_NAMES[$random_resource]) . "! ";
+                            if (!isset($stolen_resources[$random_resource])) {
+                                $stolen_resources[$random_resource] = 0;
+                            }
+                            $stolen_resources[$random_resource]++;
                         } else {
                             $message .= "Target has run out of resources!";
+                            break;
                         }
                     }
+                    $stolen_messages = [];
+                    foreach ($stolen_resources as $resource_id => $count) {
+                        if (count($stolen_messages) > 0) {
+                            $stolen_messages[] = "$count " . System::unSlug(WarManager::RESOURCE_NAMES[$resource_id]);
+                        } else {
+                            $stolen_messages[] = "Stole $count " . System::unSlug(WarManager::RESOURCE_NAMES[$resource_id]);
+                        }
+
+                    }
+                    $message .= implode(", ", $stolen_messages) . ".";
                     $caravan_resources = json_encode($caravan_resources);
                     $this->system->db->query("UPDATE `caravans` SET `resources` = '{$caravan_resources}' WHERE `id` = {$this->target_id}");
                     break;

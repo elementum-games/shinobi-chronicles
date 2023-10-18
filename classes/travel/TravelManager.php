@@ -1032,6 +1032,7 @@ class TravelManager {
                     return true;
                 }
             }
+            return false;
         } else {
             $target = $this->system->db->query("SELECT `id` FROM `region_locations`
                 WHERE `x` = {$this->user->location->x}

@@ -45,7 +45,7 @@ class WarManager {
         4 => 0,
     ];
     const PATROL_RESPAWN_TIME = 600;
-    const BASE_LOOT_CAPACITY = 15;
+    const BASE_LOOT_CAPACITY = 25;
 
     private System $system;
     private User $user;

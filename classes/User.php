@@ -905,6 +905,10 @@ class User extends Fighter {
         // Get current region
         $this->region = $this->getCurrentRegion();
 
+        // Apply policy benefits
+        $this->scout_range += $this->village->policy->scouting;
+        $this->stealth += $this->village->policy->stealth;
+
         return;
     }
 
