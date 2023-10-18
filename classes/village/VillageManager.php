@@ -786,6 +786,22 @@ class VillageManager {
         $time = time();
         switch ($proposal['type']) {
             case self::PROPOSAL_TYPE_CHANGE_POLICY:
+                // policy restriction - check not in alliance
+                if (VillagePolicy::$POLICY_EFFECTS[$proposal['policy_id']][VillagePolicy::POLICY_RESTRICTION_ALLIANCE_ENABLED] == false) {
+                    $relation_type = VillageRelation::RELATION_ALLIANCE;
+                    $system->db->query("SELECT COUNT(*) FROM `village_relations` WHERE `relation_end` IS NULL AND `relation_type` = {$relation_type} AND (`village1_id` = {$proposal['village_id']} OR `village2_id` = {$proposal['village_id']})");
+                    if ($system->db->last_num_rows > 0) {
+                        return "Cannot change policy to " . VillagePolicy::POLICY_NAMES[$proposal['policy_id']] . " while in an active alliance.";
+                    }
+                }
+                // policy restriction - check not in offensive war, village1_id is always the initiating village
+                if (VillagePolicy::$POLICY_EFFECTS[$proposal['policy_id']][VillagePolicy::POLICY_RESTRICTION_WAR_ENABLED] == false) {
+                    $relation_type = VillageRelation::RELATION_WAR;
+                    $system->db->query("SELECT COUNT(*) FROM `village_relations` WHERE `relation_end` IS NULL AND `relation_type` = {$relation_type} AND `village1_id` = {$proposal['village_id']}");
+                    if ($system->db->last_num_rows > 0) {
+                        return "Cannot change policy to " . VillagePolicy::POLICY_NAMES[$proposal['policy_id']] . " while in an offensive war.";
+                    }
+                }
                 // update village policy
                 $system->db->query("UPDATE `villages` SET `policy_id` = {$proposal['policy_id']} WHERE `village_id` = {$proposal['village_id']}");
                 // create notifications
@@ -818,6 +834,12 @@ class VillageManager {
                 if (!$player->village->isNeutral($proposal['target_village_id'])) {
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
                     return "Proposal canceled. Villages must be neutral to declare war.";
+                }
+                // check diplomatic restriction
+                $policy_result = $system->db->query("SELECT `policy_id` FROM `villages` WHERE `village_id` = {$proposal['village_id']}");
+                $policy_result = $system->db->fetch($policy_result);
+                if (VillagePolicy::$POLICY_EFFECTS[$policy_result['policy_id']][VillagePolicy::POLICY_RESTRICTION_WAR_ENABLED] == false) {
+                    return "Cannot declare war due to policy restriction.";
                 }
                 // update relation
                 self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_WAR, $proposal['type']);
@@ -911,6 +933,17 @@ class VillageManager {
                 if (!$player->village->isNeutral($proposal['target_village_id'])) {
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
                     return "Proposal canceled. Villages must be neutral to form alliance.";
+                }
+                // check diplomatic restriction
+                $policy_result = $system->db->query("SELECT `policy_id` FROM `villages` WHERE `village_id` = {$proposal['village_id']}");
+                $policy_result = $system->db->fetch($policy_result);
+                if (VillagePolicy::$POLICY_EFFECTS[$policy_result['policy_id']][VillagePolicy::POLICY_RESTRICTION_ALLIANCE_ENABLED] == false) {
+                    return "Cannot declare war due to policy restriction.";
+                }
+                $policy_result = $system->db->query("SELECT `policy_id` FROM `villages` WHERE `village_id` = {$proposal['target_village_id']}");
+                $policy_result = $system->db->fetch($policy_result);
+                if (VillagePolicy::$POLICY_EFFECTS[$proposal['target_village_id']][VillagePolicy::POLICY_RESTRICTION_ALLIANCE_ENABLED] == false) {
+                    return "Cannot form alliance due to policy restriction.";
                 }
                 // update relation
                 self::setNewRelations($system, $proposal['target_village_id'], $proposal['village_id'], VillageRelation::RELATION_ALLIANCE, $proposal['type']);
