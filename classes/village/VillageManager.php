@@ -413,9 +413,9 @@ class VillageManager {
     /**
      * @return VillageSeatDto
      */
-    public static function getPlayerSeat(System $system, int $player_id): VillageSeatDto
+    public static function getPlayerSeat(System $system, User $player): VillageSeatDto
     {
-        $result = $system->db->query("SELECT * FROM `village_seats` WHERE `user_id` = {$player_id} AND `seat_end` IS NULL LIMIT 1");
+        $result = $system->db->query("SELECT * FROM `village_seats` WHERE `user_id` = {$player->user_id} AND `seat_end` IS NULL LIMIT 1");
         $result = $system->db->fetch($result);
         if (empty($result)) {
             $seat = new VillageSeatDto(
@@ -429,22 +429,63 @@ class VillageManager {
                 user_name: null,
                 avatar_link: null,
                 is_provisional: null
-
             );
             return $seat;
+        } else {
+            $seat = new VillageSeatDto(
+                seat_key: null,
+                seat_id: $result['seat_id'],
+                user_id: $player->user_id,
+                village_id: $result['village_id'],
+                seat_type: $result['seat_type'],
+                seat_title: $result['seat_title'],
+                seat_start: $result['seat_start'],
+                user_name: null,
+                avatar_link: null,
+                is_provisional: $result['is_provisional']
+            );
+            // check requirement met
+            switch ($result['seat_type']) {
+                case "kage":
+                    if ($player->reputation->rank < self::MIN_KAGE_CLAIM_TIER) {
+                        $player->village_seat = $seat;
+                        self::resign($system, $player);
+                        $seat = new VillageSeatDto(
+                            seat_key: null,
+                            seat_id: null,
+                            user_id: null,
+                            village_id: null,
+                            seat_type: null,
+                            seat_title: null,
+                            seat_start: null,
+                            user_name: null,
+                            avatar_link: null,
+                            is_provisional: null
+                        );
+                    }
+                    break;
+                case "elder":
+                    if ($player->reputation->rank < self::MIN_ELDER_CLAIM_TIER) {
+                        $player->village_seat = $seat;
+                        self::resign($system, $player);
+                        $seat = new VillageSeatDto(
+                            seat_key: null,
+                            seat_id: null,
+                            user_id: null,
+                            village_id: null,
+                            seat_type: null,
+                            seat_title: null,
+                            seat_start: null,
+                            user_name: null,
+                            avatar_link: null,
+                            is_provisional: null
+                        );
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
-        $seat = new VillageSeatDto(
-            seat_key: null,
-            seat_id: $result['seat_id'],
-            user_id: $player_id,
-            village_id: $result['village_id'],
-            seat_type: $result['seat_type'],
-            seat_title: $result['seat_title'],
-            seat_start: $result['seat_start'],
-            user_name: null,
-            avatar_link: null,
-            is_provisional: $result['is_provisional']
-        );
         return $seat;
     }
 

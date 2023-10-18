@@ -900,7 +900,7 @@ class User extends Fighter {
         $this->loadTrainingManager();
 
         // Get village seat
-        $this->village_seat = VillageManager::getPlayerSeat($this->system, $this->user_id);
+        $this->village_seat = VillageManager::getPlayerSeat($this->system, $this);
 
         // Get current region
         $this->region = $this->getCurrentRegion();
