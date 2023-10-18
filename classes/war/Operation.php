@@ -45,15 +45,15 @@ class Operation
         self::OPERATION_LOOT => 50,
     ];*/
 
-    const BASE_OPERATION_SPEED = 20; // progress per interval
-    const BASE_OPERATION_INTERVAL = 12; // time per interval
-    const BASE_OPERATION_COST = 150; // chakra/stam cost per interval, 750 total
+    const BASE_OPERATION_INTERVAL_PROGRESS_PERCENT = 20; // progress per interval
+    const BASE_OPERATION_INTERVAL_SECONDS = 12; // time per interval
+    const BASE_OPERATION_POOL_COST = 150; // chakra/stam cost per interval, 750 total
     /* 100 / 20 * 12s = 60s */
 
     const LOOT_GAIN = 5;
-    const LOOT_OPERATION_SPEED = 100; // each loot action is only 1 interval
-    const LOOT_OPERATION_INTERVAL = 6; // takes half time as normal
-    const LOOT_OPERATION_COST = 75; // takes half pool cost
+    const LOOT_OPERATION_INTERVAL_PROGRESS_PERCENT = 100; // each loot action is only 1 interval
+    const LOOT_OPERATION_INTERVAL_SECONDS = 6; // takes half time as normal
+    const LOOT_OPERATION_POOL_COST = 75; // takes half pool cost
     /* 100 / 100 * 6s = 6s */
 
 
@@ -79,9 +79,9 @@ class Operation
         $this->system = $system;
         $this->user = $user;
         if ($this->type == self::OPERATION_LOOT) {
-            $interval = self::LOOT_OPERATION_INTERVAL;
+            $interval = self::LOOT_OPERATION_INTERVAL_SECONDS;
         } else {
-            $interval = self::BASE_OPERATION_INTERVAL;
+            $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
         }
         $this->interval_progress = (((microtime(true) * 1000) - $this->last_update_ms) / ($interval * 1000)) * 100;
     }
@@ -106,32 +106,32 @@ class Operation
         $message = '';
         switch ($this->type) {
             case self::OPERATION_LOOT:
-                $interval = self::LOOT_OPERATION_INTERVAL;
-                $cost = self::LOOT_OPERATION_COST;
-                $speed = self::LOOT_OPERATION_SPEED;
+                $interval = self::LOOT_OPERATION_INTERVAL_SECONDS;
+                $cost = self::LOOT_OPERATION_POOL_COST;
+                $speed = self::LOOT_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
             case self::OPERATION_INFILTRATE:
-                $interval = self::BASE_OPERATION_INTERVAL;
+                $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
                 $interval = round($interval * (100 / (100 + $this->user->village->policy->infiltrate_speed)), 1);
-                $cost = self::BASE_OPERATION_COST;
-                $speed = self::BASE_OPERATION_SPEED;
+                $cost = self::BASE_OPERATION_POOL_COST;
+                $speed = self::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
             case self::OPERATION_REINFORCE:
-                $interval = self::BASE_OPERATION_INTERVAL;
+                $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
                 $interval = round($interval * (100 / (100 + $this->user->village->policy->reinforce_speed)), 1);
-                $cost = self::BASE_OPERATION_COST;
-                $speed = self::BASE_OPERATION_SPEED;
+                $cost = self::BASE_OPERATION_POOL_COST;
+                $speed = self::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
             case self::OPERATION_RAID:
-                $interval = self::BASE_OPERATION_INTERVAL;
+                $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
                 $interval = round($interval * (100 / (100 + $this->user->village->policy->raid_speed)), 1);
-                $cost = self::BASE_OPERATION_COST;
-                $speed = self::BASE_OPERATION_SPEED;
+                $cost = self::BASE_OPERATION_POOL_COST;
+                $speed = self::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
             default:
-                $interval = self::BASE_OPERATION_INTERVAL;
-                $cost = self::BASE_OPERATION_COST;
-                $speed = self::BASE_OPERATION_SPEED;
+                $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
+                $cost = self::BASE_OPERATION_POOL_COST;
+                $speed = self::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
         }
 

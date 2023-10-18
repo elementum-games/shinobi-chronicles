@@ -372,13 +372,13 @@ class VillageManager {
             $result = $system->db->fetch($result);
             $resource_history[$resource_id]['collected'] = (int)$result['collected'];
             // get claimed
-            $result = $system->db->query("SELECT COUNT(*) as 'claimed' FROM `loot` WHERE `resource_id` = {$resource_id} AND `claimed_village_id` = {$village_id} AND `claimed_time` > {$time}");
+            $result = $system->db->query("SELECT COUNT(*) as 'claimed_loot_count' FROM `loot` WHERE `resource_id` = {$resource_id} AND `claimed_village_id` = {$village_id} AND `claimed_time` > {$time}");
             $result = $system->db->fetch($result);
-            $resource_history[$resource_id]['claimed'] = (int)$result['claimed'];
+            $resource_history[$resource_id]['claimed'] = (int)$result['claimed_loot_count'];
             // get lost (lol)
-            $result = $system->db->query("SELECT COUNT(*) as 'lost' FROM `loot` WHERE `resource_id` = {$resource_id} AND `target_village_id` = {$village_id} AND (`claimed_village_id` != {$village_id} OR `claimed_village_id` IS NULL) AND (`claimed_time` > {$time} OR `claimed_time` IS NULL)");
+            $result = $system->db->query("SELECT COUNT(*) as 'lost_loot_count' FROM `loot` WHERE `resource_id` = {$resource_id} AND `target_village_id` = {$village_id} AND (`claimed_village_id` != {$village_id} OR `claimed_village_id` IS NULL) AND (`claimed_time` > {$time} OR `claimed_time` IS NULL)");
             $result = $system->db->fetch($result);
-            $resource_history[$resource_id]['lost'] = (int) $result['lost'];
+            $resource_history[$resource_id]['lost'] = (int) $result['lost_loot_count'];
             // get upkeep - WIP
             $result = $system->db->query("SELECT SUM(`quantity`) as 'spent' FROM `resource_logs` WHERE `resource_id` = {$resource_id} AND `village_id` = {$village_id} AND `type` = " . self::RESOURCE_LOG_EXPENSE . " AND `time` > {$time}");
             $result = $system->db->fetch($result);

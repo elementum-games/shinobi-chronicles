@@ -374,7 +374,7 @@ class WarManager {
         return $message;
     }
 
-    public function handlePatrolDefeat(int $patrol_id) {
+    public function handleWinAgainstPatrol(int $patrol_id) {
         $x = mt_rand(1, 100);
         if ($x <= self::PATROL_CHANCE[3]) {
             $name = self::PATROL_NAMES[min(3 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
@@ -393,7 +393,7 @@ class WarManager {
         $this->system->db->query("UPDATE `patrols` SET `start_time` = {$respawn_time}, `name` = '{$name}', `ai_id` = {$ai_id}, `tier` = {$tier} WHERE `id` = {$patrol_id}");
     }
 
-    public function handlePatrolWin(int $patrol_id): string
+    public function handleLossAgainstPatrol(int $patrol_id): string
     {
         $message = '';
         // get patrol
