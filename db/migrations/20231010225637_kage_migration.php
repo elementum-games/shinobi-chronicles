@@ -52,6 +52,9 @@ final class KageMigration extends AbstractMigration
 
             -- Alter table notifications
             ALTER TABLE `notifications` ADD `expires` INT(11) NULL DEFAULT NULL;
+
+            -- Alter table 
+            UPDATE `region_locations` SET `name` = 'Nekogakure' WHERE `id` = 29;
         ");
     }
 

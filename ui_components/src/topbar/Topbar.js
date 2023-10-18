@@ -130,10 +130,11 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
          "proposal_canceled",
          "proposal_expired",
          "policy_change",
-         "declare_war",
-         "form_alliance",
-         "end_war",
-         "end_alliance"
+         "diplomacy_declare_war",
+         "diplomacy_form_alliance",
+         "diplomacy_end_war",
+         "diplomacy_end_alliance",
+         "news"
     ];
 
     return (

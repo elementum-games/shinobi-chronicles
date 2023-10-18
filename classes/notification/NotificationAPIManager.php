@@ -222,6 +222,7 @@ class NotificationAPIManager {
                 case NotificationManager::NOTIFICATION_DIPLOMACY_ALLIANCE:
                 case NotificationManager::NOTIFICATION_DIPLOMACY_END_WAR:
                 case NotificationManager::NOTIFICATION_DIPLOMACY_END_ALLIANCE:
+                case NotificationManager::NOTIFICATION_POLICY_CHANGE:
                     if (false) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
@@ -234,7 +235,7 @@ class NotificationAPIManager {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
-                        $notifications[] = NotificationDto::fromDb($row, "/?home&view=news");
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->base_url . "?home&view=news");
                     }
                     break;
                 default:

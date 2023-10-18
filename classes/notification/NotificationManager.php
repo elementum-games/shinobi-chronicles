@@ -38,8 +38,8 @@ class NotificationManager {
     const NOTIFICATION_PROPOSAL_CANCELED = "proposal_canceled";
     const NOTIFICATION_PROPOSAL_EXPIRED = "proposal_expired";
     const NOTIFICATION_POLICY_CHANGE = "policy_change";
-    const NOTIFICATION_DIPLOMACY_WAR = "diplomacy_war";
-    const NOTIFICATION_DIPLOMACY_ALLIANCE = "diplomacy_alliance";
+    const NOTIFICATION_DIPLOMACY_WAR = "diplomacy_declare_war";
+    const NOTIFICATION_DIPLOMACY_ALLIANCE = "diplomacy_form_alliance";
     const NOTIFICATION_DIPLOMACY_END_WAR = "diplomacy_end_war";
     const NOTIFICATION_DIPLOMACY_END_ALLIANCE = "diplomacy_end_alliance";
     const NOTIFICATION_NEWS = "news";
@@ -50,8 +50,8 @@ class NotificationManager {
     const NOTIFICATION_EXPIRATION_DAYS_PROPOSAL = 3;
     const NOTIFICATION_EXPIRATION_DAYS_DIPLOMACY = 3;
     const NOTIFICATION_EXPIRATION_DAYS_NEWS = 14;
-    //const NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION = 1;
-    //const NOTIFICATION_EXPIRATION_DAYS_TRAINING = 1;
+    const NOTIFICATION_EXPIRATION_DAYS_CHAT = 7;
+    const NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION = 1;
 
     public static function createNotification(NotificationDto $notification, System $system, int $UPDATE, int $limit = 5): bool {
         $db_modified = false;

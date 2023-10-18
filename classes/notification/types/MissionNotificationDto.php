@@ -23,7 +23,6 @@ class MissionNotificationDto extends NotificationDto {
             $user_id,
             $created,
             $duration,
-            $expires,
             $alert,
         );
         $this->mission_rank = $mission_rank;

@@ -928,9 +928,17 @@ function KageQuarters({
                                             </div>
                                         }
                                         <div className="active_proposal_name_container">
+                                            <svg className="proposal_decoration_nw" width="18" height="8">
+                                                <polygon points="0,4 4,0 8,4 4,8" fill="#ad9357" />
+                                                <polygon points="10,4 14,0 18,4 14,8" fill="#ad9357" />
+                                            </svg>
                                             <div className="active_proposal_name">
                                                 {currentProposal ? currentProposal.name : "NO ACTIVE PROPOSALs"}
                                             </div>
+                                            <svg className="proposal_decoration_se" width="18" height="8">
+                                                <polygon points="0,4 4,0 8,4 4,8" fill="#ad9357" />
+                                                <polygon points="10,4 14,0 18,4 14,8" fill="#ad9357" />
+                                            </svg>
                                         </div>
                                         <div className="active_proposal_timer">
                                             {(currentProposal && currentProposal.vote_time_remaining !== null) && currentProposal.vote_time_remaining}

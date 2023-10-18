@@ -839,7 +839,7 @@
     font-family: var(--font-secondary);
     text-transform: uppercase;
     font-size: 10px;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     margin-top: 15px;
 }
 .proposal_container_left {
@@ -866,6 +866,17 @@
     height: 30px;
     border: 1px solid #2e2b38;
     background-color: #1c1a25;
+    position: relative;
+}
+.proposal_decoration_nw {
+    position: absolute;
+    top: -4px;
+    left: 7px;
+}
+.proposal_decoration_se {
+    position: absolute;
+    bottom: -4px;
+    right: 7px;
 }
 .active_proposal_name {
     height: 100%;

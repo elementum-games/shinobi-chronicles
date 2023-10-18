@@ -23,7 +23,6 @@ class BattleNotificationDto extends NotificationDto {
             $user_id,
             $created,
             $duration,
-            $expires,
             $alert,
         );
         $this->battle_id = $battle_id;

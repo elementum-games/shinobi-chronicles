@@ -929,9 +929,29 @@ function KageQuarters({
     className: "proposal_count"
   }, "PROPOSAL 0 OUT OF ", proposalDataState.length), /*#__PURE__*/React.createElement("div", {
     className: "active_proposal_name_container"
-  }, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "proposal_decoration_nw",
+    width: "18",
+    height: "8"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "0,4 4,0 8,4 4,8",
+    fill: "#ad9357"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "10,4 14,0 18,4 14,8",
+    fill: "#ad9357"
+  })), /*#__PURE__*/React.createElement("div", {
     className: "active_proposal_name"
-  }, currentProposal ? currentProposal.name : "NO ACTIVE PROPOSALs")), /*#__PURE__*/React.createElement("div", {
+  }, currentProposal ? currentProposal.name : "NO ACTIVE PROPOSALs"), /*#__PURE__*/React.createElement("svg", {
+    className: "proposal_decoration_se",
+    width: "18",
+    height: "8"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "0,4 4,0 8,4 4,8",
+    fill: "#ad9357"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "10,4 14,0 18,4 14,8",
+    fill: "#ad9357"
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "active_proposal_timer"
   }, currentProposal && currentProposal.vote_time_remaining !== null && currentProposal.vote_time_remaining, currentProposal && currentProposal.enact_time_remaining !== null && currentProposal.enact_time_remaining)), /*#__PURE__*/React.createElement("div", {
     className: "proposal_container_right"

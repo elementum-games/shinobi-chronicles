@@ -771,7 +771,7 @@ class TravelManager {
             }
             if ($this->user->mission_stage['action_type'] == 'search') {
                 $mission_result = $this->system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
-                $mission_location = TravelCoords::fromDbString($this->user->mission_stage['last_location']);
+                $mission_location = !empty($this->user->mission_stage['last_location']) ? TravelCoords::fromDbString($this->user->mission_stage['last_location']) : TravelCoords::fromDbString($this->user->mission_stage['action_data']);
                 $objectives[] = new MapObjective(
                     id: MapObjective::MISSION_OBJECTIVE_ID,
                     name: $this->system->db->fetch($mission_result)['name'],

@@ -313,6 +313,7 @@ class ChatManager {
                             message: $this->player->user_name . " replied to your post!",
                             user_id: $result['user_id'],
                             created: time(),
+                            expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_CHAT * 86400),
                             alert: false,
                             post_id: $new_post_id,
                         );
@@ -356,6 +357,7 @@ class ChatManager {
                         message: $this->player->user_name . " mentioned you in chat!",
                         user_id: $result['user_id'],
                         created: time(),
+                        expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_CHAT * 86400),
                         alert: false,
                         post_id: $new_post_id,
                     );
