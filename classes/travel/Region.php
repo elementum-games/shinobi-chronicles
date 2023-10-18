@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . "/RegionCoords.php";
+
 class Region {
     public int $region_id = 0;
     public string $name;

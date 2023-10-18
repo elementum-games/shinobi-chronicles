@@ -23,168 +23,12 @@ class VillageManager {
 
     const RESOURCE_LOG_PRODUCTION = 1;
     const RESOURCE_LOG_COLLECTION = 2;
-    const RESOURCE_LOG_EXPENDITURE = 3;
+    const RESOURCE_LOG_EXPENSE = 3;
 
     const MIN_KAGE_CLAIM_TIER = 5;
-    const MIN_KAGE_CHALLENGE_TIER = 6;
+    const MIN_KAGE_CHALLENGE_TIER = 5;
     const MIN_ELDER_CLAIM_TIER = 4;
     const MIN_ELDER_CHALLENGE_TIER = 5;
-
-    const POLICY_NONE = 0;
-    const POLICY_GROWTH = 1;
-    const POLICY_ESPIONAGE = 2;
-    const POLICY_DEFENSE = 3;
-    const POLICY_WAR = 4;
-    const POLICY_PROSPERITY = 5;
-
-    const POLICY_NAMES = [
-        self::POLICY_NONE => "Inactive Policy",
-        self::POLICY_GROWTH => "From the Ashes",
-        self::POLICY_ESPIONAGE => "Eye of the Storm",
-        self::POLICY_DEFENSE => "Fortress of Solitude",
-        self::POLICY_WAR => "Forged in Flames",
-        self::POLICY_PROSPERITY => "The Gilded Hand",
-    ];
-
-    const POLICY_BONUS_INFILTRATE_SPEED = "INFILTRATE_SPEED";
-    const POLICY_BONUS_INFILTRATE_LOOT = "INFILTRATE_LOOT";
-    const POLICY_BONUS_REINFORCE_SPEED = "REINFORCE_SPEED";
-    const POLICY_BONUS_REINFORCE_DEFENSE = "REINFORCE_DEFENSE";
-    const POLICY_BONUS_RAID_SPEED = "RAID_SPEED";
-    const POLICY_BONUS_RAID_DEFENSE = "RAID_DEFENSE";
-    const POLICY_BONUS_CARAVAN_SPEED = "CARAVAN_SPEED";
-    const POLICY_BONUS_PATROL_RESPAWN = "PATROL_RESPAWN";
-    const POLICY_BONUS_PATROL_TIER = "PATROL_TIER";
-    const POLICY_BONUS_TRAINING_SPEED = "TRAINING_SPEED";
-    const POLICY_BONUS_FREE_TRANSFER = "FREE_TRANSFER";
-    const POLICY_BONUS_HOME_PRODUCTION_BOOST = "HOME_PRODUCTION_BOOST";
-    const POLICY_BONUS_SCOUTING = "SCOUTING";
-    const POLICY_BONUS_STEALTH = "STEALTH";
-    const POLICY_BONUS_LOOT_CAPACITY = "LOOT_CAPACITY";
-    const POLICY_BONUS_PVP_VILLAGE_POINT = "PVP_VILLAGE_POINT";
-    const POLICY_RESTRICTION_WAR_ENABLED = "WAR_ENABLED";
-    const POLICY_RESTRICTION_ALLIANCE_ENABLED = "ALLIANCE_ENABLED";
-    const POLICY_COST_MATERIALS = "MATERIALS_COST";
-    const POLICY_COST_FOOD = "FOOD_COST";
-    const POLICY_COST_WEALTH = "WEALTH_COST";
-
-    const POLICY_EFFECTS = [
-        POLICY_NONE => [
-            self::POLICY_BONUS_INFILTRATE_SPEED => 0,
-            self::POLICY_BONUS_INFILTRATE_LOOT => 0,
-            self::POLICY_BONUS_REINFORCE_SPEED => 0,
-            self::POLICY_BONUS_REINFORCE_DEFENSE => 0,
-            self::POLICY_BONUS_RAID_SPEED => 0,
-            self::POLICY_BONUS_RAID_DEFENSE => 0,
-            self::POLICY_BONUS_CARAVAN_SPEED => 0,
-            self::POLICY_BONUS_PATROL_RESPAWN => 0,
-            self::POLICY_BONUS_PATROL_TIER => 0,
-            self::POLICY_BONUS_TRAINING_SPEED => 0,
-            self::POLICY_BONUS_FREE_TRANSFER => false,
-            self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 0,
-            self::POLICY_BONUS_SCOUTING => 0,
-            self::POLICY_BONUS_STEALTH => 0,
-            self::POLICY_BONUS_LOOT_CAPACITY => 0,
-            self::POLICY_BONUS_PVP_VILLAGE_POINT => 0,
-            self::POLICY_RESTRICTION_WAR_ENABLED => true,
-            self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
-            self::POLICY_COST_MATERIALS => 0,
-            self::POLICY_COST_FOOD => 0,
-            self::POLICY_COST_WEALTH => 0,
-        ],
-        POLICY_GROWTH => [
-            self::POLICY_BONUS_INFILTRATE_SPEED => 0,
-            self::POLICY_BONUS_INFILTRATE_LOOT => 0,
-            self::POLICY_BONUS_REINFORCE_SPEED => 0,
-            self::POLICY_BONUS_REINFORCE_DEFENSE => 0,
-            self::POLICY_BONUS_RAID_SPEED => 0,
-            self::POLICY_BONUS_RAID_DEFENSE => 0,
-            self::POLICY_BONUS_CARAVAN_SPEED => 25,
-            self::POLICY_BONUS_PATROL_RESPAWN => 0,
-            self::POLICY_BONUS_PATROL_TIER => 0,
-            self::POLICY_BONUS_TRAINING_SPEED => 10,
-            self::POLICY_BONUS_FREE_TRANSFER => true,
-            self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 100,
-            self::POLICY_BONUS_SCOUTING => 0,
-            self::POLICY_BONUS_STEALTH => 0,
-            self::POLICY_BONUS_LOOT_CAPACITY => 0,
-            self::POLICY_BONUS_PVP_VILLAGE_POINT => 0,
-            self::POLICY_RESTRICTION_WAR_ENABLED => false,
-            self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
-            self::POLICY_COST_MATERIALS => 0,
-            self::POLICY_COST_FOOD => 25,
-            self::POLICY_COST_WEALTH => 0,
-        ],
-        POLICY_ESPIONAGE => [
-            self::POLICY_BONUS_INFILTRATE_SPEED => 25,
-            self::POLICY_BONUS_INFILTRATE_LOOT => 1,
-            self::POLICY_BONUS_REINFORCE_SPEED => 0,
-            self::POLICY_BONUS_REINFORCE_DEFENSE => 0,
-            self::POLICY_BONUS_RAID_SPEED => 0,
-            self::POLICY_BONUS_RAID_DEFENSE => 0,
-            self::POLICY_BONUS_CARAVAN_SPEED => 0,
-            self::POLICY_BONUS_PATROL_RESPAWN => 0,
-            self::POLICY_BONUS_PATROL_TIER => 0,
-            self::POLICY_BONUS_TRAINING_SPEED => 0,
-            self::POLICY_BONUS_FREE_TRANSFER => false,
-            self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 0,
-            self::POLICY_BONUS_SCOUTING => 0,
-            self::POLICY_BONUS_STEALTH => 1,
-            self::POLICY_BONUS_LOOT_CAPACITY => 5,
-            self::POLICY_BONUS_PVP_VILLAGE_POINT => 0,
-            self::POLICY_RESTRICTION_WAR_ENABLED => true,
-            self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
-            self::POLICY_COST_MATERIALS => 0,
-            self::POLICY_COST_FOOD => 0,
-            self::POLICY_COST_WEALTH => 25,
-        ],
-        POLICY_DEFENSE => [
-            self::POLICY_BONUS_INFILTRATE_SPEED => 0,
-            self::POLICY_BONUS_INFILTRATE_LOOT => 0,
-            self::POLICY_BONUS_REINFORCE_SPEED => 25,
-            self::POLICY_BONUS_REINFORCE_DEFENSE => 1,
-            self::POLICY_BONUS_RAID_SPEED => 0,
-            self::POLICY_BONUS_RAID_DEFENSE => 0,
-            self::POLICY_BONUS_CARAVAN_SPEED => 0,
-            self::POLICY_BONUS_PATROL_RESPAWN => 0,
-            self::POLICY_BONUS_PATROL_TIER => 1,
-            self::POLICY_BONUS_TRAINING_SPEED => 0,
-            self::POLICY_BONUS_FREE_TRANSFER => false,
-            self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 0,
-            self::POLICY_BONUS_SCOUTING => 1,
-            self::POLICY_BONUS_STEALTH => 0,
-            self::POLICY_BONUS_LOOT_CAPACITY => 0,
-            self::POLICY_BONUS_PVP_VILLAGE_POINT => 0,
-            self::POLICY_RESTRICTION_WAR_ENABLED => true,
-            self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
-            self::POLICY_COST_MATERIALS => 25,
-            self::POLICY_COST_FOOD => 0,
-            self::POLICY_COST_WEALTH => 0,
-        ],
-        POLICY_WAR => [
-            self::POLICY_BONUS_INFILTRATE_SPEED => 0,
-            self::POLICY_BONUS_INFILTRATE_LOOT => 0,
-            self::POLICY_BONUS_REINFORCE_SPEED => 0,
-            self::POLICY_BONUS_REINFORCE_DEFENSE => 0,
-            self::POLICY_BONUS_RAID_SPEED => 25,
-            self::POLICY_BONUS_RAID_DEFENSE => 1,
-            self::POLICY_BONUS_CARAVAN_SPEED => 0,
-            self::POLICY_BONUS_PATROL_RESPAWN => 25,
-            self::POLICY_BONUS_PATROL_TIER => 0,
-            self::POLICY_BONUS_TRAINING_SPEED => 0,
-            self::POLICY_BONUS_FREE_TRANSFER => false,
-            self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 0,
-            self::POLICY_BONUS_SCOUTING => 0,
-            self::POLICY_BONUS_STEALTH => 0,
-            self::POLICY_BONUS_LOOT_CAPACITY => 0,
-            self::POLICY_BONUS_PVP_VILLAGE_POINT => 1,
-            self::POLICY_RESTRICTION_WAR_ENABLED => true,
-            self::POLICY_RESTRICTION_ALLIANCE_ENABLED => false,
-            self::POLICY_COST_MATERIALS => 25,
-            self::POLICY_COST_FOOD => 0,
-            self::POLICY_COST_WEALTH => 0,
-        ],
-    ];
 
     // Set these to correct values for release
     const PROPOSAL_VOTE_HOURS = 0; // 72
@@ -303,11 +147,11 @@ class VillageManager {
     /**
      * @return array
      */
-    public static function getVillagePolicy(System $system, string $village_id): int
+    public static function getVillagePolicyID(System $system, string $village_id): int
     {
-        $policy_result = $system->db->query("SELECT `policy` FROM `villages` WHERE `village_id` = {$village_id}");
+        $policy_result = $system->db->query("SELECT `policy_id` FROM `villages` WHERE `village_id` = {$village_id}");
         $policy_result = $system->db->fetch($policy_result);
-        return $policy_result['policy'];
+        return $policy_result['policy_id'];
     }
 
     /**
@@ -536,7 +380,9 @@ class VillageManager {
             $result = $system->db->fetch($result);
             $resource_history[$resource_id]['lost'] = (int) $result['lost'];
             // get upkeep - WIP
-            $resource_history[$resource_id]['spent'] = 0;
+            $result = $system->db->query("SELECT SUM(`quantity`) as 'spent' FROM `resource_logs` WHERE `resource_id` = {$resource_id} AND `village_id` = {$village_id} AND `type` = " . self::RESOURCE_LOG_EXPENSE . " AND `time` > {$time}");
+            $result = $system->db->fetch($result);
+            $resource_history[$resource_id]['spent'] = (int) $result['spent'];
         }
         return $resource_history;
     }
@@ -700,7 +546,7 @@ class VillageManager {
             }
         }
         // check different policy than current
-        if ($policy_id == $player->village->policy) {
+        if ($policy_id == $player->village->policy_id) {
             return "Selected policy is the same.";
         }
         // check no pending proposal of same type

@@ -4,7 +4,8 @@ class VillageApiPresenter {
     public static function policyDataResponse(System $system, User $player): array
     {
         return [
-            "policy_id" => VillageManager::getVillagePolicy($system, $player->village->village_id),
+            "policy_id" => VillageManager::getVillagePolicyID($system, $player->village->village_id),
+            //"policy" => $player->village->policy,
         ];
     }
     public static function populationDataResponse(System $system, User $player): array

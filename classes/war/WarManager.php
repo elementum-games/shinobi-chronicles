@@ -11,10 +11,15 @@ class WarManager {
     const BASE_CASTLE_HEALTH = 15000;
     const BASE_VILLAGE_DEFENSE = 50;
     const BASE_CASTLE_DEFENSE = 75;
+
+    const RESOURCE_MATERIALS = 1;
+    const RESOURCE_FOOD = 2;
+    const RESOURCE_WEALTH = 3;
+
     const RESOURCE_NAMES = [
-        1 => 'materials',
-        2 => 'food',
-        3 => 'wealth',
+        self::RESOURCE_MATERIALS => 'materials',
+        self::RESOURCE_FOOD => 'food',
+        self::RESOURCE_WEALTH => 'wealth',
         /*4 => 'adamantine',
         5 => 'quicksilver',
         6 => 'elderwood',

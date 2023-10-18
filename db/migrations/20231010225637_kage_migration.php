@@ -45,7 +45,7 @@ final class KageMigration extends AbstractMigration
             PRIMARY KEY (`log_id`));
 
             -- Alter table villages
-            ALTER TABLE `villages` ADD `policy` INT(11) NOT NULL DEFAULT '0';
+            ALTER TABLE `villages` ADD `policy_id` INT(11) NOT NULL DEFAULT '0';
 
             -- Alter table player_seats
             ALTER TABLE `village_seats` ADD `is_provisional` TINYINT(1) NOT NULL DEFAULT 0;
@@ -53,7 +53,7 @@ final class KageMigration extends AbstractMigration
             -- Alter table notifications
             ALTER TABLE `notifications` ADD `expires` INT(11) NULL DEFAULT NULL;
 
-            -- Alter table 
+            -- Update village name
             UPDATE `region_locations` SET `name` = 'Nekogakure' WHERE `id` = 29;
         ");
     }
@@ -74,7 +74,7 @@ final class KageMigration extends AbstractMigration
             DROP TABLE `policy_logs`;
 
             -- Drop column policy from villages
-            ALTER TABLE `villages` DROP COLUMN `policy`;
+            ALTER TABLE `villages` DROP COLUMN `policy_id`;
 
             -- Drop column is_provisional from village_seats;
             ALTER TABLE `village_seats` DROP COLUMN `is_provisional`;
