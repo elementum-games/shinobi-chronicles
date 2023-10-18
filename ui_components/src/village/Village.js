@@ -1363,7 +1363,7 @@ function StrategicInfoItem({ strategicInfoData, getPolicyDisplayData }) {
         <div className="strategic_info_item">
             <div className="strategic_info_name_wrapper">
                 <div className="strategic_info_name">{strategicInfoData.village.name}</div>
-                <div className="strategic_info_policy">{getPolicyDisplayData(strategicInfoData.village.policy).name}</div>
+                <div className="strategic_info_policy">{getPolicyDisplayData(strategicInfoData.village.policy_id).name}</div>
             </div>
             <div className="strategic_info_banner" style={{ backgroundImage: "url(" + getStrategicInfoBanner(strategicInfoData.village.village_id) + ")" }}></div>
             <div className="strategic_info_top">

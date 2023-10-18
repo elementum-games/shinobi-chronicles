@@ -569,7 +569,7 @@ class VillageManager {
         }
         // insert into DB
         $time = time();
-        $name = "Change Policy: " . self::POLICY_NAMES[$policy_id];
+        $name = "Change Policy: " . VillagePolicy::POLICY_NAMES[$policy_id];
         $type = self::PROPOSAL_TYPE_CHANGE_POLICY;
         $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `policy_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$type}', '{$name}', {$policy_id})");
 
@@ -746,12 +746,12 @@ class VillageManager {
         switch ($proposal['type']) {
             case self::PROPOSAL_TYPE_CHANGE_POLICY:
                 // update village policy
-                $system->db->query("UPDATE `villages` SET `policy` = {$proposal['policy_id']} WHERE `village_id` = {$proposal['village_id']}");
+                $system->db->query("UPDATE `villages` SET `policy_id` = {$proposal['policy_id']} WHERE `village_id` = {$proposal['village_id']}");
                 // create notifications
                 $active_threshold = time() - (NotificationManager::ACTIVE_PLAYER_DAYS_LAST_ACTIVE * 86400);
                 $user_ids = $system->db->query("SELECT `user_id` FROM `users` WHERE `village` = '{$player->village->name}' AND `last_login` > {$active_threshold}");
                 $user_ids = $system->db->fetch_all($user_ids);
-                $notification_message = "New village policy: " . self::POLICY_NAMES[$proposal['policy_id']];
+                $notification_message = "New village policy: " . VillagePolicy::POLICY_NAMES[$proposal['policy_id']];
                 foreach ($user_ids as $user) {
                     $new_notification = new NotificationDto(
                         type: NotificationManager::NOTIFICATION_POLICY_CHANGE,
@@ -765,10 +765,10 @@ class VillageManager {
                 }
                 // update policy log
                 $system->db->query("UPDATE `policy_logs` SET `end_time` = {$time} WHERE `village_id` = {$proposal['village_id']} AND `end_time` IS NULL");
-                $system->db->query("INSERT INTO `policy_logs` (`village_id`, `policy`, `start_time`) VALUES ({$proposal['village_id']}, {$proposal['policy_id']}, {$time})");
+                $system->db->query("INSERT INTO `policy_logs` (`village_id`, `policy_id`, `start_time`) VALUES ({$proposal['village_id']}, {$proposal['policy_id']}, {$time})");
                 // update proposal
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
-                $message = "Set village policy: " . self::POLICY_NAMES[$proposal['policy_id']] . ".";
+                $message = "Set village policy: " . VillagePolicy::POLICY_NAMES[$proposal['policy_id']] . ".";
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;

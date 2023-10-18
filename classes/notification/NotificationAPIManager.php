@@ -406,11 +406,11 @@ class NotificationAPIManager {
                 }
             }
             //Raid
-            $time = time() - 60; // only get recently updated raids, prevent something like starting a raid and logging out = perpetual notif
+            $time = microtime(true) * 1000 - 60000; // only get recently updated raids, prevent something like starting a raid and logging out = perpetual notif
             $result = $this->system->db->query("SELECT `operations`.*, `region_locations`.`x`, `region_locations`.`y`, `region_locations`.`map_id`, `region_locations`.`name` FROM `operations`
             INNER JOIN `region_locations` ON `region_locations`.`id` = `operations`.`target_id`
             WHERE (`user_village` = {$this->player->village->village_id} OR `target_village` = {$this->player->village->village_id})
-            AND `last_update` > {$time}
+            AND `last_update_ms` > {$time}
             AND `status` = " . Operation::OPERATION_ACTIVE .
                 " AND `operations`.`type` = " . Operation::OPERATION_RAID
                 . " GROUP BY `region_locations`.`id`");

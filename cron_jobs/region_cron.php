@@ -107,15 +107,17 @@ function hourlyRegion(System $system, $debug = true): void
         /* step 1: update resource count */
         foreach ($region_location_result as &$region_location) {
             // if one of the home regions, collect resources bypassing caravans
+            $production = WarManager::BASE_RESOURCE_PRODUCTION;
             if ($region['region_id'] <= 5) {
+                $production += floor(WarManager::BASE_RESOURCE_PRODUCTION * ($villages[$region['village']]->policy->home_production_boost / 100));
                 $villages[$region['village']]->addResource($region_location['resource_id'], $region_location['resource_count']);
                 $queries[] = "INSERT INTO `resource_logs`
                     (`village_id`, `resource_id`, `type`, `quantity`, `time`)
                     VALUES ({$region['village']}, {$region_location['resource_id']}, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$region_location['resource_count']}, " . time() . ")";
                 $region_location['resource_count'] = 0;
             }
-            $region_location['resource_count'] += WarManager::BASE_RESOURCE_PRODUCTION;
-            !empty($village_resource_production[$region['village']][$region_location['resource_id']]) ? $village_resource_production[$region['village']][$region_location['resource_id']] += WarManager::BASE_RESOURCE_PRODUCTION : $village_resource_production[$region['village']][$region_location['resource_id']] = WarManager::BASE_RESOURCE_PRODUCTION;
+            $region_location['resource_count'] += $production;
+            !empty($village_resource_production[$region['village']][$region_location['resource_id']]) ? $village_resource_production[$region['village']][$region_location['resource_id']] += $production : $village_resource_production[$region['village']][$region_location['resource_id']] = $production;
             unset($region_location);
         }
 

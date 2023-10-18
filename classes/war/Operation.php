@@ -31,7 +31,7 @@ class Operation
         self::OPERATION_COMPLETE => 'complete',
     ];
 
-    const OPERATION_STAT_GAIN = [
+    /*const OPERATION_STAT_GAIN = [
         self::OPERATION_INFILTRATE => 4,
         self::OPERATION_REINFORCE => 3,
         self::OPERATION_RAID => 5,
@@ -43,16 +43,19 @@ class Operation
         self::OPERATION_REINFORCE => 150,
         self::OPERATION_RAID => 250,
         self::OPERATION_LOOT => 50,
-    ];
+    ];*/
 
     const BASE_OPERATION_SPEED = 20; // progress per interval
     const BASE_OPERATION_INTERVAL = 12; // time per interval
     const BASE_OPERATION_COST = 150; // chakra/stam cost per interval, 750 total
     /* 100 / 20 * 12s = 60s */
-    const LOOT_GAIN = 1;
+
+    const LOOT_GAIN = 5;
     const LOOT_OPERATION_SPEED = 100; // each loot action is only 1 interval
     const LOOT_OPERATION_INTERVAL = 6; // takes half time as normal
     const LOOT_OPERATION_COST = 75; // takes half pool cost
+    /* 100 / 100 * 6s = 6s */
+
 
     private System $system;
     private User $user;
@@ -65,7 +68,7 @@ class Operation
     public int $status;
     public int $target_village;
     public int $user_village;
-    public int $last_update;
+    public int $last_update_ms;
     public int $interval_progress = 0;
 
     public function __construct(System $system, User $user, array $operation_data)
@@ -80,11 +83,11 @@ class Operation
         } else {
             $interval = self::BASE_OPERATION_INTERVAL;
         }
-        $this->interval_progress = ((time() - $this->last_update) / $interval) * 100;
+        $this->interval_progress = (((microtime(true) * 1000) - $this->last_update_ms) / ($interval * 1000)) * 100;
     }
 
     public function updateData() {
-        $this->last_update = time();
+        $this->last_update_ms = microtime(true) * 1000;
         $query = "UPDATE `operations`
             SET `user_id` = '{$this->user_id}',
                 `target_id` = '{$this->target_id}',
@@ -93,7 +96,7 @@ class Operation
                 `status` = '{$this->status}',
                 `target_village` = '{$this->target_village}',
                 `user_village` = '{$this->user_village}',
-                `last_update` = '{$this->last_update}'
+                `last_update_ms` = '{$this->last_update_ms}'
             WHERE `operation_id` = '{$this->operation_id}'";
         $this->system->db->query($query);
     }
@@ -101,17 +104,39 @@ class Operation
     public function progressActiveOperation(): string
     {
         $message = '';
-        if ($this->type == self::OPERATION_LOOT) {
-            $interval = self::LOOT_OPERATION_INTERVAL;
-            $cost = self::LOOT_OPERATION_COST;
-            $speed = self::LOOT_OPERATION_SPEED;
-        } else {
-            $interval = self::BASE_OPERATION_INTERVAL;
-            $cost = self::BASE_OPERATION_COST;
-            $speed = self::BASE_OPERATION_SPEED;
+        switch ($this->type) {
+            case self::OPERATION_LOOT:
+                $interval = self::LOOT_OPERATION_INTERVAL;
+                $cost = self::LOOT_OPERATION_COST;
+                $speed = self::LOOT_OPERATION_SPEED;
+                break;
+            case self::OPERATION_INFILTRATE:
+                $interval = self::BASE_OPERATION_INTERVAL * 1000;
+                $interval = round($interval * (100 / (100 + $this->user->village->policy->infiltrate_speed)), 1);
+                $cost = self::BASE_OPERATION_COST;
+                $speed = self::BASE_OPERATION_SPEED;
+                break;
+            case self::OPERATION_REINFORCE:
+                $interval = self::BASE_OPERATION_INTERVAL;
+                $interval = round($interval * (100 / (100 + $this->user->village->policy->reinforce_speed)), 1);
+                $cost = self::BASE_OPERATION_COST;
+                $speed = self::BASE_OPERATION_SPEED;
+                break;
+            case self::OPERATION_RAID:
+                $interval = self::BASE_OPERATION_INTERVAL;
+                $interval = round($interval * (100 / (100 + $this->user->village->policy->raid_speed)), 1);
+                $cost = self::BASE_OPERATION_COST;
+                $speed = self::BASE_OPERATION_SPEED;
+                break;
+            default:
+                $interval = self::BASE_OPERATION_INTERVAL;
+                $cost = self::BASE_OPERATION_COST;
+                $speed = self::BASE_OPERATION_SPEED;
+                break;
         }
+
         // only progress if active and interval time has passed
-        if ($this->status == self::OPERATION_ACTIVE && time() > $this->last_update + $interval) {
+        if ($this->status == self::OPERATION_ACTIVE && microtime(true) * 1000 > $this->last_update_ms + $interval * 1000) {
             if ($this->type == self::OPERATION_LOOT) {
                 $caravan_target = $this->system->db->query("SELECT * FROM `caravans` WHERE `id` = {$this->target_id} LIMIT 1");
                 $caravan_target = $this->system->db->fetch($caravan_target);
@@ -138,7 +163,7 @@ class Operation
 
             // get current loot count
             $loot_count = 0;
-            $max_loot = WarManager::BASE_LOOT_CAPACITY;
+            $max_loot = WarManager::BASE_LOOT_CAPACITY + $this->user->village->policy->loot_capacity;
             $loot_result = $this->system->db->query("SELECT COUNT(*) as `count` FROM `loot` WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL LIMIT 1");
             if ($this->system->db->last_num_rows > 0) {
                 $loot_result = $this->system->db->fetch($loot_result);
@@ -244,24 +269,31 @@ class Operation
         $location_target = $this->system->db->fetch($location_target);
         switch ($this->type) {
             case self::OPERATION_INFILTRATE:
+                $defense_reduction = 1 + $this->user->village->policy->infiltrate_defense;
                 if ($location_target['defense'] > 0) {
-                    $location_target['defense']--;
-                    $message .= "\nDecreased target Defense by 1!";
+                    $result = max($location_target['defense'] - $defense_reduction, 0);
+                    $defense_reduction = $location_target['defense'] - $result;
+                    $location_target['defense'] = $result;
+                    $message .= "\nDecreased target Defense by {$defense_reduction}!";
                     $this->system->db->query("UPDATE `region_locations` SET `defense` = {$location_target['defense']} WHERE `id` = {$this->target_id}");
                 } else {
                     $message .= "\nTarget Defense already at 0!";
                 }
                 break;
             case self::OPERATION_REINFORCE:
+                $defense_gain = 1 + $this->user->village->policy->reinforce_defense;
                 if ($location_target['defense'] < 100) {
-                    $location_target['defense']++;
-                    $message .= "\nIncreased target Defense by 1!";
+                    $result = min($location_target['defense'] + $defense_gain, 100);
+                    $defense_gain = $result - $location_target['defense'];
+                    $location_target['defense'] = $result;
+                    $message .= "\nIncreased target Defense by {$defense_gain}!";
                     $this->system->db->query("UPDATE `region_locations` SET `defense` = {$location_target['defense']} WHERE `id` = {$this->target_id}");
                 } else {
                     $message .= "\nTarget Defense already at 100!";
                 }
                 break;
             case self::OPERATION_RAID:
+                $defense_reduction = 1 + $this->user->village->policy->raid_defense;
                 if ($location_target['health'] == 0) {
                     // change region ownership
                     $this->system->db->query("UPDATE `regions` SET `village` = {$this->user->village->village_id} WHERE `region_id` = {$location_target['region_id']}");
@@ -276,8 +308,10 @@ class Operation
                     $this->system->db->query("UPDATE `caravans` SET `village_id` = {$this->user->village->village_id} WHERE `region_id` = {$location_target['region_id']} AND `start_time` > {$time}");
                 }
                 else if ($location_target['defense'] > 0) {
-                    $location_target['defense']--;
-                    $message .= "\nDecreased target Defense by 1!";
+                    $result = max($location_target['defense'] - $defense_reduction, 0);
+                    $defense_reduction = $location_target['defense'] - $result;
+                    $location_target['defense'] = $result;
+                    $message .= "\nDecreased target Defense by {$defense_reduction}!";
                     $this->system->db->query("UPDATE `region_locations` SET `defense` = {$location_target['defense']} WHERE `id` = {$this->target_id}");
                 } else {
                     $message .= "\nTarget Defense already at 0!";
@@ -324,8 +358,8 @@ class Operation
      * @throws RuntimeException
      */
     public static function beginOperation(System $system, User $user, int $target_id, int $type, int $target_village): int {
-        $time = time();
-        $system->db->query("INSERT INTO `operations` (`user_id`, `target_id`, `type`, `progress`, `status`, `target_village`, `user_village`, `last_update`)
+        $time = microtime(true) * 1000;
+        $system->db->query("INSERT INTO `operations` (`user_id`, `target_id`, `type`, `progress`, `status`, `target_village`, `user_village`, `last_update_ms`)
             VALUES ({$user->user_id}, {$target_id}, {$type}, 0, " . self::OPERATION_ACTIVE . ", {$target_village}, {$user->village->village_id}, {$time})
         ");
         $operation_id = $system->db->last_insert_id;

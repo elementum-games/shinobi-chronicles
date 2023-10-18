@@ -39,7 +39,7 @@ final class KageMigration extends AbstractMigration
             CREATE TABLE `vote_logs` (
             `log_id` INT(11) NOT NULL AUTO_INCREMENT,
             `village_id` INT(11) NOT NULL,
-            `policy` INT(11) NOT NULL,
+            `policy_id` INT(11) NOT NULL,
             `start_time` INT(11) NOT NULL,
             `end_time` NULL DEFAULT NULL,
             PRIMARY KEY (`log_id`));
@@ -52,6 +52,9 @@ final class KageMigration extends AbstractMigration
 
             -- Alter table notifications
             ALTER TABLE `notifications` ADD `expires` INT(11) NULL DEFAULT NULL;
+
+            -- Alter table operations
+            ALTER TABLE `operations` CHANGE `last_update` `last_update_ms` BIGINT(14) NOT NULL;
 
             -- Update village name
             UPDATE `region_locations` SET `name` = 'Nekogakure' WHERE `id` = 29;
@@ -81,6 +84,9 @@ final class KageMigration extends AbstractMigration
 
             -- Drop column `expires` from notifications
             ALTERT TABLE `notifications` DROP COLUMN `expires`;
+
+            -- Alter table operations
+            ALTER TABLE `operations` CHANGE `last_update_ms` `last_update` INT(11) NOT NULL;
         ");
     }
 }

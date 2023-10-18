@@ -1438,7 +1438,7 @@ function StrategicInfoItem({
     className: "strategic_info_name"
   }, strategicInfoData.village.name), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_policy"
-  }, getPolicyDisplayData(strategicInfoData.village.policy).name)), /*#__PURE__*/React.createElement("div", {
+  }, getPolicyDisplayData(strategicInfoData.village.policy_id).name)), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_banner",
     style: {
       backgroundImage: "url(" + getStrategicInfoBanner(strategicInfoData.village.village_id) + ")"
