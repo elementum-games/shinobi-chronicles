@@ -44,7 +44,7 @@ try {
             $message = VillageManager::claimSeat($system, $player, $seat_type);
             $VillageAPIResponse->response = [
                 'seatData' => VillageApiPresenter::seatDataResponse($system, $player),
-                'playerSeat' => $player->village_seat,
+                'playerSeat' => VillageManager::getPlayerSeat($system, $player),
                 'response_message' => $message,
             ];
             break;
@@ -52,7 +52,7 @@ try {
             $message = VillageManager::resign($system, $player);
             $VillageAPIResponse->response = [
                 'seatData' => VillageApiPresenter::seatDataResponse($system, $player),
-                'playerSeat' => $player->village_seat,
+                'playerSeat' => VillageManager::getPlayerSeat($system, $player),
                 'response_message' => $message,
             ];
             break;
