@@ -491,10 +491,10 @@ function MapNearbyPlayers({
   }), player.loot_count > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
     className: "loot_icon_1",
     src: "/../images/map/icons/loot1.png"
-  })), player.loot_count > 5 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
+  })), player.loot_count > 10 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
     className: "loot_icon_2",
     src: "/../images/map/icons/loot1.png"
-  })), player.loot_count > 10 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
+  })), player.loot_count > 20 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
     className: "loot_icon_3",
     src: "/../images/map/icons/loot1.png"
   })))));

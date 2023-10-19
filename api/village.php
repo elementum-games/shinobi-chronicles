@@ -136,6 +136,7 @@ try {
             $message = VillageManager::submitChallenge($system, $player, $seat_id, $selected_times);
             $VillageAPIResponse->response = [
                 'response_message' => $message,
+                'challengeData' => VillageManager::getChallengeData($system, $player),
             ];
             break;
         case 'AcceptChallenge':
@@ -144,6 +145,7 @@ try {
             $message = VillageManager::AcceptChallenge($system, $player, $challenge_id, $time);
             $VillageAPIResponse->response = [
                 'response_message' => $message,
+                'challengeData' => VillageManager::getChallengeData($system, $player),
             ];
             break;
         case 'LockChallenge':
@@ -151,6 +153,14 @@ try {
             $message = VillageManager::lockChallenge($system, $player, $challenge_id);
             $VillageAPIResponse->response = [
                 'response_message' => $message,
+                'challengeData' => VillageManager::getChallengeData($system, $player),
+            ];
+            break;
+        case 'CancelChallenge':
+            $message = VillageManager::cancelChallenge($system, $player);
+            $VillageAPIResponse->response = [
+                'response_message' => $message,
+                'challengeData' => VillageManager::getChallengeData($system, $player),
             ];
             break;
         default:

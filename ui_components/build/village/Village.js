@@ -125,10 +125,7 @@ function Village({
     }
     return data;
   }
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ChallengeContainer, {
-    challengeDataState: challengeDataState,
-    playerSeatState: playerSeatState
-  }), /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "navigation_row"
   }, /*#__PURE__*/React.createElement("div", {
     className: "nav_button",
@@ -163,7 +160,8 @@ function Village({
     getKageKanji: getKageKanji,
     getVillageIcon: getVillageIcon,
     getPolicyDisplayData: getPolicyDisplayData,
-    TimeGrid: TimeGrid
+    TimeGrid: TimeGrid,
+    TimeGridResponse: TimeGridResponse
   }), villageTab == "kageQuarters" && /*#__PURE__*/React.createElement(KageQuarters, {
     playerSeatState: playerSeatState,
     setPlayerSeatState: setPlayerSeatState,
@@ -220,6 +218,7 @@ function VillageHQ({
   const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
   const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
   const [selectedTimesUTC, setSelectedTimesUTC] = React.useState([]);
+  const [selectedTimeUTC, setSelectedTimeUTC] = React.useState(null);
   const [modalHeader, setModalHeader] = React.useState(null);
   const [modalText, setModalText] = React.useState(null);
   const [challengeTarget, setChallengeTarget] = React.useState(null);
@@ -320,7 +319,53 @@ function VillageHQ({
           handleErrors(response.errors);
           return;
         }
-        // challenges display update
+        setChallengeDataState(response.data.challengeData);
+        setModalHeader("Confirmation");
+        setModalText(response.data.response_message);
+        setModalState("response_message");
+      });
+    }
+  };
+  const CancelChallenge = () => {
+    if (modalState == "confirm_cancel_challenge") {
+      apiFetch(villageAPI, {
+        request: 'CancelChallenge'
+      }).then(response => {
+        if (response.errors.length) {
+          handleErrors(response.errors);
+          return;
+        }
+        setChallengeDataState(response.data.challengeData);
+        setModalHeader("Confirmation");
+        setModalText(response.data.response_message);
+        setModalState("response_message");
+      });
+    } else {
+      setModalHeader("Confirmation");
+      setModalState("confirm_cancel_challenge");
+      setModalText("Are you sure you wish to cancel your pending challenge request?");
+    }
+  };
+  const AcceptChallenge = target_challenge => {
+    setChallengeTarget(target_challenge);
+    setModalState("accept_challenge");
+    setModalHeader("Accept Challenge");
+    setModalText("Select a time slot below to accept the challenge.");
+  };
+  const ConfirmAcceptChallenge = () => {
+    if (!selectedTimeUTC) {
+      setModalText("Select a slot to accept the challenge.");
+    } else {
+      apiFetch(villageAPI, {
+        request: 'AcceptChallenge',
+        challenge_id: challengeTarget.request_id,
+        time: selectedTimeUTC
+      }).then(response => {
+        if (response.errors.length) {
+          handleErrors(response.errors);
+          return;
+        }
+        setChallengeDataState(response.data.challengeData);
         setModalHeader("Confirmation");
         setModalText(response.data.response_message);
         setModalState("response_message");
@@ -355,19 +400,48 @@ function VillageHQ({
   }, "The seat holder will have 24 hours to choose one of your selected times."), /*#__PURE__*/React.createElement("span", {
     className: "schedule_challenge_subtext"
   }, "Your battle will be scheduled a minimum of 12 hours from the time of their selection.")), /*#__PURE__*/React.createElement(TimeGrid, {
-    userTimeZone: luxon.Settings.defaultZoneName,
-    selectedTimesUTC: selectedTimesUTC,
-    setSelectedTimesUTC: setSelectedTimesUTC
+    setSelectedTimesUTC: setSelectedTimesUTC,
+    startHourUTC: luxon.DateTime.fromObject({
+      hour: 0,
+      zone: luxon.Settings.defaultZoneName
+    }).toUTC().hour
   }), /*#__PURE__*/React.createElement("div", {
     className: "modal_confirm_button",
     onClick: () => ConfirmSubmitChallenge()
   }, "confirm"), /*#__PURE__*/React.createElement("div", {
     className: "modal_cancel_button",
     onClick: () => setModalState("closed")
+  }, "cancel")), modalState == "accept_challenge" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "schedule_challenge_subtext_wrapper"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "schedule_challenge_subtext"
+  }, "Time slots are displayed in your local time."), /*#__PURE__*/React.createElement("span", {
+    className: "schedule_challenge_subtext"
+  }, "The first slot below is set a minimum 12 hours from the current time.")), /*#__PURE__*/React.createElement(TimeGridResponse, {
+    availableTimesUTC: JSON.parse(challengeTarget.selected_times),
+    setSelectedTimeUTC: setSelectedTimeUTC,
+    startHourUTC: (luxon.DateTime.utc().minute === 0 ? luxon.DateTime.utc().hour + 12 : luxon.DateTime.utc().hour + 13) % 24
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "modal_confirm_button",
+    onClick: () => ConfirmAcceptChallenge()
+  }, "confirm"), /*#__PURE__*/React.createElement("div", {
+    className: "modal_cancel_button",
+    onClick: () => setModalState("closed")
+  }, "cancel")), modalState == "confirm_cancel_challenge" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "modal_confirm_button",
+    onClick: () => CancelChallenge()
+  }, "confirm"), /*#__PURE__*/React.createElement("div", {
+    className: "modal_cancel_button",
+    onClick: () => setModalState("closed")
   }, "cancel")), modalState == "response_message" && /*#__PURE__*/React.createElement("div", {
     className: "modal_close_button",
     onClick: () => setModalState("closed")
-  }, "close"))), /*#__PURE__*/React.createElement("div", {
+  }, "close"))), /*#__PURE__*/React.createElement(ChallengeContainer, {
+    challengeDataState: challengeDataState,
+    playerSeatState: playerSeatState,
+    CancelChallenge: CancelChallenge,
+    AcceptChallenge: AcceptChallenge
+  }), /*#__PURE__*/React.createElement("div", {
     className: "hq_container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "row first"
@@ -1608,14 +1682,12 @@ function StrategicInfoItem({
   }, supply_point.name), " x", supply_point.count)))))));
 }
 const TimeGrid = ({
-  userTimeZone,
-  selectedTimesUTC,
   setSelectedTimesUTC,
   startHourUTC = 0
 }) => {
   const [selectedTimes, setSelectedTimes] = React.useState([]);
-  const timeSlots = generateSlotsForTimeZone(userTimeZone, startHourUTC);
-  function generateSlotsForTimeZone(timeZone, startHour) {
+  const timeSlots = generateSlotsForTimeZone(startHourUTC);
+  function generateSlotsForTimeZone(startHour) {
     return Array.from({
       length: 24
     }, (slot, index) => (index + startHour) % 24).map(hour => luxon.DateTime.fromObject({
@@ -1639,7 +1711,7 @@ const TimeGrid = ({
   ;
   function convertSlotsToUTC(times) {
     return times.map(time => luxon.DateTime.fromFormat(time, 'HH:mm', {
-      zone: userTimeZone
+      zone: 'local'
     }).setZone('utc').toFormat('HH:mm'));
   }
   ;
@@ -1661,11 +1733,58 @@ const TimeGrid = ({
     className: "slot_count"
   }, "Selected: ", selectedTimes.length))));
 };
+const TimeGridResponse = ({
+  availableTimesUTC,
+  setSelectedTimeUTC,
+  startHourUTC = 0
+}) => {
+  const [selectedTime, setSelectedTime] = React.useState(null);
+  const timeSlots = generateSlotsForTimeZone(startHourUTC);
+  function generateSlotsForTimeZone(startHour) {
+    return Array.from({
+      length: 24
+    }, (slot, index) => (index + startHour) % 24).map(hour => luxon.DateTime.fromObject({
+      hour
+    }, {
+      zone: 'utc'
+    }).toLocal());
+  }
+  ;
+  function toggleSlot(time) {
+    const formattedTimeLocal = time.toFormat('HH:mm');
+    const formattedTimeUTC = time.toUTC().toFormat('HH:mm');
+    if (selectedTime === formattedTimeLocal) {
+      setSelectedTime(null);
+      setSelectedTimeUTC(null);
+    } else if (availableTimesUTC.includes(formattedTimeUTC)) {
+      setSelectedTime(formattedTimeLocal);
+      setSelectedTimeUTC(formattedTimeUTC);
+    }
+  }
+  ;
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "timeslot_container"
+  }, timeSlots.map(time => {
+    const formattedTimeLocal = time.toFormat('HH:mm');
+    const formattedTimeUTC = time.toUTC().toFormat('HH:mm');
+    const isAvailable = availableTimesUTC.includes(formattedTimeUTC);
+    const slotClass = isAvailable ? selectedTime === formattedTimeLocal ? "timeslot selected" : "timeslot" : "timeslot unavailable";
+    return /*#__PURE__*/React.createElement("div", {
+      key: formattedTimeLocal,
+      onClick: () => toggleSlot(time),
+      className: slotClass
+    }, formattedTimeLocal, /*#__PURE__*/React.createElement("div", {
+      className: "timeslot_label"
+    }, time.toFormat('h:mm') + " " + time.toFormat('a')));
+  })));
+};
 const ChallengeContainer = ({
   challengeDataState,
-  playerSeatState
+  playerSeatState,
+  CancelChallenge,
+  AcceptChallenge
 }) => {
-  return /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, challengeDataState.length > 0 && /*#__PURE__*/React.createElement("div", {
     className: "challenge_container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "header"
@@ -1685,9 +1804,16 @@ const ChallengeContainer = ({
     className: "challenge_header"
   }, "ACTIVE CHALLENGE"), /*#__PURE__*/React.createElement("div", null, "Seat Holder: ", /*#__PURE__*/React.createElement("a", {
     href: "/?id=6&user=" + challenge.seat_holder_name
-  }, challenge.seat_holder_name)), /*#__PURE__*/React.createElement("div", null, "Challenge Time: ", /*#__PURE__*/React.createElement("span", null, challenge.start_time ? challenge.start_time : "PENDING")), challenge.start_time && challenge.start_time && /*#__PURE__*/React.createElement("div", {
-    className: "challenge_lock_button"
-  }, "lock in")))), challengeDataState && challengeDataState.filter(challenge => challenge.challenger_id !== playerSeatState.user_id).map((challenge, index) => /*#__PURE__*/React.createElement("div", {
+  }, challenge.seat_holder_name)), /*#__PURE__*/React.createElement("div", null, "Time: ", /*#__PURE__*/React.createElement("span", null, challenge.start_time ? luxon.DateTime.fromSeconds(challenge.start_time).toLocal().toFormat("LLL d, h:mm a") : "PENDING")), challenge.start_time && challenge.start_time < Date.now() && !challenge.challenger_locked && /*#__PURE__*/React.createElement("div", {
+    className: "challenge_button lock disabled"
+  }, "lock in"), challenge.start_time && challenge.start_time > Date.now() && !challenge.challenger_locked && /*#__PURE__*/React.createElement("div", {
+    className: "challenge_button lock"
+  }, "lock in"), challenge.start_time == null && /*#__PURE__*/React.createElement("div", {
+    className: "challenge_button cancel",
+    onClick: () => CancelChallenge()
+  }, "cancel"), challenge.challenger_locked && /*#__PURE__*/React.createElement("div", {
+    className: "challenge_button locked"
+  }, "locked in")))), challengeDataState && challengeDataState.filter(challenge => challenge.challenger_id !== playerSeatState.user_id).map((challenge, index) => /*#__PURE__*/React.createElement("div", {
     key: challenge.request_id,
     className: "challenge_item"
   }, /*#__PURE__*/React.createElement("div", {
@@ -1701,7 +1827,16 @@ const ChallengeContainer = ({
     className: "challenge_header"
   }, "CHALLENGER ", index + 1), /*#__PURE__*/React.createElement("div", null, "Challenger: ", /*#__PURE__*/React.createElement("a", {
     href: "/?id=6&user=" + challenge.challenger_name
-  }, challenge.challenger_name)), /*#__PURE__*/React.createElement("div", null, "Challenge Time: ", /*#__PURE__*/React.createElement("span", null, challenge.start_time ? challenge.start_time : "PENDING")))))), /*#__PURE__*/React.createElement("svg", {
+  }, challenge.challenger_name)), /*#__PURE__*/React.createElement("div", null, "Time: ", /*#__PURE__*/React.createElement("span", null, challenge.start_time ? luxon.DateTime.fromSeconds(challenge.start_time).toLocal().toFormat("LLL d, h:mm a") : "PENDING")), challenge.start_time && challenge.start_time < Date.now() && !challenge.seat_holder_locked && /*#__PURE__*/React.createElement("div", {
+    className: "challenge_button lock disabled"
+  }, "lock in"), challenge.start_time && challenge.start_time > Date.now() && !challenge.seat_holder_locked && /*#__PURE__*/React.createElement("div", {
+    className: "challenge_button lock"
+  }, "lock in"), challenge.start_time == null && /*#__PURE__*/React.createElement("div", {
+    className: "challenge_button schedule",
+    onClick: () => AcceptChallenge(challenge)
+  }, "schedule"), challenge.seat_holder_locked && /*#__PURE__*/React.createElement("div", {
+    className: "challenge_button locked"
+  }, "locked in"))))), /*#__PURE__*/React.createElement("svg", {
     style: {
       marginTop: "45px"
     },
@@ -1714,6 +1849,6 @@ const ChallengeContainer = ({
     y2: "1",
     stroke: "#77694e",
     strokeWidth: "1"
-  })));
+  }))));
 };
 window.Village = Village;

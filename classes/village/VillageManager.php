@@ -525,26 +525,27 @@ class VillageManager {
     /**
      * @return string
      */
-    public static function cancelChallenge(System $system, User $player, int $challenge_id): string
+    public static function cancelChallenge(System $system, User $player): string
     {
         // verify challenge target is valid
-        $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenge_id` = {$challenge_id} AND `challenger_id` = {$player->user_id} AND `end_time` IS NULL");
+        $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} AND `end_time` IS NULL LIMIT 1");
+        $challenge_result = $system->db->fetch($challenge_result);
         if ($system->db->last_num_rows == 0) {
             return "Invalid challenge.";
         }
         $time = time();
-        $system->db->query("UPDATE `challenge_requests` SET `winner` = 'seat_holder', `end_time` = {$time} WHERE `challenge_id` = {$challenge_id}");
+        $system->db->query("UPDATE `challenge_requests` SET `winner` = 'seat_holder', `end_time` = {$time} WHERE `request_id` = {$challenge_result['request_id']}");
         return "Challenge canceled.";
     }
 
     /**
      * @return string
      */
-    public static function acceptChallenge(System $system, User $player, int $challenge_id, int $challenge_time): string
+    public static function acceptChallenge(System $system, User $player, int $challenge_id, string $challenge_time): string
     {
         $slots_per_hour = 60 / self::CHALLENGE_SCHEDULE_INCREMENT_MINUTES;
         // check challenge valid
-        $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenge_id` = {$challenge_id} AND `end_time` IS NULL AND `seat_holder_id` = {$player->user_id}");
+        $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `request_id` = {$challenge_id} AND `end_time` IS NULL AND `seat_holder_id` = {$player->user_id}");
         $challenge_result = $system->db->fetch($challenge_result);
         if ($system->db->last_num_rows == 0) {
             return "Invalid challenge.";
@@ -558,24 +559,28 @@ class VillageManager {
         $date = new DateTime($challenge_time, new DateTimeZone('UTC'));
         $min_challenge_time = $date->getTimestamp();
         // check min number of hours from current time
-        $difference = $min_challenge_time - $currentTime;
+        $difference = time() - $min_challenge_time;
         if ($difference < self::CHALLENGE_MIN_DELAY_HOURS * 60 * 60) {
             // Add 24 hours to the challenge time
             $min_challenge_time += 24 * 60 * 60;
         }
         // calculate last possible time for current slot
-        $max_challenge_time = $min_challenge_time + (($slots_per_hour - 1) * 60); // e.g. 8:00->8:15->8:30->8:45
+        $max_challenge_time = $min_challenge_time + (($slots_per_hour - 1) * 60 * self::CHALLENGE_SCHEDULE_INCREMENT_MINUTES); // e.g. 8:00->8:15->8:30->8:45
         // get number of scheduled challenges in same hour
         $challenges_result = $system->db->query("SELECT COUNT(*) as `challenge_count` FROM `challenge_requests` WHERE `seat_holder_id` = {$player->user_id} AND `start_time` >= {$min_challenge_time} AND `start_time` <= {$max_challenge_time}");
         $challenges_result = $system->db->fetch($challenges_result);
-        if ($challenges_result >= $slots_per_hour) {
+        if ($challenges_result['challenge_count'] >= $slots_per_hour) {
             return "Can not schedule any more challenges for that time slot.";
         } else {
             $challenge_time = $min_challenge_time + (self::CHALLENGE_SCHEDULE_INCREMENT_MINUTES * 60) * $challenges_result['challenge_count'];
         }
         // update challenge
         $time = time();
-        $system->db->query("UPDATE `challenge_requests` SET `accepted_time` = {$time}, `start_time` = {$challenge_time} WHERE `challenge_id` = {$challenge_id}");
+        $hours = floor(($challenge_time - time()) / 3600);
+        $minutes = floor((($challenge_time - time()) % 3600) / 60);
+        $message = "Lock-in period begins in " . ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute " : $minutes . " minutes" . ".");
+        $system->db->query("UPDATE `challenge_requests` SET `accepted_time` = {$time}, `start_time` = {$challenge_time} WHERE `request_id` = {$challenge_id}");
+        return $message;
     }
 
     /**

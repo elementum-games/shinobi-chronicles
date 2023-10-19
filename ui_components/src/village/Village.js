@@ -127,10 +127,6 @@ function Village({
 
     return (
         <>
-            <ChallengeContainer
-                challengeDataState={challengeDataState}
-                playerSeatState={playerSeatState}
-            />
             <div className="navigation_row">
                 <div className="nav_button" onClick={() => setVillageTab("villageHQ")}>village hq</div>
                 <div className="nav_button" onClick={() => setVillageTab("worldInfo")}>world info</div>
@@ -160,6 +156,7 @@ function Village({
                 getVillageIcon={getVillageIcon}
                 getPolicyDisplayData={getPolicyDisplayData}
                 TimeGrid={TimeGrid}
+                TimeGridResponse={TimeGridResponse}
                 />
             }
             {villageTab == "kageQuarters" &&
@@ -226,6 +223,7 @@ function VillageHQ({
     const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
     const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
     const [selectedTimesUTC, setSelectedTimesUTC] = React.useState([]);
+    const [selectedTimeUTC, setSelectedTimeUTC] = React.useState(null);
     const [modalHeader, setModalHeader] = React.useState(null);
     const [modalText, setModalText] = React.useState(null);
     const [challengeTarget, setChallengeTarget] = React.useState(null);
@@ -339,7 +337,60 @@ function VillageHQ({
                     handleErrors(response.errors);
                     return;
                 }
-                // challenges display update
+                setChallengeDataState(response.data.challengeData);
+                setModalHeader("Confirmation");
+                setModalText(response.data.response_message);
+                setModalState("response_message");
+            });
+        }
+    }
+    const CancelChallenge = () => {
+        if (modalState == "confirm_cancel_challenge") {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'CancelChallenge',
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setChallengeDataState(response.data.challengeData);
+                setModalHeader("Confirmation");
+                setModalText(response.data.response_message);
+                setModalState("response_message");
+            });
+        }
+        else {
+            setModalHeader("Confirmation");
+            setModalState("confirm_cancel_challenge");
+            setModalText("Are you sure you wish to cancel your pending challenge request?");
+        }
+    }
+    const AcceptChallenge = (target_challenge) => {
+        setChallengeTarget(target_challenge);
+        setModalState("accept_challenge");
+        setModalHeader("Accept Challenge");
+        setModalText("Select a time slot below to accept the challenge.");
+    }
+    const ConfirmAcceptChallenge = () => {
+        if (!selectedTimeUTC) {
+            setModalText("Select a slot to accept the challenge.");
+        } else {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'AcceptChallenge',
+                    challenge_id: challengeTarget.request_id,
+                    time: selectedTimeUTC,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setChallengeDataState(response.data.challengeData);
                 setModalHeader("Confirmation");
                 setModalText(response.data.response_message);
                 setModalState("response_message");
@@ -373,11 +424,31 @@ function VillageHQ({
                                     <span className="schedule_challenge_subtext">Your battle will be scheduled a minimum of 12 hours from the time of their selection.</span>
                                 </div>
                                 <TimeGrid
-                                userTimeZone={luxon.Settings.defaultZoneName}
-                                selectedTimesUTC={selectedTimesUTC}
                                 setSelectedTimesUTC={setSelectedTimesUTC}
+                                startHourUTC={luxon.DateTime.fromObject({ hour: 0, zone: luxon.Settings.defaultZoneName }).toUTC().hour}
                                 />
                                 <div className="modal_confirm_button" onClick={() => ConfirmSubmitChallenge()}>confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "accept_challenge" &&
+                            <>
+                                <div className="schedule_challenge_subtext_wrapper">
+                                    <span className="schedule_challenge_subtext">Time slots are displayed in your local time.</span>
+                                    <span className="schedule_challenge_subtext">The first slot below is set a minimum 12 hours from the current time.</span>
+                                </div>
+                                <TimeGridResponse
+                                availableTimesUTC={JSON.parse(challengeTarget.selected_times)}
+                                setSelectedTimeUTC={setSelectedTimeUTC}
+                                startHourUTC={(luxon.DateTime.utc().minute === 0 ? luxon.DateTime.utc().hour + 12 : luxon.DateTime.utc().hour + 13) % 24}
+                                />
+                                <div className="modal_confirm_button" onClick={() => ConfirmAcceptChallenge()}>confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "confirm_cancel_challenge" &&
+                            <>
+                                <div className="modal_confirm_button" onClick={() => CancelChallenge()}>confirm</div>
                                 <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
                             </>
                         }
@@ -387,6 +458,12 @@ function VillageHQ({
                     </div>
                 </>
             }
+            <ChallengeContainer
+                challengeDataState={challengeDataState}
+                playerSeatState={playerSeatState}
+                CancelChallenge={CancelChallenge}
+                AcceptChallenge={AcceptChallenge}
+            />
             <div className="hq_container">
                 <div className="row first">
                     <div className="column first">
@@ -1515,11 +1592,11 @@ function StrategicInfoItem({ strategicInfoData, getPolicyDisplayData }) {
     );
 }
 
-const TimeGrid = ({ userTimeZone, selectedTimesUTC, setSelectedTimesUTC, startHourUTC = 0 }) => {
+const TimeGrid = ({ setSelectedTimesUTC, startHourUTC = 0 }) => {
     const [selectedTimes, setSelectedTimes] = React.useState([]);
-    const timeSlots = generateSlotsForTimeZone(userTimeZone, startHourUTC);
+    const timeSlots = generateSlotsForTimeZone(startHourUTC);
 
-    function generateSlotsForTimeZone(timeZone, startHour) {
+    function generateSlotsForTimeZone(startHour) {
         return Array.from({ length: 24 }, (slot, index) => (index + startHour) % 24).map(hour =>
             luxon.DateTime.fromObject({ hour }, { zone: 'utc' })
                 .setZone(timeZone)
@@ -1542,7 +1619,7 @@ const TimeGrid = ({ userTimeZone, selectedTimesUTC, setSelectedTimesUTC, startHo
 
     function convertSlotsToUTC(times) {
         return times.map(time =>
-            luxon.DateTime.fromFormat(time, 'HH:mm', { zone: userTimeZone })
+            luxon.DateTime.fromFormat(time, 'HH:mm', { zone: 'local' })
                 .setZone('utc')
                 .toFormat('HH:mm')
         );
@@ -1570,49 +1647,122 @@ const TimeGrid = ({ userTimeZone, selectedTimesUTC, setSelectedTimesUTC, startHo
     );
 }
 
-const ChallengeContainer = ({ challengeDataState, playerSeatState }) => {
+const TimeGridResponse = ({ availableTimesUTC, setSelectedTimeUTC, startHourUTC = 0 }) => {
+    const [selectedTime, setSelectedTime] = React.useState(null);
+    const timeSlots = generateSlotsForTimeZone(startHourUTC);
+
+    function generateSlotsForTimeZone(startHour) {
+        return Array.from({ length: 24 }, (slot, index) => (index + startHour) % 24).map(hour =>
+            luxon.DateTime.fromObject({ hour }, { zone: 'utc' }).toLocal()
+        );
+    };
+
+    function toggleSlot(time) {
+        const formattedTimeLocal = time.toFormat('HH:mm');
+        const formattedTimeUTC = time.toUTC().toFormat('HH:mm');
+
+        if (selectedTime === formattedTimeLocal) {
+            setSelectedTime(null);
+            setSelectedTimeUTC(null);
+        } else if (availableTimesUTC.includes(formattedTimeUTC)) {
+            setSelectedTime(formattedTimeLocal);
+            setSelectedTimeUTC(formattedTimeUTC);
+        }
+    };
+
     return (
-        <div className="challenge_container">
-            <div className="header">Challenges</div>
-            <div className="challenge_list">
-                {challengeDataState && challengeDataState
-                    .filter(challenge => challenge.challenger_id === playerSeatState.user_id)
-                    .map((challenge, index) => (
-                        <div key={challenge.request_id} className="challenge_item">
-                            <div className="challenge_avatar_wrapper">
-                                <img className="challenge_avatar" src={challenge.seat_holder_avatar} />
-                            </div>
-                            <div className="challenge_details">
-                                <div className="challenge_header">
-                                    ACTIVE CHALLENGE
-                                </div>
-                                <div>Seat Holder: <a href={"/?id=6&user=" + challenge.seat_holder_name}>{challenge.seat_holder_name}</a></div>
-                                <div>Challenge Time: <span>{challenge.start_time ? challenge.start_time : "PENDING"}</span></div>
-                                {(challenge.start_time && challenge.start_time ) &&
-                                    <div className="challenge_lock_button">lock in</div>
-                                }
+        <>
+            <div className="timeslot_container">
+                {timeSlots.map(time => {
+                    const formattedTimeLocal = time.toFormat('HH:mm');
+                    const formattedTimeUTC = time.toUTC().toFormat('HH:mm');
+                    const isAvailable = availableTimesUTC.includes(formattedTimeUTC);
+                    const slotClass = isAvailable ?
+                        (selectedTime === formattedTimeLocal ? "timeslot selected" : "timeslot")
+                        : "timeslot unavailable";
+
+                    return (
+                        <div key={formattedTimeLocal} onClick={() => toggleSlot(time)} className={slotClass}>
+                            {formattedTimeLocal}
+                            <div className="timeslot_label">
+                                {time.toFormat('h:mm') + " " + time.toFormat('a')}
                             </div>
                         </div>
-                    ))}
-                {challengeDataState && challengeDataState
-                    .filter(challenge => challenge.challenger_id !== playerSeatState.user_id)
-                    .map((challenge, index) => (
-                        <div key={challenge.request_id} className="challenge_item">
-                            <div className="challenge_avatar_wrapper">
-                                <img className="challenge_avatar" src={challenge.challenger_avatar} />
-                            </div>
-                            <div className="challenge_details">
-                                <div className="challenge_header">
-                                    CHALLENGER {index + 1}
-                                </div>
-                                <div>Challenger: <a href={"/?id=6&user=" + challenge.challenger_name}>{challenge.challenger_name}</a></div>
-                                <div>Challenge Time: <span>{challenge.start_time ? challenge.start_time : "PENDING"}</span></div>
-                            </div>
-                        </div>
-                    ))}
+                    );
+                })}
             </div>
-            <svg style={{ marginTop: "45px"}} width="100%" height="1"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#77694e" strokeWidth="1"></line></svg>
-        </div>
+        </>
+    );
+}
+
+const ChallengeContainer = ({ challengeDataState, playerSeatState, CancelChallenge, AcceptChallenge }) => {
+    return (
+        <>
+        {challengeDataState.length > 0 &&
+            <div className="challenge_container">
+                <div className="header">Challenges</div>
+                <div className="challenge_list">
+                    {challengeDataState && challengeDataState
+                        .filter(challenge => challenge.challenger_id === playerSeatState.user_id)
+                        .map((challenge, index) => (
+                            <div key={challenge.request_id} className="challenge_item">
+                                <div className="challenge_avatar_wrapper">
+                                    <img className="challenge_avatar" src={challenge.seat_holder_avatar} />
+                                </div>
+                                <div className="challenge_details">
+                                    <div className="challenge_header">
+                                        ACTIVE CHALLENGE
+                                    </div>
+                                    <div>Seat Holder: <a href={"/?id=6&user=" + challenge.seat_holder_name}>{challenge.seat_holder_name}</a></div>
+                                    <div>Time: <span>{challenge.start_time ? luxon.DateTime.fromSeconds(challenge.start_time).toLocal().toFormat("LLL d, h:mm a") : "PENDING"}</span></div>
+                                    {(challenge.start_time && challenge.start_time < Date.now() && !challenge.challenger_locked) &&
+                                        <div className="challenge_button lock disabled">lock in</div>
+                                    }
+                                    {(challenge.start_time && challenge.start_time > Date.now() && !challenge.challenger_locked) &&
+                                        <div className="challenge_button lock">lock in</div>
+                                    }
+                                    {(challenge.start_time == null) &&
+                                        <div className="challenge_button cancel" onClick={() => CancelChallenge()}>cancel</div>
+                                    }
+                                    {(challenge.challenger_locked) &&
+                                        <div className="challenge_button locked">locked in</div>
+                                    }
+                                </div>
+                            </div>
+                        ))}
+                    {challengeDataState && challengeDataState
+                        .filter(challenge => challenge.challenger_id !== playerSeatState.user_id)
+                        .map((challenge, index) => (
+                            <div key={challenge.request_id} className="challenge_item">
+                                <div className="challenge_avatar_wrapper">
+                                    <img className="challenge_avatar" src={challenge.challenger_avatar} />
+                                </div>
+                                <div className="challenge_details">
+                                    <div className="challenge_header">
+                                        CHALLENGER {index + 1}
+                                    </div>
+                                    <div>Challenger: <a href={"/?id=6&user=" + challenge.challenger_name}>{challenge.challenger_name}</a></div>
+                                    <div>Time: <span>{challenge.start_time ? luxon.DateTime.fromSeconds(challenge.start_time).toLocal().toFormat("LLL d, h:mm a") : "PENDING"}</span></div>
+                                    {(challenge.start_time && challenge.start_time < Date.now() && !challenge.seat_holder_locked) &&
+                                        <div className="challenge_button lock disabled">lock in</div>
+                                    }
+                                    {(challenge.start_time && challenge.start_time > Date.now() && !challenge.seat_holder_locked) &&
+                                        <div className="challenge_button lock">lock in</div>
+                                    }
+                                    {(challenge.start_time == null) &&
+                                        <div className="challenge_button schedule" onClick={() => AcceptChallenge(challenge)}>schedule</div>
+                                    }
+                                    {(challenge.seat_holder_locked) &&
+                                        <div className="challenge_button locked">locked in</div>
+                                    }
+                                </div>
+                            </div>
+                        ))}
+                </div>
+                <svg style={{ marginTop: "45px" }} width="100%" height="1"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#77694e" strokeWidth="1"></line></svg>
+            </div>
+        }
+        </>
     );
 }
 

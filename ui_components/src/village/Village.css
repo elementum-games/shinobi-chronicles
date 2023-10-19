@@ -690,7 +690,7 @@
 }
 .modal_cancel_button {
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
-    width: 75px;
+    width: 125px;
     height: 25px;
     background: linear-gradient(to bottom, #6f3043 50%, #622231 50%);
     line-height: 20px;
@@ -700,7 +700,7 @@
     cursor: pointer;
     user-select: none;
     position: absolute;
-    right: 25%;
+    right: 50px;
     bottom: -15px;
 }
     .modal_cancel_button:hover {
@@ -708,7 +708,7 @@
     }
 .modal_close_button {
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
-    width: 75px;
+    width: 125px;
     height: 25px;
     background: linear-gradient(to bottom, #6f3043 50%, #622231 50%);
     line-height: 20px;
@@ -727,7 +727,7 @@
     }
 .modal_confirm_button {
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
-    width: 75px;
+    width: 125px;
     height: 25px;
     background: linear-gradient(to bottom, #3b4176 50%, #2f345e 50%);
     line-height: 20px;
@@ -737,7 +737,7 @@
     cursor: pointer;
     user-select: none;
     position: absolute;
-    left: 25%;
+    left: 50px;
     bottom: -15px;
 }
     .modal_confirm_button:hover {
@@ -1502,6 +1502,10 @@
     }
         .timeslot.selected .timeslot_label {
         }
+    .timeslot.unavailable {
+        opacity: 30%;
+        user-select: none;
+    }
 .timeslot_container {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -1556,6 +1560,8 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    gap: 10px;
+    row-gap: 50px;
 }
 .challenge_item {
     background-color: #17161b;
@@ -1600,4 +1606,38 @@
     color: #c7b070;
     font-weight: bold;
     text-transform: uppercase;
+}
+.challenge_button {
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    width: 125px;
+    height: 25px;
+    background: linear-gradient(to bottom, #3b4176 50%, #2f345e 50%);
+    line-height: 21px;
+    font-variant: small-caps;
+    text-align: center;
+    color: #ccc1af;
+    cursor: pointer;
+    user-select: none;
+    font-size: 14px;
+    margin-top: 15px;
+}
+    .challenge_button:hover {
+        color: white;
+    }
+    .challenge_button.disabled {
+        opacity: 30%;
+        pointer-events: none;
+    }
+        .challenge_button.disabled:hover {
+            color: #ccc1af;
+            cursor: default;
+        }
+.challenge_button.locked {
+    background: linear-gradient(to bottom, #45444a 50%, #413e3e 50%);
+}
+.challenge_button.cancel {
+    background: linear-gradient(to bottom, #6f3043 50%, #622231 50%);
+}
+.challenge_button.schedule {
+    background: linear-gradient(to bottom, #6a5c3f 50%, #4e4535 50%);
 }
