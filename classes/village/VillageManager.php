@@ -170,12 +170,8 @@ class VillageManager {
                 if (!$system->isDevEnvironment()) {
                     return "Not yet available!";
                 }
-                // check rank
-                if ($player->rank_num < 4) {
-                    return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_KAGE_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_KAGE_CLAIM_TIER]['min_rep'] . " Reputation";
-                }
-                // check tier
-                if ($player->reputation->rank < self::MIN_KAGE_CLAIM_TIER) {
+                // check requirements
+                if (!self::checkSeatRequirements($system, $player, $seat_type)) {
                     return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_KAGE_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_KAGE_CLAIM_TIER]['min_rep'] . " Reputation";
                 }
                 // check seat available
@@ -225,12 +221,8 @@ class VillageManager {
                 if (!empty($seat->seat_id)) {
                     return "You already have a seat in this village!";
                 }
-                // check rank
-                if ($player->rank_num < 4) {
-                    return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_ELDER_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_ELDER_CLAIM_TIER]['min_rep'] . " Reputation";
-                }
-                // check tier
-                if ($player->reputation->rank < self::MIN_ELDER_CLAIM_TIER) {
+                // check requirements
+                if (!self::checkSeatRequirements($system, $player, $seat_type)) {
                     return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_ELDER_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_ELDER_CLAIM_TIER]['min_rep'] . " Reputation";
                 }
                 // check seat available
@@ -436,9 +428,22 @@ class VillageManager {
      */
     public static function submitChallenge(System $system, User $player, int $seat_id, array $selected_times): string
     {
+        // check active challenges
+        $active_challenge = $system->db->query("SELECT COUNT(*) FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} AND `end_time` IS NULL LIMIT 1");
+        if ($system->db->last_num_rows > 0) {
+            return "You can only have one challenge request in progress at a time.";
+        }
         // check challenge cooldown
-        if (false) {
-            return "You must wait anouther " . $hours . " hours before sending another challenge.";
+        $last_challenge = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} ORDER BY `end_time` DESC LIMIT 1");
+        $last_challenge = $system->db->fetch($last_challenge);
+        if ($system->db->last_num_rows > 0) {
+            $cooldown_remaining = ($last_challenge['end_time'] + (self::CHALLENGE_COOLDOWN_DAYS * 86400)) - time();
+            if ($cooldown_remaining > 0) {
+                $hours = floor($cooldown_remaining / 3600);
+                $minutes = floor(($cooldown_remaining % 3600) / 60);
+                $message = "You must wait another " . ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute " : $minutes . " minutes" . " before submiting another challenge.");
+                return $message;
+            }
         }
         // get seat holder
         $seat_result = $system->db->query("SELECT * FROM `village_seats` WHERE `seat_id` = {$seat_id} AND `village_id` = {$player->village->village_id} AND `seat_end` IS NULL LIMIT 1");
@@ -447,15 +452,22 @@ class VillageManager {
             return "Invalid challenge target.";
         }
         // check meet challenge requirements
-        switch ($seat_result['seat_type']) {
-            case 'kage':
-                break;
-            case 'elder':
-                break;
+        if (!self::checkSeatRequirements($system, $player, $seat_result['seat_type'], true)) {
+            switch ($seat_result['seat_type']) {
+                case 'kage':
+                    return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_KAGE_CHALLENGE_TIER) . " - " . UserReputation::$VillageRep[self::MIN_KAGE_CHALLENGE_TIER]['min_rep'] . " Reputation";
+                    break;
+                case 'elder':
+                    return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_ELDER_CHALLENGE_TIER) . " - " . UserReputation::$VillageRep[self::MIN_ELDER_CHALLENGE_TIER]['min_rep'] . " Reputation";
+                    break;
+                default:
+                    return "Seat requirements unmet.";
+                    break;
+            }
         }
         // create challenge
         $time = time();
-        $system->db->query("INSERT INTO `challenge_requests` (`challenger_id`, `seat_holder_id`, `seat_id`, `created_time`) VALUES ({$player->user_id}, {}, {$seat_id}, {$time})");
+        $system->db->query("INSERT INTO `challenge_requests` (`challenger_id`, `seat_holder_id`, `seat_id`, `created_time`, `selected_times`) VALUES ({$player->user_id}, {$seat_result['user_id']}, {$seat_id}, {$time}, '{$selected_times}')");
         return "Challenge submitted!";
     }
 
@@ -1487,6 +1499,44 @@ class VillageManager {
                 alert: false,
             );
             NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_MULTIPLE);
+        }
+    }
+
+    private static function checkSeatRequirements(System $system, User $player, string $seat_type, bool $is_challenge = false): bool {
+        switch ($seat_type) {
+            case 'kage':
+                if ($player->rank_num < 4) {
+                    return false;
+                }
+                if ($is_challenge) {
+                    if ($player->reputation->rank < self::MIN_KAGE_CHALLENGE_TIER) {
+                        return false;
+                    }
+                } else {
+                    if ($player->reputation->rank < self::MIN_KAGE_CLAIM_TIER) {
+                        return false;
+                    }
+                }
+                return true;
+                break;
+            case 'elder':
+                if ($player->rank_num < 4) {
+                    return false;
+                }
+                if ($is_challenge) {
+                    if ($player->reputation->rank < self::MIN_ELDER_CHALLENGE_TIER) {
+                        return false;
+                    }
+                } else {
+                    if ($player->reputation->rank < self::MIN_ELDER_CLAIM_TIER) {
+                        return false;
+                    }
+                }
+                return true;
+                break;
+            default:
+                return false;
+                break;
         }
     }
 }
