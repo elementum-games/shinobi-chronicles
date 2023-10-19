@@ -630,7 +630,7 @@ class System {
             $this->event = new DoubleExpEvent($double_exp_end_time);
         }
         // Double reputation gains
-        $double_reputation_end_time = new DateTimeImmutable('2023-10-30');
+        $double_reputation_end_time = new DateTimeImmutable('2023-10-29');
         if($current_datetime > $double_reputation_start_time && $current_datetime < $double_reputation_end_time) {
             $this->event = new DoubleReputationEvent($double_reputation_end_time);
         }
