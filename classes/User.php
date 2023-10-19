@@ -367,7 +367,7 @@ class User extends Fighter {
         $user->regen_rate = $user_data['regen_rate'];
         $user->regen_boost = 0;
 
-        $user->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
+        $user->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view, set_seal_bonus: false);
         $user->regen_boost += ceil($user->regen_rate * ($user->forbidden_seal->regen_boost / 100));
 
         $user->chat_color = $user_data['chat_color'];
@@ -809,7 +809,7 @@ class User extends Fighter {
         }
 
         // Forbidden seal
-        $this->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
+        $this->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view, set_seal_bonus: true);
         $this->regen_boost += ceil($this->regen_rate * ($this->forbidden_seal->regen_boost / 100));
 
         //In Village Regen
@@ -951,7 +951,7 @@ class User extends Fighter {
             $this->bloodline_id);
     }
 
-    public function setForbiddenSealFromDb(string $forbidden_seal_db, bool $remote_view) {
+    public function setForbiddenSealFromDb(string $forbidden_seal_db, bool $remote_view, bool $set_seal_bonus) {
         if(!$forbidden_seal_db) {
             $this->forbidden_seal = new ForbiddenSeal($this->system, 0, 0);
         }
@@ -972,7 +972,9 @@ class User extends Fighter {
 
         // Load benefits
         $this->forbidden_seal->setBenefits();
-        $this->reputation->setBonusRep($this->forbidden_seal->bonus_reputation);
+        if($set_seal_bonus) {
+            $this->reputation->setBonusPveRep($this->forbidden_seal->bonus_pve_reputation);
+        }
     }
 
     /**

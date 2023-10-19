@@ -9,7 +9,7 @@ require_once __DIR__ . '/Layout.php';
 require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/Route.php';
 require_once __DIR__ . '/../classes/event/DoubleExpEvent.php';
-require_once __DIR__ . '/../classes/event/DoubleReputation.php';
+require_once __DIR__ . '/../classes/event/DoubleReputationEvent.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -630,9 +630,9 @@ class System {
             $this->event = new DoubleExpEvent($double_exp_end_time);
         }
         // Double reputation gains
-        $double_reputation_end_time = new DateTimeImmutable('2023-10-28');
+        $double_reputation_end_time = new DateTimeImmutable('2023-10-30');
         if($current_datetime > $double_reputation_start_time && $current_datetime < $double_reputation_end_time) {
-            $this->event = new DoubleReputation($double_reputation_end_time);
+            $this->event = new DoubleReputationEvent($double_reputation_end_time);
         }
 
         /*****LIMITED TIME EVENTS*****/
