@@ -132,7 +132,8 @@ try {
             break;
         case 'SubmitChallenge':
             $seat_id = $system->db->clean($_POST['seat_id']);
-            $message = VillageManager::submitChallenge($system, $player, $seat_id);
+            $selected_times = $_POST['selected_times'];
+            $message = VillageManager::submitChallenge($system, $player, $seat_id, $selected_times);
             $VillageAPIResponse->response = [
                 'response_message' => $message,
             ];

@@ -3,6 +3,7 @@
 require_once __DIR__ . "/VillageSeatDto.php";
 require_once __DIR__ . "/VillageProposalDto.php";
 require_once __DIR__ . "/VillageStrategicInfoDto.php";
+require_once __DIR__ . "/ChallengeRequestDto.php";
 require_once __DIR__ . "/../notification/NotificationManager.php";
 
 class VillageManager {
@@ -54,6 +55,7 @@ class VillageManager {
     const CHALLENGE_COOLDOWN_DAYS = 3;
     const CHALLENGE_LOCK_TIME_MINUTES = 5;
     const CHALLENGE_SCHEDULE_INCREMENT_MINUTES = 15;
+    const CHALLENGE_MINIMUM_TIMES_SELECTED = 12;
 
     public static function getLocation(System $system, string $village_id): ?TravelCoords {
         $result = $system->db->query(
@@ -409,17 +411,61 @@ class VillageManager {
     }
 
     /**
-     * @return array
+     * @return ChallengeRequestDto[]
      */
     public static function getChallengeData(System $system, User $player): array
     {
         $challenge_data = [];
         $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `seat_holder_id` = {$player->user_id} AND `end_time` IS NULL");
         $challenge_result = $system->db->fetch_all($challenge_result);
-        $challenge_data['incoming_challenges'] = $challenge_result;
+        foreach ($challenge_result as $challenge) {
+            $player_result = $system->db->query("SELECT `user_name`, `avatar_link` FROM `users` WHERE `user_id` = {$challenge['challenger_id']} LIMIT 1");
+            $player_result = $system->db->fetch($player_result);
+            $challenge_data[] = new ChallengeRequestDto(
+                request_id: (int) $challenge['request_id'],
+                challenger_id: (int) $challenge['challenger_id'],
+                seat_holder_id: (int) $challenge['seat_holder_id'],
+                seat_id: (int) $challenge['seat_id'],
+                created_time: (int) $challenge['created_time'],
+                accepted_time: isset($challenge['accepted_time']) ? (int) $challenge['accepted_time'] : null,
+                start_time: isset($challenge['start_time']) ? (int) $challenge['start_time'] : null,
+                end_time: isset($challenge['end_time']) ? (int) $challenge['end_time'] : null,
+                seat_holder_locked: (bool) $challenge['seat_holder_locked'],
+                challenger_locked: (bool) $challenge['challenger_locked'],
+                selected_times: (array) $challenge['selected_times'],
+                battle_id: isset($challenge['battle_id']) ? (int) $challenge['battle_id'] : null,
+                winner: isset($challenge['winner']) ? $challenge['winner'] : null,
+                challenger_name: isset($player_result['user_name']) ? $player_result['user_name'] : '',
+                challenger_avatar: isset($player_result['avatar_link']) ? $player_result['avatar_link'] : '',
+                seat_holder_name: isset($player_result['user_name']) ? $player_result['user_name'] : '',
+                seat_holder_avatar: isset($player_result['avatar_link']) ? $player_result['avatar_link'] : ''
+            );
+        }
         $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} AND `end_time` IS NULL");
         $challenge_result = $system->db->fetch_all($challenge_result);
-        $challenge_data['outgoing_challenges'] = $challenge_result;
+        foreach ($challenge_result as $challenge) {
+            $player_result = $system->db->query("SELECT `user_name`, `avatar_link` FROM `users` WHERE `user_id` = {$challenge['seat_holder_id']} LIMIT 1");
+            $player_result = $system->db->fetch($player_result);
+            $challenge_data[] = new ChallengeRequestDto(
+                request_id: (int) $challenge['request_id'],
+                challenger_id: (int) $challenge['challenger_id'],
+                seat_holder_id: (int) $challenge['seat_holder_id'],
+                seat_id: (int) $challenge['seat_id'],
+                created_time: (int) $challenge['created_time'],
+                accepted_time: isset($challenge['accepted_time']) ? (int) $challenge['accepted_time'] : null,
+                start_time: isset($challenge['start_time']) ? (int) $challenge['start_time'] : null,
+                end_time: isset($challenge['end_time']) ? (int) $challenge['end_time'] : null,
+                seat_holder_locked: (bool) $challenge['seat_holder_locked'],
+                challenger_locked: (bool) $challenge['challenger_locked'],
+                selected_times: (array) $challenge['selected_times'],
+                battle_id: isset($challenge['battle_id']) ? (int) $challenge['battle_id'] : null,
+                winner: isset($challenge['winner']) ? $challenge['winner'] : null,
+                challenger_name: isset($player_result['user_name']) ? $player_result['user_name'] : '',
+                challenger_avatar: isset($player_result['avatar_link']) ? $player_result['avatar_link'] : '',
+                seat_holder_name: isset($player_result['user_name']) ? $player_result['user_name'] : '',
+                seat_holder_avatar: isset($player_result['avatar_link']) ? $player_result['avatar_link'] : ''
+            );
+        }
         return $challenge_data;
     }
 
@@ -428,8 +474,12 @@ class VillageManager {
      */
     public static function submitChallenge(System $system, User $player, int $seat_id, array $selected_times): string
     {
+        // check sufficient times selected
+        if (count($selected_times) < self::CHALLENGE_MINIMUM_TIMES_SELECTED) {
+            return self::CHALLENGE_MINIMUM_TIMES_SELECTED . " time slots must be selected.";
+        }
         // check active challenges
-        $active_challenge = $system->db->query("SELECT COUNT(*) FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} AND `end_time` IS NULL LIMIT 1");
+        $active_challenge = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} AND `end_time` IS NULL LIMIT 1");
         if ($system->db->last_num_rows > 0) {
             return "You can only have one challenge request in progress at a time.";
         }
@@ -461,12 +511,13 @@ class VillageManager {
                     return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_ELDER_CHALLENGE_TIER) . " - " . UserReputation::$VillageRep[self::MIN_ELDER_CHALLENGE_TIER]['min_rep'] . " Reputation";
                     break;
                 default:
-                    return "Seat requirements unmet.";
+                    return "Seat requirements not met.";
                     break;
             }
         }
         // create challenge
         $time = time();
+        $selected_times = json_encode($selected_times);
         $system->db->query("INSERT INTO `challenge_requests` (`challenger_id`, `seat_holder_id`, `seat_id`, `created_time`, `selected_times`) VALUES ({$player->user_id}, {$seat_result['user_id']}, {$seat_id}, {$time}, '{$selected_times}')");
         return "Challenge submitted!";
     }

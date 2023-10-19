@@ -127,6 +127,10 @@ function Village({
 
     return (
         <>
+            <ChallengeContainer
+                challengeDataState={challengeDataState}
+                playerSeatState={playerSeatState}
+            />
             <div className="navigation_row">
                 <div className="nav_button" onClick={() => setVillageTab("villageHQ")}>village hq</div>
                 <div className="nav_button" onClick={() => setVillageTab("worldInfo")}>world info</div>
@@ -328,6 +332,7 @@ function VillageHQ({
                 {
                     request: 'SubmitChallenge',
                     seat_id: challengeTarget.seat_id,
+                    selected_times: selectedTimesUTC,
                 }
             ).then((response) => {
                 if (response.errors.length) {
@@ -1562,6 +1567,52 @@ const TimeGrid = ({ userTimeZone, selectedTimesUTC, setSelectedTimesUTC, startHo
                 </div>
             </div>
         </>
+    );
+}
+
+const ChallengeContainer = ({ challengeDataState, playerSeatState }) => {
+    return (
+        <div className="challenge_container">
+            <div className="header">Challenges</div>
+            <div className="challenge_list">
+                {challengeDataState && challengeDataState
+                    .filter(challenge => challenge.challenger_id === playerSeatState.user_id)
+                    .map((challenge, index) => (
+                        <div key={challenge.request_id} className="challenge_item">
+                            <div className="challenge_avatar_wrapper">
+                                <img className="challenge_avatar" src={challenge.seat_holder_avatar} />
+                            </div>
+                            <div className="challenge_details">
+                                <div className="challenge_header">
+                                    ACTIVE CHALLENGE
+                                </div>
+                                <div>Seat Holder: <a href={"/?id=6&user=" + challenge.seat_holder_name}>{challenge.seat_holder_name}</a></div>
+                                <div>Challenge Time: <span>{challenge.start_time ? challenge.start_time : "PENDING"}</span></div>
+                                {(challenge.start_time && challenge.start_time ) &&
+                                    <div className="challenge_lock_button">lock in</div>
+                                }
+                            </div>
+                        </div>
+                    ))}
+                {challengeDataState && challengeDataState
+                    .filter(challenge => challenge.challenger_id !== playerSeatState.user_id)
+                    .map((challenge, index) => (
+                        <div key={challenge.request_id} className="challenge_item">
+                            <div className="challenge_avatar_wrapper">
+                                <img className="challenge_avatar" src={challenge.challenger_avatar} />
+                            </div>
+                            <div className="challenge_details">
+                                <div className="challenge_header">
+                                    CHALLENGER {index + 1}
+                                </div>
+                                <div>Challenger: <a href={"/?id=6&user=" + challenge.challenger_name}>{challenge.challenger_name}</a></div>
+                                <div>Challenge Time: <span>{challenge.start_time ? challenge.start_time : "PENDING"}</span></div>
+                            </div>
+                        </div>
+                    ))}
+            </div>
+            <svg style={{ marginTop: "45px"}} width="100%" height="1"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#77694e" strokeWidth="1"></line></svg>
+        </div>
     );
 }
 

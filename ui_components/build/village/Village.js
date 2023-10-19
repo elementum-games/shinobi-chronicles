@@ -125,7 +125,10 @@ function Village({
     }
     return data;
   }
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ChallengeContainer, {
+    challengeDataState: challengeDataState,
+    playerSeatState: playerSeatState
+  }), /*#__PURE__*/React.createElement("div", {
     className: "navigation_row"
   }, /*#__PURE__*/React.createElement("div", {
     className: "nav_button",
@@ -310,7 +313,8 @@ function VillageHQ({
     } else {
       apiFetch(villageAPI, {
         request: 'SubmitChallenge',
-        seat_id: challengeTarget.seat_id
+        seat_id: challengeTarget.seat_id,
+        selected_times: selectedTimesUTC
       }).then(response => {
         if (response.errors.length) {
           handleErrors(response.errors);
@@ -1656,5 +1660,60 @@ const TimeGrid = ({
   }, /*#__PURE__*/React.createElement("div", {
     className: "slot_count"
   }, "Selected: ", selectedTimes.length))));
+};
+const ChallengeContainer = ({
+  challengeDataState,
+  playerSeatState
+}) => {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "challenge_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "Challenges"), /*#__PURE__*/React.createElement("div", {
+    className: "challenge_list"
+  }, challengeDataState && challengeDataState.filter(challenge => challenge.challenger_id === playerSeatState.user_id).map((challenge, index) => /*#__PURE__*/React.createElement("div", {
+    key: challenge.request_id,
+    className: "challenge_item"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "challenge_avatar_wrapper"
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "challenge_avatar",
+    src: challenge.seat_holder_avatar
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "challenge_details"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "challenge_header"
+  }, "ACTIVE CHALLENGE"), /*#__PURE__*/React.createElement("div", null, "Seat Holder: ", /*#__PURE__*/React.createElement("a", {
+    href: "/?id=6&user=" + challenge.seat_holder_name
+  }, challenge.seat_holder_name)), /*#__PURE__*/React.createElement("div", null, "Challenge Time: ", /*#__PURE__*/React.createElement("span", null, challenge.start_time ? challenge.start_time : "PENDING")), challenge.start_time && challenge.start_time && /*#__PURE__*/React.createElement("div", {
+    className: "challenge_lock_button"
+  }, "lock in")))), challengeDataState && challengeDataState.filter(challenge => challenge.challenger_id !== playerSeatState.user_id).map((challenge, index) => /*#__PURE__*/React.createElement("div", {
+    key: challenge.request_id,
+    className: "challenge_item"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "challenge_avatar_wrapper"
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "challenge_avatar",
+    src: challenge.challenger_avatar
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "challenge_details"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "challenge_header"
+  }, "CHALLENGER ", index + 1), /*#__PURE__*/React.createElement("div", null, "Challenger: ", /*#__PURE__*/React.createElement("a", {
+    href: "/?id=6&user=" + challenge.challenger_name
+  }, challenge.challenger_name)), /*#__PURE__*/React.createElement("div", null, "Challenge Time: ", /*#__PURE__*/React.createElement("span", null, challenge.start_time ? challenge.start_time : "PENDING")))))), /*#__PURE__*/React.createElement("svg", {
+    style: {
+      marginTop: "45px"
+    },
+    width: "100%",
+    height: "1"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#77694e",
+    strokeWidth: "1"
+  })));
 };
 window.Village = Village;
