@@ -44,6 +44,22 @@ final class KageMigration extends AbstractMigration
             `end_time` NULL DEFAULT NULL,
             PRIMARY KEY (`log_id`));
 
+            -- Add table scheduled_battles
+            CREATE TABLE `shinobi_chronicles`.`scheduled_battles` (
+            `scheduled_battle_id` INT(11) NOT NULL AUTO_INCREMENT,
+            `battle_id` INT(11) NULL DEFAULT NULL,
+            `user1_id` INT(11) NOT NULL,
+            `user2_id` INT(11) NOT NULL,
+            `scheduled_battle_type` VARCHAR(20) NOT NULL,
+            `start_time` INT(11) NOT NULL,
+            `user1_locked_time` INT(11) NULL DEFAULT NULL,
+            `user2_locked_time` INT(11) NULL DEFAULT NULL,
+            `map_id` INT(11) NOT NULL,
+            `x` INT(11) NOT NULL,
+            `y` INT(11) NOT NULL,
+            `winner_id` INT(11) NULL DEFAULT NULL,
+            PRIMARY KEY (`scheduled_battle_id`));
+
             -- Alter table villages
             ALTER TABLE `villages` ADD `policy_id` INT(11) NOT NULL DEFAULT '0';
 
@@ -76,7 +92,10 @@ final class KageMigration extends AbstractMigration
             -- Drop table policy_logs
             DROP TABLE `policy_logs`;
 
-            -- Drop column policy from villages
+            -- Drop table scheduled_battles
+            DROP TABLE `scheduled_battles`;
+
+            -- Drop column policy_id from villages
             ALTER TABLE `villages` DROP COLUMN `policy_id`;
 
             -- Drop column is_provisional from village_seats;

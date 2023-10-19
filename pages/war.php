@@ -108,7 +108,7 @@ function processWarBattleEnd($battle, $player): string {
         }
 
         // handle patrol logic
-        $warManager->handlePatrolDefeat($patrol_id);
+        $warManager->handleWinAgainstPatrol($patrol_id);
 
         $player->ai_wins++;
         $player->battle_id = 0;
@@ -120,7 +120,7 @@ function processWarBattleEnd($battle, $player): string {
         //$player->moveToVillage();
         $player->battle_id = 0;
         $player->last_pvp_ms = System::currentTimeMs();
-        $battle_result .= $warManager->handlePatrolWin($patrol_id);
+        $battle_result .= $warManager->handleLossAgainstPatrol($patrol_id);
     } else if ($battle->isDraw()) {
         $battle_result .= "The battle ended in a draw.";
         $player->health = 5;

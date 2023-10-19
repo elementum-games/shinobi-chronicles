@@ -138,7 +138,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
             $player->pvp_immunity_ms = System::currentTimeMs() + (5 * 1000);
         }*/
 
-        $village_point_gain = 1;
+        $village_point_gain = 1 + $player->village->policy->pvp_village_point;
         $team_point_gain = 1;
 
         $player->addMoney($pvp_yen, "PVP win");
