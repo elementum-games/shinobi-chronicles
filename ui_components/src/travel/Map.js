@@ -459,12 +459,12 @@ function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId, ranksToV
                                 <img className='loot_icon_1' src='/../images/map/icons/loot1.png' />
                             </>
                         }
-                        {player.loot_count > 5 &&
+                        {player.loot_count > 10 &&
                             <>
                                 <img className='loot_icon_2' src='/../images/map/icons/loot1.png' />
                             </>
                         }
-                        {player.loot_count > 10 &&
+                        {player.loot_count > 20 &&
                             <>
                                 <img className='loot_icon_3' src='/../images/map/icons/loot1.png' />
                             </>

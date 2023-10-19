@@ -151,6 +151,7 @@ function Village({
                 getKageKanji={getKageKanji}
                 getVillageIcon={getVillageIcon}
                 getPolicyDisplayData={getPolicyDisplayData}
+                TimeGrid={TimeGrid}
                 />
             }
             {villageTab == "kageQuarters" &&
@@ -214,6 +215,8 @@ function VillageHQ({
     const [modalState, setModalState] = React.useState("closed");
     const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
     const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
+    const [selectedTimesUTC, setSelectedTimesUTC] = React.useState([]);
+    const modalHeader = React.useRef(null);
     const modalText = React.useRef(null);
     const DisplayFromDays = (days) => {
         switch (days) {
@@ -273,6 +276,7 @@ function VillageHQ({
             }
             setSeatDataState(response.data.seatData);
             setPlayerSeatState(response.data.playerSeat);
+            modalHeader.current = "Confirmation";
             modalText.current = response.data.response_message;
             setModalState("response_message");
         });
@@ -291,6 +295,7 @@ function VillageHQ({
                 }
                 setSeatDataState(response.data.seatData);
                 setPlayerSeatState(response.data.playerSeat);
+                modalHeader.current = "Confirmation";
                 modalText.current = response.data.response_message;
                 setModalState("response_message");
             });
@@ -300,6 +305,14 @@ function VillageHQ({
             modalText.current = "Are you sure you wish to resign from your current position?";
         }
     }
+    const Challenge = () => {
+        setModalState("schedule_challenge");
+        modalHeader.current = "Schedule Challenge";
+        modalText.current = "Select times below that you are available to battle.";
+    }
+    const ConfirmChallenge = () => {
+
+    }
     const totalPopulation = populationData.reduce((acc, rank) => acc + rank.count, 0);
     const kage = seatDataState.find(seat => seat.seat_type === 'kage');
     return (
@@ -308,11 +321,27 @@ function VillageHQ({
                 <>
                     <div className="modal_backdrop"></div>
                     <div className="modal">
-                        <div className="modal_header">Confirmation</div>
+                        <div className="modal_header">{modalHeader.current}</div>
                         <div className="modal_text">{modalText.current}</div>
                         {modalState == "confirm_resign" &&
                             <>
                                 <div className="modal_confirm_button" onClick={() => Resign()}>confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "schedule_challenge" &&
+                            <>
+                                <div className="schedule_challenge_subtext_wrapper">
+                                    <span className="schedule_challenge_subtext">Time slots are displayed in your local time.</span>
+                                    <span className="schedule_challenge_subtext">The seat holder will have 24 hours to choose one of your selected times.</span>
+                                    <span className="schedule_challenge_subtext">Your battle will be scheduled a minimum of 12 hours from the time of their selection.</span>
+                                </div>
+                                <TimeGrid
+                                userTimeZone={luxon.Settings.defaultZoneName}
+                                selectedTimesUTC={selectedTimesUTC}
+                                setSelectedTimesUTC={setSelectedTimesUTC}
+                                />
+                                <div className="modal_confirm_button" onClick={() => ConfirmChallenge()}>confirm</div>
                                 <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
                             </>
                         }
@@ -384,7 +413,7 @@ function VillageHQ({
                                     <div className="kage_claim_button" onClick={() => ClaimSeat("kage")}>claim</div>
                                 }
                                 {(kage.seat_id && kage.seat_id != playerSeatState.seat_id) &&
-                                    <div className="kage_challenge_button">challenge</div>
+                                    <div className="kage_challenge_button" onClick={() => Challenge()}>challenge</div>
                                 }
                             </div>
                         </div>
@@ -409,7 +438,7 @@ function VillageHQ({
                                                 <div className={playerSeatState.seat_id ? "elder_claim_button disabled" : "elder_claim_button"} onClick={playerSeatState.seat_id ? null : () => ClaimSeat("elder")}>claim</div>
                                             }
                                             {(elder.seat_id && elder.seat_id != playerSeatState.seat_id) &&
-                                                <div className="elder_challenge_button">challenge</div>
+                                                <div className="elder_challenge_button" onClick={() => Challenge()}>challenge</div>
                                             }
                                         </div>
                                     ))}
@@ -1447,6 +1476,57 @@ function StrategicInfoItem({ strategicInfoData, getPolicyDisplayData }) {
                 </div>
             </div>
         </div>
+    );
+}
+
+const TimeGrid = ({ userTimeZone, selectedTimesUTC, setSelectedTimesUTC, startHourUTC = 0 }) => {
+    const [selectedTimes, setSelectedTimes] = React.useState([]);
+    const timeSlots = generateSlotsForTimeZone(userTimeZone, startHourUTC);
+
+    function generateSlotsForTimeZone(timeZone, startHour) {
+        return Array.from({ length: 24 }, (slot, index) => (index + startHour) % 24).map(hour =>
+            luxon.DateTime.fromObject({ hour }, { zone: 'utc' })
+                .setZone(timeZone)
+        );
+    };
+
+    function toggleSlot(time) {
+        const formattedTime = time.toFormat('HH:mm');
+        if (selectedTimes.includes(formattedTime)) {
+            setSelectedTimes(prev => prev.filter(t => t !== formattedTime));
+        } else {
+            setSelectedTimes(prev => [...prev, formattedTime]);
+        }
+        setSelectedTimesUTC(convertSlotsToUTC());
+    };
+
+    function convertSlotsToUTC() {
+        return selectedTimes.map(time =>
+            luxon.DateTime.fromFormat(time, 'HH:mm', { zone: userTimeZone })
+                .setZone('utc')
+                .toFormat('HH:mm')
+        );
+    };
+
+    return (
+        <>
+            <div className="timeslot_container">
+                {timeSlots.map(time => (
+                    <div key={time.toFormat('HH:mm')} onClick={() => toggleSlot(time)} className={selectedTimes.includes(time.toFormat('HH:mm')) ? "timeslot selected" : "timeslot"}>
+                        {time.toFormat('HH:mm')}
+                        <div className="timeslot_label">
+                            {time.toFormat('h:mm') + " " + time.toFormat('a')}
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <div className="slot_requirements_container">
+                <div className="slot_requirements">At least 12 slots must be selected for availability.</div>
+                <div className="slot_count_wrapper">
+                    <div className="slot_count">Selected: {selectedTimes.length}</div>
+                </div>
+            </div>
+        </>
     );
 }
 

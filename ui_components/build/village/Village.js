@@ -155,7 +155,8 @@ function Village({
     handleErrors: handleErrors,
     getKageKanji: getKageKanji,
     getVillageIcon: getVillageIcon,
-    getPolicyDisplayData: getPolicyDisplayData
+    getPolicyDisplayData: getPolicyDisplayData,
+    TimeGrid: TimeGrid
   }), villageTab == "kageQuarters" && /*#__PURE__*/React.createElement(KageQuarters, {
     playerSeatState: playerSeatState,
     setPlayerSeatState: setPlayerSeatState,
@@ -209,6 +210,8 @@ function VillageHQ({
   const [modalState, setModalState] = React.useState("closed");
   const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
   const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
+  const [selectedTimesUTC, setSelectedTimesUTC] = React.useState([]);
+  const modalHeader = React.useRef(null);
   const modalText = React.useRef(null);
   const DisplayFromDays = days => {
     switch (days) {
@@ -262,6 +265,7 @@ function VillageHQ({
       }
       setSeatDataState(response.data.seatData);
       setPlayerSeatState(response.data.playerSeat);
+      modalHeader.current = "Confirmation";
       modalText.current = response.data.response_message;
       setModalState("response_message");
     });
@@ -277,6 +281,7 @@ function VillageHQ({
         }
         setSeatDataState(response.data.seatData);
         setPlayerSeatState(response.data.playerSeat);
+        modalHeader.current = "Confirmation";
         modalText.current = response.data.response_message;
         setModalState("response_message");
       });
@@ -285,6 +290,12 @@ function VillageHQ({
       modalText.current = "Are you sure you wish to resign from your current position?";
     }
   };
+  const Challenge = () => {
+    setModalState("schedule_challenge");
+    modalHeader.current = "Schedule Challenge";
+    modalText.current = "Select times below that you are available to battle.";
+  };
+  const ConfirmChallenge = () => {};
   const totalPopulation = populationData.reduce((acc, rank) => acc + rank.count, 0);
   const kage = seatDataState.find(seat => seat.seat_type === 'kage');
   return /*#__PURE__*/React.createElement(React.Fragment, null, modalState !== "closed" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
@@ -293,11 +304,29 @@ function VillageHQ({
     className: "modal"
   }, /*#__PURE__*/React.createElement("div", {
     className: "modal_header"
-  }, "Confirmation"), /*#__PURE__*/React.createElement("div", {
+  }, modalHeader.current), /*#__PURE__*/React.createElement("div", {
     className: "modal_text"
   }, modalText.current), modalState == "confirm_resign" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "modal_confirm_button",
     onClick: () => Resign()
+  }, "confirm"), /*#__PURE__*/React.createElement("div", {
+    className: "modal_cancel_button",
+    onClick: () => setModalState("closed")
+  }, "cancel")), modalState == "schedule_challenge" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "schedule_challenge_subtext_wrapper"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "schedule_challenge_subtext"
+  }, "Time slots are displayed in your local time."), /*#__PURE__*/React.createElement("span", {
+    className: "schedule_challenge_subtext"
+  }, "The seat holder will have 24 hours to choose one of your selected times."), /*#__PURE__*/React.createElement("span", {
+    className: "schedule_challenge_subtext"
+  }, "Your battle will be scheduled a minimum of 12 hours from the time of their selection.")), /*#__PURE__*/React.createElement(TimeGrid, {
+    userTimeZone: luxon.Settings.defaultZoneName,
+    selectedTimesUTC: selectedTimesUTC,
+    setSelectedTimesUTC: setSelectedTimesUTC
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "modal_confirm_button",
+    onClick: () => ConfirmChallenge()
   }, "confirm"), /*#__PURE__*/React.createElement("div", {
     className: "modal_cancel_button",
     onClick: () => setModalState("closed")
@@ -383,7 +412,8 @@ function VillageHQ({
     className: "kage_claim_button",
     onClick: () => ClaimSeat("kage")
   }, "claim"), kage.seat_id && kage.seat_id != playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
-    className: "kage_challenge_button"
+    className: "kage_challenge_button",
+    onClick: () => Challenge()
   }, "challenge")))), /*#__PURE__*/React.createElement("div", {
     className: "column third"
   }, /*#__PURE__*/React.createElement("div", {
@@ -413,7 +443,8 @@ function VillageHQ({
     className: playerSeatState.seat_id ? "elder_claim_button disabled" : "elder_claim_button",
     onClick: playerSeatState.seat_id ? null : () => ClaimSeat("elder")
   }, "claim"), elder.seat_id && elder.seat_id != playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
-    className: "elder_challenge_button"
+    className: "elder_challenge_button",
+    onClick: () => Challenge()
   }, "challenge"))))), /*#__PURE__*/React.createElement("div", {
     className: "points_container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -1542,4 +1573,56 @@ function StrategicInfoItem({
     className: "supply_point_name"
   }, supply_point.name), " x", supply_point.count)))))));
 }
+const TimeGrid = ({
+  userTimeZone,
+  selectedTimesUTC,
+  setSelectedTimesUTC,
+  startHourUTC = 0
+}) => {
+  const [selectedTimes, setSelectedTimes] = React.useState([]);
+  const timeSlots = generateSlotsForTimeZone(userTimeZone, startHourUTC);
+  function generateSlotsForTimeZone(timeZone, startHour) {
+    return Array.from({
+      length: 24
+    }, (slot, index) => (index + startHour) % 24).map(hour => luxon.DateTime.fromObject({
+      hour
+    }, {
+      zone: 'utc'
+    }).setZone(timeZone));
+  }
+  ;
+  function toggleSlot(time) {
+    const formattedTime = time.toFormat('HH:mm');
+    if (selectedTimes.includes(formattedTime)) {
+      setSelectedTimes(prev => prev.filter(t => t !== formattedTime));
+    } else {
+      setSelectedTimes(prev => [...prev, formattedTime]);
+    }
+    setSelectedTimesUTC(convertSlotsToUTC());
+  }
+  ;
+  function convertSlotsToUTC() {
+    return selectedTimes.map(time => luxon.DateTime.fromFormat(time, 'HH:mm', {
+      zone: userTimeZone
+    }).setZone('utc').toFormat('HH:mm'));
+  }
+  ;
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "timeslot_container"
+  }, timeSlots.map(time => /*#__PURE__*/React.createElement("div", {
+    key: time.toFormat('HH:mm'),
+    onClick: () => toggleSlot(time),
+    className: selectedTimes.includes(time.toFormat('HH:mm')) ? "timeslot selected" : "timeslot"
+  }, time.toFormat('HH:mm'), /*#__PURE__*/React.createElement("div", {
+    className: "timeslot_label"
+  }, time.toFormat('h:mm') + " " + time.toFormat('a'))))), /*#__PURE__*/React.createElement("div", {
+    className: "slot_requirements_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "slot_requirements"
+  }, "At least 12 slots must be selected for availability."), /*#__PURE__*/React.createElement("div", {
+    className: "slot_count_wrapper"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "slot_count"
+  }, "Selected: ", selectedTimes.length))));
+};
 window.Village = Village;
