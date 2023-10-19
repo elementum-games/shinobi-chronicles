@@ -972,6 +972,9 @@ class User extends Fighter {
 
         // Load benefits
         $this->forbidden_seal->setBenefits();
+        if(!$remote_view && isset($this->reputation) && !$this->reputation->bonus_pve_loaded) {
+            $this->reputation->setBonusPveRep($this->forbidden_seal->bonus_pve_reputation);
+        }
     }
 
     /**

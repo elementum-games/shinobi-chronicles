@@ -190,6 +190,8 @@ class UserReputation {
     const SPAR_REP_DRAW = 5;
     const SPAR_REP_WIN = 7;
 
+    protected ?Event $event;
+
     protected int $rep;
     protected int $weekly_rep;
     protected int $weekly_pvp_rep;
@@ -200,6 +202,9 @@ class UserReputation {
     public int $weekly_cap;
     public int $weekly_pvp_cap;
 
+    protected int $bonus_pve_rep; // Use only for forbidden_seal bonuses!
+    public bool $bonus_pve_loaded;
+
     // TODO: Make recent_killed private
     public ?string $recent_players_killed_ids;
     public array $recent_players_killed_ids_array;
@@ -209,11 +214,16 @@ class UserReputation {
     public array $benefits;
 
     public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$last_pvp_kills, &$last_killer_ids, $mission_cd, $event) {
+        //System data
+        $this->event = $event;
+
         //Player data
         $this->rep = &$player_rep;
         $this->weekly_rep = &$player_weekly_rep;
         $this->mission_cd = $mission_cd;
         $this->rank = self::tierByRepAmount($this->rep);
+        $this->bonus_pve_rep = 0;
+        $this->bonus_pve_loaded = false;
 
         //PvP data
         $this->weekly_pvp_rep = &$player_pvp_rep;
@@ -232,6 +242,12 @@ class UserReputation {
         $this->weekly_cap = $REP_RANK['weekly_cap'];
         $this->weekly_pvp_cap = $REP_RANK['weekly_pvp_cap'];
         $this->base_pvp_reward = $REP_RANK['base_pvp_rep_reward'];
+
+        // EVENT MODIFICATIONS
+        if(!empty($this->event) && $this->event instanceof DoubleReputationEvent) {
+            $this->weekly_cap *= DoubleReputationEvent::pve_cap_multiplier;
+            $this->weekly_pvp_cap *= DoubleReputationEvent::pvp_cap_multiplier;
+        }
     }
 
     /**
@@ -247,8 +263,16 @@ class UserReputation {
      * Returns amount of reputation awarded for display/data confirmation purposes
      */
     public function addRep(int $amount, bool $bypass_weekly_cap = false, bool $increment_pvp = false): int {
+        // Double repuation
+        if (!empty($this->event) && $this->event instanceof DoubleReputationEvent) {
+            $amount *= DoubleReputationEvent::rep_gain_multiplier;
+        }
+
         //Adjust reputation gain if gain goes above cap
         if(!$bypass_weekly_cap) {
+            // Bonus seal reputation
+            $amount += $this->bonus_pve_rep;
+
             $new_rep = $this->rep + $amount;
 
             // Determine if rep rank changes and modify weekly cap if change occurs
@@ -259,9 +283,11 @@ class UserReputation {
             if($this->weekly_rep + $amount > $weekly_cap) {
                 $amount = $weekly_cap - $this->weekly_rep;
             }
-            $this->weekly_rep += $amount;
+
+            //$this->weekly_rep += $amount;  Note: bug fix, this needs to be at the end of calculations, due to pvp separation
         }
-        // Pvp rep
+
+        // Increment Pvp rep
         if($increment_pvp) {
             if($this->weekly_pvp_rep + $amount > $this->weekly_pvp_cap) {
                 $amount = $this->weekly_pvp_cap - $this->weekly_pvp_rep;
@@ -271,6 +297,10 @@ class UserReputation {
         //Increment rep amount
         if($amount > 0) {
             $this->rep += $amount;
+            // Weekly rep needs to be added last to avoid adding more weekly rep than what is gained should pvp reduce amount
+            if(!$bypass_weekly_cap) {
+                $this->weekly_rep += $amount;
+            }
         }
 
         return $amount; // Use this return for display/gain confirmation
@@ -290,6 +320,16 @@ class UserReputation {
         if($this->rep < 0) {
             $this->rep = 0;
         }
+    }
+
+    // Set bonus reputation from seal
+    public function setBonusPveRep($amount): void {
+        $this->bonus_pve_rep = $amount;
+        $this->bonus_pve_loaded = true;
+    }
+
+    public function getBonusPveRep(): int {
+        return $this->bonus_pve_rep;
     }
 
     public function resetPvpRep(): void {

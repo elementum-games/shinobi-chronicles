@@ -201,7 +201,8 @@
                 Cheaper stat transfers +<?= $fourDragonSeal->extra_stat_transfer_points_per_ak ?> stat points per AK<br />
                 Increased free stat transfer limit (+<?= $fourDragonSeal->free_transfer_bonus ?>%)<br />
                 Faster stat transfers (+<?=$fourDragonSeal->stat_transfer_boost?>/minute)<br />
-                View logs of your last <?= $fourDragonSeal->max_battle_history_view ?> battles
+                View logs of your last <?= $fourDragonSeal->max_battle_history_view ?> battles<br />
+                Additional +<?= $fourDragonSeal->bonus_pve_reputation ?> Reputation from PVE sources
                 <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
                     <p style='width:100%;text-align:center;margin: 2.2em 0 0;'>
                         <input type='hidden' name='seal_level' value='2'/>
