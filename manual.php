@@ -335,6 +335,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
             <li>Faster stat transfers (+5/minute)</li>
             <li>Cheaper stat transfers +100 stat points per AK</li>
             <li>View logs of your last 20 battles</li>
+            <li>Additional +1 Reputation from non-pvp sources</li>
         </ul>
 
 
