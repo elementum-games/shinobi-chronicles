@@ -130,6 +130,28 @@ try {
                 'response_message' => $message,
             ];
             break;
+        case 'SubmitChallenge':
+            $seat_id = $system->db->clean($_POST['seat_id']);
+            $message = VillageManager::submitChallenge($system, $player, $seat_id);
+            $VillageAPIResponse->response = [
+                'response_message' => $message,
+            ];
+            break;
+        case 'AcceptChallenge':
+            $challenge_id = $system->db->clean($_POST['challenge_id']);
+            $time = $system->db->clean($_POST['time']);
+            $message = VillageManager::AcceptChallenge($system, $player, $challenge_id, $time);
+            $VillageAPIResponse->response = [
+                'response_message' => $message,
+            ];
+            break;
+        case 'LockChallenge':
+            $challenge_id = $system->db->clean($_POST['challenge_id']);
+            $message = VillageManager::lockChallenge($system, $player, $challenge_id);
+            $VillageAPIResponse->response = [
+                'response_message' => $message,
+            ];
+            break;
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
     }

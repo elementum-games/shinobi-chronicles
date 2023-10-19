@@ -89,4 +89,8 @@ class VillageApiPresenter {
     {
         return VillageManager::getVillageStrategicInfo($system);
     }
+    public static function challengeDataResponse(System $system, User $player): array
+    {
+        return VillageManager::getChallengeData($system, $player);
+    }
 }

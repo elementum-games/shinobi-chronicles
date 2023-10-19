@@ -49,6 +49,12 @@ class VillageManager {
     const PROPOSAL_TYPE_ACCEPT_PEACE = "accept_peace";
     const PROPOSAL_TYPE_BREAK_ALLIANCE = "break_alliance";
 
+    const CHALLENGE_EXPIRE_DAYS = 1;
+    const CHALLENGE_MIN_DELAY_HOURS = 12;
+    const CHALLENGE_COOLDOWN_DAYS = 3;
+    const CHALLENGE_LOCK_TIME_MINUTES = 5;
+    const CHALLENGE_SCHEDULE_INCREMENT_MINUTES = 15;
+
     public static function getLocation(System $system, string $village_id): ?TravelCoords {
         $result = $system->db->query(
             "SELECT `maps_locations`.`x`, `maps_locations`.`y`, `maps_locations`.`map_id` FROM `villages`
@@ -408,6 +414,121 @@ class VillageManager {
         $result = $system->db->query("SELECT * FROM `clans` WHERE `village` = '{$village}'");
         $result = $system->db->fetch_all($result);
         return $result;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getChallengeData(System $system, User $player): array
+    {
+        $challenge_data = [];
+        $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `seat_holder_id` = {$player->user_id} AND `end_time` IS NULL");
+        $challenge_result = $system->db->fetch_all($challenge_result);
+        $challenge_data['incoming_challenges'] = $challenge_result;
+        $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} AND `end_time` IS NULL");
+        $challenge_result = $system->db->fetch_all($challenge_result);
+        $challenge_data['outgoing_challenges'] = $challenge_result;
+        return $challenge_data;
+    }
+
+    /**
+     * @return string
+     */
+    public static function submitChallenge(System $system, User $player, int $seat_id, array $selected_times): string
+    {
+        // check challenge cooldown
+        if (false) {
+            return "You must wait anouther " . $hours . " hours before sending another challenge.";
+        }
+        // get seat holder
+        $seat_result = $system->db->query("SELECT * FROM `village_seats` WHERE `seat_id` = {$seat_id} AND `village_id` = {$player->village->village_id} AND `seat_end` IS NULL LIMIT 1");
+        $seat_result = $system->db->fetch($seat_result);
+        if ($system->db->last_num_rows == 0) {
+            return "Invalid challenge target.";
+        }
+        // check meet challenge requirements
+        switch ($seat_result['seat_type']) {
+            case 'kage':
+                break;
+            case 'elder':
+                break;
+        }
+        // create challenge
+        $time = time();
+        $system->db->query("INSERT INTO `challenge_requests` (`challenger_id`, `seat_holder_id`, `seat_id`, `created_time`) VALUES ({$player->user_id}, {}, {$seat_id}, {$time})");
+        return "Challenge submitted!";
+    }
+
+    /**
+     * @return string
+     */
+    public static function cancelChallenge(System $system, User $player, int $challenge_id): string
+    {
+        // verify challenge target is valid
+        $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenge_id` = {$challenge_id} AND `challenger_id` = {$player->user_id} AND `end_time` IS NULL");
+        if ($system->db->last_num_rows == 0) {
+            return "Invalid challenge.";
+        }
+        $time = time();
+        $system->db->query("UPDATE `challenge_requests` SET `winner` = 'seat_holder', `end_time` = {$time} WHERE `challenge_id` = {$challenge_id}");
+        return "Challenge canceled.";
+    }
+
+    /**
+     * @return string
+     */
+    public static function acceptChallenge(System $system, User $player, int $challenge_id, int $challenge_time): string
+    {
+        $slots_per_hour = 60 / self::CHALLENGE_SCHEDULE_INCREMENT_MINUTES;
+        // check challenge valid
+        $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenge_id` = {$challenge_id} AND `end_time` IS NULL AND `seat_holder_id` = {$player->user_id}");
+        $challenge_result = $system->db->fetch($challenge_result);
+        if ($system->db->last_num_rows == 0) {
+            return "Invalid challenge.";
+        }
+        // check challenge time in options
+        $selected_times = json_decode($challenge_result['selected_times']);
+        if (!in_array($challenge_time, $selected_times)) {
+            return "Invalid time slot.";
+        }
+        // convert challenge time to UTC
+        $date = new DateTime($challenge_time, new DateTimeZone('UTC'));
+        $min_challenge_time = $date->getTimestamp();
+        // check min number of hours from current time
+        $difference = $min_challenge_time - $currentTime;
+        if ($difference < self::CHALLENGE_MIN_DELAY_HOURS * 60 * 60) {
+            // Add 24 hours to the challenge time
+            $min_challenge_time += 24 * 60 * 60;
+        }
+        // calculate last possible time for current slot
+        $max_challenge_time = $min_challenge_time + (($slots_per_hour - 1) * 60); // e.g. 8:00->8:15->8:30->8:45
+        // get number of scheduled challenges in same hour
+        $challenges_result = $system->db->query("SELECT COUNT(*) as `challenge_count` FROM `challenge_requests` WHERE `seat_holder_id` = {$player->user_id} AND `start_time` >= {$min_challenge_time} AND `start_time` <= {$max_challenge_time}");
+        $challenges_result = $system->db->fetch($challenges_result);
+        if ($challenges_result >= $slots_per_hour) {
+            return "Can not schedule any more challenges for that time slot.";
+        } else {
+            $challenge_time = $min_challenge_time + (self::CHALLENGE_SCHEDULE_INCREMENT_MINUTES * 60) * $challenges_result['challenge_count'];
+        }
+        // update challenge
+        $time = time();
+        $system->db->query("UPDATE `challenge_requests` SET `accepted_time` = {$time}, `start_time` = {$challenge_time} WHERE `challenge_id` = {$challenge_id}");
+    }
+
+    /**
+     * @return string
+     */
+    public static function lockChallenge(System $system, User $player, int $challenge_id): string
+    {
+        return "test";
+    }
+
+    /**
+     * @return string
+     */
+    public static function processChallengeEnd(System $system, int $challenge_id, int $winner_id): string
+    {
+        return "test";
     }
 
     /**

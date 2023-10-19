@@ -11,7 +11,8 @@ function Village({
   resourceData,
   clanData,
   proposalData,
-  strategicData
+  strategicData,
+  challengeData
 }) {
   const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
   const [policyDataState, setPolicyDataState] = React.useState(policyData);
@@ -21,6 +22,7 @@ function Village({
   const [resourceDataState, setResourceDataState] = React.useState(resourceData);
   const [proposalDataState, setProposalDataState] = React.useState(proposalData);
   const [strategicDataState, setStrategicDataState] = React.useState(strategicData);
+  const [challengeDataState, setChallengeDataState] = React.useState(challengeData);
   const [villageTab, setVillageTab] = React.useState("villageHQ");
   function handleErrors(errors) {
     console.warn(errors);
@@ -151,6 +153,8 @@ function Village({
     diplomacyDataState: diplomacyDataState,
     resourceDataState: resourceDataState,
     setResourceDataState: setResourceDataState,
+    challengeDataState: challengeDataState,
+    setChallengeDataState: setChallengeDataState,
     clanData: clanData,
     handleErrors: handleErrors,
     getKageKanji: getKageKanji,
@@ -201,6 +205,8 @@ function VillageHQ({
   diplomacyDataState,
   resourceDataState,
   setResourceDataState,
+  challengeDataState,
+  setChallengeDataState,
   clanData,
   handleErrors,
   getKageKanji,
@@ -211,8 +217,9 @@ function VillageHQ({
   const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
   const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
   const [selectedTimesUTC, setSelectedTimesUTC] = React.useState([]);
-  const modalHeader = React.useRef(null);
-  const modalText = React.useRef(null);
+  const [modalHeader, setModalHeader] = React.useState(null);
+  const [modalText, setModalText] = React.useState(null);
+  const [challengeTarget, setChallengeTarget] = React.useState(null);
   const DisplayFromDays = days => {
     switch (days) {
       case 1:
@@ -265,8 +272,8 @@ function VillageHQ({
       }
       setSeatDataState(response.data.seatData);
       setPlayerSeatState(response.data.playerSeat);
-      modalHeader.current = "Confirmation";
-      modalText.current = response.data.response_message;
+      setModalHeader("Confirmation");
+      setModalText(response.data.response_message);
       setModalState("response_message");
     });
   };
@@ -281,21 +288,44 @@ function VillageHQ({
         }
         setSeatDataState(response.data.seatData);
         setPlayerSeatState(response.data.playerSeat);
-        modalHeader.current = "Confirmation";
-        modalText.current = response.data.response_message;
+        setModalHeader("Confirmation");
+        setModalText(response.data.response_message);
         setModalState("response_message");
       });
     } else {
+      setModalHeader("Confirmation");
       setModalState("confirm_resign");
-      modalText.current = "Are you sure you wish to resign from your current position?";
+      setModalText("Are you sure you wish to resign from your current position?");
     }
   };
-  const Challenge = () => {
-    setModalState("schedule_challenge");
-    modalHeader.current = "Schedule Challenge";
-    modalText.current = "Select times below that you are available to battle.";
+  const Challenge = target_seat => {
+    setChallengeTarget(target_seat);
+    setModalState("submit_challenge");
+    setModalHeader("Submit Challenge");
+    setModalText("Select times below that you are available to battle.");
   };
-  const ConfirmChallenge = () => {};
+  const ConfirmSubmitChallenge = () => {
+    if (selectedTimesUTC.length < 12) {
+      setModalText("Insufficient slots selected.");
+    } else {
+      apiFetch(villageAPI, {
+        request: 'SubmitChallenge',
+        seat_id: challengeTarget.seat_id
+      }).then(response => {
+        if (response.errors.length) {
+          handleErrors(response.errors);
+          return;
+        }
+        // challenges display update
+        setModalHeader("Confirmation");
+        setModalText(response.data.response_message);
+        setModalState("response_message");
+      });
+    }
+  };
+  const CancelChallengeSchedule = () => {
+    setSelectedTimesUTC([]);
+  };
   const totalPopulation = populationData.reduce((acc, rank) => acc + rank.count, 0);
   const kage = seatDataState.find(seat => seat.seat_type === 'kage');
   return /*#__PURE__*/React.createElement(React.Fragment, null, modalState !== "closed" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
@@ -304,15 +334,15 @@ function VillageHQ({
     className: "modal"
   }, /*#__PURE__*/React.createElement("div", {
     className: "modal_header"
-  }, modalHeader.current), /*#__PURE__*/React.createElement("div", {
+  }, modalHeader), /*#__PURE__*/React.createElement("div", {
     className: "modal_text"
-  }, modalText.current), modalState == "confirm_resign" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, modalText), modalState == "confirm_resign" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "modal_confirm_button",
     onClick: () => Resign()
   }, "confirm"), /*#__PURE__*/React.createElement("div", {
     className: "modal_cancel_button",
     onClick: () => setModalState("closed")
-  }, "cancel")), modalState == "schedule_challenge" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "cancel")), modalState == "submit_challenge" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "schedule_challenge_subtext_wrapper"
   }, /*#__PURE__*/React.createElement("span", {
     className: "schedule_challenge_subtext"
@@ -326,7 +356,7 @@ function VillageHQ({
     setSelectedTimesUTC: setSelectedTimesUTC
   }), /*#__PURE__*/React.createElement("div", {
     className: "modal_confirm_button",
-    onClick: () => ConfirmChallenge()
+    onClick: () => ConfirmSubmitChallenge()
   }, "confirm"), /*#__PURE__*/React.createElement("div", {
     className: "modal_cancel_button",
     onClick: () => setModalState("closed")
@@ -413,7 +443,7 @@ function VillageHQ({
     onClick: () => ClaimSeat("kage")
   }, "claim"), kage.seat_id && kage.seat_id != playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
     className: "kage_challenge_button",
-    onClick: () => Challenge()
+    onClick: () => Challenge(kage)
   }, "challenge")))), /*#__PURE__*/React.createElement("div", {
     className: "column third"
   }, /*#__PURE__*/React.createElement("div", {
@@ -444,7 +474,7 @@ function VillageHQ({
     onClick: playerSeatState.seat_id ? null : () => ClaimSeat("elder")
   }, "claim"), elder.seat_id && elder.seat_id != playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
     className: "elder_challenge_button",
-    onClick: () => Challenge()
+    onClick: () => Challenge(elder)
   }, "challenge"))))), /*#__PURE__*/React.createElement("div", {
     className: "points_container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -1593,16 +1623,18 @@ const TimeGrid = ({
   ;
   function toggleSlot(time) {
     const formattedTime = time.toFormat('HH:mm');
+    let newSelectedTimes;
     if (selectedTimes.includes(formattedTime)) {
-      setSelectedTimes(prev => prev.filter(t => t !== formattedTime));
+      newSelectedTimes = selectedTimes.filter(t => t !== formattedTime);
     } else {
-      setSelectedTimes(prev => [...prev, formattedTime]);
+      newSelectedTimes = [...selectedTimes, formattedTime];
     }
-    setSelectedTimesUTC(convertSlotsToUTC());
+    setSelectedTimes(newSelectedTimes);
+    setSelectedTimesUTC(convertSlotsToUTC(newSelectedTimes));
   }
   ;
-  function convertSlotsToUTC() {
-    return selectedTimes.map(time => luxon.DateTime.fromFormat(time, 'HH:mm', {
+  function convertSlotsToUTC(times) {
+    return times.map(time => luxon.DateTime.fromFormat(time, 'HH:mm', {
       zone: userTimeZone
     }).setZone('utc').toFormat('HH:mm'));
   }

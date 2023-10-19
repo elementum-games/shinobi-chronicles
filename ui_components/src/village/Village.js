@@ -13,6 +13,7 @@ function Village({
     clanData,
     proposalData,
     strategicData,
+    challengeData,
 }) {
     const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
     const [policyDataState, setPolicyDataState] = React.useState(policyData);
@@ -22,6 +23,7 @@ function Village({
     const [resourceDataState, setResourceDataState] = React.useState(resourceData);
     const [proposalDataState, setProposalDataState] = React.useState(proposalData);
     const [strategicDataState, setStrategicDataState] = React.useState(strategicData);
+    const [challengeDataState, setChallengeDataState] = React.useState(challengeData);
     const [villageTab, setVillageTab] = React.useState("villageHQ");
 
     function handleErrors(errors) {
@@ -146,6 +148,8 @@ function Village({
                 diplomacyDataState={diplomacyDataState}
                 resourceDataState={resourceDataState}
                 setResourceDataState={setResourceDataState}
+                challengeDataState={challengeDataState}
+                setChallengeDataState={setChallengeDataState}
                 clanData={clanData}
                 handleErrors={handleErrors}
                 getKageKanji={getKageKanji}
@@ -206,6 +210,8 @@ function VillageHQ({
     diplomacyDataState,
     resourceDataState,
     setResourceDataState,
+    challengeDataState,
+    setChallengeDataState,
     clanData,
     handleErrors,
     getKageKanji,
@@ -216,8 +222,9 @@ function VillageHQ({
     const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
     const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
     const [selectedTimesUTC, setSelectedTimesUTC] = React.useState([]);
-    const modalHeader = React.useRef(null);
-    const modalText = React.useRef(null);
+    const [modalHeader, setModalHeader] = React.useState(null);
+    const [modalText, setModalText] = React.useState(null);
+    const [challengeTarget, setChallengeTarget] = React.useState(null);
     const DisplayFromDays = (days) => {
         switch (days) {
             case 1:
@@ -276,8 +283,8 @@ function VillageHQ({
             }
             setSeatDataState(response.data.seatData);
             setPlayerSeatState(response.data.playerSeat);
-            modalHeader.current = "Confirmation";
-            modalText.current = response.data.response_message;
+            setModalHeader("Confirmation");
+            setModalText(response.data.response_message);
             setModalState("response_message");
         });
     }
@@ -295,23 +302,47 @@ function VillageHQ({
                 }
                 setSeatDataState(response.data.seatData);
                 setPlayerSeatState(response.data.playerSeat);
-                modalHeader.current = "Confirmation";
-                modalText.current = response.data.response_message;
+                setModalHeader("Confirmation");
+                setModalText(response.data.response_message);
                 setModalState("response_message");
             });
         }
         else {
+            setModalHeader("Confirmation");
             setModalState("confirm_resign");
-            modalText.current = "Are you sure you wish to resign from your current position?";
+            setModalText("Are you sure you wish to resign from your current position?");
         }
     }
-    const Challenge = () => {
-        setModalState("schedule_challenge");
-        modalHeader.current = "Schedule Challenge";
-        modalText.current = "Select times below that you are available to battle.";
+    const Challenge = (target_seat) => {
+        setChallengeTarget(target_seat);
+        setModalState("submit_challenge");
+        setModalHeader("Submit Challenge");
+        setModalText("Select times below that you are available to battle.");
     }
-    const ConfirmChallenge = () => {
-
+    const ConfirmSubmitChallenge = () => {
+        if (selectedTimesUTC.length < 12) {
+            setModalText("Insufficient slots selected.");
+        } else {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'SubmitChallenge',
+                    seat_id: challengeTarget.seat_id,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                // challenges display update
+                setModalHeader("Confirmation");
+                setModalText(response.data.response_message);
+                setModalState("response_message");
+            });
+        }
+    }
+    const CancelChallengeSchedule = () => {
+        setSelectedTimesUTC([]);
     }
     const totalPopulation = populationData.reduce((acc, rank) => acc + rank.count, 0);
     const kage = seatDataState.find(seat => seat.seat_type === 'kage');
@@ -321,15 +352,15 @@ function VillageHQ({
                 <>
                     <div className="modal_backdrop"></div>
                     <div className="modal">
-                        <div className="modal_header">{modalHeader.current}</div>
-                        <div className="modal_text">{modalText.current}</div>
+                        <div className="modal_header">{modalHeader}</div>
+                        <div className="modal_text">{modalText}</div>
                         {modalState == "confirm_resign" &&
                             <>
                                 <div className="modal_confirm_button" onClick={() => Resign()}>confirm</div>
                                 <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
                             </>
                         }
-                        {modalState == "schedule_challenge" &&
+                        {modalState == "submit_challenge" &&
                             <>
                                 <div className="schedule_challenge_subtext_wrapper">
                                     <span className="schedule_challenge_subtext">Time slots are displayed in your local time.</span>
@@ -341,7 +372,7 @@ function VillageHQ({
                                 selectedTimesUTC={selectedTimesUTC}
                                 setSelectedTimesUTC={setSelectedTimesUTC}
                                 />
-                                <div className="modal_confirm_button" onClick={() => ConfirmChallenge()}>confirm</div>
+                                <div className="modal_confirm_button" onClick={() => ConfirmSubmitChallenge()}>confirm</div>
                                 <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
                             </>
                         }
@@ -413,7 +444,7 @@ function VillageHQ({
                                     <div className="kage_claim_button" onClick={() => ClaimSeat("kage")}>claim</div>
                                 }
                                 {(kage.seat_id && kage.seat_id != playerSeatState.seat_id) &&
-                                    <div className="kage_challenge_button" onClick={() => Challenge()}>challenge</div>
+                                    <div className="kage_challenge_button" onClick={() => Challenge(kage)}>challenge</div>
                                 }
                             </div>
                         </div>
@@ -438,7 +469,7 @@ function VillageHQ({
                                                 <div className={playerSeatState.seat_id ? "elder_claim_button disabled" : "elder_claim_button"} onClick={playerSeatState.seat_id ? null : () => ClaimSeat("elder")}>claim</div>
                                             }
                                             {(elder.seat_id && elder.seat_id != playerSeatState.seat_id) &&
-                                                <div className="elder_challenge_button" onClick={() => Challenge()}>challenge</div>
+                                                <div className="elder_challenge_button" onClick={() => Challenge(elder)}>challenge</div>
                                             }
                                         </div>
                                     ))}
@@ -1492,16 +1523,20 @@ const TimeGrid = ({ userTimeZone, selectedTimesUTC, setSelectedTimesUTC, startHo
 
     function toggleSlot(time) {
         const formattedTime = time.toFormat('HH:mm');
+        let newSelectedTimes;
+
         if (selectedTimes.includes(formattedTime)) {
-            setSelectedTimes(prev => prev.filter(t => t !== formattedTime));
+            newSelectedTimes = selectedTimes.filter(t => t !== formattedTime);
         } else {
-            setSelectedTimes(prev => [...prev, formattedTime]);
+            newSelectedTimes = [...selectedTimes, formattedTime];
         }
-        setSelectedTimesUTC(convertSlotsToUTC());
+
+        setSelectedTimes(newSelectedTimes);
+        setSelectedTimesUTC(convertSlotsToUTC(newSelectedTimes));
     };
 
-    function convertSlotsToUTC() {
-        return selectedTimes.map(time =>
+    function convertSlotsToUTC(times) {
+        return times.map(time =>
             luxon.DateTime.fromFormat(time, 'HH:mm', { zone: userTimeZone })
                 .setZone('utc')
                 .toFormat('HH:mm')
