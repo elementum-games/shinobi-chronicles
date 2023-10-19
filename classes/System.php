@@ -612,7 +612,7 @@ class System {
 
         // Dev Environment Event start times
         if($this->isDevEnvironment()) {
-            $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-15');
+            $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-15');
             $double_exp_start_time = new DateTimeImmutable('2023-09-13');
             $double_reputation_start_time = new DateTimeImmutable('2023-10-16');
         }
