@@ -31,8 +31,6 @@ class NotificationManager {
     const NOTIFICATION_RAID_ALLY = "raid_ally";
     const NOTIFICATION_RAID_ENEMY = "raid_enemy";
     const NOTIFICATION_CARAVAN = "caravan";
-    const NOTIFICATION_SEAT_CHALLENGE = "seat_challenge";
-    const NOTIFICATION_LOCK_CHALLENGE = "lock_challenge";
     const NOTIFICATION_PROPOSAL_CREATED = "proposal_created";
     const NOTIFICATION_PROPOSAL_PASSED = "proposal_passed";
     const NOTIFICATION_PROPOSAL_CANCELED = "proposal_canceled";
@@ -43,6 +41,10 @@ class NotificationManager {
     const NOTIFICATION_DIPLOMACY_END_WAR = "diplomacy_end_war";
     const NOTIFICATION_DIPLOMACY_END_ALLIANCE = "diplomacy_end_alliance";
     const NOTIFICATION_NEWS = "news";
+    const NOTIFICATION_CHALLENGE_PENDING = "challenge_pending";
+    const NOTIFICATION_CHALLENGE_ACCEPTED = "challenge_accepted";
+    const NOTIFICATION_KAGE_CHANGE = "kage_change";
+    const NOTIFICATION_ACHIEVEMENT = "achievement";
 
     const ACTIVE_PLAYER_DAYS_LAST_ACTIVE = 14;
 

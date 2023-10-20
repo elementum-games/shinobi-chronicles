@@ -134,7 +134,11 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
          "diplomacy_form_alliance",
          "diplomacy_end_war",
          "diplomacy_end_alliance",
-         "news"
+         "news",
+         "challenge_pending",
+         "challenge_accepted",
+         "kage_change",
+         "achievement"
     ];
 
     return (

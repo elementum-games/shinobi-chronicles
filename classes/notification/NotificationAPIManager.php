@@ -223,6 +223,9 @@ class NotificationAPIManager {
                 case NotificationManager::NOTIFICATION_DIPLOMACY_END_WAR:
                 case NotificationManager::NOTIFICATION_DIPLOMACY_END_ALLIANCE:
                 case NotificationManager::NOTIFICATION_POLICY_CHANGE:
+                case NotificationManager::NOTIFICATION_CHALLENGE_PENDING:
+                case NotificationManager::NOTIFICATION_CHALLENGE_ACCEPTED:
+                case NotificationManager::NOTIFICATION_KAGE_CHANGE:
                     if (false) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;

@@ -214,6 +214,21 @@ class VillageManager {
                 ");
                 $system->db->query("UPDATE `villages` SET `leader` = {$player->user_id} WHERE `village_id` = {$player->village->village_id}");
                 $player->village_seat = self::getPlayerSeat($system, $player);
+                // create notifiction
+                $active_threshold = time() - (NotificationManager::ACTIVE_PLAYER_DAYS_LAST_ACTIVE * 86400);
+                $user_ids = $system->db->query("SELECT `user_id` FROM `users` WHERE `village` = '{$player->village->name}' AND `last_login` > {$active_threshold}");
+                $user_ids = $system->db->fetch_all($user_ids);
+                $notification_message = $reclaim ? $player->user_name . " has reclaimed the title of " . $seat_title . "!" : $player->user_name . " has claimed the title of " . $seat_title . "!";
+                foreach ($user_ids as $user) {
+                    $new_notification = new NotificationDto(
+                        type: NotificationManager::NOTIFICATION_KAGE_CHANGE,
+                        message: $notification_message,
+                        user_id: $user['user_id'],
+                        created: time(),
+                        alert: false,
+                    );
+                    NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                }
                 if ($reclaim) {
                     return "You have reclaimed the title of {$seat_title}!";
                 } else {
@@ -532,6 +547,15 @@ class VillageManager {
         $time = time();
         $selected_times = json_encode($selected_times);
         $system->db->query("INSERT INTO `challenge_requests` (`challenger_id`, `seat_holder_id`, `seat_id`, `created_time`, `selected_times`) VALUES ({$player->user_id}, {$seat_result['user_id']}, {$seat_id}, {$time}, '{$selected_times}')");
+        // create notification
+        $new_notification = new NotificationDto(
+            type: NotificationManager::NOTIFICATION_CHALLENGE_PENDING,
+            message: "New challenge pending!",
+            user_id: $seat_result['user_id'],
+            created: time(),
+            alert: false,
+        );
+        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_MULTIPLE);
         return "Challenge submitted!";
     }
 
@@ -593,6 +617,15 @@ class VillageManager {
         $minutes = floor((($challenge_time - time()) % 3600) / 60);
         $message = "Lock-in period begins in " . ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute " : $minutes . " minutes" . ".");
         $system->db->query("UPDATE `challenge_requests` SET `accepted_time` = {$time}, `start_time` = {$challenge_time} WHERE `request_id` = {$challenge_id}");
+        // create notification
+        $new_notification = new NotificationDto(
+            type: NotificationManager::NOTIFICATION_CHALLENGE_ACCEPTED,
+            message: "Challenge accepted: " . $message,
+            user_id: $challenge_result['challenger_id'],
+            created: time(),
+            alert: false,
+        );
+        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
         return $message;
     }
 

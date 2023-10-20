@@ -39,7 +39,11 @@ export type NotificationType = {|
         | "diplomacy_declare_war"
         | "diplomacy_form_alliance"
         | "diplomacy_end_war"
-        | "diplomacy_end_alliance",
+        | "diplomacy_end_alliance"
+        | "challenge_pending"
+        | "challenge_accepted"
+        | "kage_change"
+        | "achievement",
     +message: string,
     +notification_id: number,
     +user_id: number,
