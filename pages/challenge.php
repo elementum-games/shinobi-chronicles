@@ -55,7 +55,7 @@ function processChallengeBattleEnd(BattleManager $battle, User $player, System $
         $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_WIN * 10);
         $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
         $result .= "<br>You have gained $rep_gain village reputation!";
-        if (isset($player->locked_challenge)) {
+        if ($player->locked_challenge > 0) {
             VillageManager::processChallengeEnd($system, $player->locked_challenge, $player->user_id, $player);
         }
         return $result;
@@ -65,7 +65,7 @@ function processChallengeBattleEnd(BattleManager $battle, User $player, System $
         $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_LOSS * 10);
         $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
         $result .= "<br>You have gained $rep_gain village reputation!";
-        if (isset($player->locked_challenge)) {
+        if ($player->locked_challenge > 0) {
             VillageManager::processChallengeEnd($system, $player->locked_challenge, $battle->opponent->user_id, $player);
         }
         return $result;
@@ -75,7 +75,7 @@ function processChallengeBattleEnd(BattleManager $battle, User $player, System $
         $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_DRAW * 10);
         $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
         $result .= "<br>You have gained $rep_gain village reputation!";
-        if (isset($player->locked_challenge)) {
+        if ($player->locked_challenge > 0) {
             VillageManager::processChallengeEnd($system, $player->locked_challenge, null, $player);
         }
         return $result;

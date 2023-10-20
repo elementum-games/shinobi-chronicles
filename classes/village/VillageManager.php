@@ -673,13 +673,13 @@ class VillageManager {
         $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `request_id` = {$player->locked_challenge} LIMIT 1");
         $challenge_result = $system->db->fetch($challenge_result);
         if ($system->db->last_num_rows == 0) {
-            $player->locked_challenge = null;
+            $player->locked_challenge = 0;
             $player->updateData();
             return;
         }
         // if challenge finished, clear lock
         if (isset($challenge_result['end_time'])) {
-            $player->locked_challenge = null;
+            $player->locked_challenge = 0;
             $player->updateData();
             return;
         }
@@ -706,7 +706,7 @@ class VillageManager {
         $min_lock_time = $challenge_result['start_time'];
         $max_lock_time = $min_lock_time + self::CHALLENGE_LOCK_TIME_MINUTES * 60;
         if (time() > $max_lock_time || time() < $min_lock_time) {
-            $player->locked_challenge = null;
+            $player->locked_challenge = 0;
             $player->updateData();
             self::processChallengeEnd($system, $challenge_result['request_id'], $player->user_id, $player);
             return;
@@ -721,13 +721,13 @@ class VillageManager {
         $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `request_id` = {$challenge_id} LIMIT 1");
         $challenge_result = $system->db->fetch($challenge_result);
         if ($system->db->last_num_rows == 0) {
-            $player->locked_challenge = null;
+            $player->locked_challenge = 0;
             $player->updateData();
             return;
         }
         // if already processed
         if (isset($challenge_result['end_time'])) {
-            $player->locked_challenge = null;
+            $player->locked_challenge = 0;
             $player->updateData();
             return;
         }

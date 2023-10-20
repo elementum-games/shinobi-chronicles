@@ -142,7 +142,7 @@ class Router {
 
         // Check if challenge locked
         if (isset($route->challenge_lock_ok) && $route->challenge_lock_ok === false) {
-            if (isset($player->locked_challenge)) {
+            if ($player->locked_challenge > 0) {
                 throw new RuntimeException("You are unable to access this page while locked-in for battle!");
             }
         }

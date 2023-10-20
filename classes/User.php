@@ -307,7 +307,7 @@ class User extends Fighter {
 
     public VillageSeatDto $village_seat;
     public Region $region;
-    public ?int $locked_challenge;
+    public int $locked_challenge;
 
     /**
      * User constructor.
@@ -915,7 +915,7 @@ class User extends Fighter {
         // Challenge
         $this->locked_challenge = $user_data['locked_challenge'];
         if ($UPDATE >= User::UPDATE_FULL) {
-            if (isset($this->locked_challenge) && $this->battle_id == 0) {
+            if ($this->locked_challenge > 0 && $this->battle_id == 0) {
                 VillageManager::checkChallengeLock($this->system, $this);
             }
         }

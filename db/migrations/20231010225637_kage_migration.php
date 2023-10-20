@@ -78,7 +78,7 @@ final class KageMigration extends AbstractMigration
             UPDATE `region_locations` SET `name` = 'Nekogakure' WHERE `id` = 29;
 
             -- Alter table users
-            ALTER TABLE `users` ADD `locked_challenge` INT(11) NULL DEFAULT NULL;
+            ALTER TABLE `users` ADD `locked_challenge` INT(11) NOT NULL DEFAULT 0;
         ");
     }
 
