@@ -29,7 +29,7 @@ class VillageManager {
     const MIN_KAGE_CLAIM_TIER = 5;
     const MIN_KAGE_CHALLENGE_TIER = 5;
     const MIN_ELDER_CLAIM_TIER = 4;
-    const MIN_ELDER_CHALLENGE_TIER = 5;
+    const MIN_ELDER_CHALLENGE_TIER = 4;
 
     // Set these to correct values for release
     const PROPOSAL_VOTE_HOURS = 0; // 72
