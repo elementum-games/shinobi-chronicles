@@ -57,7 +57,7 @@ final class KageMigration extends AbstractMigration
             `end_time` INT NULL DEFAULT NULL,
             `seat_holder_locked` TINYINT(1) NOT NULL DEFAULT 0,
             `challenger_locked` TINYINT(1) NOT NULL DEFAULT 0,
-            `selected_times` VARCHAR(100) NOT NULL DEFAULT '[]',
+            `selected_times` VARCHAR(200) NOT NULL DEFAULT '[]',
             `battle_id` INT(11) NULL DEFAULT NULL,
             `winner` VARCHAR(20) NULL DEFAULT NULL,
             PRIMARY KEY (`request_id`));

@@ -501,6 +501,10 @@ class VillageManager {
         if ($system->db->last_num_rows == 0) {
             return "Invalid challenge target.";
         }
+        // check if already has seat
+        if (isset($player->village_seat->seat_id) && $seat_result['seat_type'] != 'kage') {
+            return "Invalid challenge target.";
+        }
         // check meet challenge requirements
         if (!self::checkSeatRequirements($system, $player, $seat_result['seat_type'], true)) {
             switch ($seat_result['seat_type']) {
@@ -559,7 +563,7 @@ class VillageManager {
         $date = new DateTime($challenge_time, new DateTimeZone('UTC'));
         $min_challenge_time = $date->getTimestamp();
         // check min number of hours from current time
-        $difference = time() - $min_challenge_time;
+        $difference = $min_challenge_time - time();
         if ($difference < self::CHALLENGE_MIN_DELAY_HOURS * 60 * 60) {
             // Add 24 hours to the challenge time
             $min_challenge_time += 24 * 60 * 60;

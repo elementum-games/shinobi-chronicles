@@ -1599,7 +1599,7 @@ const TimeGrid = ({ setSelectedTimesUTC, startHourUTC = 0 }) => {
     function generateSlotsForTimeZone(startHour) {
         return Array.from({ length: 24 }, (slot, index) => (index + startHour) % 24).map(hour =>
             luxon.DateTime.fromObject({ hour }, { zone: 'utc' })
-                .setZone(timeZone)
+                .setZone('local')
         );
     };
 
@@ -1714,18 +1714,23 @@ const ChallengeContainer = ({ challengeDataState, playerSeatState, CancelChallen
                                         ACTIVE CHALLENGE
                                     </div>
                                     <div>Seat Holder: <a href={"/?id=6&user=" + challenge.seat_holder_name}>{challenge.seat_holder_name}</a></div>
-                                    <div>Time: <span>{challenge.start_time ? luxon.DateTime.fromSeconds(challenge.start_time).toLocal().toFormat("LLL d, h:mm a") : "PENDING"}</span></div>
-                                    {(challenge.start_time && challenge.start_time < Date.now() && !challenge.challenger_locked) &&
-                                        <div className="challenge_button lock disabled">lock in</div>
+                                    <div>Time: {challenge.start_time
+                                        ? (luxon.DateTime.fromSeconds(challenge.start_time).toLocal() <= luxon.DateTime.local()
+                                            ? <span className="challenge_time_now">NOW</span>
+                                            : luxon.DateTime.fromSeconds(challenge.start_time).toLocal().toFormat("LLL d, h:mm a"))
+                                            : <span className="challenge_time_pending">PENDING</span>}
+                                    </div>
+                                    {(challenge.start_time && luxon.DateTime.fromSeconds(challenge.start_time).toLocal() >= luxon.DateTime.local() && !challenge.challenger_locked) &&
+                                        <div className="challenge_button lock disabled">lock in<img src="/images/v2/icons/unlocked.png" /></div>
                                     }
-                                    {(challenge.start_time && challenge.start_time > Date.now() && !challenge.challenger_locked) &&
-                                        <div className="challenge_button lock">lock in</div>
+                                    {(challenge.start_time && luxon.DateTime.fromSeconds(challenge.start_time).toLocal() <= luxon.DateTime.local() && !challenge.challenger_locked) &&
+                                        <div className="challenge_button lock">lock in<img src="/images/v2/icons/unlocked.png"/></div>
                                     }
                                     {(challenge.start_time == null) &&
                                         <div className="challenge_button cancel" onClick={() => CancelChallenge()}>cancel</div>
                                     }
                                     {(challenge.challenger_locked) &&
-                                        <div className="challenge_button locked">locked in</div>
+                                        <div className="challenge_button locked">locked in<img src="/images/v2/icons/locked.png" /></div>
                                     }
                                 </div>
                             </div>
@@ -1742,18 +1747,23 @@ const ChallengeContainer = ({ challengeDataState, playerSeatState, CancelChallen
                                         CHALLENGER {index + 1}
                                     </div>
                                     <div>Challenger: <a href={"/?id=6&user=" + challenge.challenger_name}>{challenge.challenger_name}</a></div>
-                                    <div>Time: <span>{challenge.start_time ? luxon.DateTime.fromSeconds(challenge.start_time).toLocal().toFormat("LLL d, h:mm a") : "PENDING"}</span></div>
-                                    {(challenge.start_time && challenge.start_time < Date.now() && !challenge.seat_holder_locked) &&
-                                        <div className="challenge_button lock disabled">lock in</div>
+                                    <div>Time: {challenge.start_time
+                                            ? (luxon.DateTime.fromSeconds(challenge.start_time).toLocal() <= luxon.DateTime.local()
+                                                ? <span className="challenge_time_now">NOW</span>
+                                                : luxon.DateTime.fromSeconds(challenge.start_time).toLocal().toFormat("LLL d, h:mm a"))
+                                                : <span className="challenge_time_pending">PENDING</span>}
+                                    </div>
+                                    {(challenge.start_time && luxon.DateTime.fromSeconds(challenge.start_time).toLocal() >= luxon.DateTime.local() && !challenge.seat_holder_locked) &&
+                                        <div className="challenge_button lock disabled">lock in<img src="/images/v2/icons/unlocked.png" /></div>
                                     }
-                                    {(challenge.start_time && challenge.start_time > Date.now() && !challenge.seat_holder_locked) &&
-                                        <div className="challenge_button lock">lock in</div>
+                                    {(challenge.start_time && luxon.DateTime.fromSeconds(challenge.start_time).toLocal() <= luxon.DateTime.local() && !challenge.seat_holder_locked) &&
+                                        <div className="challenge_button lock">lock in<img src="/images/v2/icons/unlocked.png" /></div>
                                     }
                                     {(challenge.start_time == null) &&
                                         <div className="challenge_button schedule" onClick={() => AcceptChallenge(challenge)}>schedule</div>
                                     }
                                     {(challenge.seat_holder_locked) &&
-                                        <div className="challenge_button locked">locked in</div>
+                                        <div className="challenge_button locked">locked in<img src="/images/v2/icons/locked.png" /></div>
                                     }
                                 </div>
                             </div>

@@ -1620,7 +1620,14 @@
     user-select: none;
     font-size: 14px;
     margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
 }
+    .challenge_button img {
+        padding-top: 5px;
+        max-height: 16px;
+    }
     .challenge_button:hover {
         color: white;
     }
@@ -1640,4 +1647,10 @@
 }
 .challenge_button.schedule {
     background: linear-gradient(to bottom, #6a5c3f 50%, #4e4535 50%);
+}
+.challenge_time_pending {
+    color: #7ee5a2;
+}
+.challenge_time_now {
+    color: #c7b070;
 }

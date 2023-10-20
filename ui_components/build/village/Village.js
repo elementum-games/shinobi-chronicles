@@ -1694,7 +1694,7 @@ const TimeGrid = ({
       hour
     }, {
       zone: 'utc'
-    }).setZone(timeZone));
+    }).setZone('local'));
   }
   ;
   function toggleSlot(time) {
@@ -1804,16 +1804,26 @@ const ChallengeContainer = ({
     className: "challenge_header"
   }, "ACTIVE CHALLENGE"), /*#__PURE__*/React.createElement("div", null, "Seat Holder: ", /*#__PURE__*/React.createElement("a", {
     href: "/?id=6&user=" + challenge.seat_holder_name
-  }, challenge.seat_holder_name)), /*#__PURE__*/React.createElement("div", null, "Time: ", /*#__PURE__*/React.createElement("span", null, challenge.start_time ? luxon.DateTime.fromSeconds(challenge.start_time).toLocal().toFormat("LLL d, h:mm a") : "PENDING")), challenge.start_time && challenge.start_time < Date.now() && !challenge.challenger_locked && /*#__PURE__*/React.createElement("div", {
+  }, challenge.seat_holder_name)), /*#__PURE__*/React.createElement("div", null, "Time: ", challenge.start_time ? luxon.DateTime.fromSeconds(challenge.start_time).toLocal() <= luxon.DateTime.local() ? /*#__PURE__*/React.createElement("span", {
+    className: "challenge_time_now"
+  }, "NOW") : luxon.DateTime.fromSeconds(challenge.start_time).toLocal().toFormat("LLL d, h:mm a") : /*#__PURE__*/React.createElement("span", {
+    className: "challenge_time_pending"
+  }, "PENDING")), challenge.start_time && luxon.DateTime.fromSeconds(challenge.start_time).toLocal() >= luxon.DateTime.local() && !challenge.challenger_locked && /*#__PURE__*/React.createElement("div", {
     className: "challenge_button lock disabled"
-  }, "lock in"), challenge.start_time && challenge.start_time > Date.now() && !challenge.challenger_locked && /*#__PURE__*/React.createElement("div", {
+  }, "lock in", /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/icons/unlocked.png"
+  })), challenge.start_time && luxon.DateTime.fromSeconds(challenge.start_time).toLocal() <= luxon.DateTime.local() && !challenge.challenger_locked && /*#__PURE__*/React.createElement("div", {
     className: "challenge_button lock"
-  }, "lock in"), challenge.start_time == null && /*#__PURE__*/React.createElement("div", {
+  }, "lock in", /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/icons/unlocked.png"
+  })), challenge.start_time == null && /*#__PURE__*/React.createElement("div", {
     className: "challenge_button cancel",
     onClick: () => CancelChallenge()
   }, "cancel"), challenge.challenger_locked && /*#__PURE__*/React.createElement("div", {
     className: "challenge_button locked"
-  }, "locked in")))), challengeDataState && challengeDataState.filter(challenge => challenge.challenger_id !== playerSeatState.user_id).map((challenge, index) => /*#__PURE__*/React.createElement("div", {
+  }, "locked in", /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/icons/locked.png"
+  }))))), challengeDataState && challengeDataState.filter(challenge => challenge.challenger_id !== playerSeatState.user_id).map((challenge, index) => /*#__PURE__*/React.createElement("div", {
     key: challenge.request_id,
     className: "challenge_item"
   }, /*#__PURE__*/React.createElement("div", {
@@ -1827,16 +1837,26 @@ const ChallengeContainer = ({
     className: "challenge_header"
   }, "CHALLENGER ", index + 1), /*#__PURE__*/React.createElement("div", null, "Challenger: ", /*#__PURE__*/React.createElement("a", {
     href: "/?id=6&user=" + challenge.challenger_name
-  }, challenge.challenger_name)), /*#__PURE__*/React.createElement("div", null, "Time: ", /*#__PURE__*/React.createElement("span", null, challenge.start_time ? luxon.DateTime.fromSeconds(challenge.start_time).toLocal().toFormat("LLL d, h:mm a") : "PENDING")), challenge.start_time && challenge.start_time < Date.now() && !challenge.seat_holder_locked && /*#__PURE__*/React.createElement("div", {
+  }, challenge.challenger_name)), /*#__PURE__*/React.createElement("div", null, "Time: ", challenge.start_time ? luxon.DateTime.fromSeconds(challenge.start_time).toLocal() <= luxon.DateTime.local() ? /*#__PURE__*/React.createElement("span", {
+    className: "challenge_time_now"
+  }, "NOW") : luxon.DateTime.fromSeconds(challenge.start_time).toLocal().toFormat("LLL d, h:mm a") : /*#__PURE__*/React.createElement("span", {
+    className: "challenge_time_pending"
+  }, "PENDING")), challenge.start_time && luxon.DateTime.fromSeconds(challenge.start_time).toLocal() >= luxon.DateTime.local() && !challenge.seat_holder_locked && /*#__PURE__*/React.createElement("div", {
     className: "challenge_button lock disabled"
-  }, "lock in"), challenge.start_time && challenge.start_time > Date.now() && !challenge.seat_holder_locked && /*#__PURE__*/React.createElement("div", {
+  }, "lock in", /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/icons/unlocked.png"
+  })), challenge.start_time && luxon.DateTime.fromSeconds(challenge.start_time).toLocal() <= luxon.DateTime.local() && !challenge.seat_holder_locked && /*#__PURE__*/React.createElement("div", {
     className: "challenge_button lock"
-  }, "lock in"), challenge.start_time == null && /*#__PURE__*/React.createElement("div", {
+  }, "lock in", /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/icons/unlocked.png"
+  })), challenge.start_time == null && /*#__PURE__*/React.createElement("div", {
     className: "challenge_button schedule",
     onClick: () => AcceptChallenge(challenge)
   }, "schedule"), challenge.seat_holder_locked && /*#__PURE__*/React.createElement("div", {
     className: "challenge_button locked"
-  }, "locked in"))))), /*#__PURE__*/React.createElement("svg", {
+  }, "locked in", /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/icons/locked.png"
+  })))))), /*#__PURE__*/React.createElement("svg", {
     style: {
       marginTop: "45px"
     },
