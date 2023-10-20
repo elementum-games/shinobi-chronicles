@@ -1,5 +1,6 @@
 import { apiFetch } from "../utils/network.js";
 function Village({
+  playerID,
   playerSeat,
   villageName,
   villageAPI,
@@ -141,6 +142,7 @@ function Village({
     className: playerSeatState.seat_id != null ? "nav_button" : "nav_button disabled",
     onClick: () => setVillageTab("kageQuarters")
   }, "kage's quarters")), villageTab == "villageHQ" && /*#__PURE__*/React.createElement(VillageHQ, {
+    playerID: playerID,
     playerSeatState: playerSeatState,
     setPlayerSeatState: setPlayerSeatState,
     villageName: villageName,
@@ -163,6 +165,7 @@ function Village({
     TimeGrid: TimeGrid,
     TimeGridResponse: TimeGridResponse
   }), villageTab == "kageQuarters" && /*#__PURE__*/React.createElement(KageQuarters, {
+    playerID: playerID,
     playerSeatState: playerSeatState,
     setPlayerSeatState: setPlayerSeatState,
     villageName: villageName,
@@ -194,6 +197,7 @@ function Village({
   }));
 }
 function VillageHQ({
+  playerID,
   playerSeatState,
   setPlayerSeatState,
   villageName,
@@ -372,6 +376,28 @@ function VillageHQ({
       });
     }
   };
+  const LockChallenge = target_challenge => {
+    if (modalState == "confirm_lock_challenge") {
+      apiFetch(villageAPI, {
+        request: 'LockChallenge',
+        challenge_id: challengeTarget.request_id
+      }).then(response => {
+        if (response.errors.length) {
+          handleErrors(response.errors);
+          return;
+        }
+        setChallengeDataState(response.data.challengeData);
+        setModalHeader("Confirmation");
+        setModalText(response.data.response_message);
+        setModalState("response_message");
+      });
+    } else {
+      setChallengeTarget(target_challenge);
+      setModalHeader("Confirmation");
+      setModalState("confirm_lock_challenge");
+      setModalText("Are you sure you want to lock in?\nYour actions will be restricted until the battle begins.");
+    }
+  };
   const CancelChallengeSchedule = () => {
     setSelectedTimesUTC([]);
   };
@@ -433,14 +459,21 @@ function VillageHQ({
   }, "confirm"), /*#__PURE__*/React.createElement("div", {
     className: "modal_cancel_button",
     onClick: () => setModalState("closed")
+  }, "cancel")), modalState == "confirm_lock_challenge" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "modal_confirm_button",
+    onClick: () => LockChallenge()
+  }, "confirm"), /*#__PURE__*/React.createElement("div", {
+    className: "modal_cancel_button",
+    onClick: () => setModalState("closed")
   }, "cancel")), modalState == "response_message" && /*#__PURE__*/React.createElement("div", {
     className: "modal_close_button",
     onClick: () => setModalState("closed")
   }, "close"))), /*#__PURE__*/React.createElement(ChallengeContainer, {
+    playerID: playerID,
     challengeDataState: challengeDataState,
-    playerSeatState: playerSeatState,
     CancelChallenge: CancelChallenge,
-    AcceptChallenge: AcceptChallenge
+    AcceptChallenge: AcceptChallenge,
+    LockChallenge: LockChallenge
   }), /*#__PURE__*/React.createElement("div", {
     className: "hq_container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -692,6 +725,7 @@ function VillageHQ({
   }, resource.spent)))))))));
 }
 function KageQuarters({
+  playerID,
   playerSeatState,
   villageName,
   villageAPI,
@@ -1132,7 +1166,7 @@ function KageQuarters({
     className: "proposal_no_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button disabled"
-  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id == playerID) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button",
@@ -1142,7 +1176,7 @@ function KageQuarters({
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button",
     onClick: () => SubmitVote(0)
-  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id == playerID) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button disabled"
@@ -1150,7 +1184,7 @@ function KageQuarters({
     className: "proposal_no_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button disabled"
-  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id == playerID) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button",
@@ -1160,7 +1194,7 @@ function KageQuarters({
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_boost_vote_button",
     onClick: () => BoostVote()
-  }, "boost vote"))), currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "boost vote"))), currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id == playerID) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button disabled"
@@ -1779,10 +1813,11 @@ const TimeGridResponse = ({
   })));
 };
 const ChallengeContainer = ({
+  playerID,
   challengeDataState,
-  playerSeatState,
   CancelChallenge,
-  AcceptChallenge
+  AcceptChallenge,
+  LockChallenge
 }) => {
   return /*#__PURE__*/React.createElement(React.Fragment, null, challengeDataState.length > 0 && /*#__PURE__*/React.createElement("div", {
     className: "challenge_container"
@@ -1790,7 +1825,7 @@ const ChallengeContainer = ({
     className: "header"
   }, "Challenges"), /*#__PURE__*/React.createElement("div", {
     className: "challenge_list"
-  }, challengeDataState && challengeDataState.filter(challenge => challenge.challenger_id === playerSeatState.user_id).map((challenge, index) => /*#__PURE__*/React.createElement("div", {
+  }, challengeDataState && challengeDataState.filter(challenge => challenge.challenger_id === playerID).map((challenge, index) => /*#__PURE__*/React.createElement("div", {
     key: challenge.request_id,
     className: "challenge_item"
   }, /*#__PURE__*/React.createElement("div", {
@@ -1813,7 +1848,8 @@ const ChallengeContainer = ({
   }, "lock in", /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/icons/unlocked.png"
   })), challenge.start_time && luxon.DateTime.fromSeconds(challenge.start_time).toLocal() <= luxon.DateTime.local() && !challenge.challenger_locked && /*#__PURE__*/React.createElement("div", {
-    className: "challenge_button lock"
+    className: "challenge_button lock",
+    onClick: () => LockChallenge(challenge)
   }, "lock in", /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/icons/unlocked.png"
   })), challenge.start_time == null && /*#__PURE__*/React.createElement("div", {
@@ -1823,7 +1859,7 @@ const ChallengeContainer = ({
     className: "challenge_button locked"
   }, "locked in", /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/icons/locked.png"
-  }))))), challengeDataState && challengeDataState.filter(challenge => challenge.challenger_id !== playerSeatState.user_id).map((challenge, index) => /*#__PURE__*/React.createElement("div", {
+  }))))), challengeDataState && challengeDataState.filter(challenge => challenge.challenger_id !== playerID).map((challenge, index) => /*#__PURE__*/React.createElement("div", {
     key: challenge.request_id,
     className: "challenge_item"
   }, /*#__PURE__*/React.createElement("div", {
@@ -1846,7 +1882,8 @@ const ChallengeContainer = ({
   }, "lock in", /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/icons/unlocked.png"
   })), challenge.start_time && luxon.DateTime.fromSeconds(challenge.start_time).toLocal() <= luxon.DateTime.local() && !challenge.seat_holder_locked && /*#__PURE__*/React.createElement("div", {
-    className: "challenge_button lock"
+    className: "challenge_button lock",
+    onClick: () => LockChallenge(challenge)
   }, "lock in", /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/icons/unlocked.png"
   })), challenge.start_time == null && /*#__PURE__*/React.createElement("div", {

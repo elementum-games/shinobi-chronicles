@@ -1,6 +1,7 @@
 ﻿import { apiFetch } from "../utils/network.js";
 
 function Village({
+    playerID,
     playerSeat,
     villageName,
     villageAPI,
@@ -136,6 +137,7 @@ function Village({
             </div>
             {villageTab == "villageHQ" &&
                 <VillageHQ
+                playerID={playerID}
                 playerSeatState={playerSeatState}
                 setPlayerSeatState={setPlayerSeatState}
                 villageName={villageName}
@@ -161,6 +163,7 @@ function Village({
             }
             {villageTab == "kageQuarters" &&
                 <KageQuarters
+                playerID={playerID}
                 playerSeatState={playerSeatState}
                 setPlayerSeatState={setPlayerSeatState}
                 villageName={villageName}
@@ -199,6 +202,7 @@ function Village({
 }
 
 function VillageHQ({
+    playerID,
     playerSeatState,
     setPlayerSeatState,
     villageName,
@@ -397,6 +401,32 @@ function VillageHQ({
             });
         }
     }
+    const LockChallenge = (target_challenge) => {
+        if (modalState == "confirm_lock_challenge") {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'LockChallenge',
+                    challenge_id: challengeTarget.request_id,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setChallengeDataState(response.data.challengeData);
+                setModalHeader("Confirmation");
+                setModalText(response.data.response_message);
+                setModalState("response_message");
+            });
+        }
+        else {
+            setChallengeTarget(target_challenge);
+            setModalHeader("Confirmation");
+            setModalState("confirm_lock_challenge");
+            setModalText("Are you sure you want to lock in?\nYour actions will be restricted until the battle begins.");
+        }
+    }
     const CancelChallengeSchedule = () => {
         setSelectedTimesUTC([]);
     }
@@ -452,6 +482,12 @@ function VillageHQ({
                                 <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
                             </>
                         }
+                        {modalState == "confirm_lock_challenge" &&
+                            <>
+                                <div className="modal_confirm_button" onClick={() => LockChallenge()}>confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
                         {modalState == "response_message" &&
                             <div className="modal_close_button" onClick={() => setModalState("closed")}>close</div>
                         }
@@ -459,10 +495,11 @@ function VillageHQ({
                 </>
             }
             <ChallengeContainer
+                playerID={playerID}
                 challengeDataState={challengeDataState}
-                playerSeatState={playerSeatState}
                 CancelChallenge={CancelChallenge}
                 AcceptChallenge={AcceptChallenge}
+                LockChallenge={LockChallenge}
             />
             <div className="hq_container">
                 <div className="row first">
@@ -670,6 +707,7 @@ function VillageHQ({
 }
 
 function KageQuarters({
+    playerID,
     playerSeatState,
     villageName,
     villageAPI,
@@ -1126,7 +1164,7 @@ function KageQuarters({
                                                 </div>
                                             </>
                                         }
-                                        {(currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
+                                        {(currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id == playerID)) &&
                                             <>
                                                 <div className="proposal_yes_button_wrapper">
                                                     <div className="proposal_yes_button" onClick={() => SubmitVote(1)}>vote in favor</div>
@@ -1136,7 +1174,7 @@ function KageQuarters({
                                                 </div>
                                             </>
                                         }
-                                        {(currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
+                                        {(currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id == playerID)) &&
                                             <>
                                                 <div className="proposal_yes_button_wrapper">
                                                     <div className="proposal_yes_button disabled">vote in favor</div>
@@ -1146,7 +1184,7 @@ function KageQuarters({
                                                 </div>
                                             </>
                                         }
-                                        {(currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
+                                        {(currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id == playerID)) &&
                                             <>
                                                 <div className="proposal_cancel_vote_button_wrapper">
                                                 <div className="proposal_cancel_vote_button" onClick={() => CancelVote()}>change vote</div>
@@ -1156,7 +1194,7 @@ function KageQuarters({
                                                 </div>
                                             </>
                                         }
-                                        {(currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
+                                        {(currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id == playerID)) &&
                                             <>
                                                 <div className="proposal_cancel_vote_button_wrapper">
                                                     <div className="proposal_cancel_vote_button disabled">cancel vote</div>
@@ -1695,7 +1733,7 @@ const TimeGridResponse = ({ availableTimesUTC, setSelectedTimeUTC, startHourUTC 
     );
 }
 
-const ChallengeContainer = ({ challengeDataState, playerSeatState, CancelChallenge, AcceptChallenge }) => {
+const ChallengeContainer = ({ playerID, challengeDataState, CancelChallenge, AcceptChallenge, LockChallenge }) => {
     return (
         <>
         {challengeDataState.length > 0 &&
@@ -1703,7 +1741,7 @@ const ChallengeContainer = ({ challengeDataState, playerSeatState, CancelChallen
                 <div className="header">Challenges</div>
                 <div className="challenge_list">
                     {challengeDataState && challengeDataState
-                        .filter(challenge => challenge.challenger_id === playerSeatState.user_id)
+                        .filter(challenge => challenge.challenger_id === playerID)
                         .map((challenge, index) => (
                             <div key={challenge.request_id} className="challenge_item">
                                 <div className="challenge_avatar_wrapper">
@@ -1724,7 +1762,7 @@ const ChallengeContainer = ({ challengeDataState, playerSeatState, CancelChallen
                                         <div className="challenge_button lock disabled">lock in<img src="/images/v2/icons/unlocked.png" /></div>
                                     }
                                     {(challenge.start_time && luxon.DateTime.fromSeconds(challenge.start_time).toLocal() <= luxon.DateTime.local() && !challenge.challenger_locked) &&
-                                        <div className="challenge_button lock">lock in<img src="/images/v2/icons/unlocked.png"/></div>
+                                        <div className="challenge_button lock" onClick={() => LockChallenge(challenge)}>lock in<img src="/images/v2/icons/unlocked.png" /></div>
                                     }
                                     {(challenge.start_time == null) &&
                                         <div className="challenge_button cancel" onClick={() => CancelChallenge()}>cancel</div>
@@ -1736,7 +1774,7 @@ const ChallengeContainer = ({ challengeDataState, playerSeatState, CancelChallen
                             </div>
                         ))}
                     {challengeDataState && challengeDataState
-                        .filter(challenge => challenge.challenger_id !== playerSeatState.user_id)
+                        .filter(challenge => challenge.challenger_id !== playerID)
                         .map((challenge, index) => (
                             <div key={challenge.request_id} className="challenge_item">
                                 <div className="challenge_avatar_wrapper">
@@ -1757,7 +1795,7 @@ const ChallengeContainer = ({ challengeDataState, playerSeatState, CancelChallen
                                         <div className="challenge_button lock disabled">lock in<img src="/images/v2/icons/unlocked.png" /></div>
                                     }
                                     {(challenge.start_time && luxon.DateTime.fromSeconds(challenge.start_time).toLocal() <= luxon.DateTime.local() && !challenge.seat_holder_locked) &&
-                                        <div className="challenge_button lock">lock in<img src="/images/v2/icons/unlocked.png" /></div>
+                                        <div className="challenge_button lock" onClick={() => LockChallenge(challenge)}>lock in<img src="/images/v2/icons/unlocked.png" /></div>
                                     }
                                     {(challenge.start_time == null) &&
                                         <div className="challenge_button schedule" onClick={() => AcceptChallenge(challenge)}>schedule</div>

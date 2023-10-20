@@ -193,6 +193,8 @@ class VillageManager {
                         return "You already have a seat in this village!";
                     }
                 }
+                // clear active challenges
+                self::cancelUserChallenges($system, $player->user_id);
                 // claim
                 $time = time();
                 $reclaim = false;
@@ -233,6 +235,8 @@ class VillageManager {
                 if ($result['elder_count'] == 3) {
                     return "No seats available to claim!";
                 }
+                // clear active challenges
+                self::cancelUserChallenges($system, $player->user_id);
                 // claim
                 $time = time();
                 $seat_title = "Elder";
@@ -252,6 +256,8 @@ class VillageManager {
     {
         $time = time();
         $player_seat = $player->village_seat;
+        // clear active challenges
+        self::cancelUserChallenges($system, $player->user_id);
         // clear active votes
         $system->db->query("DELETE `vote_logs` FROM `vote_logs` INNER JOIN `proposals` on `vote_logs`.`proposal_id` = `proposals`.`proposal_id` WHERE `vote_logs`.`user_id` = {$player->user_id} AND `proposals`.`end_time` IS NULL");
         $result = $system->db->query("UPDATE `village_seats` SET `seat_end` = {$time} WHERE `seat_end` IS NULL AND `user_id` = {$player->user_id}");
@@ -484,10 +490,10 @@ class VillageManager {
             return "You can only have one challenge request in progress at a time.";
         }
         // check challenge cooldown
-        $last_challenge = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} ORDER BY `end_time` DESC LIMIT 1");
+        $last_challenge = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
         $last_challenge = $system->db->fetch($last_challenge);
         if ($system->db->last_num_rows > 0) {
-            $cooldown_remaining = ($last_challenge['end_time'] + (self::CHALLENGE_COOLDOWN_DAYS * 86400)) - time();
+            $cooldown_remaining = ($last_challenge['start_time'] + (self::CHALLENGE_COOLDOWN_DAYS * 86400)) - time();
             if ($cooldown_remaining > 0) {
                 $hours = floor($cooldown_remaining / 3600);
                 $minutes = floor(($cooldown_remaining % 3600) / 60);
@@ -592,15 +598,134 @@ class VillageManager {
      */
     public static function lockChallenge(System $system, User $player, int $challenge_id): string
     {
-        return "test";
+        // get challenge data
+        $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `request_id` = {$challenge_id} AND `end_time` IS NULL AND `start_time` IS NOT NULL AND (`seat_holder_id` = {$player->user_id} OR `challenger_id` = {$player->user_id}) LIMIT 1");
+        $challenge_result = $system->db->fetch($challenge_result);
+        if ($system->db->last_num_rows == 0) {
+            return "Invalid challenge request.";
+        }
+        // check lock period
+        $min_lock_time = $challenge_result['start_time'];
+        $max_lock_time = $min_lock_time + self::CHALLENGE_LOCK_TIME_MINUTES * 60;
+        if (time() > $max_lock_time || time() < $min_lock_time) {
+            return "Outside of lock-in period.";
+        }
+        // check location
+        if (!$player->location->equals($player->village_location)) {
+            return "You must be in your village to lock-in for a challenge.";
+        }
+        // update player data
+        $player->locked_challenge = $challenge_id;
+        $player->updateData();
+        // update challenge
+        if ($player->user_id == $challenge_result['challenger_id']) {
+            $system->db->query("UPDATE `challenge_requests` SET `challenger_locked` = 1");
+            return "Locked in! Your battle will begin shortly.";
+        } else {
+            $system->db->query("UPDATE `challenge_requests` SET `seat_holder_locked` = 1");
+            return "Locked in! Your battle will begin shortly.";
+        }
+    }
+
+    public static function cancelUserChallenges(System $system, int $user_id) {
+        $time = time();
+        $system->db->query("UPDATE `challenge_requests` SET `end_time` = {$time} WHERE `end_time` IS NULL AND (`seat_holder_id` = {$user_id} OR `challenger_id` = {$user_id})");
+    }
+
+    public static function checkChallengeLock(System $system, User $player) {
+        // get challenge data
+        $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `request_id` = {$player->locked_challenge} LIMIT 1");
+        $challenge_result = $system->db->fetch($challenge_result);
+        if ($system->db->last_num_rows == 0) {
+            $player->locked_challenge = null;
+            $player->updateData();
+            return;
+        }
+        // if challenge finished, clear lock
+        if (isset($challenge_result['end_time'])) {
+            $player->locked_challenge = null;
+            $player->updateData();
+            return;
+        }
+        // if both players locked begin battle
+        if ((int) $challenge_result['challenger_locked'] && (int) $challenge_result['seat_holder_locked']) {
+            if ($player->user_id == $challenge_result['challenger_id']) {
+                $challenger = $player;
+                $seat_holder = User::loadFromId($system, $challenge_result['seat_holder_id']);
+                $seat_holder->loadData(User::UPDATE_NOTHING);
+            } else {
+                $seat_holder = $player;
+                $challenger = User::loadFromId($system, $challenge_result['challenger_id']);
+                $challenger->loadData(User::UPDATE_NOTHING);
+            }
+            if ($system->USE_NEW_BATTLES) {
+                $battle_id = BattleV2::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE);
+            } else {
+                $battle_id = Battle::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE);
+            }
+            $system->db->query("UPDATE `challenge_requests` SET `battle_id` = {$battle_id} WHERE `request_id` = {$player->locked_challenge}");
+            return;
+        }
+        // else if outside of lock period, clear lock and set winner
+        $min_lock_time = $challenge_result['start_time'];
+        $max_lock_time = $min_lock_time + self::CHALLENGE_LOCK_TIME_MINUTES * 60;
+        if (time() > $max_lock_time || time() < $min_lock_time) {
+            $player->locked_challenge = null;
+            $player->updateData();
+            self::processChallengeEnd($system, $challenge_result['request_id'], $player->user_id, $player);
+            return;
+        }
     }
 
     /**
      * @return string
      */
-    public static function processChallengeEnd(System $system, int $challenge_id, int $winner_id): string
-    {
-        return "test";
+    public static function processChallengeEnd(System $system, int $challenge_id, ?int $winner_id, $player) {
+        // get challenge data
+        $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `request_id` = {$challenge_id} LIMIT 1");
+        $challenge_result = $system->db->fetch($challenge_result);
+        if ($system->db->last_num_rows == 0) {
+            $player->locked_challenge = null;
+            $player->updateData();
+            return;
+        }
+        // if already processed
+        if (isset($challenge_result['end_time'])) {
+            $player->locked_challenge = null;
+            $player->updateData();
+            return;
+        }
+        // get users
+        if ($player->user_id == $challenge_result['challenger_id']) {
+            $challenger = $player;
+            $seat_holder = User::loadFromId($system, $challenge_result['seat_holder_id']);
+            $seat_holder->loadData(User::UPDATE_NOTHING);
+        } else {
+            $seat_holder = $player;
+            $challenger = User::loadFromId($system, $challenge_result['challenger_id']);
+            $challenger->loadData(User::UPDATE_NOTHING);
+        }
+        $seat_result = $system->db->query("SELECT * FROM `village_seats` WHERE `seat_id` = {$challenge_result['seat_id']} AND `village_id` = {$player->village->village_id} AND `seat_end` IS NULL LIMIT 1");
+        $seat_result = $system->db->fetch($seat_result);
+        switch ($winner_id) {
+            case $challenge_result['challenger_id']:
+                // verify challenger meets requirements
+                self::checkSeatRequirements($system, $challenger, $seat_result['seat_type']);
+                // remove seat holder from seat
+                self::resign($system, $seat_holder);
+                // claim seat for challenger
+                self::claimSeat($system, $challenger, $seat_result['seat_type']);
+                break;
+            case null:
+            case $challenge_result['seat_holder_id']:
+                // no change
+                break;
+            default:
+                break;
+        }
+        // update challenge
+        $time = time();
+        $system->db->query("UPDATE `challenge_requests` SET `winner` = " . (!empty($winner_id) ? $winner_id : "NULL") . ", `end_time` = {$time} WHERE `request_id` = {$challenge_id}");
     }
 
     /**

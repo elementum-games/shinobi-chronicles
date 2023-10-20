@@ -277,6 +277,9 @@ class NotificationAPIManager {
                     case Battle::TYPE_SPAR:
                         $link = $this->system->router->getUrl('spar');
                         break;
+                    case Battle::TYPE_CHALLENGE:
+                        $link = $this->system->router->getUrl('challenge');
+                        break;
                     case Battle::TYPE_FIGHT:
                         // battle notifications for PVP created on attack
                         break;

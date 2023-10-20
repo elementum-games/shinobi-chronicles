@@ -307,6 +307,7 @@ class User extends Fighter {
 
     public VillageSeatDto $village_seat;
     public Region $region;
+    public ?int $locked_challenge;
 
     /**
      * User constructor.
@@ -381,6 +382,8 @@ class User extends Fighter {
         $user->village = new Village($system, $user_data['village']);
         $user->rank_num = $user_data['rank'];
         $user->accept_students = $user_data['accept_students'];
+
+        $user->locked_challenge = $user_data['locked_challenge'];
 
         //Todo: Remove this in a couple months, only a temporary measure to support current bans
         if($user->ban_type) {
@@ -908,6 +911,14 @@ class User extends Fighter {
         // Apply policy benefits
         $this->scout_range += $this->village->policy->scouting;
         $this->stealth += $this->village->policy->stealth;
+
+        // Challenge
+        $this->locked_challenge = $user_data['locked_challenge'];
+        if ($UPDATE >= User::UPDATE_FULL) {
+            if (isset($this->locked_challenge) && $this->battle_id == 0) {
+                VillageManager::checkChallengeLock($this->system, $this);
+            }
+        }
 
         return;
     }
@@ -1871,6 +1882,7 @@ class User extends Fighter {
 		`willpower` = '$this->willpower',
 		`village_changes` = '$this->village_changes',
 		`clan_changes` = '$this->clan_changes',
+        `locked_challenge` = '$this->locked_challenge',
 		`censor_explicit_language` = " . (int)$this->censor_explicit_language . "
 		WHERE `user_id` = '{$this->user_id}' LIMIT 1";
         $this->system->db->query($query);

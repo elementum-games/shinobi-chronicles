@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../classes/Route.php';
 
 // KEEP IDS IN SYNC WITH Router::PAGE_IDS
-// NEXT ID: 38 (i.e. if you add 28, update this to 29 to help other contributors)
+// NEXT ID: 39 (i.e. if you add 28, update this to 29 to help other contributors)
 return $routes = [
     // User Menu
     1 => new Route(
@@ -79,7 +79,8 @@ return $routes = [
         menu: Route::MENU_ACTIVITY,
         battle_ok: false,
         village_ok: Route::IN_VILLAGE_OKAY,
-        survival_mission_ok: false
+        survival_mission_ok: false,
+        challenge_lock_ok: false,
     ),
     12 => new Route(
         file_name: 'arena.php',
@@ -88,6 +89,7 @@ return $routes = [
         menu: Route::MENU_ACTIVITY,
         battle_type: Battle::TYPE_AI_ARENA,
         village_ok: Route::NOT_IN_VILLAGE,
+        challenge_lock_ok: false,
     ),
     13 => new Route(
         file_name: 'training_v2.php',
@@ -104,7 +106,8 @@ return $routes = [
         menu: Route::MENU_ACTIVITY,
         battle_type: Battle::TYPE_AI_MISSION,
         min_rank: 2,
-        village_ok: Route::IN_VILLAGE_OKAY
+        village_ok: Route::IN_VILLAGE_OKAY,
+        challenge_lock_ok: false,
     ),
     15 => new Route(
         file_name: 'specialmissions.php',
@@ -114,6 +117,7 @@ return $routes = [
         min_rank: 2,
         battle_ok: false,
         village_ok: Route::IN_VILLAGE_OKAY,
+        challenge_lock_ok: false,
     ),
     22 => new Route(
         file_name: 'spar.php',
@@ -122,6 +126,7 @@ return $routes = [
         menu: Route::MENU_ACTIVITY,
         battle_type: Battle::TYPE_SPAR,
         village_ok: Route::IN_VILLAGE_OKAY,
+        challenge_lock_ok: false,
     ),
     23 => new Route(
         file_name: 'healingShop.php',
@@ -166,6 +171,7 @@ return $routes = [
         title: 'Ancient Market',
         function_name: 'premiumShop',
         menu: Route::MENU_VILLAGE,
+        challenge_lock_ok: false,
     ),
     33 => new Route(
         file_name: 'academy.php',
@@ -269,5 +275,12 @@ return $routes = [
         function_name: 'war',
         menu: Route::MENU_NONE,
         battle_type: Battle::TYPE_AI_WAR,
+    ),
+    38 => new Route(
+        file_name: 'challenge.php',
+        title: "Challenge",
+        function_name: 'challenge',
+        menu: Route::MENU_NONE,
+        battle_type: Battle::TYPE_CHALLENGE,
     ),
 ];

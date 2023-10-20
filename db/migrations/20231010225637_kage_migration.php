@@ -76,6 +76,9 @@ final class KageMigration extends AbstractMigration
 
             -- Update village name
             UPDATE `region_locations` SET `name` = 'Nekogakure' WHERE `id` = 29;
+
+            -- Alter table users
+            ALTER TABLE `users` ADD `locked_challenge` INT(11) NULL DEFAULT NULL;
         ");
     }
 
@@ -108,6 +111,9 @@ final class KageMigration extends AbstractMigration
 
             -- Alter table operations
             ALTER TABLE `operations` CHANGE `last_update_ms` `last_update` INT(11) NOT NULL;
+
+            -- Alter table users
+            ALTER TABLE `users` DROP column `locked_challenge`;
         ");
     }
 }
