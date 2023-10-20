@@ -35,7 +35,7 @@ class VillageManager {
     const PROPOSAL_VOTE_HOURS = 0; // 72
     const PROPOSAL_ENACT_HOURS = 1; // 24
     const PROPOSAL_COOLDOWN_HOURS = 0; // 24
-    const KAGE_PROVISIONAL_DAYS = 7; // 7
+    const KAGE_PROVISIONAL_DAYS = 1; // 7
     const POLICY_CHANGE_COOLDOWN_DAYS = 0; // 14
 
     const VOTE_NO = 0;
@@ -213,6 +213,7 @@ class VillageManager {
                     VALUES ({$player->user_id}, {$player->village->village_id}, '{$seat_type}', '{$seat_title}', {$time}, {$is_provisional})
                 ");
                 $system->db->query("UPDATE `villages` SET `leader` = {$player->user_id} WHERE `village_id` = {$player->village->village_id}");
+                $player->village_seat = self::getPlayerSeat($system, $player);
                 if ($reclaim) {
                     return "You have reclaimed the title of {$seat_title}!";
                 } else {
@@ -244,6 +245,7 @@ class VillageManager {
                     (`user_id`, `village_id`, `seat_type`, `seat_title`, `seat_start`)
                     VALUES ({$player->user_id}, {$player->village->village_id}, '{$seat_type}', '{$seat_title}', {$time})
                 ");
+                $player->village_seat = self::getPlayerSeat($system, $player);
                 return "You have become an Elder of {$player->village->name}!";
                 break;
         }
@@ -265,6 +267,7 @@ class VillageManager {
             $result = $system->db->query("UPDATE `villages` SET `leader` = 0 WHERE `village_id` = {$player->village->village_id}");
         }
         if ($system->db->last_affected_rows > 0) {
+            $player->village_seat = self::getPlayerSeat($system, $player);
             return "You have resigned from your position!";
         } else {
             return "No village seat found!";
@@ -969,10 +972,16 @@ class VillageManager {
                     $result = $system->db->fetch($result);
                     $seat_title = self::getOrdinal($result['kage_count'] + 1) . " " . self::KAGE_NAMES[$player->village->village_id];
                     // update seat
-                    $system->db->query("UPDATE `village_seats` SET `is_provisional` = 0, `seat_title` = '{$seat_title}' WHERE `seat_id` = {$player->village_seat->seat_id}");
+                    $time = time();
+                    $system->db->query("UPDATE `village_seats` SET `seat_end` = {$time} WHERE `seat_id` = {$player->village_seat->seat_id}");
+                    $system->db->query("INSERT INTO `village_seats`
+                    (`user_id`, `village_id`, `seat_type`, `seat_title`, `seat_start`)
+                    VALUES ({$player->user_id}, {$player->village->village_id}, 'kage', '{$seat_title}', {$time})
+                ");
                 }
             }
         }
+        $player->village_seat = self::getPlayerSeat($system, $player);
     }
 
     /**
