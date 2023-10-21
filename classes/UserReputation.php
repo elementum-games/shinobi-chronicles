@@ -172,7 +172,7 @@ class UserReputation {
     const MAX_PVP_LEVEL_DIFFERENCE = 20;
     const MAX_PVP_REP_TIER_DIFFERENCE = 4;
 
-    const PVP_MEDIAN_LEVEL_BASED_GAIN = 6; // amount gained when fighting someone of the same level
+    const PVP_MEDIAN_LEVEL_BASED_GAIN = 5; // amount gained when fighting someone of the same level
     const PVP_MEDIAN_REP_TIER_BASED_GAIN = 2; // amount gained when fighting someone of the same rep tier (TODO: 7)
 
     const PVP_REP_ENABLED = true;
