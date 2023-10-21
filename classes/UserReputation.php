@@ -547,14 +547,18 @@ class UserReputation {
 
         $rep_loss = round($level_based_loss + $tier_based_loss);
 
-        // Redundancy to ensure rep is not lost when it shouldn't be
-        if($rep_loss < 0) {
-            $rep_loss = 0;
-        }
+        $rep_loss *= 0.75;
 
         // If retreat, halve loss
         if ($retreat) {
-            $rep_loss = ceil($rep_loss / 2);
+            $rep_loss *= 0.5;
+        }
+
+        $rep_loss = ceil($rep_loss);
+
+        // Redundancy to ensure rep is not lost when it shouldn't be
+        if($rep_loss < 0) {
+            $rep_loss = 0;
         }
 
         $player->reputation->subtractRep($rep_loss);
