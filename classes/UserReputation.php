@@ -172,7 +172,7 @@ class UserReputation {
     const MAX_PVP_LEVEL_DIFFERENCE = 20;
     const MAX_PVP_REP_TIER_DIFFERENCE = 4;
 
-    const PVP_MEDIAN_LEVEL_BASED_GAIN = 4; // amount gained when fighting someone of the same level (TODO: 5)
+    const PVP_MEDIAN_LEVEL_BASED_GAIN = 5; // amount gained when fighting someone of the same level (TODO: 5)
     const PVP_MEDIAN_REP_TIER_BASED_GAIN = 2; // amount gained when fighting someone of the same rep tier (TODO: 7)
 
     const PVP_REP_ENABLED = true;
@@ -452,8 +452,16 @@ class UserReputation {
         }
 
         /* This is so we can adjust from maximum level difference (say, 20 levels) to maximum gain difference (say, +/- 4 rep)
-         Max point difference is 5
-         Assuming max level diff of 20, level_diff_to_gain_divider is 20 / 5 = 5
+         The gain can stretch from 0x => 2x of the median level-based gain, e.g. if median is 5 we do 0 - 10.
+
+         Level diff to gain divider represents how many level correspond to +/- 1 rep.
+
+         Assuming max level diff of 20 and median gain of 5, level_diff_to_gain_divider is 20 / 5 = 4. For example:
+         - +1 to +4 levels = +1 rep
+         - +5 to +8 levels = +2 rep
+         - +9 to +12 levels = +3 rep
+         - +13 to +16 levels = +4 rep
+         - +17 to +20 levels = +5 rep
 
          Scenario 1: Beat someone 10 levels higher. Levels above opponent = -10
 
