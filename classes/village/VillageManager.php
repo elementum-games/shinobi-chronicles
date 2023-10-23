@@ -32,7 +32,7 @@ class VillageManager {
     const MIN_ELDER_CHALLENGE_TIER = 4;
 
     // Set these to correct values for release
-    const PROPOSAL_VOTE_HOURS = 0; // 72
+    const PROPOSAL_VOTE_HOURS = 1; // 72
     const PROPOSAL_ENACT_HOURS = 1; // 24
     const PROPOSAL_COOLDOWN_HOURS = 0; // 24
     const KAGE_PROVISIONAL_DAYS = 1; // 7
@@ -1001,7 +1001,7 @@ class VillageManager {
             if ($player->village_seat->seat_type == "kage" && $player->village_seat->is_provisional) {
                 if ($player->village_seat->seat_start + (VillageManager::KAGE_PROVISIONAL_DAYS * 86400) < time()) {
                     // get new title, base on number of previous unique, non-provisional kage in same village
-                    $result = $system->db->query("SELECT COUNT(DISTINCT `user_id`) as 'kage_count' FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` != {$player->user_id} AND `is_provisional` = 0");
+                    $result = $system->db->query("SELECT COUNT(DISTINCT `user_id`) as 'kage_count' FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = 'kage' AND `user_id` != {$player->user_id} AND `is_provisional` = 0");
                     $result = $system->db->fetch($result);
                     $seat_title = self::getOrdinal($result['kage_count'] + 1) . " " . self::KAGE_NAMES[$player->village->village_id];
                     // update seat
