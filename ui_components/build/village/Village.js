@@ -583,9 +583,11 @@ function VillageHQ({
   }, "resign"), !elder.seat_id && /*#__PURE__*/React.createElement("div", {
     className: playerSeatState.seat_id ? "elder_claim_button disabled" : "elder_claim_button",
     onClick: playerSeatState.seat_id ? null : () => ClaimSeat("elder")
-  }, "claim"), elder.seat_id && elder.seat_id != playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
+  }, "claim"), elder.seat_id && playerSeatState.seat_id == null && /*#__PURE__*/React.createElement("div", {
     className: "elder_challenge_button",
     onClick: () => Challenge(elder)
+  }, "challenge"), elder.seat_id && playerSeatState.seat_id !== null && playerSeatState.seat_id != elder.seat_id && /*#__PURE__*/React.createElement("div", {
+    className: "elder_challenge_button disabled"
   }, "challenge"))))), /*#__PURE__*/React.createElement("div", {
     className: "points_container"
   }, /*#__PURE__*/React.createElement("div", {

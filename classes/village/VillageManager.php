@@ -443,6 +443,28 @@ class VillageManager {
         $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `seat_holder_id` = {$player->user_id} AND `end_time` IS NULL");
         $challenge_result = $system->db->fetch_all($challenge_result);
         foreach ($challenge_result as $challenge) {
+            // process any challenges that are unresolved (outside of lock-in period)
+            if (!empty($challenge['start_time'])) {
+                $min_lock_time = $challenge['start_time'];
+                $max_lock_time = $min_lock_time + self::CHALLENGE_LOCK_TIME_MINUTES * 60;
+                // if outside of lock period and no battle in progress
+                if (time() > $max_lock_time && empty($challenge['battle_id'])) {
+                    $challenger_locked = (bool)$challenge['challenger_locked'];
+                    $seat_holder_locked = (bool)$challenge['seat_holder_locked'];
+                    if (!$challenger_locked && !$seat_holder_locked) {
+                        $winner = null;
+                    } else if (!$challenger_locked && $seat_holder_locked) {
+                        $winner = $challenge['seat_holder_id'];
+                    } else if ($challenger_locked && !$seat_holder_locked) {
+                        $winner = $challenge['challenger_id'];
+                    } else {
+                        // failsafe in case crazy stuff happens
+                        continue;
+                    }
+                    self::processChallengeEnd($system, $challenge['request_id'], $winner, $player);
+                    continue;
+                }
+            }
             $player_result = $system->db->query("SELECT `user_name`, `avatar_link` FROM `users` WHERE `user_id` = {$challenge['challenger_id']} LIMIT 1");
             $player_result = $system->db->fetch($player_result);
             $challenge_data[] = new ChallengeRequestDto(
@@ -468,6 +490,28 @@ class VillageManager {
         $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} AND `end_time` IS NULL");
         $challenge_result = $system->db->fetch_all($challenge_result);
         foreach ($challenge_result as $challenge) {
+            // process any challenges that are unresolved (outside of lock-in period)
+            if (!empty($challenge['start_time'])) {
+                $min_lock_time = $challenge['start_time'];
+                $max_lock_time = $min_lock_time + self::CHALLENGE_LOCK_TIME_MINUTES * 60;
+                // if outside of lock period and no battle in progress
+                if (time() > $max_lock_time && empty($challenge['battle_id'])) {
+                    $challenger_locked = (bool)$challenge['challenger_locked'];
+                    $seat_holder_locked = (bool)$challenge['seat_holder_locked'];
+                    if (!$challenger_locked && !$seat_holder_locked) {
+                        $winner = null;
+                    } else if (!$challenger_locked && $seat_holder_locked) {
+                        $winner = $challenge['seat_holder_id'];
+                    } else if ($challenger_locked && !$seat_holder_locked) {
+                        $winner = $challenge['challenger_id'];
+                    } else {
+                        // failsafe in case crazy stuff happens
+                        continue;
+                    }
+                    self::processChallengeEnd($system, $challenge['request_id'], $winner, $player);
+                    continue;
+                }
+            }
             $player_result = $system->db->query("SELECT `user_name`, `avatar_link` FROM `users` WHERE `user_id` = {$challenge['seat_holder_id']} LIMIT 1");
             $player_result = $system->db->fetch($player_result);
             $challenge_data[] = new ChallengeRequestDto(

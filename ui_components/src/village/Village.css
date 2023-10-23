@@ -595,6 +595,15 @@
     .elder_challenge_button:hover {
         color: white;
     }
+    .elder_challenge_button.disabled {
+        cursor: default;
+        opacity: 30%;
+        pointer-events: none;
+    }
+    .elder_challenge_button.disabled:hover {
+        opacity: 30%;
+        color: #ccc1af;
+    }
 .elder_resign_button {
     margin-top: 15px;
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);

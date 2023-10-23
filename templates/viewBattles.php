@@ -5,6 +5,23 @@
 
 ?>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const timeElements = document.querySelectorAll('.utc-time');
+
+    timeElements.forEach(element => {
+        const utcTime = new Date(element.getAttribute('data-utc-time'));
+        element.textContent = utcTime.toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    });
+});
+</script>
+
 <?php if (!empty($scheduled_battles)): ?>
     <table class='table' style="text-align:center;">
         <tr>
@@ -31,7 +48,7 @@
                 <?php if(isset($battle['battle_id'])): ?>
                 <a href="<?= $self_link ?>&battle_id=<?= $battle['battle_id'] ?>">Watch</a>
                 <?php else: ?>
-                <?= Date('M jS, h:i A', $battle['time']) ?>
+                <span class="utc-time" data-utc-time="<?= gmdate('c', $battle['time']) ?>"><?= Date('M jS, h:i A', $battle['time']) ?></span>
                 <?php endif; ?>
             </td>
         </tr>

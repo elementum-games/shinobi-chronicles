@@ -587,8 +587,11 @@ function VillageHQ({
                                             {!elder.seat_id &&
                                                 <div className={playerSeatState.seat_id ? "elder_claim_button disabled" : "elder_claim_button"} onClick={playerSeatState.seat_id ? null : () => ClaimSeat("elder")}>claim</div>
                                             }
-                                            {(elder.seat_id && elder.seat_id != playerSeatState.seat_id) &&
+                                            {(elder.seat_id && playerSeatState.seat_id == null) &&
                                                 <div className="elder_challenge_button" onClick={() => Challenge(elder)}>challenge</div>
+                                            }
+                                            {(elder.seat_id && playerSeatState.seat_id !== null && playerSeatState.seat_id != elder.seat_id) &&
+                                                <div className="elder_challenge_button disabled">challenge</div>
                                             }
                                         </div>
                                     ))}
