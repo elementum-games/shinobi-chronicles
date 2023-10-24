@@ -270,7 +270,7 @@ class UserReputation {
         }
         // Double repuation
         if (!empty($this->event) && $this->event instanceof DoubleReputationEvent) {
-            $amount += floor($amount * DoubleReputationEvent::rep_gain_multiplier);
+            $amount = floor($amount * DoubleReputationEvent::rep_gain_multiplier);
             if($this->debug) {
                 echo "Amount after double: $amount<br />";
             }
@@ -290,10 +290,10 @@ class UserReputation {
             $rep_rank_after = self::tierByRepAmount($new_rep);
             $weekly_cap = ($this->rank != $rep_rank_after) ? self::$VillageRep[$rep_rank_after]['weekly_cap'] : $this->weekly_cap;
             if(!empty($this->event) && $this->event instanceof DoubleReputationEvent && $this->rank != $rep_rank_after) {
-                $weekly_cap += floor($weekly_cap * DoubleReputationEvent::pve_cap_multiplier);
-            }
-            if($this->debug) {
-                echo "Weekly cap after rank change: $weekly_cap<br />";
+                $weekly_cap = floor($weekly_cap * DoubleReputationEvent::pve_cap_multiplier);
+				if($this->debug) {
+                	echo "Weekly cap after rank change: $weekly_cap<br />";
+            	}
             }
 
             // Adjust gain to conform with weekly caps
