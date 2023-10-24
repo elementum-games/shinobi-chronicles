@@ -217,7 +217,7 @@ class UserReputation {
     public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$last_pvp_kills, &$last_killer_ids, $mission_cd, $event) {
         //System data
         $this->event = $event;
-        $this->debug = true;
+        $this->debug = false;
 
         //Player data
         $this->rep = &$player_rep;
@@ -270,7 +270,7 @@ class UserReputation {
         }
         // Double repuation
         if (!empty($this->event) && $this->event instanceof DoubleReputationEvent) {
-            $amount *= DoubleReputationEvent::rep_gain_multiplier;
+            $amount += floor( $amount * DoubleReputationEvent::rep_gain_multiplier);
             if($this->debug) {
                 echo "Amount after double: $amount<br />";
             }
