@@ -212,10 +212,12 @@ class UserReputation {
     public array $recent_killer_ids_array;
     public int $base_pvp_reward;
     public array $benefits;
+    public bool $debug;
 
     public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$last_pvp_kills, &$last_killer_ids, $mission_cd, $event) {
         //System data
         $this->event = $event;
+        $this->debug = true;
 
         //Player data
         $this->rep = &$player_rep;
@@ -263,13 +265,13 @@ class UserReputation {
      * Returns amount of reputation awarded for display/data confirmation purposes
      */
     public function addRep(int $amount, bool $bypass_weekly_cap = false, bool $increment_pvp = false): int {
-        if($this-system->debug['add_rep']) {
+        if($this->debug) {
             echo "Amount: $amount<br />";
         }
         // Double repuation
         if (!empty($this->event) && $this->event instanceof DoubleReputationEvent) {
             $amount *= DoubleReputationEvent::rep_gain_multiplier;
-            if($this->system->debug['add_rep']) {
+            if($this->debug) {
                 echo "Amount after double: $amount<br />";
             }
         }
@@ -278,7 +280,7 @@ class UserReputation {
         if(!$bypass_weekly_cap) {
             // Bonus seal reputation
             $amount += $this->bonus_pve_rep;
-            if($this->system->debug['add_rep']) {
+            if($this->debug) {
                 echo "Amount after bonus PVE: $amount<br />";
             }
 
@@ -294,7 +296,7 @@ class UserReputation {
             }
 
             $this->weekly_rep += $amount;
-            if($this->system->debug['add_rep']) {
+            if($this->debug) {
                 echo "Amount after weekly: $amount<br />";
             }
         }
@@ -305,7 +307,7 @@ class UserReputation {
                 $amount = $this->weekly_pvp_cap - $this->weekly_pvp_rep;
             }
             $this->weekly_pvp_rep += $amount;
-            if($this->system->debug['add_rep']) {
+            if($this->debug) {
                 echo "Amount after PvP: $amount<br />";
             }
         }
@@ -315,7 +317,7 @@ class UserReputation {
         }
 
         return $amount; // Use this return for display/gain confirmation
-        if($this->system->debug['add_rep']) {
+        if($this->debug) {
             echo "Final amount: $amount<br />";
         }
     }
