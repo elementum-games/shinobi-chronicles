@@ -263,15 +263,24 @@ class UserReputation {
      * Returns amount of reputation awarded for display/data confirmation purposes
      */
     public function addRep(int $amount, bool $bypass_weekly_cap = false, bool $increment_pvp = false): int {
+        if($this-system->debug['add_rep']) {
+            echo "Amount: $amount<br />";
+        }
         // Double repuation
         if (!empty($this->event) && $this->event instanceof DoubleReputationEvent) {
             $amount *= DoubleReputationEvent::rep_gain_multiplier;
+            if($this->system->debug['add_rep']) {
+                echo "Amount after double: $amount<br />";
+            }
         }
 
         //Adjust reputation gain if gain goes above cap
         if(!$bypass_weekly_cap) {
             // Bonus seal reputation
             $amount += $this->bonus_pve_rep;
+            if($this->system->debug['add_rep']) {
+                echo "Amount after bonus PVE: $amount<br />";
+            }
 
             $new_rep = $this->rep + $amount;
 
@@ -284,7 +293,10 @@ class UserReputation {
                 $amount = $weekly_cap - $this->weekly_rep;
             }
 
-            //$this->weekly_rep += $amount;  Note: bug fix, this needs to be at the end of calculations, due to pvp separation
+            $this->weekly_rep += $amount;
+            if($this->system->debug['add_rep']) {
+                echo "Amount after weekly: $amount<br />";
+            }
         }
 
         // Increment Pvp rep
@@ -293,17 +305,19 @@ class UserReputation {
                 $amount = $this->weekly_pvp_cap - $this->weekly_pvp_rep;
             }
             $this->weekly_pvp_rep += $amount;
+            if($this->system->debug['add_rep']) {
+                echo "Amount after PvP: $amount<br />";
+            }
         }
         //Increment rep amount
         if($amount > 0) {
             $this->rep += $amount;
-            // Weekly rep needs to be added last to avoid adding more weekly rep than what is gained should pvp reduce amount
-            if(!$bypass_weekly_cap) {
-                $this->weekly_rep += $amount;
-            }
         }
 
         return $amount; // Use this return for display/gain confirmation
+        if($this->system->debug['add_rep']) {
+            echo "Final amount: $amount<br />";
+        }
     }
 
     /**

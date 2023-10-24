@@ -179,6 +179,7 @@ class System {
         'damage' => false,
         'bloodline' => false,
         'stat_cut' => false,
+        'add_rep' => true,
     ];
 
     public function __construct() {
