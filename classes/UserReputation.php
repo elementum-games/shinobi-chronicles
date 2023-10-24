@@ -289,6 +289,9 @@ class UserReputation {
             // Determine if rep rank changes and modify weekly cap if change occurs
             $rep_rank_after = self::tierByRepAmount($new_rep);
             $weekly_cap = ($this->rank != $rep_rank_after) ? self::$VillageRep[$rep_rank_after]['weekly_cap'] : $this->weekly_cap;
+            if(!empty($this->event) && $this->event instanceof DoubleReputationEvent) {
+                $weekly_cap += floor($weekly_cap * DoubleReputationEvent::pve_cap_multiplier);
+            }
 
             // Adjust gain to conform with weekly caps
             if($this->weekly_rep + $amount > $weekly_cap) {
