@@ -5,6 +5,7 @@
  * @var PremiumShopManager $premiumShopManager
  * @var ForbiddenSeal $twinSeal
  * @var ForbiddenSeal $fourDragonSeal
+ * @var ForbiddenSeal $eightTrigramSeal
  * @var string $self_link
  * @var string $view
  * @var array  $available_clans
@@ -212,6 +213,51 @@
                             <?php endforeach ?>
                         </select><br/>
                         <input type='submit' style='margin-top: 5px' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 2 ? 'Extend' : 'Purchase') ?>' />
+                    </p>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <th id='premium_eightTrigramSeal_header' colspan="2"><?=$eightTrigramSeal->name?></th>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align: center;">
+                <p style='font-weight:bold;text-align:center;'>
+                    <?= $premiumShopManager->costs['forbidden_seal_monthly_cost'][3] ?> Ancient Kunai / 30 days</p>
+                <br/>
+                All benefits of <?=$fourDragonSeal->name?><br />
+                Longer journal (<?=$eightTrigramSeal->journal_size?> characters)<br />
+                Journal image size of <?=$eightTrigramSeal->journal_image_display?><br />
+                Enhanced long trainings (<?=$eightTrigramSeal->long_training_time?>x length, <?=$eightTrigramSeal->long_training_gains?>x gains)<br />
+                Enhanced extended trainings (<?=$eightTrigramSeal->extended_training_time?>x length, <?=$eightTrigramSeal->extended_training_gains?>x gains)<br />
+                Faster stat transfers(+<?=$eightTrigramSeal->stat_transfer_boost?>/minute)<br />
+                View logs of your last <?=$eightTrigramSeal->max_battle_history_view?> battles
+
+                <!--TEMPORARY SALE LOGIC-->
+                <?php if($premiumShopManager->tierThreeSaleActive()): ?>
+                    <br /><br />
+                    <b><?=$eightTrigramSeal->name?> SALE!</b>
+                    <p style='margin: 0;' id="sale_time_remaining"><?= System::timeRemaining($premiumShopManager->saleTimeRemaining(), 'short') ?> Remaining</p>
+                    <script type="text/javascript">
+                        countdownTimer(<?=$premiumShopManager->saleTimeRemaining()?>, 'sale_time_remaining');
+                    </script>
+                    <br />
+                    <?php if($player->forbidden_seal->level == 0 || $player->forbidden_seal->level == 3): ?>
+                        Sixty (60) and ninety (90) day seal purchases are currently discounted!
+                    <?php else: ?>
+                        Any estimated seal credit above purchase price will be refunded at <?=PremiumShopManager::SALE_REFUND_RATE?>%
+                    <?php endif ?>
+                <?php endif ?>
+
+                <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
+                    <p style='width:100%;text-align:center;margin: 2.2em 0 0;'>
+                        <input type='hidden' name='seal_level' value='3'/>
+                        <select name='seal_length'>
+                            <?php foreach($premiumShopManager->costs['forbidden_seal'][3] as $pLength => $pCost): ?>
+                                <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> AK)</option>
+                            <?php endforeach ?>
+                        </select><br/>
+                        <input type='submit' style='margin-top: 5px' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 3 ? 'Extend' : 'Purchase') ?>' />
                     </p>
                 </form>
             </td>

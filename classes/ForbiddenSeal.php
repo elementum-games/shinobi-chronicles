@@ -46,7 +46,8 @@ class ForbiddenSeal {
     public static array $forbidden_seal_names = array(
         0 => '',
         1 => 'Twin Sparrow Seal',
-        2 => 'Four Dragon Seal'
+        2 => 'Four Dragon Seal',
+        3 => 'Eight Trigram Seal'
     );
     public static array $benefits = array (
         0 => [
@@ -175,6 +176,54 @@ class ForbiddenSeal {
             'stat_transfer_boost' => 5,
             'extra_stat_transfer_points_per_ak' => 100,
             'max_battle_history_view' => 20,
+            'free_transfer_bonus' => 50,
+            'bonus_pve_reputation' => 1,
+        ],
+        3 => [
+            'regen_boost' => 20, //Report in whole percentages (20 will be .2 bonus)
+            'name_colors' => [
+                'blue' => 'blue',
+                'pink' => 'pink',
+            ],
+            'name_color_display' => 'Blue/Pink', //Premium page desc display only
+            'avatar_size' => 200,
+            'avatar_size_display' => '200x200', //Premium page display only.
+            'avatar_filesize' => self::ONE_MEGABYTE * 2,
+            'avatar_styles' => [
+                'avy_none' => 'none',
+                'avy_round' => 'circle',
+                'avy_three-point' => 'triangle',
+                'avy_three-point-inverted' => 'triange inverted',
+                'avy_four-point' => 'square',
+                'avy_four-point-90' => 'diamond',
+                'avy_four-point-oblique' => 'oblique',
+                'avy_five-point' => 'pentagon',
+                'avy_six-point' => 'hexagon',
+                'avy_six-point-long' => 'crystal',
+                //'avy_six-point-long-reverse' => 'crystal reverse',
+                'avy_eight-point' => 'octagon',
+                'avy_eight-point-wide' => 'octagon wide',
+                'avy_nine-point' => 'nonagon',
+                'avy_twelve-point' => 'cross',
+            ],
+            'logout_timer' => System::LOGOUT_LIMIT,
+            'inbox_size' => 75,
+            'journal_size' => 3500,
+            'journal_image_x' => 600,
+            'journal_image_y' => 600,
+            'journal_image_display' => '600x600', //Premium page display only.
+            'chat_post_size' => 450,
+            'pm_size' => 1500,
+            'extra_jutsu_equips' => 1,
+            'extra_weapon_equips' => 1,
+            'extra_armor_equips' => 1,
+            'long_training_time' => 1.5,
+            'long_training_gains' => 2.2,
+            'extended_training_time' => 2,
+            'extended_training_gains' => 3,
+            'stat_transfer_boost' => 6,
+            'extra_stat_transfer_points_per_ak' => 125,
+            'max_battle_history_view' => 50,
             'free_transfer_bonus' => 50,
             'bonus_pve_reputation' => 1,
         ]
