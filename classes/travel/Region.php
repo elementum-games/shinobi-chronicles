@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . "/RegionCoords.php";
+
 class Region {
     public int $region_id = 0;
     public string $name;
@@ -18,7 +20,7 @@ class Region {
         6 => "rgba(68, 4, 139, 0.35)", // dark/rain
     ];
 
-    public static function fromDb(array $region_data, int $min_x = 0, int $min_y = 0, int $max_x = 84, int $max_y = 48, int $map_id = 1): Region {
+    public static function fromDb(array $region_data, int $min_x = 0, int $min_y = 0, int $max_x = 84, int $max_y = 48, int $map_id = 1, bool $get_coordinates = true): Region {
         $new_region = new Region();
         $new_region->region_id = $region_data['region_id'];
         $new_region->name = $region_data['name'];
@@ -26,31 +28,33 @@ class Region {
         $new_region->color = self::VILLAGE_COLORS[$new_region->village];
         $new_region->vertices = json_decode($region_data['vertices']);
         // generate coordinate list
-        for ($i = $min_x; $i < $max_x; $i++) {
-            for ($j = $min_y; $j < $max_y; $j++) {
-                $coord = new RegionCoords($i, $j, $map_id);
-                if (self::coordInRegion($coord, $new_region->vertices)) {
-                    $coord->region_id = $new_region->region_id;
-                    $coord->color = $new_region->color;
-                    $new_region->coordinates[$i][$j] = $coord;
+        if ($get_coordinates) {
+            for ($i = $min_x; $i < $max_x; $i++) {
+                for ($j = $min_y; $j < $max_y; $j++) {
+                    $coord = new RegionCoords($i, $j, $map_id);
+                    if (self::coordInRegion($coord, $new_region->vertices)) {
+                        $coord->region_id = $new_region->region_id;
+                        $coord->color = $new_region->color;
+                        $new_region->coordinates[$i][$j] = $coord;
+                    }
                 }
             }
-        }
-        // calculate borders
-        for ($i = $min_x; $i < $max_x; $i++) {
-            for ($j = $min_y; $j < $max_y; $j++) {
-                if (isset($new_region->coordinates[$i][$j])) {
-                    if (!isset($new_region->coordinates[$i][$j - 1])) {
-                        $new_region->coordinates[$i][$j]->border_top = true;
-                    }
-                    if (!isset($new_region->coordinates[$i][$j + 1])) {
-                        $new_region->coordinates[$i][$j]->border_bottom = true;
-                    }
-                    if (!isset($new_region->coordinates[$i - 1][$j])) {
-                        $new_region->coordinates[$i][$j]->border_left = true;
-                    }
-                    if (!isset($new_region->coordinates[$i + 1][$j])) {
-                        $new_region->coordinates[$i][$j]->border_right = true;
+            // calculate borders
+            for ($i = $min_x; $i < $max_x; $i++) {
+                for ($j = $min_y; $j < $max_y; $j++) {
+                    if (isset($new_region->coordinates[$i][$j])) {
+                        if (!isset($new_region->coordinates[$i][$j - 1])) {
+                            $new_region->coordinates[$i][$j]->border_top = true;
+                        }
+                        if (!isset($new_region->coordinates[$i][$j + 1])) {
+                            $new_region->coordinates[$i][$j]->border_bottom = true;
+                        }
+                        if (!isset($new_region->coordinates[$i - 1][$j])) {
+                            $new_region->coordinates[$i][$j]->border_left = true;
+                        }
+                        if (!isset($new_region->coordinates[$i + 1][$j])) {
+                            $new_region->coordinates[$i][$j]->border_right = true;
+                        }
                     }
                 }
             }

@@ -256,7 +256,7 @@ class ChatManager {
             }
 
             $title = $this->player->rank->name;
-            $seat = VillageManager::getPlayerSeat($this->system, $this->player->user_id);
+            $seat = $this->player->village_seat;
             if (!empty($seat->seat_title)) {
                 $title = $seat->seat_title;
             }
@@ -313,10 +313,11 @@ class ChatManager {
                             message: $this->player->user_name . " replied to your post!",
                             user_id: $result['user_id'],
                             created: time(),
+                            expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_CHAT * 86400),
                             alert: false,
                             post_id: $new_post_id,
                         );
-                        NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_MULTIPLE);
+                        NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_MULTIPLE, limit: 3);
                     }
                 }
             }
@@ -356,10 +357,11 @@ class ChatManager {
                         message: $this->player->user_name . " mentioned you in chat!",
                         user_id: $result['user_id'],
                         created: time(),
+                        expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_CHAT * 86400),
                         alert: false,
                         post_id: $new_post_id,
                     );
-                    NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_MULTIPLE);
+                    NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_MULTIPLE, limit: 3);
                 }
             }
 

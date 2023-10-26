@@ -19,6 +19,7 @@ class TrainingManager {
     public UserReputation $reputation;
     public ?int $sensei_id;
     public ?int $bloodline_id;
+    public VillagePolicy $policy;
 
     public int $train_time_remaining;
 
@@ -48,7 +49,7 @@ class TrainingManager {
     public int $base_jutsu_train_length;
     public int $jutsu_train_gain;
 
-    public function __construct(System $system, &$type, &$gain, &$time, $rank, $forbidden_seal, $rep, $team, $clan, $sensei, $bloodline_id) {
+    public function __construct(System $system, &$type, &$gain, &$time, $rank, $forbidden_seal, $rep, $team, $clan, $sensei, $bloodline_id, $policy) {
         $this->system = $system;
 
         $this->rank = $rank;
@@ -61,6 +62,7 @@ class TrainingManager {
         $this->reputation = $rep;
         $this->sensei_id = $sensei;
         $this->bloodline_id = $bloodline_id;
+        $this->policy = $policy;
 
         $this->train_time_remaining = $this->train_time - time();
 
@@ -214,8 +216,13 @@ class TrainingManager {
                 if ($clan_boost) {
                     $len *= 1 - ($clan_boost / 100);
                 }
+                // Reputation boost
                 if ($this->reputation->benefits[UserReputation::BENEFIT_JUTSU_TRAINING_BONUS]) {
                     $len = round($len * (100 / (100 + UserReputation::JUTSU_TRAINING_BONUS)));
+                }
+                // Policy boost
+                if ($this->policy->training_speed > 0) {
+                    $len = round($len * (100 / (100 + $this->policy->training_speed)));
                 }
                 return ($in_mins) ? $len/60 : $len;
             }
@@ -270,6 +277,10 @@ class TrainingManager {
                     // Clan boost
                     if ($clan_boost) {
                         $train_length *= 1 - ($clan_boost / 100);
+                    }
+                    // Policy boost
+                    if ($this->policy->training_speed > 0) {
+                        $train_length = round($train_length * (100 / (100 + $this->policy->training_speed)));
                     }
                     return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 default:

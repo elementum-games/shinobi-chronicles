@@ -1323,3 +1323,40 @@
     height: 18px;
     width: 18px;
 }
+
+.patrol_details {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    position: absolute;
+    top: 105%;
+    left: 50%;
+    right: 0;
+    transform: translateX(-50%);
+    margin: 0 auto;
+    padding: 5px 10px;
+    text-align: center;
+    width: fit-content;
+    white-space: pre;
+    background: #3c2b2bcc;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.46);
+    font-family: sans-serif;
+    color: #fff6e0;
+    z-index: 3;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 1px 0px 2px black;
+    gap: 2px;
+}
+.map_location:hover .patrol_details {
+    display: flex;
+}
+.patrol_details_resource {
+    line-height: 18px;
+    display: flex;
+}
+.patrol_details_resource_icon {
+    height: 18px;
+    width: 18px;
+}

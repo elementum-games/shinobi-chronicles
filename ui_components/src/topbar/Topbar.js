@@ -122,7 +122,23 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
          "caravan",
          "raid_ally",
          "raid_enemy",
-         "event"
+         "event",
+         "seat_challenge",
+         "lock_challenge",
+         "proposal_created",
+         "proposal_passed",
+         "proposal_canceled",
+         "proposal_expired",
+         "policy_change",
+         "diplomacy_declare_war",
+         "diplomacy_form_alliance",
+         "diplomacy_end_war",
+         "diplomacy_end_alliance",
+         "news",
+         "challenge_pending",
+         "challenge_accepted",
+         "kage_change",
+         "achievement"
     ];
 
     return (

@@ -602,6 +602,10 @@ function premiumShop(): void {
                     throw new RuntimeException("Invalid village!");
                     break;
             }
+            $target_village = new Village($system, $village);
+            if ($target_village->policy->free_transfer) {
+                $ak_cost = 0;
+            }
 
             if ($player->team) {
                 $debug = ($player->layout == 'classic_blue') ? "<br /><br />" : "";

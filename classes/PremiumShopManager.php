@@ -12,8 +12,8 @@ class PremiumShopManager {
     const SUPER_EXPEDITED_AK_COST_MULTIPLIER = 2;
     const SUPER_EXPEDITED_YEN_COST_MULTIPLIER = 2;
 
-    const EXCHANGE_MIN_YEN_PER_AK = 1.0;
-    const EXCHANGE_MAX_YEN_PER_AK = 20.0;
+    const EXCHANGE_MIN_YEN_PER_AK = 10.0;
+    const EXCHANGE_MAX_YEN_PER_AK = 100.0;
 
     public System $system;
     public User $player;

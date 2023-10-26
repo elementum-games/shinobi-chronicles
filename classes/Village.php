@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/SpecialMission.php';
 require_once __DIR__ . '/../classes/village/VillageRelation.php';
+require_once __DIR__ . '/../classes/village/VillagePolicy.php';
 
 class Village {
     public System $system;
@@ -16,6 +17,8 @@ class Village {
     public string $kage_name;
     public array $resources = [];
     public array $relations = [];
+    public int $policy_id = 0;
+    public VillagePolicy $policy;
 
     // to-do: we should restructure how village data is being saved
     // player village should reference the village ID and this constructor should get row by ID
@@ -33,6 +36,7 @@ class Village {
             $this->kage_name = VillageManager::KAGE_NAMES[$this->village_id];
             $this->coords = VillageManager::getLocation($this->system, $this->village_id);
             $this->relations = VillageManager::getRelations($this->system, $this->village_id);
+            $this->policy = new VillagePolicy($this->policy_id);
         }
         // updated legacy constructor logic
         else {
@@ -41,6 +45,7 @@ class Village {
             $this->kage_name = VillageManager::KAGE_NAMES[$this->village_id];
             $this->coords = VillageManager::getLocation($this->system, $this->village_id);
             $this->relations = VillageManager::getRelations($this->system, $this->village_id);
+            $this->policy = new VillagePolicy($this->policy_id);
         }
     }
 
@@ -55,6 +60,8 @@ class Village {
         $this->village_id = $result['village_id'];
         $this->points = $result['points'];
         $this->resources = json_decode($result['resources'], true);
+        $this->policy_id = $result['policy_id'];
+        $this->leader = $result['leader'];
     }
 
     public function addResource(int $resource_id, int $quantity) {
@@ -65,12 +72,23 @@ class Village {
         }
     }
 
-    public function subtractResource(int $resource_id, int $quantity) {
-        if (!empty($this->resources[$resource_id]) && $this->resources[$resource_id] > $quantity) {
+    public function subtractResource(int $resource_id, int $quantity): int {
+        $change = 0;
+        // if enough resources for full cost
+        if (!empty($this->resources[$resource_id]) && $this->resources[$resource_id] >= $quantity) {
+            $change = $quantity;
             $this->resources[$resource_id] -= $quantity;
         } else {
-            $this->resources[$resource_id] = 0;
+            // if less resources than cost
+            if (!empty($this->resources[$resource_id])) {
+                $change = $this->resources[$resource_id];
+                $this->resources[$resource_id] = 0;
+            } else {
+                $change = 0;
+                $this->resources[$resource_id] = 0;
+            }
         }
+        return $change;
     }
 
     public function updateResources(bool $run_query = true): string {
@@ -80,5 +98,15 @@ class Village {
             $this->system->db->query("UPDATE `villages` SET `resources` = '{$resources}' WHERE `village_id` = {$this->village_id}");
         }
         return $query;
+    }
+
+    public function isAlly(int $target_village_id): bool {
+        return ($this->relations[$target_village_id]->relation_type == VillageRelation::RELATION_ALLIANCE);
+    }
+    public function isEnemy(int $target_village_id): bool {
+        return ($this->relations[$target_village_id]->relation_type == VillageRelation::RELATION_WAR);
+    }
+    public function isNeutral(int $target_village_id): bool {
+        return ($this->relations[$target_village_id]->relation_type == VillageRelation::RELATION_NEUTRAL);
     }
 }

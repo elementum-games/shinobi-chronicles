@@ -771,7 +771,7 @@ class TravelManager {
             }
             if ($this->user->mission_stage['action_type'] == 'search') {
                 $mission_result = $this->system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
-                $mission_location = TravelCoords::fromDbString($this->user->mission_stage['last_location']);
+                $mission_location = !empty($this->user->mission_stage['last_location']) ? TravelCoords::fromDbString($this->user->mission_stage['last_location']) : TravelCoords::fromDbString($this->user->mission_stage['action_data']);
                 $objectives[] = new MapObjective(
                     id: MapObjective::MISSION_OBJECTIVE_ID,
                     name: $this->system->db->fetch($mission_result)['name'],
@@ -975,6 +975,9 @@ class TravelManager {
         return $objectives;
     }
 
+    /**
+     * @return string
+     */
     function getPlayerBattleUrl(): ?string {
         $link = null;
         if ($this->user->battle_id > 0) {
@@ -1008,6 +1011,9 @@ class TravelManager {
         return $link;
     }
 
+    /**
+     * @return bool
+     */
     function beginOperation($operation_type): bool {
         $message = '';
         if ($operation_type == Operation::OPERATION_LOOT) {
@@ -1026,6 +1032,7 @@ class TravelManager {
                     return true;
                 }
             }
+            return false;
         } else {
             $target = $this->system->db->query("SELECT `id` FROM `region_locations`
                 WHERE `x` = {$this->user->location->x}
@@ -1045,6 +1052,9 @@ class TravelManager {
         }
     }
 
+    /**
+     * @return bool
+     */
     function cancelOperation(): bool {
         $message = '';
         $this->warManager->cancelOperation();
@@ -1071,6 +1081,9 @@ class TravelManager {
         $this->setTravelMessage($message);
     }
 
+    /**
+     * @return bool
+     */
     function claimLoot(): bool
     {
         $message = '';
@@ -1090,6 +1103,9 @@ class TravelManager {
         }
     }
 
+    /**
+     * @return int
+     */
     function getPlayerLootCount(): int {
         $loot_count = 0;
         $loot_result = $this->system->db->query("SELECT COUNT(*) as `count` FROM `loot` WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL LIMIT 1");

@@ -140,7 +140,8 @@ export const Map = ({
     tileWidth: tile_width,
     tileHeight: tile_height,
     playerId: playerId,
-    ranksToView: ranksToView
+    ranksToView: ranksToView,
+    strategicView: strategicView
   }), /*#__PURE__*/React.createElement(Player, {
     playerStyle: PlayerStyle,
     mapData: mapData
@@ -490,10 +491,10 @@ function MapNearbyPlayers({
   }), player.loot_count > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
     className: "loot_icon_1",
     src: "/../images/map/icons/loot1.png"
-  })), player.loot_count > 5 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
+  })), player.loot_count > 10 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
     className: "loot_icon_2",
     src: "/../images/map/icons/loot1.png"
-  })), player.loot_count > 10 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
+  })), player.loot_count > 20 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
     className: "loot_icon_3",
     src: "/../images/map/icons/loot1.png"
   })))));
@@ -501,7 +502,8 @@ function MapNearbyPlayers({
 function MapNearbyPatrols({
   patrolData,
   tileWidth,
-  tileHeight
+  tileHeight,
+  strategicView
 }) {
   return /*#__PURE__*/React.createElement("div", {
     id: "patrol_locations",
@@ -518,7 +520,24 @@ function MapNearbyPatrols({
     className: "map_location_tooltip"
   }, patrol.patrol_name), /*#__PURE__*/React.createElement("div", {
     className: alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type + ' tier_' + patrol.tier
-  }))));
+  }), patrol.resources.length !== 0 && strategicView && /*#__PURE__*/React.createElement("div", {
+    className: "patrol_details"
+  }, patrol.resources[1] && /*#__PURE__*/React.createElement("div", {
+    className: "patrol_details_resource"
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "patrol_details_resource_icon",
+    src: "/images/map/icons/materials.png"
+  }), "  ", patrol.resources[1], " Materials"), patrol.resources[2] && /*#__PURE__*/React.createElement("div", {
+    className: "patrol_details_resource"
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "patrol_details_resource_icon",
+    src: "/images/map/icons/food.png"
+  }), "  ", patrol.resources[2], " Food"), patrol.resources[3] && /*#__PURE__*/React.createElement("div", {
+    className: "patrol_details_resource"
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "patrol_details_resource_icon",
+    src: "/images/map/icons/wealth.png"
+  }), "  ", patrol.resources[3], " Wealth")))));
 }
 function Player({
   mapData,

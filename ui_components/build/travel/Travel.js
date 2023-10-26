@@ -103,6 +103,7 @@ function Travel({
   const lastTravelSuccessTime = React.useRef(null);
   const lastTravelLatencyMs = React.useRef(0);
   const travelIntervalId = React.useRef(null);
+  const headerLocation = React.useRef(null);
   const headerCoords = React.useRef(null);
 
   // API ACTIONS
@@ -152,8 +153,11 @@ function Travel({
       if (response.data.success) {
         //console.log("Response Time: " + response.data.time);
         debug(`Move completed ${requestEnd - lastTravelSuccessTime.current} ms after last move`);
+        if (headerLocation.current !== null) {
+          headerLocation.current.innerHTML = "";
+        }
         if (headerCoords.current !== null) {
-          headerCoords.current.innerHTML = " (" + response.data.mapData.player_x + "." + response.data.mapData.player_y + ")";
+          headerCoords.current.innerHTML = " | " + response.data.mapData.region.name + " (" + response.data.mapData.player_x + "." + response.data.mapData.player_y + ")";
         }
         lastTravelSuccessTime.current = requestEnd;
         setMapData(response.data.mapData);
@@ -316,6 +320,7 @@ function Travel({
   // Initial Load, fetch map info from user location
   React.useEffect(() => {
     LoadTravelData();
+    headerLocation.current = document.getElementById('contentHeaderLocation');
     headerCoords.current = document.getElementById('contentHeaderCoords');
 
     // scout area loading

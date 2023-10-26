@@ -97,8 +97,8 @@ class System {
 
     // Default layout
     const DEFAULT_LAYOUT = 'new_geisha';
-    const VERSION_NUMBER = '0.9.2';
-    const VERSION_NAME = '0.9.2 Flickering Ambitions';
+    const VERSION_NUMBER = '0.9.3';
+    const VERSION_NAME = '0.9.3 Warring Shadows';
 
     // Misc stuff
     const SC_MAX_RANK = 4;

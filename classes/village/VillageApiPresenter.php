@@ -4,6 +4,8 @@ class VillageApiPresenter {
     public static function policyDataResponse(System $system, User $player): array
     {
         return [
+            "policy_id" => VillageManager::getVillagePolicyID($system, $player->village->village_id),
+            //"policy" => $player->village->policy,
         ];
     }
     public static function populationDataResponse(System $system, User $player): array
@@ -32,7 +34,7 @@ class VillageApiPresenter {
     public static function pointsDataResponse(System $system, User $player): array
     {
         return [
-            "points" => $player->village->points,
+            "points" => VillageManager::getVillagePoints($system, $player->village->village_id),
         ];
     }
     public static function diplomacyDataResponse(System $system, User $player): array
@@ -78,5 +80,40 @@ class VillageApiPresenter {
     public static function clanDataResponse(System $system, User $player): array
     {
         return VillageManager::getClans($system, $player->village->name);
+    }
+    public static function proposalDataResponse(System $system, User $player): array
+    {
+        return VillageManager::getProposalHistory($system, $player->village->village_id);
+    }
+    public static function strategicDataResponse($system): array
+    {
+        return VillageManager::getVillageStrategicInfo($system);
+    }
+    public static function challengeDataResponse(System $system, User $player): array
+    {
+        return array_map(
+            function (ChallengeRequestDto $challenge) {
+                return [
+                    "request_id" => $challenge->request_id,
+                    "challenger_id" => $challenge->challenger_id,
+                    "seat_holder_id" => $challenge->seat_holder_id,
+                    "seat_id" => $challenge->seat_id,
+                    "created_time" => $challenge->created_time,
+                    "accepted_time" => $challenge->accepted_time,
+                    "start_time" => $challenge->start_time,
+                    "end_time" => $challenge->end_time,
+                    "seat_holder_locked" => $challenge->seat_holder_locked,
+                    "challenger_locked" => $challenge->challenger_locked,
+                    "selected_times" => $challenge->selected_times,
+                    "battle_id" => $challenge->battle_id,
+                    "winner" => $challenge->winner,
+                    "challenger_name" => $challenge->challenger_name,
+                    "challenger_avatar" => $challenge->challenger_avatar,
+                    "seat_holder_name" => $challenge->seat_holder_name,
+                    "seat_holder_avatar" => $challenge->seat_holder_avatar
+                ];
+            },
+            VillageManager::getChallengeData($system, $player)
+        );
     }
 }

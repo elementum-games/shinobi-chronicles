@@ -157,6 +157,12 @@ function MainBannerSection({
             break;
     }
 
+    React.useEffect(() => {
+        if (initialView === "news" && newsRef.current) {
+            scrollTo(newsRef.current);
+        }
+    }, [initialView]);
+
     return (
         <div className="home_section main_banner_section">
             <div className="main_banner_container">
@@ -166,10 +172,12 @@ function MainBannerSection({
                     <div className="title_version">{version}</div>
                 </div>
 
+                {/*
                 <div className={"home_lantern lantern_1"}><img src="/images/v2/decorations/lanternbig.png" /></div>
                 <div className={"home_lantern lantern_2"}><img src="/images/v2/decorations/lanternbig.png" /></div>
                 <div className={"home_lantern lantern_3"}><img src="/images/v2/decorations/lanternsmall.png" /></div>
                 <div className={"home_lantern lantern_4"}><img src="/images/v2/decorations/lanternsmall.png" /></div>
+                */}
 
                 {activeModal}
 

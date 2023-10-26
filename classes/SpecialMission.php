@@ -416,6 +416,7 @@ class SpecialMission {
                     message: "Special Mission completed",
                     user_id: $this->player->user_id,
                     created: time(),
+                    expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION * 86400),
                     alert: true,
                 );
                 NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
@@ -433,6 +434,7 @@ class SpecialMission {
                     message: "Special Mission failed",
                     user_id: $this->player->user_id,
                     created: time(),
+                    expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION * 86400),
                     alert: true,
                 );
                 NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);

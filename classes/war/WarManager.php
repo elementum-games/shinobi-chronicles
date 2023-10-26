@@ -11,10 +11,15 @@ class WarManager {
     const BASE_CASTLE_HEALTH = 15000;
     const BASE_VILLAGE_DEFENSE = 50;
     const BASE_CASTLE_DEFENSE = 75;
+
+    const RESOURCE_MATERIALS = 1;
+    const RESOURCE_FOOD = 2;
+    const RESOURCE_WEALTH = 3;
+
     const RESOURCE_NAMES = [
-        1 => 'materials',
-        2 => 'food',
-        3 => 'wealth',
+        self::RESOURCE_MATERIALS => 'materials',
+        self::RESOURCE_FOOD => 'food',
+        self::RESOURCE_WEALTH => 'wealth',
         /*4 => 'adamantine',
         5 => 'quicksilver',
         6 => 'elderwood',
@@ -40,7 +45,8 @@ class WarManager {
         4 => 0,
     ];
     const PATROL_RESPAWN_TIME = 600;
-    const BASE_LOOT_CAPACITY = 15;
+    const BASE_LOOT_CAPACITY = 25;
+    const MAX_PATROL_TIER = 3;
 
     private System $system;
     private User $user;
@@ -181,25 +187,25 @@ class WarManager {
         switch ($operation->type) {
             case Operation::OPERATION_INFILTRATE:
                 // must be neutral or at war
-                if ($this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_NEUTRAL && $this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_WAR) {
+                if ($this->user->village->isAlly($target['village'])) {
                     return false;
                 }
                 break;
             case Operation::OPERATION_REINFORCE:
                 // must be owned or ally
-                if ($target['village'] != $this->user->village->village_id && $this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_ALLIANCE) {
+                if ($target['village'] != $this->user->village->village_id && !$this->user->village->isAlly($target['village'])) {
                     return false;
                 }
                 break;
             case Operation::OPERATION_RAID:
                 // must be at war
-                if ($this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_WAR) {
+                if (!$this->user->village->isEnemy($target['village'])) {
                     return false;
                 }
                 break;
             case Operation::OPERATION_LOOT:
                 // must be neutral or at war
-                if ($this->user->village->relations[$operation->target_village]->relation_type != VillageRelation::RELATION_NEUTRAL && $this->user->village->relations[$patrol->village_id]->relation_type != VillageRelation::RELATION_WAR) {
+                if ($this->user->village->isAlly($operation->target_village)) {
                     return false;
                 }
                 break;
@@ -368,26 +374,26 @@ class WarManager {
         return $message;
     }
 
-    public function handlePatrolDefeat(int $patrol_id) {
+    public function handleWinAgainstPatrol(int $patrol_id) {
         $x = mt_rand(1, 100);
         if ($x <= self::PATROL_CHANCE[3]) {
-            $name = self::PATROL_NAMES[3];
-            $ai_id = self::PATROL_AI[3];
-            $tier = 3;
+            $name = self::PATROL_NAMES[min(3 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
+            $ai_id = self::PATROL_AI[min(3 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
+            $tier = min(3 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER);
         } else if ($x <= self::PATROL_CHANCE[3] + self::PATROL_CHANCE[2]) {
-            $name = self::PATROL_NAMES[2];
-            $ai_id = self::PATROL_AI[2];
-            $tier = 2;
+            $name = self::PATROL_NAMES[min(2 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
+            $ai_id = self::PATROL_AI[min(2 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
+            $tier = min(2 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER);
         } else {
-            $name = self::PATROL_NAMES[1];
-            $ai_id = self::PATROL_AI[1];
-            $tier = 1;
+            $name = self::PATROL_NAMES[min(1 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
+            $ai_id = self::PATROL_AI[min(1 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
+            $tier = min(1 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER);
         }
-        $respawn_time = time() + self::PATROL_RESPAWN_TIME;
+        $respawn_time = time() + round(self::PATROL_RESPAWN_TIME * (100 / (100 + $this->user->village->policy->patrol_respawn)), 1);
         $this->system->db->query("UPDATE `patrols` SET `start_time` = {$respawn_time}, `name` = '{$name}', `ai_id` = {$ai_id}, `tier` = {$tier} WHERE `id` = {$patrol_id}");
     }
 
-    public function handlePatrolWin(int $patrol_id): string
+    public function handleLossAgainstPatrol(int $patrol_id): string
     {
         $message = '';
         // get patrol

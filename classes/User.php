@@ -18,6 +18,7 @@ require_once __DIR__ . "/training/TrainingManager.php";
 require_once __DIR__ . "/event/LanternEvent.php";
 require_once __DIR__ . "/Bloodline.php";
 require_once __DIR__ . "/travel/TravelManager.php";
+require_once __DIR__ . "/travel/Region.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -304,6 +305,10 @@ class User extends Fighter {
         'willpower'
     ];
 
+    public VillageSeatDto $village_seat;
+    public Region $region;
+    public int $locked_challenge;
+
     /**
      * User constructor.
      * @param System $system
@@ -377,6 +382,8 @@ class User extends Fighter {
         $user->village = new Village($system, $user_data['village']);
         $user->rank_num = $user_data['rank'];
         $user->accept_students = $user_data['accept_students'];
+
+        $user->locked_challenge = $user_data['locked_challenge'];
 
         //Todo: Remove this in a couple months, only a temporary measure to support current bans
         if($user->ban_type) {
@@ -895,6 +902,24 @@ class User extends Fighter {
         // Load training manager
         $this->loadTrainingManager();
 
+        // Get village seat
+        $this->village_seat = VillageManager::getPlayerSeat($this->system, $this);
+
+        // Get current region
+        $this->region = $this->getCurrentRegion();
+
+        // Apply policy benefits
+        $this->scout_range += $this->village->policy->scouting;
+        $this->stealth += $this->village->policy->stealth;
+
+        // Challenge
+        $this->locked_challenge = $user_data['locked_challenge'];
+        if ($UPDATE >= User::UPDATE_FULL) {
+            if ($this->locked_challenge > 0 && $this->battle_id == 0) {
+                VillageManager::checkChallengeLock($this->system, $this);
+            }
+        }
+
         return;
     }
 
@@ -948,7 +973,7 @@ class User extends Fighter {
     {
         $this->trainingManager = new TrainingManager($this->system, $this->train_type, $this->train_gain,
     $this->train_time, $this->rank, $this->forbidden_seal, $this->reputation, $this->team, $this->clan, $this->sensei_id,
-            $this->bloodline_id);
+            $this->bloodline_id, $this->village->policy);
     }
 
     public function setForbiddenSealFromDb(string $forbidden_seal_db, bool $remote_view) {
@@ -1858,6 +1883,7 @@ class User extends Fighter {
 		`willpower` = '$this->willpower',
 		`village_changes` = '$this->village_changes',
 		`clan_changes` = '$this->clan_changes',
+        `locked_challenge` = '$this->locked_challenge',
 		`censor_explicit_language` = " . (int)$this->censor_explicit_language . "
 		WHERE `user_id` = '{$this->user_id}' LIMIT 1";
         $this->system->db->query($query);
@@ -1870,10 +1896,13 @@ class User extends Fighter {
             );
         }
 
-        //Update Daily Tasks
+        // Update Daily Tasks
         if($this->daily_tasks->tasks) {
             $this->daily_tasks->update();
         }
+
+        // Check provisional kage status
+        VillageManager::updateProvisionalKageStatus($this->system, $this);
     }
 
     public function updateLastActive() {
@@ -2502,7 +2531,7 @@ class User extends Fighter {
 
     /**
      * @return bool
-     * checks if PvP battle is complete, used to redirect playuer
+     * checks if PvP battle is complete, used to redirect player
      */
     public function checkPvPComplete(): bool {
         $complete = false;
@@ -2518,5 +2547,22 @@ class User extends Fighter {
             }
         }
         return $complete;
+    }
+
+    /**
+     * @return Region
+     */
+    public function getCurrentRegion(): Region {
+        $result = $this->system->db->query("SELECT * FROM `regions`");
+        foreach ($this->system->db->fetch_all($result) as $region) {
+            //return Region::fromDb($region, get_coordinates: false);
+            $region_vertices = json_decode($region['vertices']);
+            foreach ($region_vertices as $vertex) {
+                $coord = new RegionCoords($this->location->x, $this->location->y, $this->location->map_id);
+                if (Region::coordInRegion($coord, $region_vertices)) {
+                    return Region::fromDb($region, get_coordinates: false);
+                }
+            }
+        }
     }
 }

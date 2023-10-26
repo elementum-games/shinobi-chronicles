@@ -74,7 +74,7 @@ function training() {
 
                 // Training notification
                 $new_notification = new NotificationDto(
-                    type: "training",
+                    type: NotificationManager::NOTIFICATION_TRAINING,
                     message: "Training {$player->trainingManager->trainType()}",
                     user_id: $player->user_id,
                     created: time(),
@@ -122,7 +122,7 @@ function training() {
 
                 // Set notification
                 $new_notification = new NotificationDto(
-                    type: "training",
+                    type: NotificationManager::NOTIFICATION_TRAINING,
                     message: "Training " . System::unSlug($jutsu->name),
                     user_id: $player->user_id,
                     created: time(),
@@ -149,7 +149,7 @@ function training() {
                 $player->train_time = 0;
                 // Create notification
                 $new_notification = new NotificationDto(
-                    type: "training_complete",
+                    type: NotificationManager::NOTIFICATION_TRAINING_COMPLETE,
                     message: $stat_gain,
                     user_id: $player->user_id,
                     created: time(),

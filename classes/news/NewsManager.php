@@ -1,6 +1,7 @@
 <?php
 
 require __DIR__ . '/NewsPostDto.php';
+require_once __DIR__ . "/../notification/NotificationManager.php";
 
 class NewsManager {
     private System $system;
@@ -37,6 +38,22 @@ class NewsManager {
             if ($newsPost->post_id == 0) {
                 $this->system->db->query("INSERT INTO `news_posts` (`sender`, `title`, `message`, `time`, `tags`, `version`)
                     VALUES ('{$this->player->user_name}', '{$newsPost->title}', '{$newsPost->message}', '{$time}', '{$tags}', '{$newsPost->version}')");
+                // get users to notify
+                $active_threshold = time() - (NotificationManager::ACTIVE_PLAYER_DAYS_LAST_ACTIVE * 86400);
+                $user_ids = $this->system->db->query("SELECT `user_id` FROM `users` WHERE `last_login` > {$active_threshold}");
+                $user_ids = $this->system->db->fetch_all($user_ids);
+                // create notifications
+                foreach ($user_ids as $user) {
+                    $new_notification = new NotificationDto(
+                        type: NotificationManager::NOTIFICATION_NEWS,
+                        message: "View update notes: {$newsPost->title}",
+                        user_id: $user['user_id'],
+                        created: time(),
+                        expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_NEWS * 86400),
+                        alert: false,
+                    );
+                    NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+                }
             } else {
                 $this->system->db->query("UPDATE `news_posts` SET `title` = '{$newsPost->title}', `message` = '{$newsPost->message}', `tags` = '{$tags}', `version` = '{$newsPost->version}' WHERE `post_id` = '{$newsPost->post_id}'");
             }

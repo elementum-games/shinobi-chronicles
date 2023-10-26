@@ -35,6 +35,7 @@ HTML;
 	<script type='text/javascript' src="./scripts/functions.js"></script>
 	<script type='text/javascript' src="./scripts/timer.js"></script>
     <script type='text/javascript' src='./scripts/react-transition-group.js'></script>
+    <script type='text/javascript' src='./scripts/luxon.min.js'></script>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="keywords" content="naruto, rpg, online, game, anime, manga, mmorpg" />
 	<meta name="description" content="Shinobi Chronicles: An online browser-based RPG inspired by the anime/manga Naruto." />

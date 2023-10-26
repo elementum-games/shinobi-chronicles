@@ -24,6 +24,7 @@ class Route {
         public bool $battle_ok = true,
         public int $village_ok = Route::IN_VILLAGE_OKAY,
         public bool $survival_mission_ok = true,
+        public bool $challenge_lock_ok = true,
 
         public ?Closure $user_check = null,
     ) {}

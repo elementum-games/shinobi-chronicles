@@ -154,8 +154,9 @@ function hourlyCaravan(System $system, $debug = true): void
         }
         // create new caravan for region
         // caravans will spawn from now until the next caravan tick, also giving enough buffer so that they reach their destination before the next tick
-        $start_time = rand(time(), time() + (WarManager::CARAVAN_TIMER_HOURS * 60 * 60) - (WarManager::BASE_CARAVAN_TIME_MS / 1000));
-        $travel_time = WarManager::BASE_CARAVAN_TIME_MS;
+        $caravan_time = round(WarManager::BASE_CARAVAN_TIME_MS * (100 / (100 + $villages[$region['village']]->policy->caravan_speed)));
+        $start_time = rand(time(), time() + (WarManager::CARAVAN_TIMER_HOURS * 60 * 60) - ($caravan_time / 1000));
+        $travel_time = $caravan_time;
         $region_id = $region['region_id'];
         $village_id = $region['village'];
         $caravan_type = Patrol::CARAVAN_TYPE_RESOURCE;

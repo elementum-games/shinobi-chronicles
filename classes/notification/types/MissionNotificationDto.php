@@ -11,6 +11,7 @@ class MissionNotificationDto extends NotificationDto {
         int $user_id = 0,
         int $created = 0,
         int $duration = 0,
+        ?int $expires = null,
         bool $alert = false,
         string $mission_rank = "",
     ) {
@@ -39,6 +40,7 @@ class MissionNotificationDto extends NotificationDto {
             user_id: $row['user_id'],
             created: $row['created'],
             duration: $row['duration'],
+            expires: $row['expires'],
             alert: $row['alert'],
             mission_rank: $attributes['mission_rank'],
         );

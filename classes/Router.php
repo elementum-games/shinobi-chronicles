@@ -40,6 +40,7 @@ class Router {
         'send_money' => 35,
         'forbiddenShop' => 36,
         'war' => 37,
+        'challenge' => 38,
     ];
 
     /** @var Route[] $routes */
@@ -136,6 +137,13 @@ class Router {
                 if($battle_type != $route->battle_type) {
                     throw new RuntimeException("You cannot visit this page while in combat!");
                 }
+            }
+        }
+
+        // Check if challenge locked
+        if (isset($route->challenge_lock_ok) && $route->challenge_lock_ok === false) {
+            if ($player->locked_challenge > 0) {
+                throw new RuntimeException("You are unable to access this page while locked-in for battle!");
             }
         }
 
