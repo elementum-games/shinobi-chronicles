@@ -16,7 +16,7 @@ final class FourthWarMigration extends AbstractMigration
             ALTER TABLE `loot` ADD `target_location_id` INT(11) NULL DEFAULT NULL;
 
             -- Cleanup of unused column
-            ALTER TABLE `loot` DROP IF EXISTS `quantity`;
+            ALTER TABLE `loot` DROP `quantity`;
 
             -- Refresh tables
             DELETE FROM caravans;

@@ -9,7 +9,10 @@ import type {
     PlayerAchievementsType
 } from "../_schema/userSchema.js";
 
+import RadarNinjaChart from '../charts/Chart.js';
+
 type Props = {|
+    +isDevEnvironment: boolean,
     +links: {|
         +clan: string,
         +team: string,
@@ -24,6 +27,7 @@ type Props = {|
     +playerAchievements: PlayerAchievementsType,
 |};
 function Profile({
+    isDevEnvironment,
     links,
     playerData,
     playerStats,
@@ -31,6 +35,15 @@ function Profile({
     playerDailyTasks,
     playerAchievements,
 }: Props) {
+
+    //Chart.js variables
+    const [showChart, setShowChart] = React.useState(false);
+    function handleShowGraph() {
+        setShowChart(!showChart);
+    }
+    //marginRight temp fix for wrapping to same row as chart when window width changes
+    let showChartButtonStyle={display:'block', marginRight: '75%', backgroundColor: 'rgb(20, 19, 23)', color: 'rgb(209, 197, 173)', borderRadius: '12px 12px 0 0', marginTop: '10px'}
+
     return (
         <div className="profile_container">
             {/* First row */}
@@ -41,13 +54,28 @@ function Profile({
                     playerSettings={playerSettings}
                 />
             </div>
+
+            {isDevEnvironment &&
+                <button style={showChartButtonStyle} onClick={handleShowGraph}>
+                    {(!showChart) ? "Show Graph" : "Show Stats"}
+                </button>
+            }
             
             {/* Second row */}
             <div className="profile_row_second">
-                <PlayerStats
-                    playerData={playerData}
-                    playerStats={playerStats}
-                />
+                {/* Show Chart or Graph */}
+                {
+                    (!showChart) ? 
+                    <PlayerStats
+                        playerData={playerData}
+                        playerStats={playerStats}
+                    />
+                    :
+                    <RadarNinjaChart 
+                        playerStats={playerStats}
+                    />
+                }
+
                 <div className="profile_row_second_col2">
                     <PlayerUserRep
                         playerData={playerData}
@@ -62,6 +90,7 @@ function Profile({
                     />
                 </div>
             </div>
+
             <div className="profile_row_third">
                 <h2>Achievements</h2>
                 <PlayerAchievements

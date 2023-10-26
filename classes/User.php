@@ -997,6 +997,9 @@ class User extends Fighter {
 
         // Load benefits
         $this->forbidden_seal->setBenefits();
+        if(!$remote_view && isset($this->reputation) && !$this->reputation->bonus_pve_loaded) {
+            $this->reputation->setBonusPveRep($this->forbidden_seal->bonus_pve_reputation);
+        }
     }
 
     /**
@@ -1284,7 +1287,8 @@ class User extends Fighter {
                 }
 
                 $this->train_time = 0;
-            } else if (str_contains($this->train_type, 'jutsu:')) {
+            }
+            else if (str_contains($this->train_type, 'jutsu:')) {
                 $jutsu_id = $this->train_gain;
                 $this->getInventory();
 
@@ -1315,10 +1319,7 @@ class User extends Fighter {
 
                         $jutsu_skill_type = $this->jutsu[$jutsu_id]->jutsu_type . '_skill';
                         if ($this->total_stats < $this->rank->stat_cap) {
-                            $this->{$jutsu_skill_type}++;
-                            $this->exp += 10;
-                            $message .= ' You have gained 1 ' . ucwords(str_replace('_', ' ', $jutsu_skill_type)) .
-                                ' and 10 experience.';
+                            $message .= $this->addStatGain($jutsu_skill_type, 1, false);
                         }
 
                         // Create notification
@@ -1436,8 +1437,8 @@ class User extends Fighter {
     /**
      * @param string $stat
      * @param int    $stat_gain
+     * @param bool   $event_boost
      * @return string
-     * @throws RuntimeException
      */
     public function addStatGain(string $stat, int $stat_gain, bool $event_boost = true): string {
         if(!in_array($stat, $this->stats)) {

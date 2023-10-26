@@ -8,8 +8,8 @@ class UserReputation {
             'title' => 'Villager',
             'outlaw_title' => 'Vagabond',
             'min_rep' => 0,
-            'weekly_cap' => 1250,
-            'weekly_pvp_cap' => 1000,
+            'weekly_cap' => 1000,
+            'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 0,
             'base_decay' => 0,
         ],
@@ -17,8 +17,8 @@ class UserReputation {
             'title' => 'Aspiring Shinobi',
             'outlaw_title' => 'Thief',
             'min_rep' => 2500,
-            'weekly_cap' => 1250,
-            'weekly_pvp_cap' => 1000,
+            'weekly_cap' => 1000,
+            'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 2,
             'base_decay' => 0,
         ],
@@ -26,8 +26,8 @@ class UserReputation {
             'title' => 'Shinobi',
             'outlaw_title' => 'Bandit',
             'min_rep' => 5000,
-            'weekly_cap' => 1250,
-            'weekly_pvp_cap' => 1000,
+            'weekly_cap' => 1000,
+            'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 2,
             'base_decay' => 0,
         ],
@@ -35,8 +35,8 @@ class UserReputation {
             'title' => 'Experienced Shinobi',
             'outlaw_title' => 'Raider',
             'min_rep' => 7500,
-            'weekly_cap' => 1250,
-            'weekly_pvp_cap' => 1000,
+            'weekly_cap' => 1000,
+            'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 3,
             'base_decay' => 250,
         ],
@@ -44,8 +44,8 @@ class UserReputation {
             'title' => 'Veteran Shinobi',
             'outlaw_title' => 'Marauder',
             'min_rep' => 10000,
-            'weekly_cap' => 1250,
-            'weekly_pvp_cap' => 1000,
+            'weekly_cap' => 1000,
+            'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 3,
             'base_decay' => 500,
         ],
@@ -53,8 +53,8 @@ class UserReputation {
             'title' => 'Expert Shinobi',
             'outlaw_title' => 'Rogue',
             'min_rep' => 15000,
-            'weekly_cap' => 1250,
-            'weekly_pvp_cap' => 1000,
+            'weekly_cap' => 1000,
+            'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 3,
             'base_decay' => 750,
         ],
@@ -62,8 +62,8 @@ class UserReputation {
             'title' => 'Elite Shinobi',
             'outlaw_title' => 'Notorious Rogue',
             'min_rep' => 22500,
-            'weekly_cap' => 1250,
-            'weekly_pvp_cap' => 1000,
+            'weekly_cap' => 1000,
+            'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 4,
             'base_decay' => 1000,
         ],
@@ -71,17 +71,17 @@ class UserReputation {
             'title' => 'Master Shinobi',
             'outlaw_title' => 'Infamous Rogue',
             'min_rep' => 35000,
-            'weekly_cap' => 1250,
-            'weekly_pvp_cap' => 1000,
+            'weekly_cap' => 1000,
+            'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 4,
-            'base_decay' => 1250,
+            'base_decay' => 1000,
         ],
         9 => [
             'title' => 'Legendary Shinobi',
             'outlaw_title' => 'Legendary Rogue',
             'min_rep' => 50000,
-            'weekly_cap' => 1250,
-            'weekly_pvp_cap' => 1000,
+            'weekly_cap' => 1000,
+            'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 4,
             'base_decay' => 1500,
         ]
@@ -172,7 +172,7 @@ class UserReputation {
     const MAX_PVP_LEVEL_DIFFERENCE = 20;
     const MAX_PVP_REP_TIER_DIFFERENCE = 4;
 
-    const PVP_MEDIAN_LEVEL_BASED_GAIN = 4; // amount gained when fighting someone of the same level (TODO: 5)
+    const PVP_MEDIAN_LEVEL_BASED_GAIN = 5; // amount gained when fighting someone of the same level
     const PVP_MEDIAN_REP_TIER_BASED_GAIN = 2; // amount gained when fighting someone of the same rep tier (TODO: 7)
 
     const PVP_REP_ENABLED = true;
@@ -190,6 +190,8 @@ class UserReputation {
     const SPAR_REP_DRAW = 5;
     const SPAR_REP_WIN = 7;
 
+    protected ?Event $event;
+
     protected int $rep;
     protected int $weekly_rep;
     protected int $weekly_pvp_rep;
@@ -200,6 +202,9 @@ class UserReputation {
     public int $weekly_cap;
     public int $weekly_pvp_cap;
 
+    protected int $bonus_pve_rep; // Use only for forbidden_seal bonuses!
+    public bool $bonus_pve_loaded;
+
     // TODO: Make recent_killed private
     public ?string $recent_players_killed_ids;
     public array $recent_players_killed_ids_array;
@@ -207,13 +212,20 @@ class UserReputation {
     public array $recent_killer_ids_array;
     public int $base_pvp_reward;
     public array $benefits;
+    public bool $debug;
 
     public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$last_pvp_kills, &$last_killer_ids, $mission_cd, $event) {
+        //System data
+        $this->event = $event;
+        $this->debug = false;
+
         //Player data
         $this->rep = &$player_rep;
         $this->weekly_rep = &$player_weekly_rep;
         $this->mission_cd = $mission_cd;
         $this->rank = self::tierByRepAmount($this->rep);
+        $this->bonus_pve_rep = 0;
+        $this->bonus_pve_loaded = false;
 
         //PvP data
         $this->weekly_pvp_rep = &$player_pvp_rep;
@@ -232,6 +244,12 @@ class UserReputation {
         $this->weekly_cap = $REP_RANK['weekly_cap'];
         $this->weekly_pvp_cap = $REP_RANK['weekly_pvp_cap'];
         $this->base_pvp_reward = $REP_RANK['base_pvp_rep_reward'];
+
+        // EVENT MODIFICATIONS
+        if(!empty($this->event) && $this->event instanceof DoubleReputationEvent) {
+            $this->weekly_cap *= DoubleReputationEvent::pve_cap_multiplier;
+            $this->weekly_pvp_cap *= DoubleReputationEvent::pvp_cap_multiplier;
+        }
     }
 
     /**
@@ -247,26 +265,57 @@ class UserReputation {
      * Returns amount of reputation awarded for display/data confirmation purposes
      */
     public function addRep(int $amount, bool $bypass_weekly_cap = false, bool $increment_pvp = false): int {
+        if($this->debug) {
+            echo "Amount: $amount<br />";
+        }
+        // Double repuation
+        if (!empty($this->event) && $this->event instanceof DoubleReputationEvent) {
+            $amount = floor($amount * DoubleReputationEvent::rep_gain_multiplier);
+            if($this->debug) {
+                echo "Amount after double: $amount<br />";
+            }
+        }
+
         //Adjust reputation gain if gain goes above cap
         if(!$bypass_weekly_cap) {
+            // Bonus seal reputation
+            $amount += $this->bonus_pve_rep;
+            if($this->debug) {
+                echo "Amount after bonus PVE: $amount<br />";
+            }
+
             $new_rep = $this->rep + $amount;
 
             // Determine if rep rank changes and modify weekly cap if change occurs
             $rep_rank_after = self::tierByRepAmount($new_rep);
             $weekly_cap = ($this->rank != $rep_rank_after) ? self::$VillageRep[$rep_rank_after]['weekly_cap'] : $this->weekly_cap;
+            if(!empty($this->event) && $this->event instanceof DoubleReputationEvent && $this->rank != $rep_rank_after) {
+                $weekly_cap = floor($weekly_cap * DoubleReputationEvent::pve_cap_multiplier);
+				if($this->debug) {
+                	echo "Weekly cap after rank change: $weekly_cap<br />";
+            	}
+            }
 
             // Adjust gain to conform with weekly caps
             if($this->weekly_rep + $amount > $weekly_cap) {
                 $amount = $weekly_cap - $this->weekly_rep;
             }
+
             $this->weekly_rep += $amount;
+            if($this->debug) {
+                echo "Amount after weekly: $amount<br />";
+            }
         }
-        // Pvp rep
+
+        // Increment Pvp rep
         if($increment_pvp) {
             if($this->weekly_pvp_rep + $amount > $this->weekly_pvp_cap) {
                 $amount = $this->weekly_pvp_cap - $this->weekly_pvp_rep;
             }
             $this->weekly_pvp_rep += $amount;
+            if($this->debug) {
+                echo "Amount after PvP: $amount<br />";
+            }
         }
         //Increment rep amount
         if($amount > 0) {
@@ -274,6 +323,9 @@ class UserReputation {
         }
 
         return $amount; // Use this return for display/gain confirmation
+        if($this->debug) {
+            echo "Final amount: $amount<br />";
+        }
     }
 
     /**
@@ -292,6 +344,16 @@ class UserReputation {
         if($this->rep < 0) {
             $this->rep = 0;
         }
+    }
+
+    // Set bonus reputation from seal
+    public function setBonusPveRep($amount): void {
+        $this->bonus_pve_rep = $amount;
+        $this->bonus_pve_loaded = true;
+    }
+
+    public function getBonusPveRep(): int {
+        return $this->bonus_pve_rep;
     }
 
     public function resetPvpRep(): void {
@@ -414,8 +476,16 @@ class UserReputation {
         }
 
         /* This is so we can adjust from maximum level difference (say, 20 levels) to maximum gain difference (say, +/- 4 rep)
-         Max point difference is 5
-         Assuming max level diff of 20, level_diff_to_gain_divider is 20 / 5 = 5
+         The gain can stretch from 0x => 2x of the median level-based gain, e.g. if median is 5 we do 0 - 10.
+
+         Level diff to gain divider represents how many level correspond to +/- 1 rep.
+
+         Assuming max level diff of 20 and median gain of 5, level_diff_to_gain_divider is 20 / 5 = 4. For example:
+         - +1 to +4 levels = +1 rep
+         - +5 to +8 levels = +2 rep
+         - +9 to +12 levels = +3 rep
+         - +13 to +16 levels = +4 rep
+         - +17 to +20 levels = +5 rep
 
          Scenario 1: Beat someone 10 levels higher. Levels above opponent = -10
 
@@ -509,14 +579,18 @@ class UserReputation {
 
         $rep_loss = round($level_based_loss + $tier_based_loss);
 
-        // Redundancy to ensure rep is not lost when it shouldn't be
-        if($rep_loss < 0) {
-            $rep_loss = 0;
-        }
+        $rep_loss *= 0.75;
 
         // If retreat, halve loss
         if ($retreat) {
-            $rep_loss = ceil($rep_loss / 2);
+            $rep_loss *= 0.5;
+        }
+
+        $rep_loss = ceil($rep_loss);
+
+        // Redundancy to ensure rep is not lost when it shouldn't be
+        if($rep_loss < 0) {
+            $rep_loss = 0;
         }
 
         $player->reputation->subtractRep($rep_loss);

@@ -171,6 +171,15 @@
         <td>Double Experience is active until <?= $system->event->end_time->format("l, M jS, Y")?>.</td>
     </tr>
 </table>
+<?php elseif ($system->event instanceof DoubleReputationEvent): ?>
+    <table class="table">
+        <tr>
+            <th>Event Details</th>
+        </tr>
+        <tr style="text-align: center">
+            <td>Double Reputation is active until <?= $system->event->end_time->format("l, M jS, Y")?>.</td>
+        </tr>
+    </table>
 <?php else: ?>
     <table class="table">
         <tr><th>Event Details</th></tr>

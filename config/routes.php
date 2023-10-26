@@ -92,7 +92,7 @@ return $routes = [
         challenge_lock_ok: false,
     ),
     13 => new Route(
-        file_name: 'training_v2.php',
+        file_name: 'training.php',
         title: 'Training',
         function_name: 'training',
         menu: Route::MENU_ACTIVITY,

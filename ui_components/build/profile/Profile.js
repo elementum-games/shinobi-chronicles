@@ -1,6 +1,8 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
+import RadarNinjaChart from '../charts/Chart.js';
 
 function Profile({
+  isDevEnvironment,
   links,
   playerData,
   playerStats,
@@ -8,6 +10,22 @@ function Profile({
   playerDailyTasks,
   playerAchievements
 }) {
+  //Chart.js variables
+  const [showChart, setShowChart] = React.useState(false);
+
+  function handleShowGraph() {
+    setShowChart(!showChart);
+  } //marginRight temp fix for wrapping to same row as chart when window width changes
+
+
+  let showChartButtonStyle = {
+    display: 'block',
+    marginRight: '75%',
+    backgroundColor: 'rgb(20, 19, 23)',
+    color: 'rgb(209, 197, 173)',
+    borderRadius: '12px 12px 0 0',
+    marginTop: '10px'
+  };
   return /*#__PURE__*/React.createElement("div", {
     className: "profile_container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -16,10 +34,15 @@ function Profile({
     playerData: playerData,
     links: links,
     playerSettings: playerSettings
-  })), /*#__PURE__*/React.createElement("div", {
+  })), isDevEnvironment && /*#__PURE__*/React.createElement("button", {
+    style: showChartButtonStyle,
+    onClick: handleShowGraph
+  }, !showChart ? "Show Graph" : "Show Stats"), /*#__PURE__*/React.createElement("div", {
     className: "profile_row_second"
-  }, /*#__PURE__*/React.createElement(PlayerStats, {
+  }, !showChart ? /*#__PURE__*/React.createElement(PlayerStats, {
     playerData: playerData,
+    playerStats: playerStats
+  }) : /*#__PURE__*/React.createElement(RadarNinjaChart, {
     playerStats: playerStats
   }), /*#__PURE__*/React.createElement("div", {
     className: "profile_row_second_col2"

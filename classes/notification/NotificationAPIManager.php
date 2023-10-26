@@ -411,10 +411,11 @@ class NotificationAPIManager {
                     }
                 }
             }
+
             //Raid
             $time = microtime(true) * 1000 - 60000; // only get recently updated raids, prevent something like starting a raid and logging out = perpetual notif
             $result = $this->system->db->query("SELECT
-            DISTINCT `region_locations`.id,
+            DISTINCT `region_locations`.`id`,
             `operations`.*, 
             `region_locations`.`x`, 
             `region_locations`.`y`, 
