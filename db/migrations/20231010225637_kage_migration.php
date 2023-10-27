@@ -36,7 +36,7 @@ final class KageMigration extends AbstractMigration
             PRIMARY KEY (`vote_id`));
 
             -- Add table policy_logs
-            CREATE TABLE `vote_logs` (
+            CREATE TABLE `policy_logs` (
             `log_id` INT(11) NOT NULL AUTO_INCREMENT,
             `village_id` INT(11) NOT NULL,
             `policy_id` INT(11) NOT NULL,
@@ -45,7 +45,7 @@ final class KageMigration extends AbstractMigration
             PRIMARY KEY (`log_id`));
 
             -- Add table challenge_requests
-            CREATE TABLE `shinobi_chronicles`.`challenge_requests` (
+            CREATE TABLE `challenge_requests` (
             `request_id` INT(11) NOT NULL AUTO_INCREMENT,
             `challenger_id` INT(11) NOT NULL,
             `seat_holder_id` INT(11) NOT NULL,
