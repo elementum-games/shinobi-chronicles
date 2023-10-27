@@ -22,7 +22,7 @@ final class KageMigration extends AbstractMigration
             `result` VARCHAR(20) NULL DEFAULT NULL,
             `type` VARCHAR(20) NOT NULL,
             `target_village_id` INT(11) NULL DEFAULT NULL,
-            `policy_id` INT(11) NULL DEFAULT NULL
+            `policy_id` INT(11) NULL DEFAULT NULL,
             PRIMARY KEY (`proposal_id`));
 
             -- Add table vote_logs
@@ -41,7 +41,7 @@ final class KageMigration extends AbstractMigration
             `village_id` INT(11) NOT NULL,
             `policy_id` INT(11) NOT NULL,
             `start_time` INT(11) NOT NULL,
-            `end_time` NULL DEFAULT NULL,
+            `end_time` INT(11) NULL DEFAULT NULL,
             PRIMARY KEY (`log_id`));
 
             -- Add table challenge_requests
