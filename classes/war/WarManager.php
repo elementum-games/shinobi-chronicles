@@ -33,9 +33,9 @@ class WarManager {
         4 => "War Hero",
     ];
     const PATROL_AI = [
-        1 => 17,
+        1 => 8,
         2 => 17,
-        3 => 17,
+        3 => 130,
         4 => 17,
     ];
     const PATROL_CHANCE = [
@@ -363,6 +363,7 @@ class WarManager {
             } else {
                 $message .= ",";
             }
+            WarLogManager::logAction($this->system, $this->user, $count, WarLogManager::WAR_LOG_RESOURCES_CLAIMED, $this->user->village->village_id);
             $message .= " " . $count . " " . System::unSlug(WarManager::RESOURCE_NAMES[$resource_id]);
             $this->user->village->addResource($resource_id, $count);
         }
@@ -375,6 +376,12 @@ class WarManager {
     }
 
     public function handleWinAgainstPatrol(int $patrol_id) {
+        $patrol_result = $this->system->db->query("SELECT * FROM `patrols` WHERE `id` = {$patrol_id}");
+        $patrol_result = $this->system->db->fetch($patrol_result);
+        if ($this->system->db->last_num_rows == 0) {
+            return;
+        }
+        WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_PATROLS_DEFEATED, $patrol_result['village_id']);
         $x = mt_rand(1, 100);
         if ($x <= self::PATROL_CHANCE[3]) {
             $name = self::PATROL_NAMES[min(3 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
@@ -388,6 +395,9 @@ class WarManager {
             $name = self::PATROL_NAMES[min(1 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
             $ai_id = self::PATROL_AI[min(1 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
             $tier = min(1 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER);
+        }
+        if ($this->system->isDevEnvironment()) {
+            $ai_id = 17;
         }
         $respawn_time = time() + round(self::PATROL_RESPAWN_TIME * (100 / (100 + $this->user->village->policy->patrol_respawn)), 1);
         $this->system->db->query("UPDATE `patrols` SET `start_time` = {$respawn_time}, `name` = '{$name}', `ai_id` = {$ai_id}, `tier` = {$tier} WHERE `id` = {$patrol_id}");

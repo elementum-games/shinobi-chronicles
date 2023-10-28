@@ -101,12 +101,21 @@ class Village {
     }
 
     public function isAlly(int $target_village_id): bool {
+        if ($target_village_id == $this->village_id) {
+            return true;
+        }
         return ($this->relations[$target_village_id]->relation_type == VillageRelation::RELATION_ALLIANCE);
     }
     public function isEnemy(int $target_village_id): bool {
+        if ($target_village_id == $this->village_id) {
+            return false;
+        }
         return ($this->relations[$target_village_id]->relation_type == VillageRelation::RELATION_WAR);
     }
     public function isNeutral(int $target_village_id): bool {
+        if ($target_village_id == $this->village_id) {
+            return false;
+        }
         return ($this->relations[$target_village_id]->relation_type == VillageRelation::RELATION_NEUTRAL);
     }
 }

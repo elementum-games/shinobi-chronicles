@@ -181,7 +181,7 @@ class Operation
                         $this->system->db->query("INSERT INTO `loot` (`user_id`, `resource_id`, `target_village_id`, `target_location_id`) VALUES ({$this->user_id}, {$location_target['resource_id']}, {$this->target_village}, {$this->target_id})");
                         $message .= "Stole 1 " . System::unSlug(WarManager::RESOURCE_NAMES[$location_target['resource_id']]) . "!";
                         $location_target['resource_count']--;
-
+                        WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_RESOURCES_STOLEN, $this->target_village);
                         $this->system->db->query("UPDATE `region_locations` SET `resource_count` = {$location_target['resource_count']} WHERE `id` = {$this->target_id}");
                     } else {
                         $message .= "Target has run out of resources!";
@@ -199,10 +199,12 @@ class Operation
                             break;
                     }
                     if ($location_target['health'] < $location_target['max_health']) {
-                        $player_attack = $this->user->level;
                         $player_heal = floor($this->user->level / 2);
-                        $location_target['health'] = min($location_target['health'] + $player_heal, $location_target['max_health']);
-                        $message .= "Restored " . $player_heal . " health to " . $location_target['name'] . "!";
+                        $new_health = $location_target['health'] + $player_heal;
+                        $actual_heal = min($new_health, $location_target['max_health']) - $location_target['health'];
+                        $location_target['health'] = $location_target['health'] + $actual_heal;
+                        $message .= "Restored " . $actual_heal . " health to " . $location_target['name'] . "!";
+                        WarLogManager::logAction($this->system, $this->user, $actual_heal, WarLogManager::WAR_LOG_DAMAGE_HEALED, $this->target_village);
                         $this->system->db->query("UPDATE `region_locations` SET `health` = {$location_target['health']} WHERE `id` = {$this->target_id}");
                     } else {
                         $message .= "Target is already at max health!";
@@ -210,10 +212,12 @@ class Operation
                     break;
                 case self::OPERATION_RAID:
                     if ($location_target['health'] > 0) {
-                        $player_attack = $this->user->level;
                         $player_damage = max($this->user->level - $location_target['defense'], 0);
-                        $location_target['health'] = max($location_target['health'] - $player_damage, 0);
-                        $message .= "Dealt " . $player_damage . " damage to " . $location_target['name'] . "!";
+                        $new_health = $location_target['health'] - $player_damage;
+                        $actual_damage = $location_target['health'] - max($new_health, 0);
+                        $location_target['health'] = $new_health;
+                        $message .= "Dealt " . $actual_damage . " damage to " . $location_target['name'] . "!";
+                        WarLogManager::logAction($this->system, $this->user, $actual_heal, WarLogManager::WAR_LOG_DAMAGE_DEALT, $this->target_village);
                         $this->system->db->query("UPDATE `region_locations` SET `health` = {$location_target['health']} WHERE `id` = {$this->target_id}");
                     } else {
                         $message .= "Target is already at 0 health!";
@@ -255,7 +259,7 @@ class Operation
                         } else {
                             $stolen_messages[] = "Stole $count " . System::unSlug(WarManager::RESOURCE_NAMES[$resource_id]);
                         }
-
+                        WarLogManager::logAction($this->system, $this->user, $count, WarLogManager::WAR_LOG_RESOURCES_STOLEN, $this->target_village);
                     }
                     $message .= implode(", ", $stolen_messages) . ".";
                     $caravan_resources = json_encode($caravan_resources);
@@ -288,32 +292,38 @@ class Operation
         $location_target = $this->system->db->fetch($location_target);
         switch ($this->type) {
             case self::OPERATION_INFILTRATE:
+                WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_INFILTRATE, $this->target_village);
                 $defense_reduction = 1 + $this->user->village->policy->infiltrate_defense;
                 if ($location_target['defense'] > 0) {
                     $result = max($location_target['defense'] - $defense_reduction, 0);
                     $defense_reduction = $location_target['defense'] - $result;
                     $location_target['defense'] = $result;
                     $message .= "\nDecreased target Defense by {$defense_reduction}!";
+                    WarLogManager::logAction($this->system, $this->user, $defense_reduction, WarLogManager::WAR_LOG_DEFENSE_REDUCED, $this->target_village);
                     $this->system->db->query("UPDATE `region_locations` SET `defense` = {$location_target['defense']} WHERE `id` = {$this->target_id}");
                 } else {
                     $message .= "\nTarget Defense already at 0!";
                 }
                 break;
             case self::OPERATION_REINFORCE:
+                WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_REINFORCE, $this->target_village);
                 $defense_gain = 1 + $this->user->village->policy->reinforce_defense;
                 if ($location_target['defense'] < 100) {
                     $result = min($location_target['defense'] + $defense_gain, 100);
                     $defense_gain = $result - $location_target['defense'];
                     $location_target['defense'] = $result;
                     $message .= "\nIncreased target Defense by {$defense_gain}!";
+                    WarLogManager::logAction($this->system, $this->user, $defense_gain, WarLogManager::WAR_LOG_DEFENSE_GAINED, $this->target_village);
                     $this->system->db->query("UPDATE `region_locations` SET `defense` = {$location_target['defense']} WHERE `id` = {$this->target_id}");
                 } else {
                     $message .= "\nTarget Defense already at 100!";
                 }
                 break;
             case self::OPERATION_RAID:
+                WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_RAID, $this->target_village);
                 $defense_reduction = 1 + $this->user->village->policy->raid_defense;
                 if ($location_target['health'] == 0) {
+                    WarLogManager::logRegionCapture($this->system, $this->player, $location_target['region_id']);
                     // change region ownership
                     $this->system->db->query("UPDATE `regions` SET `village` = {$this->user->village->village_id} WHERE `region_id` = {$location_target['region_id']}");
                     // update castle health to 25%
@@ -331,12 +341,14 @@ class Operation
                     $defense_reduction = $location_target['defense'] - $result;
                     $location_target['defense'] = $result;
                     $message .= "\nDecreased target Defense by {$defense_reduction}!";
+                    WarLogManager::logAction($this->system, $this->user, $defense_reduction, WarLogManager::WAR_LOG_DEFENSE_REDUCED, $this->target_village);
                     $this->system->db->query("UPDATE `region_locations` SET `defense` = {$location_target['defense']} WHERE `id` = {$this->target_id}");
                 } else {
                     $message .= "\nTarget Defense already at 0!";
                 }
                 break;
             case self::OPERATION_LOOT:
+                WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_LOOT, $this->target_village);
                 break;
         }
         /* Add yen

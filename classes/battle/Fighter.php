@@ -92,6 +92,8 @@ abstract class Fighter {
 
     public $barrier;
 
+    public $reputation_defense_boost = 0;
+
     // Combat nerfs
     public $ninjutsu_nerf = 0;
     public $taijutsu_nerf = 0;
@@ -381,6 +383,10 @@ abstract class Fighter {
                 break;
             default:
                 error_log("Invalid defense type! {$defense_type}");
+        }
+
+        if ($apply_resists && $this->reputation_defense_boost > 0) {
+            $raw_damage *= (100 - $this->reputation_defense_boost) / 100;
         }
 
         if($this instanceof NPC && $defense_type == 'genjutsu') {

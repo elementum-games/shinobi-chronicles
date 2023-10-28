@@ -200,9 +200,7 @@ class System {
 
         $this->checkForActiveEvent();
 
-        if ($this->isDevEnvironment()) {
-            $this->war_enabled = true;
-        }
+        $this->war_enabled = true;
     }
 
     /**

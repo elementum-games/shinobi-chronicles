@@ -30,7 +30,8 @@ function Home({
     loginMessageText: loginMessageText,
     registerPreFill: registerPreFill,
     newsRef: newsRef,
-    contactRef: contactRef
+    contactRef: contactRef,
+    AshBackground: AshBackground
   }), /*#__PURE__*/React.createElement("div", {
     ref: newsRef,
     id: "news_container",
@@ -73,7 +74,8 @@ function MainBannerSection({
   loginMessageText,
   registerPreFill,
   newsRef,
-  contactRef
+  contactRef,
+  AshBackground
 }) {
   const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset" ? "reset" : "login");
   const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
@@ -134,7 +136,7 @@ function MainBannerSection({
     src: "/images/v2/decorations/homepagelogo.png"
   }), /*#__PURE__*/React.createElement("div", {
     className: "title_version"
-  }, version)), activeModal, /*#__PURE__*/React.createElement("div", {
+  }, version)), activeModal, /*#__PURE__*/React.createElement(AshBackground, null), /*#__PURE__*/React.createElement("div", {
     className: "login_container",
     style: activeModal != null ? {
       visibility: "hidden"
@@ -427,7 +429,6 @@ function ContactSection({
     className: "home_form_container"
   }));
 }
-
 function FooterSection({
   version
 }) {
@@ -459,13 +460,13 @@ function LoginButton({
   }, /*#__PURE__*/React.createElement("stop", {
     offset: "0%",
     style: {
-      stopColor: '#464f87',
+      stopColor: '#1F3E56',
       stopOpacity: 1
     }
   }), /*#__PURE__*/React.createElement("stop", {
     offset: "100%",
     style: {
-      stopColor: '#343d77',
+      stopColor: '#264563',
       stopOpacity: 1
     }
   })), /*#__PURE__*/React.createElement("radialGradient", {
@@ -478,13 +479,13 @@ function LoginButton({
   }, /*#__PURE__*/React.createElement("stop", {
     offset: "0%",
     style: {
-      stopColor: '#343d77',
+      stopColor: '#264563',
       stopOpacity: 1
     }
   }), /*#__PURE__*/React.createElement("stop", {
     offset: "100%",
     style: {
-      stopColor: '#464f87',
+      stopColor: '#1F3E56',
       stopOpacity: 1
     }
   })), /*#__PURE__*/React.createElement("rect", {
@@ -530,13 +531,13 @@ function LoggedInButtons({
   }, /*#__PURE__*/React.createElement("stop", {
     offset: "0%",
     style: {
-      stopColor: '#464f87',
+      stopColor: '#1F3E56',
       stopOpacity: 1
     }
   }), /*#__PURE__*/React.createElement("stop", {
     offset: "100%",
     style: {
-      stopColor: '#343d77',
+      stopColor: '#264563',
       stopOpacity: 1
     }
   })), /*#__PURE__*/React.createElement("radialGradient", {
@@ -549,13 +550,13 @@ function LoggedInButtons({
   }, /*#__PURE__*/React.createElement("stop", {
     offset: "0%",
     style: {
-      stopColor: '#343d77',
+      stopColor: '#264563',
       stopOpacity: 1
     }
   }), /*#__PURE__*/React.createElement("stop", {
     offset: "100%",
     style: {
-      stopColor: '#464f87',
+      stopColor: '#1F3E56',
       stopOpacity: 1
     }
   })), /*#__PURE__*/React.createElement("rect", {
@@ -595,13 +596,13 @@ function LoggedInButtons({
   }, /*#__PURE__*/React.createElement("stop", {
     offset: "0%",
     style: {
-      stopColor: '#84314e',
+      stopColor: '#721B25',
       stopOpacity: 1
     }
   }), /*#__PURE__*/React.createElement("stop", {
     offset: "100%",
     style: {
-      stopColor: '#68293f',
+      stopColor: '#822d31',
       stopOpacity: 1
     }
   })), /*#__PURE__*/React.createElement("radialGradient", {
@@ -614,13 +615,13 @@ function LoggedInButtons({
   }, /*#__PURE__*/React.createElement("stop", {
     offset: "0%",
     style: {
-      stopColor: '#68293f',
+      stopColor: '#822d31',
       stopOpacity: 1
     }
   }), /*#__PURE__*/React.createElement("stop", {
     offset: "100%",
     style: {
-      stopColor: '#84314e',
+      stopColor: '#721B25',
       stopOpacity: 1
     }
   })), /*#__PURE__*/React.createElement("rect", {
@@ -641,4 +642,139 @@ function LoggedInButtons({
     dominantBaseline: "middle"
   }, "logout"))));
 }
+const AshBackground = () => {
+  const canvasRef = React.useRef(null);
+  const bufferRef = React.useRef(null);
+  React.useEffect(() => {
+    const cntr = document.getElementById("canvascontainer");
+    const W = cntr.offsetWidth;
+    const H = cntr.offsetHeight;
+    const canvas = [canvasRef.current, bufferRef.current];
+    const ctxs = [canvas[0].getContext("2d"), canvas[1].getContext("2d")];
+    let C = 0;
+    let angle = 0;
+    const A = [];
+    function ash(o) {
+      var i,
+        j,
+        m = Math.random(),
+        p = randomRange(4, 8, m);
+      if (o && o.x) this.x = o.x;else this.x = m * W;
+      if (o && o.y) this.y = o.y;else this.y = m * H;
+      if (o && o.a) this.a = o.a;else this.a = m * (p - 4) + 4;
+      this.r = randomRange(233, 255, m);
+      this.g = randomRange(65, 100, m);
+      this.b = randomRange(65, 100, m);
+      if (o && o.dp) this.dp = o.dp;else {
+        this.dp = [{
+          x: 0,
+          y: 0
+        }];
+        for (i = 0; i < p; i++) {
+          j = i == 0 || p / 2 > i ? 1 : -1;
+          this.dp.push({
+            x: this.dp[i].x + randomRange(5, 30) * j,
+            y: this.dp[i].y + randomRange(5, 30) * j
+          });
+        }
+      }
+    }
+    function randomRange(from, to, seed) {
+      return Math.floor((seed ? seed : Math.random()) * (to - from + 1) + from);
+    }
+    function draw() {
+      var grad, i, j, p, ctx;
+      if (C == 0) {
+        //Show the canvas
+        canvas[0].style.visibility = "visible";
+        canvas[1].style.visibility = "hidden";
+        C = 1;
+      } else {
+        //Show the buffer
+        canvas[1].style.visibility = "visible";
+        C = 0;
+      }
+      ctx = ctxs[C];
+      ctx.clearRect(0, 0, W, H);
+      for (i = 0; i < A.length; i++) {
+        p = A[i];
+        grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.a);
+        grad.addColorStop(0, "rgba(" + p.r + ", " + p.g + ", " + p.b + ", 1)");
+        grad.addColorStop(0.9, "rgba(" + p.r + ", " + p.g + ", " + p.b + ", " + randomRange(1, 10) / 10 + ")");
+        grad.addColorStop(1, "rgba(" + p.r + ", " + p.g + ", " + p.b + ", 0)");
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        for (j = 1; j < p.dp.length; j++) ctx.lineTo(p.x + p.dp[j].x, p.y + p.dp[j].y);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.globalAlpha = 0.7;
+        ctx.fill();
+      }
+      update();
+    }
+    function update() {
+      var i, p;
+      angle += 0.01;
+      for (i = 0; i < A.length; i++) {
+        p = A[i];
+        p.y += Math.cos(angle + A.length) + p.a / 4;
+        p.x += Math.sin(angle) * 2;
+        if (p.x > W + 5 || p.x < -5 || p.y > H) {
+          if (i % 3 > 0) A[i] = new ash({
+            y: -10,
+            a: p.a,
+            d: p.d,
+            dp: p.dp
+          });else {
+            //Enter from the left
+            if (Math.sin(angle) > 0) A[i] = new ash({
+              x: -5,
+              a: p.a,
+              d: p.d,
+              dp: p.dp
+            });
+            //Enter from the right
+            else A[i] = new ash({
+              x: W + 5,
+              a: p.a,
+              d: p.d,
+              dp: p.dp
+            });
+          }
+        }
+      }
+    }
+    canvas[0].width = W;
+    canvas[0].height = H;
+    canvas[1].width = W;
+    canvas[1].height = H;
+    for (var i = 0; i < 75; i++) {
+      var initialY = Math.random() * H; // random position between 0 to canvas height
+      A.push(new ash({
+        y: initialY
+      }));
+    }
+    const interval = setInterval(draw, 15);
+
+    // Cleanup function
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+  return /*#__PURE__*/React.createElement("div", {
+    id: "canvascontainer"
+  }, /*#__PURE__*/React.createElement("canvas", {
+    ref: canvasRef,
+    id: "canvas",
+    style: {
+      visibility: 'hidden'
+    }
+  }), /*#__PURE__*/React.createElement("canvas", {
+    ref: bufferRef,
+    id: "buffer",
+    style: {
+      visibility: 'hidden'
+    }
+  }));
+};
 window.Home = Home;

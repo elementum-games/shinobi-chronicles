@@ -28,7 +28,7 @@ class Battle {
     const MIN_DEBUFF_RATIO = 0.1;
     const MAX_DIFFUSE_PERCENT = 0.75;
 
-    const REPUTATION_TIER_HEALTH_BOOST = 15;
+    const REPUTATION_DAMAGE_RESISTANCE_BOOST = 15;
 
     private System $system;
 
@@ -280,6 +280,17 @@ class Battle {
         if($this->player2 instanceof User && $this->player2->id != $this->player->id) {
             $this->player2->loadData(User::UPDATE_NOTHING, true);
         }
+        if ($this->battle_type == Battle::TYPE_CHALLENGE) {
+		    if (true) {
+			    $tier_difference = $this->player1->reputation->rank - $this->player2->reputation->rank;
+			    if ($tier_difference > 0) {
+				    $this->player1->reputation_defense_boost = Battle::REPUTATION_DAMAGE_RESISTANCE_BOOST * abs($tier_difference);
+			    }
+                else if ($tier_difference < 0) {
+                    $this->player2->reputation_defense_boost = Battle::REPUTATION_DAMAGE_RESISTANCE_BOOST * abs($tier_difference);
+                }
+		    }
+	    }
 
         $this->player1->getInventory();
         $this->player2->getInventory();

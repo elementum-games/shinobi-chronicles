@@ -102,12 +102,12 @@ export function CreateCharacterButton({ onClick }) {
             onKeyPress={clickOnEnter}
         >
             <radialGradient id="register_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                <stop offset="0%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
-                <stop offset="100%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
+                <stop offset="0%" style={{ stopColor: '#721B25', stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: '#822d31', stopOpacity: 1 }} />
             </radialGradient>
             <radialGradient id="register_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                <stop offset="0%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
-                <stop offset="100%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
+                <stop offset="0%" style={{ stopColor: '#822d31', stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: '#721B25', stopOpacity: 1 }} />
             </radialGradient>
             <rect className="register_button_background" width="100%" height="100%" />
             <text className="register_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">create a character</text>
