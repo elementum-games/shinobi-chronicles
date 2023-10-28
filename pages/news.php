@@ -16,7 +16,7 @@ function news() {
 	$self_link = $system->router->links['news'];
 
 	$page = isset($_GET['page']) ? $_GET['page'] : false;
-    $max_length = 5000;
+    $max_length = 7500;
 
 	if(!empty($_POST['create_post']) && $player->hasAdminPanel()) {
 		$post = $system->db->clean($_POST['news_post']);
