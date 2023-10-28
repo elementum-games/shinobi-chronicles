@@ -64,6 +64,26 @@ final class WarTrackingMigration extends AbstractMigration
             `capture_time` INT(11) NOT NULL,
             `relation_id` INT(11) NOT NULL,
             PRIMARY KEY (`log_id`));
+
+            -- Clear patrols
+            DELETE FROM `patrols`;
+
+            -- Insert patrols
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '6', '1', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '7', '1', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '8', '1', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '9', '2', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '10', '2', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '11', '2', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '12', '3', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '13', '3', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '14', '3', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '15', '4', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '16', '4', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '17', '4', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '18', '5', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '19', '5', 'Patrol', '8', '1');
+            INSERT INTO `patrols` (`id`, `start_time`, `travel_time`, `travel_interval`, `region_id`, `village_id`, `name`, `ai_id`, `tier`) VALUES (NULL, '1698454683', NULL, '2000 ', '20', '5', 'Patrol', '8', '1');
         ");
     }
 
