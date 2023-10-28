@@ -34,7 +34,7 @@ class VillageManager {
     // Set these to correct values for release
     const PROPOSAL_VOTE_HOURS = 72; // 72
     const PROPOSAL_ENACT_HOURS = 24; // 24
-    const PROPOSAL_COOLDOWN_HOURS = 24; // 24
+    const PROPOSAL_COOLDOWN_HOURS = 1; // 1
     const KAGE_PROVISIONAL_DAYS = 7; // 7
     const POLICY_CHANGE_COOLDOWN_DAYS = 14; // 14
 
