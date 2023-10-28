@@ -49,7 +49,6 @@ final class KageMigration extends AbstractMigration
             `request_id` INT(11) NOT NULL AUTO_INCREMENT,
             `challenger_id` INT(11) NOT NULL,
             `seat_holder_id` INT(11) NOT NULL,
-            `scheduled_battle_id` INT(11) NOT NULL,
             `seat_id` INT(11) NOT NULL,
             `created_time` INT NOT NULL,
             `accepted_time` INT NULL DEFAULT NULL,
