@@ -23,10 +23,12 @@ function viewLogsPage(System $system, User $player) {
         }
     }
 
+    $allowed_log_types = ['staff_logs', 'currency_logs', 'cron_job_logs'];
+
     //Pagination - log types
     if(isset($_GET['log_type'])) {
         $log_type = $system->db->clean($_GET['log_type']);
-        if(!in_array($log_type, ['staff_logs', 'currency_logs'])) {
+        if(!in_array($log_type, $allowed_log_types)) {
             $log_type = $default_log_type;
         }
         $self_link .= "&log_type=$log_type";
@@ -35,27 +37,39 @@ function viewLogsPage(System $system, User $player) {
     $offset = 0;
     $limit = 25;
 
-    if($log_type === 'currency_logs') {
-        if($character_id != null) {
-            $max = $player->staff_manager->countCurrencyLogs(
-                character_id: $character_id,
+    // Get max post ID
+    switch($log_type) {
+        case 'currency_logs':
+            if($character_id != null) {
+                $max = $player->staff_manager->countCurrencyLogs(
+                    character_id: $character_id,
+                    offset: $offset,
+                    limit: $limit,
+                    currency_type: $currency_type
+                ) - $limit;
+            }
+            else {
+                $max = 0;
+            }
+            break;
+        case 'cron_job_logs':
+            $query = "SELECT COUNT(*) as `count` FROM `logs` WHERE `log_type`='cron'";
+            $result = $system->db->query($query);
+            if($system->db->last_num_rows) {
+                $max = $system->db->fetch($result)['count'] - $limit;
+            }
+            $max = 0;
+            break;
+        default:
+            // staff logs
+            $max = $player->staff_manager->getStaffLogs(
+                table: $log_type,
+                log_type: 'all',
                 offset: $offset,
                 limit: $limit,
-                currency_type: $currency_type
+                maxCount: true
             ) - $limit;
-        }
-        else {
-            $max = 0;
-        }
-    }
-    else {
-        $max = $player->staff_manager->getStaffLogs(
-            table: $log_type,
-            log_type: 'all',
-            offset: $offset,
-            limit: $limit,
-            maxCount: true
-        ) - $limit;
+            break;
     }
 
     if(isset($_GET['offset'])) {
@@ -77,23 +91,36 @@ function viewLogsPage(System $system, User $player) {
         $previous = 0;
     }
 
-    if($log_type === 'currency_logs') {
-        if($character_id != null) {
-            $logs = $player->staff_manager->getCurrencyLogs(
-                character_id: $character_id,
-                offset: $offset,
-                limit: $limit,
-                currency_type: $currency_type
-            );
-        }
-        else {
+    // get logs
+    switch($log_type) {
+        case 'currency_logs':
+            if($character_id != null) {
+                $logs = $player->staff_manager->getCurrencyLogs(
+                    character_id: $character_id,
+                    offset: $offset,
+                    limit: $limit,
+                    currency_type: $currency_type
+                );
+            }
+            else {
+                $logs = [];
+            }
+            break;
+        case 'cron_job_logs':
             $logs = [];
-        }
 
+            $query = "SELECT * FROM `logs` WHERE `log_type`='cron' ORDER BY `log_id` DESC LIMIT $limit OFFSET $offset";
+            $result = $system->db->query($query);
+            if($system->db->last_num_rows) {
+                $logs = $system->db->fetch_all($result);
+            }
+
+            break;
+        default:
+            $logs = $player->staff_manager->getStaffLogs(table: $log_type, log_type: 'all', offset: $offset, limit: $limit);
+            break;
     }
-    else {
-        $logs = $player->staff_manager->getStaffLogs(table: $log_type, log_type: 'all', offset: $offset, limit: $limit);
-    }
+
 
     if($system->message) {
         $system->printMessage();
