@@ -217,7 +217,7 @@ class Operation
                         $actual_damage = $location_target['health'] - max($new_health, 0);
                         $location_target['health'] = $new_health;
                         $message .= "Dealt " . $actual_damage . " damage to " . $location_target['name'] . "!";
-                        WarLogManager::logAction($this->system, $this->user, $actual_heal, WarLogManager::WAR_LOG_DAMAGE_DEALT, $this->target_village);
+                        WarLogManager::logAction($this->system, $this->user, $actual_damage, WarLogManager::WAR_LOG_DAMAGE_DEALT, $this->target_village);
                         $this->system->db->query("UPDATE `region_locations` SET `health` = {$location_target['health']} WHERE `id` = {$this->target_id}");
                     } else {
                         $message .= "Target is already at 0 health!";
@@ -323,7 +323,7 @@ class Operation
                 WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_RAID, $this->target_village);
                 $defense_reduction = 1 + $this->user->village->policy->raid_defense;
                 if ($location_target['health'] == 0) {
-                    WarLogManager::logRegionCapture($this->system, $this->player, $location_target['region_id']);
+                    WarLogManager::logRegionCapture($this->system, $this->user, $location_target['region_id']);
                     // change region ownership
                     $this->system->db->query("UPDATE `regions` SET `village` = {$this->user->village->village_id} WHERE `region_id` = {$location_target['region_id']}");
                     // update castle health to 25%

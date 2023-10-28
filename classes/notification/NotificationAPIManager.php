@@ -424,6 +424,7 @@ class NotificationAPIManager {
             FROM `operations`
             INNER JOIN `region_locations` ON `region_locations`.`id` = `operations`.`target_id`
             WHERE (`user_village` = {$this->player->village->village_id} OR `target_village` = {$this->player->village->village_id})
+            AND `user_id` != {$this->player->user_id}
             AND `last_update_ms` > {$time}
             AND `status` = " . Operation::OPERATION_ACTIVE . " 
             AND `operations`.`type` = " . Operation::OPERATION_RAID);
