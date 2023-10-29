@@ -40,11 +40,11 @@ class WarLogManager {
         $region = $system->db->query("SELECT * FROM `regions` WHERE `region_id` = {$region_id} LIMIT 1");
         $region = $system->db->fetch($region);
         $time = time();
-        $system->db->query("INSERT INTO `region_logs` (`region_id`, `previous_village_id`, `new_village_id`, `user_id`, `capture_time`, `relation_id`) VALUES ({$region_id}, {$region['village_id']}, {$player->village->village_id}, {$player->user_id}, {$time}, {$player->village->relations[$region['village_id']]->relation_id})");
+        $system->db->query("INSERT INTO `region_logs` (`region_id`, `previous_village_id`, `new_village_id`, `user_id`, `capture_time`, `relation_id`) VALUES ({$region_id}, {$region['village']}, {$player->village->village_id}, {$player->user_id}, {$time}, {$player->village->relations[$region['village']]->relation_id})");
         // log for player
-        self::updatePlayerLog($system, $player, 1, self::WAR_LOG_REGIONS_CAPTURED, $player->village->relations[$region['village_id']]->relation_id);
+        self::updatePlayerLog($system, $player, 1, self::WAR_LOG_REGIONS_CAPTURED, $player->village->relations[$region['village']]->relation_id);
         // log for village
-        self::updateVillageLog($system, $player, 1, self::WAR_LOG_REGIONS_CAPTURED, $player->village->relations[$region['village_id']]->relation_id);
+        self::updateVillageLog($system, $player, 1, self::WAR_LOG_REGIONS_CAPTURED, $player->village->relations[$region['village']]->relation_id);
     }
 
     private static function updatePlayerLog(System $system, User $player, int $value, string $type, ?int $relation_id) {

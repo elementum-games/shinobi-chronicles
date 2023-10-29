@@ -322,7 +322,7 @@ class Operation
             case self::OPERATION_RAID:
                 WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_RAID, $this->target_village);
                 $defense_reduction = 1 + $this->user->village->policy->raid_defense;
-                if ($location_target['health'] == 0) {
+                if ($location_target['health'] <= 0) {
                     WarLogManager::logRegionCapture($this->system, $this->user, $location_target['region_id']);
                     // change region ownership
                     $this->system->db->query("UPDATE `regions` SET `village` = {$this->user->village->village_id} WHERE `region_id` = {$location_target['region_id']}");
