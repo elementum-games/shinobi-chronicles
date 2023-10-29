@@ -19,7 +19,7 @@ class UserReputation {
             'min_rep' => 2500,
             'weekly_cap' => 1000,
             'weekly_pvp_cap' => 1500,
-            'base_pvp_rep_reward' => 2,
+            'base_pvp_rep_reward' => 1,
             'base_decay' => 0,
         ],
         3 => [
@@ -37,7 +37,7 @@ class UserReputation {
             'min_rep' => 7500,
             'weekly_cap' => 1000,
             'weekly_pvp_cap' => 1500,
-            'base_pvp_rep_reward' => 3,
+            'base_pvp_rep_reward' => 2,
             'base_decay' => 250,
         ],
         5 => [
@@ -82,7 +82,7 @@ class UserReputation {
             'min_rep' => 50000,
             'weekly_cap' => 1000,
             'weekly_pvp_cap' => 1500,
-            'base_pvp_rep_reward' => 4,
+            'base_pvp_rep_reward' => 5,
             'base_decay' => 1500,
         ]
     ];
@@ -469,10 +469,10 @@ class UserReputation {
 
         // Hard limits - no gains if >20 levels over opponent or >2 rep tiers
         if($player_levels_above_opponent > self::MAX_PVP_LEVEL_DIFFERENCE) {
-            return 0;
+            return self::$VillageRep[$opponent->reputation->rank]['base_pvp_rep_reward'];
         }
         if($player_rep_tiers_above_opponent > self::MAX_PVP_REP_TIER_DIFFERENCE) {
-            return 0;
+            return self::$VillageRep[$opponent->reputation->rank]['base_pvp_rep_reward'];
         }
 
         /* This is so we can adjust from maximum level difference (say, 20 levels) to maximum gain difference (say, +/- 4 rep)
