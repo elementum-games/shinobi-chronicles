@@ -1359,7 +1359,7 @@ class VillageManager {
                 $policy_result = $system->db->query("SELECT `policy_id` FROM `villages` WHERE `village_id` = {$proposal['village_id']}");
                 $policy_result = $system->db->fetch($policy_result);
                 if (VillagePolicy::$POLICY_EFFECTS[$policy_result['policy_id']][VillagePolicy::POLICY_RESTRICTION_ALLIANCE_ENABLED] == false) {
-                    return "Cannot declare war due to policy restriction.";
+                    return "Cannot form alliance due to policy restriction.";
                 }
                 $policy_result = $system->db->query("SELECT `policy_id` FROM `villages` WHERE `village_id` = {$proposal['target_village_id']}");
                 $policy_result = $system->db->fetch($policy_result);

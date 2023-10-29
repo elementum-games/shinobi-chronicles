@@ -278,7 +278,7 @@ class TravelManager {
             $can_attack = false;
             if ($this->user->location->equals(TravelCoords::fromDbString($user['location']))
                 && $user['user_id'] != $this->user->user_id
-                && $user['village'] !== $this->user->village->name) {
+                && $user_alignment !== 'Ally') {
                 if ((int)$user['rank'] === $this->user->rank_num) {
                     $can_attack = true;
                 } else if ($user['operation'] > 0) {
