@@ -1619,7 +1619,7 @@ class VillageManager {
         // check neither village has existing alliance
         $time = time();
         $alliance_type = VillageRelation::RELATION_ALLIANCE;
-        $system->db->query("SELECT COUNT(*) FROM `village_relations`
+        $result = $system->db->query("SELECT * FROM `village_relations`
             WHERE `relation_type` = {$alliance_type}
             AND `relation_end` IS NULL
             AND ((`village1_id` = {$player->village->village_id} OR `village1_id` = {$target_village_id})
