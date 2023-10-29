@@ -445,7 +445,7 @@ class VillageManager {
         foreach ($challenge_result as $challenge) {
             // process any challenges that are unresolved (outside of scheduling OR lock-in period)
             if (empty($challenge['start_time'])) {
-                $max_schedule_time = $challenge['created_time'] + self::CHALLENGE_SCHEDULE_TIME_HOURS * 60;
+                $max_schedule_time = $challenge['created_time'] + self::CHALLENGE_SCHEDULE_TIME_HOURS * 3600;
                 if (time() > $max_schedule_time) {
                     $winner = $challenge['challenger_id'];
                     self::processChallengeEnd($system, $challenge['request_id'], $winner, $player);
@@ -495,12 +495,13 @@ class VillageManager {
                 seat_holder_avatar: isset($player_result['avatar_link']) ? $player_result['avatar_link'] : ''
             );
         }
+
         $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} AND `end_time` IS NULL");
         $challenge_result = $system->db->fetch_all($challenge_result);
         foreach ($challenge_result as $challenge) {
             // process any challenges that are unresolved (outside of scheduling OR lock-in period)
             if (empty($challenge['start_time'])) {
-                $max_schedule_time = $challenge['created_time'] + self::CHALLENGE_SCHEDULE_TIME_HOURS * 60;
+                $max_schedule_time = $challenge['created_time'] + self::CHALLENGE_SCHEDULE_TIME_HOURS * 3600;
                 if (time() > $max_schedule_time) {
                     $winner = $challenge['challenger_id'];
                     self::processChallengeEnd($system, $challenge['request_id'], $winner, $player);
