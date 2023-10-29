@@ -84,7 +84,7 @@ function Village({
         data.phrase = "bonds forged, courage shared.";
         data.description = "In unity, find the strength to overcome.\nOne village, one heart, one fight.";
         data.bonuses = ["25% increased Caravan speed", "+100% resource production [home region]", "+5% training speed", "Free incoming village transfer"];
-        data.penalties = ["-15 Materials/hour", "-25 Food/hour", "-10 Wealth/hour", "Cannot declare War"];
+        data.penalties = ["-25 Materials/hour", "-35 Food/hour", "-15 Wealth/hour", "Cannot declare War"];
         data.glowClass = "growth_glow";
         break;
       case 2:
@@ -93,7 +93,7 @@ function Village({
         data.phrase = "half truths, all lies.";
         data.description = "Become informants dealing in truths and lies.\nDeceive, divide and destroy.";
         data.bonuses = ["25% increased Infiltrate speed", "+1 Defense reduction from Infiltrate", "+1 Stealth", "+15 Loot Capacity"];
-        data.penalties = ["-10 Materials/hour", "-10 Food/hour", "-30 Wealth/hour"];
+        data.penalties = ["-15 Materials/hour", "-15 Food/hour", "-45 Wealth/hour"];
         data.glowClass = "espionage_glow";
         break;
       case 3:
@@ -102,7 +102,7 @@ function Village({
         data.phrase = "vigilant minds, enduring hearts.";
         data.description = "Show the might of will unyielding.\nPrepare, preserve, prevail.";
         data.bonuses = ["25% increased Reinforce speed", "+1 Defense gain from Reinforce", "+1 Scouting", "Increased Patrol strength"];
-        data.penalties = ["-25 Materials/hour", "-15 Food/hour", "-10 Wealth/hour"];
+        data.penalties = ["-35 Materials/hour", "-25 Food/hour", "-15 Wealth/hour"];
         data.glowClass = "defense_glow";
         break;
       case 4:
@@ -111,7 +111,7 @@ function Village({
         data.phrase = "blades sharp, minds sharper.";
         data.description = "Lead your village on the path of a warmonger.\nFeel no fear, no hesitation, no doubt.";
         data.bonuses = ["25% increased Raid speed", "+1 Defense reduction from Raid", "+1 Village Point from PvP", "Faster Patrol respawn"];
-        data.penalties = ["-15 Materials/hour", "-20 Food/hour", "-15 Wealth/hour", "Cannot form Alliances"];
+        data.penalties = ["-20 Materials/hour", "-35 Food/hour", "-20 Wealth/hour", "Cannot form Alliances"];
         data.glowClass = "war_glow";
         break;
       case 5:

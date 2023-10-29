@@ -212,7 +212,10 @@ class Operation
                     break;
                 case self::OPERATION_RAID:
                     if ($location_target['health'] > 0) {
-                        $player_damage = max($this->user->level - $location_target['defense'], 0);
+                        //$player_damage = max($this->user->level - $location_target['defense'], 0);
+                        $defense_reduction = min($location_target['defense'] / 100, 1);
+                        $player_damage = intval($this->user->level * (1 - $defense_reduction));
+                        $player_damage = max($player_damage, 0);
                         $new_health = $location_target['health'] - $player_damage;
                         $actual_damage = $location_target['health'] - max($new_health, 0);
                         $location_target['health'] = $new_health;

@@ -273,7 +273,9 @@ class WarManager {
                             Operation::OPERATION_RAID => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_RAID]),
                         ];
                         if ($for_display) {
-                            $damage = max(0, $this->user->level - $target_location['defense']);
+                            $defense_reduction = min($target_location['defense'] / 100, 1);
+                            $damage = intval($this->user->level * (1 - $defense_reduction));
+                            $damage = max($damage, 0);
                             $valid_operations[Operation::OPERATION_RAID] .= "<br><span class='raid_button_text'>{$damage} damage</span>";
                         }
                         break;
