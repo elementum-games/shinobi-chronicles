@@ -32,11 +32,11 @@ class VillageManager {
     const MIN_ELDER_CHALLENGE_TIER = 4;
 
     // Set these to correct values for release
-    const PROPOSAL_VOTE_HOURS = 1; // 72
-    const PROPOSAL_ENACT_HOURS = 1; // 24
-    const PROPOSAL_COOLDOWN_HOURS = 0; // 24
-    const KAGE_PROVISIONAL_DAYS = 1; // 7
-    const POLICY_CHANGE_COOLDOWN_DAYS = 0; // 14
+    const PROPOSAL_VOTE_HOURS = 72; // 72
+    const PROPOSAL_ENACT_HOURS = 24; // 24
+    const PROPOSAL_COOLDOWN_HOURS = 1; // 1
+    const KAGE_PROVISIONAL_DAYS = 7; // 7
+    const POLICY_CHANGE_COOLDOWN_DAYS = 14; // 14
 
     const VOTE_NO = 0;
     const VOTE_YES = 1;
@@ -56,6 +56,7 @@ class VillageManager {
     const CHALLENGE_LOCK_TIME_MINUTES = 5;
     const CHALLENGE_SCHEDULE_INCREMENT_MINUTES = 15;
     const CHALLENGE_MINIMUM_TIMES_SELECTED = 12;
+    const CHALLENGE_SCHEDULE_TIME_HOURS = 24;
 
     public static function getLocation(System $system, string $village_id): ?TravelCoords {
         $result = $system->db->query(
@@ -263,6 +264,9 @@ class VillageManager {
                 $player->village_seat = self::getPlayerSeat($system, $player);
                 return "You have become an Elder of {$player->village->name}!";
                 break;
+            default:
+                return '';
+                break;
         }
     }
 
@@ -443,8 +447,16 @@ class VillageManager {
         $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `seat_holder_id` = {$player->user_id} AND `end_time` IS NULL");
         $challenge_result = $system->db->fetch_all($challenge_result);
         foreach ($challenge_result as $challenge) {
-            // process any challenges that are unresolved (outside of lock-in period)
-            if (!empty($challenge['start_time'])) {
+            // process any challenges that are unresolved (outside of scheduling OR lock-in period)
+            if (empty($challenge['start_time'])) {
+                $max_schedule_time = $challenge['created_time'] + self::CHALLENGE_SCHEDULE_TIME_HOURS * 60;
+                if (time() > $max_schedule_time) {
+                    $winner = $challenge['challenger_id'];
+                    self::processChallengeEnd($system, $challenge['request_id'], $winner, $player);
+                    continue;
+                }
+            }
+            else if (!empty($challenge['start_time'])) {
                 $min_lock_time = $challenge['start_time'];
                 $max_lock_time = $min_lock_time + self::CHALLENGE_LOCK_TIME_MINUTES * 60;
                 // if outside of lock period and no battle in progress
@@ -490,8 +502,16 @@ class VillageManager {
         $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} AND `end_time` IS NULL");
         $challenge_result = $system->db->fetch_all($challenge_result);
         foreach ($challenge_result as $challenge) {
-            // process any challenges that are unresolved (outside of lock-in period)
-            if (!empty($challenge['start_time'])) {
+            // process any challenges that are unresolved (outside of scheduling OR lock-in period)
+            if (empty($challenge['start_time'])) {
+                $max_schedule_time = $challenge['created_time'] + self::CHALLENGE_SCHEDULE_TIME_HOURS * 60;
+                if (time() > $max_schedule_time) {
+                    $winner = $challenge['challenger_id'];
+                    self::processChallengeEnd($system, $challenge['request_id'], $winner, $player);
+                    continue;
+                }
+            }
+            else if (!empty($challenge['start_time'])) {
                 $min_lock_time = $challenge['start_time'];
                 $max_lock_time = $min_lock_time + self::CHALLENGE_LOCK_TIME_MINUTES * 60;
                 // if outside of lock period and no battle in progress
@@ -1280,7 +1300,7 @@ class VillageManager {
                 }
                 // neither village can have an existing ally
                 $alliance_type = VillageRelation::RELATION_ALLIANCE;
-                $system->db->query("SELECT COUNT(*) FROM `village_relations`
+                $system->db->query("SELECT * FROM `village_relations`
                     WHERE `relation_type` = {$alliance_type}
                     AND `relation_end` IS NULL
                     AND ((`village1_id` = {$proposal['village_id']} OR `village1_id` = {$proposal['target_village_id']})
@@ -1599,7 +1619,7 @@ class VillageManager {
         // check neither village has existing alliance
         $time = time();
         $alliance_type = VillageRelation::RELATION_ALLIANCE;
-        $system->db->query("SELECT COUNT(*) FROM `village_relations`
+        $result = $system->db->query("SELECT * FROM `village_relations`
             WHERE `relation_type` = {$alliance_type}
             AND `relation_end` IS NULL
             AND ((`village1_id` = {$player->village->village_id} OR `village1_id` = {$target_village_id})

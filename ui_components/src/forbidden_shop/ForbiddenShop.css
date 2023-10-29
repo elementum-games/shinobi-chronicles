@@ -10,7 +10,7 @@
     width: calc(100% - (var(--forbidden-shop-padding) * 2));
     margin-left: auto;
     margin-right: auto;
-    background: url(/../images/forbidden_shop/bannerimg.png);
+    background: url(/../images/forbidden_shop/bannerimg.jpg);
     background-size: auto;
     background-repeat: no-repeat;
 }

@@ -394,7 +394,8 @@ address and requested a password reset. If this is not your account, please disr
             if(mail($email, $subject, $message, $headers)) {
                 ;
                 $system->message("Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!");
-                $login_message_text = "Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!";
+                //$login_message_text = "Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!";
+                $login_message_text = "Account created! Log in to continue.";
             }
             else {
                 $system->message("There was a problem sending the email to the address provided: $email. If you are unable to log in please submit a ticket or contact a staff member on discord for manual activation.");

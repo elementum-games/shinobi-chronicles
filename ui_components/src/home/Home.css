@@ -143,7 +143,7 @@ body {
 }
 
 .main_banner_title {
-    margin-top: 155px;
+    margin-top: 185px;
     user-select: none;
     z-index: 2;
 
@@ -357,10 +357,10 @@ body {
     cursor: pointer;
 }
 .diamond_red rect {
-    fill: #68293f;
+    fill: #822d31;
 }
 .diamond_blue rect {
-    fill: #343d77;
+    fill: #264563;
 }
 .home_diamond_rear {
     fill: #987e50 !important;
@@ -1163,4 +1163,15 @@ body {
         left: 20px;
         bottom: 50px;
     }
+}
+
+#canvascontainer {
+    position: absolute;
+    width: var(--banner-width);
+    height: var(--banner-height);
+    clip-path: circle(50% at 50% 50%);
+    top: calc(0px - var(--banner-hidden-portion));
+    -webkit-transform3d: translate(0,0,0);
+    -moz-transform3d: translate(0,0,0);
+    transform3d: translate(0,0,0);
 }

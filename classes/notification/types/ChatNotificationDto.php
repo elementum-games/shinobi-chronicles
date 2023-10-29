@@ -11,8 +11,8 @@ class ChatNotificationDto extends NotificationDto {
         int $user_id = 0,
         int $created = 0,
         int $duration = 0,
-        ?int $expires = null,
         bool $alert = false,
+        ?int $expires = null,
         int $post_id = 0,
     ) {
         parent::__construct(
@@ -23,8 +23,8 @@ class ChatNotificationDto extends NotificationDto {
             $user_id,
             $created,
             $duration,
-            $expires,
             $alert,
+            $expires,
         );
         $this->post_id = $post_id;
     }

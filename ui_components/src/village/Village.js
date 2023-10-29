@@ -77,7 +77,7 @@ function Village({
                 data.glowClass = "";
                 break;
             case 1:
-                data.banner = "/images/v2/decorations/policy_banners/growthpolicy.png";
+                data.banner = "/images/v2/decorations/policy_banners/growthpolicy.jpg";
                 data.name = "From the Ashes";
                 data.phrase = "bonds forged, courage shared.";
                 data.description = "In unity, find the strength to overcome.\nOne village, one heart, one fight.";
@@ -86,7 +86,7 @@ function Village({
                 data.glowClass = "growth_glow";
                 break;
             case 2:
-                data.banner = "/images/v2/decorations/policy_banners/espionagepolicy.png";
+                data.banner = "/images/v2/decorations/policy_banners/espionagepolicy.jpg";
                 data.name = "Eye of the Storm";
                 data.phrase = "half truths, all lies.";
                 data.description = "Become informants dealing in truths and lies.\nDeceive, divide and destroy.";
@@ -95,7 +95,7 @@ function Village({
                 data.glowClass = "espionage_glow";
                 break;
             case 3:
-                data.banner = "/images/v2/decorations/policy_banners/defensepolicy.png";
+                data.banner = "/images/v2/decorations/policy_banners/defensepolicy.jpg";
                 data.name = "Fortress of Solitude";
                 data.phrase = "vigilant minds, enduring hearts.";
                 data.description = "Show the might of will unyielding.\nPrepare, preserve, prevail.";
@@ -104,7 +104,7 @@ function Village({
                 data.glowClass = "defense_glow";
                 break;
             case 4:
-                data.banner = "/images/v2/decorations/policy_banners/warpolicy.png";
+                data.banner = "/images/v2/decorations/policy_banners/warpolicy.jpg";
                 data.name = "Forged in Flames";
                 data.phrase = "blades sharp, minds sharper.";
                 data.description = "Lead your village on the path of a warmonger.\nFeel no fear, no hesitation, no doubt.";
@@ -113,7 +113,7 @@ function Village({
                 data.glowClass = "war_glow";
                 break;
             case 5:
-                data.banner = "/images/v2/decorations/policy_banners/prosperitypolicy.png";
+                data.banner = "/images/v2/decorations/policy_banners/prosperitypolicy.jpg";
                 data.name = "The Gilded Hand";
                 data.phrase = "";
                 data.description = "";
@@ -1529,15 +1529,15 @@ function StrategicInfoItem({ strategicInfoData, getPolicyDisplayData }) {
     function getStrategicInfoBanner(village_id) {
         switch (village_id) {
             case 1:
-                return '/images/v2/decorations/strategic_banners/stratbannerstone.png';
+                return '/images/v2/decorations/strategic_banners/stratbannerstone.jpg';
             case 2:
-                return '/images/v2/decorations/strategic_banners/stratbannercloud.png';
+                return '/images/v2/decorations/strategic_banners/stratbannercloud.jpg';
             case 3:
-                return '/images/v2/decorations/strategic_banners/stratbannerleaf.png';
+                return '/images/v2/decorations/strategic_banners/stratbannerleaf.jpg';
             case 4:
-                return '/images/v2/decorations/strategic_banners/stratbannersand.png';
+                return '/images/v2/decorations/strategic_banners/stratbannersand.jpg';
             case 5:
-                return '/images/v2/decorations/strategic_banners/stratbannermist.png';
+                return '/images/v2/decorations/strategic_banners/stratbannermist.jpg';
             default:
                 return null;
         }
