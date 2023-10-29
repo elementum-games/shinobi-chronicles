@@ -169,10 +169,6 @@ class VillageManager {
     public static function claimSeat(System $system, User $player, string $seat_type): string {
         switch ($seat_type) {
             case 'kage':
-                // Temp disable
-                if (!$system->isDevEnvironment()) {
-                    return "Not yet available!";
-                }
                 // check requirements
                 if (!self::checkSeatRequirements($system, $player, $seat_type)) {
                     return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_KAGE_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_KAGE_CLAIM_TIER]['min_rep'] . " Reputation";
