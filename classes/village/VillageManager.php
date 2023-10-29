@@ -1300,7 +1300,7 @@ class VillageManager {
                 }
                 // neither village can have an existing ally
                 $alliance_type = VillageRelation::RELATION_ALLIANCE;
-                $system->db->query("SELECT COUNT(*) FROM `village_relations`
+                $system->db->query("SELECT * FROM `village_relations`
                     WHERE `relation_type` = {$alliance_type}
                     AND `relation_end` IS NULL
                     AND ((`village1_id` = {$proposal['village_id']} OR `village1_id` = {$proposal['target_village_id']})
