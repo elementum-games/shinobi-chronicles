@@ -40,7 +40,7 @@ class VillageManager {
 
     const VOTE_NO = 0;
     const VOTE_YES = 1;
-    const VOTE_BOOST_COST = 500;
+    const VOTE_BOOST_COST = 250;
 
     const PROPOSAL_TYPE_CHANGE_POLICY = "change_policy";
     const PROPOSAL_TYPE_DECLARE_WAR = "declare_war";
@@ -575,7 +575,7 @@ class VillageManager {
         $last_challenge = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
         $last_challenge = $system->db->fetch($last_challenge);
         if ($system->db->last_num_rows > 0) {
-            $cooldown_remaining = ($last_challenge['start_time'] + (self::CHALLENGE_COOLDOWN_DAYS * 86400)) - time();
+            $cooldown_remaining = ($last_challenge['created_time'] + (self::CHALLENGE_COOLDOWN_DAYS * 86400)) - time();
             if ($cooldown_remaining > 0) {
                 $hours = floor($cooldown_remaining / 3600);
                 $minutes = floor(($cooldown_remaining % 3600) / 60);
