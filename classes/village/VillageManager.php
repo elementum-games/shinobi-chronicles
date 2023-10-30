@@ -32,7 +32,7 @@ class VillageManager {
     const MIN_ELDER_CHALLENGE_TIER = 4;
 
     // Set these to correct values for release
-    const PROPOSAL_VOTE_HOURS = 72; // 72
+    const PROPOSAL_VOTE_HOURS = 24; // 24
     const PROPOSAL_ENACT_HOURS = 24; // 24
     const PROPOSAL_COOLDOWN_HOURS = 1; // 1
     const KAGE_PROVISIONAL_DAYS = 7; // 7
@@ -1359,7 +1359,7 @@ class VillageManager {
                 $policy_result = $system->db->query("SELECT `policy_id` FROM `villages` WHERE `village_id` = {$proposal['village_id']}");
                 $policy_result = $system->db->fetch($policy_result);
                 if (VillagePolicy::$POLICY_EFFECTS[$policy_result['policy_id']][VillagePolicy::POLICY_RESTRICTION_ALLIANCE_ENABLED] == false) {
-                    return "Cannot declare war due to policy restriction.";
+                    return "Cannot form alliance due to policy restriction.";
                 }
                 $policy_result = $system->db->query("SELECT `policy_id` FROM `villages` WHERE `village_id` = {$proposal['target_village_id']}");
                 $policy_result = $system->db->fetch($policy_result);

@@ -160,7 +160,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
             // Loot - winner takes half loser's if retreat, which is all remaining since loser has left battle in order to flag as retreat
             $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}");
             if ($system->db->last_affected_rows > 0) {
-                //$result .= "You have claimed half the loot being carried by your opponent.[br]";
+                $result .= "You have taken half the loot carried by your opponent.[br]";
             }
         } else {
             // Calculate rep gains
@@ -173,7 +173,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
             // Loot
             $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}");
             if ($system->db->last_affected_rows > 0) {
-                //$result .= "You have claimed the loot being carried by your opponent.[br]";
+                $result .= "You have taken all loot carried by your opponent.[br]";
             }
         }
 
@@ -216,7 +216,9 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                     $half_loot = floor($total_loot / 2);
                     $query = "UPDATE `loot` SET `battle_id` = NULL WHERE `battle_id` = {$player->battle_id} ORDER BY `id` ASC LIMIT $half_loot";
                     $system->db->query($query);
-                    //$result .= "Half of your loot was claimed by your opponent.[br]";
+                    if ($system->db->last_affected_rows > 0) {
+                        $result .= "Half of your loot was taken by your opponent.[br]";
+                    }
                 }
             }
         } else {

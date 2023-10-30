@@ -242,7 +242,7 @@ class Operation
                         if (!empty($caravan_resources)) {
                             $random_resource = array_rand($caravan_resources);
                             $caravan_resources[$random_resource]--;
-                            if ($caravan_resources[$random_resource] == 0) {
+                            if ($caravan_resources[$random_resource] <= 0) {
                                 unset($caravan_resources[$random_resource]);
                             }
                             $this->system->db->query("INSERT INTO `loot` (`user_id`, `resource_id`, `target_village_id`) VALUES ({$this->user_id}, {$random_resource}, {$this->target_village})");
