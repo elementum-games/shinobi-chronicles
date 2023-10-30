@@ -47,9 +47,12 @@ class Notifications {
                     case Battle::TYPE_FIGHT:
                         $link = $system->router->links['battle'];
                         break;
-                    /* case Battle::TYPE_CHALLENGE:
-                         $link = $system->router->links['spar'];
-                         break;*/
+                    case Battle::TYPE_CHALLENGE:
+                        $link = $system->router->links['challenge'];
+                        break;
+                    case Battle::TYPE_AI_WAR:
+                        $link = $system->router->links['war'];
+                        break;
                 }
                 if($link) {
                     $notifications[] = new Notification($link, "In battle!", critical: true);

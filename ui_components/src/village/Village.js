@@ -90,7 +90,7 @@ function Village({
                 data.name = "Eye of the Storm";
                 data.phrase = "half truths, all lies.";
                 data.description = "Become informants dealing in truths and lies.\nDeceive, divide and destroy.";
-                data.bonuses = ["25% increased Infiltrate speed", "+1 Defense reduction from Infiltrate", "+1 Stealth", "+15 Loot Capacity"];
+                data.bonuses = ["25% increased Infiltrate speed", "+1 Defense reduction from Infiltrate", "+1 Stealth", "+5 Loot Capacity"];
                 data.penalties = ["-15 Materials/hour", "-15 Food/hour", "-45 Wealth/hour"];
                 data.glowClass = "espionage_glow";
                 break;

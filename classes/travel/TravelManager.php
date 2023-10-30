@@ -586,10 +586,12 @@ class TravelManager {
             throw new RuntimeException("You died within the last minute, please wait " .
                 ceil((($this->user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
         }
+        // we already give PvP immunity that breaks on attacking/war so this old restriction isn't needed
+        /*
         if ($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
             throw new RuntimeException("Target has died within the last minute, please wait " .
                 ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
-        }
+        }*/
         if ($this->user->operation > 0) {
             throw new RuntimeException("You are currently in an operation!");
         }
