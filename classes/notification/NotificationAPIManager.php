@@ -426,8 +426,8 @@ class NotificationAPIManager {
             AND `user_id` != {$this->player->user_id}
             AND `last_update_ms` > {$time}
             AND `status` = " . Operation::OPERATION_ACTIVE . " 
-            AND `operations`.`type` = " . Operation::OPERATION_RAID) . "
-            GROUP BY `region_locations`.`id`";
+            AND `operations`.`type` = " . Operation::OPERATION_RAID . "
+            GROUP BY `region_locations`.`id`");
             $result = $this->system->db->fetch_all($result);
             foreach ($result as $row) {
                 $location = new TravelCoords($row['x'], $row['y'], $row['map_id']);
