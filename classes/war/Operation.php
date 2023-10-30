@@ -335,8 +335,9 @@ class Operation {
                     $patrol_spawn = time() + (60 * 5);
                     $this->system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$this->user->village->village_id} WHERE `region_id` = {$location_target['region_id']}");
                     // update caravans, change only caravans that haven't spawned
+                    $name = VillageManager::VILLAGE_NAMES[$this->user->village->village_id] . " Caravan";
                     $time = time();
-                    $this->system->db->query("UPDATE `caravans` SET `village_id` = {$this->user->village->village_id} WHERE `region_id` = {$location_target['region_id']} AND `start_time` > {$time}");
+                    $this->system->db->query("UPDATE `caravans` SET `village_id` = {$this->user->village->village_id}, `name` = {$name} WHERE `region_id` = {$location_target['region_id']} AND `start_time` > {$time}");
                 }
                 else if ($location_target['defense'] > 0) {
                     $result = max($location_target['defense'] - $defense_reduction, 0);
