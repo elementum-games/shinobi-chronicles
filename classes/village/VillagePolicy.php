@@ -101,7 +101,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_PATROL_TIER => 0,
                 self::POLICY_BONUS_TRAINING_SPEED => 5,
                 self::POLICY_BONUS_FREE_TRANSFER => true,
-                self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 100,
+                self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 50,
                 self::POLICY_BONUS_SCOUTING => 0,
                 self::POLICY_BONUS_STEALTH => 0,
                 self::POLICY_BONUS_LOOT_CAPACITY => 0,

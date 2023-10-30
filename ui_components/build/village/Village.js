@@ -83,7 +83,7 @@ function Village({
         data.name = "From the Ashes";
         data.phrase = "bonds forged, courage shared.";
         data.description = "In unity, find the strength to overcome.\nOne village, one heart, one fight.";
-        data.bonuses = ["25% increased Caravan speed", "+100% resource production [home region]", "+5% training speed", "Free incoming village transfer"];
+        data.bonuses = ["25% increased Caravan speed", "+50% resource production [home region]", "+5% training speed", "Free incoming village transfer"];
         data.penalties = ["-25 Materials/hour", "-35 Food/hour", "-15 Wealth/hour", "Cannot declare War"];
         data.glowClass = "growth_glow";
         break;
