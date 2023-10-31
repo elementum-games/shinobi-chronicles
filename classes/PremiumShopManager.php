@@ -15,6 +15,10 @@ class PremiumShopManager {
     const EXCHANGE_MIN_YEN_PER_AK = 10.0;
     const EXCHANGE_MAX_YEN_PER_AK = 100.0;
 
+    const TIER_THREE_SALE_END = '2023-11-30';
+    const SALE_REFUND_RATE = 50;
+    const EDS_90_DAY_DISCOUNT = 0.17;
+
     public System $system;
     public User $player;
 
@@ -42,6 +46,30 @@ class PremiumShopManager {
         $this->initStatTransferVars();
     }
 
+    ///TEMPORARY SALE LOGIC
+    public function tierThreeSaleActive(): bool {
+        $sale_end = new DateTimeImmutable(self::TIER_THREE_SALE_END);
+        $current_time = new DateTimeImmutable();
+
+        return $current_time < $sale_end;
+    }
+
+    public function saleTimeRemaining(): int {
+        $sale_end = new DateTimeImmutable(self::TIER_THREE_SALE_END);
+        return $sale_end->getTimestamp() - time();
+    }
+
+    public function loadTierThreeSalePrices($current_seal_level): void {
+        if($this->tierThreeSaleActive() && ($current_seal_level == 0 || $current_seal_level == 3)) {
+            $this->costs['forbidden_seal'][3][60] -= 5;
+            $this->costs['forbidden_seal'][3][90] -= 15;
+        }
+        else {
+            $this->costs['forbidden_seal'][3][60] = $this->costs['forbidden_seal_monthly_cost'][3] * 2;
+            $this->costs['forbidden_seal'][3][90] = $this->costs['forbidden_seal_monthly_cost'][3] * 3;
+        }
+    }
+
     private function initCosts(): void {
         $this->costs['name_change'] = 15;
         $this->costs['gender_change'] = 10;
@@ -53,7 +81,8 @@ class PremiumShopManager {
         $this->costs['bloodline_random'][2] = 20;
         $this->costs['forbidden_seal_monthly_cost'] = [
             1 => 5,
-            2 => 15
+            2 => 15,
+            3 => 30,
         ];
         $this->costs['forbidden_seal'] = [
             1 => [
@@ -65,6 +94,11 @@ class PremiumShopManager {
                 30 => $this->costs['forbidden_seal_monthly_cost'][2],
                 60 => $this->costs['forbidden_seal_monthly_cost'][2] * 2,
                 90 => $this->costs['forbidden_seal_monthly_cost'][2] * 3
+            ],
+            3 => [
+                30 => $this->costs['forbidden_seal_monthly_cost'][3],
+                60 => $this->costs['forbidden_seal_monthly_cost'][3] * 2,
+                90 => $this->calcSealDiscount($this->costs['forbidden_seal_monthly_cost'][3] * 3, self::EDS_90_DAY_DISCOUNT)
             ]
         ];
         $this->costs['element_change'] = 10;
@@ -79,6 +113,10 @@ class PremiumShopManager {
 
         $this->costs['reset_ai_battles'] = 10;
         $this->costs['reset_pvp_battles'] = 20;
+    }
+
+    private function calcSealDiscount(int $cost, float $discount_rate): int {
+        return $cost - floor($cost * $discount_rate);
     }
 
     private function initStatTransferVars(): void {
