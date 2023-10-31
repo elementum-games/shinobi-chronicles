@@ -279,6 +279,7 @@ class UserReputation {
         // EVENT MODIFICATIONS
         if(!empty($this->event) && $this->event instanceof DoubleReputationEvent) {
             $this->weekly_pve_cap *= DoubleReputationEvent::pve_cap_multiplier;
+            $this->weekly_war_cap *= DoubleReputationEvent::pve_cap_multiplier;
             $this->weekly_pvp_cap *= DoubleReputationEvent::pvp_cap_multiplier;
         }
     }

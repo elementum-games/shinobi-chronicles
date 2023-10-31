@@ -201,6 +201,7 @@ class PremiumShopManager {
         //Reset Village Reputation Data
         $this->player->village_rep = 0;
         $this->player->weekly_pve_rep = 0;
+        $this->player->weekly_war_rep = 0;
         $this->player->weekly_pvp_rep = 0;
         $this->player->mission_rep_cd = 0;
 

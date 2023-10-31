@@ -97,13 +97,7 @@ function weeklyCron(System $system, $debug = false): void {
 
         $queries [] = "UPDATE `users` SET 
             `village_rep`=`village_rep`- " . $RANK['base_decay'] . " 
-            WHERE `village_rep` >= " . $RANK['min_rep'] . $next_rank_where . " 
-            AND `weekly_pve_rep` + `weekly_pvp_rep` < " . $RANK['weekly_pve_cap'];
-
-        $queries[] = "UPDATE `users` SET 
-            `village_rep`=`village_rep`- " . $RANK['base_decay'] . " 
-            WHERE `village_rep` >= " . $RANK['min_rep'] . $next_rank_where . " 
-            AND `weekly_pve_rep` + `weekly_pvp_rep` >= " . $RANK['weekly_pve_cap'];
+            WHERE `village_rep` >= " . $RANK['min_rep'] . $next_rank_where;
     }
 
     foreach($queries as $query) {
