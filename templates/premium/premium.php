@@ -242,9 +242,7 @@
                         countdownTimer(<?=$premiumShopManager->saleTimeRemaining()?>, 'sale_time_remaining');
                     </script>
                     <br />
-                    <?php if($player->forbidden_seal->level == 0 || $player->forbidden_seal->level == 3): ?>
-                        Sixty (60) and ninety (90) day seal purchases are currently discounted!
-                    <?php else: ?>
+                    <?php if($player->forbidden_seal->level == 1 || $player->forbidden_seal->level == 2): ?>
                         Any estimated seal credit above purchase price will be refunded at <?=PremiumShopManager::SALE_REFUND_RATE?>%
                     <?php endif ?>
                 <?php endif ?>

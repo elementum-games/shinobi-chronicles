@@ -47,7 +47,7 @@ class ForbiddenSeal {
         0 => '',
         1 => 'Twin Sparrow Seal',
         2 => 'Four Dragon Seal',
-        3 => 'Eight Trigram Seal'
+        3 => 'Eight Deities Seal'
     );
     public static array $benefits = array (
         0 => [
@@ -180,7 +180,7 @@ class ForbiddenSeal {
             'bonus_pve_reputation' => 1,
         ],
         3 => [
-            'regen_boost' => 20, //Report in whole percentages (20 will be .2 bonus)
+            'regen_boost' => 25, //Report in whole percentages (20 will be .2 bonus)
             'name_colors' => [
                 'blue' => 'blue',
                 'pink' => 'pink',

@@ -17,6 +17,7 @@ class PremiumShopManager {
 
     const TIER_THREE_SALE_END = '2023-11-30';
     const SALE_REFUND_RATE = 50;
+    const EDS_90_DAY_DISCOUNT = 0.17;
 
     public System $system;
     public User $player;
@@ -97,7 +98,7 @@ class PremiumShopManager {
             3 => [
                 30 => $this->costs['forbidden_seal_monthly_cost'][3],
                 60 => $this->costs['forbidden_seal_monthly_cost'][3] * 2,
-                90 => $this->costs['forbidden_seal_monthly_cost'][3] * 3
+                90 => $this->calcSealDiscount($this->costs['forbidden_seal_monthly_cost'][3] * 3, self::EDS_90_DAY_DISCOUNT)
             ]
         ];
         $this->costs['element_change'] = 10;
@@ -112,6 +113,10 @@ class PremiumShopManager {
 
         $this->costs['reset_ai_battles'] = 10;
         $this->costs['reset_pvp_battles'] = 20;
+    }
+
+    private function calcSealDiscount(int $cost, float $discount_rate): int {
+        return $cost - floor($cost * $discount_rate);
     }
 
     private function initStatTransferVars(): void {

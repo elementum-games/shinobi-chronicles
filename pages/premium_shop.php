@@ -13,11 +13,6 @@ function premiumShop(): void {
 
     $premiumShopManager = new PremiumShopManager($system, $player);
 
-    //TEMPORARY SALE LOGIC
-    if($premiumShopManager->tierThreeSaleActive()) {
-        $premiumShopManager->loadTierThreeSalePrices($player->forbidden_seal->level);
-    }
-
     $available_clans = $premiumShopManager->getAvailableClans();
     $available_name_colors = $player->getNameColors();
 
@@ -527,11 +522,6 @@ function premiumShop(): void {
                     $player->subtractPremiumCredits($ak_cost, $message);
                     $player->forbidden_seal->addSeal($seal_level, $seal_length);
 
-                    //TEMPORARY SALE LOGIC - Run for display purposes
-                    if($premiumShopManager->tierThreeSaleActive()) {
-                        $premiumShopManager->loadTierThreeSalePrices($player->forbidden_seal->level);
-                    }
-
                     $system->message("You changed your seal!");
                 }
             }
@@ -548,11 +538,6 @@ function premiumShop(): void {
                 //Load benefits for displaying market & storing in db
                 $player->forbidden_seal->setBenefits();
                 $player->forbidden_seal_loaded = true;
-
-                //TEMPORARY SALE LOGIC - Run for display purposes
-                if($premiumShopManager->tierThreeSaleActive()) {
-                    $premiumShopManager->loadTierThreeSalePrices($player->forbidden_seal->level);
-                }
 
                 $system->message("Seal infused!");
             }
