@@ -220,7 +220,7 @@ function processSparFightEnd(BattleManager $battle, User $player, System $system
     if($battle->isPlayerWinner()) {
 		$result = "You win!";
         if ($reputation_eligible) {
-            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_WIN);
+            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_WIN, UserReputation::ACTIVITY_TYPE_PVE);
             $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
             $result .= "<br>You have gained $rep_gain village reputation!";
         }
@@ -230,7 +230,7 @@ function processSparFightEnd(BattleManager $battle, User $player, System $system
         $player->health = 5;
         $result = "You lose.";
         if ($reputation_eligible) {
-            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_LOSS);
+            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_LOSS, UserReputation::ACTIVITY_TYPE_PVE);
             $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
             $result .= "<br>You have gained $rep_gain village reputation!";
         }
@@ -240,7 +240,7 @@ function processSparFightEnd(BattleManager $battle, User $player, System $system
         $player->health = 5;
         $result = "You both knocked each other out.";
         if ($reputation_eligible) {
-            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_DRAW);
+            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_DRAW, UserReputation::ACTIVITY_TYPE_PVE);
             $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
             $result .= "<br>You have gained $rep_gain village reputation!";
         }
@@ -289,7 +289,7 @@ function isReputationEligible(BattleManager $battle, User $player, System $syste
     }
 
 	// if rep timer available
-    if (!$player->reputation->canGain(check_mission_cd: true, check_pvp: false)) {
+    if (!$player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
         return false;
     }
 

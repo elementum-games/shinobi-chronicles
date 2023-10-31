@@ -1387,16 +1387,17 @@ class VillageManager {
                 $rep_adjustment += $vote['rep_adjustment'];
                 $user = User::loadFromId($system, $vote['user_id']);
                 $user->loadData();
-                $user->reputation->subtractRep($vote['rep_adjustment'], false);
+                $user->reputation->subtractRep($vote['rep_adjustment'], UserReputation::ACTIVITY_TYPE_UNCAPPED);
                 $user->updateData();
             }
         }
+
         if ($rep_adjustment > 0) {
-            $player->reputation->addRep($rep_adjustment, bypass_weekly_cap: true);
+            $player->reputation->addRep($rep_adjustment, UserReputation::ACTIVITY_TYPE_UNCAPPED);
             $message .= "\n You have gained {$rep_adjustment} Reputation!";
             $player->updateData();
         } else if ($rep_adjustment < 0) {
-            $player->reputation->subtractRep($rep_adjustment, false);
+            $player->reputation->subtractRep($rep_adjustment, UserReputation::ACTIVITY_TYPE_UNCAPPED);
             $message .= "\n You have lost {$rep_adjustment} Reputation!";
             $player->updateData();
         }

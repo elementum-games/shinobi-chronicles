@@ -421,8 +421,9 @@ $clan_positions = [
     <br />
     <label style='width:<?= $label_width ?>;'>Village:</label> <?= $player->village->name ?><br />
     <label style='width:<?= $label_width ?>;'>Reputation:</label> <?= $player->reputation->rank_name ?> <em>(<?= $player->reputation->getRepAmount() ?>)</em><br />
-    <label style='width:<?= $label_width ?>;'>Weekly Cap:</label> <?= $player->reputation->getWeeklyRepAmount() ?> / <?= $player->reputation->weekly_cap ?><br />
-    <label style='width:<?= $label_width ?>;'>PvP Cap:</label> <?= $player->reputation->getWeeklyPvpRep() ?> / <?= $player->reputation->weekly_pvp_cap ?><br />
+    <label style='width:<?= $label_width ?>;'>Weekly PvE Cap:</label> <?= $player->reputation->getWeeklyPveRep() ?> / <?= $player->reputation->weekly_pve_cap ?><br />
+    <label style='width:<?= $label_width ?>;'>Weekly War Cap:</label> <?= $player->reputation->getWeeklyWarRep() ?> / <?= $player->reputation->weekly_war_cap ?><br />
+    <label style='width:<?= $label_width ?>;'>Weekly PvP Cap:</label> <?= $player->reputation->getWeeklyPvpRep() ?> / <?= $player->reputation->weekly_pvp_cap ?><br />
     <br />
     <label style='width:<?= $label_width ?>;'>Money:</label> &yen;<?= $player->getMoney() ?><br />
     <label style='width:<?= $label_width ?>;'>Ancient Kunai:</label> <?= $player->getPremiumCredits() ?><br />

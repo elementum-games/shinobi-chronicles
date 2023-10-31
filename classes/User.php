@@ -125,8 +125,9 @@ class User extends Fighter {
 
     public Village $village;
     public int $village_rep;
-    public int $weekly_rep;
-    public int $pvp_rep;
+    public int $weekly_pve_rep;
+    public int $weekly_war_rep;
+    public int $weekly_pvp_rep;
     public int $last_pvp_rep_reset;
     public int $mission_rep_cd;
     public UserReputation $reputation;
@@ -497,12 +498,22 @@ class User extends Fighter {
 
         $this->village = new Village($this->system, $user_data['village']);
         $this->village_rep = $user_data['village_rep'];
-        $this->weekly_rep = $user_data['weekly_rep'];
-	    $this->pvp_rep = $user_data['pvp_rep'];
+        $this->weekly_pve_rep = $user_data['weekly_pve_rep'];
+        $this->weekly_war_rep = $user_data['weekly_war_rep'];
+	    $this->weekly_pvp_rep = $user_data['weekly_pvp_rep'];
         $this->mission_rep_cd = $user_data['mission_rep_cd'];
         $this->recent_players_killed_ids = $user_data['recent_players_killed_ids'];
 	    $this->recent_killer_ids = $user_data['recent_killer_ids'];
-        $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->pvp_rep, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd, $this->system->event);
+        $this->reputation = new UserReputation(
+            player_rep: $this->village_rep,
+            player_weekly_pve_rep: $this->weekly_pve_rep,
+            player_weekly_war_rep: $this->weekly_war_rep,
+            player_weekly_pvp_rep: $this->weekly_pvp_rep,
+            last_pvp_kills: $this->recent_players_killed_ids,
+            last_killer_ids: $this->recent_killer_ids,
+            mission_cd: $this->mission_rep_cd,
+            event: $this->system->event
+        );
 
         $this->gender = $user_data['gender'];
         $this->level = $user_data['level'];
@@ -667,7 +678,7 @@ class User extends Fighter {
             $completion_data = $this->daily_tasks->checkTaskCompletion();
             if($completion_data != null) {
                 $this->addMoney($completion_data['money_gain'], 'Completed daily task');
-                $rep_gain = $this->reputation->addRep($completion_data['rep_gain'], UserReputation::DAILY_TASK_BYPASS_CAP);
+                $rep_gain = $this->reputation->addRep($completion_data['rep_gain'], UserReputation::ACTIVITY_TYPE_DAILY_TASK);
                 $task_display = "You have completed the task " . (sizeof($completion_data['tasks_completed']) > 1 ? "s" : "");
                 foreach ($completion_data['tasks_completed'] as $x => $t_name) {
                     if ($x > 0) {
@@ -1764,8 +1775,9 @@ class User extends Fighter {
 		`marriage_time` = '$this->marriage_time',
 		`village` = '{$this->village->name}',
 		`village_rep` = '$this->village_rep',
-		`weekly_rep` = '$this->weekly_rep',
-  		`pvp_rep` = '$this->pvp_rep',
+		`weekly_pve_rep` = '$this->weekly_pve_rep',
+		`weekly_war_rep` = '$this->weekly_war_rep',
+  		`weekly_pvp_rep` = '$this->weekly_pvp_rep',
 		`recent_players_killed_ids` = '$this->recent_players_killed_ids',
 		`recent_killer_ids` = '$this->recent_killer_ids',
 		`mission_rep_cd` = '$this->mission_rep_cd',

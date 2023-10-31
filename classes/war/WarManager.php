@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . "/Operation.php";
+
 class WarManager {
     const BASE_RESOURCE_PRODUCTION = 25; // 25/hour, 600/village/day, 1800/region/day, 7200/faction/day (assuming 4 regions)
     const HOME_REGION_RESOURCE_BONUS = 25;
@@ -438,4 +440,59 @@ class WarManager {
         $this->system->db->query("UPDATE `loot` SET `claimed_village_id` = {$village->village_id}, `claimed_time` = {$time}, `battle_id` = NULL, `user_id` = 0 WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL");
         return $message;
     }
+
+    /**
+     * Returns raid targets the player might want to attack or defend.
+     * * Enemy towns/castles that allies are raiding
+     * * Ally towns/castles that enemies are raiding
+     *
+     * @param System $system
+     * @param User   $player
+     * @return RaidTargetDto[]
+     */
+    public static function getPlayerAttackOrDefendRaidTargets(System $system, User $player): array {
+        // only get recently updated raids, prevent something like starting a raid and logging out = perpetual notif
+        $num_raid_cycles = 100 / Operation::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
+        $max_raid_duration_ms = $num_raid_cycles * Operation::BASE_OPERATION_INTERVAL_SECONDS * 1000;
+        $oldest_active_raid_time = (microtime(true) * 1000) - $max_raid_duration_ms;
+
+        $result = $system->db->query("SELECT
+            `operations`.`user_village` as `attacking_user_village`, 
+            `operations`.`target_id`,
+            `region_locations`.`x`, 
+            `region_locations`.`y`, 
+            `region_locations`.`map_id`, 
+            `region_locations`.`name` 
+            FROM `operations`
+            INNER JOIN `region_locations` ON `region_locations`.`id` = `operations`.`target_id`
+            WHERE (`operations`.`user_village` = {$player->village->village_id} OR `operations`.`target_village` = {$player->village->village_id})
+            AND `user_id` != {$player->user_id}
+            AND `last_update_ms` > {$oldest_active_raid_time}
+            AND `status` = " . Operation::OPERATION_ACTIVE . " 
+            AND `operations`.`type` = " . Operation::OPERATION_RAID . "
+            GROUP BY `operations`.`target_id`, `attacking_user_village`");
+        $raw_raid_targets = $system->db->fetch_all($result);
+
+        $raid_targets = [];
+        foreach($raw_raid_targets as $target) {
+            if(!isset($raid_targets[$target['target_id']])) {
+                $raid_targets[$target['target_id']] = new RaidTargetDto(
+                    name: $target['name'],
+                    location: new TravelCoords(x: $target['x'], y: $target['y'], map_id: $target['map_id']),
+                    // TODO: Notifications for allied villages? This logic only does the player's own village
+                    is_ally_location: $target['attacking_user_village'] != $player->village->village_id,
+                );
+            }
+        }
+
+        return $raid_targets;
+    }
+}
+
+class RaidTargetDto {
+    public function __construct(
+        public string $name,
+        public TravelCoords $location,
+        public bool $is_ally_location,
+    ) {}
 }

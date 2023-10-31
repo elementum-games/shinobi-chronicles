@@ -52,7 +52,10 @@ function processChallengeBattleEnd(BattleManager $battle, User $player, System $
 
     if ($battle->isPlayerWinner()) {
         $result = "You win!";
-        $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_WIN * 10);
+        $rep_gain = $player->reputation->addRep(
+            UserReputation::SPAR_REP_WIN * 10,
+            UserReputation::ACTIVITY_TYPE_PVE
+        );
         $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
         $result .= "<br>You have gained $rep_gain village reputation!";
         if ($player->locked_challenge > 0) {
@@ -62,7 +65,10 @@ function processChallengeBattleEnd(BattleManager $battle, User $player, System $
     } else if ($battle->isOpponentWinner()) {
         $player->health = 5;
         $result = "You lose.";
-        $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_LOSS * 10);
+        $rep_gain = $player->reputation->addRep(
+            UserReputation::SPAR_REP_LOSS * 10,
+            UserReputation::ACTIVITY_TYPE_PVE
+        );
         $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
         $result .= "<br>You have gained $rep_gain village reputation!";
         if ($player->locked_challenge > 0) {
@@ -72,7 +78,10 @@ function processChallengeBattleEnd(BattleManager $battle, User $player, System $
     } else if ($battle->isDraw()) {
         $player->health = 5;
         $result = "You both knocked each other out.";
-        $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_DRAW * 10);
+        $rep_gain = $player->reputation->addRep(
+            UserReputation::SPAR_REP_DRAW * 10,
+            UserReputation::ACTIVITY_TYPE_PVE
+        );
         $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
         $result .= "<br>You have gained $rep_gain village reputation!";
         if ($player->locked_challenge > 0) {

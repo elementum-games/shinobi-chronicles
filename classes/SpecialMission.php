@@ -471,8 +471,8 @@ class SpecialMission {
             $reward_text = self::$event_names[self::EVENT_COMPLETE_REWARD]['text'] . $yen_gain . '!';
 
             //Reputation Reward
-            if ($this->player->reputation->canGain(true)) {
-                $rep_gain = $this->player->reputation->addRep(self::$difficulties[$this->difficulty]['rep_gain']);
+            if ($this->player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
+                $rep_gain = $this->player->reputation->addRep(self::$difficulties[$this->difficulty]['rep_gain'], UserReputation::ACTIVITY_TYPE_PVE);
                 if ($rep_gain > 0) {
                     $this->player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
                     $reward_text .= ' You have gained ' . $rep_gain . " village reputation!";

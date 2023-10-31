@@ -3,6 +3,7 @@
 require_once __DIR__ . "/NotificationDto.php";
 require_once __DIR__ . "/../../classes.php";
 require_once __DIR__ . "/../ReportManager.php";
+require_once __DIR__ . "/../war/WarManager.php";
 
 class NotificationAPIManager {
     private System $system;
@@ -413,32 +414,19 @@ class NotificationAPIManager {
             }
 
             //Raid
-            $time = microtime(true) * 1000 - 60000; // only get recently updated raids, prevent something like starting a raid and logging out = perpetual notif
-            $result = $this->system->db->query("SELECT
-            `operations`.`user_village`, 
-            `region_locations`.`x`, 
-            `region_locations`.`y`, 
-            `region_locations`.`map_id`, 
-            `region_locations`.`name` 
-            FROM `operations`
-            INNER JOIN `region_locations` ON `region_locations`.`id` = `operations`.`target_id`
-            WHERE (`user_village` = {$this->player->village->village_id} OR `target_village` = {$this->player->village->village_id})
-            AND `user_id` != {$this->player->user_id}
-            AND `last_update_ms` > {$time}
-            AND `status` = " . Operation::OPERATION_ACTIVE . " 
-            AND `operations`.`type` = " . Operation::OPERATION_RAID . "
-            GROUP BY `region_locations`.`id`");
-            $result = $this->system->db->fetch_all($result);
-            foreach ($result as $row) {
-                $location = new TravelCoords($row['x'], $row['y'], $row['map_id']);
+            $active_raid_targets = WarManager::getPlayerAttackOrDefendRaidTargets(
+                $this->system,
+                $this->player
+            );
+            foreach($active_raid_targets as $raid_target) {
                 $notifications[] = new NotificationDto(
                     action_url: $this->system->router->getUrl('travel'),
-                    type: $row['user_village'] == $this->player->village->village_id
-                        ? NotificationManager::NOTIFICATION_RAID_ALLY
-                        : NotificationManager::NOTIFICATION_RAID_ENEMY,
-                    message: $row['user_village'] == $this->player->village->village_id
-                        ? "An ally is attacking {$row['name']} at {$location->displayString()}!"
-                        : "{$row['name']} is under attack at {$location->displayString()}!",
+                    type: $raid_target->is_ally_location
+                        ? NotificationManager::NOTIFICATION_RAID_ENEMY
+                        : NotificationManager::NOTIFICATION_RAID_ALLY,
+                    message: $raid_target->is_ally_location
+                        ? "{$raid_target->name} is under attack at {$raid_target->location->displayString()}!"
+                        : "An ally is attacking {$raid_target->name} at {$raid_target->location->displayString()}!",
                     user_id: $this->player->user_id,
                     created: time(),
                     alert: false,

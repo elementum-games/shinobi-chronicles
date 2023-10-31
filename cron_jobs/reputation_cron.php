@@ -80,7 +80,7 @@ else {
 function weeklyCron(System $system, $debug = false): void {
     $queries = [];
 
-    $queries[] = "UPDATE `users` SET `weekly_rep`=0, `pvp_rep`=0 WHERE 1;";
+    $queries[] = "UPDATE `users` SET `weekly_pve_rep`=0, `weekly_war_rep`=0, `weekly_pvp_rep`=0 WHERE 1;";
 
     foreach(UserReputation::$VillageRep as $RANK_INT => $RANK) {
         if($RANK_INT == 1) {
@@ -98,12 +98,12 @@ function weeklyCron(System $system, $debug = false): void {
         $queries [] = "UPDATE `users` SET 
             `village_rep`=`village_rep`- " . $RANK['base_decay'] . " 
             WHERE `village_rep` >= " . $RANK['min_rep'] . $next_rank_where . " 
-            AND `weekly_rep` + `pvp_rep` < " . $RANK['weekly_cap'];
+            AND `weekly_pve_rep` + `weekly_pvp_rep` < " . $RANK['weekly_pve_cap'];
 
         $queries[] = "UPDATE `users` SET 
-            `village_rep`=`village_rep`- " . floor($RANK['base_decay'] * UserReputation::WEEKLY_CAP_MET_DECAY_MULTIPLIER) . " 
+            `village_rep`=`village_rep`- " . $RANK['base_decay'] . " 
             WHERE `village_rep` >= " . $RANK['min_rep'] . $next_rank_where . " 
-            AND `weekly_rep` + `pvp_rep` >= " . $RANK['weekly_cap'];
+            AND `weekly_pve_rep` + `weekly_pvp_rep` >= " . $RANK['weekly_pve_cap'];
     }
 
     foreach($queries as $query) {

@@ -358,8 +358,11 @@ class Operation {
         $this->user->addMoney(self::OPERATION_YEN_GAIN[$this->type], "Operation");
         $message .= "\nGained " . self::OPERATION_YEN_GAIN[$this->type] . "yen!";*/
         // Add reputation
-        if ($this->user->reputation->canGain()) {
-            $rep_gain = $this->user->reputation->addRep(UserReputation::OPERATION_GAINS[$this->type]);
+        if ($this->user->reputation->canGain(UserReputation::ACTIVITY_TYPE_WAR)) {
+            $rep_gain = $this->user->reputation->addRep(
+                amount: UserReputation::OPERATION_GAINS[$this->type],
+                activity_type: UserReputation::ACTIVITY_TYPE_WAR
+            );
             if ($rep_gain > 0) {
                 $message .= "\nGained " . $rep_gain . " village reputation!";
             }
