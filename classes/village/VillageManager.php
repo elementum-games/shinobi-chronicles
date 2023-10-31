@@ -716,10 +716,10 @@ class VillageManager {
         $player->updateData();
         // update challenge
         if ($player->user_id == $challenge_result['challenger_id']) {
-            $system->db->query("UPDATE `challenge_requests` SET `challenger_locked` = 1");
+            $system->db->query("UPDATE `challenge_requests` SET `challenger_locked` = 1 WHERE `request_id`={$challenge_id}");
             return "Locked in! Your battle will begin shortly.";
         } else {
-            $system->db->query("UPDATE `challenge_requests` SET `seat_holder_locked` = 1");
+            $system->db->query("UPDATE `challenge_requests` SET `seat_holder_locked` = 1 WHERE `request_id`={$challenge_id}");
             return "Locked in! Your battle will begin shortly.";
         }
     }
