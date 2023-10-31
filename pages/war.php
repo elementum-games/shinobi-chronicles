@@ -47,7 +47,7 @@ function displayBattle(): bool
     return true;
 }
 
-function processWarBattleEnd($battle, $player): string {
+function processWarBattleEnd($battle, User $player): string {
     global $system;
 
     // Base chance at 100, goes down if fight is too short/lower level AI
@@ -91,8 +91,11 @@ function processWarBattleEnd($battle, $player): string {
 
         // Village Rep Gains - PLACEHOLDER FOR WAR GAINS
         $rep_gain_string = "";
-        if ($player->reputation->canGain(true)) {
-            $rep_gain = $player->reputation->addRep($player->reputation->calcArenaReputation($player->level, $opponent->level));
+        if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_WAR)) {
+            $rep_gain = $player->reputation->addRep(
+                $player->reputation->calcArenaReputation($player->level, $opponent->level),
+                UserReputation::ACTIVITY_TYPE_WAR
+            );
             if ($rep_gain > 0) {
                 $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
                 $rep_gain_string = "Defeating enemy war combatants has earned you $rep_gain Reputation.<br />";
