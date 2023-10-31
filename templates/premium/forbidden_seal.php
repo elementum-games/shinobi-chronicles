@@ -122,7 +122,7 @@
         </td>
         <td>
             <?= $eightDeitiesSeal->journal_size ?> characters<br />
-            <?= $eightDeitiesSeal->journal_image_display ?> images
+            <?= $eightDeitiesSeal->journal_image_display ?> images<br />
         </td>
     </tr>
     <tr>

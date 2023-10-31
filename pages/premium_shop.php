@@ -460,19 +460,25 @@ function premiumShop(): void {
                 if (!isset($_POST['change_forbidden_seal'])) {
                     // Convert remaining premium time to days and calculate AK value
                     $akCredit = $player->forbidden_seal->calcRemainingCredit();
+                    $new_seal = new ForbiddenSeal($system, $seal_level);
 
                     // TEMPORARY SALE LOGIC
                     $remainingCredit = max(0, $akCredit - $ak_cost);
 
                     // Adjust purchase cost with minimum 0
+                    $original_ak_cost = $ak_cost;
                     $ak_cost -= $akCredit;
                     if ($ak_cost < 0) {
                         $ak_cost = 0;
                     }
 
-                    $confirmation_string = "Are you sure you would like to change from your {$player->forbidden_seal->name}?<br />
-                    You will lose {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of premium time.<br />
-                    Up to {$akCredit} Ancient Kunai will be credited toward your purchase from existing premium time.<br />
+                    $credit_used = min($akCredit, $original_ak_cost);
+
+                    $confirmation_string = "Are you sure you would like to upgrade to {$new_seal->name}?<br />
+                    You will lose your remaining {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of {$player->forbidden_seal->name}.<br />
+                    <br />
+                    Cost for $seal_length days of {$new_seal->name}: {$original_ak_cost} AK<br />
+                    Credit from existing seal time: {$credit_used} AK<br />
                     <b>This can not be undone!</b>";
 
                     // TEMPORARY SALE LOGIC
@@ -480,7 +486,7 @@ function premiumShop(): void {
                         if($remainingCredit > 1) {
                             $confirmation_string .= "<br /><br />
                             <b>" . ForbiddenSeal::$forbidden_seal_names[3] . " Sale!</b><br />
-                            You will also receive an estimated refund of " . floor($remainingCredit * (PremiumShopManager::SALE_REFUND_RATE/100)) . " AK.";
+                            You will also receive a refund of " . floor($remainingCredit * (PremiumShopManager::SALE_REFUND_RATE/100)) . " AK.";
                         }
                     }
 
