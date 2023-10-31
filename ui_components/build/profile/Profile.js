@@ -177,7 +177,7 @@ function PlayerStats({
     className: "badge"
   }, "\u8840\u7D99"), /*#__PURE__*/React.createElement("span", {
     className: "ft-c3"
-  }, "Increases the control over one's bloodline.", /*#__PURE__*/React.createElement("br", null), "Helps with its mastery."))), /*#__PURE__*/React.createElement("div", {
+  }, "Increases control and mastery over one's bloodline."))), /*#__PURE__*/React.createElement("div", {
     className: "stat_list attributes"
   }, /*#__PURE__*/React.createElement("div", {
     className: "stat box-secondary"

@@ -225,8 +225,7 @@ function PlayerStats({ playerData, playerStats }) {
                     <div className="stat box-secondary">
                         <h3>Bloodline skill: {playerStats.bloodlineSkill.toLocaleString()}</h3>
                         <div className="badge">血継</div>
-                        <span className="ft-c3">Increases the control over one's bloodline.<br />
-                        Helps with its mastery.</span>
+                        <span className="ft-c3">Increases control and mastery over one's bloodline.</span>
                     </div>
                 </div>
                 <div className="stat_list attributes">

@@ -870,13 +870,17 @@ function premiumShop(): void {
     }
 
     //Load premium seals
-    $baseDisplay = ForbiddenSeal::$benefits[0];
+    $baseDisplay = new ForbiddenSeal($system, 0);
+    $baseDisplay->setBenefits();
+
     $twinSeal = new ForbiddenSeal($system, 1);
     $twinSeal->setBenefits();
+
     $fourDragonSeal = new ForbiddenSeal($system, 2);
     $fourDragonSeal->setBenefits();
-    $eightTrigramSeal = new ForbiddenSeal($system, 3);
-    $eightTrigramSeal->setBenefits();
+
+    $eightDeitiesSeal = new ForbiddenSeal($system, 3);
+    $eightDeitiesSeal->setBenefits();
 
     require "templates/premium/premium.php";
 }

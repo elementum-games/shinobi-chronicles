@@ -53,7 +53,7 @@ class ForbiddenSeal {
         0 => [
             'regen_boost' => 0,
             'name_colors' => [],
-            'name_color_display' => '',
+            'name_color_display' => 'Standard',
             'avatar_size' => 125,
             'avatar_size_display' => '125x125',
             'avatar_filesize' => self::ONE_MEGABYTE,
