@@ -229,9 +229,14 @@
             <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
                 <p style='width:100%;text-align:center;margin: 2.2em 0 0;'>
                     <input type='hidden' name='seal_level' value='3'/>
-                    <select name='seal_length'>
+                    <select name='seal_length' style='width:125px;'>
                         <?php foreach($premiumShopManager->costs['forbidden_seal'][3] as $pLength => $pCost): ?>
-                            <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> AK)</option>
+                            <option value="<?=$pLength?>">
+                                <?=$pLength?> days (<?=$pCost?> AK)
+                                <?php if($pLength === 90): ?>
+                                    [15% off!]
+                                <?php endif; ?>
+                            </option>
                         <?php endforeach ?>
                     </select><br/>
                     <input type='submit' style='margin-top: 5px' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 3 ? 'Extend' : 'Purchase') ?>' />
