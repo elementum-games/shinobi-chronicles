@@ -226,6 +226,7 @@
                     <?= $premiumShopManager->costs['forbidden_seal_monthly_cost'][3] ?> Ancient Kunai / 30 days</p>
                 <br/>
                 All benefits of <?=$fourDragonSeal->name?><br />
+                +<?=$eightTrigramSeal->regen_boost?>% regen rate<br/>
                 Longer journal (<?=$eightTrigramSeal->journal_size?> characters)<br />
                 Journal image size of <?=$eightTrigramSeal->journal_image_display?><br />
                 Enhanced long trainings (<?=$eightTrigramSeal->long_training_time?>x length, <?=$eightTrigramSeal->long_training_gains?>x gains)<br />
