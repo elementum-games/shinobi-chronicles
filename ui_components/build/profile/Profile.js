@@ -246,7 +246,7 @@ function PlayerUserRep({
     className: "reputation_name"
   }, /*#__PURE__*/React.createElement("b", null, playerData.villageRepTier), "\xA0(", playerData.villageRep, " rep)"), /*#__PURE__*/React.createElement("span", {
     className: "weekly_reputation"
-  }, playerData.weeklyRep, "/", playerData.maxWeeklyRep, " PvE \xA0|\xA0\xA0", playerData.weeklyPvpRep, "/", playerData.maxWeeklyPvpRep, " PvP")));
+  }, playerData.weeklyPveRep, "/", playerData.maxWeeklyPveRep, " PvE \xA0|\xA0", playerData.weeklyWarRep, "/", playerData.maxWeeklyWarRep, " War \xA0|\xA0", playerData.weeklyPvpRep, "/", playerData.maxWeeklyPvpRep, " PvP")));
 }
 
 function DailyTasks({
