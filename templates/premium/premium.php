@@ -235,14 +235,14 @@
 
                 <!--TEMPORARY SALE LOGIC-->
                 <?php if($premiumShopManager->tierThreeSaleActive()): ?>
-                    <br /><br />
-                    <b><?=$eightTrigramSeal->name?> SALE!</b>
-                    <p style='margin: 0;' id="sale_time_remaining"><?= System::timeRemaining($premiumShopManager->saleTimeRemaining(), 'short') ?> Remaining</p>
-                    <script type="text/javascript">
-                        countdownTimer(<?=$premiumShopManager->saleTimeRemaining()?>, 'sale_time_remaining');
-                    </script>
-                    <br />
                     <?php if($player->forbidden_seal->level == 1 || $player->forbidden_seal->level == 2): ?>
+                        <br /><br />
+                        <b><?=$eightTrigramSeal->name?> SALE!</b>
+                        <p style='margin: 0;' id="sale_time_remaining"><?= System::timeRemaining($premiumShopManager->saleTimeRemaining(), 'short') ?> Remaining</p>
+                        <script type="text/javascript">
+                            countdownTimer(<?=$premiumShopManager->saleTimeRemaining()?>, 'sale_time_remaining');
+                        </script>
+                        <br />
                         Any estimated seal credit above purchase price will be refunded at <?=PremiumShopManager::SALE_REFUND_RATE?>%
                     <?php endif ?>
                 <?php endif ?>
