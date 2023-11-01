@@ -375,7 +375,7 @@ class Operation {
                     // update caravans, change only caravans that haven't spawned
                     $name = VillageManager::VILLAGE_NAMES[$this->user->village->village_id] . " Caravan";
                     $time = time();
-                    $this->system->db->query("UPDATE `caravans` SET `village_id` = {$this->user->village->village_id}, `name` = {$name} WHERE `region_id` = {$location_target['region_id']} AND `start_time` > {$time}");
+                    $this->system->db->query("UPDATE `caravans` SET `village_id` = {$this->user->village->village_id}, `name` = '{$name}' WHERE `region_id` = {$location_target['region_id']} AND `start_time` > {$time}");
                     // for each occupied village in newly controlled region, if not at war then clear occupation
                     $occupied_villages = $this->system->db->query("SELECT * FROM `region_locations` WHERE `region_id` = {$location_target['region_id']} AND `occupying_village_id` IS NOT NULL");
                     $occupied_villages = $this->system->db->fetch_all($occupied_villages);
