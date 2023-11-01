@@ -122,35 +122,7 @@ function hourlyRegion(System $system, $debug = true): void
             unset($region_location);
         }
 
-        /* step 2: update health */
-        $castle = null;
-        $village_regen_share = 0;
-        foreach ($region_location_result as &$region_location) {
-            switch ($region_location['type']) {
-                case 'castle':
-                    // increase health, cap at max
-                    $region_location['health'] = min($region_location['health'] + WarManager::BASE_CASTLE_REGEN, WarManager::BASE_CASTLE_HEALTH);
-                    // get castle reference
-                    $castle = &$region_location;
-                    break;
-                case 'village';
-                    // give a bonus to castle regen based on village HP
-                    $village_regen_share += (WarManager::VILLAGE_REGEN_SHARE_PERCENT / 100) * WarManager::BASE_VILLAGE_REGEN * ($region_location['health'] / WarManager::BASE_VILLAGE_HEALTH);
-                    // increase health, cap at max
-                    $region_location['health'] = min($region_location['health'] + WarManager::BASE_VILLAGE_REGEN, WarManager::BASE_VILLAGE_HEALTH);
-                    break;
-                default;
-                    break;
-            }
-            unset($region_location);
-        }
-        // if castle exists, add bonus regen from villages
-        if (!empty($castle)) {
-            $castle['health'] = min($castle['health'] + $village_regen_share, WarManager::BASE_CASTLE_HEALTH);
-            unset($castle);
-        }
-
-        /* step 3: update defense */
+        /* step 2: update defense */
         foreach ($region_location_result as &$region_location) {
             switch ($region_location['type']) {
                 case 'castle':
@@ -174,7 +146,7 @@ function hourlyRegion(System $system, $debug = true): void
             unset($region_location);
         }
 
-        /* step 4: update region_locations */
+        /* step 3: update region_locations */
         foreach ($region_location_result as $region_location) {
             $queries[] = "UPDATE `region_locations`
                 SET `resource_count` = {$region_location['resource_count']},

@@ -900,9 +900,12 @@ class TravelManager {
         $objectives = [];
 
         // Get Region Objectives
-        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `type`, `x`, `y`, `resource_id`, `resource_count`, `defense`, `village`, `villages`.`name` as `village_name`, `villages`.`village_id` FROM `region_locations`
+        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `type`, `x`, `y`, `resource_id`, `resource_count`, `defense`,
+            COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) AS `village`,
+            `villages`.`name` as `village_name`, `villages`.`village_id`
+            FROM `region_locations`
             INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
-            INNER JOIN `villages` ON `regions`.`village` = `villages`.`village_id`");
+            INNER JOIN `villages` ON COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) = `villages`.`village_id`");
         $region_objectives = $this->system->db->fetch_all($region_result);
         foreach ($region_objectives as $obj) {
             $distance = $this->user->location->distanceDifference(

@@ -36,7 +36,7 @@ class VillageManager {
     const PROPOSAL_ENACT_HOURS = 24; // 24
     const PROPOSAL_COOLDOWN_HOURS = 1; // 1
     const KAGE_PROVISIONAL_DAYS = 7; // 7
-    const POLICY_CHANGE_COOLDOWN_DAYS = 14; // 14
+    const POLICY_CHANGE_COOLDOWN_DAYS = 3; // 3
 
     const VOTE_NO = 0;
     const VOTE_YES = 1;
@@ -1348,6 +1348,15 @@ class VillageManager {
                 $message = "Accepted peace offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
+                // if village occupied by enemy, return to owner's control
+                $system->db->query("UPDATE `region_locations`
+                    INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+                    SET `region_locations`.`occupying_village_id` = NULL
+                    WHERE `regions`.`village` = {$proposal['target_village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['village_id']}");
+                $system->db->query("UPDATE `region_locations`
+                    INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+                    SET `region_locations`.`occupying_village_id` = NULL
+                    WHERE `regions`.`village` = {$proposal['village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['target_village_id']}");
                 break;
             case self::PROPOSAL_TYPE_ACCEPT_ALLIANCE:
                 // check neutral
