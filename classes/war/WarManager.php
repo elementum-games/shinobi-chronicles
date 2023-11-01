@@ -14,7 +14,7 @@ class WarManager {
     const BASE_CASTLE_HEALTH = 15000;
     const BASE_VILLAGE_DEFENSE = 50;
     const BASE_CASTLE_DEFENSE = 75;
-    const REGION_INTERVAL_MINUTES = 5;
+    const REGEN_INTERVAL_MINUTES = 5;
 
     const RESOURCE_MATERIALS = 1;
     const RESOURCE_FOOD = 2;
