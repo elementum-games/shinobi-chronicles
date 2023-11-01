@@ -225,8 +225,7 @@ function PlayerStats({ playerData, playerStats }) {
                     <div className="stat box-secondary">
                         <h3>Bloodline skill: {playerStats.bloodlineSkill.toLocaleString()}</h3>
                         <div className="badge">血継</div>
-                        <span className="ft-c3">Increases the control over one's bloodline.<br />
-                        Helps with its mastery.</span>
+                        <span className="ft-c3">Increases control and mastery over one's bloodline.</span>
                     </div>
                 </div>
                 <div className="stat_list attributes">
@@ -295,8 +294,10 @@ function PlayerUserRep({playerData}: PlayerUserRepProps) {
                     <b>{playerData.villageRepTier}</b>&nbsp;({playerData.villageRep} rep)
                 </span>
                 <span className="weekly_reputation">
-                    {playerData.weeklyRep}/{playerData.maxWeeklyRep} PvE
-                    &nbsp;|&nbsp;&nbsp;
+                    {playerData.weeklyPveRep}/{playerData.maxWeeklyPveRep} PvE
+                    &nbsp;|&nbsp;
+                    {playerData.weeklyWarRep}/{playerData.maxWeeklyWarRep} War
+                    &nbsp;|&nbsp;
                     {playerData.weeklyPvpRep}/{playerData.maxWeeklyPvpRep} PvP
                 </span>
             </div>

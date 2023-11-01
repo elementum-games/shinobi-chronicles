@@ -85,7 +85,7 @@ function arena(): bool {
         echo "<table class='table'><tr><th>Choose Opponent</th></tr>
         <tr><td style='text-align: center;'>
         Welcome to the Arena. Here you can fight against various opponents for cash prizes. Please select your opponent below:";
-	if(!$player->reputation->canGain(true)) {
+	if(!$player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
 	$remaining = $player->mission_rep_cd - time();
 	echo "<br /><br />You can gain village reputation in: <div id='rep_cd' style='display: inline-block'>"
 	    . System::timeRemaining($remaining) . "</div>
@@ -206,8 +206,11 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
 
         // Village Rep Gains
         $rep_gain_string = "";
-        if($player->reputation->canGain(true)) {
-            $rep_gain = $player->reputation->addRep($player->reputation->calcArenaReputation($player->level, $opponent->level));
+        if($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
+            $rep_gain = $player->reputation->addRep(
+                amount: $player->reputation->calcArenaReputation($player->level, $opponent->level),
+                activity_type: UserReputation::ACTIVITY_TYPE_PVE
+            );
             if($rep_gain > 0) {
                 $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
                 $rep_gain_string = "Fellow " . $player->village->name . " Shinobi learned from your battle, earning you $rep_gain Reputation.<br />";

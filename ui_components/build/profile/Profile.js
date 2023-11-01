@@ -177,7 +177,7 @@ function PlayerStats({
     className: "badge"
   }, "\u8840\u7D99"), /*#__PURE__*/React.createElement("span", {
     className: "ft-c3"
-  }, "Increases the control over one's bloodline.", /*#__PURE__*/React.createElement("br", null), "Helps with its mastery."))), /*#__PURE__*/React.createElement("div", {
+  }, "Increases control and mastery over one's bloodline."))), /*#__PURE__*/React.createElement("div", {
     className: "stat_list attributes"
   }, /*#__PURE__*/React.createElement("div", {
     className: "stat box-secondary"
@@ -246,7 +246,7 @@ function PlayerUserRep({
     className: "reputation_name"
   }, /*#__PURE__*/React.createElement("b", null, playerData.villageRepTier), "\xA0(", playerData.villageRep, " rep)"), /*#__PURE__*/React.createElement("span", {
     className: "weekly_reputation"
-  }, playerData.weeklyRep, "/", playerData.maxWeeklyRep, " PvE \xA0|\xA0\xA0", playerData.weeklyPvpRep, "/", playerData.maxWeeklyPvpRep, " PvP")));
+  }, playerData.weeklyPveRep, "/", playerData.maxWeeklyPveRep, " PvE \xA0|\xA0", playerData.weeklyWarRep, "/", playerData.maxWeeklyWarRep, " War \xA0|\xA0", playerData.weeklyPvpRep, "/", playerData.maxWeeklyPvpRep, " PvP")));
 }
 
 function DailyTasks({

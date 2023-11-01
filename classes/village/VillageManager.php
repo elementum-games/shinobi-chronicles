@@ -716,10 +716,10 @@ class VillageManager {
         $player->updateData();
         // update challenge
         if ($player->user_id == $challenge_result['challenger_id']) {
-            $system->db->query("UPDATE `challenge_requests` SET `challenger_locked` = 1");
+            $system->db->query("UPDATE `challenge_requests` SET `challenger_locked` = 1 WHERE `request_id`={$challenge_id}");
             return "Locked in! Your battle will begin shortly.";
         } else {
-            $system->db->query("UPDATE `challenge_requests` SET `seat_holder_locked` = 1");
+            $system->db->query("UPDATE `challenge_requests` SET `seat_holder_locked` = 1 WHERE `request_id`={$challenge_id}");
             return "Locked in! Your battle will begin shortly.";
         }
     }
@@ -1387,16 +1387,17 @@ class VillageManager {
                 $rep_adjustment += $vote['rep_adjustment'];
                 $user = User::loadFromId($system, $vote['user_id']);
                 $user->loadData();
-                $user->reputation->subtractRep($vote['rep_adjustment'], false);
+                $user->reputation->subtractRep($vote['rep_adjustment'], UserReputation::ACTIVITY_TYPE_UNCAPPED);
                 $user->updateData();
             }
         }
+
         if ($rep_adjustment > 0) {
-            $player->reputation->addRep($rep_adjustment, bypass_weekly_cap: true);
+            $player->reputation->addRep($rep_adjustment, UserReputation::ACTIVITY_TYPE_UNCAPPED);
             $message .= "\n You have gained {$rep_adjustment} Reputation!";
             $player->updateData();
         } else if ($rep_adjustment < 0) {
-            $player->reputation->subtractRep($rep_adjustment, false);
+            $player->reputation->subtractRep($rep_adjustment, UserReputation::ACTIVITY_TYPE_UNCAPPED);
             $message .= "\n You have lost {$rep_adjustment} Reputation!";
             $player->updateData();
         }

@@ -8,7 +8,8 @@ class UserReputation {
             'title' => 'Villager',
             'outlaw_title' => 'Vagabond',
             'min_rep' => 0,
-            'weekly_cap' => 1000,
+            'weekly_pve_cap' => 750,
+            'weekly_war_cap' => 1000,
             'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 0,
             'base_decay' => 0,
@@ -17,7 +18,8 @@ class UserReputation {
             'title' => 'Aspiring Shinobi',
             'outlaw_title' => 'Thief',
             'min_rep' => 2500,
-            'weekly_cap' => 1000,
+            'weekly_pve_cap' => 750,
+            'weekly_war_cap' => 1000,
             'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 1,
             'base_decay' => 0,
@@ -26,7 +28,8 @@ class UserReputation {
             'title' => 'Shinobi',
             'outlaw_title' => 'Bandit',
             'min_rep' => 5000,
-            'weekly_cap' => 1000,
+            'weekly_pve_cap' => 750,
+            'weekly_war_cap' => 1000,
             'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 2,
             'base_decay' => 0,
@@ -35,7 +38,8 @@ class UserReputation {
             'title' => 'Experienced Shinobi',
             'outlaw_title' => 'Raider',
             'min_rep' => 7500,
-            'weekly_cap' => 1000,
+            'weekly_pve_cap' => 750,
+            'weekly_war_cap' => 1000,
             'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 2,
             'base_decay' => 250,
@@ -44,7 +48,8 @@ class UserReputation {
             'title' => 'Veteran Shinobi',
             'outlaw_title' => 'Marauder',
             'min_rep' => 10000,
-            'weekly_cap' => 1000,
+            'weekly_pve_cap' => 750,
+            'weekly_war_cap' => 1000,
             'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 3,
             'base_decay' => 500,
@@ -53,7 +58,8 @@ class UserReputation {
             'title' => 'Expert Shinobi',
             'outlaw_title' => 'Rogue',
             'min_rep' => 15000,
-            'weekly_cap' => 1000,
+            'weekly_pve_cap' => 750,
+            'weekly_war_cap' => 1000,
             'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 3,
             'base_decay' => 750,
@@ -62,7 +68,8 @@ class UserReputation {
             'title' => 'Elite Shinobi',
             'outlaw_title' => 'Notorious Rogue',
             'min_rep' => 22500,
-            'weekly_cap' => 1000,
+            'weekly_pve_cap' => 750,
+            'weekly_war_cap' => 1000,
             'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 4,
             'base_decay' => 1000,
@@ -71,7 +78,8 @@ class UserReputation {
             'title' => 'Master Shinobi',
             'outlaw_title' => 'Infamous Rogue',
             'min_rep' => 35000,
-            'weekly_cap' => 1000,
+            'weekly_pve_cap' => 750,
+            'weekly_war_cap' => 1000,
             'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 4,
             'base_decay' => 1000,
@@ -80,43 +88,23 @@ class UserReputation {
             'title' => 'Legendary Shinobi',
             'outlaw_title' => 'Legendary Rogue',
             'min_rep' => 50000,
-            'weekly_cap' => 1000,
+            'weekly_pve_cap' => 750,
+            'weekly_war_cap' => 1000,
             'weekly_pvp_cap' => 1500,
             'base_pvp_rep_reward' => 5,
             'base_decay' => 1500,
         ]
     ];
 
-    // Shop benefits
-    const ITEM_SHOP_DISCOUNT_RATE = 10;
-    const BENEFIT_CONSUMABLE_DISCOUNT = 'consumable_discount';
-    const BENEFIT_GEAR_DISCOUNT = 'gear_discount';
-    const BENEFIT_JUTSU_SCROLL_DISCOUNT = 'scroll_discount';
-
-    // Training benefits
-    const EFFICIENT_LONG_INCREASE = 5;
-    const EFFICIENT_EXTENDED_INCREASE = 6.25;
-    const JUTSU_TRAINING_BONUS = 25;
-    const BENEFIT_EFFICIENT_LONG = 'efficient_long';
-    const BENEFIT_EFFICIENT_EXTENDED = 'efficient_extended';
-    const BENEFIT_PARTIAL_TRAINING_GAINS = 'partial_trains';
-    const BENEFIT_JUTSU_TRAINING_BONUS = 'jutsu_bonus';
-
-    // Other benefits
-    const FREE_TRANSFER_BONUS = 50;
-    const BENEFIT_FREE_TRANSFER_BONUS = 'free_transfer_bonus';
-
-    // Benefits array, add all benefits as inactive and turn them on in loadBenefits() as appropriate
-    public static array $Benefits = [
-        self::BENEFIT_CONSUMABLE_DISCOUNT => false,
-        self::BENEFIT_GEAR_DISCOUNT => false,
-        self::BENEFIT_JUTSU_SCROLL_DISCOUNT => false,
-        self::BENEFIT_EFFICIENT_LONG => false,
-        self::BENEFIT_EFFICIENT_EXTENDED => false,
-        self::BENEFIT_PARTIAL_TRAINING_GAINS => false,
-        self::BENEFIT_JUTSU_TRAINING_BONUS => false,
-        self::BENEFIT_FREE_TRANSFER_BONUS => false,
-    ];
+    // Arena, special missions, etc
+    const ACTIVITY_TYPE_PVE = 'pve';
+    const ACTIVITY_TYPE_DAILY_TASK = 'daily_task';
+    // War operations
+    const ACTIVITY_TYPE_WAR = 'war';
+    // PvP
+    const ACTIVITY_TYPE_PVP = 'pvp';
+    // Uncapped
+    const ACTIVITY_TYPE_UNCAPPED = 'uncapped';
 
     // Limits
     const ARENA_MISSION_CD = 0;
@@ -167,8 +155,6 @@ class UserReputation {
     const DAILY_TASK_PVP_WIN_MOD = 5; // Increase rep by this amount for tasks requiring pvp wins (harder than completes)f
     const DAILY_TASK_BYPASS_CAP = false;
 
-    const WEEKLY_CAP_MET_DECAY_MULTIPLIER = 1; // Reduce reputation decay by 30% if weekly cap is met
-
     const MAX_PVP_LEVEL_DIFFERENCE = 20;
     const MAX_PVP_REP_TIER_DIFFERENCE = 4;
 
@@ -190,16 +176,49 @@ class UserReputation {
     const SPAR_REP_DRAW = 5;
     const SPAR_REP_WIN = 7;
 
+    // Shop benefits
+    const ITEM_SHOP_DISCOUNT_RATE = 10;
+    const BENEFIT_CONSUMABLE_DISCOUNT = 'consumable_discount';
+    const BENEFIT_GEAR_DISCOUNT = 'gear_discount';
+    const BENEFIT_JUTSU_SCROLL_DISCOUNT = 'scroll_discount';
+
+    // Training benefits
+    const EFFICIENT_LONG_INCREASE = 5;
+    const EFFICIENT_EXTENDED_INCREASE = 6.25;
+    const JUTSU_TRAINING_BONUS = 25;
+    const BENEFIT_EFFICIENT_LONG = 'efficient_long';
+    const BENEFIT_EFFICIENT_EXTENDED = 'efficient_extended';
+    const BENEFIT_PARTIAL_TRAINING_GAINS = 'partial_trains';
+    const BENEFIT_JUTSU_TRAINING_BONUS = 'jutsu_bonus';
+
+    // Other benefits
+    const FREE_TRANSFER_BONUS = 50;
+    const BENEFIT_FREE_TRANSFER_BONUS = 'free_transfer_bonus';
+
+    // Benefits array, add all benefits as inactive and turn them on in loadBenefits() as appropriate
+    public static array $Benefits = [
+        self::BENEFIT_CONSUMABLE_DISCOUNT => false,
+        self::BENEFIT_GEAR_DISCOUNT => false,
+        self::BENEFIT_JUTSU_SCROLL_DISCOUNT => false,
+        self::BENEFIT_EFFICIENT_LONG => false,
+        self::BENEFIT_EFFICIENT_EXTENDED => false,
+        self::BENEFIT_PARTIAL_TRAINING_GAINS => false,
+        self::BENEFIT_JUTSU_TRAINING_BONUS => false,
+        self::BENEFIT_FREE_TRANSFER_BONUS => false,
+    ];
+
     protected ?Event $event;
 
     protected int $rep;
-    protected int $weekly_rep;
+    protected int $weekly_pve_rep;
+    protected int $weekly_war_rep;
     protected int $weekly_pvp_rep;
     public int $mission_cd;
 
     public int $rank;
     public string $rank_name;
-    public int $weekly_cap;
+    public int $weekly_pve_cap;
+    public int $weekly_war_cap;
     public int $weekly_pvp_cap;
 
     protected int $bonus_pve_rep; // Use only for forbidden_seal bonuses!
@@ -214,21 +233,32 @@ class UserReputation {
     public array $benefits;
     public bool $debug;
 
-    public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$last_pvp_kills, &$last_killer_ids, $mission_cd, $event) {
+    public function __construct(
+        &$player_rep,
+        &$player_weekly_pve_rep,
+        &$player_weekly_war_rep,
+        &$player_weekly_pvp_rep,
+        &$last_pvp_kills,
+        &$last_killer_ids,
+        $mission_cd,
+        $event
+    ) {
         //System data
         $this->event = $event;
         $this->debug = false;
 
         //Player data
         $this->rep = &$player_rep;
-        $this->weekly_rep = &$player_weekly_rep;
+        $this->weekly_pve_rep = &$player_weekly_pve_rep;
+        $this->weekly_war_rep = &$player_weekly_war_rep;
+        $this->weekly_pvp_rep = &$player_weekly_pvp_rep;
+
         $this->mission_cd = $mission_cd;
         $this->rank = self::tierByRepAmount($this->rep);
         $this->bonus_pve_rep = 0;
         $this->bonus_pve_loaded = false;
 
         //PvP data
-        $this->weekly_pvp_rep = &$player_pvp_rep;
         $this->recent_players_killed_ids = &$last_pvp_kills;
         $this->recent_killer_ids = &$last_killer_ids;
 
@@ -241,34 +271,34 @@ class UserReputation {
         $REP_RANK = self::$VillageRep[$this->rank];
 
         $this->rank_name = self::nameByRepRank($this->rank); // Use method here for future proofing
-        $this->weekly_cap = $REP_RANK['weekly_cap'];
+        $this->weekly_pve_cap = $REP_RANK['weekly_pve_cap'];
+        $this->weekly_war_cap = $REP_RANK['weekly_war_cap'];
         $this->weekly_pvp_cap = $REP_RANK['weekly_pvp_cap'];
         $this->base_pvp_reward = $REP_RANK['base_pvp_rep_reward'];
 
         // EVENT MODIFICATIONS
         if(!empty($this->event) && $this->event instanceof DoubleReputationEvent) {
-            $this->weekly_cap *= DoubleReputationEvent::pve_cap_multiplier;
+            $this->weekly_pve_cap *= DoubleReputationEvent::pve_cap_multiplier;
+            $this->weekly_war_cap *= DoubleReputationEvent::pve_cap_multiplier;
             $this->weekly_pvp_cap *= DoubleReputationEvent::pvp_cap_multiplier;
         }
     }
 
     /**
-     * @param int  $amount
-     * @param bool $bypass_weekly_cap
-     * @param bool $increment_pvp
+     * @param int    $amount
+     * @param string $activity_type
      * @return int
      *
      * Increments user village reputation
-     * $bypass_weekly_cap enabled will always reward the full amount of rep and add to weekly amount
-     * $increment_pvp enabled will add towards pvp reputation threshold
      *
      * Returns amount of reputation awarded for display/data confirmation purposes
      */
-    public function addRep(int $amount, bool $bypass_weekly_cap = false, bool $increment_pvp = false): int {
+    public function addRep(int $amount, string $activity_type): int {
         if($this->debug) {
             echo "Amount: $amount<br />";
         }
-        // Double repuation
+
+        // Double reputation
         if (!empty($this->event) && $this->event instanceof DoubleReputationEvent) {
             $amount = floor($amount * DoubleReputationEvent::rep_gain_multiplier);
             if($this->debug) {
@@ -276,70 +306,90 @@ class UserReputation {
             }
         }
 
-        //Adjust reputation gain if gain goes above cap
-        if(!$bypass_weekly_cap) {
-            // Bonus seal reputation
-            $amount += $this->bonus_pve_rep;
-            if($this->debug) {
-                echo "Amount after bonus PVE: $amount<br />";
-            }
+        switch($activity_type) {
+            case UserReputation::ACTIVITY_TYPE_PVE:
+            case UserReputation::ACTIVITY_TYPE_DAILY_TASK:
+                // Bonus seal reputation
+                $amount += $this->bonus_pve_rep;
+                if($this->debug) {
+                    echo "Amount after bonus PVE: $amount<br />";
+                }
 
-            $new_rep = $this->rep + $amount;
+                $new_rep = $this->rep + $amount;
 
-            // Determine if rep rank changes and modify weekly cap if change occurs
-            $rep_rank_after = self::tierByRepAmount($new_rep);
-            $weekly_cap = ($this->rank != $rep_rank_after) ? self::$VillageRep[$rep_rank_after]['weekly_cap'] : $this->weekly_cap;
-            if(!empty($this->event) && $this->event instanceof DoubleReputationEvent && $this->rank != $rep_rank_after) {
-                $weekly_cap = floor($weekly_cap * DoubleReputationEvent::pve_cap_multiplier);
-				if($this->debug) {
-                	echo "Weekly cap after rank change: $weekly_cap<br />";
-            	}
-            }
+                // Determine if rep rank changes and modify weekly cap if change occurs
+                $rep_rank_after = self::tierByRepAmount($new_rep);
+                $weekly_pve_cap = ($this->rank != $rep_rank_after) ? self::$VillageRep[$rep_rank_after]['weekly_pve_cap'] : $this->weekly_pve_cap;
+                if(!empty($this->event) && $this->event instanceof DoubleReputationEvent && $this->rank != $rep_rank_after) {
+                    $weekly_pve_cap = floor($weekly_pve_cap * DoubleReputationEvent::pve_cap_multiplier);
+                    if($this->debug) {
+                        echo "Weekly cap after rank change: $weekly_pve_cap<br />";
+                    }
+                }
 
-            // Adjust gain to conform with weekly caps
-            if($this->weekly_rep + $amount > $weekly_cap) {
-                $amount = $weekly_cap - $this->weekly_rep;
-            }
+                // Adjust gain to conform with weekly caps
+                if($this->weekly_pve_rep + $amount > $weekly_pve_cap) {
+                    $amount = $weekly_pve_cap - $this->weekly_pve_rep;
+                }
 
-            $this->weekly_rep += $amount;
-            if($this->debug) {
-                echo "Amount after weekly: $amount<br />";
-            }
+                $this->weekly_pve_rep += $amount;
+                if($this->debug) {
+                    echo "Amount after weekly: $amount<br />";
+                }
+                break;
+            case UserReputation::ACTIVITY_TYPE_WAR:
+                if($this->weekly_war_rep + $amount > $this->weekly_war_cap) {
+                    $amount = $this->weekly_war_cap - $this->weekly_war_rep;
+                }
+                $this->weekly_war_rep += $amount;
+                if($this->debug) {
+                    echo "Amount after War: $amount<br />";
+                }
+                break;
+            case UserReputation::ACTIVITY_TYPE_PVP:
+                if($this->weekly_pvp_rep + $amount > $this->weekly_pvp_cap) {
+                    $amount = $this->weekly_pvp_cap - $this->weekly_pvp_rep;
+                }
+                $this->weekly_pvp_rep += $amount;
+                if($this->debug) {
+                    echo "Amount after PvP: $amount<br />";
+                }
+                break;
+            case UserReputation::ACTIVITY_TYPE_UNCAPPED:
+                if($this->debug) {
+                    echo "Uncapped amount: $amount<br />";
+                }
+                break;
+            default:
+                throw new RuntimeException("Invalid activity type!");
         }
 
-        // Increment Pvp rep
-        if($increment_pvp) {
-            if($this->weekly_pvp_rep + $amount > $this->weekly_pvp_cap) {
-                $amount = $this->weekly_pvp_cap - $this->weekly_pvp_rep;
-            }
-            $this->weekly_pvp_rep += $amount;
-            if($this->debug) {
-                echo "Amount after PvP: $amount<br />";
-            }
-        }
         //Increment rep amount
         if($amount > 0) {
             $this->rep += $amount;
         }
 
-        return $amount; // Use this return for display/gain confirmation
         if($this->debug) {
             echo "Final amount: $amount<br />";
         }
+        return $amount; // Use this return for display/gain confirmation
     }
 
     /**
-     * @param int $amount
+     * @param int    $amount
+     * @param string $activity_type
      *
      * Decreases user rep by amount provided
      * If $decrement_weekly is enabled, this will also decrease weekly rep allowing for restricted methods to allow gains again
      */
-    public function subtractRep(int $amount, bool $decrement_weekly = true): void {
+    public function subtractRep(int $amount, string $activity_type): void {
         $this->rep -= $amount;
-        if ($decrement_weekly) {
+
+        if ($activity_type == UserReputation::ACTIVITY_TYPE_PVP) {
             $this->weekly_pvp_rep -= $amount;
             $this->weekly_pvp_rep = max(0, $this->weekly_pvp_rep);
         }
+
         //TODO: TEMPORARY! Remove with negative reputation (outlaw update)
         if($this->rep < 0) {
             $this->rep = 0;
@@ -365,8 +415,11 @@ class UserReputation {
         return $this->rep;
     }
     // Returns numeric value of weekly reputaiton
-    public function getWeeklyRepAmount():int {
-        return $this->weekly_rep;
+    public function getWeeklyPveRep():int {
+        return $this->weekly_pve_rep;
+    }
+    public function getWeeklyWarRep():int {
+        return $this->weekly_war_rep;
     }
     // Returns numeric value of weekly pvp reputaiton
     public function getWeeklyPvpRep():int {
@@ -374,20 +427,24 @@ class UserReputation {
     }
 
     // Return of user can gain more rep for restricted methods
-    public function canGain($check_mission_cd = false, $check_pvp = false):bool {
-        // Check mission cd
-        if($check_mission_cd && $this->mission_cd > time()) {
-            return false;
+    public function canGain(string $activity_type): bool {
+        switch($activity_type) {
+            case UserReputation::ACTIVITY_TYPE_PVE:
+                if($this->mission_cd > time()) {
+                    return false;
+                }
+                return $this->weekly_pve_rep < $this->weekly_pve_cap;
+            case UserReputation::ACTIVITY_TYPE_DAILY_TASK:
+                return $this->weekly_pve_rep < $this->weekly_pve_cap;
+            case UserReputation::ACTIVITY_TYPE_PVP:
+                return $this->weekly_pvp_rep < $this->weekly_pvp_cap;
+            case UserReputation::ACTIVITY_TYPE_WAR:
+                return $this->weekly_war_rep < $this->weekly_war_cap;
+            case UserReputation::ACTIVITY_TYPE_UNCAPPED:
+                return true;
+            default:
+                throw new RuntimeException("Invalid activity type!");
         }
-        // Check pvp cap
-        if($check_pvp && $this->weekly_pvp_rep >= $this->weekly_pvp_cap) {
-            return false;
-        }
-        // Check weekly cap
-        if($this->weekly_rep > $this->weekly_cap && !$check_pvp) {
-            return false;
-        }
-        return true;
     }
 
     // Load reputation benefits
@@ -525,7 +582,7 @@ class UserReputation {
             $rep_gain = ceil($rep_gain / 2);
         }
 
-        $player->reputation->addRep($rep_gain, true, true);
+        $player->reputation->addRep($rep_gain, UserReputation::ACTIVITY_TYPE_PVP);
 
         return $rep_gain;
     }
@@ -593,7 +650,7 @@ class UserReputation {
             $rep_loss = 0;
         }
 
-        $player->reputation->subtractRep($rep_loss);
+        $player->reputation->subtractRep($rep_loss, UserReputation::ACTIVITY_TYPE_PVP);
         return $rep_loss;
     }
 

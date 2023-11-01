@@ -158,7 +158,7 @@
 
 /* Stats */
 .stats_container {
-    flex-basis: 65%;
+    flex-basis: 60%;
     flex-shrink: 1;
     display: flex;
     flex-direction: column;
@@ -249,7 +249,7 @@
 
 .profile_row_second {
     display: flex;
-    gap: 20px;
+    gap: 15px;
     flex-grow: 1;
 }
 .profile_row_second_col2 {
@@ -481,7 +481,7 @@
 }
 
 .weekly_reputation {
-    margin: 1px 0;
+    margin: 1px 0 2px;
     font-size: var(--font-small);
     color: var(--font-color-6)
 }

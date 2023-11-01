@@ -460,17 +460,35 @@ function premiumShop(): void {
                 if (!isset($_POST['change_forbidden_seal'])) {
                     // Convert remaining premium time to days and calculate AK value
                     $akCredit = $player->forbidden_seal->calcRemainingCredit();
+                    $new_seal = new ForbiddenSeal($system, $seal_level);
+
+                    // TEMPORARY SALE LOGIC
+                    $remainingCredit = max(0, $akCredit - $ak_cost);
 
                     // Adjust purchase cost with minimum 0
+                    $original_ak_cost = $ak_cost;
                     $ak_cost -= $akCredit;
                     if ($ak_cost < 0) {
                         $ak_cost = 0;
                     }
 
-                    $confirmation_string = "Are you sure you would like to change from your {$player->forbidden_seal->name}?<br />
-                    You will lose {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of premium time.<br />
-                    Up to {$akCredit} Ancient Kunai will be credited toward your purchase from existing premium time.<br />
+                    $credit_used = min($akCredit, $original_ak_cost);
+
+                    $confirmation_string = "Are you sure you would like to upgrade to {$new_seal->name}?<br />
+                    You will lose your remaining {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of {$player->forbidden_seal->name}.<br />
+                    <br />
+                    Cost for $seal_length days of {$new_seal->name}: {$original_ak_cost} AK<br />
+                    Credit from existing seal time: {$credit_used} AK<br />
                     <b>This can not be undone!</b>";
+
+                    // TEMPORARY SALE LOGIC
+                    if($premiumShopManager->tierThreeSaleActive() && ($player->forbidden_seal->level == 1 || $player->forbidden_seal->level == 2) && $seal_level == 3) {
+                        if($remainingCredit > 1) {
+                            $confirmation_string .= "<br /><br />
+                            <b>" . ForbiddenSeal::$forbidden_seal_names[3] . " Sale!</b><br />
+                            You will also receive a refund of " . floor($remainingCredit * (PremiumShopManager::SALE_REFUND_RATE/100)) . " AK.";
+                        }
+                    }
 
                     renderPurchaseConfirmation(
                         purchase_type: 'forbidden_seal',
@@ -485,14 +503,22 @@ function premiumShop(): void {
                         ak_cost: $ak_cost
                     );
                 } else {
-                    $message = "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level] . " seal for {$seal_length} days.";
-                    if ($overwrite) {
-                        $message .= " This purchase removed {$system->time_remaining($player->forbidden_seal->seal_time_remaining)}" .
-                            " of their {$player->forbidden_seal->name}.";
-                    }
+                    $message = "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level] . " seal for {$seal_length} days.
+                    This purchase removed {$system->time_remaining($player->forbidden_seal->seal_time_remaining)}
+                        of their {$player->forbidden_seal->name}.";
                     // Recalculate adjusted akCost
                     if ($player->forbidden_seal->level > 0) {
                         $akCredit = $player->forbidden_seal->calcRemainingCredit();
+
+                        //TEMPORARY SALE LOGIC
+                        if($premiumShopManager->tierThreeSaleActive() && $seal_level == 3) {
+                            $remainingCredit = $akCredit - $ak_cost;
+                            if($remainingCredit > 1) {
+                                $refund = floor($remainingCredit * (PremiumShopManager::SALE_REFUND_RATE/100));
+                                $player->addPremiumCredits($refund, "Tier 3 seal sale refund.");
+                            }
+                        }
+
                         $ak_cost -= $akCredit;
                         if ($ak_cost < 0) {
                             $ak_cost = 0;
@@ -850,11 +876,17 @@ function premiumShop(): void {
     }
 
     //Load premium seals
-    $baseDisplay = ForbiddenSeal::$benefits[0];
+    $baseDisplay = new ForbiddenSeal($system, 0);
+    $baseDisplay->setBenefits();
+
     $twinSeal = new ForbiddenSeal($system, 1);
     $twinSeal->setBenefits();
+
     $fourDragonSeal = new ForbiddenSeal($system, 2);
     $fourDragonSeal->setBenefits();
+
+    $eightDeitiesSeal = new ForbiddenSeal($system, 3);
+    $eightDeitiesSeal->setBenefits();
 
     require "templates/premium/premium.php";
 }

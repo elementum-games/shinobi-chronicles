@@ -151,7 +151,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
 
         if ($battle->is_retreat) {
             // Calculate rep gains
-            if ($player->reputation->canGain(check_mission_cd: false, check_pvp: true) && UserReputation::PVP_REP_ENABLED) {
+            if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVP) && UserReputation::PVP_REP_ENABLED) {
                 $rep_gained = $player->reputation->handlePvPWin($player, $battle->opponent, true);
                 if ($rep_gained > 0) {
                     $result .= "You have earned $rep_gained village reputation.[br]";
@@ -164,7 +164,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
             }
         } else {
             // Calculate rep gains
-            if ($player->reputation->canGain(check_mission_cd: false, check_pvp: true) && UserReputation::PVP_REP_ENABLED) {
+            if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVP) && UserReputation::PVP_REP_ENABLED) {
                 $rep_gained = $player->reputation->handlePvPWin($player, $battle->opponent);
                 if ($rep_gained > 0) {
                     $result .= "You have earned $rep_gained village reputation.[br]";
