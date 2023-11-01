@@ -9,9 +9,12 @@ require_once __DIR__ . '/BattleAttack.php';
 require_once __DIR__ . '/LegacyFighterAction.php';
 
 class BattleManager {
-    const SPEED_DAMAGE_REDUCTION_RATIO = 0.47;
-    const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 0.47;
-    const MAX_EVASION_DAMAGE_REDUCTION = 0.35;
+    //const SPEED_DAMAGE_REDUCTION_RATIO = 0.47;
+    //const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 0.47;
+    //const MAX_EVASION_DAMAGE_REDUCTION = 0.35;
+    const SPEED_DAMAGE_REDUCTION_RATIO = 1; // e.g. 10% of your stats in speed = 10% evasion
+    const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 1; // e.g. 10% of your stats in speed = 10% evasion
+    const MAX_EVASION_DAMAGE_REDUCTION = 0.50; // allows baseline investment of up to half your stats in speed against a speedless opponent
 
     private System $system;
 
@@ -999,15 +1002,18 @@ class BattleManager {
             }
         }
 
-        $player1_evasion_stat_amount = $this->getEvasionStatAmount($player1, $player1_jutsu);
-        $player2_evasion_stat_amount = $this->getEvasionStatAmount($player2, $player2_jutsu);
+        //$player1_evasion_stat_amount = $this->getEvasionStatAmount($player1, $player1_jutsu);
+        //$player2_evasion_stat_amount = $this->getEvasionStatAmount($player2, $player2_jutsu);
+        $player1_evasion_stat_amount = $this->getEvasionStatAmount($player1, $player1_jutsu, $player2->getBaseStatTotal());
+        $player2_evasion_stat_amount = $this->getEvasionStatAmount($player2, $player2_jutsu, $player1->getBaseStatTotal());
 
         if($player1_evasion_stat_amount >= $player2_evasion_stat_amount && $player2_jutsu_is_attack) {
-            $damage_reduction = ($player1_evasion_stat_amount / $player2_evasion_stat_amount) - 1.0;
+            //$damage_reduction = ($player1_evasion_stat_amount / $player2_evasion_stat_amount) - 1.0;
+            $damage_reduction = round($player1_evasion_stat_amount - $player2_evasion_stat_amount, 2);
 
-            $damage_reduction = $player1_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU
+            /*$damage_reduction = $player1_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU
                 ? round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2)
-                : round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                : round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);*/
 
             if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
                 $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
@@ -1025,11 +1031,12 @@ class BattleManager {
             }
         }
         else if($player2_evasion_stat_amount >= $player1_evasion_stat_amount && $player1_jutsu_is_attack) {
-            $damage_reduction = ($player2_evasion_stat_amount / $player1_evasion_stat_amount) - 1.0;
+            //$damage_reduction = ($player2_evasion_stat_amount / $player1_evasion_stat_amount) - 1.0;
+            $damage_reduction = round($player2_evasion_stat_amount - $player1_evasion_stat_amount, 2);
 
-            $damage_reduction = $player2_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU
+            /*$damage_reduction = $player2_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU
                 ? round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2)
-                : round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                : round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);*/
 
             if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
                 $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
@@ -1053,22 +1060,36 @@ class BattleManager {
     /**
      * @throws RuntimeException
      */
-    private function getEvasionStatAmount(Fighter $fighter, Jutsu $fighter_jutsu): float|int {
+    private function getEvasionStatAmount(Fighter $fighter, Jutsu $fighter_jutsu, int $target_stat_total): float|int {
         switch($fighter_jutsu->jutsu_type) {
             case Jutsu::TYPE_TAIJUTSU:
-                $evasion_stat_amount = $fighter->speed + $fighter->speed_boost - $fighter->speed_nerf;
+                // get total speed, only direct speed boost will be from bloodline
+                $evasion_stat_amount = $fighter->speed + $fighter->speed_boost;
+                // calculate evasion based on speed stat relative to opponent stat total, this is equvialent to comparing to own stat total in even fights
+                $evasion_stat_amount *= BattleManager::SPEED_DAMAGE_REDUCTION_RATIO / max($target_stat_total, 1);
+                // modify by evasion nerf/boost
+                $evasion_stat_amount += $fighter->speed_evasion_boost - $fighter->speed_evasion_nerf;
+
+                /*$evasion_stat_amount = $fighter->speed + $fighter->speed_boost - $fighter->speed_nerf;
                 $evasion_stat_amount = 50 + ($evasion_stat_amount * 0.5);
                 if($evasion_stat_amount <= 0) {
                     $evasion_stat_amount = 1;
-                }
+                }*/
                 break;
             case Jutsu::TYPE_GENJUTSU:
             case Jutsu::TYPE_NINJUTSU:
-                $evasion_stat_amount = $fighter->cast_speed + $fighter->cast_speed_boost - $fighter->cast_speed_nerf;
+                // get total cast speed, only direct cast speed boost will be from bloodline
+                $evasion_stat_amount = $fighter->cast_speed + $fighter->cast_speed_boost;
+                // calculate evasion based on cast speed stat relative to opponent stat total, this is equvialent to comparing to own stat total in even fights
+                $evasion_stat_amount *= BattleManager::CAST_SPEED_DAMAGE_REDUCTION_RATIO / max($target_stat_total, 1);
+                // modify by evasion nerf/boost
+                $evasion_stat_amount += $fighter->cast_speed_evasion_boost - $fighter->cast_speed_evasion_nerf;
+
+                /*$evasion_stat_amount = $fighter->cast_speed + $fighter->cast_speed_boost - $fighter->cast_speed_nerf;
                 $evasion_stat_amount = 50 + ($evasion_stat_amount * 0.5);
                 if($evasion_stat_amount <= 0) {
                     $evasion_stat_amount = 1;
-                }
+                }*/
                 break;
             default:
                 throw new RuntimeException("Invalid jutsu type!");

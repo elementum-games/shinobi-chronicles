@@ -47,7 +47,7 @@ class BattleEffectsManager {
 
         if($this->system->debug['battle_effects']) {
             echo sprintf("JP: %s (%s)<br />", $jutsu->power, $jutsu->effect);
-            echo sprintf("%s / %s<br />", $raw_damage, $debuff_power);
+            echo sprintf("%s / %s / %s<br />", $raw_damage, $debuff_power, $jutsu->effect_amount);
         }
 
         switch($jutsu->effect) {
@@ -202,10 +202,10 @@ class BattleEffectsManager {
             $target->genjutsu_boost += ($effect->effect_amount / 100);
         }
         else if($effect->effect == 'cast_speed_boost') {
-            $target->cast_speed_boost += $target->getCastSpeed(true) * ($effect->effect_amount / 100);
+            $target->cast_speed_evasion_boost += ($effect->effect_amount / 100);
         }
         else if($effect->effect == 'speed_boost' or $effect->effect == 'lighten') {
-            $target->speed_boost += $target->getSpeed(true) * ($effect->effect_amount / 100);
+            $target->speed_evasion_boost += ($effect->effect_amount / 100);
         }
         else if($effect->effect == 'intelligence_boost') {
             $target->intelligence_boost += $effect->effect_amount;
@@ -227,7 +227,8 @@ class BattleEffectsManager {
         }
 
         // Debuffs
-        $effect_amount = $effect->effect_amount - $target->getDebuffResist();
+        $effect_amount = $effect->effect_amount;
+        //$effect_amount = $effect->effect_amount - $target->getDebuffResist();
         if($effect_amount < $effect->effect_amount * Battle::MIN_DEBUFF_RATIO) {
             $effect_amount = $effect->effect_amount * Battle::MIN_DEBUFF_RATIO;
         }
@@ -242,11 +243,11 @@ class BattleEffectsManager {
             $target->genjutsu_nerf += $effect_amount;
         }
         else if($effect->effect == 'speed_nerf' or $effect->effect == 'cripple') {
-            $target->speed_nerf += $target->getSpeed(true) * ($effect->effect_amount / 100);
-            $target->cast_speed_nerf += $target->getCastSpeed(true) * ($effect->effect_amount / 100);
+            $target->speed_evasion_nerf += ($effect_amount / 100);
+            $target->cast_speed_evasion_nerf += ($effect_amount / 100);
 
-            $target->speed_nerf = min($target->speed_nerf, $target->getSpeed(true) * self::MAX_SPEED_REDUCTION);
-            $target->cast_speed_nerf = min($target->cast_speed_nerf, $target->getCastSpeed(true) * self::MAX_SPEED_REDUCTION);
+            $target->speed_evasion_nerf = min($target->speed_evasion_nerf, self::MAX_SPEED_REDUCTION / 100);
+            $target->cast_speed_evasion_nerf = min($target->cast_speed_evasion_nerf, self::MAX_SPEED_REDUCTION / 100);
         }
         else if($effect->effect == 'intelligence_nerf') {
             $target->intelligence_nerf += $effect_amount;
