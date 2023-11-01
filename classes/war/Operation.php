@@ -379,7 +379,7 @@ class Operation {
                     // for each occupied village in newly controlled region, if not at war then clear occupation
                     $occupied_villages = $this->system->db->query("SELECT * FROM `region_locations` WHERE `region_id` = {$location_target['region_id']} AND `occupying_village_id` IS NOT NULL");
                     $occupied_villages = $this->system->db->fetch_all($occupied_villages);
-                    if ($this->system->dn->last_num_rows > 0) {
+                    if ($this->system->db->last_num_rows > 0) {
                         foreach ($occupied_villages as $village) {
                             if (!$this->user->village->isEnemy($village['occupying_village_id'])) {
                                 $this->system->db->query("UPDATE `region_locations` SET `occupying_village_id` = NULL WHERE `id` = {$village['id']}");
