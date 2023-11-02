@@ -3,17 +3,21 @@
 require_once __DIR__ . "/Operation.php";
 
 class WarManager {
-    const BASE_RESOURCE_PRODUCTION = 25; // 25/hour, 600/village/day, 1800/region/day, 7200/faction/day (assuming 4 regions)
-    const HOME_REGION_RESOURCE_BONUS = 25;
+    const BASE_TOWN_RESOURCE_PRODUCTION = 25;
+    const BASE_CASTLE_RESOURCE_PRODUCTION = 50;
+    const VILLAGE_BASE_RESOURCE_PRODUCTION = 75;
     const BASE_CARAVAN_TIME_MS = 300000; // 5 minute travel time
     const CARAVAN_TIMER_HOURS = 6; // 24m average caravan spawn timer, so 19 minute average downtime
-    const BASE_VILLAGE_REGEN = 1250;
-    const BASE_CASTLE_REGEN = 2500;
-    const VILLAGE_REGEN_SHARE_PERCENT = 100; // 2 villages + base = 5000/hour max
+    const BASE_VILLAGE_REGEN_PER_MINUTE = 40; // 2400/hour
+    const BASE_CASTLE_REGEN_PER_MINUTE = 45; // 2700/hour
+    const VILLAGE_REGEN_SHARE_PERCENT = 100; // 2 villages + base = 7500/hour max
     const BASE_VILLAGE_HEALTH = 5000;
     const BASE_CASTLE_HEALTH = 15000;
     const BASE_VILLAGE_DEFENSE = 50;
     const BASE_CASTLE_DEFENSE = 75;
+
+    // region_regen_cron.php must run on matching cadence to this interval, if you change this value, change the cron job config to run region_regen_cron.php at whatever the new value is
+    const REGEN_INTERVAL_MINUTES = 5;
 
     const RESOURCE_MATERIALS = 1;
     const RESOURCE_FOOD = 2;
@@ -48,8 +52,9 @@ class WarManager {
         4 => 0,
     ];
     const PATROL_RESPAWN_TIME = 600;
-    const BASE_LOOT_CAPACITY = 25;
+    const BASE_LOOT_CAPACITY = 50;
     const MAX_PATROL_TIER = 3;
+    const YEN_PER_RESOURCE = 10;
 
     private System $system;
     private User $user;
@@ -118,7 +123,8 @@ class WarManager {
             throw new RuntimeException("You are currently in battle!");
         }
         if ($operation_type != Operation::OPERATION_LOOT) {
-            $target = $this->system->db->query("SELECT `region_locations`.*, `regions`.`village` FROM `region_locations`
+            $target = $this->system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`, `regions`.`village` as `original_village` 
+            FROM `region_locations`
             INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
             WHERE `id` = {$target_id} LIMIT 1");
             if ($this->system->db->last_num_rows == 0) {
@@ -161,6 +167,13 @@ class WarManager {
                 }
                 Operation::beginOperation($this->system, $this->user, $patrol->id, $operation_type, $patrol->village_id);
                 break;
+            case Operation::OPERATION_LOOT_VILLAGE:
+                // must be occupied by self
+                if (empty($target['occupying_village_id']) || $target['occupying_village_id'] != $this->user->village->village_id) {
+                    throw new RuntimeException("Invalid operation target!");
+                }
+                Operation::beginOperation($this->system, $this->user, $target_id, $operation_type, $target['original_village']);
+                break;
             default:
                 throw new RuntimeException("Invalid operation type!");
         }
@@ -174,7 +187,8 @@ class WarManager {
             return false;
         }
         if ($operation->type != Operation::OPERATION_LOOT) {
-            $target = $this->system->db->query("SELECT `region_locations`.*, `regions`.`village` FROM `region_locations`
+            $target = $this->system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`, `regions`.`village` as `original_village`
+            FROM `region_locations`
             INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
             WHERE `id` = {$operation->target_id} LIMIT 1");
             if ($this->system->db->last_num_rows == 0) {
@@ -212,6 +226,12 @@ class WarManager {
                     return false;
                 }
                 break;
+            case OPERATION::OPERATION_LOOT_VILLAGE:
+                // must be occupied by self
+                if (empty($target['occupying_village_id']) || $target['occupying_village_id'] != $this->user->village->village_id) {
+                    return false;
+                }
+                break;
             default:
                 return false;
         }
@@ -238,7 +258,8 @@ class WarManager {
         }
 
         // get region location where location = player location
-        $target_location = $this->system->db->query("SELECT `region_locations`.*, `regions`.`village` FROM `region_locations`
+        $target_location = $this->system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`, `regions`.`village` as `original_village`
+            FROM `region_locations`
             INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
             WHERE `x` = {$this->user->location->x}
             AND `y` = {$this->user->location->y}
@@ -253,6 +274,9 @@ class WarManager {
                 if ($for_display) {
                     $health_gain = floor($this->user->level / 2);
                     $valid_operations[Operation::OPERATION_REINFORCE] .= "<br><span class='reinforce_button_text'>{$health_gain} health</span>";
+                }
+                if (!empty($target_location['occupying_village_id'])) {
+                    $valid_operations[Operation::OPERATION_LOOT_VILLAGE] = System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_LOOT_VILLAGE]);
                 }
             } else {
                 switch ($this->user->village->relations[$target_location['village']]->relation_type) {
@@ -361,6 +385,7 @@ class WarManager {
         }
         // update village resources
         $first = true;
+        $yen_gain = 0;
         foreach ($loot_gained as $resource_id => $count) {
             if ($first) {
                 $message .= "Deposited";
@@ -371,9 +396,12 @@ class WarManager {
             WarLogManager::logAction($this->system, $this->user, $count, WarLogManager::WAR_LOG_RESOURCES_CLAIMED, $this->user->village->village_id);
             $message .= " " . $count . " " . System::unSlug(WarManager::RESOURCE_NAMES[$resource_id]);
             $this->user->village->addResource($resource_id, $count);
+            $yen_gain += $count * self::YEN_PER_RESOURCE;
         }
         $this->user->village->updateResources();
         $message .= "!";
+        $message .= "\nGained {$yen_gain} yen!";
+        $this->user->addMoney($yen_gain, "Resource");
         // update loot table
         $time = time();
         $this->system->db->query("UPDATE `loot` SET `claimed_village_id` = {$this->user->village->village_id}, `claimed_time` = {$time} WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL");
@@ -457,31 +485,41 @@ class WarManager {
         $oldest_active_raid_time = (microtime(true) * 1000) - $max_raid_duration_ms;
 
         $result = $system->db->query("SELECT
-            `operations`.`user_village` as `attacking_user_village`, 
+            `operations`.`user_village`, 
             `operations`.`target_id`,
+            `operations`.`target_village`,
             `region_locations`.`x`, 
             `region_locations`.`y`, 
             `region_locations`.`map_id`, 
             `region_locations`.`name` 
             FROM `operations`
             INNER JOIN `region_locations` ON `region_locations`.`id` = `operations`.`target_id`
-            WHERE (`operations`.`user_village` = {$player->village->village_id} OR `operations`.`target_village` = {$player->village->village_id})
             AND `user_id` != {$player->user_id}
             AND `last_update_ms` > {$oldest_active_raid_time}
             AND `status` = " . Operation::OPERATION_ACTIVE . " 
             AND `operations`.`type` = " . Operation::OPERATION_RAID . "
-            GROUP BY `operations`.`target_id`, `attacking_user_village`");
+            GROUP BY `operations`.`target_id`, `operations`.`target_village`");
         $raw_raid_targets = $system->db->fetch_all($result);
 
         $raid_targets = [];
         foreach($raw_raid_targets as $target) {
             if(!isset($raid_targets[$target['target_id']])) {
-                $raid_targets[$target['target_id']] = new RaidTargetDto(
-                    name: $target['name'],
-                    location: new TravelCoords(x: $target['x'], y: $target['y'], map_id: $target['map_id']),
-                    // TODO: Notifications for allied villages? This logic only does the player's own village
-                    is_ally_location: $target['attacking_user_village'] != $player->village->village_id,
-                );
+                // if ally being raided
+                if ($player->village->isAlly($target['target_village'])) {
+                    $raid_targets[$target['target_id']] = new RaidTargetDto(
+                        name: $target['name'],
+                        location: new TravelCoords(x: $target['x'], y: $target['y'], map_id: $target['map_id']),
+                        is_ally_location: true,
+                    );
+                } 
+                // if ally raiding
+                else if ($player->village->isAlly($target['user_village'])) {
+                    $raid_targets[$target['target_id']] = new RaidTargetDto(
+                        name: $target['name'],
+                        location: new TravelCoords(x: $target['x'], y: $target['y'], map_id: $target['map_id']),
+                        is_ally_location: false,
+                    );
+                }
             }
         }
 

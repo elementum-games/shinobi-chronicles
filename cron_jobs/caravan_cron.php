@@ -132,12 +132,12 @@ function hourlyCaravan(System $system, $debug = true): void
 
     /* step 3: generate new caravans */
 
-    // get regions
+    // get regions, ignore home regions
     $region_result = $system->db->query("SELECT * FROM `regions` WHERE `region_id` > 5");
     $region_result = $system->db->fetch_all($region_result);
     foreach ($region_result as $region) {
-        // get region locations for region
-        $region_location_result = $system->db->query("SELECT * FROM `region_locations` WHERE `region_id` = {$region['region_id']}");
+        // get region locations for region, ignore occupied villages
+        $region_location_result = $system->db->query("SELECT * FROM `region_locations` WHERE `region_id` = {$region['region_id']} AND `occupying_village_id` IS NULL");
         $region_location_result = $system->db->fetch_all($region_location_result);
         $caravan_resources = [];
         // add resources to region caravan

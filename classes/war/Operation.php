@@ -5,12 +5,14 @@ class Operation {
     const OPERATION_REINFORCE = 2;
     const OPERATION_RAID = 3;
     const OPERATION_LOOT = 4;
+    const OPERATION_LOOT_VILLAGE = 5;
 
     const OPERATION_TYPE = [
         self::OPERATION_INFILTRATE => "infiltrate",
         self::OPERATION_REINFORCE => "reinforce",
         self::OPERATION_RAID => "raid",
         self::OPERATION_LOOT => "loot",
+        self::OPERATION_LOOT_VILLAGE => "loot_town",
     ];
 
     const OPERATION_TYPE_DESCRIPTOR = [
@@ -18,6 +20,7 @@ class Operation {
         self::OPERATION_REINFORCE => "reinforcing",
         self::OPERATION_RAID => "raiding",
         self::OPERATION_LOOT => "looting",
+        self::OPERATION_LOOT_VILLAGE => "looting",
     ];
 
     const OPERATION_ACTIVE = 1;
@@ -30,14 +33,14 @@ class Operation {
         self::OPERATION_COMPLETE => 'complete',
     ];
 
-    /*const OPERATION_STAT_GAIN = [
-        self::OPERATION_INFILTRATE => 4,
-        self::OPERATION_REINFORCE => 3,
-        self::OPERATION_RAID => 5,
-        self::OPERATION_LOOT => 1,
+    const OPERATION_STAT_GAIN = [
+        self::OPERATION_INFILTRATE => 2,
+        self::OPERATION_REINFORCE => 1,
+        self::OPERATION_RAID => 2,
+        self::OPERATION_LOOT => 0,
     ];
 
-    const OPERATION_YEN_GAIN = [
+    /*const OPERATION_YEN_GAIN = [
         self::OPERATION_INFILTRATE => 200,
         self::OPERATION_REINFORCE => 150,
         self::OPERATION_RAID => 250,
@@ -46,13 +49,19 @@ class Operation {
 
     const BASE_OPERATION_INTERVAL_PROGRESS_PERCENT = 20; // progress per interval
     const BASE_OPERATION_INTERVAL_SECONDS = 12; // time per interval
-    const BASE_OPERATION_POOL_COST = 150; // chakra/stam cost per interval, 750 total
+    const BASE_OPERATION_POOL_COST = [ // chakra/stam cost per interval per rank, 750 total
+        3 => 100,
+        4 => 150
+    ];
     /* 100 / 20 * 12s = 60s */
 
-    const LOOT_GAIN = 5;
+    const LOOT_GAIN = 10;
     const LOOT_OPERATION_INTERVAL_PROGRESS_PERCENT = 100; // each loot action is only 1 interval
     const LOOT_OPERATION_INTERVAL_SECONDS = 6; // takes half time as normal
-    const LOOT_OPERATION_POOL_COST = 75; // takes half pool cost
+    const LOOT_OPERATION_POOL_COST = [
+        3 => 50,
+        4 => 75
+    ];
     /* 100 / 100 * 6s = 6s */
 
 
@@ -77,7 +86,7 @@ class Operation {
         }
         $this->system = $system;
         $this->user = $user;
-        if ($this->type == self::OPERATION_LOOT) {
+        if ($this->type == self::OPERATION_LOOT || $this->type == self::OPERATION_LOOT_VILLAGE) {
             $interval = self::LOOT_OPERATION_INTERVAL_SECONDS;
         } else {
             $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
@@ -105,31 +114,32 @@ class Operation {
         $message = '';
         switch ($this->type) {
             case self::OPERATION_LOOT:
+            case self::OPERATION_LOOT_VILLAGE:
                 $interval = self::LOOT_OPERATION_INTERVAL_SECONDS;
-                $cost = self::LOOT_OPERATION_POOL_COST;
+                $cost = self::LOOT_OPERATION_POOL_COST[$this->user->rank_num];;
                 $speed = self::LOOT_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
             case self::OPERATION_INFILTRATE:
                 $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
                 $interval = round($interval * (100 / (100 + $this->user->village->policy->infiltrate_speed)), 1);
-                $cost = self::BASE_OPERATION_POOL_COST;
+                $cost = self::BASE_OPERATION_POOL_COST[$this->user->rank_num];
                 $speed = self::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
             case self::OPERATION_REINFORCE:
                 $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
                 $interval = round($interval * (100 / (100 + $this->user->village->policy->reinforce_speed)), 1);
-                $cost = self::BASE_OPERATION_POOL_COST;
+                $cost = self::BASE_OPERATION_POOL_COST[$this->user->rank_num];
                 $speed = self::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
             case self::OPERATION_RAID:
                 $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
                 $interval = round($interval * (100 / (100 + $this->user->village->policy->raid_speed)), 1);
-                $cost = self::BASE_OPERATION_POOL_COST;
+                $cost = self::BASE_OPERATION_POOL_COST[$this->user->rank_num];
                 $speed = self::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
             default:
                 $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
-                $cost = self::BASE_OPERATION_POOL_COST;
+                $cost = self::BASE_OPERATION_POOL_COST[$this->user->rank_num];
                 $speed = self::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
         }
@@ -170,6 +180,7 @@ class Operation {
             }
 
             $early_completion = false;
+            $cancel_operation = false;
             switch ($this->type) {
                 case self::OPERATION_INFILTRATE:
                     if ($loot_count >= $max_loot) {
@@ -221,6 +232,9 @@ class Operation {
                         $message .= "Dealt " . $actual_damage . " damage to " . $location_target['name'] . "!";
                         WarLogManager::logAction($this->system, $this->user, $actual_damage, WarLogManager::WAR_LOG_DAMAGE_DEALT, $this->target_village);
                         $this->system->db->query("UPDATE `region_locations` SET `health` = {$location_target['health']} WHERE `id` = {$this->target_id}");
+                        if ($location_target['health'] <= 0) {
+                            $early_completion = true;
+                        }
                     } else {
                         $message .= "Target is already at 0 health!";
                         $early_completion = true;
@@ -251,6 +265,7 @@ class Operation {
                             $stolen_resources[$random_resource]++;
                         } else {
                             $message .= "Target has run out of resources!";
+                            $cancel_operation = true;
                             break;
                         }
                     }
@@ -267,10 +282,36 @@ class Operation {
                     $caravan_resources = json_encode($caravan_resources);
                     $this->system->db->query("UPDATE `caravans` SET `resources` = '{$caravan_resources}' WHERE `id` = {$this->target_id}");
                     break;
+                case self::OPERATION_LOOT_VILLAGE:
+                    if ($loot_count >= $max_loot) {
+                        $message .= "You cannot carry any more resources!";
+                        break;
+                    }
+                    if ($location_target['resource_count'] > 0) {
+                        $stolen_resource_count = self::LOOT_GAIN;
+                        if ($location_target['resource_count'] < $stolen_resource_count) {
+                            $stolen_resource_count = $location_target['resource_count'];
+                        }
+                        $location_target['resource_count'] -= $stolen_resource_count;
+                        for ($i = 0; $i < $stolen_resource_count; $i++) {
+                            $this->system->db->query("INSERT INTO `loot` (`user_id`, `resource_id`, `target_village_id`, `target_location_id`) VALUES ({$this->user_id}, {$location_target['resource_id']}, {$this->target_village}, {$this->target_id})");
+                        }
+                        $message .= "Stole {$stolen_resource_count} " . System::unSlug(WarManager::RESOURCE_NAMES[$location_target['resource_id']]) . "!";
+                        WarLogManager::logAction($this->system, $this->user, $stolen_resource_count, WarLogManager::WAR_LOG_RESOURCES_STOLEN, $this->target_village);
+                        $this->system->db->query("UPDATE `region_locations` SET `resource_count` = {$location_target['resource_count']} WHERE `id` = {$this->target_id}");
+                    } else {
+                        $message .= "Target has run out of resources!";
+                        $cancel_operation = true;
+                        break;
+                    }
+                    break;
             }
-
+            if ($cancel_operation) {
+                $this->status = self::OPERATION_FAILED;
+                $this->handleFailure();
+            }
             // if progress reaches 100, operation is complete
-            if ($this->progress >= 100 || $early_completion) {
+            else if ($this->progress >= 100 || $early_completion) {
                 $this->progress = 100;
                 $this->status = self::OPERATION_COMPLETE;
                 // handle completion
@@ -290,7 +331,10 @@ class Operation {
         if ($this->status != self::OPERATION_COMPLETE) {
             throw new RuntimeException("Invalid operation status!");
         }
-        $location_target = $this->system->db->query("SELECT * FROM `region_locations` WHERE `id` = {$this->target_id} LIMIT 1");
+        $location_target = $this->system->db->query("SELECT `region_locations`.*, `regions`.`village` as `original_village`
+            FROM `region_locations`
+            INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+            WHERE `id` = {$this->target_id} LIMIT 1");
         $location_target = $this->system->db->fetch($location_target);
         switch ($this->type) {
             case self::OPERATION_INFILTRATE:
@@ -328,16 +372,37 @@ class Operation {
                     WarLogManager::logRegionCapture($this->system, $this->user, $location_target['region_id']);
                     // change region ownership
                     $this->system->db->query("UPDATE `regions` SET `village` = {$this->user->village->village_id} WHERE `region_id` = {$location_target['region_id']}");
-                    // update castle health to 25%
-                    $castle_hp = floor(WarManager::BASE_CASTLE_HEALTH * 0.25);
-                    $this->system->db->query("UPDATE `region_locations` SET `health` = {$castle_hp} WHERE `region_id` = {$location_target['region_id']} AND `type` = 'Castle'");
+                    // update castle health to 50%, defense to 25
+                    $castle_hp = floor(WarManager::BASE_CASTLE_HEALTH * 0.5);
+                    $this->system->db->query("UPDATE `region_locations` SET `health` = {$castle_hp}, `defense` = 25 WHERE `region_id` = {$location_target['region_id']} AND `type` = 'castle'");
                     // update patrols, move back 5 minutes
                     $patrol_spawn = time() + (60 * 5);
                     $this->system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$this->user->village->village_id} WHERE `region_id` = {$location_target['region_id']}");
                     // update caravans, change only caravans that haven't spawned
                     $name = VillageManager::VILLAGE_NAMES[$this->user->village->village_id] . " Caravan";
                     $time = time();
-                    $this->system->db->query("UPDATE `caravans` SET `village_id` = {$this->user->village->village_id}, `name` = {$name} WHERE `region_id` = {$location_target['region_id']} AND `start_time` > {$time}");
+                    $this->system->db->query("UPDATE `caravans` SET `village_id` = {$this->user->village->village_id}, `name` = '{$name}' WHERE `region_id` = {$location_target['region_id']} AND `start_time` > {$time}");
+                    // for each occupied village in newly controlled region, if not at war then clear occupation
+                    $occupied_villages = $this->system->db->query("SELECT * FROM `region_locations` WHERE `region_id` = {$location_target['region_id']} AND `occupying_village_id` IS NOT NULL");
+                    $occupied_villages = $this->system->db->fetch_all($occupied_villages);
+                    if ($this->system->db->last_num_rows > 0) {
+                        foreach ($occupied_villages as $village) {
+                            if (!$this->user->village->isEnemy($village['occupying_village_id'])) {
+                                $this->system->db->query("UPDATE `region_locations` SET `occupying_village_id` = NULL WHERE `id` = {$village['id']}");
+                            }
+                        }
+                    }
+                } 
+                else if ($location_target['health'] <= 0 && $location_target['type'] == 'village') {
+                    WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_VILLAGES_CAPTURED, $this->target_village);
+                    // occupy village and set HP/defense
+                    $village_hp = floor(WarManager::BASE_VILLAGE_HEALTH * 0.5);
+                    // if self or ally owns the region, set occupying village to null
+                    if ($this->user->village->isAlly($location_target['original_village'])) {
+                        $this->system->db->query("UPDATE `region_locations` SET `occupying_village_id` = NULL, `health` = {$village_hp}, `defense` = 25 WHERE `id` = {$location_target['id']}");
+                    } else {
+                        $this->system->db->query("UPDATE `region_locations` SET `occupying_village_id` = {$this->user->village->village_id}, `health` = {$village_hp}, `defense` = 25 WHERE `id` = {$location_target['id']}");
+                    }
                 }
                 else if ($location_target['defense'] > 0) {
                     $result = max($location_target['defense'] - $defense_reduction, 0);
@@ -351,6 +416,7 @@ class Operation {
                 }
                 break;
             case self::OPERATION_LOOT:
+            case self::OPERATION_LOOT_VILLAGE:
                 WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_LOOT, $this->target_village);
                 break;
         }
@@ -367,16 +433,19 @@ class Operation {
                 $message .= "\nGained " . $rep_gain . " village reputation!";
             }
         }
-        /* Add stats
+        // Add stats
         $stat_to_gain = $this->user->getTrainingStatForArena();
         $stat_gain = self::OPERATION_STAT_GAIN[$this->type];
+        if ($this->user->rank_num > 3 && $stat_gain > 0) {
+            $stat_gain += $this->user->rank_num - 3;
+        }
         if ($stat_to_gain != null && $stat_gain > 0) {
             $stat_gained = $this->user->addStatGain($stat_to_gain, $stat_gain);
             if (!empty($stat_gained)) {
                 $message .= "\n" . $stat_gained;
             }
         }
-        $message .= '!';*/
+        $message .= '!';
         $this->user->operation = 0;
         return $message;
     }

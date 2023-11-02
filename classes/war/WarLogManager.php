@@ -13,6 +13,7 @@ class WarLogManager {
     const WAR_LOG_RESOURCES_CLAIMED = 'resources_claimed';
     const WAR_LOG_PATROLS_DEFEATED = 'patrols_defeated';
     const WAR_LOG_REGIONS_CAPTURED = 'regions_captured';
+    const WAR_LOG_VILLAGES_CAPTURED = 'villages_captured';
     const WAR_LOG_PVP_WINS = 'pvp_wins';
     const WAR_LOG_POINTS_GAINED = 'points_gained';
 

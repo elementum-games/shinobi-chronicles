@@ -1279,6 +1279,9 @@
     text-shadow: 1px 0px 2px black;
     gap: 2px;
 }
+.region_objective:hover {
+    z-index: 4;
+}
 .region_objective:hover .region_objective_details {
     display: flex;
 }

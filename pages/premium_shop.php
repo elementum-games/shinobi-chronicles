@@ -657,7 +657,7 @@ function premiumShop(): void {
                 $confirmation_string = "Are you sure you want to move from the {$player->village->name} village to the $village
                 village?"
                     . (!$player->clan->bloodline_only ? " You will be kicked out of your clan and placed in a random clan in the new village." : "")
-                    . "<br />You will lose 1 Reputation tier for all village changes after the first (you can not fall below Shinobi).<br />
+                    . "<br />You will lose 20% of your Reputation for all village changes after the first (you can not fall below Shinobi).<br />
                 <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village
                 you will have to pay a higher transfer fee)</b>";
 
@@ -699,8 +699,8 @@ function premiumShop(): void {
 
                 // Lose rep tier for subsequent village changes (5k minimum rep)
                 if ($player->village_changes > 0 && $player->reputation->rank >= 3) {
-                    $new_tier = max($player->reputation->rank - 1, 3);
-                    $player->village_rep = UserReputation::$VillageRep[$new_tier]['min_rep'];
+                    $new_reputation = floor(max($player->village_rep * 0.8, UserReputation::$VillageRep[3]['min_rep']));
+                    $player->village_rep = $new_reputation;
                 }
 
                 // Cost

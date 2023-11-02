@@ -96,8 +96,31 @@ function hourlyRegion(System $system, $debug = true): void
     $village_result = $system->db->query("SELECT * FROM `villages`");
     $village_result = $system->db->fetch_all($village_result);
     $villages = [];
+    // apply base production
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);
+        $production = WarManager::VILLAGE_BASE_RESOURCE_PRODUCTION + $villages[$village['village_id']]->policy->home_production_boost;
+        $villages[$village['village_id']]->addResource(1, $production);
+        $villages[$village['village_id']]->addResource(2, $production);
+        $villages[$village['village_id']]->addResource(3, $production);
+        $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village['village_id']}, 1, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", {$production}, " . time() . ")";
+        $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village['village_id']}, 1, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$production}, " . time() . ")";
+        $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village['village_id']}, 2, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", {$production}, " . time() . ")";
+        $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village['village_id']}, 2, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$production}, " . time() . ")";
+        $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village['village_id']}, 3, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", {$production}, " . time() . ")";
+        $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village['village_id']}, 3, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$production}, " . time() . ")";
     }
     foreach ($region_result as $region) {
         // get region locations for region
@@ -107,50 +130,31 @@ function hourlyRegion(System $system, $debug = true): void
         /* step 1: update resource count */
         foreach ($region_location_result as &$region_location) {
             // if one of the home regions, collect resources bypassing caravans
-            $production = WarManager::BASE_RESOURCE_PRODUCTION;
+            switch ($region_location['type']) {
+                case 'castle':
+                    $production = WarManager::BASE_CASTLE_RESOURCE_PRODUCTION;
+                    break;
+                case 'village';
+                    $production = WarManager::BASE_TOWN_RESOURCE_PRODUCTION;
+                    break;
+                default;
+                    break;
+            }
             if ($region['region_id'] <= 5) {
-                //$production += WarManager::HOME_REGION_RESOURCE_BONUS;
-                $production += floor(WarManager::BASE_RESOURCE_PRODUCTION * ($villages[$region['village']]->policy->home_production_boost / 100));
-                $villages[$region['village']]->addResource($region_location['resource_id'], $region_location['resource_count']);
-                $queries[] = "INSERT INTO `resource_logs`
-                    (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                    VALUES ({$region['village']}, {$region_location['resource_id']}, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$region_location['resource_count']}, " . time() . ")";
-                $region_location['resource_count'] = 0;
+                if (empty($region['occupying_village_id'])) {
+                    $villages[$region['village']]->addResource($region_location['resource_id'], $region_location['resource_count']);
+                    $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$region['village']}, {$region_location['resource_id']}, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$region_location['resource_count']}, " . time() . ")";
+                    $region_location['resource_count'] = 0;
+                }
             }
             $region_location['resource_count'] += $production;
             !empty($village_resource_production[$region['village']][$region_location['resource_id']]) ? $village_resource_production[$region['village']][$region_location['resource_id']] += $production : $village_resource_production[$region['village']][$region_location['resource_id']] = $production;
             unset($region_location);
         }
 
-        /* step 2: update health */
-        $castle = null;
-        $village_regen_share = 0;
-        foreach ($region_location_result as &$region_location) {
-            switch ($region_location['type']) {
-                case 'castle':
-                    // increase health, cap at max
-                    $region_location['health'] = min($region_location['health'] + WarManager::BASE_CASTLE_REGEN, WarManager::BASE_CASTLE_HEALTH);
-                    // get castle reference
-                    $castle = &$region_location;
-                    break;
-                case 'village';
-                    // give a bonus to castle regen based on village HP
-                    $village_regen_share += (WarManager::VILLAGE_REGEN_SHARE_PERCENT / 100) * WarManager::BASE_VILLAGE_REGEN * ($region_location['health'] / WarManager::BASE_VILLAGE_HEALTH);
-                    // increase health, cap at max
-                    $region_location['health'] = min($region_location['health'] + WarManager::BASE_VILLAGE_REGEN, WarManager::BASE_VILLAGE_HEALTH);
-                    break;
-                default;
-                    break;
-            }
-            unset($region_location);
-        }
-        // if castle exists, add bonus regen from villages
-        if (!empty($castle)) {
-            $castle['health'] = min($castle['health'] + $village_regen_share, WarManager::BASE_CASTLE_HEALTH);
-            unset($castle);
-        }
-
-        /* step 3: update defense */
+        /* step 2: update defense */
         foreach ($region_location_result as &$region_location) {
             switch ($region_location['type']) {
                 case 'castle':
@@ -174,7 +178,7 @@ function hourlyRegion(System $system, $debug = true): void
             unset($region_location);
         }
 
-        /* step 4: update region_locations */
+        /* step 3: update region_locations */
         foreach ($region_location_result as $region_location) {
             $queries[] = "UPDATE `region_locations`
                 SET `resource_count` = {$region_location['resource_count']},
