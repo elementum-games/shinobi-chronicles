@@ -330,10 +330,6 @@ function userSettings() {
 		$journal = $result['journal'];
 	}
 
-    // Fetch blacklist data
-    $list = $player->blacklist->generateSettingsList(self_link: $self_link);
-    $current_layout = $system->setLayoutByName($player->layout);
-
 	// Temp settings
     $sidebar_position = $player->getSidebarPosition();
     $sidebar_collapse = $player->getSidebarCollapse();

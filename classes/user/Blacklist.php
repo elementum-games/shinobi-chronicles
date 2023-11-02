@@ -92,13 +92,14 @@ class Blacklist {
 
     // Generate settings page list
     public function generateSettingsList(string $self_link): string {
-        $return = "";
         if(!empty($this->blacklist)) {
+            $return = "";
             foreach ($this->blacklist as $user_id => $user_data) {
                 $return .= "<a href='{$this->system->router->links['members']}&user={$user_data['user_name']}'>{$user_data['user_name']}</a><sup>(<a href='$self_link&blacklist_remove=$user_id'>x</a>)</sup>,";
             }
+            return substr($return, 0, strlen($return)-1);
         }
-        return $return;
+        return "No blacklist!";
     }
 
     // Prep blacklist for storage in database - call whenever any changes are made
