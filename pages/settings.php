@@ -66,7 +66,8 @@ function userSettings() {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    } else if (!empty($_POST['change_password'])) {
+    }
+    else if (!empty($_POST['change_password'])) {
         $password = trim($_POST['current_password']);
         $new_password = trim($_POST['new_password']);
         $confirm_password = trim($_POST['confirm_new_password']);
@@ -116,7 +117,8 @@ function userSettings() {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    } else if (!empty($_POST['change_journal'])) {
+    }
+    else if (!empty($_POST['change_journal'])) {
         try {
             $journal_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($_POST['journal'])));
             if ($journal_length > $max_journal_length) {
@@ -139,7 +141,8 @@ function userSettings() {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    } else if (!empty($_POST['blacklist_add']) or !empty($_POST['blacklist_remove'])) {
+    }
+    else if (!empty($_POST['blacklist_add']) or !empty($_POST['blacklist_remove'])) {
         $blacklist_username = $system->db->clean(trim($_POST['blacklist_name']));
         $result = $system->db->query(
             "SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='{$blacklist_username}'"
@@ -156,17 +159,25 @@ function userSettings() {
             if ($player->user_id == $blacklist_user['user_id']) {
                 throw new RuntimeException("You cannot blacklist yourself!");
             }
+            // Add user
             if (isset($_POST['blacklist_add'])) {
-                if (!empty($player->blacklist) && array_key_exists($blacklist_user['user_id'], $player->blacklist)) {
+                if($player->blacklist->userBlocked($blacklist_user['user_id'])) {
                     throw new RuntimeException("User already in your blacklist!");
                 }
-                $player->blacklist[$blacklist_user['user_id']][$blacklist_user['user_id']] = $blacklist_user;
+                $player->blacklist->addUser(
+                    user_id: $blacklist_user['user_id'],
+                    user_name: $blacklist_user['user_name'],
+                    staff_level: $blacklist_user['staff_level']
+                );
                 $system->message("{$blacklist_user['user_name']} added to blacklist.");
-            } else {
-                if ($player->blacklist[$blacklist_user['user_id']]) {
-                    unset($player->blacklist[$blacklist_user['user_id']]);
+            }
+            // Remove user
+            else {
+                if($player->blacklist->userBlocked($blacklist_user['user_id'])) {
+                    $player->blacklist->removeName(user_id: $blacklist_user['user_id']);
                     $system->message("{$blacklist_user['user_name']} has been removed from your blacklist.");
-                } else {
+                }
+                else {
                     $system->message("{$blacklist_user['user_name']} is not on your blacklist");
                 }
             }
@@ -179,12 +190,13 @@ function userSettings() {
         $user_remove = abs((int) $user_remove);
 
         try {
-            $user_exists = $player->blacklist[$user_remove];
-
-            $message = ($user_exists) ? "{$player->blacklist[$user_remove][$user_remove]['user_name']} has been removed from your blacklist" : "This user is not on your blacklist.";
-
-            if ($user_exists) {
-                unset($player->blacklist[$user_remove]);
+            if($player->blacklist->userBlocked($user_remove)) {
+                $user_name = $player->blacklist->getBlockedUsername($user_remove);
+                $player->blacklist->removeName($user_remove);
+                $message = "$user_name has been removed.";
+            }
+            else {
+                $message = "This user is not blocked.";
             }
 
             $system->message($message);
@@ -319,19 +331,7 @@ function userSettings() {
 	}
 
     // Fetch blacklist data
-    if(!empty($player->blacklist)) {
-        $list = "";
-        $i = 0;
-        foreach ($player->blacklist as $id => $name) {
-            $i++;
-            // var_dump($name);
-            $list .= "<a href='{$system->router->links['members']}&user={$name[$id]['user_name']}'>{$name[$id]['user_name']}</a><sup>(<a href='$self_link&blacklist_remove=$id'>x</a>)</sup>";
-            if(count($player->blacklist) > $i) {
-                $list .= ", ";
-            }
-        }
-    }
-
+    $list = $player->blacklist->generateSettingsList(self_link: $self_link);
     $current_layout = $system->setLayoutByName($player->layout);
 
 	// Temp settings

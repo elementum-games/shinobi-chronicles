@@ -83,7 +83,7 @@
             <?php endif ?>
         </td>
     </tr>
-    <?php if ($system->isDevEnvironment()): ?> 
+    <?php if ($system->isDevEnvironment() && $system->enable_dev_only_features): ?>
     <tr><th colspan='2'>Player Card</th></tr>
     <tr>
         <td colspan="2">
@@ -254,7 +254,7 @@
             </form>
         </td>
         <td style='text-align:center;'>
-            <?php if(!empty($player->blacklist)): ?>
+            <?php if($player->blacklist->hasUsersBlocked()): ?>
                 <?=$list?>
             <?php else: ?>
                 <p style="text-align: center;">No blocked users!</p>
