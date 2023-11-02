@@ -3,8 +3,9 @@
 require_once __DIR__ . "/Operation.php";
 
 class WarManager {
-    const BASE_RESOURCE_PRODUCTION = 25; // 25/hour, 600/village/day, 1800/region/day, 7200/faction/day (assuming 4 regions)
-    const HOME_REGION_RESOURCE_BONUS = 25;
+    const BASE_TOWN_RESOURCE_PRODUCTION = 15;
+    const BASE_CASTLE_RESOURCE_PRODUCTION = 35;
+    const HOME_REGION_RESOURCE_BONUS = 10;
     const BASE_CARAVAN_TIME_MS = 300000; // 5 minute travel time
     const CARAVAN_TIMER_HOURS = 6; // 24m average caravan spawn timer, so 19 minute average downtime
     const BASE_VILLAGE_REGEN_PER_MINUTE = 40; // 2400/hour
@@ -14,6 +15,8 @@ class WarManager {
     const BASE_CASTLE_HEALTH = 15000;
     const BASE_VILLAGE_DEFENSE = 50;
     const BASE_CASTLE_DEFENSE = 75;
+
+    // region_regen_cron.php must run on matching cadence to this interval, if you change this value, change the cron job config to run region_regen_cron.php at whatever the new value is
     const REGEN_INTERVAL_MINUTES = 5;
 
     const RESOURCE_MATERIALS = 1;
@@ -495,7 +498,7 @@ class WarManager {
             AND `last_update_ms` > {$oldest_active_raid_time}
             AND `status` = " . Operation::OPERATION_ACTIVE . " 
             AND `operations`.`type` = " . Operation::OPERATION_RAID . "
-            GROUP BY `operations`.`target_id`");
+            GROUP BY `operations`.`target_id`, `operations`.`target_village`");
         $raw_raid_targets = $system->db->fetch_all($result);
 
         $raid_targets = [];

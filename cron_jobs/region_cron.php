@@ -107,10 +107,19 @@ function hourlyRegion(System $system, $debug = true): void
         /* step 1: update resource count */
         foreach ($region_location_result as &$region_location) {
             // if one of the home regions, collect resources bypassing caravans
-            $production = WarManager::BASE_RESOURCE_PRODUCTION;
+            switch ($region_location['type']) {
+                case 'castle':
+                    $production = WarManager::BASE_CASTLE_RESOURCE_PRODUCTION;
+                    break;
+                case 'village';
+                    $production = WarManager::BASE_TOWN_RESOURCE_PRODUCTION;
+                    break;
+                default;
+                    break;
+            }
             if ($region['region_id'] <= 5) {
-                //$production += WarManager::HOME_REGION_RESOURCE_BONUS;
-                $production += floor(WarManager::BASE_RESOURCE_PRODUCTION * ($villages[$region['village']]->policy->home_production_boost / 100));
+                $production += WarManager::HOME_REGION_RESOURCE_BONUS;
+                $production += floor($production * ($villages[$region['village']]->policy->home_production_boost / 100));
                 $villages[$region['village']]->addResource($region_location['resource_id'], $region_location['resource_count']);
                 $queries[] = "INSERT INTO `resource_logs`
                     (`village_id`, `resource_id`, `type`, `quantity`, `time`)

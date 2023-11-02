@@ -2,16 +2,12 @@
 session_start();
 
 /**
- * Region Cron Job
+ * Region Regen Cron Job
  **
- *  This should be processed every hour.
+ *  This should be processed every WarManager::REGEN_INTERVAL_MINUTES.
  *
  *  Region Cron does the following:
- *      Collects home region resources
- *      Increases resource count of each region by production rate (25)
- *      Increases/Decreases region_location defense value by 1 toward baseline
  *      Applies region_location regen, bonus for castles based on local village health
- *      Creates resource logs
  */
 
 require_once __DIR__ . '/../classes/System.php';
@@ -46,7 +42,7 @@ if (isset($_SESSION['user_id'])) {
                     <input type='text' name='confirm' /><input type='submit' value='Run Script' />
                 </form>";
                 } else {
-                    hourlyRegion($system, $debug);
+                    processRegionRegenInterval($system, $debug);
                     $player->staff_manager->staffLog(
                         StaffManager::STAFF_LOG_ADMIN,
                         "{$player->user_name}({$player->user_id}) manually ran region regen cron."
@@ -57,7 +53,7 @@ if (isset($_SESSION['user_id'])) {
                 if (isset($_GET['debug'])) {
                     $debug = $system->db->clean($_GET['debug']);
                 }
-                hourlyRegion($system, $debug);
+                processRegionRegenInterval($system, $debug);
                 $player->staff_manager->staffLog(
                     StaffManager::STAFF_LOG_ADMIN,
                     "{$player->user_name}({$player->user_id}) manually ran region regen cron."
@@ -77,14 +73,14 @@ if (isset($_SESSION['user_id'])) {
     }
 
     if ($run_ok) {
-        hourlyRegion($system, debug: false);
+        processRegionRegenInterval($system, debug: false);
         $system->log('cron', 'Region Regen', "Regions have been processed.");
     } else {
         $system->log('cron', 'Invalid access', "Attempted access by " . $_SERVER['REMOTE_ADDR']);
     }
 }
 
-function hourlyRegion(System $system, $debug = true): void
+function processRegionRegenInterval(System $system, $debug = true): void
 {
     // get regions
     $region_result = $system->db->query("SELECT * FROM `regions`");

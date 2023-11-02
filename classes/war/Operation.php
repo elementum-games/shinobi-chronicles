@@ -12,7 +12,7 @@ class Operation {
         self::OPERATION_REINFORCE => "reinforce",
         self::OPERATION_RAID => "raid",
         self::OPERATION_LOOT => "loot",
-        self::OPERATION_LOOT_VILLAGE => "loot",
+        self::OPERATION_LOOT_VILLAGE => "loot_town",
     ];
 
     const OPERATION_TYPE_DESCRIPTOR = [
@@ -49,13 +49,19 @@ class Operation {
 
     const BASE_OPERATION_INTERVAL_PROGRESS_PERCENT = 20; // progress per interval
     const BASE_OPERATION_INTERVAL_SECONDS = 12; // time per interval
-    const BASE_OPERATION_POOL_COST_PER_RANK = 50; // chakra/stam cost per interval per rank, 750 total
+    const BASE_OPERATION_POOL_COST = [ // chakra/stam cost per interval per rank, 750 total
+        3 => 100,
+        4 => 150
+    ];
     /* 100 / 20 * 12s = 60s */
 
     const LOOT_GAIN = 5;
     const LOOT_OPERATION_INTERVAL_PROGRESS_PERCENT = 100; // each loot action is only 1 interval
     const LOOT_OPERATION_INTERVAL_SECONDS = 6; // takes half time as normal
-    const LOOT_OPERATION_POOL_COST_PER_RANK = 25; // takes half pool cost
+    const LOOT_OPERATION_POOL_COST = [
+        3 => 50,
+        4 => 75
+    ];
     /* 100 / 100 * 6s = 6s */
 
 
@@ -110,30 +116,30 @@ class Operation {
             case self::OPERATION_LOOT:
             case self::OPERATION_LOOT_VILLAGE:
                 $interval = self::LOOT_OPERATION_INTERVAL_SECONDS;
-                $cost = self::LOOT_OPERATION_POOL_COST_PER_RANK * ($this->user->rank_num - 1);
+                $cost = self::LOOT_OPERATION_POOL_COST[$this->user->rank_num];;
                 $speed = self::LOOT_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
             case self::OPERATION_INFILTRATE:
                 $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
                 $interval = round($interval * (100 / (100 + $this->user->village->policy->infiltrate_speed)), 1);
-                $cost = self::BASE_OPERATION_POOL_COST_PER_RANK * ($this->user->rank_num - 1);
+                $cost = self::BASE_OPERATION_POOL_COST[$this->user->rank_num];
                 $speed = self::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
             case self::OPERATION_REINFORCE:
                 $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
                 $interval = round($interval * (100 / (100 + $this->user->village->policy->reinforce_speed)), 1);
-                $cost = self::BASE_OPERATION_POOL_COST_PER_RANK * ($this->user->rank_num - 1);
+                $cost = self::BASE_OPERATION_POOL_COST[$this->user->rank_num];
                 $speed = self::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
             case self::OPERATION_RAID:
                 $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
                 $interval = round($interval * (100 / (100 + $this->user->village->policy->raid_speed)), 1);
-                $cost = self::BASE_OPERATION_POOL_COST_PER_RANK * ($this->user->rank_num - 1);
+                $cost = self::BASE_OPERATION_POOL_COST[$this->user->rank_num];
                 $speed = self::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
             default:
                 $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
-                $cost = self::BASE_OPERATION_POOL_COST_PER_RANK * ($this->user->rank_num - 1);
+                $cost = self::BASE_OPERATION_POOL_COST[$this->user->rank_num];
                 $speed = self::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
                 break;
         }
