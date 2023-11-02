@@ -99,7 +99,7 @@ function hourlyRegion(System $system, $debug = true): void
     // apply base production
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);
-        $production = WarManager::VILLAGE_BASE_RESOURCE_PRODUCTION + $villages[$region['village']]->policy->home_production_boost;
+        $production = WarManager::VILLAGE_BASE_RESOURCE_PRODUCTION + $villages[$village['village_id']]->policy->home_production_boost;
         $villages[$village['village_id']]->addResource(1, $production);
         $villages[$village['village_id']]->addResource(2, $production);
         $villages[$village['village_id']]->addResource(3, $production);
