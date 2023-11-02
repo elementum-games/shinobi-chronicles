@@ -180,7 +180,7 @@ class VillageManager {
                 if ($system->db->last_num_rows > 0) {
                     $cooldown_remaining = ($result['seat_end'] + self::SEAT_RECLAIM_COOLDOWN_HOURS * 3600) - time();
                     if ($cooldown_remaining > 0) {
-                        $message = "You must wait another " . $system->time_remaining($cooldown_remaining) . " before reclaiming this seat.");
+                        $message = "You must wait another " . $system->time_remaining($cooldown_remaining) . " before reclaiming this seat.";
                         return $message;
                     }
                 }
@@ -259,7 +259,7 @@ class VillageManager {
                 if ($system->db->last_num_rows > 0) {
                     $cooldown_remaining = ($result['seat_end'] + self::SEAT_RECLAIM_COOLDOWN_HOURS * 3600) - $result['seat_end'];
                     if ($cooldown_remaining > 0) {
-                        $message = "You must wait another " . $system->time_remaining($cooldown_remaining) . " before reclaiming this seat.");
+                        $message = "You must wait another " . $system->time_remaining($cooldown_remaining) . " before reclaiming this seat.";
                         return $message;
                     }
                 }
