@@ -1757,7 +1757,7 @@ class User extends Fighter {
 		`last_ip` = '$this->last_ip',
 		`failed_logins` = '$this->failed_logins',
 		`last_login` = '$this->last_login',
-		`last_login_attmpet` = '$this->last_login_attempt',
+		`last_login_attempt` = '$this->last_login_attempt',
 		`last_update` = '$this->last_update',
 		`last_active` = '" . time() . "',
 		`avatar_link` = '$this->avatar_link',
