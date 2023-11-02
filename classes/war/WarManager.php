@@ -482,8 +482,9 @@ class WarManager {
         $oldest_active_raid_time = (microtime(true) * 1000) - $max_raid_duration_ms;
 
         $result = $system->db->query("SELECT
-            `operations`.`user_village` as `attacking_user_village`, 
+            `operations`.`user_village`, 
             `operations`.`target_id`,
+            `operations`.`target_village`,
             `region_locations`.`x`, 
             `region_locations`.`y`, 
             `region_locations`.`map_id`, 
@@ -494,7 +495,7 @@ class WarManager {
             AND `last_update_ms` > {$oldest_active_raid_time}
             AND `status` = " . Operation::OPERATION_ACTIVE . " 
             AND `operations`.`type` = " . Operation::OPERATION_RAID . "
-            GROUP BY `operations`.`target_id`, `attacking_user_village`");
+            GROUP BY `operations`.`target_id`");
         $raw_raid_targets = $system->db->fetch_all($result);
 
         $raid_targets = [];
