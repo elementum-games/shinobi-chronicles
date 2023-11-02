@@ -5,14 +5,14 @@ class Operation {
     const OPERATION_REINFORCE = 2;
     const OPERATION_RAID = 3;
     const OPERATION_LOOT = 4;
-    const OPERATION_LOOT_VILLAGE = 5;
+    const OPERATION_LOOT_TOWN = 5;
 
     const OPERATION_TYPE = [
         self::OPERATION_INFILTRATE => "infiltrate",
         self::OPERATION_REINFORCE => "reinforce",
         self::OPERATION_RAID => "raid",
         self::OPERATION_LOOT => "loot",
-        self::OPERATION_LOOT_VILLAGE => "loot_town",
+        self::OPERATION_LOOT_TOWN => "loot_town",
     ];
 
     const OPERATION_TYPE_DESCRIPTOR = [
@@ -20,7 +20,7 @@ class Operation {
         self::OPERATION_REINFORCE => "reinforcing",
         self::OPERATION_RAID => "raiding",
         self::OPERATION_LOOT => "looting",
-        self::OPERATION_LOOT_VILLAGE => "looting",
+        self::OPERATION_LOOT_TOWN => "looting",
     ];
 
     const OPERATION_ACTIVE = 1;
@@ -38,6 +38,7 @@ class Operation {
         self::OPERATION_REINFORCE => 1,
         self::OPERATION_RAID => 2,
         self::OPERATION_LOOT => 0,
+        self::OPERATION_LOOT_TOWN => 0,
     ];
 
     /*const OPERATION_YEN_GAIN = [
@@ -86,7 +87,7 @@ class Operation {
         }
         $this->system = $system;
         $this->user = $user;
-        if ($this->type == self::OPERATION_LOOT || $this->type == self::OPERATION_LOOT_VILLAGE) {
+        if ($this->type == self::OPERATION_LOOT || $this->type == self::OPERATION_LOOT_TOWN) {
             $interval = self::LOOT_OPERATION_INTERVAL_SECONDS;
         } else {
             $interval = self::BASE_OPERATION_INTERVAL_SECONDS;
@@ -114,7 +115,7 @@ class Operation {
         $message = '';
         switch ($this->type) {
             case self::OPERATION_LOOT:
-            case self::OPERATION_LOOT_VILLAGE:
+            case self::OPERATION_LOOT_TOWN:
                 $interval = self::LOOT_OPERATION_INTERVAL_SECONDS;
                 $cost = self::LOOT_OPERATION_POOL_COST[$this->user->rank_num];;
                 $speed = self::LOOT_OPERATION_INTERVAL_PROGRESS_PERCENT;
@@ -282,7 +283,7 @@ class Operation {
                     $caravan_resources = json_encode($caravan_resources);
                     $this->system->db->query("UPDATE `caravans` SET `resources` = '{$caravan_resources}' WHERE `id` = {$this->target_id}");
                     break;
-                case self::OPERATION_LOOT_VILLAGE:
+                case self::OPERATION_LOOT_TOWN:
                     if ($loot_count >= $max_loot) {
                         $message .= "You cannot carry any more resources!";
                         break;
@@ -416,7 +417,7 @@ class Operation {
                 }
                 break;
             case self::OPERATION_LOOT:
-            case self::OPERATION_LOOT_VILLAGE:
+            case self::OPERATION_LOOT_TOWN:
                 WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_LOOT, $this->target_village);
                 break;
         }

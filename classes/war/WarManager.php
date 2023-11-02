@@ -167,7 +167,7 @@ class WarManager {
                 }
                 Operation::beginOperation($this->system, $this->user, $patrol->id, $operation_type, $patrol->village_id);
                 break;
-            case Operation::OPERATION_LOOT_VILLAGE:
+            case Operation::OPERATION_LOOT_TOWN:
                 // must be occupied by self
                 if (empty($target['occupying_village_id']) || $target['occupying_village_id'] != $this->user->village->village_id) {
                     throw new RuntimeException("Invalid operation target!");
@@ -226,7 +226,7 @@ class WarManager {
                     return false;
                 }
                 break;
-            case OPERATION::OPERATION_LOOT_VILLAGE:
+            case OPERATION::OPERATION_LOOT_TOWN:
                 // must be occupied by self
                 if (empty($target['occupying_village_id']) || $target['occupying_village_id'] != $this->user->village->village_id) {
                     return false;
@@ -276,7 +276,7 @@ class WarManager {
                     $valid_operations[Operation::OPERATION_REINFORCE] .= "<br><span class='reinforce_button_text'>{$health_gain} health</span>";
                 }
                 if (!empty($target_location['occupying_village_id'])) {
-                    $valid_operations[Operation::OPERATION_LOOT_VILLAGE] = System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_LOOT_VILLAGE]);
+                    $valid_operations[Operation::OPERATION_LOOT_TOWN] = System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_LOOT_TOWN]);
                 }
             } else {
                 switch ($this->user->village->relations[$target_location['village']]->relation_type) {
