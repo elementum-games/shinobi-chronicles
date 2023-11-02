@@ -56,7 +56,9 @@ class User extends Fighter {
     const MAX_NAME_LENGTH = 18;
     const MIN_PASSWORD_LENGTH = 6;
     const PARTIAL_LOCK = 3;
+    const PARTIAL_LOCK_CD = 300; // 5 minutes (this gets hit on new locations)
     const FULL_LOCK = 5;
+    const FULL_LOCK_CD = 180; // 3 minutes (this gets hit on existing locations)
 
     const BASE_EXP = 0;
     const BASE_REGEN = 25;
@@ -221,6 +223,7 @@ class User extends Fighter {
     public $chat_color;
     public $chat_effect;
     public $last_login;
+    public int $last_login_attempt;
 
     /** @var Jutsu[] */
     public array $jutsu_scrolls = [];
@@ -369,6 +372,7 @@ class User extends Fighter {
         $user->song_ban = $user_data['song_ban'];
 
         $user->last_login = $user_data['last_login'];
+        $user->last_login_attempt = $user_data['last_login_attempt'];
 
         $user->regen_rate = $user_data['regen_rate'];
         $user->regen_boost = 0;
@@ -1753,6 +1757,7 @@ class User extends Fighter {
 		`last_ip` = '$this->last_ip',
 		`failed_logins` = '$this->failed_logins',
 		`last_login` = '$this->last_login',
+		`last_login_attmpet` = '$this->last_login_attempt',
 		`last_update` = '$this->last_update',
 		`last_active` = '" . time() . "',
 		`avatar_link` = '$this->avatar_link',
