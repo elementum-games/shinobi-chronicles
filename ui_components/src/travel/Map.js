@@ -576,6 +576,9 @@ function Player({ mapData, playerStyle }) {
                     </div>
                 </>
             }
+            {mapData.is_protected &&
+                <img className="player_protected_icon" src='/images/map/icons/protected.png' style={{ position: 'absolute', bottom: '-4px', right: '-4px', height: '18px' }} />
+            }
         </div>
     );
 }

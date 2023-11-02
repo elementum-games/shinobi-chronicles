@@ -287,6 +287,12 @@ class TravelManager {
                     $can_attack = true;
                 }
             }
+            // additionally, if player is jonin and target is chuunin
+            $is_protected = false;
+            if (User::isProtectedByAlly($this->system, user_id: $user['user_id']) && $this->user->rank_num == 4) {
+                $can_attack = false;
+                $is_protected = true;
+            }
 
             // calculate direction
             $user_direction = "none";
@@ -323,6 +329,7 @@ class TravelManager {
                 distance: $distance,
                 village_id: $user['village_id'],
                 loot_count: $loot_count,
+                is_protected: $is_protected,
             );
         }
 
@@ -350,6 +357,7 @@ class TravelManager {
                     invulnerable: false,
                     village_id: 3,
                     loot_count: 6,
+                    is_protected: false,
                 );
             }
             for ($i = 0; $i < 2; $i++) {
@@ -372,6 +380,7 @@ class TravelManager {
                     invulnerable: false,
                     village_id: 3,
                     loot_count: 11,
+                    is_protected: false,
                 );
             }
             for ($i = 0; $i < 2; $i++) {
@@ -394,6 +403,7 @@ class TravelManager {
                     invulnerable: false,
                     village_id: 3,
                     loot_count: 11,
+                    is_protected: true,
                 );
             }
         }
@@ -582,9 +592,10 @@ class TravelManager {
         if ($user->last_active < time() - 120) {
             throw new RuntimeException("Target is inactive/offline!");
         }
-        if ($this->user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
+        // make this 70s as a small buffer since a war action takes 60s
+        if ($this->user->last_death_ms > System::currentTimeMs() - (70 * 1000)) {
             throw new RuntimeException("You died within the last minute, please wait " .
-                ceil((($this->user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+                ceil((($this->user->last_death_ms + (70 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
         }
         // we already give PvP immunity that breaks on attacking/war so this old restriction isn't needed
         /*
@@ -594,6 +605,9 @@ class TravelManager {
         }*/
         if ($this->user->operation > 0) {
             throw new RuntimeException("You are currently in an operation!");
+        }
+        if (User::isProtectedByAlly($this->system, user: $user) && $this->user->rank_num == 4) {
+            throw new RuntimeException("Cannot attack Chuunin protected by allied Jonin!");
         }
 
         if ($this->system->USE_NEW_BATTLES) {

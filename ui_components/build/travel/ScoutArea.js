@@ -15,6 +15,10 @@
  * battle_id:       int,
  * direction:       string,
  * invulnerable:    boolean,
+ * distance:        int,
+ * village_id:      int,
+ * loot_count:      int,
+ * is_protected:    boolean,
  * }} player
  */
 export const ScoutArea = ({
@@ -103,6 +107,8 @@ const Player = ({
     className: "in-battle"
   }), player_data.attack === false && player_data.direction !== 'none' && /*#__PURE__*/React.createElement("span", {
     className: `direction ${player_data.direction}`
+  }), player_data.attack === false && player_data.is_protected && /*#__PURE__*/React.createElement("span", {
+    className: "is-protected"
   })));
 };
 const QuickScoutInner = ({

@@ -385,6 +385,7 @@ class User extends Fighter {
         $user->accept_students = $user_data['accept_students'];
 
         $user->locked_challenge = $user_data['locked_challenge'];
+        $user->location = TravelCoords::fromDbString($user_data['location']);
 
         //Todo: Remove this in a couple months, only a temporary measure to support current bans
         if($user->ban_type) {
@@ -2576,5 +2577,35 @@ class User extends Fighter {
                 }
             }
         }
+    }
+
+    /**
+     * @return Bool
+     * Use either $user_id or $user object
+     */
+    public static function isProtectedByAlly(System $system, ?int $user_id = null, ?User $user = null): bool {
+        if (empty($user)) {
+            $user = User::loadFromId($system, $user_id, read_only: true);
+        }
+        if ($system->db->last_num_rows > 0) {
+            if ($user->rank_num == 3) {
+                $time = System::currentTimeMs();
+                $player_result = $system->db->query("SELECT `users`.*, `villages`.`village_id` FROM `users`
+                    INNER JOIN `villages` ON `users`.`village` = `villages`.`name`
+                    WHERE `location` = '{$user->location->fetchString()}' 
+                    AND `rank` = 4 
+                    AND `battle_id` = 0
+                    AND `users`.`last_active` > UNIX_TIMESTAMP() - 120
+                    AND `users`.`pvp_immunity_ms` < {$time}"
+                );
+                $player_result = $system->db->fetch_all($player_result);
+                foreach ($player_result as $player) {
+                    if ($user->village->isAlly($player['village_id'])) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
