@@ -325,7 +325,7 @@ class System {
         return $meme_array;
     }
 
-    public function html_parse($text, $img = false, $faces = false): array|string {
+    public function html_parse($text, $img = false, $faces = false, $youtube = false): array|string {
         $search_array = array(
             "[b]","[/b]","[u]","[/u]","[i]","[/i]",
             "&lt;3","[strike]","[/strike]","[super]","[/super]","[sub]","[/sub]", "[center]", "[/center]", "[right]", "[/right]",
@@ -340,13 +340,18 @@ class System {
         $memes = $this->getMemes();
         $text = str_replace($memes['codes'], ($faces ? $memes['images'] : $memes['texts']), $text);
 
+        // Exclude images
         if($img) {
-            $search_array[count($search_array)] = "[img]https://";
-            $search_array[count($search_array)] = "[img]http://";
-            $search_array[count($search_array)] = "[/img]";
-            $replace_array[count($replace_array)] = "<img src='[image_prefix]";
-            $replace_array[count($replace_array)] = "<img src='[image_prefix]";
-            $replace_array[count($replace_array)] = "' />";
+            $search_array[] = "[img]https://";
+            $search_array[] = "[img]http://";
+            $search_array[] = "[/img]";
+            $replace_array[] = "<img src='[https_prefix]";
+            $replace_array[] = "<img src='[https_prefix]";
+            $replace_array[] = "' />";
+        }
+        if($youtube) {
+            $search_array[] = "[youtube]https://";
+            $replace_array[] = "[youtube][https_prefix]";
         }
 
         $text = str_ireplace($search_array,$replace_array,$text);
@@ -354,6 +359,7 @@ class System {
         $search_array = [];
         $replace_array = [];
 
+        // Process links
         $reg_exUrl = '/((?:http|https):\/\/(?:[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
         if(self::LOCAL_HOST) {
             //Allow regex to work with local links if system is set to local host
@@ -371,7 +377,9 @@ class System {
             $text
         );
 
-        $search_array[] = '[image_prefix]';
+        // process tags
+
+        $search_array[] = '[https_prefix]';
         $replace_array[] = 'https://';
 
         $search_array[] = '\r\n';
@@ -385,8 +393,31 @@ class System {
         $search_array[] = '&amp;gt;';
         $replace_array[] = "&gt;";
 
-        return str_ireplace($search_array, $replace_array, $text);
+        $text = str_ireplace($search_array, $replace_array, $text);
 
+        // Youtube videos
+        if($youtube) {
+            $text = preg_replace_callback(
+                pattern: "!\[youtube\]https:\/\/"
+                . "(?#full URL or short URL)(?:(?>www\.youtube\.com\/watch\?v=)|(?>youtu\.be\/))"
+                . "(?#capture video ID)([\w-]+)"
+                . "(?#capture optional time specifier)(?:[?&]t=(\d+))?"
+                . "(?#any extra chars before ending tag, discard)(.*)?\[\/youtube\]!",
+                callback: function($matches) {
+                    return "<iframe
+                     width='750'
+                     height='600'
+                     src='https://www.youtube.com/embed/{$matches[1]}" . ($matches[2] ? "?start={$matches[2]}" : "") . "'
+                     frameborder='0'
+                     allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+                     allowfullscreen
+                 ></iframe>";
+                },
+                subject: str_replace("&amp;", "&", $text)
+            );
+        }
+
+        return $text;
     }
 
     public function parseMarkdown($text, $allow_images = false, $strip_breaks = true, $faces = false): string {

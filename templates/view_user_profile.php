@@ -133,7 +133,13 @@ $clan_positions = array(
 
             <?php if(!empty($journal)): ?>
                 <?php
-                    $journal = $system->html_parse(stripslashes($journal), true, true);
+                    $journal = $system->html_parse(
+                        text: stripslashes($journal),
+                        img: true,
+                        faces: true,
+                        youtube: $viewUser->forbidden_seal->journal_youtube_embed,
+                    );
+
                     $journal = $system->explicitLanguageReplace(
                         text: $journal,
                         allow_non_banned_words: !$player->censor_explicit_language
@@ -153,6 +159,7 @@ $clan_positions = array(
                 <tr><th colspan='2'>Journal</th></tr>
                 <tr><td colspan='2'>
                     <div id='journal' class='<?= $class_name ?>'><?= $journal ?></div>
+                        
                 </td></tr>
             <?php endif; ?>
 

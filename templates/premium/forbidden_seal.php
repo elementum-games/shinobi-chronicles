@@ -123,6 +123,7 @@
         <td>
             <?= $eightDeitiesSeal->journal_size ?> characters<br />
             <?= $eightDeitiesSeal->journal_image_display ?> images<br />
+            YouTube video embeds
         </td>
     </tr>
     <tr>

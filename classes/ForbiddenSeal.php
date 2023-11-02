@@ -11,27 +11,37 @@ class ForbiddenSeal {
     /** Benefits **/
     public string $name;
     public array $name_colors;
+
     public int $regen_boost;
+
     public int $avatar_size;
     public int $avatar_filesize;
     public array $avatar_styles;
+
     public int $logout_timer;
     public int $inbox_size;
+
     public int $journal_size;
     public int $journal_image_x;
     public int $journal_image_y;
+    public bool $journal_youtube_embed;
+
     public int $chat_post_size;
     public int $pm_size;
+
     public int $extra_jutsu_equips;
     public int $extra_armor_equips;
     public int $extra_weapon_equips;
+
     public int $stat_transfer_boost;
     public int $extra_stat_transfer_points_per_ak;
+    public int $free_transfer_bonus;
+
     public float $long_training_time;
     public float $long_training_gains;
     public float $extended_training_time;
     public float $extended_training_gains;
-    public int $free_transfer_bonus;
+
     public int $max_battle_history_view;
     public int $bonus_pve_reputation;
 
@@ -68,6 +78,7 @@ class ForbiddenSeal {
             'journal_image_x' => 300,
             'journal_image_y' => 200,
             'journal_image_display' => '300x200',
+            'journal_youtube_embed' => false,
             'chat_post_size' => 350,
             'pm_size' => 1000,
             'extra_jutsu_equips' => 0,
@@ -116,6 +127,7 @@ class ForbiddenSeal {
             'journal_image_x' => 500,
             'journal_image_y' => 500,
             'journal_image_display' => '500x500', //Premium page display only.
+            'journal_youtube_embed' => false,
             'chat_post_size' => 450,
             'pm_size' => 1500,
             'extra_jutsu_equips' => 0,
@@ -164,6 +176,7 @@ class ForbiddenSeal {
             'journal_image_x' => 500,
             'journal_image_y' => 500,
             'journal_image_display' => '500x500', //Premium page display only.
+            'journal_youtube_embed' => false,
             'chat_post_size' => 450,
             'pm_size' => 1500,
             'extra_jutsu_equips' => 1,
@@ -180,7 +193,7 @@ class ForbiddenSeal {
             'bonus_pve_reputation' => 1,
         ],
         3 => [
-            'regen_boost' => 25, //Report in whole percentages (20 will be .2 bonus)
+            'regen_boost' => 30, //Report in whole percentages (20 will be .2 bonus)
             'name_colors' => [
                 'blue' => 'blue',
                 'pink' => 'pink',
@@ -212,6 +225,7 @@ class ForbiddenSeal {
             'journal_image_x' => 600,
             'journal_image_y' => 600,
             'journal_image_display' => '600x600', //Premium page display only.
+            'journal_youtube_embed' => true,
             'chat_post_size' => 450,
             'pm_size' => 1500,
             'extra_jutsu_equips' => 1,
@@ -284,6 +298,7 @@ class ForbiddenSeal {
         $this->journal_size = self::$benefits[$this->level]['journal_size'];
         $this->journal_image_x = self::$benefits[$this->level]['journal_image_x'];
         $this->journal_image_y = self::$benefits[$this->level]['journal_image_y'];
+        $this->journal_youtube_embed = self::$benefits[$this->level]['journal_youtube_embed'];
         $this->chat_post_size = self::$benefits[$this->level]['chat_post_size'];
         $this->pm_size = self::$benefits[$this->level]['pm_size'];
         $this->extra_jutsu_equips = self::$benefits[$this->level]['extra_jutsu_equips'];
