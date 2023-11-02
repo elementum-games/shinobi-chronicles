@@ -55,7 +55,7 @@ class Operation {
     ];
     /* 100 / 20 * 12s = 60s */
 
-    const LOOT_GAIN = 5;
+    const LOOT_GAIN = 10;
     const LOOT_OPERATION_INTERVAL_PROGRESS_PERCENT = 100; // each loot action is only 1 interval
     const LOOT_OPERATION_INTERVAL_SECONDS = 6; // takes half time as normal
     const LOOT_OPERATION_POOL_COST = [

@@ -3,9 +3,9 @@
 require_once __DIR__ . "/Operation.php";
 
 class WarManager {
-    const BASE_TOWN_RESOURCE_PRODUCTION = 15;
-    const BASE_CASTLE_RESOURCE_PRODUCTION = 35;
-    const HOME_REGION_RESOURCE_BONUS = 10;
+    const BASE_TOWN_RESOURCE_PRODUCTION = 25;
+    const BASE_CASTLE_RESOURCE_PRODUCTION = 50;
+    const VILLAGE_BASE_RESOURCE_PRODUCTION = 75;
     const BASE_CARAVAN_TIME_MS = 300000; // 5 minute travel time
     const CARAVAN_TIMER_HOURS = 6; // 24m average caravan spawn timer, so 19 minute average downtime
     const BASE_VILLAGE_REGEN_PER_MINUTE = 40; // 2400/hour
@@ -52,7 +52,7 @@ class WarManager {
         4 => 0,
     ];
     const PATROL_RESPAWN_TIME = 600;
-    const BASE_LOOT_CAPACITY = 25;
+    const BASE_LOOT_CAPACITY = 50;
     const MAX_PATROL_TIER = 3;
     const YEN_PER_RESOURCE = 10;
 

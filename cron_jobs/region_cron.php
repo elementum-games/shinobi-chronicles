@@ -96,8 +96,31 @@ function hourlyRegion(System $system, $debug = true): void
     $village_result = $system->db->query("SELECT * FROM `villages`");
     $village_result = $system->db->fetch_all($village_result);
     $villages = [];
+    // apply base production
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);
+        $production = WarManager::VILLAGE_BASE_RESOURCE_PRODUCTION + $villages[$region['village']]->policy->home_production_boost;
+        $villages[$village['village_id']]->addResource(1, $production);
+        $villages[$village['village_id']]->addResource(2, $production);
+        $villages[$village['village_id']]->addResource(3, $production);
+        $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village['village_id']}, 1, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", {$production}, " . time() . ")";
+        $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village['village_id']}, 1, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$production}, " . time() . ")";
+        $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village['village_id']}, 2, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", {$production}, " . time() . ")";
+        $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village['village_id']}, 2, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$production}, " . time() . ")";
+        $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village['village_id']}, 3, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", {$production}, " . time() . ")";
+        $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village['village_id']}, 3, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$production}, " . time() . ")";
     }
     foreach ($region_result as $region) {
         // get region locations for region
@@ -118,13 +141,13 @@ function hourlyRegion(System $system, $debug = true): void
                     break;
             }
             if ($region['region_id'] <= 5) {
-                $production += WarManager::HOME_REGION_RESOURCE_BONUS;
-                $production += floor($production * ($villages[$region['village']]->policy->home_production_boost / 100));
-                $villages[$region['village']]->addResource($region_location['resource_id'], $region_location['resource_count']);
-                $queries[] = "INSERT INTO `resource_logs`
-                    (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                    VALUES ({$region['village']}, {$region_location['resource_id']}, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$region_location['resource_count']}, " . time() . ")";
-                $region_location['resource_count'] = 0;
+                if (empty($region['occupying_village_id'])) {
+                    $villages[$region['village']]->addResource($region_location['resource_id'], $region_location['resource_count']);
+                    $queries[] = "INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$region['village']}, {$region_location['resource_id']}, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$region_location['resource_count']}, " . time() . ")";
+                    $region_location['resource_count'] = 0;
+                }
             }
             $region_location['resource_count'] += $production;
             !empty($village_resource_production[$region['village']][$region_location['resource_id']]) ? $village_resource_production[$region['village']][$region_location['resource_id']] += $production : $village_resource_production[$region['village']][$region_location['resource_id']] = $production;
