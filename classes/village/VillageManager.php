@@ -37,6 +37,7 @@ class VillageManager {
     const PROPOSAL_COOLDOWN_HOURS = 1; // 1
     const KAGE_PROVISIONAL_DAYS = 7; // 7
     const POLICY_CHANGE_COOLDOWN_DAYS = 3; // 3
+    const SEAT_RECLAIM_COOLDOWN_HOURS = 24; // 24
 
     const VOTE_NO = 0;
     const VOTE_YES = 1;
@@ -173,6 +174,18 @@ class VillageManager {
                 if (!self::checkSeatRequirements($system, $player, $seat_type)) {
                     return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_KAGE_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_KAGE_CLAIM_TIER]['min_rep'] . " Reputation";
                 }
+                // check if recently left this seat
+                $result = $system->db->query("SELECT * FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` = {$player->user_id} AND `seat_end` IS NOT NULL ORDER BY `seat_end` DESC LIMIT 1");
+                $result = $system->db->fetch($result);
+                if ($system->db->last_num_rows > 0) {
+                    $cooldown_remaining = ($result['seat_end'] + self::SEAT_RECLAIM_COOLDOWN_HOURS * 3600) - time();
+                    if ($cooldown_remaining > 0) {
+                        $hours = floor($cooldown_remaining / 3600);
+                        $minutes = floor(($cooldown_remaining % 3600) / 60);
+                        $message = "You must wait another " . ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute " : $minutes . " minutes" . " before reclaiming this seat.");
+                        return $message;
+                    }
+                }
                 // check seat available
                 $result = $system->db->query("SELECT `leader` FROM `villages` WHERE `village_id` = {$player->village->village_id}");
                 $result = $system->db->fetch($result);
@@ -241,6 +254,18 @@ class VillageManager {
                 // check requirements
                 if (!self::checkSeatRequirements($system, $player, $seat_type)) {
                     return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_ELDER_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_ELDER_CLAIM_TIER]['min_rep'] . " Reputation";
+                }
+                // check if recently left this seat
+                $result = $system->db->query("SELECT * FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` = {$player->user_id} AND `seat_end` IS NOT NULL ORDER BY `seat_end` DESC LIMIT 1");
+                $result = $system->db->fetch($result);
+                if ($system->db->last_num_rows > 0) {
+                    $cooldown_remaining = ($result['seat_end'] + self::SEAT_RECLAIM_COOLDOWN_HOURS * 3600) - $result['seat_end'];
+                    if ($cooldown_remaining > 0) {
+                        $hours = floor($cooldown_remaining / 3600);
+                        $minutes = floor(($cooldown_remaining % 3600) / 60);
+                        $message = "You must wait another " . ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute " : $minutes . " minutes" . " before reclaiming this seat.");
+                        return $message;
+                    }
                 }
                 // check seat available
                 $result = $system->db->query("SELECT COUNT(*) as 'elder_count' FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `seat_end` IS NULL LIMIT 1");
@@ -585,6 +610,12 @@ class VillageManager {
         $seat_result = $system->db->fetch($seat_result);
         if ($system->db->last_num_rows == 0) {
             return "Invalid challenge target.";
+        }
+        // if elder, check if other seat available
+        $elder_count = $system->db->query("SELECT count(*) as `elder_count` FROM `village_seats` WHERE `seat_type` = 'elder' AND `village_id` = {$player->village->village_id} AND `seat_end` IS NULL");
+        $elder_count = $system->db->fetch($elder_count);
+        if (isset($elder_count['elder_count']) && $elder_count['elder_count'] < 3) {
+            return "Cannot challenge Elder with open seat available for claim.";
         }
         // check if already has seat
         if (isset($player->village_seat->seat_id) && $seat_result['seat_type'] != 'kage') {
