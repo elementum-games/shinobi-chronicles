@@ -47,6 +47,7 @@ class VillageManager {
     const PROPOSAL_TYPE_DECLARE_WAR = "declare_war";
     const PROPOSAL_TYPE_OFFER_ALLIANCE = "offer_alliance";
     const PROPOSAL_TYPE_OFFER_PEACE = "offer_peace";
+    const PROPOSAL_TYPE_FORCE_PEACE = "force_peace";
     const PROPOSAL_TYPE_ACCEPT_ALLIANCE = "accept_alliance";
     const PROPOSAL_TYPE_ACCEPT_PEACE = "accept_peace";
     const PROPOSAL_TYPE_BREAK_ALLIANCE = "break_alliance";
@@ -58,6 +59,8 @@ class VillageManager {
     const CHALLENGE_SCHEDULE_INCREMENT_MINUTES = 15;
     const CHALLENGE_MINIMUM_TIMES_SELECTED = 12;
     const CHALLENGE_SCHEDULE_TIME_HOURS = 24;
+
+    const FORCE_PEACE_MINIMUM_DURATION_DAYS = 3;
 
     public static function getLocation(System $system, string $village_id): ?TravelCoords {
         $result = $system->db->query(
@@ -1412,6 +1415,31 @@ class VillageManager {
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 break;
+            case self::PROPOSAL_TYPE_FORCE_PEACE:
+                // check at war
+                if (!$player->village->isEnemy($proposal['target_village_id'])) {
+                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    return "Proposal canceled. Villages must be neutral to form alliance.";
+                }
+                // update relation
+                self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_NEUTRAL, $proposal['type']);
+                // clear active proposals
+                self::clearDiplomaticProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
+                // update proposal
+                $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                $message = "Forced peace with " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                // create notification
+                self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
+                // if village occupied by enemy, return to owner's control
+                $system->db->query("UPDATE `region_locations`
+                    INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+                    SET `region_locations`.`occupying_village_id` = NULL
+                    WHERE `regions`.`village` = {$proposal['target_village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['village_id']}");
+                $system->db->query("UPDATE `region_locations`
+                    INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+                    SET `region_locations`.`occupying_village_id` = NULL
+                    WHERE `regions`.`village` = {$proposal['village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['target_village_id']}");
+                break;
             default:
                 return "Invalid proposal type.";
                 break;
@@ -1562,8 +1590,15 @@ class VillageManager {
         if ($seat->seat_type != "kage") {
             return "You do not meet the seat requirements.";
         }
+        // check duration
+        if ($player->village->relations[$target_village_id]->relation_start + self::FORCE_PEACE_MINIMUM_DURATION_DAYS * 86400 < time()) {
+            $type = self::PROPOSAL_TYPE_FORCE_PEACE;
+            $name = "Force Peace: " . VillageManager::VILLAGE_NAMES[$target_village_id];
+        } else {
+            $type = self::PROPOSAL_TYPE_OFFER_PEACE;
+            $name = "Offer Peace: " . VillageManager::VILLAGE_NAMES[$target_village_id];
+        }
         // check no pending proposal of same type
-        $type = self::PROPOSAL_TYPE_OFFER_PEACE;
         $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = '{$type}' LIMIT 1");
         $last_change = $system->db->fetch($query);
         if ($system->db->last_num_rows > 0) {
@@ -1574,8 +1609,8 @@ class VillageManager {
             return "Village must be at war to offer peace.";
         }
         // also check not pending on receiving village
-        $type = self::PROPOSAL_TYPE_ACCEPT_PEACE;
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$target_village_id} AND `target_village_id` = {$player->village->village_id} AND `type` = '{$type}' LIMIT 1");
+        $check_type = self::PROPOSAL_TYPE_ACCEPT_PEACE;
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$target_village_id} AND `target_village_id` = {$player->village->village_id} AND `type` = '{$check_type}' LIMIT 1");
         $last_change = $system->db->fetch($query);
         if ($system->db->last_num_rows > 0) {
             return "There is already a pending proposal of the same type.";
@@ -1594,8 +1629,6 @@ class VillageManager {
         }
         // insert into DB
         $time = time();
-        $name = "Offer Peace: " . VillageManager::VILLAGE_NAMES[$target_village_id];
-        $type = self::PROPOSAL_TYPE_OFFER_PEACE;
         $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$type}', '{$name}', {$target_village_id})");
 
         // create notification
@@ -1775,6 +1808,10 @@ class VillageManager {
             case self::PROPOSAL_TYPE_DECLARE_WAR:
                 $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_WAR;
                 $message = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " has declared War on " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
+                break;
+            case self::PROPOSAL_TYPE_FORCE_PEACE:
+                $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_END_WAR;
+                $message = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " has forced peace with " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
                 break;
             default:
                 break;
