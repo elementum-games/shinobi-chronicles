@@ -61,6 +61,7 @@ class VillageManager {
     const CHALLENGE_SCHEDULE_TIME_HOURS = 24;
 
     const FORCE_PEACE_MINIMUM_DURATION_DAYS = 3;
+    const WAR_COOLDOWN_DAYS = 3;
 
     public static function getLocation(System $system, string $village_id): ?TravelCoords {
         $result = $system->db->query(
@@ -1292,6 +1293,20 @@ class VillageManager {
                 if (VillagePolicy::$POLICY_EFFECTS[$policy_result['policy_id']][VillagePolicy::POLICY_RESTRICTION_WAR_ENABLED] == false) {
                     return "Cannot declare war due to policy restriction.";
                 }
+                // check war cooldown
+                $relation_type = VillageRelation::RELATION_WAR;
+                $last_war = $system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NOT NULL AND `relation_type` = {$relation_type} 
+                AND (`village1_id` = {$proposal['village_id']} OR `village2_id` = {$proposal['village_id']})
+                AND (`village1_id` = {$proposal['target_village_id']} OR `village2_id` = {$proposal['target_village_id']})
+                ORDER BY `relation_end` DESC LIMIT 1");
+                $last_war = $system->db->fetch($last_war);
+                if ($system->db->last_num_rows > 0) {
+                    $war_cooldown = ($last_war['relation_end'] + self::WAR_COOLDOWN_DAYS * 86400) - time();
+                    if ($war_cooldown > 0) {
+                        $message = "You must wait another " . $system->time_remaining($war_cooldown) . " before declaring war on this village!";
+                        return $message;
+                    } 
+                }
                 // update relation
                 self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_WAR, $proposal['type']);
                 // clear active proposals
@@ -1556,6 +1571,20 @@ class VillageManager {
         // only allow if neutral
         if (!$player->village->isNeutral($target_village_id)) {
             return "Village must be neutral to declare war.";
+        }
+        // check war cooldown
+        $relation_type = VillageRelation::RELATION_WAR;
+        $last_war = $system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NOT NULL AND `relation_type` = {$relation_type} 
+        AND (`village1_id` = {$player->village->village_id} OR `village2_id` = {$player->village->village_id})
+        AND (`village1_id` = {$target_village_id} OR `village2_id` = {$target_village_id})
+        ORDER BY `relation_end` DESC LIMIT 1");
+        $last_war = $system->db->fetch($last_war);
+        if ($system->db->last_num_rows > 0) {
+            $war_cooldown = ($last_war['relation_end'] + self::WAR_COOLDOWN_DAYS * 86400) - time();
+            if ($war_cooldown > 0) {
+                $message = "You must wait another " . $system->time_remaining($war_cooldown) . " before declaring war on this village!";
+                return $message;
+            } 
         }
         // check player cooldown on submit proposal
         $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
