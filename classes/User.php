@@ -61,7 +61,7 @@ class User extends Fighter {
     const BASE_EXP = 0;
     const BASE_REGEN = 25;
 
-    const BASE_JUTSU_SLOTS = 4;
+    const BASE_JUTSU_SLOTS = 6;
     const BASE_ARMOR_SLOTS = 2;
     const BASE_WEAPON_SLOTS = 1;
 
