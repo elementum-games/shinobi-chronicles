@@ -88,6 +88,11 @@ function battle(): bool {
 			if($user->last_active < time() - 120) {
 				throw new RuntimeException("Target is inactive/offline!");
 			}
+            if ($user->pvp_immunity_ms > System::currentTimeMs()) {
+            throw new RuntimeException("You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
+                ceil(($user->pvp_immunity_ms - System::currentTimeMs()) / 1000) . " more seconds.");
+        }
+            /*
 			if($player->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
 				throw new RuntimeException("You died within the last minute, please wait " .
 					ceil((($player->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
@@ -95,7 +100,7 @@ function battle(): bool {
 			if($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
 				throw new RuntimeException("Target has died within the last minute, please wait " .
 					ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
-			}
+			}*/
 
             if($system->USE_NEW_BATTLES) {
                 BattleV2::start($system, $player, $user, Battle::TYPE_FIGHT);
@@ -127,6 +132,30 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
     $pvp_yen = $player->rank_num * 50;
 
     $result = "";
+
+    $player_alignment = VillageRelation::RELATION_NEUTRAL;
+    $opponent_alignment = VillageRelation::RELATION_NEUTRAL;
+    $region_objective = $system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`
+        FROM `region_locations`
+        INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+        WHERE `x` = {$player->location->x}
+        AND `y` = {$player->location->x}
+        AND `map_id` = {$player->location->x} LIMIT 1");
+    $region_objective = $system->db->fetch($region_objective);
+    if ($system->db->last_num_rows > 0) {
+        if (isset($player->village->relations[$region_objective['village']])) {
+            $player_alignment = $player->village->relations[$region_objective['village']]->relation_type;
+        }
+        else if ($player->village->village_id == $region_objective['village']) {
+            $opponent_alignment = VillageRelation::RELATION_ALLY;
+        }
+        if (isset($battle->opponent->village->relations[$region_objective['village'])) {
+            $opponent_alignment = $battle->opponent->village->relations[$region_objective['village']]->relation_type;
+        }
+        else if ($battle->opponent->village->village_id == $region_objective['village']) {
+            $opponent_alignment = VillageRelation::RELATION_ALLY;
+        }
+    }
 
     if ($battle->isPlayerWinner()) {
         $player->pvp_wins++;
@@ -187,6 +216,25 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
             $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1);
         }
+        // Objective
+        // if player is allied with location owner
+        if ($player_alignment == VillageRelation::RELATION_ALLIANCE) {
+            if ($region_objective['defense'] < 100) {
+                $region_objective['defense']++;
+                $system->db->query("UPDATE `region_locations` SET `defense` = {$region_objective['defense']} WHERE `id` = {$region_objective['id']}");
+                WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_DEFENSE_GAINED, $region_objective['village']);
+                $result .= "Increased objective defense by 1.[br]";
+            } 
+        }
+        // if opponent is allied with location owner
+        else if ($opponent_alignment == VillageRelation::RELATION_ALLIANCE) {
+            if ($region_objective['defense'] > 0) {
+                $region_objective['defense']--;
+                $system->db->query("UPDATE `region_locations` SET `defense` = {$region_objective['defense']} WHERE `id` = {$region_objective['id']}");
+                WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_DEFENSE_REDUCED, $region_objective['village']);
+                $result .= "Decreased objective defense by 1.[br]";
+            } 
+        }
 
         // War Log
         WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_PVP_WINS, $battle->opponent->village->village_id);
@@ -197,7 +245,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->pvp_losses++;
         $player->last_pvp_ms = System::currentTimeMs();
         $player->last_death_ms = System::currentTimeMs();
-        $player->pvp_immunity_ms = System::currentTimeMs() + (5 * 60 * 1000); // 5 minutes
+        $player->pvp_immunity_ms = System::currentTimeMs() + (User::PVP_IMMUNITY_SECONDS * 1000); 
 
         if ($battle->is_retreat) {
             $player->health = 5;
@@ -247,6 +295,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->health = 5;
         $player->moveToVillage();
         $player->last_pvp_ms = System::currentTimeMs();
+        $player->pvp_immunity_ms = System::currentTimeMs() + (User::PVP_IMMUNITY_SECONDS * 1000); 
 
         // If player is killed during a survival mission as a result of PVP, clear the survival mission
         if ($player->mission_id != null) {
