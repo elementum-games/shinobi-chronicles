@@ -400,7 +400,7 @@ class WarManager {
         }
         $this->user->village->updateResources();
         $message .= "!";
-        $message .= "\nGained {$yen_gain} yen!";
+        $message .= "\nGained ¥{$yen_gain}!";
         $this->user->addMoney($yen_gain, "Resource");
         // update loot table
         $time = time();
