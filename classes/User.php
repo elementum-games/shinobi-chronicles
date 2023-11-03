@@ -86,6 +86,9 @@ class User extends Fighter {
     const UPDATE_FULL = 2;
     const ATTACK_LINK_DURATION_MIN = 10;
 
+    const PVP_IMMUNITY_SECONDS = 90;
+    const SPECIAL_MISSION_STEALTH_BONUS = 2;
+
     public static int $jutsu_train_gain = 5;
 
     public System $system;

@@ -227,7 +227,7 @@ class TravelManager {
     #[Trace]
     public function fetchNearbyPlayers(): array {
         $sql = "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`village`, `users`.`rank`, `users`.`stealth`, `users`.`operation`,
-                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`, `users`.`pvp_immunity_ms`, `villages`.`village_id`
+                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`, `users`.`pvp_immunity_ms`, `villages`.`village_id`, `users`.`special_mission`
                 FROM `users`
                 INNER JOIN `ranks`
                 ON `users`.`rank`=`ranks`.`rank_id`
@@ -239,7 +239,11 @@ class TravelManager {
         $users = $this->system->db->fetch_all($result);
         $return_arr = [];
         foreach ($users as $user) {
-            // check if the user is nearby (including stealth
+            // give bonus stealth if in special mission
+            if ($user['special_mission'] > 0) {
+                $user['stealth'] += User::SPECIAL_MISSION_STEALTH_BONUS;
+            }
+            // check if the user is nearby (including stealth)
             $scout_range = max(0, $this->user->scout_range - $user['stealth']);
             $user_location = TravelCoords::fromDbString($user['location']);
             if ($user_location->map_id !== $this->user->location->map_id ||
@@ -592,13 +596,15 @@ class TravelManager {
         if ($user->last_active < time() - 120) {
             throw new RuntimeException("Target is inactive/offline!");
         }
-        // make this 70s as a small buffer since a war action takes 60s
-        if ($this->user->last_death_ms > System::currentTimeMs() - (70 * 1000)) {
-            throw new RuntimeException("You died within the last minute, please wait " .
-                ceil((($this->user->last_death_ms + (70 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+        if ($this->user->pvp_immunity_ms > System::currentTimeMs()) {
+            throw new RuntimeException("You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
+                ceil(($this->user->pvp_immunity_ms - System::currentTimeMs()) / 1000) . " more seconds.");
         }
-        // we already give PvP immunity that breaks on attacking/war so this old restriction isn't needed
         /*
+        if ($this->user->last_death_ms > System::currentTimeMs() - (User::PVP_IMMUNITY_SECONDS * 1000)) {
+            throw new RuntimeException("You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
+                ceil((($this->user->last_death_ms + (User::PVP_IMMUNITY_SECONDS * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+        }
         if ($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
             throw new RuntimeException("Target has died within the last minute, please wait " .
                 ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
@@ -968,7 +974,7 @@ class TravelManager {
                             resource_count: $obj['resource_count'],
                         );
                     case "village":
-                        if ($distance <= $this->user->scout_range || $obj['village_name'] == $this->user->village->name) {
+                        if ($distance <= $this->user->scout_range) {
                             $image = "/images/map/icons/village.png";
                             $objectives[] = new RegionObjective(
                                 id: $obj['region_location_id'],
