@@ -28,7 +28,7 @@ if($battle->battle_text) {
 ?>
 
 <script type='text/javascript'>
-    let battle_id = <?=  $battle->battle_id ?>;
+    let battle_id = <?= $battle->battle_id ?>;
     var apiUrl = `api/battle.php?check_turn=` + battle_id;
     let turn_count = <?= $battle->turn_count ?>;
     let prep_time_remaining = <?= $battle->prepTimeRemaining() ?>;
@@ -36,13 +36,12 @@ if($battle->battle_text) {
     let player2_submitted = <?= (int)isset($battle->fighter_actions[$battle->player2->combat_id]) ?>;
     let player1_time = <?= $battle->timeRemaining($battle->player1_id) ?>;
     let player2_time = <?= $battle->timeRemaining($battle->player2_id) ?>;
-    let refreshInterval = setInterval(() => checkTurn(), 1000);
+
     function checkTurn() {
         if (prep_time_remaining > 0 && turn_count == 0) {
             prep_time_remaining--;
             $("#prep_time_remaining").text(prep_time_remaining);
             if (prep_time_remaining == 0) {
-                clearInterval(refreshInterval);
                 updateContent();
                 return;
             }
@@ -52,25 +51,24 @@ if($battle->battle_text) {
         player2_time--;
         $("#player2_time").text(player2_time);
         if ((player1_time <= 0 || player1_submitted) && (player2_time <= 0 || player2_submitted)) {
-            clearInterval(refreshInterval);
             updateContent();
             return;
         }
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
-                if (data.data != undefined) {
-                    if (data.data.turn_count > turn_count) {
-                        clearInterval(refreshInterval);
-                        updateContent();
-                        return;
-                    }
+                if (data.data != undefined && data.data.turn_count > turn_count) {
+                    updateContent();
+                } else {
+                    setTimeout(checkTurn, 1000);
                 }
             })
             .catch(err => {
                 console.error(err);
+                setTimeout(checkTurn, 1000);
             });
     }
+
     function updateContent() {
         fetch(window.location.href)
             .then(response => response.text())
@@ -84,6 +82,8 @@ if($battle->battle_text) {
                 console.error('Failed to fetch new content', err);
             });
     }
+
+    checkTurn();
 </script>
 
 <style type='text/css'>
