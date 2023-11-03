@@ -111,7 +111,7 @@ function processWarBattleEnd($battle, User $player): string {
         }
 
         // handle patrol logic
-        $warManager->handleWinAgainstPatrol($patrol_id);
+        $battle_result .= $warManager->handleWinAgainstPatrol($patrol_id);
 
         $player->ai_wins++;
         $player->battle_id = 0;

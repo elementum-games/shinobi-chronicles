@@ -408,11 +408,16 @@ class WarManager {
         return $message;
     }
 
-    public function handleWinAgainstPatrol(int $patrol_id) {
-        $patrol_result = $this->system->db->query("SELECT * FROM `patrols` WHERE `id` = {$patrol_id}");
+    /**
+     * @return string
+     */
+    public function handleWinAgainstPatrol(int $patrol_id): string {
+        $message = '';
+        $time = time();
+        $patrol_result = $this->system->db->query("SELECT * FROM `patrols` WHERE `id` = {$patrol_id} AND `start_time` < {$time}");
         $patrol_result = $this->system->db->fetch($patrol_result);
         if ($this->system->db->last_num_rows == 0) {
-            return;
+            return $message;
         }
         WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_PATROLS_DEFEATED, $patrol_result['village_id']);
         $x = mt_rand(1, 100);
@@ -434,6 +439,21 @@ class WarManager {
         }
         $respawn_time = time() + round(self::PATROL_RESPAWN_TIME * (100 / (100 + $this->user->village->policy->patrol_respawn)), 1);
         $this->system->db->query("UPDATE `patrols` SET `start_time` = {$respawn_time}, `name` = '{$name}', `ai_id` = {$ai_id}, `tier` = {$tier} WHERE `id` = {$patrol_id}");
+        // decrease region location defense in region that matches patrol's village
+        $location_result = $this->system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`
+            FROM `region_locations`
+            INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+            WHERE `region_locations`.`region_id` = {$patrol_result['region_id']}
+        ");
+        $location_result = $this->system->db->fetch_all($location_result);
+        foreach ($location_result as $location) {
+            if ($location['defense'] > 0 && $location['village'] == $patrol_result['village_id']) {
+                $location['defense']--;
+                $this->system->db->query("UPDATE `region_locations` SET `defense` = {$location['defense']} WHERE `id` = {$location['id']}");
+            }
+        }
+        $message = 'Enemy region Defense decreased by 1.<br>';
+        return $message;
     }
 
     public function handleLossAgainstPatrol(int $patrol_id): string
