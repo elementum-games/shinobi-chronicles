@@ -597,7 +597,7 @@ class TravelManager {
             throw new RuntimeException("Target is inactive/offline!");
         }
         if ($this->user->pvp_immunity_ms > System::currentTimeMs()) {
-            throw new RuntimeException("You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
+            throw new RuntimeException("You were defeated within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
                 ceil(($this->user->pvp_immunity_ms - System::currentTimeMs()) / 1000) . " more seconds.");
         }
         /*
@@ -1041,6 +1041,12 @@ class TravelManager {
      */
     function beginOperation($operation_type): bool {
         $message = '';
+        if ($this->user->pvp_immunity_ms > System::currentTimeMs()) {
+            $message = "You were defeated within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
+                ceil(($this->user->pvp_immunity_ms - System::currentTimeMs()) / 1000) . " more seconds.";
+            $this->setTravelMessage($message);
+            return false;
+        }
         if ($operation_type == Operation::OPERATION_LOOT) {
             $time = time();
             $caravans = $this->system->db->query("SELECT * FROM `caravans` where `start_time` < {$time} && `village_id` != {$this->user->village->village_id}");
