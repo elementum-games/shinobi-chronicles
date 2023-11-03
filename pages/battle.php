@@ -139,21 +139,22 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         FROM `region_locations`
         INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
         WHERE `x` = {$player->location->x}
-        AND `y` = {$player->location->x}
-        AND `map_id` = {$player->location->x} LIMIT 1");
+        AND `y` = {$player->location->y}
+        AND `map_id` = {$player->location->map_id} LIMIT 1");
     $region_objective = $system->db->fetch($region_objective);
     if ($system->db->last_num_rows > 0) {
+        $result .= $region_objective['id'];
         if (isset($player->village->relations[$region_objective['village']])) {
             $player_alignment = $player->village->relations[$region_objective['village']]->relation_type;
         }
         else if ($player->village->village_id == $region_objective['village']) {
-            $opponent_alignment = VillageRelation::RELATION_ALLY;
+            $player_alignment = VillageRelation::RELATION_ALLIANCE;
         }
-        if (isset($battle->opponent->village->relations[$region_objective['village'])) {
+        if (isset($battle->opponent->village->relations[$region_objective['village']])) {
             $opponent_alignment = $battle->opponent->village->relations[$region_objective['village']]->relation_type;
         }
         else if ($battle->opponent->village->village_id == $region_objective['village']) {
-            $opponent_alignment = VillageRelation::RELATION_ALLY;
+            $opponent_alignment = VillageRelation::RELATION_ALLIANCE;
         }
     }
 
