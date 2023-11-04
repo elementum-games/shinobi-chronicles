@@ -804,6 +804,10 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
             throw new RuntimeException('Error setting difficulty!');
         }
 
+        if ($player->location != $player->village_location) {
+            throw new RuntimeException('Must be in village to begin a Special Mission!');
+        }
+
         $timestamp = time();
 
         $log = [

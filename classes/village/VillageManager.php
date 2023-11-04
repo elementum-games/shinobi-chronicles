@@ -60,7 +60,7 @@ class VillageManager {
     const CHALLENGE_MINIMUM_TIMES_SELECTED = 12;
     const CHALLENGE_SCHEDULE_TIME_HOURS = 24;
 
-    const FORCE_PEACE_MINIMUM_DURATION_DAYS = 3;
+    const FORCE_PEACE_MINIMUM_DURATION_DAYS = 7;
     const WAR_COOLDOWN_DAYS = 3;
 
     public static function getLocation(System $system, string $village_id): ?TravelCoords {

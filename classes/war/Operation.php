@@ -472,7 +472,7 @@ class Operation {
         $operation_id = $system->db->last_insert_id;
         $user->operation = $operation_id;
         // engaging in war mechanics disables pvp immunity
-        // $user->pvp_immunity_ms = 0;
+        $user->pvp_immunity_ms = 0;
         return $operation_id;
     }
 

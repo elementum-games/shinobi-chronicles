@@ -596,15 +596,16 @@ class TravelManager {
         if ($user->last_active < time() - 120) {
             throw new RuntimeException("Target is inactive/offline!");
         }
+        /*
         if ($this->user->pvp_immunity_ms > System::currentTimeMs()) {
             throw new RuntimeException("You were defeated within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
                 ceil(($this->user->pvp_immunity_ms - System::currentTimeMs()) / 1000) . " more seconds.");
-        }
-        /*
+        }*/
         if ($this->user->last_death_ms > System::currentTimeMs() - (User::PVP_IMMUNITY_SECONDS * 1000)) {
             throw new RuntimeException("You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
                 ceil((($this->user->last_death_ms + (User::PVP_IMMUNITY_SECONDS * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
         }
+        /*
         if ($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
             throw new RuntimeException("Target has died within the last minute, please wait " .
                 ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
@@ -1041,9 +1042,16 @@ class TravelManager {
      */
     function beginOperation($operation_type): bool {
         $message = '';
+        /*
         if ($this->user->pvp_immunity_ms > System::currentTimeMs()) {
             $message = "You were defeated within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
                 ceil(($this->user->pvp_immunity_ms - System::currentTimeMs()) / 1000) . " more seconds.";
+            $this->setTravelMessage($message);
+            return false;
+        }*/
+        if ($this->user->last_death_ms > System::currentTimeMs() - (User::PVP_IMMUNITY_SECONDS * 1000)) {
+            $message = "You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
+                ceil((($this->user->last_death_ms + (User::PVP_IMMUNITY_SECONDS * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.";
             $this->setTravelMessage($message);
             return false;
         }

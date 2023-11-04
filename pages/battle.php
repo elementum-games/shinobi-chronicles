@@ -88,15 +88,16 @@ function battle(): bool {
 			if($user->last_active < time() - 120) {
 				throw new RuntimeException("Target is inactive/offline!");
 			}
+            /*
             if ($user->pvp_immunity_ms > System::currentTimeMs()) {
             throw new RuntimeException("You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
                 ceil(($user->pvp_immunity_ms - System::currentTimeMs()) / 1000) . " more seconds.");
-        }
-            /*
-			if($player->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
+            }*/
+			if($player->last_death_ms > System::currentTimeMs() - (User::PVP_IMMUNITY_SECONDS * 1000)) {
 				throw new RuntimeException("You died within the last minute, please wait " .
-					ceil((($player->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+					ceil((($player->last_death_ms + (User::PVP_IMMUNITY_SECONDS * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}
+            /*
 			if($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
 				throw new RuntimeException("Target has died within the last minute, please wait " .
 					ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
