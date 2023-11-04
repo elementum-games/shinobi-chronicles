@@ -247,7 +247,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->pvp_losses++;
         $player->last_pvp_ms = System::currentTimeMs();
         $player->last_death_ms = System::currentTimeMs();
-        $player->pvp_immunity_ms = System::currentTimeMs() + (User::PVP_IMMUNITY_SECONDS * 1000); 
+        $player->pvp_immunity_ms = System::currentTimeMs() + (5 * 60 * 1000); // 5 minutes
 
         if ($battle->is_retreat) {
             $player->health = 5;
@@ -296,8 +296,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $result .= "You both knocked each other out. You were taken back to your village by some allied ninja.[br]";
         $player->health = 5;
         $player->moveToVillage();
-        $player->last_pvp_ms = System::currentTimeMs();
-        $player->pvp_immunity_ms = System::currentTimeMs() + (User::PVP_IMMUNITY_SECONDS * 1000); 
+        $player->last_pvp_ms = System::currentTimeMs(); 
 
         // If player is killed during a survival mission as a result of PVP, clear the survival mission
         if ($player->mission_id != null) {
