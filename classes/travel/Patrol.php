@@ -34,22 +34,22 @@ class Patrol {
         }
         $this->patrol_type = $patrol_type;
     }
-    public function setLocation(System $system) {
+    public function setLocation(System $system, array $region_locations) {
         $route_locations = [];
         $loop = false;
         switch ($this->patrol_type) {
             case self::PATROL_TYPE_PATROL:
                 $loop = true;
                 // patrols loop between each location within their region
-                $result = $system->db->query("SELECT `x`, `y`, `type` FROM `region_locations` WHERE `region_id` = {$this->region_id}");
-                $result = $system->db->fetch_all($result);
-
-                foreach ($result as $point) {
+                $location_list = array_filter($region_locations, function($location) {
+                    return $location['region_id'] == $this->region_id;
+                });
+                foreach ($location_list as $point) {
                     if ($point['type'] == 'castle') {
                         $route_locations[] = ['x' => $point['x'], 'y' => $point['y']];
                     }
                 }
-                foreach ($result as $point) {
+                foreach ($location_list as $point) {
                     if ($point['type'] == 'village') {
                         $route_locations[] = ['x' => $point['x'], 'y' => $point['y']];
                     }
@@ -63,19 +63,20 @@ class Patrol {
                     WHERE `village_id` = {$this->village_id} LIMIT 1");
                 $village_result = $system->db->fetch($village_result);
                 // get castle location
-                $castle_result = $system->db->query("SELECT `x`, `y` FROM `region_locations`
-                    WHERE `region_id` = {$this->region_id} AND `type` = 'castle' LIMIT 1");
-                $castle_result = $system->db->fetch($castle_result);
+                $location_list = array_filter($region_locations, function($location) {
+                    return $location['region_id'] == $this->region_id && $location['type'] == 'castle';
+                });
+                $castle = reset($location_list);
                 switch ($this->caravan_type) {
                     case self::CARAVAN_TYPE_RESOURCE:
                         // move from castle -> village
-                        $route_locations[] = ['x' => $castle_result['x'], 'y' => $castle_result['y']];
+                        $route_locations[] = ['x' => $castle['x'], 'y' => $castle['y']];
                         $route_locations[] = ['x' => $village_result['x'], 'y' => $village_result['y']];
                         break;
                     case self::CARAVAN_TYPE_SUPPLY:
                         // move from village -> castle
-                        $route_locations[] = ['x' => $village_result['x'], 'y' => $village_result['y']];
-                        $route_locations[] = ['x' => $castle_result['x'], 'y' => $castle_result['y']];
+                        $route_locations[] = ['x' => $castle['x'], 'y' => $castle['y']];
+                        $route_locations[] = ['x' => $location_list['x'], 'y' => $location_list['y']];
                         break;
                 }
                 break;

@@ -32,6 +32,24 @@ class TravelManager {
     const GRID_POSITIVE_Y = 9;
     const GRID_NEGATIVE_Y = 8;
 
+    const FONT_SPAWN_LOCATIONS = [
+        1 => ['x' => 32, 'y' => 9],
+        2 => ['x' => 28, 'y' => 22],
+        3 => ['x' => 11, 'y' => 17],
+        4 => ['x' => 81, 'y' => 17],
+        5 => ['x' => 66, 'y' => 11],
+        6 => ['x' => 53, 'y' => 4],
+        7 => ['x' => 43, 'y' => 9],
+        8 => ['x' => 60, 'y' => 16],
+        9 => ['x' => 41, 'y' => 29],
+        10 => ['x' => 27, 'y' => 30],
+        11 => ['x' => 7, 'y' => 23],
+        12 => ['x' => 38, 'y' => 46],
+        13 => ['x' => 65, 'y' => 23],
+        14 => ['x' => 58, 'y' => 29],
+        15 => ['x' => 42, 'y' => 37],
+    ];
+
     /**
      * @var TravelCoords[]
      */
@@ -497,6 +515,24 @@ class TravelManager {
                     $locations[] = $unknown;
                 }
             }
+            else if ($loc['name'] == "Font of Vitality") {
+                if (isset($system->font_location)) {
+                    $font = new MapLocation($loc);
+                    $font->location_type = "key_location";
+                    $font->x = $this->system->font_location->x;
+                    $font->y = $this->system->font_location->y;
+                    $font->map_id = $this->system->font_location->map_id;
+                    $distance = $this->user->location->distanceDifference(new TravelCoords(
+                        x: $font->x,
+                        y: $font->y,
+                        map_id: $font->map_id
+                    ));
+                    if ($distance <= self::DISPLAY_RADIUS) {
+                        $locations[] = $font;
+                    }
+                }
+                
+            } 
             else {
                 $new_location = new MapLocation($loc);
                 $new_location->location_type = "key_location";
@@ -604,6 +640,9 @@ class TravelManager {
         if ($this->user->last_death_ms > System::currentTimeMs() - (User::PVP_IMMUNITY_SECONDS * 1000)) {
             throw new RuntimeException("You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
                 ceil((($this->user->last_death_ms + (User::PVP_IMMUNITY_SECONDS * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+        }
+        if ($user->pvp_immunity_ms < time()) {
+            throw new RuntimeException("Target has died recently and immune to being attacked");
         }
         /*
         if ($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
@@ -731,9 +770,11 @@ class TravelManager {
         $time = time();
         $result = $this->system->db->query("SELECT * FROM `patrols` where `start_time` < {$time}");
         $result = $this->system->db->fetch_all($result);
+        $region_locations = $this->system->db->query("SELECT * FROM `region_locations`");
+        $region_locations = $this->system->db->fetch_all($region_locations);
         foreach ($result as $row) {
             $patrol = new Patrol($row, "patrol");
-            $patrol->setLocation($this->system);
+            $patrol->setLocation($this->system, $region_locations);
             $patrol->setAlignment($this->user);
             $distance = $this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id));
             if ($distance == 0) {
@@ -750,7 +791,7 @@ class TravelManager {
             if (!empty($row['travel_time'])) {
                 if ($row['travel_time'] + ($row['start_time'] * 1000) + Patrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
                     $patrol = new Patrol($row, "caravan");
-                    $patrol->setLocation($this->system);
+                    $patrol->setLocation($this->system, $region_locations);
                     $patrol->setAlignment($this->user);
                     if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
                         $return_arr[] = $patrol;
@@ -758,7 +799,7 @@ class TravelManager {
                 }
             } else {
                 $patrol = new Patrol($row, "caravan");
-                $patrol->setLocation($this->system);
+                $patrol->setLocation($this->system, $region_locations);
                 $patrol->setAlignment($this->user);
                 if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
                     $return_arr[] = $patrol;
@@ -1061,7 +1102,7 @@ class TravelManager {
             $caravans = $this->system->db->fetch_all($caravans);
             foreach ($caravans as $caravan) {
                 $patrol = new Patrol($caravan, "caravan");
-                $patrol->setLocation($this->system);
+                $patrol->setLocation($this->system, );
                 $patrol->setAlignment($this->user);
                 if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) == 0 && $patrol->alignment != "Ally") {
                     $this->warManager->beginOperation($operation_type, $patrol->id, $patrol);
@@ -1153,5 +1194,23 @@ class TravelManager {
             $loot_count = $loot_result['count'];
         }
         return $loot_count;
+    }
+
+    /**
+     * @return TravelCoords
+     */
+    public static function setFontLocation(): TravelCoords {
+        // 6 slots per hour, 10min
+        $seed = floor(time() / (10 * 60)); 
+        mt_srand($seed);
+
+        // keeping this as 100%, use mt_rand to set chance
+        if (mt_rand(0, 2) >= 0) { 
+            // 15 spawn locations
+            $location_key = mt_rand(1, 15);
+            return new TravelCoords(self::FONT_SPAWN_LOCATIONS[$location_key]['x'], self::FONT_SPAWN_LOCATIONS[$location_key]['y'], 1);
+        }
+        // clear seed
+        mt_srand();
     }
 }

@@ -316,9 +316,11 @@ class WarManager {
         $time = time();
         $caravans = $this->system->db->query("SELECT * FROM `caravans` where `start_time` < {$time} && `village_id` != {$this->user->village->village_id}");
         $caravans = $this->system->db->fetch_all($caravans);
+        $region_locations = $this->system->db->query("SELECT * FROM `region_locations`");
+        $region_locations = $this->system->db->fetch_all($region_locations);
         foreach ($caravans as $caravan) {
             $patrol = new Patrol($caravan, "caravan");
-            $patrol->setLocation($this->system);
+            $patrol->setLocation($this->system, $region_locations);
             $patrol->setAlignment($this->user);
             if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) == 0 && $patrol->alignment != "Ally") {
                 $valid_operations = [
