@@ -182,7 +182,7 @@ class System {
     ];
 
     public ?TravelCoords $font_location = null;
-    public int $font_regen = 200; // overrides DB value
+    public int $font_regen = 100; // overrides DB value
 
     public function __construct() {
         require __DIR__ . "/../secure/vars.php";
