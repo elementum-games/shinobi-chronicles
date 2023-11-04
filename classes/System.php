@@ -181,9 +181,6 @@ class System {
         'stat_cut' => false,
     ];
 
-    public ?TravelCoords $font_location = null;
-    public int $font_regen = 100; // overrides DB value
-
     public function __construct() {
         require __DIR__ . "/../secure/vars.php";
         /** @var $host */
@@ -204,8 +201,6 @@ class System {
         $this->checkForActiveEvent();
 
         $this->war_enabled = true;
-
-        $this->font_location = TravelManager::setFontLocation();
     }
 
     /**
