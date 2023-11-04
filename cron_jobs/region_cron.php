@@ -159,13 +159,13 @@ function hourlyRegion(System $system, $debug = true): void
             switch ($region_location['type']) {
                 case 'castle':
                     if ($region_location['defense'] > WarManager::BASE_CASTLE_DEFENSE) {
-                        $region_location['defense'] -= 5;
+                        $region_location['defense'] -= 1;
                         if ($region_location['defense'] < WarManager::BASE_CASTLE_DEFENSE) {
                             $region_location['defense'] = WarManager::BASE_CASTLE_DEFENSE;
                         }
                     }
                     else if ($region_location['defense'] < WarManager::BASE_CASTLE_DEFENSE) {
-                        $region_location['defense'] += 5;
+                        $region_location['defense'] += 1;
                         if ($region_location['defense'] > WarManager::BASE_CASTLE_DEFENSE) {
                             $region_location['defense'] = WarManager::BASE_CASTLE_DEFENSE;
                         }
@@ -173,12 +173,12 @@ function hourlyRegion(System $system, $debug = true): void
                     break;
                 case 'village';
                     if ($region_location['defense'] > WarManager::BASE_VILLAGE_DEFENSE) {
-                        $region_location['defense'] -= 5;
+                        $region_location['defense'] -= 1;
                         if ($region_location['defense'] < WarManager::BASE_VILLAGE_DEFENSE) {
                             $region_location['defense'] = WarManager::BASE_VILLAGE_DEFENSE;
                         }
                     } else if ($region_location['defense'] < WarManager::BASE_VILLAGE_DEFENSE) {
-                        $region_location['defense'] += 5;
+                        $region_location['defense'] += 1;
                         if ($region_location['defense'] > WarManager::BASE_VILLAGE_DEFENSE) {
                             $region_location['defense'] = WarManager::BASE_VILLAGE_DEFENSE;
                         }
