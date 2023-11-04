@@ -15,6 +15,10 @@
  * battle_id:       int,
  * direction:       string,
  * invulnerable:    boolean,
+ * distance:        int,
+ * village_id:      int,
+ * loot_count:      int,
+ * is_protected:    boolean,
  * }} player
  */
 export const ScoutArea = ({
@@ -117,6 +121,9 @@ const Player = ({
                 )}
                 {(player_data.attack === false && player_data.direction !== 'none') && (
                     <span className={`direction ${player_data.direction}`}></span>
+                )}
+                {(player_data.attack === false && player_data.is_protected) && (
+                    <span className='is-protected'></span>
                 )}
             </div>
         </div>

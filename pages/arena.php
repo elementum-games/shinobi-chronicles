@@ -21,6 +21,11 @@ function arena(): bool {
         $system->printMessage();
         return false;
     }
+    if ($player->special_mission > 0) {
+        $system->message("You cannot access this page while in a special mission!");
+        $system->printMessage();
+        return false;
+    }
 
 	if($player->battle_id) {
         arenaFight();

@@ -600,7 +600,16 @@ function Player({
     strokeDasharray: "100",
     strokeDashoffset: 100 - 100 / 100 * mapData.operation_interval,
     transform: "rotate(-90, 24.5, 24)"
-  })))));
+  })))), mapData.is_protected && /*#__PURE__*/React.createElement("img", {
+    className: "player_protected_icon",
+    src: "/images/map/icons/protected.png",
+    style: {
+      position: 'absolute',
+      bottom: '-4px',
+      right: '-4px',
+      height: '18px'
+    }
+  }));
 }
 function LootDisplay({
   mapData

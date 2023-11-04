@@ -126,6 +126,7 @@ class UserReputation {
         Operation::OPERATION_INFILTRATE => 4,
         Operation::OPERATION_RAID => 5,
         Operation::OPERATION_LOOT => 1,
+        Operation::OPERATION_LOOT_TOWN => 1,
     ];
 
     const DAILY_TASK_REWARDS = [

@@ -227,7 +227,7 @@ class TravelManager {
     #[Trace]
     public function fetchNearbyPlayers(): array {
         $sql = "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`village`, `users`.`rank`, `users`.`stealth`, `users`.`operation`,
-                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`, `users`.`pvp_immunity_ms`, `villages`.`village_id`
+                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`, `users`.`pvp_immunity_ms`, `villages`.`village_id`, `users`.`special_mission`
                 FROM `users`
                 INNER JOIN `ranks`
                 ON `users`.`rank`=`ranks`.`rank_id`
@@ -239,7 +239,11 @@ class TravelManager {
         $users = $this->system->db->fetch_all($result);
         $return_arr = [];
         foreach ($users as $user) {
-            // check if the user is nearby (including stealth
+            // give bonus stealth if in special mission
+            if ($user['special_mission'] > 0) {
+                $user['stealth'] += User::SPECIAL_MISSION_STEALTH_BONUS;
+            }
+            // check if the user is nearby (including stealth)
             $scout_range = max(0, $this->user->scout_range - $user['stealth']);
             $user_location = TravelCoords::fromDbString($user['location']);
             if ($user_location->map_id !== $this->user->location->map_id ||
@@ -287,6 +291,12 @@ class TravelManager {
                     $can_attack = true;
                 }
             }
+            // additionally, if player is jonin and target is chuunin
+            $is_protected = false;
+            if (User::isProtectedByAlly($this->system, user_id: $user['user_id']) && $this->user->rank_num == 4) {
+                $can_attack = false;
+                $is_protected = true;
+            }
 
             // calculate direction
             $user_direction = "none";
@@ -323,6 +333,7 @@ class TravelManager {
                 distance: $distance,
                 village_id: $user['village_id'],
                 loot_count: $loot_count,
+                is_protected: $is_protected,
             );
         }
 
@@ -350,6 +361,7 @@ class TravelManager {
                     invulnerable: false,
                     village_id: 3,
                     loot_count: 6,
+                    is_protected: false,
                 );
             }
             for ($i = 0; $i < 2; $i++) {
@@ -372,6 +384,7 @@ class TravelManager {
                     invulnerable: false,
                     village_id: 3,
                     loot_count: 11,
+                    is_protected: false,
                 );
             }
             for ($i = 0; $i < 2; $i++) {
@@ -394,6 +407,7 @@ class TravelManager {
                     invulnerable: false,
                     village_id: 3,
                     loot_count: 11,
+                    is_protected: true,
                 );
             }
         }
@@ -582,11 +596,18 @@ class TravelManager {
         if ($user->last_active < time() - 120) {
             throw new RuntimeException("Target is inactive/offline!");
         }
-        if ($this->user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
-            throw new RuntimeException("You died within the last minute, please wait " .
-                ceil((($this->user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+        /*
+        if ($this->user->pvp_immunity_ms > System::currentTimeMs()) {
+            throw new RuntimeException("You were defeated within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
+                ceil(($this->user->pvp_immunity_ms - System::currentTimeMs()) / 1000) . " more seconds.");
+        }*/
+        if ($this->user->last_death_ms > System::currentTimeMs() - (User::PVP_IMMUNITY_SECONDS * 1000)) {
+            throw new RuntimeException("You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
+                ceil((($this->user->last_death_ms + (User::PVP_IMMUNITY_SECONDS * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
         }
-        // we already give PvP immunity that breaks on attacking/war so this old restriction isn't needed
+        if ($user->pvp_immunity_ms < time()) {
+            throw new RuntimeException("Target has died recently and immune to being attacked");
+        }
         /*
         if ($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
             throw new RuntimeException("Target has died within the last minute, please wait " .
@@ -594,6 +615,9 @@ class TravelManager {
         }*/
         if ($this->user->operation > 0) {
             throw new RuntimeException("You are currently in an operation!");
+        }
+        if (User::isProtectedByAlly($this->system, user: $user) && $this->user->rank_num == 4) {
+            throw new RuntimeException("Cannot attack Chuunin protected by allied Jonin!");
         }
 
         if ($this->system->USE_NEW_BATTLES) {
@@ -710,9 +734,11 @@ class TravelManager {
         $time = time();
         $result = $this->system->db->query("SELECT * FROM `patrols` where `start_time` < {$time}");
         $result = $this->system->db->fetch_all($result);
+        $region_locations = $this->system->db->query("SELECT * FROM `region_locations`");
+        $region_locations = $this->system->db->fetch_all($region_locations);
         foreach ($result as $row) {
             $patrol = new Patrol($row, "patrol");
-            $patrol->setLocation($this->system);
+            $patrol->setLocation($this->system, $region_locations);
             $patrol->setAlignment($this->user);
             $distance = $this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id));
             if ($distance == 0) {
@@ -729,7 +755,7 @@ class TravelManager {
             if (!empty($row['travel_time'])) {
                 if ($row['travel_time'] + ($row['start_time'] * 1000) + Patrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
                     $patrol = new Patrol($row, "caravan");
-                    $patrol->setLocation($this->system);
+                    $patrol->setLocation($this->system, $region_locations);
                     $patrol->setAlignment($this->user);
                     if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
                         $return_arr[] = $patrol;
@@ -737,7 +763,7 @@ class TravelManager {
                 }
             } else {
                 $patrol = new Patrol($row, "caravan");
-                $patrol->setLocation($this->system);
+                $patrol->setLocation($this->system, $region_locations);
                 $patrol->setAlignment($this->user);
                 if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
                     $return_arr[] = $patrol;
@@ -954,7 +980,7 @@ class TravelManager {
                             resource_count: $obj['resource_count'],
                         );
                     case "village":
-                        if ($distance <= $this->user->scout_range || $obj['village_name'] == $this->user->village->name) {
+                        if ($distance <= $this->user->scout_range) {
                             $image = "/images/map/icons/village.png";
                             $objectives[] = new RegionObjective(
                                 id: $obj['region_location_id'],
@@ -1021,13 +1047,26 @@ class TravelManager {
      */
     function beginOperation($operation_type): bool {
         $message = '';
+        /*
+        if ($this->user->pvp_immunity_ms > System::currentTimeMs()) {
+            $message = "You were defeated within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
+                ceil(($this->user->pvp_immunity_ms - System::currentTimeMs()) / 1000) . " more seconds.";
+            $this->setTravelMessage($message);
+            return false;
+        }*/
+        if ($this->user->last_death_ms > System::currentTimeMs() - (User::PVP_IMMUNITY_SECONDS * 1000)) {
+            $message = "You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
+                ceil((($this->user->last_death_ms + (User::PVP_IMMUNITY_SECONDS * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.";
+            $this->setTravelMessage($message);
+            return false;
+        }
         if ($operation_type == Operation::OPERATION_LOOT) {
             $time = time();
             $caravans = $this->system->db->query("SELECT * FROM `caravans` where `start_time` < {$time} && `village_id` != {$this->user->village->village_id}");
             $caravans = $this->system->db->fetch_all($caravans);
             foreach ($caravans as $caravan) {
                 $patrol = new Patrol($caravan, "caravan");
-                $patrol->setLocation($this->system);
+                $patrol->setLocation($this->system, );
                 $patrol->setAlignment($this->user);
                 if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) == 0 && $patrol->alignment != "Ally") {
                     $this->warManager->beginOperation($operation_type, $patrol->id, $patrol);

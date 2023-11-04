@@ -52,6 +52,7 @@ class TravelApiPresenter {
             'operation_progress'=> $operation ? $operation->progress : null,
             'operation_interval'=> $operation ? $operation->interval_progress : null,
             'loot_count'        => $travelManager->getPlayerLootCount(),
+            'is_protected'      => User::isProtectedByAlly($system, user: $player),
         ];
     }
 
@@ -77,6 +78,7 @@ class TravelApiPresenter {
                     'distance'      => $nearbyPlayer->distance,
                     'village_id'    => $nearbyPlayer->village_id,
                     'loot_count'    => $nearbyPlayer->loot_count,
+                    'is_protected'  => $nearbyPlayer->is_protected,
                 ];
             },
             $travelManager->fetchNearbyPlayers()

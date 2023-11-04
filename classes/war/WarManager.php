@@ -167,7 +167,7 @@ class WarManager {
                 }
                 Operation::beginOperation($this->system, $this->user, $patrol->id, $operation_type, $patrol->village_id);
                 break;
-            case Operation::OPERATION_LOOT_VILLAGE:
+            case Operation::OPERATION_LOOT_TOWN:
                 // must be occupied by self
                 if (empty($target['occupying_village_id']) || $target['occupying_village_id'] != $this->user->village->village_id) {
                     throw new RuntimeException("Invalid operation target!");
@@ -226,7 +226,7 @@ class WarManager {
                     return false;
                 }
                 break;
-            case OPERATION::OPERATION_LOOT_VILLAGE:
+            case OPERATION::OPERATION_LOOT_TOWN:
                 // must be occupied by self
                 if (empty($target['occupying_village_id']) || $target['occupying_village_id'] != $this->user->village->village_id) {
                     return false;
@@ -276,7 +276,7 @@ class WarManager {
                     $valid_operations[Operation::OPERATION_REINFORCE] .= "<br><span class='reinforce_button_text'>{$health_gain} health</span>";
                 }
                 if (!empty($target_location['occupying_village_id'])) {
-                    $valid_operations[Operation::OPERATION_LOOT_VILLAGE] = System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_LOOT_VILLAGE]);
+                    $valid_operations[Operation::OPERATION_LOOT_TOWN] = System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_LOOT_TOWN]);
                 }
             } else {
                 switch ($this->user->village->relations[$target_location['village']]->relation_type) {
@@ -316,9 +316,11 @@ class WarManager {
         $time = time();
         $caravans = $this->system->db->query("SELECT * FROM `caravans` where `start_time` < {$time} && `village_id` != {$this->user->village->village_id}");
         $caravans = $this->system->db->fetch_all($caravans);
+        $region_locations = $this->system->db->query("SELECT * FROM `region_locations`");
+        $region_locations = $this->system->db->fetch_all($region_locations);
         foreach ($caravans as $caravan) {
             $patrol = new Patrol($caravan, "caravan");
-            $patrol->setLocation($this->system);
+            $patrol->setLocation($this->system, $region_locations);
             $patrol->setAlignment($this->user);
             if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) == 0 && $patrol->alignment != "Ally") {
                 $valid_operations = [
@@ -400,7 +402,7 @@ class WarManager {
         }
         $this->user->village->updateResources();
         $message .= "!";
-        $message .= "\nGained {$yen_gain} yen!";
+        $message .= "\nGained ¥{$yen_gain}!";
         $this->user->addMoney($yen_gain, "Resource");
         // update loot table
         $time = time();
@@ -408,11 +410,16 @@ class WarManager {
         return $message;
     }
 
-    public function handleWinAgainstPatrol(int $patrol_id) {
-        $patrol_result = $this->system->db->query("SELECT * FROM `patrols` WHERE `id` = {$patrol_id}");
+    /**
+     * @return string
+     */
+    public function handleWinAgainstPatrol(int $patrol_id): string {
+        $message = '';
+        $time = time();
+        $patrol_result = $this->system->db->query("SELECT * FROM `patrols` WHERE `id` = {$patrol_id} AND `start_time` < {$time}");
         $patrol_result = $this->system->db->fetch($patrol_result);
         if ($this->system->db->last_num_rows == 0) {
-            return;
+            return $message;
         }
         WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_PATROLS_DEFEATED, $patrol_result['village_id']);
         $x = mt_rand(1, 100);
@@ -434,6 +441,21 @@ class WarManager {
         }
         $respawn_time = time() + round(self::PATROL_RESPAWN_TIME * (100 / (100 + $this->user->village->policy->patrol_respawn)), 1);
         $this->system->db->query("UPDATE `patrols` SET `start_time` = {$respawn_time}, `name` = '{$name}', `ai_id` = {$ai_id}, `tier` = {$tier} WHERE `id` = {$patrol_id}");
+        // decrease region location defense in region that matches patrol's village
+        $location_result = $this->system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`
+            FROM `region_locations`
+            INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+            WHERE `region_locations`.`region_id` = {$patrol_result['region_id']}
+        ");
+        $location_result = $this->system->db->fetch_all($location_result);
+        foreach ($location_result as $location) {
+            if ($location['defense'] > 0 && $location['village'] == $patrol_result['village_id']) {
+                $location['defense']--;
+                $this->system->db->query("UPDATE `region_locations` SET `defense` = {$location['defense']} WHERE `id` = {$location['id']}");
+            }
+        }
+        $message = 'Enemy region Defense decreased by 1.<br>';
+        return $message;
     }
 
     public function handleLossAgainstPatrol(int $patrol_id): string
