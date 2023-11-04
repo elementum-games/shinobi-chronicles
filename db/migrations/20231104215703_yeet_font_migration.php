@@ -12,7 +12,7 @@ final class YeetFontMigration extends AbstractMigration
     {
         $this->execute("
             -- Yeet the Font
-            DELETE FROM `map_locations` WHERE `name` = 'Font of Vitality';
+            DELETE FROM `maps_locations` WHERE `name` = 'Font of Vitality';
         ");
     }
 
