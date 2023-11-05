@@ -382,7 +382,7 @@ address and requested a password reset. If this is not your account, please disr
                 $email,
                 $gender,
                 $village,
-                $village_coords->fetchString(),
+                $village_coords->toString(),
                 $verification_code
             );
 

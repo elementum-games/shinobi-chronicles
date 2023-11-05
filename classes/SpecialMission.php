@@ -338,7 +338,7 @@ class SpecialMission {
 
                 // Go around village not into it
                 $target_location = new TravelCoords($move_to_x, $move_to_y, $this->player->location->map_id);
-                if (isset($villages[$target_location->fetchString()]) && !$this->player->village_location->equals($target_location)) {
+                if (isset($villages[$target_location->toString()]) && !$this->player->village_location->equals($target_location)) {
                     if ($this->player->location->y > $this->target['y']) {
                         $move_to_y--;
                     } else {
@@ -367,7 +367,7 @@ class SpecialMission {
 
                 // Skip past village if trying to move into it
                 $target_location = new TravelCoords($move_to_x, $move_to_y, $this->player->location->map_id);
-                if (isset($villages[$target_location->fetchString()]) && !$this->player->village_location->equals($target_location)) {
+                if (isset($villages[$target_location->toString()]) && !$this->player->village_location->equals($target_location)) {
                     if ($this->player->location->x > $this->target['x']) {
                         $move_to_x--;
                     } else {

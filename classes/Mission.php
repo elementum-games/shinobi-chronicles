@@ -135,8 +135,8 @@ class Mission {
                 $this->current_stage = array(
                     'stage_id' => $stage_id + 1,
                     'action_type' => 'travel',
-                    'action_data' => $this->custom_start_location->fetchString(),
-                    'description' => 'Return to ' . $this->custom_start_location->fetchString() . ' to complete the mission.'
+                    'action_data' => $this->custom_start_location->toString(),
+                    'description' => 'Return to ' . $this->custom_start_location->toString() . ' to complete the mission.'
                 );
             }
             // otherwise use village
@@ -144,7 +144,7 @@ class Mission {
                 $this->current_stage = array(
                     'stage_id' => $stage_id + 1,
                     'action_type' => 'travel',
-                    'action_data' => $this->player->village_location->fetchString(),
+                    'action_data' => $this->player->village_location->toString(),
                     'description' => 'Report back to the village to complete the mission.'
                 );
             }
@@ -190,16 +190,16 @@ class Mission {
         // Get last location
         if (isset($this->custom_start_location) && !empty($this->custom_start_location)) {
             // use custom_start_location as default
-            $last_location = $this->custom_start_location->fetchString();
+            $last_location = $this->custom_start_location->toString();
         } else {
             // else use village as default
-            $last_location = $this->player->village_location->fetchString();
+            $last_location = $this->player->village_location->toString();
         }
         if (isset($this->current_stage['action_type'])) {
             if ($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
                 $last_location = $this->current_stage['action_data'];
             } else if ($this->current_stage['action_type'] == 'combat') {
-                $last_location = $this->player->location->fetchString();
+                $last_location = $this->player->location->toString();
             }
 
         }
@@ -265,7 +265,7 @@ class Mission {
                 else {
                     $location = $this->rollLocation($this->player->location);
                 }
-                if(!isset($villages[$location->fetchString()]) || $location->equals($this->player->village_location)) {
+                if(!isset($villages[$location->toString()]) || $location->equals($this->player->village_location)) {
                     break;
                 }
             }
@@ -275,7 +275,7 @@ class Mission {
                 $this->current_stage['last_location'] = $last_location;
             }
 
-            $this->current_stage['action_data'] = $location->fetchString();
+            $this->current_stage['action_data'] = $location->toString();
         }
 
         $search_array = array('[action_data]', '[location_radius]');
@@ -380,8 +380,8 @@ class Mission {
                 $this->current_stage = array(
                     'stage_id' => $stage_id + 1,
                     'action_type' => 'travel',
-                    'action_data' => $this->custom_start_location->fetchString(),
-                    'description' => 'Return to ' . $this->custom_start_location->fetchString() . ' to complete the mission.'
+                    'action_data' => $this->custom_start_location->toString(),
+                    'description' => 'Return to ' . $this->custom_start_location->toString() . ' to complete the mission.'
                 );
             }
             // otherwise use village
@@ -389,7 +389,7 @@ class Mission {
                 $this->current_stage = array(
                     'stage_id' => $stage_id + 1,
                     'action_type' => 'travel',
-                    'action_data' => $this->player->village_location->fetchString(),
+                    'action_data' => $this->player->village_location->toString(),
                     'description' => 'Report back to the village to complete the mission.'
                 );
             }
@@ -441,12 +441,12 @@ class Mission {
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
             for($i = 0; $i < 3; $i++) {
                 $location = $this->rollLocation($this->player->village_location);
-                if(!isset($villages[$location->fetchString()]) || $location->equals($this->player->village_location)) {
+                if(!isset($villages[$location->toString()]) || $location->equals($this->player->village_location)) {
                     break;
                 }
             }
 
-            $this->current_stage['action_data'] = $location->fetchString();
+            $this->current_stage['action_data'] = $location->toString();
         }
 
         $search_array = array('[action_data]', '[location_radius]');

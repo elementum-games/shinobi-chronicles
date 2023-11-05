@@ -59,10 +59,15 @@ class WarManager {
     private System $system;
     private User $user;
 
+    /** @var VillageRelation[][] */
+    public array $village_relations_by_village_ids;
+
     public function __construct(System $system, User $user)
     {
         $this->system = $system;
         $this->user = $user;
+
+        $this->village_relations_by_village_ids = VillageManager::getAllRelationsByVillageIds($system);
     }
 
     /**
@@ -133,7 +138,7 @@ class WarManager {
             $target = $this->system->db->fetch($target);
             // must be at target location
             $target_location = new TravelCoords($target['x'], $target['y'], $target['map_id']);
-            if ($this->user->location->fetchString() != $target_location->fetchString()) {
+            if ($this->user->location->toString() != $target_location->toString()) {
                 throw new RuntimeException("Invalid operation target!");
             }
         }
@@ -197,7 +202,7 @@ class WarManager {
             $target = $this->system->db->fetch($target);
             // must be at target location
             $target_location = new TravelCoords($target['x'], $target['y'], $target['map_id']);
-            if ($this->user->location->fetchString() != $target_location->fetchString()) {
+            if ($this->user->location->toString() != $target_location->toString()) {
                 return false;
             }
         }
@@ -343,7 +348,7 @@ class WarManager {
             return;
         }
         // if not at same location
-        if ($this->user->location->fetchString() != $patrol_location->fetchString()) {
+        if ($this->user->location->toString() != $patrol_location->toString()) {
             return;
         }
         // if no AI set
@@ -402,7 +407,7 @@ class WarManager {
         }
         $this->user->village->updateResources();
         $message .= "!";
-        $message .= "\nGained ¥{$yen_gain}!";
+        $message .= "\nGained ï¿½{$yen_gain}!";
         $this->user->addMoney($yen_gain, "Resource");
         // update loot table
         $time = time();
@@ -507,7 +512,7 @@ class WarManager {
         $oldest_active_raid_time = (microtime(true) * 1000) - $max_raid_duration_ms;
 
         $result = $system->db->query("SELECT
-            `operations`.`user_village`, 
+            `operations`.`user_village` as `attacking_user_village`, 
             `operations`.`target_id`,
             `operations`.`target_village`,
             `region_locations`.`x`, 
@@ -520,7 +525,7 @@ class WarManager {
             AND `last_update_ms` > {$oldest_active_raid_time}
             AND `status` = " . Operation::OPERATION_ACTIVE . " 
             AND `operations`.`type` = " . Operation::OPERATION_RAID . "
-            GROUP BY `operations`.`target_id`, `operations`.`target_village`");
+            GROUP BY `operations`.`target_id`, `operations`.`target_village`, `attacking_user_village`");
         $raw_raid_targets = $system->db->fetch_all($result);
 
         $raid_targets = [];
@@ -535,7 +540,7 @@ class WarManager {
                     );
                 } 
                 // if ally raiding
-                else if ($player->village->isAlly($target['user_village'])) {
+                else if ($player->village->isAlly($target['attacking_user_village'])) {
                     $raid_targets[$target['target_id']] = new RaidTargetDto(
                         name: $target['name'],
                         location: new TravelCoords(x: $target['x'], y: $target['y'], map_id: $target['map_id']),
@@ -546,6 +551,11 @@ class WarManager {
         }
 
         return $raid_targets;
+    }
+
+    public function villagesAreAllies(int $village1_id, int $village2_id): bool {
+        return $village1_id == $village2_id ||
+            $this->village_relations_by_village_ids[$village1_id][$village2_id]->relation_type == VillageRelation::RELATION_ALLIANCE;
     }
 }
 

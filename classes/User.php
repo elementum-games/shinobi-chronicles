@@ -1822,7 +1822,7 @@ class User extends Fighter {
 		`last_movement_ms` = '$this->last_movement_ms',
 		`attack_id` = '$this->attack_id',
 		`attack_id_time_ms` = '$this->attack_id_time_ms',
-		`location` = '".$this->location->fetchString()."',
+		`location` = '".$this->location->toString()."',
 		`filters` = '".json_encode($this->filters)."',";
         if($this->mission_id) {
             if(is_array($this->mission_stage)) {
@@ -2580,35 +2580,5 @@ class User extends Fighter {
                 }
             }
         }
-    }
-
-    /**
-     * @return Bool
-     * Use either $user_id or $user object
-     */
-    public static function isProtectedByAlly(System $system, ?int $user_id = null, ?User $user = null): bool {
-        if (empty($user)) {
-            $user = User::loadFromId($system, $user_id, read_only: true);
-        }
-        if ($system->db->last_num_rows > 0) {
-            if ($user->rank_num == 3) {
-                $time = System::currentTimeMs();
-                $player_result = $system->db->query("SELECT `users`.*, `villages`.`village_id` FROM `users`
-                    INNER JOIN `villages` ON `users`.`village` = `villages`.`name`
-                    WHERE `location` = '{$user->location->fetchString()}' 
-                    AND `rank` = 4 
-                    AND `battle_id` = 0
-                    AND `users`.`last_active` > UNIX_TIMESTAMP() - 120
-                    AND `users`.`pvp_immunity_ms` < {$time}"
-                );
-                $player_result = $system->db->fetch_all($player_result);
-                foreach ($player_result as $player) {
-                    if ($user->village->isAlly($player['village_id'])) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 }

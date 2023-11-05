@@ -82,38 +82,77 @@ class VillageManager {
     }
 
     /**
+     * @param System   $system
+     * @param int|null $village_id
      * @return VillageRelation[]
      */
-    public static function getRelations(System $system, int $village_id): array {
-        $relations = [];
-        $relations_result = $system->db->query(
-            "SELECT
+    private static function getRelations(System $system, ?int $village_id = null): array {
+        $query = "SELECT
                 `village_relations`.*,
                 `v1`.`name` AS `village1_name`,
                 `v2`.`name` AS `village2_name`
-            FROM
-                `village_relations`
-            INNER JOIN
-                `villages` AS `v1` ON `village_relations`.`village1_id` = `v1`.`village_id`
-            INNER JOIN
-                `villages` AS `v2` ON `village_relations`.`village2_id` = `v2`.`village_id`
-            WHERE
-                `village_relations`.`relation_end` IS NULL
-                AND (`village_relations`.`village1_id` = {$village_id} OR `village_relations`.`village2_id` = {$village_id});
-            ");
-        $relations_result = $system->db->fetch_all($relations_result);
-        foreach ($relations_result as $relation) {
-            $relation_target = 0;
-            if ($relation['village1_id'] != $village_id) {
-                $relation_target = $relation['village1_id'];
-            }
-            else if ($relation['village2_id'] != $village_id) {
-                $relation_target = $relation['village2_id'];
-            }
-            $relations[$relation_target] = new VillageRelation($relation);
+            FROM `village_relations`
+            INNER JOIN `villages` AS `v1` ON `village_relations`.`village1_id` = `v1`.`village_id`
+            INNER JOIN `villages` AS `v2` ON `village_relations`.`village2_id` = `v2`.`village_id`
+            WHERE `village_relations`.`relation_end` IS NULL";
+        if($village_id != null) {
+            $query .= " AND (`village_relations`.`village1_id` = {$village_id} OR `village_relations`.`village2_id` = {$village_id})";
         }
-        return $relations;
+
+        $relations_result = $system->db->query($query);
+        $relations_arr = $system->db->fetch_all($relations_result);
+
+        return array_map(function ($relation_raw) {
+            return new VillageRelation($relation_raw);
+        }, $relations_arr);
     }
+
+    /**
+     * @return VillageRelation[]
+     */
+    public static function getRelationsForVillage(System $system, int $village_id): array {
+        $relations = self::getRelations($system, $village_id);
+
+        $relations_by_id = [];
+        foreach($relations as $relation) {
+            $other_village_id = 0;
+            if ($relation->village1_id == $village_id) {
+                $other_village_id = $relation->village2_id;
+            }
+            else if ($relation->village2_id == $village_id) {
+                $other_village_id = $relation->village1_id;
+            }
+            $relations_by_id[$other_village_id] = $relation;
+        }
+        return $relations_by_id;
+    }
+
+    /**
+     * Returns all relations keyed by both village ids, e.g. relations[1][3] and relations[3][1] both work
+     *
+     * @param System $system
+     * @return VillageRelation[][]
+     */
+    public static function getAllRelationsByVillageIds(System $system): array {
+        $relations = self::getRelations($system);
+        $relations_by_village_ids = [];
+
+        foreach($relations as $relation) {
+            if(!isset($relations_by_village[$relation->village1_id])) {
+                $relations_by_village_ids[$relation->village1_id] = [];
+            }
+            if(!isset($relations_by_village[$relation->village2_id])) {
+                $relations_by_village_ids[$relation->village2_id] = [];
+            }
+
+            $relations_by_village_ids[$relation->village1_id][$relation->village2_id] = $relation;
+            $relations_by_village_ids[$relation->village2_id][$relation->village1_id] = $relation;
+        }
+
+        return $relations_by_village_ids;
+    }
+
+
 
     /**
      * @return array

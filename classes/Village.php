@@ -35,7 +35,7 @@ class Village {
             }
             $this->kage_name = VillageManager::KAGE_NAMES[$this->village_id];
             $this->coords = VillageManager::getLocation($this->system, $this->village_id);
-            $this->relations = VillageManager::getRelations($this->system, $this->village_id);
+            $this->relations = VillageManager::getRelationsForVillage($this->system, $this->village_id);
             $this->policy = new VillagePolicy($this->policy_id);
         }
         // updated legacy constructor logic
@@ -44,7 +44,7 @@ class Village {
             $this->getVillageData();
             $this->kage_name = VillageManager::KAGE_NAMES[$this->village_id];
             $this->coords = VillageManager::getLocation($this->system, $this->village_id);
-            $this->relations = VillageManager::getRelations($this->system, $this->village_id);
+            $this->relations = VillageManager::getRelationsForVillage($this->system, $this->village_id);
             $this->policy = new VillagePolicy($this->policy_id);
         }
     }

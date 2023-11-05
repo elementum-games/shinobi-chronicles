@@ -21,7 +21,7 @@ class TravelCoords {
         $this->map_id = $map_id;
     }
 
-    public function fetchString(): string {
+    public function toString(): string {
         return $this->x . ':' . $this->y . ':' . $this->map_id;
     }
 

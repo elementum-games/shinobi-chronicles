@@ -16,6 +16,7 @@ class TravelManager {
         'Sand' => 'images/village_icons/sand.png',
         'Leaf' => 'images/village_icons/leaf.png'
     ];
+    const INACTIVE_SECONDS = 120;
 
     private System $system;
     private User $user;
@@ -56,7 +57,6 @@ class TravelManager {
 
         return $count >= 1;
     }
-
 
     public function updateFilter(string $filter, string $filter_value): bool {
         switch($filter) {
@@ -226,19 +226,41 @@ class TravelManager {
      */
     #[Trace]
     public function fetchNearbyPlayers(): array {
-        $sql = "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`village`, `users`.`rank`, `users`.`stealth`, `users`.`operation`,
-                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`, `users`.`pvp_immunity_ms`, `villages`.`village_id`, `users`.`special_mission`
+        $sql = "SELECT `users`.`user_id`, 
+                    `users`.`user_name`, 
+                    `users`.`village`, 
+                    `users`.`rank`, 
+                    `users`.`stealth`, 
+                    `users`.`operation`,
+                    `users`.`level`, 
+                    `users`.`attack_id`, 
+                    `users`.`battle_id`, 
+                    `ranks`.`name` as `rank_name`, 
+                    `users`.`location`, 
+                    `users`.`pvp_immunity_ms`,
+                    `villages`.`village_id`, 
+                    `users`.`special_mission`, 
+                    COUNT(`loot`.`id`) as `loot_count`
                 FROM `users`
-                INNER JOIN `ranks`
-                ON `users`.`rank`=`ranks`.`rank_id`
-                INNER JOIN `villages`
-                ON `users`.`village` = `villages`.`name`
-                WHERE `users`.`last_active` > UNIX_TIMESTAMP() - 120
-                ORDER BY `users`.`exp` DESC, `users`.`user_name` DESC";
+                INNER JOIN `ranks` ON `users`.`rank`=`ranks`.`rank_id`
+                INNER JOIN `villages` ON `users`.`village` = `villages`.`name`
+                LEFT JOIN `loot` ON (`loot`.`user_id`=`users`.`user_id` AND `loot`.`claimed_village_id` IS NULL AND `loot`.`battle_id` IS NULL)
+                WHERE `users`.`last_active` > UNIX_TIMESTAMP() - " . TravelManager::INACTIVE_SECONDS . "
+                GROUP BY `users`.`user_id`, `users`.`exp`, `users`.`user_name`, `villages`.`village_id`
+                ORDER BY `users`.`exp` DESC, `users`.`user_name` DESC;";
         $result = $this->system->db->query($sql);
         $users = $this->system->db->fetch_all($result);
         $return_arr = [];
+
+        $user_ids_by_coords = [];
+
         foreach ($users as $user) {
+            // Build map of coords => user IDs for efficient checks against users on same square
+            if(!isset($user_ids_by_coords[$user['location']])) {
+                $user_ids_by_coords[$user['location']] = [];
+            }
+            $user_ids_by_coords[$user['location']][] = $user['user_id'];
+
             // give bonus stealth if in special mission
             if ($user['special_mission'] > 0) {
                 $user['stealth'] += User::SPECIAL_MISSION_STEALTH_BONUS;
@@ -252,7 +274,7 @@ class TravelManager {
             }
 
             // if there were alliance we can do additional checks here - the future is now, old man
-            if ($this->user->village->village_id == $user['village_id']) {
+            if ($this->warManager->villagesAreAllies($this->user->village->village_id, $user['village_id'])) {
                 $user_alignment = 'Ally';
             }
             else {
@@ -291,12 +313,6 @@ class TravelManager {
                     $can_attack = true;
                 }
             }
-            // additionally, if player is jonin and target is chuunin
-            $is_protected = false;
-            if (User::isProtectedByAlly($this->system, user_id: $user['user_id']) && $this->user->rank_num == 4) {
-                $can_attack = false;
-                $is_protected = true;
-            }
 
             // calculate direction
             $user_direction = "none";
@@ -317,9 +333,7 @@ class TravelManager {
             $return_arr[] = new NearbyPlayerDto(
                 user_id: $user['user_id'],
                 user_name: $user['user_name'],
-                target_x: $user_location->x,
-                target_y: $user_location->y,
-                target_map_id: $user_location->map_id,
+                location: $user_location,
                 rank_name: $user['rank_name'],
                 rank_num: $user['rank'],
                 village_icon: TravelManager::VILLAGE_ICONS[$user['village']],
@@ -329,12 +343,24 @@ class TravelManager {
                 level: $user['level'],
                 battle_id: $user['battle_id'],
                 direction: $user_direction,
+                village_id: $user['village_id'],
                 invulnerable: $invulnerable,
                 distance: $distance,
-                village_id: $user['village_id'],
-                loot_count: $loot_count,
-                is_protected: $is_protected,
+                loot_count: $user['loot_count'],
+                is_protected: false,
             );
+        }
+
+        // Check for protection
+        foreach($return_arr as $nearby_player) {
+            $players_on_same_tile = array_map(function($user_id) use($users) {
+                return $users[$user_id];
+            }, $user_ids_by_coords[$nearby_player->location->toString()]);
+
+            if ($this->isProtectedByAlly($nearby_player, players_on_same_tile: $players_on_same_tile)) {
+                $nearby_player->attack = false;
+                $nearby_player->is_protected = true;
+            }
         }
 
         // Add more users for display
@@ -345,9 +371,7 @@ class TravelManager {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
-                    target_x: $placeholder_coords->x,
-                    target_y: $placeholder_coords->y,
-                    target_map_id: $placeholder_coords->map_id,
+                    location: $placeholder_coords,
                     rank_name: 'Akademi-sei',
                     rank_num: 3,
                     village_icon: TravelManager::VILLAGE_ICONS['Mist'],
@@ -357,9 +381,9 @@ class TravelManager {
                     level: 30,
                     battle_id: 0,
                     direction: $this->user->location->directionToTarget($placeholder_coords),
-                    distance: $this->user->location->distanceDifference($placeholder_coords),
-                    invulnerable: false,
                     village_id: 3,
+                    invulnerable: false,
+                    distance: $this->user->location->distanceDifference($placeholder_coords),
                     loot_count: 6,
                     is_protected: false,
                 );
@@ -368,9 +392,7 @@ class TravelManager {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
-                    target_x: $placeholder_coords->x,
-                    target_y: $placeholder_coords->y,
-                    target_map_id: $placeholder_coords->map_id,
+                    location: $placeholder_coords,
                     rank_name: 'Akademi-sei',
                     rank_num: 3,
                     village_icon: TravelManager::VILLAGE_ICONS['Stone'],
@@ -380,9 +402,9 @@ class TravelManager {
                     level: 30,
                     battle_id: 0,
                     direction: $this->user->location->directionToTarget($placeholder_coords),
-                    distance: $this->user->location->distanceDifference($placeholder_coords),
-                    invulnerable: false,
                     village_id: 3,
+                    invulnerable: false,
+                    distance: $this->user->location->distanceDifference($placeholder_coords),
                     loot_count: 11,
                     is_protected: false,
                 );
@@ -391,9 +413,7 @@ class TravelManager {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
-                    target_x: $placeholder_coords->x,
-                    target_y: $placeholder_coords->y,
-                    target_map_id: $placeholder_coords->map_id,
+                    location: $placeholder_coords,
                     rank_name: 'Akademi-sei',
                     rank_num: 3,
                     village_icon: TravelManager::VILLAGE_ICONS['Sand'],
@@ -403,9 +423,9 @@ class TravelManager {
                     level: 30,
                     battle_id: 0,
                     direction: $this->user->location->directionToTarget($placeholder_coords),
-                    distance: $this->user->location->distanceDifference($placeholder_coords),
-                    invulnerable: false,
                     village_id: 3,
+                    invulnerable: false,
+                    distance: $this->user->location->distanceDifference($placeholder_coords),
                     loot_count: 11,
                     is_protected: true,
                 );
@@ -519,6 +539,7 @@ class TravelManager {
     /**
      * @return array|null
      */
+    #[Trace]
     public function fetchCurrentLocationPortal(): ?array {
         $portal_data = null;
 
@@ -543,6 +564,7 @@ class TravelManager {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     public function attackPlayer(string $target_attack_id): bool {
         // get user id off the attack link
         $result = $this->system->db->query("SELECT `user_id` FROM `users` WHERE `attack_id`='{$target_attack_id}' LIMIT 1");
@@ -616,8 +638,8 @@ class TravelManager {
         if ($this->user->operation > 0) {
             throw new RuntimeException("You are currently in an operation!");
         }
-        if (User::isProtectedByAlly($this->system, user: $user) && $this->user->rank_num == 4) {
-            throw new RuntimeException("Cannot attack Chuunin protected by allied Jonin!");
+        if ($this->dbFetchIsProtectedByAlly($user)) {
+            throw new RuntimeException("Target is protected by a higher rank ally! Attack them first.");
         }
 
         if ($this->system->USE_NEW_BATTLES) {
@@ -626,6 +648,67 @@ class TravelManager {
             Battle::start($this->system, $this->user, $user, Battle::TYPE_FIGHT);
         }
         return true;
+    }
+
+    /**
+     * @param NearbyPlayerDto|User $target_player
+     * @param NearbyPlayerDto[]    $players_on_same_tile
+     * @return bool
+     */
+    #[Trace]
+    public function isProtectedByAlly(NearbyPlayerDto|User $target_player, array $players_on_same_tile): bool {
+         if ($target_player->rank_num < System::SC_MAX_RANK) {
+            foreach($players_on_same_tile as $nearby_player) {
+                if($nearby_player->rank_num <= $target_player->rank_num) continue;
+                if($nearby_player->battle_id != 0) continue;
+                if($nearby_player->invulnerable) continue;
+
+                if($target_player instanceof User) {
+                    $target_player_village_id = $target_player->village->village_id;
+                }
+                else if($target_player instanceof NearbyPlayerDto) {
+                    $target_player_village_id = $target_player->village_id;
+                }
+                else {
+                    throw new RuntimeException("Invalid target player class!");
+                }
+
+                if(!$this->warManager->villagesAreAllies($target_player_village_id, $nearby_player->village_id)) {
+                    continue;
+                }
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Do not use this method for batch operations, use isProtectedByAlly instead
+     *
+     * @param User $user
+     * @return bool
+     */
+    #[Trace]
+    public function dbFetchIsProtectedByAlly(User $user): bool {
+         if ($user->rank_num < System::SC_MAX_RANK) {
+            $time = System::currentTimeMs();
+            $player_result = $this->system->db->query("SELECT `users`.`user_id`, `villages`.`village_id` FROM `users`
+            INNER JOIN `villages` ON `users`.`village` = `villages`.`name`
+            WHERE `users`.`location` = '{$user->location->toString()}' 
+            AND `users`.`rank` > {$user->rank_num} 
+            AND `users`.`battle_id` = 0
+            AND `users`.`last_active` > UNIX_TIMESTAMP() - " . TravelManager::INACTIVE_SECONDS . "
+            AND `users`.`pvp_immunity_ms` < {$time}");
+
+            $player_result = $this->system->db->fetch_all($player_result);
+            foreach ($player_result as $player) {
+                if ($user->village->isAlly($player['village_id'])) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -639,7 +722,7 @@ class TravelManager {
         ");
         while($row = $system->db->fetch($result)) {
             $village_coords = new TravelCoords($row['x'], $row['y'], $row['map_id']);
-            $village_locations[$village_coords->fetchString()] = $row['name'];
+            $village_locations[$village_coords->toString()] = $row['name'];
         }
 
         return $village_locations;
@@ -693,6 +776,7 @@ class TravelManager {
     }
 
     /**
+     * @param $regions
      * @return array
      */
     public function getCoordsByRegion($regions): array
@@ -1045,6 +1129,7 @@ class TravelManager {
     /**
      * @return bool
      */
+    #[Trace]
     function beginOperation($operation_type): bool {
         $message = '';
         /*
@@ -1099,6 +1184,7 @@ class TravelManager {
     /**
      * @return bool
      */
+    #[Trace]
     function cancelOperation(): bool {
         $message = '';
         $this->warManager->cancelOperation();
@@ -1108,6 +1194,7 @@ class TravelManager {
         return true;
     }
 
+    #[Trace]
     function checkOperation() {
         $message = '';
         if ($this->system->war_enabled && $this->user->operation > 0) {
@@ -1128,6 +1215,7 @@ class TravelManager {
     /**
      * @return bool
      */
+    #[Trace]
     function claimLoot(): bool
     {
         $message = '';
@@ -1136,6 +1224,7 @@ class TravelManager {
         return true;
     }
 
+    #[Trace]
     private function setTravelMessage($message) {
         if (!empty($message)) {
             if (!empty($this->travel_message)) {
@@ -1150,6 +1239,7 @@ class TravelManager {
     /**
      * @return int
      */
+    #[Trace]
     function getPlayerLootCount(): int {
         $loot_count = 0;
         $loot_result = $this->system->db->query("SELECT COUNT(*) as `count` FROM `loot` WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL LIMIT 1");

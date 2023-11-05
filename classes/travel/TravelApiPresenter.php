@@ -52,7 +52,7 @@ class TravelApiPresenter {
             'operation_progress'=> $operation ? $operation->progress : null,
             'operation_interval'=> $operation ? $operation->interval_progress : null,
             'loot_count'        => $travelManager->getPlayerLootCount(),
-            'is_protected'      => User::isProtectedByAlly($system, user: $player),
+            'is_protected'      => $travelManager->dbFetchIsProtectedByAlly($player),
         ];
     }
 
@@ -62,9 +62,9 @@ class TravelApiPresenter {
                 return [
                     'user_id'       => $nearbyPlayer->user_id,
                     'user_name'     => $nearbyPlayer->user_name,
-                    'target_x'      => $nearbyPlayer->target_x,
-                    'target_y'      => $nearbyPlayer->target_y,
-                    'target_map_id' => $nearbyPlayer->target_map_id,
+                    'target_x'      => $nearbyPlayer->location->x,
+                    'target_y'      => $nearbyPlayer->location->y,
+                    'target_map_id' => $nearbyPlayer->location->map_id,
                     'rank_name'     => $nearbyPlayer->rank_name,
                     'rank_num'      => $nearbyPlayer->rank_num,
                     'village_icon'  => $nearbyPlayer->village_icon,
@@ -74,9 +74,9 @@ class TravelApiPresenter {
                     'level'         => $nearbyPlayer->level,
                     'battle_id'     => $nearbyPlayer->battle_id,
                     'direction'     => $nearbyPlayer->direction,
+                    'village_id'    => $nearbyPlayer->village_id,
                     'invulnerable'  => $nearbyPlayer->invulnerable,
                     'distance'      => $nearbyPlayer->distance,
-                    'village_id'    => $nearbyPlayer->village_id,
                     'loot_count'    => $nearbyPlayer->loot_count,
                     'is_protected'  => $nearbyPlayer->is_protected,
                 ];
