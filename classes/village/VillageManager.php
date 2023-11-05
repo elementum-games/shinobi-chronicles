@@ -1140,8 +1140,12 @@ class VillageManager {
                     $system->db->query("UPDATE `village_seats` SET `seat_end` = {$time} WHERE `seat_id` = {$player->village_seat->seat_id}");
                     $system->db->query("INSERT INTO `village_seats`
                     (`user_id`, `village_id`, `seat_type`, `seat_title`, `seat_start`)
-                    VALUES ({$player->user_id}, {$player->village->village_id}, 'kage', '{$seat_title}', {$time})
-                ");
+                    VALUES ({$player->user_id}, {$player->village->village_id}, 'kage', '{$seat_title}', {$time})");
+
+                    $new_seat_id = $system->db->last_insert_id;
+
+                    // Update existing challenges to new seat
+                    $system->db->query("UPDATE `challenge_requests` SET `seat_id`={$new_seat_id} WHERE `seat_id`={$player->village_seat->seat_id}");
                 }
             }
         }
