@@ -10,11 +10,13 @@ function Home({
   versionNumber,
   initialView,
   loginErrorText,
+  loginUserNotActive,
   registerErrorText,
   resetErrorText,
   loginMessageText,
   registerPreFill,
-  initialNewsPosts
+  initialNewsPosts,
+  SC_OPEN
 }) {
   const newsRef = React.useRef(null);
   const contactRef = React.useRef(null);
@@ -25,13 +27,15 @@ function Home({
     version: version,
     initialView: initialView,
     loginErrorText: loginErrorText,
+    loginUserNotActive: loginUserNotActive,
     registerErrorText: registerErrorText,
     resetErrorText: resetErrorText,
     loginMessageText: loginMessageText,
     registerPreFill: registerPreFill,
     newsRef: newsRef,
     contactRef: contactRef,
-    AshBackground: AshBackground
+    AshBackground: AshBackground,
+    SC_OPEN: SC_OPEN
   }), /*#__PURE__*/React.createElement("div", {
     ref: newsRef,
     id: "news_container",
@@ -69,15 +73,17 @@ function MainBannerSection({
   version,
   initialView,
   loginErrorText,
+  loginUserNotActive,
   registerErrorText,
   resetErrorText,
   loginMessageText,
   registerPreFill,
   newsRef,
   contactRef,
-  AshBackground
+  AshBackground,
+  SC_OPEN
 }) {
-  const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset" ? "reset" : "login");
+  const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset_password" ? "reset_password" : "login");
   const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
   const loginFormRef = React.useRef(null);
   function handleLogin() {
@@ -136,17 +142,20 @@ function MainBannerSection({
     src: "/images/v2/decorations/homepagelogo.png"
   }), /*#__PURE__*/React.createElement("div", {
     className: "title_version"
-  }, version)), activeModal, /*#__PURE__*/React.createElement(AshBackground, null), /*#__PURE__*/React.createElement("div", {
+  }, version), !SC_OPEN && /*#__PURE__*/React.createElement("div", {
+    className: "sc_closed"
+  }, "SC is currently offline for maintenance!", /*#__PURE__*/React.createElement("br", null), "Please check back in a few minutes.", /*#__PURE__*/React.createElement("br", null), "Expected downtime is usually 15 - 30 minutes.")), activeModal, /*#__PURE__*/React.createElement(AshBackground, null), /*#__PURE__*/React.createElement("div", {
     className: "login_container",
     style: activeModal != null ? {
       visibility: "hidden"
     } : {}
-  }, !isLoggedIn && loginDisplay !== "reset" && /*#__PURE__*/React.createElement(LoginForm, {
+  }, !isLoggedIn && loginDisplay !== "reset_password" && /*#__PURE__*/React.createElement(LoginForm, {
     loginMessageText: loginMessageText,
     loginErrorText: loginErrorText,
+    loginUserNotActive: loginUserNotActive,
     setLoginDisplay: setLoginDisplay,
     formRef: loginFormRef
-  }), loginDisplay === "reset" && /*#__PURE__*/React.createElement(ResetPasswordForm, {
+  }), loginDisplay === "reset_password" && /*#__PURE__*/React.createElement(ResetPasswordForm, {
     resetErrorText: resetErrorText,
     handleCloseClick: () => setLoginDisplay("login")
   }), !isLoggedIn && /*#__PURE__*/React.createElement(LoginButton, {
@@ -283,6 +292,7 @@ function BannerDiamondButton({
 function LoginForm({
   loginMessageText,
   loginErrorText,
+  loginUserNotActive,
   setLoginDisplay,
   formRef
 }) {
@@ -330,10 +340,13 @@ function LoginForm({
     className: "login_input_bottom"
   }, /*#__PURE__*/React.createElement("div", {
     className: "login_error_label"
-  }, loginErrorText), /*#__PURE__*/React.createElement("div", {
+  }, loginErrorText), !loginUserNotActive && /*#__PURE__*/React.createElement("div", {
     className: "reset_link",
-    onClick: () => setLoginDisplay("reset")
-  }, "reset password")));
+    onClick: () => setLoginDisplay("reset_password")
+  }, "reset password"), loginUserNotActive && /*#__PURE__*/React.createElement("div", {
+    className: "reset_link",
+    onClick: () => setLoginDisplay("reset_verification")
+  }, "resend verification")));
 }
 function ResetPasswordForm({
   resetErrorText,

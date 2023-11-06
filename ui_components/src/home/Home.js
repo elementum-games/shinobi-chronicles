@@ -15,8 +15,9 @@ type Props = {|
     +isAdmin: bool,
     +version: string,
     +versionNumber: string,
-    +initialView: "login" | "reset" | "register",
+    +initialView: "login" | "reset_password" | "register",
     +loginErrorText: string,
+    +loginUserNotActive: boolean,
     +registerErrorText: string,
     +resetErrorText: string,
     +loginMessageText: string,
@@ -27,6 +28,7 @@ type Props = {|
         +gender: "Male" | "Female" | "Non-binary" | "None",
     },
     +initialNewsPosts: $ReadOnlyArray<NewsPostType>,
+    +SC_OPEN: boolean,
 |};
 function Home({
     homeLinks,
@@ -36,11 +38,13 @@ function Home({
     versionNumber,
     initialView,
     loginErrorText,
+    loginUserNotActive,
     registerErrorText,
     resetErrorText,
     loginMessageText,
     registerPreFill,
     initialNewsPosts,
+    SC_OPEN,
 }: Props) {
     const newsRef = React.useRef(null);
     const contactRef = React.useRef(null);
@@ -54,6 +58,7 @@ function Home({
                 version={version}
                 initialView={initialView}
                 loginErrorText={loginErrorText}
+                loginUserNotActive={loginUserNotActive}
                 registerErrorText={registerErrorText}
                 resetErrorText={resetErrorText}
                 loginMessageText={loginMessageText}
@@ -61,6 +66,7 @@ function Home({
                 newsRef={newsRef}
                 contactRef={contactRef}
                 AshBackground={AshBackground}
+                SC_OPEN={SC_OPEN}
             />
             <div ref={newsRef} id="news_container" className={"home_section news_section"}>
                 <div className="home_header">
@@ -99,15 +105,17 @@ function MainBannerSection({
     version,
     initialView,
     loginErrorText,
+    loginUserNotActive,
     registerErrorText,
     resetErrorText,
     loginMessageText,
     registerPreFill,
     newsRef,
     contactRef,
-    AshBackground
+    AshBackground,
+    SC_OPEN
 }) {
-    const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset" ? "reset" : "login");
+    const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset_password" ? "reset_password" : "login");
     const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
 
     const loginFormRef = React.useRef(null);
@@ -172,6 +180,13 @@ function MainBannerSection({
                 <div className="main_banner_title">
                     <img src="/images/v2/decorations/homepagelogo.png" />
                     <div className="title_version">{version}</div>
+                    {!SC_OPEN &&
+                        <div className="sc_closed">
+                            SC is currently offline for maintenance!<br />
+                            Please check back in a few minutes.<br />
+                            Expected downtime is usually 15 - 30 minutes.
+                        </div>
+                    }
                 </div>
 
                 {/*
@@ -186,15 +201,16 @@ function MainBannerSection({
                 <AshBackground />
 
                 <div className="login_container" style={activeModal != null ? {visibility: "hidden"} : {}}>
-                    {!isLoggedIn && loginDisplay !== "reset" &&
+                    {!isLoggedIn && loginDisplay !== "reset_password" &&
                         <LoginForm
                             loginMessageText={loginMessageText}
                             loginErrorText={loginErrorText}
+                            loginUserNotActive={loginUserNotActive}
                             setLoginDisplay={setLoginDisplay}
                             formRef={loginFormRef}
                         />
                     }
-                    {loginDisplay === "reset" &&
+                    {loginDisplay === "reset_password" &&
                         <ResetPasswordForm
                             resetErrorText={resetErrorText}
                             handleCloseClick={() => setLoginDisplay("login")}
@@ -329,10 +345,11 @@ function BannerDiamondButton({
 type LoginFormProps = {|
     +loginMessageText: string,
     +loginErrorText: string,
+    +loginUserNotActive: boolean,
     +setLoginDisplay: (string) => void,
     +formRef: { current: ?HTMLFormElement },
 |};
-function LoginForm({ loginMessageText, loginErrorText, setLoginDisplay, formRef }: LoginFormProps) {
+function LoginForm({ loginMessageText, loginErrorText, loginUserNotActive, setLoginDisplay, formRef }: LoginFormProps) {
     const handleInputKeyDown = (e: SyntheticKeyboardEvent) => {
         if(e.code !== "Enter") {
             return;
@@ -378,7 +395,8 @@ function LoginForm({ loginMessageText, loginErrorText, setLoginDisplay, formRef 
             {loginErrorText !== "" &&
                 <div className="login_input_bottom">
                     <div className="login_error_label">{loginErrorText}</div>
-                    <div className="reset_link" onClick={() => setLoginDisplay("reset")}>reset password</div>
+                    {!loginUserNotActive && <div className="reset_link" onClick={() => setLoginDisplay("reset_password")}>reset password</div>}
+                    {loginUserNotActive && <div className="reset_link" onClick={() => setLoginDisplay("reset_verification")}>resend verification</div>}
                 </div>
             }
         </form>

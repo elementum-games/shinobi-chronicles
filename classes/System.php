@@ -30,6 +30,12 @@ class System {
     const SC_ADMIN_EMAIL = "admin@shinobichronicles.com";
     const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
+    const SEND_EMAIL_DURING_REGISTER = false;
+
+    const DEVELOPER_IDS = [
+        1, //Lsmjudoka
+        254, //Hitori
+    ];
 
     // Temporary event data storage
     public ?Event $event;

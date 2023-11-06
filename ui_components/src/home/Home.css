@@ -171,6 +171,23 @@ body {
     margin-top: 10px;
     user-select: none;
 }
+.sc_closed {
+    background-color: rgba(130, 45, 49, 0.9);
+    height: 77px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    color: #fffcf5;
+    letter-spacing: 3px;
+    display: inline-flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-top: 10px;
+    user-select: none;
+}
 
 .login_container {
     width: 400px;

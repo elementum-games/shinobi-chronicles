@@ -435,6 +435,20 @@ class User extends Fighter {
         return null;
     }
 
+    /**
+     * @param System $system
+     * @param string $user_name
+     * @return array|null
+     */
+    public static function findByNameForLogin(System $system, string $user_name): ?array {
+        $result = $system->db->query("SELECT `user_name`, `user_id`, `password`, `failed_logins`, `current_ip`, 
+            `last_ip`, `user_verified`, `staff_level` FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
+        if(!$system->db->last_num_rows) {
+            return null;
+        }
+        return $system->db->fetch($result);
+    }
+
     /* function loadData()
         Loads user data from the database into class members
         -Parameters-
