@@ -173,8 +173,8 @@ class WarManager {
                 Operation::beginOperation($this->system, $this->user, $patrol->id, $operation_type, $patrol->village_id);
                 break;
             case Operation::OPERATION_LOOT_TOWN:
-                // must be occupied by self
-                if (empty($target['occupying_village_id']) || $target['occupying_village_id'] != $this->user->village->village_id) {
+                // must be occupied by self or ally 
+                if (empty($target['occupying_village_id']) || !$this->user->village->isAlly($target['occupying_village_id'])) {
                     throw new RuntimeException("Invalid operation target!");
                 }
                 Operation::beginOperation($this->system, $this->user, $target_id, $operation_type, $target['original_village']);
@@ -233,7 +233,7 @@ class WarManager {
                 break;
             case OPERATION::OPERATION_LOOT_TOWN:
                 // must be occupied by self
-                if (empty($target['occupying_village_id']) || $target['occupying_village_id'] != $this->user->village->village_id) {
+                if (empty($target['occupying_village_id']) || !$this->user->village->isAlly($target['occupying_village_id'])) {
                     return false;
                 }
                 break;
@@ -297,6 +297,9 @@ class WarManager {
                         if ($for_display) {
                             $health_gain = floor($this->user->level / 2);
                             $valid_operations[Operation::OPERATION_REINFORCE] .= "<br><span class='reinforce_button_text'>{$health_gain} health</span>";
+                        }
+                        if (!empty($target_location['occupying_village_id'])) {
+                            $valid_operations[Operation::OPERATION_LOOT_TOWN] = System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_LOOT_TOWN]);
                         }
                         break;
                     case VillageRelation::RELATION_WAR:
@@ -407,7 +410,7 @@ class WarManager {
         }
         $this->user->village->updateResources();
         $message .= "!";
-        $message .= "\nGained �{$yen_gain}!";
+        $message .= "\nGained {$yen_gain} YEN!";
         $this->user->addMoney($yen_gain, "Resource");
         // update loot table
         $time = time();

@@ -372,7 +372,7 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, pl
                                 filter: "blur(0)",
                             }}
                         >
-                            <div className='region_objective_tooltip' style={{ display: strategicView || (objective.x == player_x && objective.y == player_y) ? 'flex' : 'none' }}>
+                            <div className={'region_objective_tooltip' + (objective.is_occupied ? ' occupied' : '')} style={{ display: strategicView || (objective.x == player_x && objective.y == player_y) ? 'flex' : 'none' }}>
                                 <span className='region_objective_tooltip_name'>{objective.name}</span>
                                 <div className='region_objective_tooltip_tags'>
                                     <span className='region_objective_tooltip_defense'>{objective.defense}</span>

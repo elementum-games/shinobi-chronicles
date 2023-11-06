@@ -1335,6 +1335,14 @@
     height: 18px;
     width: 18px;
 }
+.region_objective_tooltip.occupied {
+    background: #620909cc !important;
+}
+.region_objective_tooltip_chains {
+    height: 18px;
+    width: 18px;
+    margin-left: 2px;
+}
 
 .patrol_details {
     display: none;

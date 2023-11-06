@@ -339,7 +339,7 @@ function RegionObjectives({
       filter: "blur(0)"
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "region_objective_tooltip",
+    className: 'region_objective_tooltip' + (objective.is_occupied ? ' occupied' : ''),
     style: {
       display: strategicView || objective.x == player_x && objective.y == player_y ? 'flex' : 'none'
     }
