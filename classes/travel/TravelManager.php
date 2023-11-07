@@ -354,11 +354,7 @@ class TravelManager {
         // Check for protection
         foreach($return_arr as $nearby_player) {
             $players_on_same_tile = array_map(function($user_id) use($users) {
-                if (isset($users[$user_id])) {
-                    return $users[$user_id];
-                } else {
-                    return null;
-                }
+                return $users[$user_id];
             }, $user_ids_by_coords[$nearby_player->location->toString()]);
 
             if ($this->isProtectedByAlly($nearby_player, players_on_same_tile: $players_on_same_tile)) {
