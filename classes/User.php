@@ -1477,6 +1477,9 @@ class User extends Fighter {
         if ($event_boost && !empty($this->system->event) && $this->system->event instanceof DoubleExpEvent) {
             $stat_gain *= DoubleExpEvent::exp_modifier;
         }
+        if(!empty($this->event) && $this->system->event instanceof WeekendBoost) {
+            $train_gain *= WeekendBoost::exp_modifier;
+        }
 
         $new_total_stats = $this->total_stats + $stat_gain;
         if($new_total_stats > $this->rank->stat_cap) {

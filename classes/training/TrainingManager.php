@@ -325,6 +325,9 @@ class TrainingManager {
         if (!empty($this->system->event) && $this->system->event instanceof DoubleExpEvent) {
             $train_gain *= DoubleExpEvent::exp_modifier;
         }
+        if(!empty($this->event) && $this->system->event instanceof WeekendBoost) {
+            $train_gain *= WeekendBoost::exp_modifier;
+        }
         if(str_contains($this->train_type, 'jutsu:')) {
             return "You will gain " . User::$jutsu_train_gain . " jutsu levels once training is complete!";
         }
