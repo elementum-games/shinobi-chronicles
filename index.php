@@ -317,21 +317,20 @@ else {
         if(!$system->SC_OPEN) {
             require('./templates/legacy_layout_stuff/SC_CLOSED.php');
         }
-
-        // Render home page
-        require('./templates/home.php');
-
-        // Render page ned
-        $page_load_time = round(microtime(as_float: true) - $PAGE_LOAD_START, 3);
-        $layout->renderAfterContentHTML(
-            system: $system,
-            player: null,
-            page_load_time: $page_load_time,
-            render_content: false,
-            render_footer: false,
-            render_hotbar: false
-        );
-        $system->db->commitTransaction();
-        exit;
     }
+
+    // Render home page
+    require('./templates/home.php');
+
+    // Render page ned
+    $page_load_time = round(microtime(as_float: true) - $PAGE_LOAD_START, 3);
+    $layout->renderAfterContentHTML(
+        system: $system,
+        player: null,
+        page_load_time: $page_load_time,
+        render_content: false,
+        render_footer: false,
+        render_hotbar: false
+    );
+    $system->db->commitTransaction();
 }
