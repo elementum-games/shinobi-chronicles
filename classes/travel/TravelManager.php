@@ -249,7 +249,7 @@ class TravelManager {
                 GROUP BY `users`.`user_id`, `users`.`exp`, `users`.`user_name`, `villages`.`village_id`
                 ORDER BY `users`.`exp` DESC, `users`.`user_name` DESC;";
         $result = $this->system->db->query($sql);
-        $users = $this->system->db->fetch_all($result);
+        $users = $this->system->db->fetch_all($result, 'user_id');
         $return_arr = [];
 
         $user_ids_by_coords = [];
@@ -351,10 +351,32 @@ class TravelManager {
             );
         }
 
+
+
         // Check for protection
         foreach($return_arr as $nearby_player) {
             $players_on_same_tile = array_map(function($user_id) use($users) {
-                return $users[$user_id];
+                $user = $users[$user_id];
+                // TODO: Use same array as the first pass
+                return new NearbyPlayerDto(
+                    user_id: $user['user_id'],
+                    user_name: $user['user_name'],
+                    location: TravelCoords::fromDbString($user['location']),
+                    rank_name: $user['rank_name'],
+                    rank_num: $user['rank'],
+                    village_icon: TravelManager::VILLAGE_ICONS[$user['village']],
+                    alignment: '',
+                    attack: false,
+                    attack_id: $user['attack_id'],
+                    level: $user['level'],
+                    battle_id: $user['battle_id'],
+                    direction: '',
+                    village_id: $user['village_id'],
+                    invulnerable: $user['pvp_immunity_ms'] > System::currentTimeMs(),
+                    distance: 0,
+                    loot_count: $user['loot_count'],
+                    is_protected: false,
+                );
             }, $user_ids_by_coords[$nearby_player->location->toString()]);
 
             if ($this->isProtectedByAlly($nearby_player, players_on_same_tile: $players_on_same_tile)) {
@@ -627,7 +649,7 @@ class TravelManager {
             throw new RuntimeException("You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
                 ceil((($this->user->last_death_ms + (User::PVP_IMMUNITY_SECONDS * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
         }
-        if ($user->pvp_immunity_ms < time()) {
+        if ($user->pvp_immunity_ms > time()) {
             throw new RuntimeException("Target has died recently and immune to being attacked");
         }
         /*
@@ -651,29 +673,19 @@ class TravelManager {
     }
 
     /**
-     * @param NearbyPlayerDto|User $target_player
+     * @param NearbyPlayerDto $target_player
      * @param NearbyPlayerDto[]    $players_on_same_tile
      * @return bool
      */
     #[Trace]
-    public function isProtectedByAlly(NearbyPlayerDto|User $target_player, array $players_on_same_tile): bool {
-         if ($target_player->rank_num < System::SC_MAX_RANK) {
+    public function isProtectedByAlly(NearbyPlayerDto $target_player, array $players_on_same_tile): bool {
+        if ($target_player->rank_num < System::SC_MAX_RANK) {
             foreach($players_on_same_tile as $nearby_player) {
                 if($nearby_player->rank_num <= $target_player->rank_num) continue;
                 if($nearby_player->battle_id != 0) continue;
                 if($nearby_player->invulnerable) continue;
 
-                if($target_player instanceof User) {
-                    $target_player_village_id = $target_player->village->village_id;
-                }
-                else if($target_player instanceof NearbyPlayerDto) {
-                    $target_player_village_id = $target_player->village_id;
-                }
-                else {
-                    throw new RuntimeException("Invalid target player class!");
-                }
-
-                if(!$this->warManager->villagesAreAllies($target_player_village_id, $nearby_player->village_id)) {
+                if(!$this->warManager->villagesAreAllies($target_player->village_id, $nearby_player->village_id)) {
                     continue;
                 }
 
