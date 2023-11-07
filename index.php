@@ -36,6 +36,12 @@ if(!isset($_SESSION['user_id'])) {
 // Logged in display
 if(isset($_SESSION['user_id'])) {
     $system->db->startTransaction();
+
+    if(true) {
+        echo "Logged in...";
+        $system->db->commitTransaction();
+        exit;
+    }
     
     // Load player
     $player = User::loadFromId(system: $system, user_id: $_SESSION['user_id']);
