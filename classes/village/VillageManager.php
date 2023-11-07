@@ -138,10 +138,10 @@ class VillageManager {
         $relations_by_village_ids = [];
 
         foreach($relations as $relation) {
-            if(!isset($relations_by_village[$relation->village1_id])) {
+            if(!isset($relations_by_village_ids[$relation->village1_id])) {
                 $relations_by_village_ids[$relation->village1_id] = [];
             }
-            if(!isset($relations_by_village[$relation->village2_id])) {
+            if(!isset($relations_by_village_ids[$relation->village2_id])) {
                 $relations_by_village_ids[$relation->village2_id] = [];
             }
 
