@@ -682,7 +682,7 @@ class System {
             $server_time = $current_datetime->setTimezone(new DateTimeZone('America/New_York'));
             if(in_array($server_time->format('l'), ['Tuesday', 'Wednesday'])) {
                 $end_time = $server_time->modify('next thursday');
-                $this->event = new WeekendBoost();
+                $this->event = new WeekendBoost($end_time);
             }
         }
     }
