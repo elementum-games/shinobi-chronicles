@@ -10,6 +10,7 @@ require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/Route.php';
 require_once __DIR__ . '/../classes/event/DoubleExpEvent.php';
 require_once __DIR__ . '/../classes/event/DoubleReputationEvent.php';
+require_once __DIR__ . '/../classes/event/WeekendBoost.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
