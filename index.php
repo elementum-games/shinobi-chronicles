@@ -37,12 +37,6 @@ if(!isset($_SESSION['user_id'])) {
 if(isset($_SESSION['user_id'])) {
     $system->db->startTransaction();
 
-    if(true) {
-        echo "Logged in...";
-        $system->db->commitTransaction();
-        exit;
-    }
-    
     // Load player
     $player = User::loadFromId(system: $system, user_id: $_SESSION['user_id']);
     $player->loadData();
@@ -122,6 +116,14 @@ if(isset($_SESSION['user_id'])) {
             }
             $system->log('player_action', $player->user_name, $log_contents);
         }
+
+        // Clear global message
+        if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
+            $player->global_message_viewed = 1;
+        }
+
+        // Route list
+        $routes = Router::$routes;
 
         // Pre-content display
         $page_loaded = false;
@@ -289,14 +291,6 @@ if(isset($_SESSION['user_id'])) {
 
         $system->db->commitTransaction();
     }
-
-    // Clear global message
-    if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
-        $player->global_message_viewed = 1;
-    }
-
-    // Route list
-    $routes = Router::$routes;
 }
 // Logged out display
 else {
