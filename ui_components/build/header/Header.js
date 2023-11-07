@@ -31,7 +31,7 @@ function Header({
     };
     const formattedDate = currentDate.toLocaleDateString('en-US', options);
     const formattedTime = currentDate.toLocaleTimeString('en-US', {
-      hour12: true
+      timeZone: 'America/New_York', hour12: true
     });
     setServerTime(formattedDate + ' - ' + formattedTime);
   }
