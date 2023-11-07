@@ -177,7 +177,7 @@
         <th>Event Details</th>
     </tr>
     <tr style="text-align: center">
-        <td>Training boost is active (+<?=((1 - WeekendBoost::exp_modifier) * 100)?>%) until <?= $system->event->end_time->format("l, M jS, Y")?>.</td>
+        <td>Training boost is active (+<?=(abs(1 - WeekendBoost::exp_modifier) * 100)?>%) until <?= $system->event->end_time->format("l, M jS, Y")?>.</td>
     </tr>
 </table>
 <?php elseif ($system->event instanceof DoubleReputationEvent): ?>
