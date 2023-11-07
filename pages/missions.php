@@ -49,7 +49,7 @@ function missions(): bool {
 	// Sub-menu
 	echo "<div class='submenu'>
 	<ul class='submenu'>";
-	$width = 100 / $max_mission_rank;
+	$width = 100 / ($max_mission_rank + 1);
 	$width = round($width - 0.6, 2);
 	for($i = 1; $i <= $max_mission_rank; $i++) {
 		echo "<li style='width:$width%;'><a href='{$self_link}&view_rank=$i'>" . Mission::$rank_names[$i] . "</a></li> ";
