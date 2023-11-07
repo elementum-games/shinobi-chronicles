@@ -657,6 +657,13 @@ class System {
             $double_exp_start_time = new DateTimeImmutable('2023-09-19');
             $double_reputation_start_time = new DateTimeImmutable('2023-10-18');
         }
+        /*****LIMITED TIME EVENTS*****/
+        // July 2023 Lantern Event
+        $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
+        if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
+            $this->event = new LanternEvent($july_2023_lantern_event_end_time);
+        }
+
         /*****CORE EVENTS*****/
         // TODO: Make core events more manageable
         // Double exp gains
@@ -670,11 +677,10 @@ class System {
             $this->event = new DoubleReputationEvent($double_reputation_end_time);
         }
 
-        /*****LIMITED TIME EVENTS*****/
-        // July 2023 Lantern Event
-        $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
-        if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
-            $this->event = new LanternEvent($july_2023_lantern_event_end_time);
+        // Weekend boost - THIS MUST BE LAST!!!!
+        if(is_null($this->event)) {
+            $date = new DateTimeImmutable("now", new DateTimeZone('America/New York'));
+            echo $newDate->format('Y-m-d H:i:sP');
         }
     }
 

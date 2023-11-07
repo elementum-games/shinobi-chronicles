@@ -171,6 +171,15 @@
         <td>Double Experience is active until <?= $system->event->end_time->format("l, M jS, Y")?>.</td>
     </tr>
 </table>
+<?php elseif ($system->event instanceof WeekendBoost): ?>
+<table class="table">
+    <tr>
+        <th>Event Details</th>
+    </tr>
+    <tr style="text-align: center">
+        <td>Training boost is active (+<?=1 - WeekendBoost::exp_modifier?>%) until <?= $system->event->end_time->format("l, M jS, Y")?>.</td>
+    </tr>
+</table>
 <?php elseif ($system->event instanceof DoubleReputationEvent): ?>
     <table class="table">
         <tr>
