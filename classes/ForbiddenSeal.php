@@ -218,6 +218,7 @@ class ForbiddenSeal {
                 'avy_eight-point-wide' => 'octagon wide',
                 'avy_nine-point' => 'nonagon',
                 'avy_twelve-point' => 'cross',
+                'avy_star' => 'star',
             ],
             'logout_timer' => System::LOGOUT_LIMIT,
             'inbox_size' => 75,
