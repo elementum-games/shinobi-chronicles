@@ -144,7 +144,6 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         AND `map_id` = {$player->location->map_id} LIMIT 1");
     $region_objective = $system->db->fetch($region_objective);
     if ($system->db->last_num_rows > 0) {
-        $result .= $region_objective['id'];
         if (isset($player->village->relations[$region_objective['village']])) {
             $player_alignment = $player->village->relations[$region_objective['village']]->relation_type;
         }
