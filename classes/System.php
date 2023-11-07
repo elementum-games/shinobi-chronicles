@@ -679,7 +679,7 @@ class System {
 
         // Weekend boost - THIS MUST BE LAST!!!!
         if(is_null($this->event)) {
-            $date = new DateTimeImmutable("now", new DateTimeZone('America/New York'));
+            $date = new DateTimeImmutable("now", new DateTimeZone('America/New_York'));
             echo $newDate->format('Y-m-d H:i:sP');
         }
     }
