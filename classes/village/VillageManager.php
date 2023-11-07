@@ -1338,7 +1338,7 @@ class VillageManager {
                 }
                 // check war cooldown
                 $relation_type = VillageRelation::RELATION_WAR;
-                $last_war = $system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NOT NULL AND `relation_type` = {$relation_type} 
+                $last_war = $system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NOT NULL AND `relation_type` = {$relation_type}
                 AND (`village1_id` = {$proposal['village_id']} OR `village2_id` = {$proposal['village_id']})
                 AND (`village1_id` = {$proposal['target_village_id']} OR `village2_id` = {$proposal['target_village_id']})
                 ORDER BY `relation_end` DESC LIMIT 1");
@@ -1348,7 +1348,7 @@ class VillageManager {
                     if ($war_cooldown > 0) {
                         $message = "You must wait another " . $system->time_remaining($war_cooldown) . " before declaring war on this village!";
                         return $message;
-                    } 
+                    }
                 }
                 // update relation
                 self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_WAR, $proposal['type']);
@@ -1546,7 +1546,12 @@ class VillageManager {
             $regions = $system->db->fetch_all($regions);
             // get supply points
             $supply_points = [];
-            $resource_counts = $system->db->query("SELECT `region_locations`.`resource_id`, COUNT(`region_locations`.`resource_id`) AS `supply_points` FROM `region_locations` INNER JOIN `regions` ON `region_locations`.`region_id` = `regions`.`region_id` WHERE `regions`.`village` = {$i} GROUP BY `region_locations`.`resource_id`");
+            $resource_counts = $system->db->query("SELECT `region_locations`.`resource_id`, COUNT(`region_locations`.`resource_id`) AS `supply_points` 
+                FROM `region_locations`
+                INNER JOIN `regions` ON `region_locations`.`region_id` = `regions`.`region_id`
+                WHERE (`regions`.`village` = {$i} AND `region_locations`.`occupying_village_id` IS NULL)
+                OR `region_locations`.`occupying_village_id` = {$i}
+                GROUP BY `region_locations`.`resource_id`");
             $resource_data = [];
             while ($row = $system->db->fetch($resource_counts)) {
                 $resource_data[$row['resource_id']] = $row['supply_points'];
@@ -1617,7 +1622,7 @@ class VillageManager {
         }
         // check war cooldown
         $relation_type = VillageRelation::RELATION_WAR;
-        $last_war = $system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NOT NULL AND `relation_type` = {$relation_type} 
+        $last_war = $system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NOT NULL AND `relation_type` = {$relation_type}
         AND (`village1_id` = {$player->village->village_id} OR `village2_id` = {$player->village->village_id})
         AND (`village1_id` = {$target_village_id} OR `village2_id` = {$target_village_id})
         ORDER BY `relation_end` DESC LIMIT 1");
@@ -1627,7 +1632,7 @@ class VillageManager {
             if ($war_cooldown > 0) {
                 $message = "You must wait another " . $system->time_remaining($war_cooldown) . " before declaring war on this village!";
                 return $message;
-            } 
+            }
         }
         // check player cooldown on submit proposal
         $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
