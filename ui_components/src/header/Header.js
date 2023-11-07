@@ -34,6 +34,7 @@ function Header({ links, navigationAPIData }: Props) {
     function getCurrentTime() {
         const currentDate = new Date();
         const options = {
+            timeZone: 'America/New_York',
             weekday: 'long',
             year: 'numeric',
             month: 'short',
