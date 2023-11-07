@@ -62,13 +62,13 @@ if(isset($_SESSION['user_id'])) {
         $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
 
         //Display header
-        $layout->renderBeforeContentHTML(vsystem: $system, user: $player,  page_title: "Profile");
+        $layout->renderBeforeContentHTML(vsystem: $system, player: $player,  page_title: "Profile");
 
         //Ban info
         require 'templates/ban_info.php';
 
         // Footer
-        $layout->renderAfterContentHTML(system: $system, user: $player);
+        $layout->renderAfterContentHTML(system: $system, player: $player);
         exit;
     }
 
@@ -235,7 +235,7 @@ if(isset($_SESSION['user_id'])) {
         }
         $layout->renderBeforeContentHTML(
             system: $system,
-            user: $player ?? null,
+            player: $player ?? null,
             page_title: "Home",
             render_content: false,
             render_header: true,
@@ -255,7 +255,7 @@ if(isset($_SESSION['user_id'])) {
 
         $layout->renderAfterContentHTML(
             system: $system, 
-            user: $player ?? null, 
+            player: $player ?? null, 
             render_content: false,
             render_footer: false, 
             render_hotbar: false
