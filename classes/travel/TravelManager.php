@@ -379,7 +379,7 @@ class TravelManager {
                 );
             }, $user_ids_by_coords[$nearby_player->location->toString()]);
 
-            if ($this->isProtectedByAlly($nearby_player, players_on_same_tile: $players_on_same_tile)) {
+            if ($this->isProtectedByAlly($nearby_player, players_on_same_tile: $players_on_same_tile) && $this->user->rank_num >= 4) {
                 $nearby_player->attack = false;
                 $nearby_player->is_protected = true;
             }

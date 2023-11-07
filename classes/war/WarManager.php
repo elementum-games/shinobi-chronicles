@@ -128,7 +128,7 @@ class WarManager {
             throw new RuntimeException("You are currently in battle!");
         }
         if ($operation_type != Operation::OPERATION_LOOT) {
-            $target = $this->system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`, `regions`.`village` as `original_village` 
+            $target = $this->system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`, `regions`.`village` as `original_village`
             FROM `region_locations`
             INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
             WHERE `id` = {$target_id} LIMIT 1");
@@ -173,7 +173,7 @@ class WarManager {
                 Operation::beginOperation($this->system, $this->user, $patrol->id, $operation_type, $patrol->village_id);
                 break;
             case Operation::OPERATION_LOOT_TOWN:
-                // must be occupied by self or ally 
+                // must be occupied by self or ally
                 if (empty($target['occupying_village_id']) || !$this->user->village->isAlly($target['occupying_village_id'])) {
                     throw new RuntimeException("Invalid operation target!");
                 }
@@ -410,7 +410,7 @@ class WarManager {
         }
         $this->user->village->updateResources();
         $message .= "!";
-        $message .= "\nGained {$yen_gain} YEN!";
+        $message .= "\nGained \u{00a5}{$yen_gain}!";
         $this->user->addMoney($yen_gain, "Resource");
         // update loot table
         $time = time();
@@ -515,18 +515,18 @@ class WarManager {
         $oldest_active_raid_time = (microtime(true) * 1000) - $max_raid_duration_ms;
 
         $result = $system->db->query("SELECT
-            `operations`.`user_village` as `attacking_user_village`, 
+            `operations`.`user_village` as `attacking_user_village`,
             `operations`.`target_id`,
             `operations`.`target_village`,
-            `region_locations`.`x`, 
-            `region_locations`.`y`, 
-            `region_locations`.`map_id`, 
-            `region_locations`.`name` 
+            `region_locations`.`x`,
+            `region_locations`.`y`,
+            `region_locations`.`map_id`,
+            `region_locations`.`name`
             FROM `operations`
             INNER JOIN `region_locations` ON `region_locations`.`id` = `operations`.`target_id`
             AND `user_id` != {$player->user_id}
             AND `last_update_ms` > {$oldest_active_raid_time}
-            AND `status` = " . Operation::OPERATION_ACTIVE . " 
+            AND `status` = " . Operation::OPERATION_ACTIVE . "
             AND `operations`.`type` = " . Operation::OPERATION_RAID . "
             GROUP BY `operations`.`target_id`, `operations`.`target_village`, `attacking_user_village`");
         $raw_raid_targets = $system->db->fetch_all($result);
@@ -541,7 +541,7 @@ class WarManager {
                         location: new TravelCoords(x: $target['x'], y: $target['y'], map_id: $target['map_id']),
                         is_ally_location: true,
                     );
-                } 
+                }
                 // if ally raiding
                 else if ($player->village->isAlly($target['attacking_user_village'])) {
                     $raid_targets[$target['target_id']] = new RaidTargetDto(
