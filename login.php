@@ -57,7 +57,7 @@ if(!isset($_SESSION['user_id'])) {
                 $player->last_login = time();
                 $player->failed_logins = 0;
                 $player->log(User::LOG_LOGIN, $_SERVER['REMOTE_ADDR']);
-                $player->updateDAta();
+                $player->updateData();
             }
             // Incorrect password, increment failed logins
             else {
