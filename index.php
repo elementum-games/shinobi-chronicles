@@ -87,210 +87,210 @@ if(isset($_SESSION['user_id'])) {
         // Footer
         $layout->renderAfterContentHTML($system, $player);
         exit;
+    }
 
-        // Action log
-        if($player->log_actions) {
-            $log_contents = '';
-            if($_GET['id'] && isset($routes[$_GET['id']])) {
-                $log_contents .= 'Page: ' . $routes[$_GET['id']]['title'] . ' - Time: ' . round(microtime(true), 1) . '[br]';
-            }
-            foreach($_GET as $key => $value) {
-                $val = $value;
-                if($key == 'id') {
-                    continue;
-                }
-                if(strlen($val) > 32) {
-                    $val = substr($val, 0, 32) . '...';
-                }
-                $log_contents .= $key . ': ' . $val . '[br]';
-            }
-            foreach($_POST as $key => $value) {
-                $val = $value;
-                if(strpos($key, 'password') !== false) {
-                    $val = '*******';
-                }
-                if(strlen($val) > 32) {
-                    $val = substr($val, 0, 32) . '...';
-                }
-                $log_contents .= $key . ': ' . $val . '[br]';
-            }
-            $system->log('player_action', $player->user_name, $log_contents);
+    // Action log
+    if($player->log_actions) {
+        $log_contents = '';
+        if($_GET['id'] && isset($routes[$_GET['id']])) {
+            $log_contents .= 'Page: ' . $routes[$_GET['id']]['title'] . ' - Time: ' . round(microtime(true), 1) . '[br]';
         }
-
-        // Clear global message
-        if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
-            $player->global_message_viewed = 1;
+        foreach($_GET as $key => $value) {
+            $val = $value;
+            if($key == 'id') {
+                continue;
+            }
+            if(strlen($val) > 32) {
+                $val = substr($val, 0, 32) . '...';
+            }
+            $log_contents .= $key . ': ' . $val . '[br]';
         }
+        foreach($_POST as $key => $value) {
+            $val = $value;
+            if(strpos($key, 'password') !== false) {
+                $val = '*******';
+            }
+            if(strlen($val) > 32) {
+                $val = substr($val, 0, 32) . '...';
+            }
+            $log_contents .= $key . ': ' . $val . '[br]';
+        }
+        $system->log('player_action', $player->user_name, $log_contents);
+    }
 
-        // Route list
-        $routes = Router::$routes;
+    // Clear global message
+    if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
+        $player->global_message_viewed = 1;
+    }
 
-        // Pre-content display
-        $page_loaded = false;
+    // Route list
+    $routes = Router::$routes;
 
-        // Attempt requested page
-        if(isset($_GET['id'])) {
-            $id = (int)$_GET['id'];
-            $route = Router::$routes[$id] ?? null;
-    
-            try {
-                if ($layout->usesV2Interface()) {
-                    $location_name = $player->current_location->location_id
-                        ? ' ' . ' <div id="contentHeaderLocation">' . " | " . $player->current_location->name . '</div>'
-                        : null;
-                    $location_coords = "<div id='contentHeaderCoords'>" . " | " . $player->region->name . " (" . $player->location->x . "." . $player->location->y . ")" . '</div>';
-                    $content_header_divider = '<div class="contentHeaderDivider"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#77694e" stroke-width="1"></line></svg></div>';
-                } else {
-                    $location_name = $player->current_location->location_id
-                        ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
-                        : null;
-                    $location_coords = null;
-                    $content_header_divider = null;
-                }
-    
-                $layout->renderBeforeContentHTML(
-                    system: $system,
-                    player: $player,
-                    page_title: $route->title . $location_name . $location_coords . $content_header_divider,
+    // Pre-content display
+    $page_loaded = false;
+
+    // Attempt requested page
+    if(isset($_GET['id'])) {
+        $id = (int)$_GET['id'];
+        $route = Router::$routes[$id] ?? null;
+
+        try {
+            if ($layout->usesV2Interface()) {
+                $location_name = $player->current_location->location_id
+                    ? ' ' . ' <div id="contentHeaderLocation">' . " | " . $player->current_location->name . '</div>'
+                    : null;
+                $location_coords = "<div id='contentHeaderCoords'>" . " | " . $player->region->name . " (" . $player->location->x . "." . $player->location->y . ")" . '</div>';
+                $content_header_divider = '<div class="contentHeaderDivider"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#77694e" stroke-width="1"></line></svg></div>';
+            } else {
+                $location_name = $player->current_location->location_id
+                    ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
+                    : null;
+                $location_coords = null;
+                $content_header_divider = null;
+            }
+
+            $layout->renderBeforeContentHTML(
+                system: $system,
+                player: $player,
+                page_title: $route->title . $location_name . $location_coords . $content_header_divider,
+            );
+
+            $system->router->assertRouteIsValid($route, $player);
+
+            // Force view battle page if waiting too long
+            if($player->battle_id && empty($route->battle_type)) {
+                $battle_result = $system->db->query(
+                    "SELECT winner, turn_time, battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1"
                 );
-    
-                $system->router->assertRouteIsValid($route, $player);
-    
-                // Force view battle page if waiting too long
-                if($player->battle_id && empty($route->battle_type)) {
-                    $battle_result = $system->db->query(
-                        "SELECT winner, turn_time, battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1"
-                    );
-                    if($system->db->last_num_rows) {
-                        $battle_data = $system->db->fetch($battle_result);
-                        $time_since_turn = time() - $battle_data['turn_time'];
-    
-                        if($battle_data['winner'] && $time_since_turn >= 60) {
-                            foreach($routes as $page_id => $page) {
-                                $type = $page->battle_type ?? null;
-                                if($type == $battle_data['battle_type']) {
-                                    $id = $page_id;
-                                }
+                if($system->db->last_num_rows) {
+                    $battle_data = $system->db->fetch($battle_result);
+                    $time_since_turn = time() - $battle_data['turn_time'];
+
+                    if($battle_data['winner'] && $time_since_turn >= 60) {
+                        foreach($routes as $page_id => $page) {
+                            $type = $page->battle_type ?? null;
+                            if($type == $battle_data['battle_type']) {
+                                $id = $page_id;
                             }
                         }
                     }
                 }
-    
-                $self_link = $system->router->base_url . '?id=' . $id;
-    
-                // EVENT
-                if($system->event != null) {
-                    if (!$layout->usesV2Interface()) {
-                        require 'templates/temp_event_header.php';
-                    }
-                }
-    
-                require('pages/' . $route->file_name);
-    
-                try {
-                    ($route->function_name)();
-                } catch (DatabaseDeadlockException $e) {
-                    // Wait 1ms, then retry deadlocked transaction
-                    $system->db->rollbackTransaction();
-                    usleep(1000);
-    
-                    $system->db->startTransaction();
-                    $player->loadData();
-                    ($route->function_name)();
-                }
-    
-                $page_loaded = true;
-            } catch (Exception $e) {
-                if($e instanceof DatabaseDeadlockException) {
-                    error_log("DEADLOCK - retry did not solve");
-                    $system->db->rollbackTransaction();
-                    $system->message("Database deadlock, please reload your page and tell Lsm to fix!");
-                    $system->printMessage(true);
-                }
-                else if(strlen($e->getMessage()) > 1) {
-                    $system->db->rollbackTransaction();
-                    $system->message($e->getMessage());
-                    $system->printMessage(true);
+            }
+
+            $self_link = $system->router->base_url . '?id=' . $id;
+
+            // EVENT
+            if($system->event != null) {
+                if (!$layout->usesV2Interface()) {
+                    require 'templates/temp_event_header.php';
                 }
             }
-        }
-        else if (isset($_GET['home'])) {
-            $LoginManager->initial_home_view = "default";
-            if (isset($_GET['view'])) {
-                switch ($_GET['view']) {
-                    case "news":
-                        $LoginManager->initial_home_view = "news";
-                        break;
-                    case "contact":
-                        $LoginManager->initial_home_view = "contact";
-                        break;
-                    case "rules":
-                        $LoginManager->initial_home_view = "rules";
-                        break;
-                    case "terms":
-                        $LoginManager->initial_home_view = "terms";
-                        break;
-                }
-            }
-            $layout->renderBeforeContentHTML(
-                system: $system,
-                user: $player ?? null,
-                page_title: "Home",
-                render_content: false,
-                render_header: true,
-                render_sidebar: false,
-                render_topbar: false
-            );
-    
+
+            require('pages/' . $route->file_name);
+
             try {
-                require('./templates/home.php');
-            } catch (RuntimeException $e) {
+                ($route->function_name)();
+            } catch (DatabaseDeadlockException $e) {
+                // Wait 1ms, then retry deadlocked transaction
                 $system->db->rollbackTransaction();
-                $system->message($e->getMessage());
-                if (!$system->layout->usesV2Interface()) {
-                    $system->printMessage(true);
-                }
+                usleep(1000);
+
+                $system->db->startTransaction();
+                $player->loadData();
+                ($route->function_name)();
             }
-    
-            $layout->renderAfterContentHTML(
-                system: $system, 
-                user: $player ?? null, 
-                render_content: false,
-                render_footer: false, 
-                render_hotbar: false
-            );
-        }
-        else {
-            $layout->renderBeforeContentHTML(
-                system: $system,
-                player: $player,
-                page_title: "Profile"
-            );
-    
-            $system->printMessage();
-            if (!$player->global_message_viewed) {
-                $global_message = $system->fetchGlobalMessage();
-                $layout->renderGlobalMessage($system, $global_message);
+
+            $page_loaded = true;
+        } catch (Exception $e) {
+            if($e instanceof DatabaseDeadlockException) {
+                error_log("DEADLOCK - retry did not solve");
+                $system->db->rollbackTransaction();
+                $system->message("Database deadlock, please reload your page and tell Lsm to fix!");
+                $system->printMessage(true);
             }
-    
-            try {
-                require("pages/profile.php");
-                userProfile();
-            } catch (RuntimeException $e) {
+            else if(strlen($e->getMessage()) > 1) {
                 $system->db->rollbackTransaction();
                 $system->message($e->getMessage());
                 $system->printMessage(true);
             }
         }
-    
-        $player->updateData();
-
-        // Render footer
-        $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
-        $layout->renderAfterContentHTML($system, $player ?? null, $page_load_time);
-
-        $system->db->commitTransaction();
     }
+    else if (isset($_GET['home'])) {
+        $LoginManager->initial_home_view = "default";
+        if (isset($_GET['view'])) {
+            switch ($_GET['view']) {
+                case "news":
+                    $LoginManager->initial_home_view = "news";
+                    break;
+                case "contact":
+                    $LoginManager->initial_home_view = "contact";
+                    break;
+                case "rules":
+                    $LoginManager->initial_home_view = "rules";
+                    break;
+                case "terms":
+                    $LoginManager->initial_home_view = "terms";
+                    break;
+            }
+        }
+        $layout->renderBeforeContentHTML(
+            system: $system,
+            user: $player ?? null,
+            page_title: "Home",
+            render_content: false,
+            render_header: true,
+            render_sidebar: false,
+            render_topbar: false
+        );
+
+        try {
+            require('./templates/home.php');
+        } catch (RuntimeException $e) {
+            $system->db->rollbackTransaction();
+            $system->message($e->getMessage());
+            if (!$system->layout->usesV2Interface()) {
+                $system->printMessage(true);
+            }
+        }
+
+        $layout->renderAfterContentHTML(
+            system: $system, 
+            user: $player ?? null, 
+            render_content: false,
+            render_footer: false, 
+            render_hotbar: false
+        );
+    }
+    else {
+        $layout->renderBeforeContentHTML(
+            system: $system,
+            player: $player,
+            page_title: "Profile"
+        );
+
+        $system->printMessage();
+        if (!$player->global_message_viewed) {
+            $global_message = $system->fetchGlobalMessage();
+            $layout->renderGlobalMessage($system, $global_message);
+        }
+
+        try {
+            require("pages/profile.php");
+            userProfile();
+        } catch (RuntimeException $e) {
+            $system->db->rollbackTransaction();
+            $system->message($e->getMessage());
+            $system->printMessage(true);
+        }
+    }
+
+    $player->updateData();
+
+    // Render footer
+    $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
+    $layout->renderAfterContentHTML($system, $player ?? null, $page_load_time);
+
+    $system->db->commitTransaction();
 }
 // Logged out display
 else {
