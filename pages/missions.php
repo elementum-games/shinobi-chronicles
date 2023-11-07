@@ -38,6 +38,10 @@ function missions(): bool {
 
 	$missions = array();
 	while($row = $system->db->fetch($result)) {
+        // E-rank missions are for AS only
+        if($row['rank'] == Mission::RANK_E && $player->rank_num != 1) {
+            continue;
+        }
 		$missions[$row['mission_id']] = $row;
 	}
 

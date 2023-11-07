@@ -105,7 +105,6 @@ return $routes = [
         function_name: 'missions',
         menu: Route::MENU_ACTIVITY,
         battle_type: Battle::TYPE_AI_MISSION,
-        min_rank: 2,
         village_ok: Route::IN_VILLAGE_OKAY,
         challenge_lock_ok: false,
     ),

@@ -5,6 +5,7 @@ require_once __DIR__ . '/../classes/notification/NotificationManager.php';
 /* Class:		Mission
 */
 class Mission {
+    const RANK_E = 0;
     const RANK_D = 1;
     const RANK_C = 2;
     const RANK_B = 3;
@@ -35,6 +36,7 @@ class Mission {
     const STATUS_COMPLETE = 2;
 
     public static array $rank_names = [
+        Mission::RANK_E => 'E-Rank',
         Mission::RANK_D => 'D-Rank',
         Mission::RANK_C => 'C-Rank',
         Mission::RANK_B => 'B-Rank',
@@ -633,7 +635,10 @@ class Mission {
     }
 
     public static function maxMissionRank(int $player_rank): int {
-        $max_mission_rank = Mission::RANK_D;
+        $max_mission_rank = Mission::RANK_E;
+        if($player_rank == 2) {
+            $max_mission_rank = Mission::RANK_D;
+        }
         if($player_rank == 3) {
             $max_mission_rank = Mission::RANK_B;
         }

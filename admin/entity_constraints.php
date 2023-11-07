@@ -518,7 +518,7 @@ $constraints['mission'] = [
     'rank' => [
         'data_type' => 'int',
         'input_type' => 'radio',
-        'options' => [1 => 'D-Rank', 2 => 'C-Rank', 3 => 'B-Rank', 4 => 'A-Rank', 5 => 'S-Rank'],
+        'options' => [0 => 'E-Rank', 1 => 'D-Rank', 2 => 'C-Rank', 3 => 'B-Rank', 4 => 'A-Rank', 5 => 'S-Rank'],
     ],
     'mission_type' => [
         'data_type' => 'int',
