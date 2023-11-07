@@ -454,10 +454,13 @@ function runActiveMission(): bool {
                     $player->daily_tasks->progressTask(DailyTask::ACTIVITY_MISSIONS, 1, $mission_rank);
                 }
 
-                if (isset($player->missions_completed[$mission->rank])) {
-                    $player->missions_completed[$mission->rank] += 1;
-                } else {
-                    $player->missions_completed[$mission->rank] = 1;
+                // Only track D-rank+
+                if($mission->rank > Mission::RANK_E) {
+                    if (isset($player->missions_completed[$mission->rank])) {
+                        $player->missions_completed[$mission->rank] += 1;
+                    } else {
+                        $player->missions_completed[$mission->rank] = 1;
+                    }
                 }
 
                 // Rewards
