@@ -679,9 +679,11 @@ class System {
 
         // Weekend boost - THIS MUST BE LAST!!!!
         if(is_null($this->event)) {
-            $date = new DateTimeImmutable();
-            $newDate = $date->setTimezone(new DateTimeZone('America/New_York'));
-            echo $newDate->format('Y-m-d H:i:sP');
+            $server_time = $current_datetime->setTimezone(new DateTimeZone('America/New_York'));
+            if(in_array($server_time->format('l'), ['Tuesday', 'Wednesday'])) {
+                $end_time = $server_time->modify('next thursday');
+                $this->event = new WeekendBoost();
+            }
         }
     }
 
