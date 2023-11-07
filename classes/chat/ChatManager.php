@@ -259,6 +259,9 @@ class ChatManager {
             $seat = $this->player->village_seat;
             if (!empty($seat->seat_title)) {
                 $title = $seat->seat_title;
+                if ($seat->seat_type == 'kage') {
+                    $title = VillageManager::KAGE_NAMES[$this->player->village->village_id];
+                }
             }
             $staff_level = $this->player->staff_level;
             $supported_colors = $this->player->getNameColors();

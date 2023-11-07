@@ -226,20 +226,20 @@ class TravelManager {
      */
     #[Trace]
     public function fetchNearbyPlayers(): array {
-        $sql = "SELECT `users`.`user_id`, 
-                    `users`.`user_name`, 
-                    `users`.`village`, 
-                    `users`.`rank`, 
-                    `users`.`stealth`, 
+        $sql = "SELECT `users`.`user_id`,
+                    `users`.`user_name`,
+                    `users`.`village`,
+                    `users`.`rank`,
+                    `users`.`stealth`,
                     `users`.`operation`,
-                    `users`.`level`, 
-                    `users`.`attack_id`, 
-                    `users`.`battle_id`, 
-                    `ranks`.`name` as `rank_name`, 
-                    `users`.`location`, 
+                    `users`.`level`,
+                    `users`.`attack_id`,
+                    `users`.`battle_id`,
+                    `ranks`.`name` as `rank_name`,
+                    `users`.`location`,
                     `users`.`pvp_immunity_ms`,
-                    `villages`.`village_id`, 
-                    `users`.`special_mission`, 
+                    `villages`.`village_id`,
+                    `users`.`special_mission`,
                     COUNT(`loot`.`id`) as `loot_count`
                 FROM `users`
                 INNER JOIN `ranks` ON `users`.`rank`=`ranks`.`rank_id`
@@ -707,8 +707,8 @@ class TravelManager {
             $time = System::currentTimeMs();
             $player_result = $this->system->db->query("SELECT `users`.`user_id`, `villages`.`village_id` FROM `users`
             INNER JOIN `villages` ON `users`.`village` = `villages`.`name`
-            WHERE `users`.`location` = '{$user->location->toString()}' 
-            AND `users`.`rank` > {$user->rank_num} 
+            WHERE `users`.`location` = '{$user->location->toString()}'
+            AND `users`.`rank` > {$user->rank_num}
             AND `users`.`battle_id` = 0
             AND `users`.`last_active` > UNIX_TIMESTAMP() - " . TravelManager::INACTIVE_SECONDS . "
             AND `users`.`pvp_immunity_ms` < {$time}");
@@ -1022,7 +1022,7 @@ class TravelManager {
         $objectives = [];
 
         // Get Region Objectives
-        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `type`, `x`, `y`, `resource_id`, `resource_count`, `defense`,
+        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `type`, `x`, `y`, `resource_id`, `resource_count`, `defense`, `occupying_village_id`,
             COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) AS `village`,
             `villages`.`name` as `village_name`, `villages`.`village_id`
             FROM `region_locations`
@@ -1055,6 +1055,7 @@ class TravelManager {
                             village_id: $obj['village_id'],
                             resource_id: $obj['resource_id'],
                             resource_count: $obj['resource_count'],
+                            is_occupied: !empty($obj['occupying_village_id']),
                         );
                         break;
                     case "tower":
@@ -1074,6 +1075,7 @@ class TravelManager {
                             village_id: $obj['village_id'],
                             resource_id: $obj['resource_id'],
                             resource_count: $obj['resource_count'],
+                            is_occupied: !empty($obj['occupying_village_id']),
                         );
                     case "village":
                         if ($distance <= $this->user->scout_range) {
@@ -1092,6 +1094,7 @@ class TravelManager {
                                 village_id: $obj['village_id'],
                                 resource_id: $obj['resource_id'],
                                 resource_count: $obj['resource_count'],
+                                is_occupied: !empty($obj['occupying_village_id']),
                             );
                         }
                         break;

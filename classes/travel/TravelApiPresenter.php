@@ -125,6 +125,7 @@ class TravelApiPresenter {
                     'resource_id' => $regionObjective->resource_id,
                     'resource_count' => $regionObjective->resource_count,
                     'resource_name' => WarManager::RESOURCE_NAMES[$regionObjective->resource_id],
+                    'is_occupied' => $regionObjective->is_occupied,
                 ];
             },
             $travelManager->fetchRegionObjectives()

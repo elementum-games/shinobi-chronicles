@@ -12,7 +12,7 @@ class Operation {
         self::OPERATION_REINFORCE => "reinforce",
         self::OPERATION_RAID => "raid",
         self::OPERATION_LOOT => "loot",
-        self::OPERATION_LOOT_TOWN => "loot_town",
+        self::OPERATION_LOOT_TOWN => "loot",
     ];
 
     const OPERATION_TYPE_DESCRIPTOR = [
