@@ -164,7 +164,7 @@ class PremiumShopManager {
         if (SenseiManager::isSensei($this->player->user_id, $this->system)) {
             throw new RuntimeException("You must resign from being a sensei first!");
         }
-        if($this->player->stat_transfer_complete_time != 0) {
+        if($this->player->stat_transfer_completion_time != 0) {
             throw new RuntimeException("You must complete/cancel your stat transfer first!");
         }
         if($this->player->trainingManager->hasActiveTraining()) {
