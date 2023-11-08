@@ -660,7 +660,7 @@ class TravelManager {
         if ($this->user->operation > 0) {
             throw new RuntimeException("You are currently in an operation!");
         }
-        if ($this->dbFetchIsProtectedByAlly($user)) {
+        if ($this->dbFetchIsProtectedByAlly($user) && $this->user->rank_num >= 4) {
             throw new RuntimeException("Target is protected by a higher rank ally! Attack them first.");
         }
 
