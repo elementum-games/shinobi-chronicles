@@ -147,6 +147,8 @@ class Inbox {
      */
     public static function checkBlacklist(System $system, array $convo_members): bool {
         $user_ids = [];
+        // Temporary disable until rework
+        /*
         foreach($convo_members as $member) {
             $user_ids[$member->user_id] = $member->user_id;
         }
@@ -163,7 +165,7 @@ class Inbox {
                     return true;
                 }
             }
-        }
+        }*/
         return false;
     }
 
