@@ -5,7 +5,7 @@
  */
 
 $UserAPIManager = new UserAPIManager($system, $player);
-$NavigationAPIManager = new NavigationAPIManager($system, $player);
+$NavigationAPIManager = NavigationAPIManager::loadNavigationAPIManager($system, $player);
 
 ?>
 
