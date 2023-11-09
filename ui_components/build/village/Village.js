@@ -1599,7 +1599,6 @@ function WarTable({
   const [playerWarLog, setPlayerWarLog] = React.useState(warLogData.player_war_log);
   const [globalLeaderboardWarLogs, setGlobalLeaderboardWarLogs] = React.useState(warLogData.global_leaderboard_war_logs);
   const [globalLeaderboardPageNumber, setGlobalLeaderboardPageNumber] = React.useState(1);
-  const chart_colors = ['#2b80cf', '#23c869', '#dd5f60'];
   function WarLogHeader() {
     return /*#__PURE__*/React.createElement("div", {
       className: "warlog_label_row"
@@ -1631,6 +1630,17 @@ function WarTable({
     log,
     index
   }) {
+    const scoreData = [{
+      name: 'Objective Score',
+      score: log.objective_score
+    }, {
+      name: 'Resource Score',
+      score: log.resource_score
+    }, {
+      name: 'Battle Score',
+      score: log.battle_score
+    }];
+    const chart_colors = ['#2b80cf', '#23c869', '#dd5f60'];
     return /*#__PURE__*/React.createElement("div", {
       key: index,
       className: "warlog_item"
@@ -1671,29 +1681,11 @@ function WarTable({
       height: 50
     }, /*#__PURE__*/React.createElement(Recharts.Pie, {
       stroke: "none",
-      data: [{
-        name: 'Objective Score',
-        score: log.objective_score
-      }, {
-        name: 'Resource Score',
-        score: log.resource_score
-      }, {
-        name: 'Battle Score',
-        score: log.battle_score
-      }],
+      data: scoreData,
       dataKey: "score",
       outerRadius: 16,
       fill: "green"
-    }, [{
-      name: 'Objective Score',
-      score: log.objective_score
-    }, {
-      name: 'Resource Score',
-      score: log.resource_score
-    }, {
-      name: 'Battle Score',
-      score: log.battle_score
-    }].map((entry, index) => /*#__PURE__*/React.createElement(Recharts.Cell, {
+    }, scoreData.map((entry, index) => /*#__PURE__*/React.createElement(Recharts.Cell, {
       key: `cell-${index}`,
       fill: chart_colors[index % chart_colors.length]
     })))), /*#__PURE__*/React.createElement("div", {

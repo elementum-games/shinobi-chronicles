@@ -1541,7 +1541,6 @@ function WarTable({
     const [playerWarLog, setPlayerWarLog] = React.useState(warLogData.player_war_log);
     const [globalLeaderboardWarLogs, setGlobalLeaderboardWarLogs] = React.useState(warLogData.global_leaderboard_war_logs);
     const [globalLeaderboardPageNumber, setGlobalLeaderboardPageNumber] = React.useState(1);
-    const chart_colors = ['#2b80cf', '#23c869', '#dd5f60'];
 
     function WarLogHeader() {
         return (
@@ -1561,6 +1560,12 @@ function WarTable({
         );
     }
     function WarLog({ log, index }) {
+        const scoreData = [
+            { name: 'Objective Score', score: log.objective_score },
+            { name: 'Resource Score', score: log.resource_score },
+            { name: 'Battle Score', score: log.battle_score }
+        ];
+        const chart_colors = ['#2b80cf', '#23c869', '#dd5f60'];
         return (
             <div key={index} className="warlog_item">
                 <div className="warlog_data_row">
@@ -1585,20 +1590,8 @@ function WarTable({
                     <div className="warlog_resources">{log.resources_stolen}</div>
                     <div className="warlog_chart">
                         <Recharts.PieChart width={50} height={50}>
-                            <Recharts.Pie
-                                stroke="none"
-                                data={[
-                                    { name: 'Objective Score', score: log.objective_score },
-                                    { name: 'Resource Score', score: log.resource_score },
-                                    { name: 'Battle Score', score: log.battle_score }
-                                ]}
-                                dataKey="score" outerRadius={16} fill="green"
-                            >
-                                {[
-                                    { name: 'Objective Score', score: log.objective_score },
-                                    { name: 'Resource Score', score: log.resource_score },
-                                    { name: 'Battle Score', score: log.battle_score }
-                                ].map((entry, index) => (
+                            <Recharts.Pie stroke="none" data={scoreData} dataKey="score" outerRadius={16} fill="green">
+                                {scoreData.map((entry, index) => (
                                     <Recharts.Cell key={`cell-${index}`} fill={chart_colors[index % chart_colors.length]} />
                                 ))}
                             </Recharts.Pie>
