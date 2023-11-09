@@ -583,9 +583,7 @@ class UserReputation {
             $rep_gain = ceil($rep_gain / 2);
         }
 
-        $player->reputation->addRep($rep_gain, UserReputation::ACTIVITY_TYPE_PVP);
-
-        return $rep_gain;
+        return $player->reputation->addRep($rep_gain, UserReputation::ACTIVITY_TYPE_PVP);
     }
 
     public function handlePvPLoss(User $player, Fighter $opponent, bool $retreat = false): int {
