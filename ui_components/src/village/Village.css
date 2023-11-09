@@ -1663,3 +1663,179 @@
 .challenge_time_now {
     color: #c7b070;
 }
+
+/* War Table */
+.wartable_container {
+    margin-top: 15px;
+    margin-left: 25px;
+    margin-right: 25px;
+    color: var(--village-text-color-1);
+}
+    .wartable_container .row.first {
+        margin-bottom: 15px;
+    }
+    .wartable_container .row.first .column.first {
+        width: 100%;
+    }
+    .wartable_container .row.second .column.first {
+        width: 100%;
+    }
+.player_warlog_container {
+    width: 100%;
+    margin-top: -10px;
+}
+.warlog_item {
+    width: 100%;
+}
+.warlog_data_row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    background: #17161b;
+}
+    .warlog_data_row > div {
+        height: 80%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+        border-right: 1px solid #3b372e;
+        flex-grow: 1;
+        flex-basis: 0;
+    }
+.warlog_label_row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2px;
+}
+    .warlog_label_row > div {
+        text-align: center;
+        flex-grow: 1;
+        flex-basis: 0;
+        font-family: var(--font-primary);
+        font-variant: var(--font-primary-variant);
+        color: var(--font-color-1);
+        font-size: 12px;
+    }
+.warlog_war_score {
+    font-size: 16px;
+    color: #dbc483;
+}
+.warlog_username {
+    width: 150px;
+    color: #bfb7e0;
+    font-weight: bold;
+    font-size: 20px;
+    align-items: baseline !important;
+    box-sizing: border-box;
+    padding-left: 20px;
+    flex: 0 0 auto !important;
+    border-right: none !important;
+}
+.warlog_username_label {
+    width: 150px;
+    flex: 0 0 auto !important;
+}
+.warlog_resources {
+    border-right: none !important;
+}
+.warlog_chart {
+    width: 50px;
+    flex: 0 0 auto !important;
+    border-right: none !important;
+    position: relative;
+}
+.warlog_chart:hover .warlog_chart_tooltip {
+    display: flex;
+}
+.warlog_chart_label {
+    width: 50px;
+    flex: 0 0 auto !important;
+}
+.warlog_green {
+    color: #c5ffca;
+}
+.warlog_red {
+    color: #ffbdbd;
+}
+.global_leaderboard_container {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-top: -10px;
+}
+    .global_leaderboard_container > :nth-child(2n) .warlog_data_row {
+        background-color: #1c1a25;
+    }
+.warlog_chart_tooltip {
+    position: absolute;
+    height: 85px;
+    width: 175px;
+    background-color: #1c1a25;
+    top: 100%;
+    right: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: baseline;
+    font-style: italic;
+    display: none;
+    z-index: 1;
+}
+.warlog_chart_tooltip_row {
+    display: flex;
+    gap: 10px;
+    padding-left: 15px;
+    color: #a59e8d;
+    line-height: 10px;
+}
+
+.global_leaderboard_navigation {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+.global_leaderboard_navigation_divider_left {
+    margin-left: 25px;
+    flex-basis: 50%;
+}
+.global_leaderboard_navigation_divider_right {
+    margin-right: 25px;
+    flex-basis: 50%;
+}
+.global_leaderboard_navigation_divider_middle {
+    width: 100px;
+    flex-shrink: 0;
+}
+.global_leaderboard_pagination {
+    white-space: nowrap;
+    cursor: pointer;
+    font-weight: 400 !important;
+    font-size: var(--font-small);
+    font-family: var(--font-secondary);
+    font-variant: var(--font-secondary-variant);
+    user-select: none;
+}
+.global_leaderboard_pagination_wrapper {
+    margin-top: 2px;
+    width: 60px;
+    flex-shrink: 0;
+    text-align: center;
+}
+.global_leaderboard_navigation_latest .chat_pagination {
+    color: var(--font-color-5);
+}
+.global_leaderboard_navigation_top .chat_pagination {
+    color: var(--font-color-5);
+}
+.global_leaderboard_navigation_bottom .chat_pagination {
+    color: var(--font-color-5);
+}
+.chat_pagination:hover {
+    color: var(--text-hover);
+}

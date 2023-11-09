@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__ . '/WarLogDto.php';
+
 class WarLogManager {
     const WAR_LOG_INFILTRATE = 'infiltrate_count';
     const WAR_LOG_REINFORCE = 'reinforce_count';
@@ -17,6 +19,21 @@ class WarLogManager {
     const WAR_LOG_PVP_WINS = 'pvp_wins';
     const WAR_LOG_POINTS_GAINED = 'points_gained';
 
+    const SCORE_WEIGHT_DAMAGE_DEALT = 0.1;
+    const SCORE_WEIGHT_DAMAGE_HEALED = 0.1;
+    const SCORE_WEIGHT_DEFENSE_REDUCED = 10;
+    const SCORE_WEIGHT_DEFENSE_GAINED = 10;
+    const SCORE_WEIGHT_REGION_CAPTURES = 250;
+    const SCORE_WEIGHT_VILLAGE_CAPTURES = 100;
+    const SCORE_WEIGHT_RESOURCES_STOLEN = 10;
+    const SCORE_WEIGHT_PVP_WINS = 50;
+    const SCORE_WEIGHT_PATROL_WINS = 10;
+
+    const WAR_LOG_TYPE_PLAYER = "player";
+    const WAR_LOG_TYPE_VILLAGE = "village";
+
+    const WAR_LOGS_PER_PAGE = 10;
+
     public static function logAction(System $system, User $player, int $value, string $type, int $target_village_id) {
         // use null relation_id to track overall
         self::updatePlayerLog($system, $player, $value, $type, null);
@@ -24,7 +41,7 @@ class WarLogManager {
         if (!$player->village->isAlly($target_village_id)) {
             self::updatePlayerLog($system, $player, $value, $type, $player->village->relations[$target_village_id]->relation_id);
             self::updateVillageLog($system, $player, $value, $type, $player->village->relations[$target_village_id]->relation_id);
-        } 
+        }
         else {
             // if target village is self or ally then we log those action types for all ongoing neutral/war relations
             foreach ($player->village->relations as $relation) {
@@ -34,7 +51,7 @@ class WarLogManager {
                 }
             }
         }
-        
+
     }
 
     public static function logRegionCapture(System $system, User $player, int $region_id) {
@@ -105,5 +122,113 @@ class WarLogManager {
                 return 0;
                 break;
         }
+    }
+
+    /**
+     * @return WarLogDto[]
+     */
+    public static function getPlayerWarLogs(System $system, int $page_number = 1, int $relation_id = null): array {
+        $war_logs = [];
+        if (!empty($relation_id)) {
+            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
+            FROM `player_war_logs`
+            INNER JOIN `users`
+            ON `player_war_logs`.`user_id` = `users`.`user_id`
+            WHERE `relation_id` = {$relation_id}");
+        }
+        else {
+            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
+            FROM `player_war_logs`
+            INNER JOIN `users`
+            ON `player_war_logs`.`user_id` = `users`.`user_id`
+            WHERE `relation_id` IS NULL");
+        }
+        $war_log_result = $system->db->fetch_all($war_log_result);
+        foreach ($war_log_result as $war_log) {
+            $new_log = new WarLogDto($war_log, self::WAR_LOG_TYPE_PLAYER);
+            self::calculateWarScore($new_log);
+            $war_logs[] = $new_log;
+        }
+        // sort by war score, to-do filters
+        usort($war_logs, function ($a, $b) {
+            return $b->war_score <=> $a->war_score;
+        });
+        $war_logs = array_slice($war_logs, ($page_number - 1) * self::WAR_LOGS_PER_PAGE, $page_number * self::WAR_LOGS_PER_PAGE);
+        return $war_logs;
+    }
+
+    /**
+     * @return WarLogDto
+     */
+    public static function getPlayerWarLogByID(System $system, int $player_id, int $relation_id = null): WarLogDto {
+        if (!empty($relation_id)) {
+            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
+            FROM `player_war_logs`
+            INNER JOIN `users`
+            ON `player_war_logs`.`user_id` = `users`.`user_id`
+            WHERE `relation_id` = {$relation_id}
+            AND `player_war_logs`.`user_id` = {$player_id} LIMIT 1");
+        } else {
+            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
+            FROM `player_war_logs`
+            INNER JOIN `users`
+            ON `player_war_logs`.`user_id` = `users`.`user_id`
+            WHERE `relation_id` IS NULL
+            AND `player_war_logs`.`user_id` = {$player_id} LIMIT 1");
+        }
+        $war_log_result = $system->db->fetch($war_log_result);
+        $new_log = new WarLogDto($war_log_result, self::WAR_LOG_TYPE_PLAYER);
+        self::calculateWarScore($new_log);
+        return $new_log;
+    }
+
+    /**
+     * @return WarLogDto[]
+     */
+    public static function getVillageWarLogs(System $system, int $relation_id): array
+    {
+        $war_logs = [];
+        $war_log_result = $system->db->query("SELECT `village_war_logs`.*, `villages`.`name` as `village_name`
+        FROM `village_war_logs`
+        INNER JOIN `villages`
+        ON `village_war_logs`.`village_id` = `villages`.`village_id`
+        WHERE `relation_id` = {$relation_id}");
+        $war_log_result = $system->db->fetch_all($war_log_result);
+        foreach ($war_log_result as $war_log) {
+            $new_log = new WarLogDto($war_log, self::WAR_LOG_TYPE_VILLAGE);
+            self::calculateWarScore($new_log);
+            $war_logs[] = $new_log;
+        }
+        return $war_logs;
+    }
+
+    public static function calculateWarScore(WarLogDto &$warLog) {
+        $war_score = 0;
+        $objective_score = 0;
+        $resource_score = 0;
+        $battle_score = 0;
+
+        // calculate objective score
+        $objective_score += $warLog->damage_dealt * self::SCORE_WEIGHT_DAMAGE_DEALT;
+        $objective_score += $warLog->damage_healed * self::SCORE_WEIGHT_DAMAGE_HEALED;
+        $objective_score += $warLog->defense_reduced * self::SCORE_WEIGHT_DEFENSE_REDUCED;
+        $objective_score += $warLog->defense_gained * self::SCORE_WEIGHT_DEFENSE_GAINED;
+        $objective_score += $warLog->regions_captured * self::SCORE_WEIGHT_REGION_CAPTURES;
+        $objective_score += $warLog->villages_captured * self::SCORE_WEIGHT_VILLAGE_CAPTURES;
+
+        // calculate resource score
+        $resource_score += $warLog->resources_stolen * self::SCORE_WEIGHT_RESOURCES_STOLEN;
+
+        // calculate battle score
+        $battle_score += $warLog->pvp_wins * self::SCORE_WEIGHT_PVP_WINS;
+        $battle_score += $warLog->patrols_defeated * self::SCORE_WEIGHT_PVP_WINS;
+
+        // calculatge war score
+        $war_score += $objective_score + $battle_score + $resource_score;
+
+        $warLog->war_score = $war_score;
+        $warLog->objective_score = $objective_score;
+        $warLog->resource_score = $resource_score;
+        $warLog->battle_score = $battle_score;
     }
 }
