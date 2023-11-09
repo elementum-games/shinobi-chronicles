@@ -649,8 +649,8 @@ class TravelManager {
             throw new RuntimeException("You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
                 ceil((($this->user->last_death_ms + (User::PVP_IMMUNITY_SECONDS * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
         }
-        if ($user->pvp_immunity_ms > time()) {
-            throw new RuntimeException("Target has died recently and immune to being attacked");
+        if ($user->pvp_immunity_ms > System::currentTimeMs()) {
+            throw new RuntimeException("Target has died recently and immune to being attacked.");
         }
         /*
         if ($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
@@ -660,7 +660,7 @@ class TravelManager {
         if ($this->user->operation > 0) {
             throw new RuntimeException("You are currently in an operation!");
         }
-        if ($this->dbFetchIsProtectedByAlly($user)) {
+        if ($this->dbFetchIsProtectedByAlly($user) && $this->user->rank_num >= 4) {
             throw new RuntimeException("Target is protected by a higher rank ally! Attack them first.");
         }
 
