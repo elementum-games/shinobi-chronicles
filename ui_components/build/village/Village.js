@@ -13,7 +13,8 @@ function Village({
   clanData,
   proposalData,
   strategicData,
-  challengeData
+  challengeData,
+  warLogData
 }) {
   const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
   const [policyDataState, setPolicyDataState] = React.useState(policyData);
@@ -135,7 +136,8 @@ function Village({
     className: "nav_button",
     onClick: () => setVillageTab("worldInfo")
   }, "world info"), /*#__PURE__*/React.createElement("div", {
-    className: "nav_button disabled"
+    className: "nav_button",
+    onClick: () => setVillageTab("warTable")
   }, "war table"), /*#__PURE__*/React.createElement("div", {
     className: "nav_button disabled"
   }, "members & teams"), /*#__PURE__*/React.createElement("div", {
@@ -194,6 +196,10 @@ function Village({
     getVillageIcon: getVillageIcon,
     StrategicInfoItem: StrategicInfoItem,
     getPolicyDisplayData: getPolicyDisplayData
+  }), villageTab == "warTable" && /*#__PURE__*/React.createElement(WarTable, {
+    warLogData: warLogData,
+    villageAPI: villageAPI,
+    handleErrors: handleErrors
   }));
 }
 function VillageHQ({
@@ -1584,6 +1590,274 @@ function WorldInfo({
     strategicInfoData: strategicDisplayRight,
     getPolicyDisplayData: getPolicyDisplayData
   })))));
+}
+function WarTable({
+  warLogData,
+  villageAPI,
+  handleErrors
+}) {
+  const [playerWarLog, setPlayerWarLog] = React.useState(warLogData.player_war_log);
+  const [globalLeaderboardWarLogs, setGlobalLeaderboardWarLogs] = React.useState(warLogData.global_leaderboard_war_logs);
+  const [globalLeaderboardPageNumber, setGlobalLeaderboardPageNumber] = React.useState(1);
+  const chart_colors = ['#2b80cf', '#23c869', '#dd5f60'];
+  function WarLogHeader() {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "warlog_label_row"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "warlog_username_label"
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_war_score_label"
+    }, "war score"), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_pvp_wins_label"
+    }, "pvp wins"), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_raid_label"
+    }, "raid"), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_reinforce_label"
+    }, "reinforce"), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_infiltrate_label"
+    }, "infiltrate"), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_defense_label"
+    }, "def"), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_captures_label"
+    }, "captures"), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_patrols_label"
+    }, "patrols"), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_resources_label"
+    }, "resources"), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_chart_label"
+    }));
+  }
+  function WarLog({
+    log,
+    index
+  }) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: index,
+      className: "warlog_item"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "warlog_data_row"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "warlog_username"
+    }, log.user_name), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_war_score"
+    }, log.war_score), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_pvp_wins"
+    }, log.pvp_wins), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_raid"
+    }, /*#__PURE__*/React.createElement("span", null, log.raid_count), /*#__PURE__*/React.createElement("span", {
+      className: "warlog_red"
+    }, "(", log.damage_dealt, ")")), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_reinforce"
+    }, /*#__PURE__*/React.createElement("span", null, log.reinforce_count), /*#__PURE__*/React.createElement("span", {
+      className: "warlog_green"
+    }, "(", log.damage_healed, ")")), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_infiltrate"
+    }, log.infiltrate_count), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_defense"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "warlog_green"
+    }, "+", log.defense_gained), /*#__PURE__*/React.createElement("span", {
+      className: "warlog_red"
+    }, "-", log.defense_reduced)), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_captures"
+    }, log.villages_captured + log.regions_captured), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_patrols"
+    }, log.patrols_defeated), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_resources"
+    }, log.resources_stolen), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_chart"
+    }, /*#__PURE__*/React.createElement(Recharts.PieChart, {
+      width: 50,
+      height: 50
+    }, /*#__PURE__*/React.createElement(Recharts.Pie, {
+      stroke: "none",
+      data: [{
+        name: 'Objective Score',
+        score: log.objective_score
+      }, {
+        name: 'Resource Score',
+        score: log.resource_score
+      }, {
+        name: 'Battle Score',
+        score: log.battle_score
+      }],
+      dataKey: "score",
+      outerRadius: 16,
+      fill: "green"
+    }, [{
+      name: 'Objective Score',
+      score: log.objective_score
+    }, {
+      name: 'Resource Score',
+      score: log.resource_score
+    }, {
+      name: 'Battle Score',
+      score: log.battle_score
+    }].map((entry, index) => /*#__PURE__*/React.createElement(Recharts.Cell, {
+      key: `cell-${index}`,
+      fill: chart_colors[index % chart_colors.length]
+    })))), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_chart_tooltip"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "warlog_chart_tooltip_row"
+    }, /*#__PURE__*/React.createElement("svg", {
+      width: "12",
+      height: "12"
+    }, /*#__PURE__*/React.createElement("rect", {
+      width: "100",
+      height: "100",
+      fill: "#2b80cf"
+    })), /*#__PURE__*/React.createElement("div", null, "Objective score (", Math.round(log.objective_score / log.war_score * 100), "%)")), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_chart_tooltip_row"
+    }, /*#__PURE__*/React.createElement("svg", {
+      width: "12",
+      height: "12"
+    }, /*#__PURE__*/React.createElement("rect", {
+      width: "100",
+      height: "100",
+      fill: "#23c869"
+    })), /*#__PURE__*/React.createElement("div", null, "Resource score (", Math.round(log.resource_score / log.war_score * 100), "%)")), /*#__PURE__*/React.createElement("div", {
+      className: "warlog_chart_tooltip_row"
+    }, /*#__PURE__*/React.createElement("svg", {
+      width: "12",
+      height: "12"
+    }, /*#__PURE__*/React.createElement("rect", {
+      width: "100",
+      height: "100",
+      fill: "#dd5f60"
+    })), /*#__PURE__*/React.createElement("div", null, "Battle score (", Math.round(log.battle_score / log.war_score * 100), "%)"))))));
+  }
+  const GlobalLeaderboardNextPage = page_number => {
+    apiFetch(villageAPI, {
+      request: 'GetGlobalWarLeaderboard',
+      page_number: page_number
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      if (response.data.warLogData.global_leaderboard_war_logs.length == 0) {
+        return;
+      } else {
+        setGlobalLeaderboardPageNumber(page_number);
+        setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
+        setPlayerWarLog(response.data.warLogData.player_war_log);
+      }
+    });
+  };
+  const GlobalLeaderboardPreviousPage = page_number => {
+    if (page_number > 0) {
+      apiFetch(villageAPI, {
+        request: 'GetGlobalWarLeaderboard',
+        page_number: page_number
+      }).then(response => {
+        if (response.errors.length) {
+          handleErrors(response.errors);
+          return;
+        }
+        setGlobalLeaderboardPageNumber(page_number);
+        setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
+        setPlayerWarLog(response.data.warLogData.player_war_log);
+      });
+    }
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "wartable_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row first"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "column first"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "your war score"), /*#__PURE__*/React.createElement("div", {
+    className: "player_warlog_container"
+  }, /*#__PURE__*/React.createElement(WarLogHeader, null), /*#__PURE__*/React.createElement(WarLog, {
+    log: playerWarLog,
+    index: 0
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "row second"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "column first"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "global war score"), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "warlog_label_row"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "warlog_username_label"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_war_score_label"
+  }, "war score"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_pvp_wins_label"
+  }, "pvp wins"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_raid_label"
+  }, "raid"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_reinforce_label"
+  }, "reinforce"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_infiltrate_label"
+  }, "infiltrate"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_defense_label"
+  }, "def"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_captures_label"
+  }, "captures"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_patrols_label"
+  }, "patrols"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_resources_label"
+  }, "resources"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_chart_label"
+  })), globalLeaderboardWarLogs.map((log, index) => /*#__PURE__*/React.createElement(WarLog, {
+    log: log,
+    index: index
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_navigation"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_navigation_divider_left"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_pagination_wrapper"
+  }, globalLeaderboardPageNumber > 1 && /*#__PURE__*/React.createElement("a", {
+    className: "global_leaderboard_pagination",
+    onClick: () => GlobalLeaderboardPreviousPage(globalLeaderboardPageNumber - 1)
+  }, "<< Prev")), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_navigation_divider_middle"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_pagination_wrapper"
+  }, /*#__PURE__*/React.createElement("a", {
+    className: "global_leaderboard_pagination",
+    onClick: () => GlobalLeaderboardNextPage(globalLeaderboardPageNumber + 1)
+  }, "Next >>")), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_navigation_divider_right"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  })))))));
 }
 function StrategicInfoItem({
   strategicInfoData,
