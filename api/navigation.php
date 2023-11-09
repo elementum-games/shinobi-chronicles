@@ -22,7 +22,7 @@ try {
     }
 
     $NavigationResponse = new NavigationAPIResponse();
-    $NavigationManager = new NavigationAPIManager($system, $player);
+    $NavigationManager = NavigationAPIManager::loadNavigationAPIManager($system, $player);
 
     switch ($request) {
         case "getNavigationLinks":
