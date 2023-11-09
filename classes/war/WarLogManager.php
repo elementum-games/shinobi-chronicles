@@ -164,19 +164,29 @@ class WarLogManager {
         if (!empty($relation_id)) {
             $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
             FROM `player_war_logs`
-            INNER JOIN `users`
+            RIGHT JOIN `users`
             ON `player_war_logs`.`user_id` = `users`.`user_id`
+            AND `player_war_logs`.`user_id` = {$player_id}
             WHERE `relation_id` = {$relation_id}
-            AND `player_war_logs`.`user_id` = {$player_id} LIMIT 1");
+            LIMIT 1");
         } else {
             $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
             FROM `player_war_logs`
-            INNER JOIN `users`
+            RIGHT JOIN `users`
             ON `player_war_logs`.`user_id` = `users`.`user_id`
+            AND `player_war_logs`.`user_id` = {$player_id}
             WHERE `relation_id` IS NULL
-            AND `player_war_logs`.`user_id` = {$player_id} LIMIT 1");
+            LIMIT 1");
         }
         $war_log_result = $system->db->fetch($war_log_result);
+        if (empty($war_log_result['log_id'])) {
+            $war_log_result = [
+                'log_id' => 0,
+                'user_id' => $player_id,
+                'user_name' => $war_log_result['user_name'],
+                'village_id' => 0,
+            ];
+        }
         $new_log = new WarLogDto($war_log_result, self::WAR_LOG_TYPE_PLAYER);
         self::calculateWarScore($new_log);
         return $new_log;
