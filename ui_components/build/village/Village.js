@@ -1699,7 +1699,7 @@ function WarTable({
       width: "100",
       height: "100",
       fill: "#2b80cf"
-    })), /*#__PURE__*/React.createElement("div", null, "Objective score (", Math.round(log.objective_score / log.war_score * 100), "%)")), /*#__PURE__*/React.createElement("div", {
+    })), /*#__PURE__*/React.createElement("div", null, "Objective score (", Math.round(log.objective_score / Math.max(log.war_score, 1) * 100), "%)")), /*#__PURE__*/React.createElement("div", {
       className: "warlog_chart_tooltip_row"
     }, /*#__PURE__*/React.createElement("svg", {
       width: "12",
@@ -1708,7 +1708,7 @@ function WarTable({
       width: "100",
       height: "100",
       fill: "#23c869"
-    })), /*#__PURE__*/React.createElement("div", null, "Resource score (", Math.round(log.resource_score / log.war_score * 100), "%)")), /*#__PURE__*/React.createElement("div", {
+    })), /*#__PURE__*/React.createElement("div", null, "Resource score (", Math.round(log.resource_score / Math.max(log.war_score, 1) * 100), "%)")), /*#__PURE__*/React.createElement("div", {
       className: "warlog_chart_tooltip_row"
     }, /*#__PURE__*/React.createElement("svg", {
       width: "12",
@@ -1717,7 +1717,7 @@ function WarTable({
       width: "100",
       height: "100",
       fill: "#dd5f60"
-    })), /*#__PURE__*/React.createElement("div", null, "Battle score (", Math.round(log.battle_score / log.war_score * 100), "%)"))))));
+    })), /*#__PURE__*/React.createElement("div", null, "Battle score (", Math.round(log.battle_score / Math.max(log.war_score, 1) * 100), "%)"))))));
   }
   const GlobalLeaderboardNextPage = page_number => {
     apiFetch(villageAPI, {

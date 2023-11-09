@@ -1601,19 +1601,19 @@ function WarTable({
                                 <svg width="12" height="12">
                                     <rect width="100" height="100" fill="#2b80cf" />
                                 </svg>
-                                <div>Objective score ({Math.round((log.objective_score / log.war_score) * 100)}%)</div>
+                                <div>Objective score ({Math.round((log.objective_score / Math.max(log.war_score, 1)) * 100)}%)</div>
                             </div>
                             <div className="warlog_chart_tooltip_row">
                                 <svg width="12" height="12">
                                     <rect width="100" height="100" fill="#23c869" />
                                 </svg>
-                                <div>Resource score ({Math.round((log.resource_score / log.war_score) * 100)}%)</div>
+                                <div>Resource score ({Math.round((log.resource_score / Math.max(log.war_score, 1)) * 100)}%)</div>
                             </div>
                             <div className="warlog_chart_tooltip_row">
                                 <svg width="12" height="12">
                                     <rect width="100" height="100" fill="#dd5f60" />
                                 </svg>
-                                <div>Battle score ({Math.round((log.battle_score / log.war_score) * 100)}%)</div>
+                                <div>Battle score ({Math.round((log.battle_score / Math.max(log.war_score, 1)) * 100)}%)</div>
                             </div>
                         </div>
                     </div>
