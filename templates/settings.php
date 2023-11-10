@@ -89,7 +89,7 @@
             <?php endif ?>
         </td>
     </tr>
-    <?php if ($system->isDevEnvironment() && false): ?>
+    <?php if ($system->isDevEnvironment()): ?>
     <tr><th colspan='2'>Player Card</th></tr>
     <tr>
         <td colspan="2">
