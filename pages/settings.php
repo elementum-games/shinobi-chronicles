@@ -318,6 +318,34 @@ function userSettings() {
         $system->message("Censor explicit language preference set to <b>" . ($player->censor_explicit_language ? "on" : "off") . "</b>.");
         $system->printMessage();
     }
+    else if(!empty($_POST['update_notifications'])) {
+        $new_blocked_notifs = [];
+        $notif_types = [
+            NotificationManager::NOTIFICATION_SPAR,
+            NotificationManager::NOTIFICATION_TEAM,
+            NotificationManager::NOTIFICATION_MARRIAGE,
+            NotificationManager::NOTIFICATION_EVENT,
+            NotificationManager::NOTIFICATION_RAID,
+            NotificationManager::NOTIFICATION_CARAVAN,
+            NotificationManager::NOTIFICATION_DIPLOMACY,
+            NotificationManager::NOTIFICATION_KAGE_CHANGE,
+        ];
+
+        foreach($notif_types as $type) {
+            if(!isset($_POST[$type])) {
+                $new_blocked_notifs[] = $type;
+            }
+        }
+
+        if($new_blocked_notifs != $player->blocked_notifications->blockedNotifications) {
+            $player->blocked_notifications->updateBlockedNotifications($new_blocked_notifs);
+            $system->message("Notification settings updated!");
+        }
+        else {
+            $system->message("Error updating notification settings!");
+        }
+        $system->printMessage();
+    }
 
     // Fetch journal info
 	$result = $system->db->query("SELECT `journal` FROM `journals` WHERE `user_id` = '{$player->user_id}' LIMIT 1");
