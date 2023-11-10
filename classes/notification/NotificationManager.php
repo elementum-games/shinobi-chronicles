@@ -30,6 +30,7 @@ class NotificationManager {
     const NOTIFICATION_EVENT = "event";
     const NOTIFICATION_RAID_ALLY = "raid_ally";
     const NOTIFICATION_RAID_ENEMY = "raid_enemy";
+    const NOTIFICATION_RAID = "raid"; // General, used for blocking notifications
     const NOTIFICATION_CARAVAN = "caravan";
     const NOTIFICATION_PROPOSAL_CREATED = "proposal_created";
     const NOTIFICATION_PROPOSAL_PASSED = "proposal_passed";
@@ -40,11 +41,13 @@ class NotificationManager {
     const NOTIFICATION_DIPLOMACY_ALLIANCE = "diplomacy_form_alliance";
     const NOTIFICATION_DIPLOMACY_END_WAR = "diplomacy_end_war";
     const NOTIFICATION_DIPLOMACY_END_ALLIANCE = "diplomacy_end_alliance";
+    const NOTIFICATION_DIPLOMACY = "diplomacy"; // General, used for blocking notifications
     const NOTIFICATION_NEWS = "news";
     const NOTIFICATION_CHALLENGE_PENDING = "challenge_pending";
     const NOTIFICATION_CHALLENGE_ACCEPTED = "challenge_accepted";
     const NOTIFICATION_KAGE_CHANGE = "kage_change";
     const NOTIFICATION_ACHIEVEMENT = "achievement";
+    const NOTIFICATION_SPAR = "spar"; // General, used for blocking notifications
 
     const ACTIVE_PLAYER_DAYS_LAST_ACTIVE = 14;
 
