@@ -183,6 +183,14 @@ class System {
         'stat_cut' => false,
     ];
 
+    const GLOBAL_TEST_NOTIFICATION_SPAWN = false;
+    public array $testNotifications = [
+        'caravan' => (self::GLOBAL_TEST_NOTIFICATION_SPAWN == true) ? self::GLOBAL_TEST_NOTIFICATION_SPAWN : false,
+        'raid' => (self::GLOBAL_TEST_NOTIFICATION_SPAWN == true) ? self::GLOBAL_TEST_NOTIFICATION_SPAWN : false,
+        'event' => (self::GLOBAL_TEST_NOTIFICATION_SPAWN == true) ? self::GLOBAL_TEST_NOTIFICATION_SPAWN : false,
+        'diplomacy' => (self::GLOBAL_TEST_NOTIFICATION_SPAWN == true) ? self::GLOBAL_TEST_NOTIFICATION_SPAWN : false,
+    ];
+
     public function __construct() {
         require __DIR__ . "/../secure/vars.php";
         /** @var $host */
@@ -672,6 +680,10 @@ class System {
         $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
         if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
             $this->event = new LanternEvent($july_2023_lantern_event_end_time);
+        }
+
+        if($this->testNotifications['event'] && is_null($this->event) && $this->isDevEnvironment()) {
+            $this->event = new DoubleExpEvent($current_datetime->modify("+2 weeks"));
         }
     }
 
