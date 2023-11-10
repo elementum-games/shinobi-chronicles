@@ -2587,8 +2587,4 @@ class User extends Fighter {
             }
         }
     }
-
-    public function notificationIsBlocked(string $notif_type): bool {
-        return in_array($notif_type, $this->blocked_notifications);
-    }
 }
