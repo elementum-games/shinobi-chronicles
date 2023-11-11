@@ -1565,7 +1565,7 @@ function WarTable({
             { name: 'Resource Score', score: log.resource_score },
             { name: 'Battle Score', score: log.battle_score }
         ];
-        const chart_colors = ['#2b80cf', '#23c869', '#dd5f60'];
+        const chart_colors = ['#2b5fca', '#5fca8c', '#d64866'];
         return (
             <div key={index} className="warlog_item">
                 <div className="warlog_data_row">
@@ -1599,19 +1599,19 @@ function WarTable({
                         <div className="warlog_chart_tooltip">
                             <div className="warlog_chart_tooltip_row">
                                 <svg width="12" height="12">
-                                    <rect width="100" height="100" fill="#2b80cf" />
+                                    <rect width="100" height="100" fill="#2b5fca" />
                                 </svg>
                                 <div>Objective score ({Math.round((log.objective_score / Math.max(log.war_score, 1)) * 100)}%)</div>
                             </div>
                             <div className="warlog_chart_tooltip_row">
                                 <svg width="12" height="12">
-                                    <rect width="100" height="100" fill="#23c869" />
+                                    <rect width="100" height="100" fill="#5fca8c" />
                                 </svg>
                                 <div>Resource score ({Math.round((log.resource_score / Math.max(log.war_score, 1)) * 100)}%)</div>
                             </div>
                             <div className="warlog_chart_tooltip_row">
                                 <svg width="12" height="12">
-                                    <rect width="100" height="100" fill="#dd5f60" />
+                                    <rect width="100" height="100" fill="#d64866" />
                                 </svg>
                                 <div>Battle score ({Math.round((log.battle_score / Math.max(log.war_score, 1)) * 100)}%)</div>
                             </div>
