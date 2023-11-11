@@ -163,6 +163,12 @@ try {
                 'challengeData' => VillageManager::getChallengeData($system, $player),
             ];
             break;
+        case 'GetGlobalWarLeaderboard':
+            $page_number = (int)$_POST['page_number'];
+            $VillageAPIResponse->response = [
+                'warLogData' => VillageApiPresenter::warLogDataResponse($system, $player, $page_number),
+            ];
+            break;
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
     }

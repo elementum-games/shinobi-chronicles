@@ -116,4 +116,45 @@ class VillageApiPresenter {
             VillageManager::getChallengeData($system, $player)
         );
     }
+    public static function warLogDataResponse(System $system, User $player, int $page_number = 1): array {
+        $global_leaderboard_war_logs = array_map(
+            function (WarLogDto $war_log) {
+                return [
+                    "log_id" => $war_log->log_id,
+                    "log_type" => $war_log->log_type,
+                    "user_id" => $war_log->user_id,
+                    "user_name" => $war_log->user_name,
+                    "village_id" => $war_log->village_id,
+                    "village_name" => $war_log->village_name,
+                    "relation_id" => $war_log->relation_id,
+                    "rank" => $war_log->rank,
+                    "infiltrate_count" => $war_log->infiltrate_count,
+                    "reinforce_count" => $war_log->reinforce_count,
+                    "raid_count" => $war_log->raid_count,
+                    "loot_count" => $war_log->loot_count,
+                    "damage_dealt" => $war_log->damage_dealt,
+                    "damage_healed" => $war_log->damage_healed,
+                    "defense_gained" => $war_log->defense_gained,
+                    "defense_reduced" => $war_log->defense_reduced,
+                    "resources_stolen" => $war_log->resources_stolen,
+                    "resources_claimed" => $war_log->resources_claimed,
+                    "patrols_defeated" => $war_log->patrols_defeated,
+                    "regions_captured" => $war_log->regions_captured,
+                    "villages_captured" => $war_log->villages_captured,
+                    "pvp_wins" => $war_log->pvp_wins,
+                    "points_gained" => $war_log->points_gained,
+                    "war_score" => $war_log->war_score,
+                    "objective_score" => $war_log->objective_score,
+                    "resource_score" => $war_log->resource_score,
+                    "battle_score" => $war_log->battle_score,
+                ];
+            },
+            WarLogManager::getPlayerWarLogs($system, page_number: $page_number)
+        );
+        $player_war_log = WarLogManager::getPlayerWarLogByID($system, $player->user_id);
+        return [
+            "global_leaderboard_war_logs" => $global_leaderboard_war_logs,
+            "player_war_log" => $player_war_log
+        ];
+    }
 }
