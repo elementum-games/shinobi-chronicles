@@ -164,7 +164,7 @@ try {
             ];
             break;
         case 'GetGlobalWarLeaderboard':
-            $page_number = $system->db->clean($_POST['page_number']);
+            $page_number = (int)$_POST['page_number'];
             $VillageAPIResponse->response = [
                 'warLogData' => VillageApiPresenter::warLogDataResponse($system, $player, $page_number),
             ];
