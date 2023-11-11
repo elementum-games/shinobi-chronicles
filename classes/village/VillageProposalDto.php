@@ -14,6 +14,7 @@ class VillageProposalDto {
         public ?int $policy_id,
         public ?string $vote_time_remaining,
         public ?string $enact_time_remaining,
+        public ?string $trade_data,
         public array $votes = []
     ) {}
 }

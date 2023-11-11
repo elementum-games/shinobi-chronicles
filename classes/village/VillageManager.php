@@ -1043,6 +1043,7 @@ class VillageManager {
                 policy_id: $proposal['policy_id'],
                 vote_time_remaining: $proposal['vote_time_remaining'],
                 enact_time_remaining: $proposal['enact_time_remaining'],
+                trade_data: $proposal['trade_data'],
                 votes: $proposal['votes'],
             );
             unset($proposal);
