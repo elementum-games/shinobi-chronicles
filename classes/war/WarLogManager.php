@@ -23,11 +23,11 @@ class WarLogManager {
     const SCORE_WEIGHT_DAMAGE_HEALED = 0.1;
     const SCORE_WEIGHT_DEFENSE_REDUCED = 10;
     const SCORE_WEIGHT_DEFENSE_GAINED = 10;
-    const SCORE_WEIGHT_REGION_CAPTURES = 250;
-    const SCORE_WEIGHT_VILLAGE_CAPTURES = 100;
-    const SCORE_WEIGHT_RESOURCES_STOLEN = 10;
-    const SCORE_WEIGHT_PVP_WINS = 50;
-    const SCORE_WEIGHT_PATROL_WINS = 10;
+    const SCORE_WEIGHT_REGION_CAPTURES = 1500;
+    const SCORE_WEIGHT_VILLAGE_CAPTURES = 500;
+    const SCORE_WEIGHT_RESOURCES_STOLEN = 7.5;
+    const SCORE_WEIGHT_PVP_WINS = 100;
+    const SCORE_WEIGHT_PATROL_WINS = 25;
 
     const WAR_LOG_TYPE_PLAYER = "player";
     const WAR_LOG_TYPE_VILLAGE = "village";
@@ -153,7 +153,7 @@ class WarLogManager {
         usort($war_logs, function ($a, $b) {
             return $b->war_score <=> $a->war_score;
         });
-        $war_logs = array_slice($war_logs, ($page_number - 1) * self::WAR_LOGS_PER_PAGE, $page_number * self::WAR_LOGS_PER_PAGE);
+        $war_logs = array_slice($war_logs, ($page_number - 1) * self::WAR_LOGS_PER_PAGE, self::WAR_LOGS_PER_PAGE);
         return $war_logs;
     }
 
@@ -231,7 +231,7 @@ class WarLogManager {
 
         // calculate battle score
         $battle_score += $warLog->pvp_wins * self::SCORE_WEIGHT_PVP_WINS;
-        $battle_score += $warLog->patrols_defeated * self::SCORE_WEIGHT_PVP_WINS;
+        $battle_score += $warLog->patrols_defeated * self::SCORE_WEIGHT_PATROL_WINS;
 
         // calculatge war score
         $war_score += $objective_score + $battle_score + $resource_score;
