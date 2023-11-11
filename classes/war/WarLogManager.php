@@ -23,8 +23,8 @@ class WarLogManager {
     const SCORE_WEIGHT_DAMAGE_HEALED = 0.1;
     const SCORE_WEIGHT_DEFENSE_REDUCED = 10;
     const SCORE_WEIGHT_DEFENSE_GAINED = 10;
-    const SCORE_WEIGHT_REGION_CAPTURES = 1500;
-    const SCORE_WEIGHT_VILLAGE_CAPTURES = 500;
+    const SCORE_WEIGHT_REGIONS_CAPTURED = 1500;
+    const SCORE_WEIGHT_VILLAGES_CAPTURED = 500;
     const SCORE_WEIGHT_RESOURCES_STOLEN = 7.5;
     const SCORE_WEIGHT_PVP_WINS = 100;
     const SCORE_WEIGHT_PATROL_WINS = 25;
@@ -223,8 +223,8 @@ class WarLogManager {
         $objective_score += $warLog->damage_healed * self::SCORE_WEIGHT_DAMAGE_HEALED;
         $objective_score += $warLog->defense_reduced * self::SCORE_WEIGHT_DEFENSE_REDUCED;
         $objective_score += $warLog->defense_gained * self::SCORE_WEIGHT_DEFENSE_GAINED;
-        $objective_score += $warLog->regions_captured * self::SCORE_WEIGHT_REGION_CAPTURES;
-        $objective_score += $warLog->villages_captured * self::SCORE_WEIGHT_VILLAGE_CAPTURES;
+        $objective_score += $warLog->regions_captured * self::SCORE_WEIGHT_REGIONS_CAPTURED;
+        $objective_score += $warLog->villages_captured * self::SCORE_WEIGHT_VILLAGES_CAPTURED;
 
         // calculate resource score
         $resource_score += $warLog->resources_stolen * self::SCORE_WEIGHT_RESOURCES_STOLEN;
