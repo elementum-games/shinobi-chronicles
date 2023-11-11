@@ -221,9 +221,7 @@ class VillageManager {
                 $result = $system->db->query("SELECT * FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` = {$player->user_id} AND `seat_end` IS NOT NULL ORDER BY `seat_end` DESC LIMIT 1");
                 $result = $system->db->fetch($result);
                 if ($system->db->last_num_rows > 0) {
-                    $current_time = time();
-                    $cooldown_end = $result['seat_end'] + (self::SEAT_RECLAIM_COOLDOWN_HOURS * 3600);
-                    $cooldown_remaining = $cooldown_end - $current_time;
+                    $cooldown_remaining = ($result['seat_end'] + self::SEAT_RECLAIM_COOLDOWN_HOURS * 3600) - time();
                     if ($cooldown_remaining > 0) {
                         $message = "You must wait another " . $system->time_remaining($cooldown_remaining) . " before reclaiming this seat.";
                         return $message;
@@ -302,9 +300,7 @@ class VillageManager {
                 $result = $system->db->query("SELECT * FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` = {$player->user_id} AND `seat_end` IS NOT NULL ORDER BY `seat_end` DESC LIMIT 1");
                 $result = $system->db->fetch($result);
                 if ($system->db->last_num_rows > 0) {
-                    $current_time = time();
-                    $cooldown_end = $result['seat_end'] + (self::SEAT_RECLAIM_COOLDOWN_HOURS * 3600);
-                    $cooldown_remaining = $cooldown_end - $current_time;
+                    $cooldown_remaining = ($result['seat_end'] + self::SEAT_RECLAIM_COOLDOWN_HOURS * 3600) - time();
                     if ($cooldown_remaining > 0) {
                         $message = "You must wait another " . $system->time_remaining($cooldown_remaining) . " before reclaiming this seat.";
                         return $message;
@@ -1550,7 +1546,7 @@ class VillageManager {
             $regions = $system->db->fetch_all($regions);
             // get supply points
             $supply_points = [];
-            $resource_counts = $system->db->query("SELECT `region_locations`.`resource_id`, COUNT(`region_locations`.`resource_id`) AS `supply_points`
+            $resource_counts = $system->db->query("SELECT `region_locations`.`resource_id`, COUNT(`region_locations`.`resource_id`) AS `supply_points` 
                 FROM `region_locations`
                 INNER JOIN `regions` ON `region_locations`.`region_id` = `regions`.`region_id`
                 WHERE (`regions`.`village` = {$i} AND `region_locations`.`occupying_village_id` IS NULL)
