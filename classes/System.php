@@ -62,6 +62,14 @@ class System {
     public bool $is_api_request = false;
     public bool $is_legacy_ajax_request = false;
 
+    //New server time
+    const SERVER_TIME_ZONE = "America/New_York";
+    const REPUTATION_RESET_DAY = "next friday";
+    const REPUTATION_RESET_HOUR = 17;
+    const REPUTATION_RESET_MINUTE = 0;
+    public DateTimeImmutable $SERVER_TIME;
+    public DateTimeImmutable $REPUTATION_RESET;
+    // Old server time
     public $timezoneOffset;
 
     // Training boost switches
@@ -207,6 +215,11 @@ class System {
 
         $this->router = new Router($web_url ?? 'http://localhost/');
 
+        // New Server Time
+        $this->SERVER_TIME = new DateTimeImmutable(datetime: "now", timezone: new DateTimeZone(self::SERVER_TIME_ZONE));
+        $this->REPUTATION_RESET = $this->SERVER_TIME->modify(self::REPUTATION_RESET_DAY);
+        $this->REPUTATION_RESET = $this->REPUTATION_RESET->setTime(hour: self::REPUTATION_RESET_HOUR, minute: self::REPUTATION_RESET_MINUTE);
+        // Old Server Time
         $this->timezoneOffset = date('Z');
 
         $this->checkForActiveEvent();

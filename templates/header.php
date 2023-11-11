@@ -22,10 +22,11 @@
                 navigationAPIData: {
                     headerMenu: <?= json_encode(
                         NavigationAPIPresenter::menuLinksResponse(
-                            NavigationAPIManager::getHeaderMenu($system)
+                            NavigationAPIManager::getHeaderMenu($system),
                         )
                     ) ?>
                 },
+                timeZone: "<?= System::SERVER_TIME_ZONE ?>"
             }),
             headerContainer
         );

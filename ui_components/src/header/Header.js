@@ -10,9 +10,10 @@ type Props = {|
             +url: string,
             +title: string,
         |}>
-    }
+    },
+    +timeZone: string
 |};
-function Header({ links, navigationAPIData }: Props) {
+function Header({ links, navigationAPIData, timeZone }: Props) {
     // Hooks
     const [headerMenuLinks, setHeaderMenuLinks] = React.useState(navigationAPIData.headerMenu);
     const [serverTime, setServerTime] = React.useState(null);
@@ -31,16 +32,17 @@ function Header({ links, navigationAPIData }: Props) {
         })
     }
     // Utility
-    function getCurrentTime() {
+    function getCurrentTime(timeZone) {
         const currentDate = new Date();
         const options = {
+            timeZone: timeZone,
             weekday: 'long',
             year: 'numeric',
             month: 'short',
             day: 'numeric'
         };
         const formattedDate = currentDate.toLocaleDateString('en-US', options);
-        const formattedTime = currentDate.toLocaleTimeString('en-US', { hour12: true });
+        const formattedTime = currentDate.toLocaleTimeString('en-US', { hour12: true, timeZone: timeZone });
         setServerTime(formattedDate + ' - ' + formattedTime);
     }
 
@@ -52,10 +54,10 @@ function Header({ links, navigationAPIData }: Props) {
 
     // Initialize
     React.useEffect(() => {
-        getCurrentTime();
+        getCurrentTime(timeZone);
 
         const timeInterval = setInterval(() => {
-            getCurrentTime();
+            getCurrentTime(timeZone);
         }, 1000);
 
         return () => clearInterval(timeInterval);
