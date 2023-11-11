@@ -1,7 +1,8 @@
 import { apiFetch } from "../utils/network.js";
 function Header({
   links,
-  navigationAPIData
+  navigationAPIData,
+  timeZone
 }) {
   // Hooks
   const [headerMenuLinks, setHeaderMenuLinks] = React.useState(navigationAPIData.headerMenu);
@@ -20,9 +21,10 @@ function Header({
     });
   }
   // Utility
-  function getCurrentTime() {
+  function getCurrentTime(timeZone) {
     const currentDate = new Date();
     const options = {
+      timeZone: timeZone,
       weekday: 'long',
       year: 'numeric',
       month: 'short',
@@ -30,7 +32,8 @@ function Header({
     };
     const formattedDate = currentDate.toLocaleDateString('en-US', options);
     const formattedTime = currentDate.toLocaleTimeString('en-US', {
-      hour12: true
+      hour12: true,
+      timeZone: timeZone
     });
     setServerTime(formattedDate + ' - ' + formattedTime);
   }
@@ -43,9 +46,9 @@ function Header({
 
   // Initialize
   React.useEffect(() => {
-    getCurrentTime();
+    getCurrentTime(timeZone);
     const timeInterval = setInterval(() => {
-      getCurrentTime();
+      getCurrentTime(timeZone);
     }, 1000);
     return () => clearInterval(timeInterval);
   }, []);
