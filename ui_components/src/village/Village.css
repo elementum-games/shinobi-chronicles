@@ -1694,6 +1694,7 @@
     width: 100%;
     height: 50px;
     background: #17161b;
+    position: relative;
 }
     .warlog_data_row > div {
         height: 80%;
@@ -1721,18 +1722,52 @@
         color: var(--font-color-1);
         font-size: 12px;
     }
+.warlog_rank_wrapper {
+    position: absolute;
+    top: 22%;
+    left: -15px;
+    z-index: 1;
+    clip-path: circle(50% at 50%);
+    background: #17161b;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.warlog_rank {
+    line-height: 18px;
+    font-size: 16px;
+    color: #dbc483;
+    font-weight: bold;
+    height: 20px;
+}
+    .warlog_rank.first {
+        color: #ffe6a2;
+        text-shadow: 0 0 0px #856d40, 0 0 1px #856d40, 0 0 2px #856d40, 0 0 3px #856d40, 0 0 4px #856d40, 0 0 5px #856d40, 0 0 6px #856d40, 0 0 7px #856d40, 0 0 8px #856d40;
+    }
+    .warlog_rank.second {
+        color: #ece7f4;
+        text-shadow: 0 0 0px #5d5c61, 0 0 1px #5d5c61, 0 0 2px #5d5c61, 0 0 3px #5d5c61, 0 0 4px #5d5c61, 0 0 5px #5d5c61, 0 0 6px #5d5c61, 0 0 7px #5d5c61, 0 0 8px #5d5c61;
+    }
+    .warlog_rank.third {
+        color: #ffc3a2;
+        text-shadow: 0 0 0px #4b382c, 0 0 1px #4b382c, 0 0 2px #4b382c, 0 0 3px #4b382c, 0 0 4px #4b382c, 0 0 5px #4b382c, 0 0 6px #4b382c, 0 0 7px #4b382c, 0 0 8px #4b382c;
+    }
 .warlog_war_score {
     font-size: 16px;
     color: #dbc483;
+    font-weight: bold;
 }
 .warlog_username {
     width: 150px;
     color: #bfb7e0;
     font-weight: bold;
-    font-size: 20px;
+    font-size: 16px;
     align-items: baseline !important;
     box-sizing: border-box;
-    padding-left: 20px;
+    padding-left: 25px;
     flex: 0 0 auto !important;
     border-right: none !important;
 }

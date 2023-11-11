@@ -1569,6 +1569,18 @@ function WarTable({
         return (
             <div key={index} className="warlog_item">
                 <div className="warlog_data_row">
+                    {log.rank == 1 && 
+                        <span className="warlog_rank_wrapper"><span className="warlog_rank first">{log.rank}</span></span>
+                    }
+                    {log.rank == 2 &&
+                        <span className="warlog_rank_wrapper"><span className="warlog_rank second">{log.rank}</span></span>
+                    }
+                    {log.rank == 3 &&
+                        <span className="warlog_rank_wrapper"><span className="warlog_rank third">{log.rank}</span></span>
+                    }
+                    {log.rank > 3 &&
+                        <span className="warlog_rank_wrapper"><span className="warlog_rank">{log.rank}</span></span>
+                    }
                     <div className="warlog_username">{log.user_name}</div>
                     <div className="warlog_war_score">{log.war_score}</div>
                     <div className="warlog_pvp_wins">{log.pvp_wins}</div>

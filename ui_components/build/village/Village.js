@@ -1646,7 +1646,23 @@ function WarTable({
       className: "warlog_item"
     }, /*#__PURE__*/React.createElement("div", {
       className: "warlog_data_row"
-    }, /*#__PURE__*/React.createElement("div", {
+    }, log.rank == 1 && /*#__PURE__*/React.createElement("span", {
+      className: "warlog_rank_wrapper"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "warlog_rank first"
+    }, log.rank)), log.rank == 2 && /*#__PURE__*/React.createElement("span", {
+      className: "warlog_rank_wrapper"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "warlog_rank second"
+    }, log.rank)), log.rank == 3 && /*#__PURE__*/React.createElement("span", {
+      className: "warlog_rank_wrapper"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "warlog_rank third"
+    }, log.rank)), log.rank > 3 && /*#__PURE__*/React.createElement("span", {
+      className: "warlog_rank_wrapper"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "warlog_rank"
+    }, log.rank)), /*#__PURE__*/React.createElement("div", {
       className: "warlog_username"
     }, log.user_name), /*#__PURE__*/React.createElement("div", {
       className: "warlog_war_score"

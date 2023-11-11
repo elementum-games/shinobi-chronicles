@@ -127,6 +127,7 @@ class VillageApiPresenter {
                     "village_id" => $war_log->village_id,
                     "village_name" => $war_log->village_name,
                     "relation_id" => $war_log->relation_id,
+                    "rank" => $war_log->rank,
                     "infiltrate_count" => $war_log->infiltrate_count,
                     "reinforce_count" => $war_log->reinforce_count,
                     "raid_count" => $war_log->raid_count,

@@ -8,6 +8,7 @@ class WarLogDto {
     public int $village_id;
     public ?string $village_name = null;
     public ?int $relation_id;
+    public int $rank = 0;
     public int $infiltrate_count = 0;
     public int $reinforce_count = 0;
     public int $raid_count = 0;

@@ -61,8 +61,10 @@ class WarLogManager {
         $system->db->query("INSERT INTO `region_logs` (`region_id`, `previous_village_id`, `new_village_id`, `user_id`, `capture_time`, `relation_id`) VALUES ({$region_id}, {$region['village']}, {$player->village->village_id}, {$player->user_id}, {$time}, {$player->village->relations[$region['village']]->relation_id})");
         // log for player
         self::updatePlayerLog($system, $player, 1, self::WAR_LOG_REGIONS_CAPTURED, $player->village->relations[$region['village']]->relation_id);
+        self::updatePlayerLog($system, $player, 1, self::WAR_LOG_REGIONS_CAPTURED, null);
         // log for village
         self::updateVillageLog($system, $player, 1, self::WAR_LOG_REGIONS_CAPTURED, $player->village->relations[$region['village']]->relation_id);
+        self::updateVillageLog($system, $player, 1, self::WAR_LOG_REGIONS_CAPTURED, null);
     }
 
     private static function updatePlayerLog(System $system, User $player, int $value, string $type, ?int $relation_id) {
@@ -149,10 +151,15 @@ class WarLogManager {
             self::calculateWarScore($new_log);
             $war_logs[] = $new_log;
         }
-        // sort by war score, to-do filters
+        // sort by war score, to-do filters (?)
         usort($war_logs, function ($a, $b) {
             return $b->war_score <=> $a->war_score;
         });
+        // assign ranks
+        foreach ($war_logs as $index => $war_log) {
+            $war_log->rank = $index + 1;
+        }
+        // pagination
         $war_logs = array_slice($war_logs, ($page_number - 1) * self::WAR_LOGS_PER_PAGE, self::WAR_LOGS_PER_PAGE);
         return $war_logs;
     }
@@ -161,6 +168,7 @@ class WarLogManager {
      * @return WarLogDto
      */
     public static function getPlayerWarLogByID(System $system, int $player_id, int $relation_id = null): WarLogDto {
+        // right join to get user info even if no log found
         if (!empty($relation_id)) {
             $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
             FROM `player_war_logs`
