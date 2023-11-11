@@ -102,18 +102,11 @@ class WarLogManager {
             case self::WAR_LOG_REGIONS_CAPTURED:
             case self::WAR_LOG_PVP_WINS:
             case self::WAR_LOG_POINTS_GAINED:
-                $result = $system->db->query("SELECT SUM(`{$type}`) AS `total` FROM `player_war_logs` WHERE `user_id` = {$player->user_id}");
-                $result = $system->db->fetch($result);
-                if (empty($result['total'])) {
-                    return 0;
-                }
-                return $result['total'];
-                break;
             case self::WAR_LOG_REINFORCE:
             case self::WAR_LOG_DAMAGE_HEALED:
             case self::WAR_LOG_DEFENSE_GAINED:
             case self::WAR_LOG_RESOURCES_CLAIMED:
-                $result = $system->db->query("SELECT SUM(`{$type}`) AS `total` FROM `player_war_logs` WHERE `user_id` = {$player->user_id} AND `relation_id` IS NULL");
+                $result = $system->db->query("SELECT `{$type}` AS `total` FROM `player_war_logs` WHERE `user_id` = {$player->user_id} AND `relation_id` IS NULL");
                 $result = $system->db->fetch($result);
                 if (empty($result['total'])) {
                     return 0;
