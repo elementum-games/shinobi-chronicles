@@ -56,6 +56,7 @@ class WarManager {
     const MAX_PATROL_TIER = 3;
     const YEN_PER_RESOURCE = 20;
     const RESOURCES_PER_STAT = 10;
+    const RESOURCES_PER_REPUTATION = 10;
 
     private System $system;
     private User $user;
@@ -412,6 +413,7 @@ class WarManager {
         }
         $yen_gain = $total_resources * self::YEN_PER_RESOURCE;
         $stat_gain = floor($total_resources / self::RESOURCES_PER_STAT);
+        $rep_gain = floor($total_resources / self::RESOURCES_PER_REPUTATION);
         $this->user->village->updateResources();
         $message .= "!";
         // add yen
@@ -423,6 +425,16 @@ class WarManager {
             $stat_gained = $this->user->addStatGain($stat_to_gain, $stat_gain);
             if (!empty($stat_gained)) {
                 $message .= "\n" . $stat_gained;
+            }
+        }
+        // Add reputation
+        if ($this->user->reputation->canGain(UserReputation::ACTIVITY_TYPE_WAR)) {
+            $rep_gain = $this->user->reputation->addRep(
+                amount: $rep_gain,
+                activity_type: UserReputation::ACTIVITY_TYPE_WAR
+            );
+            if ($rep_gain > 0) {
+                $message .= "\nGained " . $rep_gain . " village reputation!";
             }
         }
         $message .= '!';
