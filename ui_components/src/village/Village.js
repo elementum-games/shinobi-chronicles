@@ -1559,7 +1559,7 @@ function WarTable({
             </div>
         );
     }
-    function WarLog({ log, index }) {
+    function WarLog({ log, index, animate }) {
         const scoreData = [
             { name: 'Objective Score', score: log.objective_score },
             { name: 'Resource Score', score: log.resource_score },
@@ -1602,7 +1602,7 @@ function WarTable({
                     <div className="warlog_resources">{log.resources_stolen}</div>
                     <div className="warlog_chart">
                         <Recharts.PieChart width={50} height={50}>
-                            <Recharts.Pie stroke="none" data={scoreData} dataKey="score" outerRadius={16} fill="green">
+                            <Recharts.Pie isAnimationActive={animate} stroke="none" data={scoreData} dataKey="score" outerRadius={16} fill="green">
                                 {scoreData.map((entry, index) => (
                                     <Recharts.Cell key={`cell-${index}`} fill={chart_colors[index % chart_colors.length]} />
                                 ))}
@@ -1651,7 +1651,6 @@ function WarTable({
             } else { 
                 setGlobalLeaderboardPageNumber(page_number);
                 setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
-                setPlayerWarLog(response.data.warLogData.player_war_log);
             }
         });
     }
@@ -1670,7 +1669,6 @@ function WarTable({
                 }
                 setGlobalLeaderboardPageNumber(page_number);
                 setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
-                setPlayerWarLog(response.data.warLogData.player_war_log);
             });
         }
     }
@@ -1682,7 +1680,7 @@ function WarTable({
                     <div className="header">your war score</div>
                     <div className="player_warlog_container">
                         <WarLogHeader/>
-                        <WarLog log={playerWarLog} index={0}/>
+                        <WarLog log={playerWarLog} index={0} animate={false}/>
                     </div>
                 </div>
             </div>
@@ -1705,7 +1703,7 @@ function WarTable({
                         </div>
                         {globalLeaderboardWarLogs
                             .map((log, index) => (
-                                <WarLog log={log} index={index}/>
+                                <WarLog log={log} index={index} animate={true} />
                             ))}
                     </div>
                     <div className="global_leaderboard_navigation">

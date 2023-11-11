@@ -1628,7 +1628,8 @@ function WarTable({
   }
   function WarLog({
     log,
-    index
+    index,
+    animate
   }) {
     const scoreData = [{
       name: 'Objective Score',
@@ -1696,6 +1697,7 @@ function WarTable({
       width: 50,
       height: 50
     }, /*#__PURE__*/React.createElement(Recharts.Pie, {
+      isAnimationActive: animate,
       stroke: "none",
       data: scoreData,
       dataKey: "score",
@@ -1749,7 +1751,6 @@ function WarTable({
       } else {
         setGlobalLeaderboardPageNumber(page_number);
         setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
-        setPlayerWarLog(response.data.warLogData.player_war_log);
       }
     });
   };
@@ -1765,7 +1766,6 @@ function WarTable({
         }
         setGlobalLeaderboardPageNumber(page_number);
         setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
-        setPlayerWarLog(response.data.warLogData.player_war_log);
       });
     }
   };
@@ -1781,7 +1781,8 @@ function WarTable({
     className: "player_warlog_container"
   }, /*#__PURE__*/React.createElement(WarLogHeader, null), /*#__PURE__*/React.createElement(WarLog, {
     log: playerWarLog,
-    index: 0
+    index: 0,
+    animate: false
   })))), /*#__PURE__*/React.createElement("div", {
     className: "row second"
   }, /*#__PURE__*/React.createElement("div", {
@@ -1816,7 +1817,8 @@ function WarTable({
     className: "warlog_chart_label"
   })), globalLeaderboardWarLogs.map((log, index) => /*#__PURE__*/React.createElement(WarLog, {
     log: log,
-    index: index
+    index: index,
+    animate: true
   }))), /*#__PURE__*/React.createElement("div", {
     className: "global_leaderboard_navigation"
   }, /*#__PURE__*/React.createElement("div", {
