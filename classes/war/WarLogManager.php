@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/WarLogDto.php';
+require_once __DIR__ . '/WarLogDto.php';
 
 class WarLogManager {
     const WAR_LOG_INFILTRATE = 'infiltrate_count';
@@ -125,18 +125,20 @@ class WarLogManager {
     public static function getPlayerWarLogs(System $system, int $page_number = 1, int $relation_id = null): array {
         $war_logs = [];
         if (!empty($relation_id)) {
-            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
+            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`, `users`.`village`
             FROM `player_war_logs`
             INNER JOIN `users`
             ON `player_war_logs`.`user_id` = `users`.`user_id`
             WHERE `relation_id` = {$relation_id}");
         }
         else {
-            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
+            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`, `villages`.`village_id`
             FROM `player_war_logs`
             INNER JOIN `users`
             ON `player_war_logs`.`user_id` = `users`.`user_id`
-            WHERE `relation_id` IS NULL");
+            LEFT JOIN `villages`
+            ON `users`.`village` = `villages`.`name`
+            WHERE `player_war_logs`.`relation_id` IS NULL");
         }
         $war_log_result = $system->db->fetch_all($war_log_result);
         foreach ($war_log_result as $war_log) {
@@ -181,17 +183,19 @@ class WarLogManager {
             FROM `player_war_logs`
             RIGHT JOIN `users`
             ON `player_war_logs`.`user_id` = `users`.`user_id`
-            AND `player_war_logs`.`user_id` = {$player_id}
+            AND `users`.`user_id` = {$player_id}
             WHERE `relation_id` = {$relation_id}
             LIMIT 1");
             $war_log_result = $system->db->fetch($war_log_result);
         } else {
-            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
+            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`, `villages`.`village_id`
             FROM `player_war_logs`
             RIGHT JOIN `users`
             ON `player_war_logs`.`user_id` = `users`.`user_id`
-            AND `player_war_logs`.`relation_id` IS NULL
-            WHERE `users`.`user_id` = {$player_id}");
+            LEFT JOIN `villages`
+            ON `users`.`village` = `villages`.`name`
+            WHERE `player_war_logs`.`relation_id` IS NULL
+            AND `users`.`user_id` = {$player_id}");
             $war_log_result = $system->db->fetch_all($war_log_result);
         }
         // If no relation set we get all totals (1 for each village player has been in)
@@ -204,7 +208,7 @@ class WarLogManager {
                         'log_id' => 0,
                         'user_id' => $player_id,
                         'user_name' => $war_log['user_name'],
-                        'village_id' => 0,
+                        'village_id' => $war_log['village_id'],
                     ];
                     $new_log = new WarLogDto($war_log, self::WAR_LOG_TYPE_PLAYER);
                 }
@@ -227,7 +231,7 @@ class WarLogManager {
                     'log_id' => 0,
                     'user_id' => $player_id,
                     'user_name' => $war_log_result['user_name'],
-                    'village_id' => 0,
+                    'village_id' => $war_log_result['village_id'],
                 ];
             }
             $new_log = new WarLogDto($war_log_result, self::WAR_LOG_TYPE_PLAYER);

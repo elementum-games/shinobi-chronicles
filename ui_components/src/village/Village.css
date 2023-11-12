@@ -1765,12 +1765,23 @@
     color: #bfb7e0;
     font-weight: bold;
     font-size: 16px;
-    align-items: baseline !important;
     box-sizing: border-box;
     padding-left: 25px;
     flex: 0 0 auto !important;
     border-right: none !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    gap: 4px;
 }
+    .warlog_username span {
+        width: 20px;
+        text-align: center;
+        margin-top: 5px;
+        margin-left: -3px;
+    }
+        .warlog_username span img {
+            max-height: 16px;
+        }
 .warlog_username_label {
     width: 150px;
     flex: 0 0 auto !important;

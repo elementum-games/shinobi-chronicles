@@ -203,6 +203,7 @@ function Village({
                 warLogData={warLogData}
                 villageAPI={villageAPI}
                 handleErrors={handleErrors}
+                getVillageIcon={getVillageIcon}
                 />
             }
         </>
@@ -1536,7 +1537,8 @@ function WorldInfo({
 function WarTable({
     warLogData,
     villageAPI,
-    handleErrors
+    handleErrors,
+    getVillageIcon
 }) {
     const [playerWarLog, setPlayerWarLog] = React.useState(warLogData.player_war_log);
     const [globalLeaderboardWarLogs, setGlobalLeaderboardWarLogs] = React.useState(warLogData.global_leaderboard_war_logs);
@@ -1559,7 +1561,7 @@ function WarTable({
             </div>
         );
     }
-    function WarLog({ log, index, animate }) {
+    function WarLog({ log, index, animate, getVillageIcon }) {
         const scoreData = [
             { name: 'Objective Score', score: log.objective_score },
             { name: 'Resource Score', score: log.resource_score },
@@ -1581,7 +1583,10 @@ function WarTable({
                     {log.rank > 3 &&
                         <span className="warlog_rank_wrapper"><span className="warlog_rank">{log.rank}</span></span>
                     }
-                    <div className="warlog_username">{log.user_name}</div>
+                    <div className="warlog_username">
+                        <span><img src={getVillageIcon(log.village_id)} /></span>
+                        {log.user_name}
+                    </div>
                     <div className="warlog_war_score">{log.war_score}</div>
                     <div className="warlog_pvp_wins">{log.pvp_wins}</div>
                     <div className="warlog_raid">
@@ -1679,8 +1684,8 @@ function WarTable({
                 <div className="column first">
                     <div className="header">your war score</div>
                     <div className="player_warlog_container">
-                        <WarLogHeader/>
-                        <WarLog log={playerWarLog} index={0} animate={false}/>
+                        <WarLogHeader />
+                        <WarLog log={playerWarLog} index={0} animate={false} getVillageIcon={getVillageIcon} />
                     </div>
                 </div>
             </div>
@@ -1703,7 +1708,7 @@ function WarTable({
                         </div>
                         {globalLeaderboardWarLogs
                             .map((log, index) => (
-                                <WarLog log={log} index={index} animate={true} />
+                                <WarLog log={log} index={index} animate={true} getVillageIcon={getVillageIcon} />
                             ))}
                     </div>
                     <div className="global_leaderboard_navigation">
