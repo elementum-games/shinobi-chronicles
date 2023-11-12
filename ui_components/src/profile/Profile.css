@@ -370,6 +370,14 @@
     margin-bottom: 15px;
 }
 
+.reputation_display #reputationTimer {
+    margin-top: 15px;
+    text-align: center;
+    color: #9498a9;
+    font-size: 16px;
+    font-weight: bolder;
+}
+
 .reputation_indicator {
     --height: 60px;
 
@@ -497,6 +505,11 @@
 }
 .daily_tasks_container h2 {
     margin-bottom: 0;
+}
+.daily_tasks_container h2 #taskTimer {
+    margin-left: 15px;
+    display: inline-block;
+    color: #9498a9;
 }
 .daily_task {
     height: 84px;
