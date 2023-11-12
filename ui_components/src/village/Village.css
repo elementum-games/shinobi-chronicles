@@ -1773,6 +1773,9 @@
     justify-content: flex-start !important;
     gap: 4px;
 }
+    .warlog_username a {
+        text-decoration: none;
+    }
     .warlog_username span {
         width: 20px;
         text-align: center;

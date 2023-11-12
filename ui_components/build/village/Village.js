@@ -1670,7 +1670,9 @@ function WarTable({
       className: "warlog_username"
     }, /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("img", {
       src: getVillageIcon(log.village_id)
-    })), log.user_name), /*#__PURE__*/React.createElement("div", {
+    })), /*#__PURE__*/React.createElement("a", {
+      href: "/?id=6&user=" + log.user_name
+    }, log.user_name)), /*#__PURE__*/React.createElement("div", {
       className: "warlog_war_score"
     }, log.war_score), /*#__PURE__*/React.createElement("div", {
       className: "warlog_pvp_wins"

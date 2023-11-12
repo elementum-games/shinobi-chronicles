@@ -1585,7 +1585,7 @@ function WarTable({
                     }
                     <div className="warlog_username">
                         <span><img src={getVillageIcon(log.village_id)} /></span>
-                        {log.user_name}
+                        <a href={"/?id=6&user=" + log.user_name}>{log.user_name}</a>
                     </div>
                     <div className="warlog_war_score">{log.war_score}</div>
                     <div className="warlog_pvp_wins">{log.pvp_wins}</div>
