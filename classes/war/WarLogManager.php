@@ -189,9 +189,9 @@ class WarLogManager {
             $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
             FROM `player_war_logs`
             RIGHT JOIN `users`
-    ON `player_war_logs`.`user_id` = `users`.`user_id`
-    AND `player_war_logs`.`relation_id` IS NULL
-    WHERE `users`.`user_id` = {$player_id}");
+            ON `player_war_logs`.`user_id` = `users`.`user_id`
+            AND `player_war_logs`.`relation_id` IS NULL
+            WHERE `users`.`user_id` = {$player_id}");
             $war_log_result = $system->db->fetch_all($war_log_result);
         }
         // If no relation set we get all totals (1 for each village player has been in)
