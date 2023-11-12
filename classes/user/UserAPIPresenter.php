@@ -53,6 +53,7 @@ class UserApiPresenter {
             'teamName' => $player->team?->name,
             'forbiddenSealName' => $player->forbidden_seal->name,
             'forbiddenSealTimeLeft' => $forbidden_seal_time_left,
+            'dailyTaskTimeLeft' => $player->daily_tasks->timeUntilReset(),
         ];
     }
 
