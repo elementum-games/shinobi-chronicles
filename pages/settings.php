@@ -329,6 +329,8 @@ function userSettings() {
             NotificationManager::NOTIFICATION_CARAVAN,
             NotificationManager::NOTIFICATION_DIPLOMACY,
             NotificationManager::NOTIFICATION_KAGE_CHANGE,
+            NotificationManager::NOTIFICATION_CHAT,
+            NotificationManager::NOTIFICATION_NEWS,
         ];
 
         foreach($notif_types as $type) {
