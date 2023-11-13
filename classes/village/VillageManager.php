@@ -1284,7 +1284,7 @@ class VillageManager {
                 // policy restriction - check not in alliance
                 if (VillagePolicy::$POLICY_EFFECTS[$proposal['policy_id']][VillagePolicy::POLICY_RESTRICTION_ALLIANCE_ENABLED] == false) {
                     $relation_type = VillageRelation::RELATION_ALLIANCE;
-                    $system->db->query("SELECT COUNT(*) FROM `village_relations` WHERE `relation_end` IS NULL AND `relation_type` = {$relation_type} AND (`village1_id` = {$proposal['village_id']} OR `village2_id` = {$proposal['village_id']})");
+                    $system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NULL AND `relation_type` = {$relation_type} AND (`village1_id` = {$proposal['village_id']} OR `village2_id` = {$proposal['village_id']})");
                     if ($system->db->last_num_rows > 0) {
                         return "Cannot change policy to " . VillagePolicy::POLICY_NAMES[$proposal['policy_id']] . " while in an active alliance.";
                     }
@@ -1292,7 +1292,7 @@ class VillageManager {
                 // policy restriction - check not in offensive war, village1_id is always the initiating village
                 if (VillagePolicy::$POLICY_EFFECTS[$proposal['policy_id']][VillagePolicy::POLICY_RESTRICTION_WAR_ENABLED] == false) {
                     $relation_type = VillageRelation::RELATION_WAR;
-                    $system->db->query("SELECT COUNT(*) FROM `village_relations` WHERE `relation_end` IS NULL AND `relation_type` = {$relation_type} AND `village1_id` = {$proposal['village_id']}");
+                    $system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NULL AND `relation_type` = {$relation_type} AND `village1_id` = {$proposal['village_id']}");
                     if ($system->db->last_num_rows > 0) {
                         return "Cannot change policy to " . VillagePolicy::POLICY_NAMES[$proposal['policy_id']] . " while in an offensive war.";
                     }
