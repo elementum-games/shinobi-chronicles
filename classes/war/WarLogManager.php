@@ -125,7 +125,7 @@ class WarLogManager {
     public static function getPlayerWarLogs(System $system, int $page_number = 1, int $relation_id = null): array {
         $war_logs = [];
         if (!empty($relation_id)) {
-            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`, `users`.`village`
+            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
             FROM `player_war_logs`
             INNER JOIN `users`
             ON `player_war_logs`.`user_id` = `users`.`user_id`
