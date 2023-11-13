@@ -199,7 +199,8 @@ function Village({
   }), villageTab == "warTable" && /*#__PURE__*/React.createElement(WarTable, {
     warLogData: warLogData,
     villageAPI: villageAPI,
-    handleErrors: handleErrors
+    handleErrors: handleErrors,
+    getVillageIcon: getVillageIcon
   }));
 }
 function VillageHQ({
@@ -1594,7 +1595,8 @@ function WorldInfo({
 function WarTable({
   warLogData,
   villageAPI,
-  handleErrors
+  handleErrors,
+  getVillageIcon
 }) {
   const [playerWarLog, setPlayerWarLog] = React.useState(warLogData.player_war_log);
   const [globalLeaderboardWarLogs, setGlobalLeaderboardWarLogs] = React.useState(warLogData.global_leaderboard_war_logs);
@@ -1629,7 +1631,8 @@ function WarTable({
   function WarLog({
     log,
     index,
-    animate
+    animate,
+    getVillageIcon
   }) {
     const scoreData = [{
       name: 'Objective Score',
@@ -1665,7 +1668,11 @@ function WarTable({
       className: "warlog_rank"
     }, log.rank)), /*#__PURE__*/React.createElement("div", {
       className: "warlog_username"
-    }, log.user_name), /*#__PURE__*/React.createElement("div", {
+    }, /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("img", {
+      src: getVillageIcon(log.village_id)
+    })), /*#__PURE__*/React.createElement("a", {
+      href: "/?id=6&user=" + log.user_name
+    }, log.user_name)), /*#__PURE__*/React.createElement("div", {
       className: "warlog_war_score"
     }, log.war_score), /*#__PURE__*/React.createElement("div", {
       className: "warlog_pvp_wins"
@@ -1782,7 +1789,8 @@ function WarTable({
   }, /*#__PURE__*/React.createElement(WarLogHeader, null), /*#__PURE__*/React.createElement(WarLog, {
     log: playerWarLog,
     index: 0,
-    animate: false
+    animate: false,
+    getVillageIcon: getVillageIcon
   })))), /*#__PURE__*/React.createElement("div", {
     className: "row second"
   }, /*#__PURE__*/React.createElement("div", {
@@ -1818,7 +1826,8 @@ function WarTable({
   })), globalLeaderboardWarLogs.map((log, index) => /*#__PURE__*/React.createElement(WarLog, {
     log: log,
     index: index,
-    animate: true
+    animate: true,
+    getVillageIcon: getVillageIcon
   }))), /*#__PURE__*/React.createElement("div", {
     className: "global_leaderboard_navigation"
   }, /*#__PURE__*/React.createElement("div", {

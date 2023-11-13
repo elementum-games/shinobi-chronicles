@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/WarLogDto.php';
+require_once __DIR__ . '/WarLogDto.php';
 
 class WarLogManager {
     const WAR_LOG_INFILTRATE = 'infiltrate_count';
@@ -106,7 +106,7 @@ class WarLogManager {
             case self::WAR_LOG_DAMAGE_HEALED:
             case self::WAR_LOG_DEFENSE_GAINED:
             case self::WAR_LOG_RESOURCES_CLAIMED:
-                $result = $system->db->query("SELECT `{$type}` AS `total` FROM `player_war_logs` WHERE `user_id` = {$player->user_id} AND `relation_id` IS NULL");
+                $result = $system->db->query("SELECT SUM(`{$type}`) AS `total` FROM `player_war_logs` WHERE `user_id` = {$player->user_id} AND `relation_id` IS NULL");
                 $result = $system->db->fetch($result);
                 if (empty($result['total'])) {
                     return 0;
@@ -132,17 +132,33 @@ class WarLogManager {
             WHERE `relation_id` = {$relation_id}");
         }
         else {
-            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
+            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`, `villages`.`village_id`
             FROM `player_war_logs`
             INNER JOIN `users`
             ON `player_war_logs`.`user_id` = `users`.`user_id`
-            WHERE `relation_id` IS NULL");
+            LEFT JOIN `villages`
+            ON `users`.`village` = `villages`.`name`
+            WHERE `player_war_logs`.`relation_id` IS NULL");
         }
         $war_log_result = $system->db->fetch_all($war_log_result);
         foreach ($war_log_result as $war_log) {
-            $new_log = new WarLogDto($war_log, self::WAR_LOG_TYPE_PLAYER);
-            self::calculateWarScore($new_log);
-            $war_logs[] = $new_log;
+            if (empty($relation_id)) {
+                if (isset($war_logs[$war_log['user_id']])) {
+                    // Sum new and existing values
+                    $new_log = new WarLogDto($war_log, self::WAR_LOG_TYPE_PLAYER);
+                    self::calculateWarScore($new_log);
+                    $war_logs[$war_log['user_id']]->addValues($new_log);
+                } else {
+                    // Create new log
+                    $new_log = new WarLogDto($war_log, self::WAR_LOG_TYPE_PLAYER);
+                    self::calculateWarScore($new_log);
+                    $war_logs[$war_log['user_id']] = $new_log;
+                }
+            } else {
+                $new_log = new WarLogDto($war_log, self::WAR_LOG_TYPE_PLAYER);
+                self::calculateWarScore($new_log);
+                $war_logs[$war_log['log_id']] = $new_log;
+            }
         }
         // sort by war score, to-do filters (?)
         usort($war_logs, function ($a, $b) {
@@ -167,29 +183,60 @@ class WarLogManager {
             FROM `player_war_logs`
             RIGHT JOIN `users`
             ON `player_war_logs`.`user_id` = `users`.`user_id`
-            AND `player_war_logs`.`user_id` = {$player_id}
+            AND `users`.`user_id` = {$player_id}
             WHERE `relation_id` = {$relation_id}
             LIMIT 1");
+            $war_log_result = $system->db->fetch($war_log_result);
         } else {
-            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`
+            $war_log_result = $system->db->query("SELECT `player_war_logs`.*, `users`.`user_name`, `villages`.`village_id`
             FROM `player_war_logs`
             RIGHT JOIN `users`
             ON `player_war_logs`.`user_id` = `users`.`user_id`
-            AND `player_war_logs`.`user_id` = {$player_id}
-            WHERE `relation_id` IS NULL
-            LIMIT 1");
+            LEFT JOIN `villages`
+            ON `users`.`village` = `villages`.`name`
+            WHERE `player_war_logs`.`relation_id` IS NULL
+            AND `users`.`user_id` = {$player_id}");
+            $war_log_result = $system->db->fetch_all($war_log_result);
         }
-        $war_log_result = $system->db->fetch($war_log_result);
-        if (empty($war_log_result['log_id'])) {
-            $war_log_result = [
-                'log_id' => 0,
-                'user_id' => $player_id,
-                'user_name' => $war_log_result['user_name'],
-                'village_id' => 0,
-            ];
+        // If no relation set we get all totals (1 for each village player has been in)
+        if (empty($relation_id)) {
+            $new_log = null;
+            foreach ($war_log_result as $war_log) {
+                // If no existing log in DB
+                if (empty($war_log['log_id'])) {
+                    $war_log = [
+                        'log_id' => 0,
+                        'user_id' => $player_id,
+                        'user_name' => $war_log['user_name'],
+                        'village_id' => $war_log['village_id'],
+                    ];
+                    $new_log = new WarLogDto($war_log, self::WAR_LOG_TYPE_PLAYER);
+                }
+                // If more than 1 results found, sum new and existing values
+                else if (!empty($new_log)) {
+                    $next_log = new WarLogDto($war_log, self::WAR_LOG_TYPE_PLAYER);
+                    self::calculateWarScore($next_log);
+                    $new_log->addValues($next_log);
+                }
+                // Create new log
+                else {
+                    $new_log = new WarLogDto($war_log, self::WAR_LOG_TYPE_PLAYER);
+                    self::calculateWarScore($new_log);
+                }
+            }
+        } else {
+            // If no existing log in DB
+            if (empty($war_log_result['log_id'])) {
+                $war_log_result = [
+                    'log_id' => 0,
+                    'user_id' => $player_id,
+                    'user_name' => $war_log_result['user_name'],
+                    'village_id' => $war_log_result['village_id'],
+                ];
+            }
+            $new_log = new WarLogDto($war_log_result, self::WAR_LOG_TYPE_PLAYER);
+            self::calculateWarScore($new_log);
         }
-        $new_log = new WarLogDto($war_log_result, self::WAR_LOG_TYPE_PLAYER);
-        self::calculateWarScore($new_log);
         return $new_log;
     }
 
