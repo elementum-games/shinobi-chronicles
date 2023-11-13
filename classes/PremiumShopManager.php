@@ -164,6 +164,9 @@ class PremiumShopManager {
         if (SenseiManager::isSensei($this->player->user_id, $this->system)) {
             throw new RuntimeException("You must resign from being a sensei first!");
         }
+        if($this->player->trainingManager->hasActiveTraining()) {
+            throw new RuntimeException("You can not have an active training!");
+        }
     }
 
     public function resetUser(): ActionResult {
@@ -208,6 +211,10 @@ class PremiumShopManager {
         //Bug fix: Elements previously was not cleared. -- Shadekun
         $this->player->elements = array();
         $this->player->missions_completed = array(); //Reset missions complete -- Hitori
+        // Remove stat transfers
+        $this->player->stat_transfer_completion_time = 0;
+        $this->player->stat_transfer_amount = 0;
+        $this->player->stat_transfer_target_stat = '';
 
         $this->player->exam_stage = 0;
 

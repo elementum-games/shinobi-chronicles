@@ -24,8 +24,9 @@ function premiumShop(): void {
                 renderPurchaseConfirmation(
                     purchase_type: "user_reset",
                     confirmation_type: "confirm_reset",
-                    confirmation_string: "Are you sure you want to reset your character? You will lose all your stats,
-                bloodline, rank and clan. You will keep your money.",
+                    confirmation_string: "Are you sure you want to reset your character?<br />
+                        You will lose all your stats, bloodline, rank and clan. You will keep your money.<br />
+                        Any active stat transfers will be cancelled and any AK spent will be lost.",
                     form_action_link: $self_link,
                     form_submit_prompt: "Reset my Account",
                     additional_form_data: []
