@@ -6,6 +6,10 @@ class SpecialMission {
     const DIFFICULTY_HARD = 'hard';
     const DIFFICULTY_NIGHTMARE = 'nightmare';
 
+    // Used for incrementing mission ranks & completing daily tasks
+    public static array $UPGRADE_DIFFICULTIES = [self::DIFFICULTY_HARD, self::DIFFICULTY_NIGHTMARE];
+    public static int $MAX_MISSION_LEVEL = Mission::RANK_A;
+
     // Scale damage multiplier from this point in the rank to cap
     const BASE_STAT_CAP_PERCENT = 20;
     // Damage multiplier starts here at the base number, then scales down to 1x at cap
@@ -493,6 +497,20 @@ class SpecialMission {
             }
         }
 
+        // Award mission completes
+        $mission_rank = $this->getMissionRank();
+        if(isset($this->player->missions_completed[$mission_rank])) {
+            $this->player->missions_completed[$mission_rank]++;
+        }
+        else {
+            $this->player->missions_completed[$mission_rank] = 1;
+        }
+        // Check daily tasks
+        if($this->player->daily_tasks->hasTaskType(type: DailyTask::ACTIVITY_MISSIONS)) {
+            $this->player->daily_tasks->progressTask(activity: DailyTask::ACTIVITY_MISSIONS, amount: 1, sub_task: $mission_rank);
+        }
+        $reward_text .= " You have completed a " . Mission::$rank_names[$mission_rank] . " mission.";
+
         return $reward_text;
     }
 
@@ -784,6 +802,64 @@ class SpecialMission {
         return floor(($hp_lost_percent / 100) * $this->player->max_health);
     }
 
+    public function downgradeMissionRank(int $mission_rank): int {
+        return match ($mission_rank) {
+            Mission::RANK_S => Mission::RANK_A,
+            Mission::RANK_A => Mission::RANK_B,
+            Mission::RANK_B => Mission::RANK_C,
+            default => Mission::RANK_D,
+        };
+    }
+
+    public function upgradeMissionRank(int $mission_rank): int {
+        return match ($mission_rank) {
+            Mission::RANK_A => Mission::RANK_S,
+            Mission::RANK_B => Mission::RANK_A,
+            Mission::RANK_C => Mission::RANK_B,
+            default => Mission::RANK_C,
+        };
+    }
+    public function getMissionRank(): int {
+        $mission_rank = match ($this->player->rank_num) {
+            5 => Mission::RANK_A,
+            4 => Mission::RANK_B,
+            3 => Mission::RANK_C,
+            default => Mission::RANK_D,
+        };
+
+        // Difficulty downgrade
+        if($this->difficulty == self::DIFFICULTY_EASY) {
+            $mission_rank = $this->downgradeMissionRank($mission_rank);
+        }
+        // Difficulty upgrade
+        if(in_array($this->difficulty, self::$UPGRADE_DIFFICULTIES)) {
+            $mission_rank = $this->upgradeMissionRank($mission_rank);
+        }
+
+        // Upgrade level for capped Chuunin
+        if($this->player->rank_num == 3 && $this->player->level >= 50) {
+            // This is intended to be INCLUSIVE w/difficulty below
+            $mission_rank = $this->upgradeMissionRank($mission_rank);
+            // Downgrade based on easy & normal difficulties (intended to STACK with easy downgrade above)
+            if(in_array($this->difficulty, [self::DIFFICULTY_NORMAL, self::DIFFICULTY_EASY])) {
+                $mission_rank = $this->downgradeMissionRank($mission_rank);
+            }
+        }
+        // Jonin level upgrade, begin at level 90
+        if($this->player->rank_num == 4 && $this->player->level >= 90) {
+            $mission_rank = $this->upgradeMissionRank($mission_rank);
+        }
+        // Jonin level downgrade based on NORMAL difficulty (intended to STACK with easy downgrade above)
+        if($this->player->rank_num == 4 && $this->player->level >= 75 && in_array($this->difficulty, [self::DIFFICULTY_EASY, self::DIFFICULTY_NORMAL])) {
+            $mission_rank = $this->downgradeMissionRank($mission_rank);
+        }
+        // TODO: Sennin level upgrade/downgrade
+
+
+        // Return mission rank, conforming to max mission level
+        return min($mission_rank, self::$MAX_MISSION_LEVEL);
+    }
+
     // Cancel the mission
     public static function cancelMission($system, $player, $mission_id) {
         $timestamp = time();
@@ -794,7 +870,8 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
         return true;
     }
 
-    public static function startMission($system, $player, $difficulty): SpecialMission {
+    public static function startMission($system, $player, $difficulty): SpecialMission
+    {
 
         if ($player->special_mission != 0) {
             throw new RuntimeException('You cannot start multiple missions!');
@@ -812,9 +889,9 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
 
         $log = [
             0 => [
-            'event' => self::$event_names['start']['event'],
-            'timestamp_ms' => floor(microtime(true) * 1000),
-            'description' => self::$event_names['start']['text']
+                'event' => self::$event_names['start']['event'],
+                'timestamp_ms' => floor(microtime(true) * 1000),
+                'description' => self::$event_names['start']['text']
             ]
         ];
         $log_encode = json_encode($log);
@@ -829,5 +906,4 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
         return (new SpecialMission($system, $player, $mission_id));
 
     }
-
 }
