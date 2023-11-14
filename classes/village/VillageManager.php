@@ -304,7 +304,7 @@ class VillageManager {
                 $result = $system->db->query("SELECT * FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` = {$player->user_id} AND `seat_end` IS NOT NULL ORDER BY `seat_end` DESC LIMIT 1");
                 $result = $system->db->fetch($result);
                 if ($system->db->last_num_rows > 0) {
-                    $cooldown_remaining = ($result['seat_end'] + self::SEAT_RECLAIM_COOLDOWN_HOURS * 3600) - $result['seat_end'];
+                    $cooldown_remaining = ($result['seat_end'] + self::SEAT_RECLAIM_COOLDOWN_HOURS * 3600) - time();
                     if ($cooldown_remaining > 0) {
                         $message = "You must wait another " . $system->time_remaining($cooldown_remaining) . " before reclaiming this seat.";
                         return $message;

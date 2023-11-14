@@ -29,6 +29,7 @@
                 proposalData: <?= json_encode(VillageApiPresenter::proposalDataResponse($system, $player)) ?>,
                 strategicData: <?= json_encode(VillageApiPresenter::strategicDataResponse($system)) ?>,
                 challengeData: <?= json_encode(VillageApiPresenter::challengeDataResponse($system, $player)) ?>,
+                warLogData: <?= json_encode(VillageApiPresenter::warLogDataResponse($system, $player)) ?>,
             }),
             villageContainer
         );

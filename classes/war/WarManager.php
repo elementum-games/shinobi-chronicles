@@ -54,7 +54,9 @@ class WarManager {
     const PATROL_RESPAWN_TIME = 600;
     const BASE_LOOT_CAPACITY = 50;
     const MAX_PATROL_TIER = 3;
-    const YEN_PER_RESOURCE = 10;
+    const YEN_PER_RESOURCE = 20;
+    const RESOURCES_PER_STAT = 10;
+    const RESOURCES_PER_REPUTATION = 10;
 
     private System $system;
     private User $user;
@@ -358,6 +360,10 @@ class WarManager {
         if (empty($patrol->ai_id)) {
             return;
         }
+        // if in a special mission
+        if ($this->user->special_mission > 0) {
+            return;
+        }
         $ai = $this->system->db->query("SELECT `ai_id` FROM `ai_opponents` WHERE `ai_id` = {$patrol->ai_id} LIMIT 1");
         if ($this->system->db->last_num_rows == 0) {
             return;
@@ -396,6 +402,7 @@ class WarManager {
         // update village resources
         $first = true;
         $yen_gain = 0;
+        $total_resources = 0;
         foreach ($loot_gained as $resource_id => $count) {
             if ($first) {
                 $message .= "Deposited";
@@ -406,12 +413,35 @@ class WarManager {
             WarLogManager::logAction($this->system, $this->user, $count, WarLogManager::WAR_LOG_RESOURCES_CLAIMED, $this->user->village->village_id);
             $message .= " " . $count . " " . System::unSlug(WarManager::RESOURCE_NAMES[$resource_id]);
             $this->user->village->addResource($resource_id, $count);
-            $yen_gain += $count * self::YEN_PER_RESOURCE;
+            $total_resources += $count;
         }
+        $yen_gain = $total_resources * self::YEN_PER_RESOURCE;
+        $stat_gain = floor($total_resources / self::RESOURCES_PER_STAT);
+        $rep_gain = floor($total_resources / self::RESOURCES_PER_REPUTATION);
         $this->user->village->updateResources();
         $message .= "!";
+        // add yen
         $message .= "\nGained \u{00a5}{$yen_gain}!";
         $this->user->addMoney($yen_gain, "Resource");
+        // add stat
+        $stat_to_gain = $this->user->getTrainingStatForArena();
+        if ($stat_to_gain != null && $stat_gain > 0) {
+            $stat_gained = $this->user->addStatGain($stat_to_gain, $stat_gain);
+            if (!empty($stat_gained)) {
+                $message .= "\n" . $stat_gained;
+            }
+        }
+        // Add reputation
+        if ($this->user->reputation->canGain(UserReputation::ACTIVITY_TYPE_WAR)) {
+            $rep_gain = $this->user->reputation->addRep(
+                amount: $rep_gain,
+                activity_type: UserReputation::ACTIVITY_TYPE_WAR
+            );
+            if ($rep_gain > 0) {
+                $message .= "\nGained " . $rep_gain . " village reputation!";
+            }
+        }
+        $message .= '!';
         // update loot table
         $time = time();
         $this->system->db->query("UPDATE `loot` SET `claimed_village_id` = {$this->user->village->village_id}, `claimed_time` = {$time} WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL");

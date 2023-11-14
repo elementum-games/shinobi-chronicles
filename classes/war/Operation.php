@@ -34,9 +34,9 @@ class Operation {
     ];
 
     const OPERATION_STAT_GAIN = [
-        self::OPERATION_INFILTRATE => 2,
-        self::OPERATION_REINFORCE => 1,
-        self::OPERATION_RAID => 2,
+        self::OPERATION_INFILTRATE => 3,
+        self::OPERATION_REINFORCE => 2,
+        self::OPERATION_RAID => 4,
         self::OPERATION_LOOT => 0,
         self::OPERATION_LOOT_TOWN => 0,
     ];
@@ -443,10 +443,9 @@ class Operation {
         if ($stat_to_gain != null && $stat_gain > 0) {
             $stat_gained = $this->user->addStatGain($stat_to_gain, $stat_gain);
             if (!empty($stat_gained)) {
-                $message .= "\n" . $stat_gained;
+                $message .= "\n" . $stat_gained . "!";
             }
         }
-        $message .= '!';
         $this->user->operation = 0;
         return $message;
     }
