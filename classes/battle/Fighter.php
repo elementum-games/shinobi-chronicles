@@ -94,6 +94,9 @@ abstract class Fighter {
 
     public $reputation_defense_boost = 0;
 
+    public $evasion_boost = 0;
+    public $resist_boost = 0;
+
     // Combat nerfs
     public $ninjutsu_nerf = 0;
     public $taijutsu_nerf = 0;
@@ -103,6 +106,9 @@ abstract class Fighter {
     public $speed_nerf = 0;
     public $intelligence_nerf = 0;
     public $willpower_nerf = 0;
+
+    public $evasion_nerf = 0;
+    public $resist_nerf = 0;
 
     // Getters
     abstract public function getName(): string;
@@ -328,7 +334,7 @@ abstract class Fighter {
         }
 
         $damage = round(
-          ($damage * (1 + $off_boost)) - $off_nerf, 
+          ($damage * (1 + $off_boost)) - $off_nerf,
           2
         );
         if($damage < 0) {
@@ -406,6 +412,23 @@ abstract class Fighter {
 
     public function getSpeed(bool $include_bloodline = false): float {
         return $include_bloodline ? $this->speed + $this->bloodline_speed_boost : $this->speed;
+    }
+
+    public function getBaseStatTotal(): int {
+        if ($this instanceof NPC) {
+            $rankManager = new RankManager($this->system);
+            $rankManager->loadRanks();
+            return $rankManager->statsForRankAndLevel($this->rank, $this->level);
+        }
+        $stat_total = $this->taijutsu_skill
+            + $this->ninjutsu_skill
+            + $this->genjutsu_skill
+            + (!empty($this->bloodline_skill) ? $this->bloodline_skill : 0)
+            + $this->willpower
+            + $this->intelligence
+            + $this->speed
+            + $this->cast_speed;
+        return max(1, $stat_total);
     }
 
     // Actions
