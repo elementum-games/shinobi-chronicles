@@ -25,6 +25,8 @@ class VillageManager {
     const RESOURCE_LOG_PRODUCTION = 1;
     const RESOURCE_LOG_COLLECTION = 2;
     const RESOURCE_LOG_EXPENSE = 3;
+    const RESOURCE_LOG_TRADE_GAIN = 4;
+    const RESOURCE_LOG_TRADE_LOSS = 5;
 
     const MIN_KAGE_CLAIM_TIER = 5;
     const MIN_KAGE_CHALLENGE_TIER = 5;
@@ -51,6 +53,8 @@ class VillageManager {
     const PROPOSAL_TYPE_ACCEPT_ALLIANCE = "accept_alliance";
     const PROPOSAL_TYPE_ACCEPT_PEACE = "accept_peace";
     const PROPOSAL_TYPE_BREAK_ALLIANCE = "break_alliance";
+    const PROPOSAL_TYPE_OFFER_TRADE = "offer_trade";
+    const PROPOSAL_TYPE_ACCEPT_TRADE = "accept_trade";
 
     const CHALLENGE_EXPIRE_DAYS = 1;
     const CHALLENGE_MIN_DELAY_HOURS = 12;
@@ -1027,8 +1031,32 @@ class VillageManager {
                     $proposal['enact_time_remaining'] = null;
                 }
             }
-            //get enact time
+            if (empty($proposal['trade_data'])) {
+                $trade_data = [];
+            } else {
+                $trade_data = json_decode($proposal['trade_data'], true);
+                $result = $system->db->query("SELECT `name`, `region_id` FROM `regions`");
+                $all_regions = $system->db->fetch_all($result);
 
+                $regions_lookup = [];
+                foreach ($all_regions as $region) {
+                    $regions_lookup[$region['region_id']] = $region['name'];
+                }
+
+                $trade_data['offered_regions'] = array_map(function ($region_id) use ($regions_lookup) {
+                    return [
+                        'region_id' => $region_id,
+                        'name' => $regions_lookup[$region_id]
+                    ];
+                }, $trade_data['offered_regions']);
+
+                $trade_data['requested_regions'] = array_map(function ($region_id) use ($regions_lookup) {
+                    return [
+                        'region_id' => $region_id,
+                        'name' => $regions_lookup[$region_id]
+                    ];
+                }, $trade_data['requested_regions']);
+            }
 
             $proposal_history[] = new VillageProposalDto(
                 proposal_id: $proposal['proposal_id'],
@@ -1043,7 +1071,7 @@ class VillageManager {
                 policy_id: $proposal['policy_id'],
                 vote_time_remaining: $proposal['vote_time_remaining'],
                 enact_time_remaining: $proposal['enact_time_remaining'],
-                trade_data: $proposal['trade_data'],
+                trade_data: $trade_data,
                 votes: $proposal['votes'],
             );
             unset($proposal);
@@ -1355,6 +1383,7 @@ class VillageManager {
                 self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_WAR, $proposal['type']);
                 // clear active proposals
                 self::clearDiplomaticProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
+                self::clearTradeProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
                 // update proposal
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 $message = "Declared war on " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
@@ -1499,6 +1528,49 @@ class VillageManager {
                     SET `region_locations`.`occupying_village_id` = NULL
                     WHERE `regions`.`village` = {$proposal['village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['target_village_id']}");
                 break;
+            case self::PROPOSAL_TYPE_OFFER_TRADE:
+                // check at war
+                if ($player->village->isEnemy($proposal['target_village_id'])) {
+                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    return "Villages must be at peace in order to trade!";
+                }
+                // check has resources / regions
+                $trade_data = json_decode($proposal['trade_data'], true);
+                $is_valid_trade = self::checkTradeValid($system, $player->village->village_id, $proposal['target_village_id'], $trade_data['offered_resources'], $trade_data['offered_regions'], $trade_data['requested_resources'], $trade_data['requested_regions']);
+                if (!$is_valid_trade) {
+                    return "One or either village does not have the necessary items to complete the trade.";
+                }
+                // create new proposal for target village
+                $name = "Accept Trade: " . VillageManager::VILLAGE_NAMES[$player->village->village_id];
+                $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`, `trade_data`) VALUES ({$proposal['target_village_id']}, {$player->user_id}, {$time}, 'accept_trade', '{$name}', {$player->village->village_id}, '{$proposal['trade_data']}')");
+                // create notification
+                self::createProposalNotification($system, $proposal['target_village_id'], NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
+                // update proposal
+                $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                // create notification
+                self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
+                return "Sent trade offer to " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                break;
+            case self::PROPOSAL_TYPE_ACCEPT_TRADE:
+                // check at war
+                if ($player->village->isEnemy($proposal['target_village_id'])) {
+                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    return "Villages must be at peace in order to trade!";
+                }
+                // check has resources / regions
+                $trade_data = json_decode($proposal['trade_data'], true);
+                $is_valid_trade = self::checkTradeValid($system, $proposal['target_village_id'], $player->village->village_id, $trade_data['offered_resources'], $trade_data['offered_regions'], $trade_data['requested_resources'], $trade_data['requested_regions']);
+                if (!$is_valid_trade) {
+                    return "One or either village does not have the necessary items to complete the trade.";
+                }
+                // handle region and resource change
+                self::handleTradeCompletion($system, $proposal['target_village_id'], $player->village->village_id, $trade_data['offered_resources'], $trade_data['offered_regions'], $trade_data['requested_resources'], $trade_data['requested_regions']);
+                // update proposal
+                $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                // create notification
+                self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
+                return "Accepted trade offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                break;
             default:
                 return "Invalid proposal type.";
                 break;
@@ -1543,11 +1615,11 @@ class VillageManager {
             // get seat holders
             $seats = self::getVillageSeats($system, $i);
             // get regions
-            $regions = $system->db->query("SELECT `name` FROM `regions` WHERE `village` = {$i}");
+            $regions = $system->db->query("SELECT `name`, `region_id` FROM `regions` WHERE `village` = {$i}");
             $regions = $system->db->fetch_all($regions);
             // get supply points
             $supply_points = [];
-            $resource_counts = $system->db->query("SELECT `region_locations`.`resource_id`, COUNT(`region_locations`.`resource_id`) AS `supply_points` 
+            $resource_counts = $system->db->query("SELECT `region_locations`.`resource_id`, COUNT(`region_locations`.`resource_id`) AS `supply_points`
                 FROM `region_locations`
                 INNER JOIN `regions` ON `region_locations`.`region_id` = `regions`.`region_id`
                 WHERE (`regions`.`village` = {$i} AND `region_locations`.`occupying_village_id` IS NULL)
@@ -1827,12 +1899,142 @@ class VillageManager {
         return "Proposal created!";
     }
 
+     /**
+     * @return string
+     */
+    public static function createTradeProposal(System $system, User $player, int $target_village_id, array $offered_resources, array $offered_regions, array $requested_resources, array $requested_regions): string {
+        // check player permissions
+        $seat = $player->village_seat;
+        if ($seat->seat_type != "kage") {
+            return "You do not meet the seat requirements.";
+        }
+        // check not at war
+        if ($player->village->isEnemy($target_village_id)) {
+            return "Villages must be at peace in order to trade!";
+        }
+        // check no pending proposal of same type
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND (`type` = 'offer_trade' OR `type` = 'accept_trade') LIMIT 1");
+        if ($system->db->last_num_rows > 0) {
+            return "There is already a pending trade request.";
+        }
+        // check has resources / regions
+        $is_valid_trade = self::checkTradeValid($system, $player->village->village_id, $target_village_id, $offered_resources, $offered_regions, $requested_resources, $requested_regions);
+        if (!$is_valid_trade) {
+            return "One or either village does not have the necessary items to complete the trade.";
+        }
+        // insert into DB
+        $trade_data = [
+            "offered_resources" => $offered_resources,
+            "offered_regions" => $offered_regions,
+            "requested_resources" => $requested_resources,
+            "requested_regions" => $requested_regions
+        ];
+        $trade_data = json_encode($trade_data);
+        $time = time();
+        $name = "Offer Trade: " . VillageManager::VILLAGE_NAMES[$target_village_id];
+        $type = self::PROPOSAL_TYPE_OFFER_TRADE;
+        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`, `trade_data`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$type}', '{$name}', {$target_village_id}, '{$trade_data}')");
+
+        // create notification
+        self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
+
+        return "Proposal created!";
+    }
+
+    private static function checkTradeValid(System $system, int $village1_id, int $village2_id, array $offered_resources, array $offered_regions, array $requested_resources, array $requested_regions): bool {
+        // get regions
+        $village1_regions = $system->db->query("SELECT `region_id` FROM `regions` WHERE `village` = {$village1_id}");
+        $village1_regions = $system->db->fetch_all($village1_regions);
+        $village2_regions = $system->db->query("SELECT `region_id` FROM `regions` WHERE `village` = {$village2_id}");
+        $village2_regions = $system->db->fetch_all($village2_regions);
+        // get resources
+        $village1_resources = self::getResources($system, $village1_id);
+        $village2_resources = self::getResources($system, $village2_id);
+        // check valid
+        foreach ($offered_resources as $resource) {
+            $resource_id = $resource['resource_id'];
+            $required_count = $resource['count'];
+            if (!isset($village1_resources[$resource_id]) || $village1_resources[$resource_id] < $required_count) {
+                return false;
+            }
+        }
+        foreach ($requested_resources as $resource) {
+            $resource_id = $resource['resource_id'];
+            $required_count = $resource['count'];
+            if (!isset($village2_resources[$resource_id]) || $village2_resources[$resource_id] < $required_count) {
+                return false;
+            }
+        }
+        $village_region_ids = array_column($village1_regions, 'region_id');
+        foreach ($offered_regions as $offered_region_id) {
+            if (!in_array($offered_region_id, $village_region_ids)) {
+                return false;
+            }
+        }
+        $village_region_ids = array_column($village2_regions, 'region_id');
+        foreach ($requested_regions as $requested_region_id) {
+            if (!in_array($requested_region_id, $village_region_ids)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static function handleTradeCompletion(System $system, int $village1_id, int $village2_id, array $offered_resources, array $offered_regions, array $requested_resources, array $requested_regions)
+    {
+        // update regions
+        foreach ($offered_regions as $region) {
+            $system->db->query("UPDATE `regions` SET `village` = {$village2_id} WHERE `region_id` = {$region}");
+        }
+        foreach ($requested_regions as $region) {
+            $system->db->query("UPDATE `regions` SET `village` = {$village1_id} WHERE `region_id` = {$region}");
+        }
+        // update resources
+        $village_result = $system->db->query("SELECT * FROM `villages` WHERE `village_id` = {$village1_id} LIMIT 1");
+        $village_result = $system->db->fetch($village_result);
+        $village1 = new Village($system, village_row: $village_result);
+        $village_result = $system->db->query("SELECT * FROM `villages` WHERE `village_id` = {$village2_id} LIMIT 1");
+        $village_result = $system->db->fetch($village_result);
+        $village2 = new Village($system, village_row: $village_result);
+        foreach ($offered_resources as $resource) {
+            $village1->subtractResource($resource['resource_id'], $resource['count']);
+            $system->db->query("INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village1->village_id}, {$resource['resource_id']}, " . VillageManager::RESOURCE_LOG_TRADE_LOSS . ", {$resource['count']}, " . time() . ")");
+            $village2->addResource($resource['resource_id'], $resource['count']);
+            $system->db->query("INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village2->village_id}, {$resource['resource_id']}, " . VillageManager::RESOURCE_LOG_TRADE_GAIN . ", {$resource['count']}, " . time() . ")");
+        }
+        foreach ($requested_resources as $resource) {
+            $village2->subtractResource($resource['resource_id'], $resource['count']);
+            $system->db->query("INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village2->village_id}, {$resource['resource_id']}, " . VillageManager::RESOURCE_LOG_TRADE_LOSS . ", {$resource['count']}, " . time() . ")");
+            $village1->addResource($resource['resource_id'], $resource['count']);
+            $system->db->query("INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village1->village_id}, {$resource['resource_id']}, " . VillageManager::RESOURCE_LOG_TRADE_GAIN . ", {$resource['count']}, " . time() . ")");
+        }
+        $village1->updateResources(true);
+        $village2->updateResources(true);
+    }
+
     private static function clearDiplomaticProposals(System $system, int $village1_id, int $village2_id, int $proposal_id) {
         $time = time();
         $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` =  'canceled' WHERE
             ((`village_id` = {$village1_id} OR `village_id` = {$village2_id})
             AND (`target_village_id` = {$village1_id} OR `target_village_id` = {$village2_id}))
-            AND `type` IN ('offer_alliance', 'offer_peace', 'accept_alliance', 'accept_peace', 'declare_war', 'break_alliance')
+            AND `type` IN ('offer_alliance', 'offer_peace', 'accept_alliance', 'accept_peace', 'declare_war', 'break_alliance', 'force_peace')
+            AND `proposal_id` != {$proposal_id}");
+    }
+    private static function clearTradeProposals(System $system, int $village1_id, int $village2_id, int $proposal_id)
+    {
+        $time = time();
+        $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` =  'canceled' WHERE
+            ((`village_id` = {$village1_id} OR `village_id` = {$village2_id})
+            AND (`target_village_id` = {$village1_id} OR `target_village_id` = {$village2_id}))
+            AND `type` IN ('offer_trade', 'accept_trade')
             AND `proposal_id` != {$proposal_id}");
     }
 

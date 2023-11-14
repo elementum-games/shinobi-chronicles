@@ -740,8 +740,21 @@ function KageQuarters({
     const [proposalRepAdjustment, setProposalRepAdjustment] = React.useState(0);
     const [strategicDisplayLeft, setStrategicDisplayLeft] = React.useState(strategicDataState.find(item => item.village.name == villageName));
     const [strategicDisplayRight, setStrategicDisplayRight] = React.useState(strategicDataState.find(item => item.village.name != villageName));
+    const [offeredResources, setOfferedResources] = React.useState([
+        { resource_id: 1, resource_name: "materials", count: 0 },
+        { resource_id: 2, resource_name: "food", count: 0 },
+        { resource_id: 3, resource_name: "wealth", count: 0 }
+    ]);
+    const [offeredRegions, setOfferedRegions] = React.useState([]);
+    const [requestedResources, setRequestedResources] = React.useState([
+        { resource_id: 1, resource_name: "materials", count: 0 },
+        { resource_id: 2, resource_name: "food", count: 0 },
+        { resource_id: 3, resource_name: "wealth", count: 0 }
+    ]);
+    const [requestedRegions, setRequestedRegions] = React.useState([]);
     const [modalState, setModalState] = React.useState("closed");
-    const modalText = React.useRef(null);
+    const [modalHeader, setModalHeader] = React.useState(null);
+    const [modalText, setModalText] = React.useState(null);
     const ChangePolicy = () => {
         if (modalState == "confirm_policy") {
             apiFetch(
@@ -757,13 +770,15 @@ function KageQuarters({
                     return;
                 }
                 setProposalDataState(response.data.proposalData);
-                modalText.current = response.data.response_message;
+                setModalHeader("Confirmation");
+                setModalText(response.data.response_message);
                 setModalState("response_message");
             });
         }
         else {
             setModalState("confirm_policy");
-            modalText.current = "Are you sure you want to change policies? You will be unable to select a new policy for 14 days.";
+            setModalHeader("Confirmation");
+            setModalText("Are you sure you want to change policies? You will be unable to select a new policy for 14 days.");
         }
     }
     const DeclareWar = () => {
@@ -781,13 +796,15 @@ function KageQuarters({
                     return;
                 }
                 setProposalDataState(response.data.proposalData);
-                modalText.current = response.data.response_message;
+                setModalText(response.data.response_message);
+                setModalHeader("Confirmation");
                 setModalState("response_message");
             });
         }
         else {
             setModalState("confirm_declare_war");
-            modalText.current = "Are you sure you declare war with " + strategicDisplayRight.village.name + "?";
+            setModalText("Are you sure you declare war with " + strategicDisplayRight.village.name + "?");
+            setModalHeader("Confirmation");
         }
     }
     const OfferPeace = () => {
@@ -805,13 +822,15 @@ function KageQuarters({
                     return;
                 }
                 setProposalDataState(response.data.proposalData);
-                modalText.current = response.data.response_message;
+                setModalText(response.data.response_message);
+                setModalHeader("Confirmation");
                 setModalState("response_message");
             });
         }
         else {
             setModalState("confirm_offer_peace");
-            modalText.current = "Are you sure you want to offer peace with " + strategicDisplayRight.village.name + "?";
+            setModalText("Are you sure you want to offer peace with " + strategicDisplayRight.village.name + "?");
+            setModalHeader("Confirmation");
         }
     }
     const OfferAlliance = () => {
@@ -829,13 +848,15 @@ function KageQuarters({
                     return;
                 }
                 setProposalDataState(response.data.proposalData);
-                modalText.current = response.data.response_message;
+                setModalText(response.data.response_message);
+                setModalHeader("Confirmation");
                 setModalState("response_message");
             });
         }
         else {
             setModalState("confirm_form_alliance");
-            modalText.current = "Are you sure you want to form an alliance with " + strategicDisplayRight.village.name + "?\nYou can be a member of only one Alliance at any given time.";
+            setModalText("Are you sure you want to form an alliance with " + strategicDisplayRight.village.name + "?\nYou can be a member of only one Alliance at any given time.");
+            setModalHeader("Confirmation");
         }
     }
     const BreakAlliance = () => {
@@ -853,13 +874,15 @@ function KageQuarters({
                     return;
                 }
                 setProposalDataState(response.data.proposalData);
-                modalText.current = response.data.response_message;
+                setModalText(response.data.response_message);
+                setModalHeader("Confirmation");
                 setModalState("response_message");
             });
         }
         else {
             setModalState("confirm_break_alliance");
-            modalText.current = "Are you sure you want break an alliance with " + strategicDisplayRight.village.name + "?";
+            setModalText("Are you sure you want break an alliance with " + strategicDisplayRight.village.name + "?");
+            setModalHeader("Confirmation");
         }
     }
     const CancelProposal = () => {
@@ -878,13 +901,45 @@ function KageQuarters({
                 setProposalDataState(response.data.proposalData);
                 setCurrentProposal(null);
                 setCurrentProposalKey(null);
-                modalText.current = response.data.response_message;
+                setModalText(response.data.response_message);
+                setModalHeader("Confirmation");
                 setModalState("response_message");
             });
         }
         else {
             setModalState("confirm_cancel_proposal");
-            modalText.current = "Are you sure you want to cancel this proposal?";
+            setModalText("Are you sure you want to cancel this proposal?");
+            setModalHeader("Confirmation");
+        }
+    }
+    const OfferTrade = () => {
+        if (modalState == "confirm_offer_trade") {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'CreateProposal',
+                    type: 'offer_trade',
+                    target_village_id: strategicDisplayRight.village.village_id,
+                    offered_resources: offeredResources,
+                    offered_regions: offeredRegions,
+                    requested_resources: requestedResources,
+                    requested_regions: requestedRegions
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setProposalDataState(response.data.proposalData);
+                setModalText(response.data.response_message);
+                setModalHeader("Confirmation");
+                setModalState("response_message");
+            });
+        }
+        else {
+            setModalState("confirm_offer_trade");
+            setModalText(null);
+            setModalHeader("Trade resources and regions");
         }
     }
     const EnactProposal = () => {
@@ -909,13 +964,15 @@ function KageQuarters({
                 setStrategicDataState(response.data.strategicData);
                 setStrategicDisplayLeft(response.data.strategicData.find(item => item.village.name == villageName));
                 setStrategicDisplayRight(response.data.strategicData.find(item => item.village.name == strategicDisplayRight.village.name));
-                modalText.current = response.data.response_message;
+                setModalText(response.data.response_message);
+                setModalHeader("Confirmation");
                 setModalState("response_message");
             });
         }
         else {
             setModalState("confirm_enact_proposal");
-            modalText.current = "Are you sure you want to enact this proposal?";
+            setModalText("Are you sure you want to enact this proposal?");
+            setModalHeader("Confirmation");
         }
     }
     const BoostVote = () => {
@@ -933,13 +990,15 @@ function KageQuarters({
                 }
                 setProposalDataState(response.data.proposalData);
                 setCurrentProposal(response.data.proposalData[currentProposalKey]);
-                modalText.current = response.data.response_message;
+                setModalText(response.data.response_message);
+                setModalHeader("Confirmation");
                 setModalState("response_message");
             });
         }
         else {
             setModalState("confirm_boost_vote");
-            modalText.current = "Are you sure you wish to boost this vote?\nThe Kage will gain/lose 500 Reputation based on their decision. This will cost 500 Reputation when the proposal is enacted.";
+            setModalText("Are you sure you wish to boost this vote?\nThe Kage will gain/lose 500 Reputation based on their decision. This will cost 500 Reputation when the proposal is enacted.");
+            setModalHeader("Confirmation");
         }
     }
     const CancelVote = () => {
@@ -957,13 +1016,15 @@ function KageQuarters({
                 }
                 setProposalDataState(response.data.proposalData);
                 setCurrentProposal(response.data.proposalData[currentProposalKey]);
-                modalText.current = response.data.response_message;
+                setModalText(response.data.response_message);
+                setModalHeader("Confirmation");
                 setModalState("response_message");
             });
         }
         else {
             setModalState("confirm_cancel_vote");
-            modalText.current = "Are you sure you wish to cancel your vote for this proposal?";
+            setModalText("Are you sure you wish to cancel your vote for this proposal?");
+            setModalHeader("Confirmation");
         }
     }
     const SubmitVote = (vote) => {
@@ -983,6 +1044,11 @@ function KageQuarters({
             setCurrentProposal(response.data.proposalData[currentProposalKey]);
         });
     }
+    const ViewTrade = () => {
+        setModalState("view_trade");
+        setModalText(null);
+        setModalHeader("View trade offer");
+    }
     React.useEffect(() => {
         if (proposalDataState.length && currentProposal === null) {
             setCurrentProposal(proposalDataState[0]);
@@ -996,8 +1062,8 @@ function KageQuarters({
                 <>
                     <div className="modal_backdrop"></div>
                     <div className="modal">
-                        <div className="modal_header">Confirmation</div>
-                        <div className="modal_text">{modalText.current}</div>
+                        <div className="modal_header">{modalHeader}</div>
+                        <div className="modal_text">{modalText}</div>
                         {modalState == "confirm_policy" &&
                             <>
                                 <div className="modal_confirm_button" onClick={() => ChangePolicy()}>Confirm</div>
@@ -1035,21 +1101,62 @@ function KageQuarters({
                             </>
                         }
                         {modalState == "confirm_offer_peace" &&
-                        <>
+                            <>
                                 <div className="modal_confirm_button" onClick={() => OfferPeace()}>Confirm</div>
                                 <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
                             </>
                         }
                         {modalState == "confirm_form_alliance" &&
-                        <>
+                            <>
                                 <div className="modal_confirm_button" onClick={() => OfferAlliance()}>Confirm</div>
                                 <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
                             </>
                         }
                         {modalState == "confirm_break_alliance" &&
-                        <>
-                            <div className="modal_confirm_button" onClick={() => BreakAlliance()}>Confirm</div>
+                            <>
+                                <div className="modal_confirm_button" onClick={() => BreakAlliance()}>Confirm</div>
                                 <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "confirm_offer_trade" &&
+                            <>
+                                <TradeDisplay
+                                    viewOnly={false}
+                                    offeringVillageResources={resourceDataState}
+                                    offeringVillageRegions={strategicDisplayLeft.regions}
+                                    offeredResources={offeredResources}
+                                    setOfferedResources={setOfferedResources}
+                                    offeredRegions={offeredRegions}
+                                    setOfferedRegions={setOfferedRegions}
+                                    targetVillageResources={null}
+                                    targetVillageRegions={strategicDisplayRight.regions}
+                                    requestedResources={requestedResources}
+                                    setRequestedResources={setRequestedResources}
+                                    requestedRegions={requestedRegions}
+                                    setRequestedRegions={setRequestedRegions}
+                                />
+                                <div className="modal_confirm_button" onClick={() => OfferTrade()}>confirm</div>
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
+                            </>
+                        }
+                        {modalState == "view_trade" &&
+                            <>
+                                <TradeDisplay
+                                    viewOnly={true}
+                                    offeringVillageResources={null}
+                                    offeringVillageRegions={null}
+                            offeredResources={currentProposal.trade_data.offered_resources}
+                                    setOfferedResources={null}
+                            offeredRegions={currentProposal.trade_data.offered_regions}
+                                    setOfferedRegions={null}
+                                    targetVillageResources={null}
+                                    targetVillageRegions={null}
+                            requestedResources={currentProposal.trade_data.requested_resources}
+                                    setRequestedResources={null}
+                            requestedRegions={currentProposal.trade_data.requested_regions}
+                                    setRequestedRegions={null}
+                                />
+                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>close</div>
                             </>
                         }
                         {modalState == "response_message" &&
@@ -1142,6 +1249,13 @@ function KageQuarters({
                                         <div className="proposal_cancel_button_wrapper">
                                             <div className={currentProposal ? "proposal_cancel_button" : "proposal_cancel_button disabled"} onClick={() => CancelProposal()}>cancel proposal</div>
                                         </div>
+                                        {(currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade")) &&
+                                            <div className="trade_view_button_wrapper alliance" onClick={() => ViewTrade()}>
+                                                <div className="trade_view_button_inner">
+                                                    <img src="/images/v2/icons/trade.png" className="trade_view_button_icon" />
+                                                </div>
+                                            </div>
+                                        }
                                         <div className="proposal_enact_button_wrapper">
                                             <div className={(currentProposal && (currentProposal.enact_time_remaining !== null ||
                                                 currentProposal.votes.length == seatDataState.filter(seat => seat.seat_type == "elder" && seat.seat_id != null).length
@@ -1408,6 +1522,15 @@ function KageQuarters({
                                         </div>
                                     }
                                 </div>
+                                <div className="strategic_info_navigation_diplomacy_buttons">
+                                    {!strategicDisplayLeft.enemies.find(enemy => enemy == strategicDisplayRight.village.name) &&
+                                        <div className="diplomacy_action_button_wrapper alliance" onClick={() => OfferTrade()}>
+                                            <div className="diplomacy_action_button_inner">
+                                                <img src="/images/v2/icons/trade.png" className="diplomacy_action_button_icon" />
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
                             </div>
                             <StrategicInfoItem
                                 strategicInfoData={strategicDisplayRight}
@@ -1419,6 +1542,237 @@ function KageQuarters({
             </div>
         </>
     );
+
+    function TradeDisplay({
+        viewOnly,
+        offeringVillageResources,
+        offeringVillageRegions,
+        offeredResources,
+        setOfferedResources,
+        offeredRegions,
+        setOfferedRegions,
+        targetVillageResources,
+        targetVillageRegions,
+        requestedResources,
+        setRequestedResources,
+        requestedRegions,
+        setRequestedRegions,
+    }) {
+        const toggleOfferedRegion = (regionId) => {
+            setOfferedRegions(current => {
+                // Check if the region is already selected
+                if (current.includes(regionId)) {
+                    // If it is, filter it out (unselect it)
+                    return current.filter(id => id !== regionId);
+                } else {
+                    // Otherwise, add it to the selected regions
+                    return [...current, regionId];
+                }
+            });
+        };
+        const toggleRequestedRegion = (regionId) => {
+            setRequestedRegions(current => {
+                // Check if the region is already selected
+                if (current.includes(regionId)) {
+                    // If it is, filter it out (unselect it)
+                    return current.filter(id => id !== regionId);
+                } else {
+                    // Otherwise, add it to the selected regions
+                    return [...current, regionId];
+                }
+            });
+        };
+        const handleOfferedResourcesChange = (resourceName, value) => {
+            setOfferedResources(currentResources =>
+                currentResources.map(resource =>
+                    resource.resource_name === resourceName
+                        ? { ...resource, count: value }
+                        : resource
+                )
+            );
+        };
+        const handleRequestedResourcesChange = (resourceName, value) => {
+            setRequestedResources(currentResources =>
+                currentResources.map(resource =>
+                    resource.resource_name === resourceName
+                        ? { ...resource, count: value }
+                        : resource
+                )
+            );
+        };
+
+        return (
+            viewOnly ?
+                <div className="trade_display_container">
+                    <div className="trade_display_offer_container">
+                        <div className="header">Offered Resources</div>
+                        <div className="trade_display_resources">
+                            {offeredResources
+                                .map((resource, index) => {
+                                    const total = offeringVillageResources ? offeringVillageResources.find(total => total.resource_id === resource.resource_id).count : null;
+                                    return (
+                                        <div key={resource.resource_id} className="trade_display_resource_wrapper">
+                                            <input
+                                                type="text"
+                                                min="0"
+                                                max={total ? total : null}
+                                                step="100"
+                                                placeholder="0"
+                                                className="trade_display_resource_input"
+                                                value={resource.count}
+                                                onChange={(e) => handleOfferedResourcesChange(resource.resource_name, parseInt(e.target.value))}
+                                                style={{ userSelect: "none" }}
+                                                readOnly
+                                            />
+                                            <div className="trade_display_resource_name">{resource.resource_name}</div>
+                                            {total &&
+                                                <div className="trade_display_resource_total">{total}</div>
+                                            }
+                                        </div>
+                                    );
+                                })}
+                        </div>
+                        <div className="header">Offered Regions</div>
+                        <div className="trade_display_regions">
+                            {offeredRegions
+                                .filter(region => region.region_id > 5)
+                                .map((region, index) => (
+                                    <div key={region.name} className="trade_display_region_wrapper">
+                                        <div className="trade_display_region_name">{region.name}</div>
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                    <div className="trade_display_request_container">
+                        <div className="header">Requested Resources</div>
+                        <div className="trade_display_resources">
+                            {requestedResources
+                                .map((resource, index) => {
+                                    const total = targetVillageResources ? targetVillageResources.find(total => total.resource_id === resource.resource_id).count : null;
+                                    return (
+                                        <div key={resource.resource_id} className="trade_display_resource_wrapper">
+                                            <input
+                                                type="text"
+                                                min="0"
+                                                max={total ? total : null}
+                                                step="100"
+                                                placeholder="0"
+                                                className="trade_display_resource_input"
+                                                value={resource.count}
+                                                onChange={(e) => handleRequestedResourcesChange(resource.resource_name, parseInt(e.target.value))}
+                                                style={{ userSelect: "none" }}
+                                                readOnly
+                                            />
+                                            <div className="trade_display_resource_name">{resource.resource_name}</div>
+                                            {total &&
+                                                <div className="trade_display_resource_total">{total}</div>
+                                            }
+                                        </div>
+                                    );
+                                })}
+                        </div>
+                        <div className="header">Requested Regions</div>
+                        <div className="trade_display_regions">
+                            {requestedRegions
+                                .filter(region => region.region_id > 5)
+                                .map((region, index) => (
+                                    <div key={region.name} className="trade_display_region_wrapper">
+                                        <div className="trade_display_region_name">{region.name}</div>
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                </div>
+            :
+                <div className="trade_display_container">
+                    <div className="trade_display_offer_container">
+                        <div className="header">Offer Resources</div>
+                        <div className="trade_display_resources">
+                            {offeredResources
+                                .map((resource, index) => {
+                                    const total = offeringVillageResources ? offeringVillageResources.find(total => total.resource_id === resource.resource_id).count : null;
+                                    return (
+                                        <div key={resource.resource_id} className="trade_display_resource_wrapper">
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max={total ? total : null}
+                                                step="100"
+                                                placeholder="0"
+                                                className="trade_display_resource_input"
+                                                value={resource.count}
+                                                onChange={(e) => handleOfferedResourcesChange(resource.resource_name, parseInt(e.target.value))}
+                                            />
+                                            <div className="trade_display_resource_name">{resource.resource_name}</div>
+                                            {total &&
+                                                <div className="trade_display_resource_total">{total}</div>
+                                            }
+                                        </div>
+                                    );
+                                })}
+                        </div>
+                        <div className="header">Offer Regions</div>
+                        <div className="trade_display_regions">
+                            {offeringVillageRegions
+                                .filter(region => region.region_id > 5)
+                                .map((region, index) => (
+                                    <div key={region.name} className="trade_display_region_wrapper">
+                                        <div className="trade_display_region_name">{region.name}</div>
+                                        <input
+                                            type="checkbox"
+                                            checked={offeredRegions.includes(region.region_id)}
+                                            onChange={() => toggleOfferedRegion(region.region_id)}
+                                        />
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                    <div className="trade_display_request_container">
+                        <div className="header">Request Resources</div>
+                        <div className="trade_display_resources">
+                            {requestedResources
+                                .map((resource, index) => {
+                                    const total = targetVillageResources ? targetVillageResources.find(total => total.resource_id === resource.resource_id).count : null;
+                                    return (
+                                        <div key={resource.resource_id} className="trade_display_resource_wrapper">
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max={total ? total : null}
+                                                step="100"
+                                                placeholder="0"
+                                                className="trade_display_resource_input"
+                                                value={resource.count}
+                                                onChange={(e) => handleRequestedResourcesChange(resource.resource_name, parseInt(e.target.value))}
+                                            />
+                                            <div className="trade_display_resource_name">{resource.resource_name}</div>
+                                            {total &&
+                                                <div className="trade_display_resource_total">{total}</div>
+                                            }
+                                        </div>
+                                    );
+                                })}
+                        </div>
+                        <div className="header">Request Regions</div>
+                        <div className="trade_display_regions">
+                            {targetVillageRegions
+                                .filter(region => region.region_id > 5)
+                                .map((region, index) => (
+                                    <div key={region.name} className="trade_display_region_wrapper">
+                                        <div className="trade_display_region_name">{region.name}</div>
+                                        <input
+                                            type="checkbox"
+                                            checked={requestedRegions.includes(region.region_id)}
+                                            onChange={() => toggleRequestedRegion(region.region_id)}
+                                        />
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                </div>
+        );
+    }
+
     function cyclePolicy(direction) {
         var newPolicyID;
         switch (direction) {
