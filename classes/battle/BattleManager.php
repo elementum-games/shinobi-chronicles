@@ -1049,24 +1049,22 @@ class BattleManager {
         switch($fighter_jutsu->jutsu_type) {
             case Jutsu::TYPE_TAIJUTSU:
                 // get speed stat total
-                $evasion_stat_amount = $fighter->speed;
+                $evasion_stat_amount = $fighter->speed + $fighter->speed_boost;
                 // determine base evasion against opponent
                 $evasion_stat_amount *= BattleManager::SPEED_DAMAGE_REDUCTION_RATIO / max($target_stat_total, 1);
                 // apply all boosts/nerfs to evasion
                 $evasion_stat_amount += $fighter->evasion_boost;
                 $evasion_stat_amount -= $fighter->evasion_nerf;
-                echo ("<br>" . $fighter->evasion_boost . " " . $fighter->evasion_nerf);
                 break;
             case Jutsu::TYPE_GENJUTSU:
             case Jutsu::TYPE_NINJUTSU:
                 // get speed stat total
-                $evasion_stat_amount = $fighter->cast_speed;
+                $evasion_stat_amount = $fighter->cast_speed + $fighter->cast_speed_boost;
                 // determine base evasion against opponent
                 $evasion_stat_amount *= BattleManager::SPEED_DAMAGE_REDUCTION_RATIO / max($target_stat_total, 1);
                 // apply all boosts/nerfs to evasion
                 $evasion_stat_amount += $fighter->evasion_boost;
                 $evasion_stat_amount -= $fighter->evasion_nerf;
-                echo ("<br>" . $fighter->evasion_boost . " " . $fighter->evasion_nerf);
                 break;
             default:
                 throw new RuntimeException("Invalid jutsu type!");
