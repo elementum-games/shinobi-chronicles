@@ -1115,7 +1115,7 @@ function KageQuarters({
   }, "Confirm"), /*#__PURE__*/React.createElement("div", {
     className: "modal_cancel_button",
     onClick: () => setModalState("closed")
-  }, "cancel")), modalState == "confirm_offer_trade" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(TradeDisplay, {
+  }, "cancel")), modalState == "confirm_offer_trade" && /*#__PURE__*/React.createElement(React.Fragment, null, TradeDisplay({
     viewOnly: false,
     offeringVillageResources: resourceDataState,
     offeringVillageRegions: strategicDisplayLeft.regions,
@@ -1603,7 +1603,7 @@ function KageQuarters({
     className: "strategic_info_nav_button_icon"
   })))), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_navigation_diplomacy_buttons"
-  }, !strategicDisplayLeft.enemies.find(enemy => enemy == strategicDisplayRight.village.name) && /*#__PURE__*/React.createElement("div", {
+  }, strategicDisplayLeft.allies.find(ally => ally == strategicDisplayRight.village.name) && /*#__PURE__*/React.createElement("div", {
     className: "diplomacy_action_button_wrapper alliance",
     onClick: () => OfferTrade()
   }, /*#__PURE__*/React.createElement("div", {
@@ -1682,12 +1682,11 @@ function KageQuarters({
       }, /*#__PURE__*/React.createElement("input", {
         type: "text",
         min: "0",
-        max: total ? total : null,
+        max: total ? total : 25000,
         step: "100",
         placeholder: "0",
         className: "trade_display_resource_input",
         value: resource.count,
-        onChange: e => handleOfferedResourcesChange(resource.resource_name, parseInt(e.target.value)),
         style: {
           userSelect: "none"
         },
@@ -1720,7 +1719,7 @@ function KageQuarters({
       }, /*#__PURE__*/React.createElement("input", {
         type: "text",
         min: "0",
-        max: total ? total : null,
+        max: total ? total : 25000,
         step: "100",
         placeholder: "0",
         className: "trade_display_resource_input",

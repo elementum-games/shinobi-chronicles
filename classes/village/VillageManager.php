@@ -67,6 +67,8 @@ class VillageManager {
     const FORCE_PEACE_MINIMUM_DURATION_DAYS = 7;
     const WAR_COOLDOWN_DAYS = 3;
 
+    const MAX_TRADE_RESOURCE_TYPE = 25000;
+
     public static function getLocation(System $system, string $village_id): ?TravelCoords {
         $result = $system->db->query(
             "SELECT `maps_locations`.`x`, `maps_locations`.`y`, `maps_locations`.`map_id` FROM `villages`
@@ -1529,10 +1531,10 @@ class VillageManager {
                     WHERE `regions`.`village` = {$proposal['village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['target_village_id']}");
                 break;
             case self::PROPOSAL_TYPE_OFFER_TRADE:
-                // check at war
-                if ($player->village->isEnemy($proposal['target_village_id'])) {
+                // check is ally
+                if (!$player->village->isAlly($proposal['target_village_id'])) {
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
-                    return "Villages must be at peace in order to trade!";
+                    return "Villages must be allied in order to trade!";
                 }
                 // check has resources / regions
                 $trade_data = json_decode($proposal['trade_data'], true);
@@ -1952,6 +1954,9 @@ class VillageManager {
         $village2_resources = self::getResources($system, $village2_id);
         // check valid
         foreach ($offered_resources as $resource) {
+            if ($resource['count'] > self::MAX_TRADE_RESOURCE_TYPE) {
+                return false;
+            }
             $resource_id = $resource['resource_id'];
             $required_count = $resource['count'];
             if (!isset($village1_resources[$resource_id]) || $village1_resources[$resource_id] < $required_count) {
@@ -1959,6 +1964,9 @@ class VillageManager {
             }
         }
         foreach ($requested_resources as $resource) {
+            if ($resource['count'] > self::MAX_TRADE_RESOURCE_TYPE) {
+                return false;
+            }
             $resource_id = $resource['resource_id'];
             $required_count = $resource['count'];
             if (!isset($village2_resources[$resource_id]) || $village2_resources[$resource_id] < $required_count) {

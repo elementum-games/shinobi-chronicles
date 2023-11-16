@@ -1129,21 +1129,21 @@ function KageQuarters({
                         }
                         {modalState == "confirm_offer_trade" &&
                             <>
-                                <TradeDisplay
-                                    viewOnly={false}
-                                    offeringVillageResources={resourceDataState}
-                                    offeringVillageRegions={strategicDisplayLeft.regions}
-                                    offeredResources={offeredResources}
-                                    setOfferedResources={setOfferedResources}
-                                    offeredRegions={offeredRegions}
-                                    setOfferedRegions={setOfferedRegions}
-                                    targetVillageResources={null}
-                                    targetVillageRegions={strategicDisplayRight.regions}
-                                    requestedResources={requestedResources}
-                                    setRequestedResources={setRequestedResources}
-                                    requestedRegions={requestedRegions}
-                                    setRequestedRegions={setRequestedRegions}
-                                />
+                                {TradeDisplay({
+                                    viewOnly:false,
+                                    offeringVillageResources:resourceDataState,
+                                    offeringVillageRegions:strategicDisplayLeft.regions,
+                                    offeredResources:offeredResources,
+                                    setOfferedResources:setOfferedResources,
+                                    offeredRegions:offeredRegions,
+                                    setOfferedRegions:setOfferedRegions,
+                                    targetVillageResources:null,
+                                    targetVillageRegions:strategicDisplayRight.regions,
+                                    requestedResources:requestedResources,
+                                    setRequestedResources:setRequestedResources,
+                                    requestedRegions:requestedRegions,
+                                    setRequestedRegions:setRequestedRegions,
+                                })}
                                 <div className="modal_confirm_button" onClick={() => OfferTrade()}>confirm</div>
                                 <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
                             </>
@@ -1532,7 +1532,7 @@ function KageQuarters({
                                     }
                                 </div>
                                 <div className="strategic_info_navigation_diplomacy_buttons">
-                                    {!strategicDisplayLeft.enemies.find(enemy => enemy == strategicDisplayRight.village.name) &&
+                                    {strategicDisplayLeft.allies.find(ally => ally == strategicDisplayRight.village.name) &&
                                         <div className="diplomacy_action_button_wrapper alliance" onClick={() => OfferTrade()}>
                                             <div className="diplomacy_action_button_inner">
                                                 <img src="/images/v2/icons/trade.png" className="diplomacy_action_button_icon" />
@@ -1624,12 +1624,11 @@ function KageQuarters({
                                             <input
                                                 type="text"
                                                 min="0"
-                                                max={total ? total : null}
+                                                max={total ? total : 25000}
                                                 step="100"
                                                 placeholder="0"
                                                 className="trade_display_resource_input"
                                                 value={resource.count}
-                                                onChange={(e) => handleOfferedResourcesChange(resource.resource_name, parseInt(e.target.value))}
                                                 style={{ userSelect: "none" }}
                                                 readOnly
                                             />
@@ -1663,7 +1662,7 @@ function KageQuarters({
                                             <input
                                                 type="text"
                                                 min="0"
-                                                max={total ? total : null}
+                                                max={total ? total : 25000}
                                                 step="100"
                                                 placeholder="0"
                                                 className="trade_display_resource_input"
