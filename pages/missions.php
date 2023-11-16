@@ -25,6 +25,13 @@ function missions(): bool {
         return true;
 	}
 
+    // failsafe if player in mission battle but mission_id isn't set
+    $battle_type = Battle::TYPE_AI_MISSION;
+    $result = $system->db->query("SELECT `battle_type` FROM `battles` WHERE `battle_id`='{$player->battle_id}' AND `battle_type` = {$battle_type} LIMIT 1");
+    if ($system->db->last_num_rows > 0) {
+        $player->battle_id = 0;
+    }
+
 	$max_mission_rank = Mission::maxMissionRank($player->rank_num);
 
 	$result = $system->db->query(
