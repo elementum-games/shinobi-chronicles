@@ -1998,12 +1998,10 @@ class VillageManager {
             $system->db->query("UPDATE `regions` SET `village` = {$village1_id} WHERE `region_id` = {$region}");
         }
         // update resources
-        $village_result = $system->db->query("SELECT * FROM `villages` WHERE `village_id` = {$village1_id} LIMIT 1");
-        $village_result = $system->db->fetch($village_result);
-        $village1 = new Village($system, village_row: $village_result);
-        $village_result = $system->db->query("SELECT * FROM `villages` WHERE `village_id` = {$village2_id} LIMIT 1");
-        $village_result = $system->db->fetch($village_result);
-        $village2 = new Village($system, village_row: $village_result);
+        $villages_result = $system->db->query("SELECT * FROM `villages` WHERE `village_id` = {$village1_id} OR `village_id`={$village2_id} LIMIT 2");
+        $villages = $system->db->fetch_all($villages_result, 'village_id');
+        $village1 = new Village($system, village_row: $villages[$village1_id]);
+        $village2 = new Village($system, village_row: $villages[$village2_id]);
         foreach ($offered_resources as $resource) {
             $village1->subtractResource($resource['resource_id'], $resource['count']);
             $system->db->query("INSERT INTO `resource_logs`
