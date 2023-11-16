@@ -12,7 +12,7 @@ final class VillageTradeMigration extends AbstractMigration
     {
         $this->execute("
             -- Alter table proposals
-            ALTER TABLE `proposals` ADD `trade_data` VARCHAR(200) NULL DEFAULT NULL;
+            ALTER TABLE `proposals` ADD `trade_data` VARCHAR(1000) NULL DEFAULT NULL;
         ");
     }
 
