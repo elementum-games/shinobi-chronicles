@@ -379,7 +379,12 @@ class BattleEffectsManager {
             }
         }
         else if($effect->effect == 'heal') {
-            $heal = $effect->effect_amount;
+            $currentHealthPercent = $target->health / $target->max_health;
+            // At 100% health, 75% effectiveness (-25%)
+            // At 0% health, 125% effectiveness (+25%)
+            $scalingFactor = 1 - (Bloodline::HEAL_RANGE_PERCENT / 100) + (2 * (Bloodline::HEAL_RANGE_PERCENT / 100) * (1 - $currentHealthPercent));
+            $heal = $effect->effect_amount * $scalingFactor;
+
             $this->addDisplay($target, $target->getName() . " heals " . "<span class=\"battle_text_heal\" style=\"color:green\">" . round($heal) . "</span>" . " health");
 
             $target->health += $heal;

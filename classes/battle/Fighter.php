@@ -8,7 +8,7 @@ abstract class Fighter {
 
     const SKILL_OFFENSE_RATIO = 0.10;
     const BLOODLINE_OFFENSE_RATIO = self::SKILL_OFFENSE_RATIO * 0.8;
-    const BLOODLINE_DEFENSE_MULTIPLIER = 35;
+    const BLOODLINE_DEFENSE_MULTIPLIER = 50;
 
     const SPEED_OFFENSE_RATIO = 0.25;
 
@@ -150,6 +150,7 @@ abstract class Fighter {
                     case 'ninjutsu_resist':
                     case 'genjutsu_resist':
                     case 'taijutsu_resist':
+                    case 'damage_resist':
                         $x = count($this->bloodline_defense_boosts);
                         $this->bloodline_defense_boosts[$x]['effect'] = $effect['effect'];
                         $this->bloodline_defense_boosts[$x]['effect_amount'] = $effect['effect_amount'];
@@ -360,7 +361,7 @@ abstract class Fighter {
             if (!empty($this->bloodline_defense_boosts)) {
                 foreach ($this->bloodline_defense_boosts as $id => $boost) {
                     $boost_type = explode('_', $boost['effect'])[0];
-                    if ($boost_type != $defense_type) {
+                    if ($boost_type != $defense_type && $boost_type != 'damage') {
                         continue;
                     }
 
@@ -419,6 +420,8 @@ abstract class Fighter {
             $rankManager = new RankManager($this->system);
             $rankManager->loadRanks();
             return $rankManager->statsForRankAndLevel($this->rank, $this->level);
+        } else if ($this instanceof User) {
+            return $this->total_stats;
         }
         $stat_total = $this->taijutsu_skill
             + $this->ninjutsu_skill
