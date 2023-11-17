@@ -1295,6 +1295,13 @@ function KageQuarters({
                                                 <div className="proposal_yes_button_wrapper">
                                                     <div className="proposal_yes_button" onClick={() => SubmitVote(1)}>vote in favor</div>
                                                 </div>
+                                                {(currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade")) &&
+                                                    <div className="trade_view_button_wrapper alliance" onClick={() => ViewTrade()}>
+                                                        <div className="trade_view_button_inner">
+                                                            <img src="/images/v2/icons/trade.png" className="trade_view_button_icon" />
+                                                        </div>
+                                                    </div>
+                                                }
                                                 <div className="proposal_no_button_wrapper">
                                                     <div className="proposal_no_button" onClick={() => SubmitVote(0)}>vote against</div>
                                                 </div>
@@ -1305,6 +1312,13 @@ function KageQuarters({
                                                 <div className="proposal_yes_button_wrapper">
                                                     <div className="proposal_yes_button disabled">vote in favor</div>
                                                 </div>
+                                                {(currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade")) &&
+                                                    <div className="trade_view_button_wrapper alliance" onClick={() => ViewTrade()}>
+                                                        <div className="trade_view_button_inner">
+                                                            <img src="/images/v2/icons/trade.png" className="trade_view_button_icon" />
+                                                        </div>
+                                                    </div>
+                                                }
                                                 <div className="proposal_no_button_wrapper">
                                                     <div className="proposal_no_button disabled">vote against</div>
                                                 </div>
@@ -1315,6 +1329,13 @@ function KageQuarters({
                                                 <div className="proposal_cancel_vote_button_wrapper">
                                                 <div className="proposal_cancel_vote_button" onClick={() => CancelVote()}>change vote</div>
                                                 </div>
+                                                {(currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade")) &&
+                                                    <div className="trade_view_button_wrapper alliance" onClick={() => ViewTrade()}>
+                                                        <div className="trade_view_button_inner">
+                                                            <img src="/images/v2/icons/trade.png" className="trade_view_button_icon" />
+                                                        </div>
+                                                    </div>
+                                                }
                                                 <div className="proposal_boost_vote_button_wrapper">
                                                 <div className="proposal_boost_vote_button" onClick={() => BoostVote()}>boost vote</div>
                                                 </div>
@@ -1325,6 +1346,13 @@ function KageQuarters({
                                                 <div className="proposal_cancel_vote_button_wrapper">
                                                     <div className="proposal_cancel_vote_button disabled">cancel vote</div>
                                                 </div>
+                                                {(currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade")) &&
+                                                    <div className="trade_view_button_wrapper alliance" onClick={() => ViewTrade()}>
+                                                        <div className="trade_view_button_inner">
+                                                            <img src="/images/v2/icons/trade.png" className="trade_view_button_icon" />
+                                                        </div>
+                                                    </div>
+                                                }
                                                 <div className="proposal_boost_vote_button_wrapper">
                                                     <div className="proposal_boost_vote_button disabled">boost vote</div>
                                                 </div>
