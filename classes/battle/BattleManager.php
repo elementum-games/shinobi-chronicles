@@ -12,6 +12,9 @@ class BattleManager {
     const SPEED_DAMAGE_REDUCTION_RATIO = 1; // e.g. 10% of your stats in speed = 10% evasion
     const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 1; // e.g. 10% of your stats in speed = 10% evasion
     const MAX_EVASION_DAMAGE_REDUCTION = 0.5; // allows baseline investment of up to half your stats in speed against a speedless opponent
+    const EVASION_SOFT_CAP = 0.5; // caps at 50% evasion
+    const EVASION_SOFT_CAP_RATIO = 0.5; // evasion beyond soft cap only 50% as effective
+    const EVASION_HARD_CAP = 0.75; // caps at 75% evasion
 
     private System $system;
 
@@ -1005,9 +1008,15 @@ class BattleManager {
         if($player1_evasion_stat_amount >= $player2_evasion_stat_amount && $player2_jutsu_is_attack) {
             $damage_reduction = round($player1_evasion_stat_amount - $player2_evasion_stat_amount, 2);
 
-            if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
+            // if higher than soft cap, apply penalty
+            if ($damage_reduction > self::EVASION_SOFT_CAP) {
+                $damage_reduction = (($damage_reduction - self::EVASION_SOFT_CAP) * self::EVASION_SOFT_CAP_RATIO) + $damage_reduction - self::EVASION_SOFT_CAP;
             }
+            // if still higher than cap cap, set to hard cap
+            if ($damage_reduction > self::EVASION_HARD_CAP) {
+                $damage_reduction = self::EVASION_HARD_CAP;
+            }
+
             if($damage_reduction >= 0.01) {
                 $player2_damage *= 1 - $damage_reduction;
 
@@ -1023,9 +1032,15 @@ class BattleManager {
         else if($player2_evasion_stat_amount >= $player1_evasion_stat_amount && $player1_jutsu_is_attack) {
             $damage_reduction = round($player2_evasion_stat_amount - $player1_evasion_stat_amount, 2);
 
-            if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
+            // if higher than soft cap, apply penalty
+            if ($damage_reduction > self::EVASION_SOFT_CAP) {
+                $damage_reduction = (($damage_reduction - self::EVASION_SOFT_CAP) * self::EVASION_SOFT_CAP_RATIO) + $damage_reduction - self::EVASION_SOFT_CAP;
             }
+            // if still higher than cap cap, set to hard cap
+            if ($damage_reduction > self::EVASION_HARD_CAP) {
+                $damage_reduction = self::EVASION_HARD_CAP;
+            }
+
             if($damage_reduction >= 0.01) {
                 $player1_damage *= 1 - $damage_reduction;
 
