@@ -1303,7 +1303,15 @@ function KageQuarters({
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button",
     onClick: () => SubmitVote(1)
-  }, "vote in favor")), /*#__PURE__*/React.createElement("div", {
+  }, "vote in favor")), currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade") && /*#__PURE__*/React.createElement("div", {
+    className: "trade_view_button_wrapper alliance",
+    onClick: () => ViewTrade()
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "trade_view_button_inner"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/icons/trade.png",
+    className: "trade_view_button_icon"
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button",
@@ -1312,7 +1320,15 @@ function KageQuarters({
     className: "proposal_yes_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button disabled"
-  }, "vote in favor")), /*#__PURE__*/React.createElement("div", {
+  }, "vote in favor")), currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade") && /*#__PURE__*/React.createElement("div", {
+    className: "trade_view_button_wrapper alliance",
+    onClick: () => ViewTrade()
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "trade_view_button_inner"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/icons/trade.png",
+    className: "trade_view_button_icon"
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button disabled"
@@ -1321,7 +1337,15 @@ function KageQuarters({
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button",
     onClick: () => CancelVote()
-  }, "change vote")), /*#__PURE__*/React.createElement("div", {
+  }, "change vote")), currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade") && /*#__PURE__*/React.createElement("div", {
+    className: "trade_view_button_wrapper alliance",
+    onClick: () => ViewTrade()
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "trade_view_button_inner"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/icons/trade.png",
+    className: "trade_view_button_icon"
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "proposal_boost_vote_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_boost_vote_button",
@@ -1330,7 +1354,15 @@ function KageQuarters({
     className: "proposal_cancel_vote_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button disabled"
-  }, "cancel vote")), /*#__PURE__*/React.createElement("div", {
+  }, "cancel vote")), currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade") && /*#__PURE__*/React.createElement("div", {
+    className: "trade_view_button_wrapper alliance",
+    onClick: () => ViewTrade()
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "trade_view_button_inner"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/icons/trade.png",
+    className: "trade_view_button_icon"
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "proposal_boost_vote_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_boost_vote_button disabled"
