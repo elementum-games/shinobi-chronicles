@@ -657,8 +657,8 @@ function premiumShop(): void {
                 $confirmation_string = "Are you sure you want to move from the {$player->village->name} village to the $village
                 village?"
                     . (!$player->clan->bloodline_only ? " You will be kicked out of your clan and placed in a random clan in the new village." : "")
-                    . (!$target_village->policy->free_transfer ? "<br />You will lose 20% of your Reputation for all village changes after the first (you can not fall below Shinobi).<br />" : "")
-                    . "<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village you will have to pay a higher transfer fee)</b>";
+                    . ((!$target_village->policy->free_transfer && $player->village_changes > 0) ? "<br />You will lose 20% of your Reputation for this village change (you can not fall below Shinobi)." : "")
+                    . "<br><b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village you will have to pay a higher transfer fee)</b>";
 
                 renderPurchaseConfirmation(
                     purchase_type: 'change_village',
