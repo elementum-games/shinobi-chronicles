@@ -101,9 +101,9 @@
                         <div class="player_card_title"></div>
                         <div class="player_card_rank"></div>
                         <div class="player_card_village"><?= $player->village->name ?></div>
-                        <div class="player_card_clan"><?= $player->clan->name ?></div>
-                        <div class="player_card_team"><?= $player->team->name ?></div>
-                        <div class="player_card_bloodline"><?= $player->bloodline->name ?></div>
+                        <div class="player_card_clan"><?= $player->clan?->name ?></div>
+                        <div class="player_card_team"><?= $player->team?->name ?></div>
+                        <div class="player_card_bloodline"><?= $player->bloodline?->name ?></div>
                     </div>
                 </div>
                 <div style="margin-left: 5px">
