@@ -1002,8 +1002,8 @@ class BattleManager {
             }
         }
 
-        $player1_evasion_stat_amount = $this->getEvasionStatAmount($player1, $player1_jutsu, $player2->getBaseStatTotal());
-        $player2_evasion_stat_amount = $this->getEvasionStatAmount($player2, $player2_jutsu, $player1->getBaseStatTotal());
+        $player1_evasion_stat_amount = $this->getEvasionPercent($player1, $player1_jutsu, $player2->getBaseStatTotal());
+        $player2_evasion_stat_amount = $this->getEvasionPercent($player2, $player2_jutsu, $player1->getBaseStatTotal());
 
         if($player1_evasion_stat_amount >= $player2_evasion_stat_amount && $player2_jutsu_is_attack) {
             $damage_reduction = round($player1_evasion_stat_amount - $player2_evasion_stat_amount, 2);
@@ -1060,7 +1060,7 @@ class BattleManager {
     /**
      * @throws RuntimeException
      */
-    private function getEvasionStatAmount(Fighter $fighter, Jutsu $fighter_jutsu, int $target_stat_total): float|int {
+    private function getEvasionPercent(Fighter $fighter, Jutsu $fighter_jutsu, int $target_stat_total): float|int {
         switch($fighter_jutsu->jutsu_type) {
             case Jutsu::TYPE_TAIJUTSU:
                 // get speed stat total
