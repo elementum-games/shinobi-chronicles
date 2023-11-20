@@ -83,7 +83,7 @@
             <?php endif ?>
         </td>
     </tr>
-    <?php if ($system->isDevEnvironment()): ?> 
+    <?php if ($system->isDevEnvironment() && $system->enable_dev_only_features): ?>
     <tr><th colspan='2'>Player Card</th></tr>
     <tr>
         <td colspan="2">
@@ -175,7 +175,7 @@
                 <input type='submit' name='change_layout' value='Change' />
             </form>
             <span><i>Note: Legacy layouts may not be compatible with all pages</i></span>
-            <?php if($current_layout->usesV2Interface()): ?>
+            <?php if($system->layout->usesV2Interface()): ?>
             <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap">
                 <div>
                     <label>Avatar Style</label>
@@ -254,11 +254,7 @@
             </form>
         </td>
         <td style='text-align:center;'>
-            <?php if(!empty($player->blacklist)): ?>
-                <?=$list?>
-            <?php else: ?>
-                <p style="text-align: center;">No blocked users!</p>
-            <?php endif ?>
+            <?= $player->blacklist->generateSettingsList($self_link) ?>
             <br />
             <form action='<?=$self_link?>' method='post'>
                 <input type='text' name='blacklist_name' style='width:250px;margin-bottom:5px;' /> <br />

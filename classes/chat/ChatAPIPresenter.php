@@ -7,6 +7,7 @@ class ChatAPIPresenter {
     public static function chatPostResponse(System $system, ChatPostDto $chatPost) {
         return [
             'id' => $chatPost->id,
+            'userId' => $chatPost->user_id,
             'userName' => $chatPost->user_name,
             'message' => $chatPost->message,
             'userTitle' => $chatPost->title,
