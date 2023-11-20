@@ -352,16 +352,17 @@ abstract class Fighter {
      * @return float|int
      */
     public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false, bool $apply_resists = true): float|int {
-        $defense = self::BASE_DEFENSE * (1 + $this->defense_boost);
+        $defense = self::BASE_DEFENSE;
 
         if($defense <= 0) {
             $defense = 1;
         }
         if($apply_resists) {
+            $defense *= (1 + $this->defense_boost);
             if (!empty($this->bloodline_defense_boosts)) {
                 foreach ($this->bloodline_defense_boosts as $id => $boost) {
                     $boost_type = explode('_', $boost['effect'])[0];
-                    if ($boost_type != $defense_type && $boost_type != 'damage') {
+                    if ($boost_type != $defense_type) {
                         continue;
                     }
 

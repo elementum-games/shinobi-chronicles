@@ -297,6 +297,27 @@ class Battle {
 
         $this->player1->applyBloodlineBoosts();
         $this->player2->applyBloodlineBoosts();
+
+        // Setup bloodline defense bonus
+        if (!empty($this->player1->bloodline_defense_boosts)) {
+            foreach ($this->player1->bloodline_defense_boosts as $id => $boost) {
+                $boost_type = explode('_', $boost['effect'])[0];
+                if ($boost_type != 'damage') {
+                    continue;
+                }
+                $this->player1->defense_boost += $boost['effect_amount'] / $this->player2->getBaseStatTotal();
+                echo $this->player1->defense_boost;
+            }
+        }
+        if (!empty($this->player2->bloodline_defense_boosts)) {
+            foreach ($this->player2->bloodline_defense_boosts as $id => $boost) {
+                $boost_type = explode('_', $boost['effect'])[0];
+                if ($boost_type != 'damage') {
+                    continue;
+                }
+                $this->player2->defense_boost += $boost['effect_amount'] / $this->player1->getBaseStatTotal();
+            }
+        }
     }
 
     /**

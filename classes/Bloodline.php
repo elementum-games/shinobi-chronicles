@@ -15,9 +15,6 @@ class Bloodline {
 
     const BOOST_POWER_PRECISION = 5;
 
-    // 75% effectiveness at 100% HP, 125% effectiveness at 0% HP
-    const HEAL_RANGE_PERCENT = 25;
-
     public static array $public_ranks = [
         self::RANK_LEGENDARY => 'Legendary',
         self::RANK_ELITE  => 'Elite',
@@ -157,7 +154,7 @@ class Bloodline {
     ): void {
         $ratios = [
             'offense_boost' => 0.02,
-            'defense_boost' => 0.03,
+            'defense_boost' => 0.09,
             'speed_boost' => 0.08,
             'mental_boost' => 0.1,
             'heal' => 0.03,
