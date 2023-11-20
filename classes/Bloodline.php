@@ -15,6 +15,7 @@ class Bloodline {
 
     const BOOST_POWER_PRECISION = 5;
 
+    // 75% effectiveness at 100% HP, 125% effectiveness at 0% HP
     const HEAL_RANGE_PERCENT = 25;
 
     public static array $public_ranks = [
