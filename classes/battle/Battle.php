@@ -306,7 +306,6 @@ class Battle {
                     continue;
                 }
                 $this->player1->defense_boost += $boost['effect_amount'] / $this->player2->getBaseStatTotal();
-                echo $this->player1->defense_boost;
             }
         }
         if (!empty($this->player2->bloodline_defense_boosts)) {

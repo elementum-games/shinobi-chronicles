@@ -15,6 +15,10 @@ abstract class Fighter {
     const MIN_RAND = 33;
     const MAX_RAND = 36;
 
+    const RESIST_SOFT_CAP = 0.5; // caps at 50% evasion
+    const RESIST_SOFT_CAP_RATIO = 0.5; // evasion beyond soft cap only 50% as effective
+    const RESIST_HARD_CAP = 0.75; // caps at 75% evasion
+
     public System $system;
 
     public string $combat_id;
@@ -358,7 +362,16 @@ abstract class Fighter {
             $defense = 1;
         }
         if($apply_resists) {
-            $defense *= (1 + $this->defense_boost);
+            $defense_boost = $this->defense_boost;
+            // if higher than soft cap, apply penalty
+            if ($defense_boost > self::RESIST_SOFT_CAP) {
+                $defense_boost = (($defense_boost - self::RESIST_SOFT_CAP) * self::RESIST_SOFT_CAP_RATIO) + self::RESIST_SOFT_CAP;
+            }
+            // if still higher than cap cap, set to hard cap
+            if ($defense_boost > self::RESIST_HARD_CAP) {
+                $defense_boost = self::RESIST_HARD_CAP;
+            }
+            $defense *= (1 + $defense_boost);
             if (!empty($this->bloodline_defense_boosts)) {
                 foreach ($this->bloodline_defense_boosts as $id => $boost) {
                     $boost_type = explode('_', $boost['effect'])[0];

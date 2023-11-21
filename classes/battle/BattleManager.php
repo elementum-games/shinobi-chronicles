@@ -1010,7 +1010,7 @@ class BattleManager {
 
             // if higher than soft cap, apply penalty
             if ($damage_reduction > self::EVASION_SOFT_CAP) {
-                $damage_reduction = (($damage_reduction - self::EVASION_SOFT_CAP) * self::EVASION_SOFT_CAP_RATIO) + $damage_reduction - self::EVASION_SOFT_CAP;
+                $damage_reduction = (($damage_reduction - self::EVASION_SOFT_CAP) * self::EVASION_SOFT_CAP_RATIO) + self::EVASION_SOFT_CAP;
             }
             // if still higher than cap cap, set to hard cap
             if ($damage_reduction > self::EVASION_HARD_CAP) {
@@ -1034,7 +1034,7 @@ class BattleManager {
 
             // if higher than soft cap, apply penalty
             if ($damage_reduction > self::EVASION_SOFT_CAP) {
-                $damage_reduction = (($damage_reduction - self::EVASION_SOFT_CAP) * self::EVASION_SOFT_CAP_RATIO) + $damage_reduction - self::EVASION_SOFT_CAP;
+                $damage_reduction = (($damage_reduction - self::EVASION_SOFT_CAP) * self::EVASION_SOFT_CAP_RATIO) + self::EVASION_SOFT_CAP;
             }
             // if still higher than cap cap, set to hard cap
             if ($damage_reduction > self::EVASION_HARD_CAP) {
