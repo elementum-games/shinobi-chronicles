@@ -362,16 +362,7 @@ abstract class Fighter {
             $defense = 1;
         }
         if($apply_resists) {
-            $defense_boost = $this->defense_boost;
-            // if higher than soft cap, apply penalty
-            if ($defense_boost > self::RESIST_SOFT_CAP) {
-                $defense_boost = (($defense_boost - self::RESIST_SOFT_CAP) * self::RESIST_SOFT_CAP_RATIO) + self::RESIST_SOFT_CAP;
-            }
-            // if still higher than cap cap, set to hard cap
-            if ($defense_boost > self::RESIST_HARD_CAP) {
-                $defense_boost = self::RESIST_HARD_CAP;
-            }
-            $defense *= (1 + $defense_boost);
+            $defense *= (1 + $this->defense_boost);
             if (!empty($this->bloodline_defense_boosts)) {
                 foreach ($this->bloodline_defense_boosts as $id => $boost) {
                     $boost_type = explode('_', $boost['effect'])[0];
@@ -417,6 +408,18 @@ abstract class Fighter {
         $damage = round($raw_damage / $defense, 2);
         if($damage < 0.0) {
             $damage = 0;
+        }
+
+        if ($apply_resists) {
+            // if higher than soft cap, apply penalty
+            if ($this->resist_boost > self::RESIST_SOFT_CAP) {
+                $this->resist_boost = (($this->resist_boost - self::RESIST_SOFT_CAP) * self::RESIST_SOFT_CAP_RATIO) + self::RESIST_SOFT_CAP;
+            }
+            // if still higher than cap cap, set to hard cap
+            if ($this->resist_boost > self::RESIST_HARD_CAP) {
+                $this->resist_boost = self::RESIST_HARD_CAP;
+            }
+            $damage *= 1 - $this->resist_boost;
         }
         return $damage;
     }

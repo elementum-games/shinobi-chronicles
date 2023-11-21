@@ -305,7 +305,7 @@ class Battle {
                 if ($boost_type != 'damage') {
                     continue;
                 }
-                $this->player1->defense_boost += $boost['effect_amount'] / $this->player2->getBaseStatTotal();
+                $this->player1->resist_boost += $boost['effect_amount'] / $this->player2->getBaseStatTotal();
             }
         }
         if (!empty($this->player2->bloodline_defense_boosts)) {
@@ -314,7 +314,7 @@ class Battle {
                 if ($boost_type != 'damage') {
                     continue;
                 }
-                $this->player2->defense_boost += $boost['effect_amount'] / $this->player1->getBaseStatTotal();
+                $this->player2->resist_boost += $boost['effect_amount'] / $this->player1->getBaseStatTotal();
             }
         }
     }
