@@ -219,7 +219,7 @@ function jutsu(): void {
     // fix barrier
     foreach ($jutsu_list as &$jutsu) {
         if ($jutsu->use_type == "barrier") {
-            $jutsu->effect = "barrier";
+            $jutsu->effects[0]->effect = "barrier";
         }
         unset($jutsu);
     }
