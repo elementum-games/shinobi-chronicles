@@ -259,10 +259,19 @@ class StaffManager {
         );
     }
 
-    public function getCurrencyLogs(int $character_id, $offset = 0, $limit = 100, ?string $currency_type = null): array {
+    public function getCurrencyLogs(
+        int $character_id,
+        $offset = 0,
+        $limit = 100,
+        ?string $currency_type = null,
+        ?string $transaction_description_prefix = null
+    ): array {
         $query = "SELECT * FROM `currency_logs` WHERE `character_id`={$character_id}";
         if($currency_type != null) {
             $query .= " AND `currency_type`='{$currency_type}'";
+        }
+        if($transaction_description_prefix != null) {
+            $query .= " AND `transaction_description` LIKE '{$transaction_description_prefix}%'";
         }
         $query .= " ORDER BY `id` DESC LIMIT $limit OFFSET $offset";
 
@@ -273,10 +282,19 @@ class StaffManager {
         return [];
     }
 
-    public function countCurrencyLogs(int $character_id, $offset = 0, $limit = 100, ?string $currency_type = null): int {
+    public function countCurrencyLogs(
+        int $character_id,
+        $offset = 0,
+        $limit = 100,
+        ?string $currency_type = null,
+        ?string $transaction_description_prefix = null
+    ): int {
         $query = "SELECT COUNT(*) as `count` FROM `currency_logs` WHERE `character_id`={$character_id}";
         if($currency_type != null) {
             $query .= " AND `currency_type`='{$currency_type}'";
+        }
+        if($transaction_description_prefix != null) {
+            $query .= " AND `transaction_description` LIKE '{$transaction_description_prefix}%'";
         }
         $query .= " ORDER BY `id` DESC LIMIT $limit OFFSET $offset";
 

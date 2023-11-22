@@ -8,6 +8,7 @@ function viewLogsPage(System $system, User $player) {
     // Filters
     $character_id = null;
     $currency_type = null;
+    $currency_transaction_description_prefix = null;
 
     if(isset($_GET['character_id'])) {
         $character_id = (int)$_GET['character_id'];
@@ -21,6 +22,9 @@ function viewLogsPage(System $system, User $player) {
             default:
                 break;
         }
+    }
+    if(isset($_GET['currency_transaction_description_prefix'])) {
+        $currency_transaction_description_prefix = $system->db->clean($_GET['currency_transaction_description_prefix']);
     }
 
     $allowed_log_types = ['staff_logs', 'currency_logs', 'cron_job_logs'];
@@ -45,7 +49,8 @@ function viewLogsPage(System $system, User $player) {
                     character_id: $character_id,
                     offset: $offset,
                     limit: $limit,
-                    currency_type: $currency_type
+                    currency_type: $currency_type,
+                    transaction_description_prefix: $currency_transaction_description_prefix
                 ) - $limit;
             }
             else {
@@ -99,7 +104,8 @@ function viewLogsPage(System $system, User $player) {
                     character_id: $character_id,
                     offset: $offset,
                     limit: $limit,
-                    currency_type: $currency_type
+                    currency_type: $currency_type,
+                    transaction_description_prefix: $currency_transaction_description_prefix
                 );
             }
             else {

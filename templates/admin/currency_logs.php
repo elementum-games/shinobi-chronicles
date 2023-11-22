@@ -15,7 +15,7 @@
  $self_link = $system->router->getUrl('admin', [
      'page' => 'logs',
      'log_type' => 'currency_logs',
-     'character_id' => $character_id ?? 0
+     'character_id' => $character_id ?? 0,
  ])
 ?>
 
@@ -49,6 +49,10 @@
                         <option value='premium_credits'>Ancient Kunai</option>
                         <option value='money'>Yen</option>
                     </select>
+                </p>
+                <p>
+                    Description prefix:
+                    <input type='text' name='currency_transaction_description_prefix' value='<?= $_GET['currency_transaction_description_prefix'] ?? ''?>' />
                 </p>
                 <p>
                     <input type='submit' value='Search' />
