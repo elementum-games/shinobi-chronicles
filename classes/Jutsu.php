@@ -292,7 +292,13 @@ class Jutsu {
     }
 
     public function hasEffect(): bool {
-        return $this->effect && $this->effect != 'none';
+        $has_effect = false;
+        foreach ($this->effects as $effect) {
+            if ($effect && $effect->effect != 'none') {
+                $has_effect = true;
+            }
+        }
+        return $has_effect;
     }
 
     #[Pure]
