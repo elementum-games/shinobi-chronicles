@@ -41,8 +41,8 @@ class Jutsu {
     const CHUUNIN_SCALE_MULTIPLIER = 1.4; // 2.9 => 3.9 = +34.4%
     const JONIN_SCALE_MULTIPLIER = 1.75; // 2.9 => 4.9 = +69%
 
-    // Genjutsu gets declared with full power and effect instead of a tradeoff between them, we balance in code
-    const GENJUTSU_ATTACK_POWER_MODIFIER = 0.55;
+    /* Genjutsu gets declared with full power and effect instead of a tradeoff between them, we balance in code
+    const GENJUTSU_ATTACK_POWER_MODIFIER = 0.55;*/
 
     public static array $elements = [
         self::ELEMENT_FIRE,
