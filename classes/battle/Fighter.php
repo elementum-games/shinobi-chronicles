@@ -308,12 +308,10 @@ abstract class Fighter {
             $offense = $extra_offense + 900;
         }
 
-
-        // Make up for genjutsu's delayed damage. This assumes fights are about 10 turns
+        /* Make up for genjutsu's delayed damage. This assumes fights are about 10 turns
         if($attack->jutsu_type == Jutsu::TYPE_GENJUTSU) {
             $offense *= 1.15;
-        }
-
+        }*/
 
         $rand = mt_rand(self::MIN_RAND, self::MAX_RAND);
         if($disable_randomness) {
