@@ -366,4 +366,45 @@ function PlayerAchievements({
     className: "progress_label"
   }, achievement.progressLabel)))));
 }
+function formatTimer(timeRemaining, prependMessage = '') {
+  if (prependMessage.length > 0) {
+    prependMessage = prependMessage + " ";
+  }
+  let returnString = prependMessage;
+
+  // Calc days
+  if (timeRemaining > 86400) {
+    let days = Math.floor(timeRemaining / 86400);
+    let daysIndicator = days >= 1 ? 'days' : 'day';
+    timeRemaining -= days * 86400;
+    returnString += days + " " + daysIndicator + " ";
+  }
+  // Calc hours
+  if (timeRemaining >= 3600) {
+    let hours = Math.floor(timeRemaining / 3600);
+    let hoursString = hours < 10 ? "0" + hours : hours;
+    timeRemaining -= hours * 3600;
+    returnString += hoursString + ":";
+  } else {
+    returnString += "00:";
+  }
+  // Calc minutes
+  if (timeRemaining >= 60) {
+    let minutes = Math.floor(timeRemaining / 60);
+    let minutesString = minutes < 10 ? "0" + minutes : minutes;
+    timeRemaining -= minutes * 60;
+    returnString += minutesString + ":";
+  } else {
+    returnString += "00:";
+  }
+  // Calc seconds
+  if (timeRemaining > 0) {
+    let seconds = timeRemaining;
+    let secondsString = seconds < 10 ? "0" + seconds : seconds;
+    returnString += secondsString;
+  } else {
+    returnString += "00";
+  }
+  return returnString;
+}
 window.Profile = Profile;
