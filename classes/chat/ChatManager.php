@@ -314,7 +314,7 @@ class ChatManager {
 			            $result = $this->system->db->fetch($result);
 
                         // Load notification blocker
-                        if(!isset($notification_blocks[$result['user_Id']])) {
+                        if(!isset($notification_blocks[$result['user_id']])) {
                             $notification_blocks[$result['user_id']] =
                                 BlockedNotificationManager::BlockedNotificationManagerFromDb(
                                     system: $this->system,

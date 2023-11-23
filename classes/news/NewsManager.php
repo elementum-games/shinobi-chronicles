@@ -52,7 +52,7 @@ class NewsManager {
                     if($blockedNotifManager->notificationBlocked(NotificationManager::NOTIFICATION_NEWS)) {
                         continue;
                     }
-                    echo "sending notif to {$user['user_id']}<br />";
+
                     // Send notification
                     $new_notification = new NotificationDto(
                         type: NotificationManager::NOTIFICATION_NEWS,
