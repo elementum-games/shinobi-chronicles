@@ -830,7 +830,7 @@ class BattleManager {
             foreach ($attack->jutsu->effects as $effect) {
                 if ($effect && $effect->effect != 'none') {
                     $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                        $this->system->db->clean($this->effects->getAnnouncementText($attack->jutsu->effect)) .
+                        $this->system->db->clean($this->effects->getAnnouncementText($effect->effect)) .
                         "</p>";
                 }
             }

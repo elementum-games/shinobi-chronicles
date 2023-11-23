@@ -233,8 +233,8 @@ function bloodline() {
 			if($jutsu->cooldown) {
 				echo "<label style='width:6.5em;'>Cooldown:</label>" . $jutsu->cooldown . " turn(s)<br />";
 			}
-            foreach ($jutsu->effect as $effect) {
-                if ($effect->effect) {
+            foreach ($jutsu->effects as $effect) {
+                if ($effect->effect && $effect->effect != 'none') {
                     echo "<label style='width:6.5em;'>Effect:</label>" .
                         System::unSlug($effect->effect) . ' (' . round($effect->effect_amount, 0) . '%) ' . ' - ' . $effect->effect_length . " turns<br />";
                 }
