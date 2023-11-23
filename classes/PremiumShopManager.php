@@ -164,9 +164,6 @@ class PremiumShopManager {
         if (SenseiManager::isSensei($this->player->user_id, $this->system)) {
             throw new RuntimeException("You must resign from being a sensei first!");
         }
-        if($this->player->trainingManager->hasActiveTraining()) {
-            throw new RuntimeException("You can not have an active training!");
-        }
     }
 
     public function resetUser(): ActionResult {
@@ -215,6 +212,10 @@ class PremiumShopManager {
         $this->player->stat_transfer_completion_time = 0;
         $this->player->stat_transfer_amount = 0;
         $this->player->stat_transfer_target_stat = '';
+        // Remove training
+        $this->player->trainingManager->train_time = 0;
+        $this->player->train_gain = 0;
+        $this->player->train_type = '';
 
         $this->player->exam_stage = 0;
 
