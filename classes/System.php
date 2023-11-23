@@ -193,10 +193,10 @@ class System {
 
     const GLOBAL_TEST_NOTIFICATION_SPAWN = false;
     public array $testNotifications = [
-        'caravan' => (self::GLOBAL_TEST_NOTIFICATION_SPAWN == true) ? self::GLOBAL_TEST_NOTIFICATION_SPAWN : false,
-        'raid' => (self::GLOBAL_TEST_NOTIFICATION_SPAWN == true) ? self::GLOBAL_TEST_NOTIFICATION_SPAWN : false,
-        'event' => (self::GLOBAL_TEST_NOTIFICATION_SPAWN == true) ? self::GLOBAL_TEST_NOTIFICATION_SPAWN : false,
-        'diplomacy' => (self::GLOBAL_TEST_NOTIFICATION_SPAWN == true) ? self::GLOBAL_TEST_NOTIFICATION_SPAWN : false,
+        'caravan' => self::GLOBAL_TEST_NOTIFICATION_SPAWN,
+        'raid' => self::GLOBAL_TEST_NOTIFICATION_SPAWN,
+        'event' => self::GLOBAL_TEST_NOTIFICATION_SPAWN,
+        'diplomacy' => self::GLOBAL_TEST_NOTIFICATION_SPAWN,
     ];
 
     public function __construct() {
