@@ -5,6 +5,8 @@ require_once __DIR__ . '/BattleEffect.php';
 class BattleEffectsManager {
     const MAX_SPEED_REDUCTION = 50;
 
+    const ELEMENTAL_WEAKNESS_MODIFIER = 0.2;
+
     protected System $system;
 
     /** @var BattleEffect[]  */
@@ -86,6 +88,13 @@ class BattleEffectsManager {
                 break;
             case Jutsu::USE_TYPE_BARRIER:
                 $jutsu->effect_amount = $raw_damage;
+                break;
+            case 'weakness_fire':
+            case 'weakness_wind':
+            case 'weakness_lightning':
+            case 'weakness_earth':
+            case 'weakness_water':
+                $jutsu->effect_amount = self::ELEMENTAL_WEAKNESS_MODIFIER;
                 break;
             default:
                 $apply_effect = false;
@@ -234,25 +243,40 @@ class BattleEffectsManager {
 
         if($effect->effect == 'ninjutsu_nerf') {
             $target->ninjutsu_nerf += $effect_amount;
-        }
+        } 
         else if($effect->effect == 'taijutsu_nerf') {
             $target->taijutsu_nerf += $effect_amount;
-        }
+        } 
         else if($effect->effect == 'genjutsu_nerf' or $effect->effect == 'daze') {
             $target->genjutsu_nerf += $effect_amount;
-        }
+        } 
         else if($effect->effect == 'speed_nerf' or $effect->effect == 'cripple') {
             $target->speed_nerf += $target->getSpeed(true) * ($effect->effect_amount / 100);
             $target->cast_speed_nerf += $target->getCastSpeed(true) * ($effect->effect_amount / 100);
 
             $target->speed_nerf = min($target->speed_nerf, $target->getSpeed(true) * self::MAX_SPEED_REDUCTION);
             $target->cast_speed_nerf = min($target->cast_speed_nerf, $target->getCastSpeed(true) * self::MAX_SPEED_REDUCTION);
-        }
+        } 
         else if($effect->effect == 'intelligence_nerf') {
             $target->intelligence_nerf += $effect_amount;
-        }
+        } 
         else if($effect->effect == 'willpower_nerf') {
             $target->willpower_nerf += $effect_amount;
+        } 
+        else if ($effect->effect == 'weakness_fire') {
+            $target->fire_weakness += $effect_amount;
+        } 
+        else if ($effect->effect == 'weakness_wind') {
+            $target->wind_weakness += $effect_amount;
+        } 
+        else if ($effect->effect == 'weakness_lightning') {
+            $target->lightning_weakness += $effect_amount;
+        } 
+        else if ($effect->effect == 'weakness_earth') {
+            $target->earth_weakness += $effect_amount;
+        } 
+        else if ($effect->effect == 'weakness_water') {
+            $target->water_weakness += $effect_amount;
         }
         return false;
     }
@@ -497,6 +521,21 @@ class BattleEffectsManager {
                 break;
             case 'cast_speed_boost':
                 $announcement_text = "[player]'s Cast Speed is being increased";
+                break;
+            case 'weakness_fire':
+                $announcement_text = "[opponent] gains weakness to Fire";
+                break;
+            case 'weakness_wind':
+                $announcement_text = "[opponent] gains weakness to Wind";
+                break;
+            case 'weakness_lightning':
+                $announcement_text = "[opponent] gains weakness to Lightning";
+                break;
+            case 'weakness_earth':
+                $announcement_text = "[opponent] gains weakness to Earth";
+                break;
+            case 'weakness_water':
+                $announcement_text = "[opponent] gains weakness to Water";
                 break;
             default:
                 break;

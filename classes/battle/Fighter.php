@@ -104,6 +104,12 @@ abstract class Fighter {
     public $intelligence_nerf = 0;
     public $willpower_nerf = 0;
 
+    public $fire_weakness = 0;
+    public $wind_weakness = 0;
+    public $lightning_weakness = 0;
+    public $earth_weakness = 0;
+    public $water_weakness = 0;
+
     // Getters
     abstract public function getName(): string;
 
