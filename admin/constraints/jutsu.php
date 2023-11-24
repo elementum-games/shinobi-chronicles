@@ -120,6 +120,7 @@ return [
             Jutsu::PURCHASE_TYPE_PURCHASABLE => 'purchasable',
             Jutsu::PURCHASE_TYPE_NON_PURCHASABLE => 'non-purchasable',
             Jutsu::PURCHASE_TYPE_EVENT_SHOP => 'event',
+            Jutsu::PURCHASE_TYPE_LINKED => 'linked',
         ],
     ],
     'effect' => [
@@ -132,6 +133,10 @@ return [
         'input_type' => 'text',
     ],
     'effect_length' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
+    ],
+    'linked_jutsu_id' => [
         'data_type' => 'int',
         'input_type' => 'text',
     ],

@@ -349,6 +349,7 @@ class BattleManager {
 
         $this->checkForWinner();
         $this->updateData();
+        $this->battle->fetchPlayerInventories();
 
         return $this->battle->winner;
     }
@@ -690,6 +691,9 @@ class BattleManager {
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
             $attack->jutsu = $fighter->bloodline->jutsu[$action->jutsu_id];
+        }
+        else if ($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_LINKED) {
+            $attack->jutsu = $fighter->jutsu[$action->jutsu_id];
         }
         else {
             throw new RuntimeException("Invalid jutsu purchase type {$action->jutsu_purchase_type} for fighter {$fighter->combat_id}");
