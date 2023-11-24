@@ -39,10 +39,14 @@ class UserApiPresenter {
             'premiumCredits' => $player->getPremiumCredits(),
             'premiumCreditsPurchased' => $player->premium_credits_purchased,
             'villageName' => $player->village->name,
-            'villageRepTier' => $player->village->getRepName($player->village_rep),
-            'villageRep' => $player->village_rep,
-            'weeklyRep' => $player->weekly_rep,
-            'maxWeeklyRep' => $player->weekly_rep_cap,
+            'villageRepTier' => $player->reputation->rank_name,
+            'villageRep' => $player->reputation->getRepAmount(),
+            'weeklyPveRep' => $player->reputation->getWeeklyPveRep(),
+            'maxWeeklyPveRep' => $player->reputation->weekly_pve_cap,
+            'weeklyWarRep' => $player->reputation->getWeeklyWarRep(),
+            'maxWeeklyWarRep' => $player->reputation->weekly_war_cap,
+            'weeklyPvpRep' => $player->reputation->getWeeklyPvpRep(),
+            'maxWeeklyPvpRep' => $player->reputation->weekly_pvp_cap,
             'clanId' => $player->clan?->id,
             'clanName' => $player->clan?->name,
             'teamId' => $player->team?->id,
@@ -66,6 +70,7 @@ class UserApiPresenter {
     }
 
     public static function playerResourcesResponse(User $player): array {
+        $regen_cut = $player->battle_id ? round(($player->regen_rate + $player->regen_boost) * 0.7, 1) : 0;
         return [
             'regen_time' => 60 - (time() - $player->last_update),
             'health' => (int) $player->health,
@@ -74,6 +79,9 @@ class UserApiPresenter {
             'max_chakra' => $player->max_chakra,
             'stamina' => (int) $player->stamina,
             'max_stamina' => $player->max_stamina,
+            'regen_cut' => $regen_cut,
+            'health_regen' => round(($player->regen_rate + $player->regen_boost - $regen_cut) * USER::$HEAL_REGEN_MULTIPLIER[$player->rank_num]),
+            'pool_regen' => round($player->regen_rate + $player->regen_boost - $regen_cut),
         ];
     }
 
@@ -82,6 +90,7 @@ class UserApiPresenter {
             'avatar_style' => $player->getAvatarStyle(),
             'avatar_frame' => $player->getAvatarFrame(),
             'sidebar_position' => $player->getSidebarPosition(),
+            'sidebar_collapse' => $player->getSidebarCollapse(),
             'enable_alerts' => $player->getEnableAlerts(),
         ];
     }
@@ -187,7 +196,7 @@ class UserApiPresenter {
             'exp' => $jutsu->exp,*/
         ];
     }
-    
+
     public static function itemResponse(Item $item): array {
         return [
             'id' => $item->id,

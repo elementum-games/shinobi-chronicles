@@ -18,6 +18,7 @@ abstract class Fighter {
     public System $system;
 
     public string $combat_id;
+    public int $user_id;
 
     // Energy
     public float $health = 100;
@@ -67,7 +68,7 @@ abstract class Fighter {
     public float $bloodline_speed_boost = 0;
 
     public string $gender;
-    public int $rep_rank;
+    public UserReputation $reputation;
 
     public string $current_ip;
 
@@ -90,6 +91,8 @@ abstract class Fighter {
     public $defense_boost = 0;
 
     public $barrier;
+
+    public $reputation_defense_boost = 0;
 
     // Combat nerfs
     public $ninjutsu_nerf = 0;
@@ -380,6 +383,10 @@ abstract class Fighter {
                 break;
             default:
                 error_log("Invalid defense type! {$defense_type}");
+        }
+
+        if ($apply_resists && $this->reputation_defense_boost > 0) {
+            $raw_damage *= (100 - $this->reputation_defense_boost) / 100;
         }
 
         if($this instanceof NPC && $defense_type == 'genjutsu') {

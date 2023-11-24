@@ -6,7 +6,6 @@ export default function BattleLog({
   if (lastTurnLog == null) {
     return null;
   }
-
   return /*#__PURE__*/React.createElement("table", {
     className: "table"
   }, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Last turn")), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("div", {
@@ -36,7 +35,6 @@ export default function BattleLog({
     });
   }))))));
 }
-
 function FighterAction({
   action,
   isAttackPhase
@@ -64,21 +62,16 @@ function FighterAction({
     className: "effectAnnouncement"
   }, announcement)));
 }
-
 function styleForEffectHitType(effectHitType) {
   switch (effectHitType) {
     case 'heal':
       return 'heal';
-
     case 'ninjutsu_damage':
       return 'ninjutsuDamage';
-
     case 'taijutsu_damage':
       return 'taijutsuDamage';
-
     case 'genjutsu_damage':
       return 'genjutsuDamage';
-
     default:
       return '';
   }

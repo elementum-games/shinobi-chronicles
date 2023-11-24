@@ -137,13 +137,13 @@ body {
     right: 7px;
 
     border-radius: 50%;
-    background: url(../../../images/v2/decorations/Banner1.jpg);
+    background: url(../../../images/v2/decorations/WarBanner.jpg);
     background-position: -35px 151px;
     background-size: 105%;
 }
 
 .main_banner_title {
-    margin-top: 155px;
+    margin-top: 185px;
     user-select: none;
     z-index: 2;
 
@@ -357,10 +357,10 @@ body {
     cursor: pointer;
 }
 .diamond_red rect {
-    fill: #68293f;
+    fill: #822d31;
 }
 .diamond_blue rect {
-    fill: #343d77;
+    fill: #264563;
 }
 .home_diamond_rear {
     fill: #987e50 !important;
@@ -886,8 +886,8 @@ body {
     background: #17161b;
     padding-left: 20px;
     padding-right: 20px;
-    padding-top: 35px;
-    padding-bottom: 35px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 .news_item_content_editor {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1001,6 +1001,7 @@ body {
 }
 
 /* Lanterns WIP */
+/*
 .home_lantern {
     position: absolute;
     z-index: 1;
@@ -1097,7 +1098,7 @@ body {
         box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
     }
 }
-
+*/
 
 /* Mobile Overrides */
 @media (max-width: 800px) {
@@ -1162,4 +1163,15 @@ body {
         left: 20px;
         bottom: 50px;
     }
+}
+
+#canvascontainer {
+    position: absolute;
+    width: var(--banner-width);
+    height: var(--banner-height);
+    clip-path: circle(50% at 50% 50%);
+    top: calc(0px - var(--banner-hidden-portion));
+    -webkit-transform3d: translate(0,0,0);
+    -moz-transform3d: translate(0,0,0);
+    transform3d: translate(0,0,0);
 }

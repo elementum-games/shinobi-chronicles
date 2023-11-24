@@ -27,6 +27,65 @@ if($battle->battle_text) {
 }
 ?>
 
+<script type='text/javascript'>
+    let battle_id = <?= $battle->battle_id ?>;
+    var apiUrl = `api/battle.php?check_turn=` + battle_id;
+    let turn_count = <?= $battle->turn_count ?>;
+    let prep_time_remaining = <?= $battle->prepTimeRemaining() ?>;
+    let player1_submitted = <?= (int)isset($battle->fighter_actions[$battle->player1->combat_id]) ?>;
+    let player2_submitted = <?= (int)isset($battle->fighter_actions[$battle->player2->combat_id]) ?>;
+    let player1_time = <?= $battle->timeRemaining($battle->player1_id) ?>;
+    let player2_time = <?= $battle->timeRemaining($battle->player2_id) ?>;
+
+    function checkTurn() {
+        if (prep_time_remaining > 0 && turn_count == 0) {
+            prep_time_remaining--;
+            $("#prep_time_remaining").text(prep_time_remaining);
+            if (prep_time_remaining == 0) {
+                updateContent();
+                return;
+            }
+        }
+        player1_time--;
+        $("#player1_time").text(player1_time);
+        player2_time--;
+        $("#player2_time").text(player2_time);
+        if ((player1_time <= 0 || player1_submitted) && (player2_time <= 0 || player2_submitted)) {
+            updateContent();
+            return;
+        }
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.data != undefined && data.data.turn_count > turn_count) {
+                    updateContent();
+                } else {
+                    setTimeout(checkTurn, 1000);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                setTimeout(checkTurn, 1000);
+            });
+    }
+
+    function updateContent() {
+        fetch(window.location.href)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, "text/html");
+                const newContent = doc.querySelector("#content").innerHTML;
+                $("#content").html(newContent);
+            })
+            .catch(err => {
+                console.error('Failed to fetch new content', err);
+            });
+    }
+
+    checkTurn();
+</script>
+
 <style type='text/css'>
     .playerAvatar {
         display:block;
@@ -93,18 +152,22 @@ if($battle->battle_text) {
         border-radius: 12px;
     }
 
-    #forfeitButton {
+    #forfeitButton, #retreatButton {
         cursor: pointer;
     }
-    #forfeitDialog button {
+    #forfeitDialog button, #retreatDialog button {
         cursor: pointer;
     }
 
-    .forfeitFormButtons {
+    .forfeitFormButtons, .retreatFormButtons {
         display: flex;
         justify-content: space-evenly;
         margin-top: 12px;
         padding: 0 25px;
+    }
+
+    #forfeitDialog, #retreatDialog {
+        display: none;
     }
 </style>
 
@@ -117,6 +180,7 @@ if($battle->battle_text) {
 
 <?php $system->printMessage(); ?>
 <table class='table'>
+    <tr><th colspan="2">Turn <?= $battle->winner ? $battle->turn_count : $battle->turn_count + 1 ?></th></tr>
     <tr>
         <th id='bi_th_user' style='width:50%;'>
             <a href='<?= $system->router->links['members'] ?>&user=<?= $player->getName() ?>' style='text-decoration:none'><?= $player->getName() ?></a>
@@ -135,24 +199,28 @@ if($battle->battle_text) {
             <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
 
                 <!-- Health -->
-                <div class='resourceBarOuter'>
-                    <label class='innerResourceBarLabel' ><?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?></label>
+                <div class='resourceBarOuter healthPreview'>
+                    <label class='innerResourceBarLabel' ><?= sprintf("%.0f", $player->health) ?> / <?= sprintf("%.0f", $player->max_health) ?></label>
                     <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
                 </div>
 
                 <?php if(!$battleManager->spectate): ?>
 
                     <!-- Chakra -->
-                    <div class='resourceBarOuter' style='margin-top:6px;'>
-                        <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?></label>
-                        <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
-                    </div>
+                <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
+                    <label class='innerResourceBarLabel'>
+                        <?= sprintf("%.0f", $player->chakra) ?> / <?= sprintf("%.0f", $player->max_chakra) ?>
+                    </label>
+                    <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
+                </div>
 
                     <!-- Stamina -->
-                    <div class='resourceBarOuter' style='margin-top:6px;'>
-                        <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->stamina) ?> / <?= sprintf("%.2f", $player->max_stamina) ?></label>
-                        <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
-                    </div>
+                <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
+                    <label class='innerResourceBarLabel'>
+                        <?= sprintf("%.0f", $player->stamina) ?> / <?= sprintf("%.0f", $player->max_stamina) ?>
+                    </label>
+                    <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
+                </div>
 
                 <?php endif; ?>
             </div>
@@ -160,8 +228,11 @@ if($battle->battle_text) {
         <td style='text-align: center;' id='bi_td_opponent'>
             <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
             <div id='ai_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
-                <div class='resourceBarOuter' style='margin-top:8px;'><div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
-                        <label  class='innerResourceBarLabel'><?= sprintf("%.2f", $opponent->health) ?> / <?= sprintf("%.2f", $opponent->max_health) ?></label>
+                <div class='resourceBarOuter healthPreview' style='margin-top:8px;'>
+                    <div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
+                        <label class='innerResourceBarLabel'>
+                            <?= sprintf("%.0f", $opponent->health) ?> / <?= sprintf("%.0f", $opponent->max_health) ?>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -183,39 +254,80 @@ if($battle->battle_text) {
         <?php if(!$battleManager->playerActionSubmitted()): ?>
             <?php require 'templates/battle/action_prompt.php'; ?>
         <?php elseif(!$battleManager->opponentActionSubmitted()): ?>
-            <tr><td colspan='2'>Please wait for <?= $opponent->getName() ?> to select an action.</td></tr>
+            <tr><td colspan='2' style="text-align: center">Please wait for <?= $opponent->getName() ?> to select an action.</td></tr>
         <?php endif; ?>
 
         <!--// Turn timer-->
         <tr><td style='text-align:center;' colspan='2'>
                 <p>
-                    <?= ($battle->isPreparationPhase() ? "Prep-" : "") ?>Time remaining:
-                    <?= $battle->isPreparationPhase() ? $battle->prepTimeRemaining() : $battle->timeRemaining() ?> seconds
+                    <?php if ($battle->isPreparationPhase()): ?>
+                        <?php echo "Prep-Time Remaining: <span id='prep_time_remaining'>" . $battle->prepTimeRemaining() . "</span>" ?>
+                    <?php elseif (!$battleManager->opponent instanceof NPC): ?>
+                        <?php echo "Time Remaining<br>"?>
+                        <?php if (isset($battle->fighter_actions[$battle->player1->combat_id])): ?>
+                            <?php echo "<b>" . $battle->player1->user_name . ":</b> ". "waiting" ?>
+                        <?php else: ?>
+                            <?php echo "<b>" . $battle->player1->user_name . ":</b> <span id='player1_time'>". $battle->timeRemaining($battle->player1_id) . "</span> seconds" ?>
+                        <?php endif; ?>
+                        <br />
+                        <?php if (isset($battle->fighter_actions[$battle->player2->combat_id])): ?>
+                            <?php echo "<b>" . $battle->player2->user_name . ":</b> ". "waiting" ?>
+                        <?php else: ?>
+                            <?php echo "<b>" . $battle->player2->user_name . ":</b> <span id='player2_time'>" . $battle->timeRemaining($battle->player2_id) . "</span> seconds" ?>
+                        <?php endif; ?>
+                    <?php endif; ?>
                 </p>
-                <a id='forfeitButton'>Forfeit</a>
-                <dialog id="forfeitDialog">
-                    <form method="post">
-                        <p>Are you sure you want to forfeit this battle?</p>
-                        <div class='forfeitFormButtons'>
-                            <button id="cancelBtn" value="cancel">Cancel</button>
-                            <button id="confirmBtn" name="forfeit" value="1">Confirm</button>
-                        </div>
-                    </form>
-                </dialog>
-                <script type='text/javascript'>
-                    const forfeitButton = document.getElementById('forfeitButton');
-                    const forfeitDialog = document.getElementById('forfeitDialog');
-                    const cancelButton = document.getElementById('cancelBtn');
+                <?php if ($battle->isPreparationPhase()): ?>
+                    <a id='retreatButton'>Retreat</a>
+                    <div id="retreatDialog">
+                        <form method="post">
+                            <p>Are you sure you want to retreat from this battle? You will suffer half the normal Reputation loss.</p>
+                            <div class='retreatFormButtons'>
+                                <button id="cancelBtn" value="cancel">Cancel</button>
+                                <button id="confirmBtn" name="retreat" value="1">Confirm</button>
+                            </div>
+                        </form>
+                    </div>
+                    <script type='text/javascript'>
+                        const retreatButton = document.getElementById('retreatButton');
+                        const retreatDialog = document.getElementById('retreatDialog');
+                        const cancelButton = document.getElementById('cancelBtn');
 
-                    forfeitButton.addEventListener('click', () => {
-                        forfeitDialog.showModal();
-                    });
-                    cancelButton.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        forfeitDialog.close();
-                    });
-                </script>
-            </td></tr>
+                        retreatButton.addEventListener('click', () => {
+                            $(retreatDialog).show();
+                        });
+                        cancelButton.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            $(retreatDialog).hide();
+                        });
+                    </script>
+                <?php else: ?>
+                    <a id='forfeitButton'>Forfeit</a>
+                    <div id="forfeitDialog">
+                        <form method="post">
+                            <p>Are you sure you want to forfeit this battle?</p>
+                            <div class='forfeitFormButtons'>
+                                <button id="cancelBtn" value="cancel">Cancel</button>
+                                <button id="confirmBtn" name="forfeit" value="1">Confirm</button>
+                            </div>
+                        </form>
+                    </div>
+                    <script type='text/javascript'>
+                        const forfeitButton = document.getElementById('forfeitButton');
+                        const forfeitDialog = document.getElementById('forfeitDialog');
+                        const cancelButton = document.getElementById('cancelBtn');
+
+                        forfeitButton.addEventListener('click', () => {
+                            $(forfeitDialog).show();
+                        });
+                        cancelButton.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            $(forfeitDialog).hide();
+                        });
+                    </script>
+                    <?php endif; ?>
+
+</td></tr>
     <?php endif; ?>
 
     <?php if($battleManager->spectate): ?>
@@ -227,7 +339,18 @@ if($battle->battle_text) {
                 <?php elseif($battle->winner == Battle::DRAW): ?>
                     Fight ended in a draw.
                 <?php else: ?>
-                    Time remaining: <?= $battle->timeRemaining() ?> seconds
+                    <?php echo "Time Remaining<br>"?>
+                        <?php if (isset($battle->fighter_actions[$battle->player1->combat_id])): ?>
+                            <?php echo "<b>" . $battle->player1->user_name . ":</b> ". "waiting" ?>
+                        <?php else: ?>
+                            <?php echo "<b>" . $battle->player1->user_name . ":</b> <span id='player1_time'>". $battle->timeRemaining($battle->player1_id) . "</span> seconds" ?>
+                        <?php endif; ?>
+                        <br />
+                        <?php if (isset($battle->fighter_actions[$battle->player2->combat_id])): ?>
+                            <?php echo "<b>" . $battle->player2->user_name . ":</b> ". "waiting" ?>
+                        <?php else: ?>
+                <?php echo "<b>" . $battle->player2->user_name . ":</b> <span id='player2_time'>" . $battle->timeRemaining($battle->player2_id) . "</span> seconds" ?>
+                        <?php endif; ?>
                 <?php endif; ?>
             </td></tr>
     <?php endif; ?>

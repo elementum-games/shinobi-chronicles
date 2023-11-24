@@ -21,7 +21,7 @@ function members(): void {
 		<form action='$self_link' method='get'>
 		<input type='hidden' name='id' value='6' />
 		<input type='text' name='user' /><br />
-		<input type='submit' value='Search' />
+		<input style='margin-top: 7px' type='submit' value='Search' />
 		</form>
 	</div>";
 
@@ -198,13 +198,14 @@ function members(): void {
 
 	if($display_list == 'standard') {
 		$online_seconds = 900; // 15 mins
+        $daily_seconds = 86400;
         $results_per_page = 15;
 
 		$query_custom = '';
 		$view = 'highest_exp';
 		if(isset($_GET['view']) && $_GET['view'] == 'highest_exp') {
-			$query_custom = " WHERE `staff_level` <= " . User::STAFF_HEAD_MODERATOR .
-                " ORDER BY `exp` DESC, `pvp_wins` DESC";
+			$query_custom = " WHERE `staff_level` < " . User::STAFF_ADMINISTRATOR.
+                " ORDER BY `exp` DESC, ABS(`village_rep`) DESC";
 			$view = 'highest_exp';
 		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_pvp') {
@@ -226,13 +227,12 @@ function members(): void {
 		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'online_users') {
 			$query_custom = "WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds ORDER BY `level` DESC";
-
 			$view = 'online_users';
             $results_per_page = 20;
 		}
 		else {
-            $query_custom = " WHERE `staff_level` <= " . User::STAFF_HEAD_MODERATOR .
-                " ORDER BY `exp` DESC, `pvp_wins` DESC";
+            $query_custom = " WHERE `staff_level` < " . User::STAFF_ADMINISTRATOR .
+                " ORDER BY `exp` DESC, ABS(`village_rep`) DESC";
 			$view = 'highest_exp';
 
 		}
@@ -261,7 +261,9 @@ function members(): void {
                     "SELECT COUNT(`user_id`) as `online_users` FROM `users` WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds"
                 );
                 $online_users = $system->db->fetch($online_users_result)['online_users'];
-                $list_name = 'Online Users (' . $online_users . ' currently online)';
+                $daily_users_result = $system->db->query("SELECT COUNT(`user_id`) as `daily_users` FROM `users` WHERE `last_active` > UNIX_TIMESTAMP() - $daily_seconds");
+                $daily_users = $system->db->fetch($daily_users_result)['daily_users'];
+                $list_name = 'Online Users (' . $online_users . ' online, ' . $daily_users . ' today)';
 				break;
             case "highest_pvp":
                 $table_header = 'Pvp Kills';
@@ -307,7 +309,7 @@ function members(): void {
 					}
 				}
 					// Team display
-				   echo "<table id='members_team_table' class='table'><tr><th colspan='4'>Top {$results_per_page} Teams - Points This Month</th></tr><tr>
+				   echo "<table id='members_team_table' class='table' style='text-align:center;'><tr><th colspan='4'>Top {$results_per_page} Teams - Points This Month</th></tr><tr>
 						   <th>Name</th>
 						   <th>Leader</th>
 						   <th>Village</th>
@@ -325,7 +327,7 @@ function members(): void {
 
 		// List top 15 users by experience
 		else {
-			echo "<table id='members_table' class='table'><tr><th colspan='4'>$list_name</th></tr>
+			echo "<table id='members_table' class='table' style='text-align:center;'><tr><th colspan='4'>$list_name</th></tr>
 				<tr>
 					<th style='width:30%;'>Username</th>
 					<th style='width:20%;'>Rank</th>
@@ -368,7 +370,7 @@ function members(): void {
 						echo $row['pvp_wins'];
 					}
                     else if($view == 'highest_rep') {
-                        echo $player->village->getRepName($row['village_rep']) . " (" . $row['village_rep'] . ")";
+                        echo UserReputation::nameByRepRank(UserReputation::tierByRepAmount($row['village_rep'])) . " (" . $row['village_rep'] . ")";
                     }
 					else {
 						echo $row['level'];
@@ -456,7 +458,7 @@ function members(): void {
 				}
 
 				echo "<tr class='threeColumns' >
-					<td class='$class' style='width:45%;'>
+					<td class='$class' style='width:45%;text-align:center;'>
 						<a class='$link_class userLink' href='$self_link&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 					<td class='$class' style='width:20%;text-align:center;'>" . $ranks[$row['rank']] . "</td>
 					<td class='$class' style='width:35%;text-align:center;'>

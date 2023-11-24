@@ -39,7 +39,8 @@
  */
 
 let startTime = 0;
-const specialMissionsUrl = 'api/legacy_special_missions.php';
+var mission_id = 0;
+var apiUrl = `api/legacy_special_missions.php?mission_id=${encodeURIComponent(mission_id)}`;
 
 // Mission event cooldown + 100ms to help prevent network variance causing premature refreshes
 const serverRefreshIntervalMs = (missionEventDurationMs || 3000) + 100;
@@ -54,14 +55,9 @@ getMissionData();
 updateTimer();
 
 function getMissionData() {
-    fetch(specialMissionsUrl)
+    fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            // stop everything if user is in battle
-            if (data.inBattle === true) {
-                inBattle();
-                return;
-            }
             if(data.systemMessage) {
                 console.log(data.systemMessage);
             }
@@ -70,6 +66,9 @@ function getMissionData() {
                 stopRefresh();
                 return true;
             }
+
+            mission_id = data.mission.mission_id;
+            apiUrl = `api/legacy_special_missions.php?mission_id=${encodeURIComponent(mission_id)}`;
 
             // check the mission status
             missionStatus(data.mission);

@@ -125,7 +125,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
 
     <?php foreach($team_members as $row): ?>
         <tr class='table_multicolumns'>
-            <td style='width:29%;'>
+            <td style='width:29%;text-align:center;'>
                 <a href='<?= $system->router->links['members'] ?>&user=<?= $row['user_name'] ?>'><?= $row['user_name'] ?></a>
             </td>
             <td style='width:20%;text-align:center;'><?= $RANK_NAMES[$row['rank']] ?></td>
@@ -151,8 +151,8 @@ $RANK_NAMES = RankManager::fetchNames($system);
                 <b>Invite Player</b><br />
                 <form action='<?= $self_link ?>' method='get'>
                     <input type='hidden' name='id' value='<?= Router::PAGE_IDS['team'] ?>'>
-                    <input type='text' name='user_name' /><br />
-                    <input type='submit' name='invite' value='Send' />
+                    <input type='text' style='margin-top: 7px' name='user_name' /><br />
+                    <input type='submit' style='margin-top: 7px' name='invite' value='Send' />
                 </form>
                 <br />
 

@@ -234,7 +234,7 @@ function event() {
                     break;
                 case "red_rep":
                     $player->getInventory();
-                    if($player->calMaxRepGain(1) == 0) {
+                    if($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
                       throw new RuntimeException("You've already received your weekly reputation limit!");
                     }
                     if (!$player->hasItem($system->event->item_ids['red_lantern_id'])) {
@@ -248,7 +248,7 @@ function event() {
                     if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['red_lantern_id']]);
                     }
-                    $player->addRep($player->calMaxRepGain(1));
+                    $player->reputation->addRep(1, UserReputation::ACTIVITY_TYPE_PVE);
 
                     $system->message("You exchanged 50 Red Lanterns for 1 Reputation!");
                     $player->updateInventory();

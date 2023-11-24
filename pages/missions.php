@@ -14,10 +14,23 @@ function missions(): bool {
 
     $RANK_NAMES = RankManager::fetchNames($system);
 
+    if ($player->operation > 0) {
+        $system->message("You cannot access this page while in an operation!");
+        $system->printMessage();
+        return false;
+    }
+
 	if($player->mission_id) {
         runActiveMission();
         return true;
 	}
+
+    // failsafe if player in mission battle but mission_id isn't set
+    $battle_type = Battle::TYPE_AI_MISSION;
+    $result = $system->db->query("SELECT `battle_type` FROM `battles` WHERE `battle_id`='{$player->battle_id}' AND `battle_type` = {$battle_type} LIMIT 1");
+    if ($system->db->last_num_rows > 0) {
+        $player->battle_id = 0;
+    }
 
 	$max_mission_rank = Mission::maxMissionRank($player->rank_num);
 
@@ -51,11 +64,12 @@ function missions(): bool {
 	// Start mission
 	if(!empty($_GET['start_mission'])) {
 		$mission_id = $_GET['start_mission'];
+        $mission_rank = $_GET['rank'];
 		try {
             // TEMP Event Missions
             if (isset($_GET['mission_type'])) {
                 if ($_GET['mission_type'] == "event") {
-                    if($system->event == null) {
+                    if ($system->event == null) {
                         throw new RuntimeException("Event not active!");
                     }
 
@@ -101,47 +115,96 @@ function missions(): bool {
                     missions();
                     return true;
                 }
-            }
+                if ($_GET['mission_type'] == "faction") {
+                    $result = $system->db->query(
+                        "SELECT `mission_id`, `name` FROM `missions` WHERE `mission_type` = " . Mission::TYPE_FACTION
+                    );
+                    if ($system->db->last_num_rows == 0) {
+                        $system->message("No missions available!");
+                        $system->printMessage();
+                        return false;
+                    }
+                    $faction_missions = array();
+                    while ($row = $system->db->fetch($result)) {
+                        $faction_missions[$row['mission_id']] = $row;
+                    }
+                    Mission::start($player, $mission_id);
+                    $player->log(User::LOG_MISSION, "Mission ID #{$mission_id}");
 
-            if(!isset($missions[$mission_id])) {
-                throw new RuntimeException("Invalid mission!");
-            }
-            Mission::start($player, $mission_id);
-            $player->log(User::LOG_MISSION, "Mission ID #{$mission_id}");
+                    // Create notification
+                    if ($player->mission_stage['action_type'] == 'travel') {
+                        $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);
+                        $new_notification = new MissionNotificationDto(
+                            type: "mission",
+                            message: $faction_missions[$mission_id]['name'] . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                            user_id: $player->user_id,
+                            created: time(),
+                            mission_rank: "F",
+                            alert: false,
+                        );
+                        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                    } else {
+                        $new_notification = new MissionNotificationDto(
+                            type: "mission",
+                            message: $faction_missions[$mission_id]['name'] . " in progress",
+                            user_id: $player->user_id,
+                            created: time(),
+                            mission_rank: "F",
+                            alert: false,
+                        );
+                        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                    }
 
-            // Create notification
-            require_once __DIR__ . '/../classes/notification/NotificationManager.php';
-            if ($player->mission_stage['action_type'] == 'travel') {
-                $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);
-                $new_notification = new MissionNotificationDto(
-                    type: "mission",
-                    message: $missions[$mission_id]['name'] . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
-                    user_id: $player->user_id,
-                    created: time(),
-                    mission_rank: Mission::$rank_names[$missions[$mission_id]['rank']],
-                    alert: false,
-                );
-                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
-            }
-            else {
+                    missions();
+                    return true;
+                }
+            } else {
+                // random mission logic
+                if (!isset($mission_rank)) {
+                    throw new RuntimeException("Invalid mission!");
+                }
+                $filtered_missions = array_filter($missions, function ($mission) use ($mission_rank) {
+                    return $mission['rank'] === $mission_rank;
+                });
+                $filtered_missions = array_values($filtered_missions);
+                $random_index = array_rand($filtered_missions);
+                $mission_id = $filtered_missions[$random_index]['mission_id'];
+
+                Mission::start($player, $mission_id);
+                $player->log(User::LOG_MISSION, "Mission ID #{$mission_id}");
+
+                // Create notification
                 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
-                $new_notification = new MissionNotificationDto(
-                    type: "mission",
-                    message: $missions[$mission_id]['name'] . " in progress",
-                    user_id: $player->user_id,
-                    created: time(),
-                    mission_rank: Mission::$rank_names[$missions[$mission_id]['rank']],
-                    alert: false,
-                );
-                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
-            }
+                if ($player->mission_stage['action_type'] == 'travel') {
+                    $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);
+                    $new_notification = new MissionNotificationDto(
+                        type: "mission",
+                        message: $missions[$mission_id]['name'] . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                        user_id: $player->user_id,
+                        created: time(),
+                        mission_rank: Mission::$rank_names[$missions[$mission_id]['rank']],
+                        alert: false,
+                    );
+                    NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                } else {
+                    require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                    $new_notification = new MissionNotificationDto(
+                        type: "mission",
+                        message: $missions[$mission_id]['name'] . " in progress",
+                        user_id: $player->user_id,
+                        created: time(),
+                        mission_rank: Mission::$rank_names[$missions[$mission_id]['rank']],
+                        alert: false,
+                    );
+                    NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                }
 
-            missions();
-			return true;
+                missions();
+                return true;
+            }
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
-
 	}
 
 	// Display missions
@@ -157,7 +220,7 @@ function missions(): bool {
 	echo "<table class='table'><tr><th>" . Mission::$rank_names[$view] . " Missions</th></tr>
 	<tr><td style='text-align:center;'>You can go on village missions here. As a " . $RANK_NAMES[$player->rank_num] . " you
 	can take on up to " . Mission::$rank_names[$max_mission_rank] . " missions.";
-    if($player->mission_rep_cd - time() > 0) {
+    if(!$player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
         $remaining = $player->mission_rep_cd - time();
         echo "<br /><br />You can gain village reputation in: <div id='rep_cd' style='display: inline-block'>"
             . System::timeRemaining($remaining) . "</div>
@@ -165,12 +228,7 @@ function missions(): bool {
     }
     echo "</td></tr>
 	<tr><td style='text-align:center;'>";
-	foreach($missions as $id => $mission) {
-		if($mission['rank'] != $view) {
-			continue;
-		}
-		echo "<a href='$self_link&start_mission=$id'><p class='button' style='margin:5px;'>" . $mission['name'] . "</p></a><br />";
-	}
+    echo "<a href='$self_link&start_mission=1&rank=$view'><p class='button' style='margin:5px;'>" . Mission::$rank_names[$view] . "</p></a><br />";
 	echo "</td></tr></table>";
 
     return true;
@@ -208,24 +266,6 @@ function runActiveMission(): bool {
     $mission_status = Mission::STATUS_IN_PROGRESS;
     $current_mission_stage_id = $player->mission_stage['stage_id'];
 
-    //Survival Mission State Controls
-    if($mission->mission_type == Mission::TYPE_SURVIVAL) {
-        if(!empty($_GET['retreat'])) {
-            $player->battle_id = 0;
-            $mission->nextStage($player->mission_stage['stage_id'] = 4);
-        }
-
-        $continue_mission = false;
-        if(!empty($_GET['continue'])) {
-            $continue_mission = boolval($_GET['continue']);
-        }
-        if($player->mission_stage['round_complete'] && $continue_mission) {
-            $player->mission_stage['round_complete'] = false;
-            $player->battle_id = 0;
-            $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
-        }
-    }
-
     if($mission_status < Mission::STATUS_COMPLETE) {
         if($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
             if($player->location->equals(TravelCoords::fromDbString($player->mission_stage['action_data']))) {
@@ -246,6 +286,12 @@ function runActiveMission(): bool {
                     throw new RuntimeException("Couldn't load opponent for mission!");
                 }
                 $opponent->loadData();
+
+                // display mission details
+                echo "<table class='table' style='width: 90%'><tr><th>Current Mission</th></tr>
+			    <tr><td style='text-align:center;'><span style='font-weight:bold;'>" .
+                    ($mission->mission_type == 3 ? '[' . $player->team->name . '] ' : '') . "$mission->name</span><br />" .
+                    $player->mission_stage['description'] . "</td></tr></table>";
 
                 // Initialize start of battle stuff
                 if(!$player->battle_id) {
@@ -363,29 +409,43 @@ function runActiveMission(): bool {
 				<a href='$self_link'>Continue</a>
 				</td></tr></table>";
             }
-            // Village/Survival mission
+            // Faction mission
+            else if ($mission->mission_type == Mission::TYPE_FACTION) {
+                echo "<table class='table'><tr><th>Current Mission</th></tr>
+			    <tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
+			    You have completed your mission.<br />";
+
+                // Rewards
+                echo Mission::processRewards($mission, $player, $system);
+                $player->clearMission();
+                $player->last_ai_ms = System::currentTimeMs();
+
+                echo "<a href='$self_link'>Continue</a>
+				</td></tr></table>";
+            }
+            // Default
             else {
                 echo "<table class='table'><tr><th>Current Mission</th></tr>
-				<tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
-				You have completed your mission.<br />";
-                if($mission->mission_type == 5) {
+			<tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
+			You have completed your mission.<br />";
+                if ($mission->mission_type == 5) {
                     $mission->money = $player->mission_stage['mission_money'];
                     echo sprintf(
                         "For your effort in defeating %d enemies, you have received &yen;%d.<br />",
                         $player->mission_stage['ai_defeated'], $mission->money
                     );
-                }
-                else {
+                } else {
                     echo "You have been paid &yen;$mission->money.<br />";
                 }
 
                 // Village reputation
-                if($player->mission_rep_cd - time() <= 0) {
-                    $rep_gain = $player->calMaxRepGain(Village::MISSION_GAINS[$mission->rank]);
-
+                if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
+                    $rep_gain = $player->reputation->addRep(
+                        amount: UserReputation::MISSION_GAINS[$mission->rank],
+                        activity_type: UserReputation::ACTIVITY_TYPE_PVE
+                    );
                     if ($rep_gain > 0) {
-                        $player->addRep($rep_gain);
-                        $player->mission_rep_cd = time() + Village::ARENA_MISSION_CD;
+                        $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
                         echo "You have gained $rep_gain village reputation!<br />";
                     }
                 }
@@ -393,16 +453,13 @@ function runActiveMission(): bool {
                 // check what mission rank for daily Task
                 $all_mission_ranks = [0, 1, 2, 3, 4];
                 $mission_rank = $all_mission_ranks[$mission->rank];
-                foreach($player->daily_tasks as $task) {
-                    if($task->activity == DailyTask::ACTIVITY_MISSIONS && $task->mission_rank == $mission_rank && !$task->complete) {
-                        $task->progress++;
-                    }
+                if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_MISSIONS)) {
+                    $player->daily_tasks->progressTask(DailyTask::ACTIVITY_MISSIONS, 1, $mission_rank);
                 }
 
-                if(isset($player->missions_completed[$mission->rank])) {
+                if (isset($player->missions_completed[$mission->rank])) {
                     $player->missions_completed[$mission->rank] += 1;
-                }
-                else {
+                } else {
                     $player->missions_completed[$mission->rank] = 1;
                 }
 
@@ -413,11 +470,11 @@ function runActiveMission(): bool {
                 $player->last_ai_ms = System::currentTimeMs();
 
                 echo "<a href='$self_link'>Continue</a>
-					</td></tr></table>";
-            }
+				</td></tr></table>";
 
-            AchievementsManager::handleMissionCompleted($system, $player, $mission);
-            $player->updateData();
+                AchievementsManager::handleMissionCompleted($system, $player, $mission);
+                $player->updateData();
+            }
         }
         // Display mission details
         else if($player->mission_id) {
@@ -439,14 +496,48 @@ function runActiveMission(): bool {
             }
 
             // Display to battle link
-            if($player->mission_stage['action_type'] == 'combat') {
+            if ($player->mission_stage['action_type'] == 'combat') {
 
-                if($mission->mission_type == 5 && $player->mission_stage['action_type'] == 'combat') {
+                if ($mission->mission_type == 5 && $player->mission_stage['action_type'] == 'combat') {
                     echo "<br /><a href='$self_link&continue=1'>Enter Combat</a> | <a href='$self_link&retreat=1'>Retreat</a>";
-                }
-                else {
+                } else {
                     echo "<br /><a href='$self_link'>Enter Combat</a>";
+                    try {
+                        // monster id
+                        $opponent = new NPC($system, $player->mission_stage['action_data']);
+                        if (!$opponent) {
+                            throw new RuntimeException("Couldn't load opponent for mission!");
+                        }
+                        $opponent->loadData();
+
+                        // Initialize start of battle stuff
+                        if (!$player->battle_id) {
+                            if ($system->USE_NEW_BATTLES) {
+                                BattleV2::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
+                            } else {
+                                Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
+                            }
+                        }
+
+                        if ($system->USE_NEW_BATTLES) {
+                            $battle = BattleManagerV2::init($system, $player, $player->battle_id);
+                        } else {
+                            $battle = BattleManager::init($system, $player, $player->battle_id);
+                        }
+                    } catch (RuntimeException $e) {
+                        error_log($e->getMessage());
+
+                        $player->clearMission();
+
+                        $system->message(
+                            "There was an error with the mission - Your mission has been cancelled. <a href='$self_link'>Continue</a>"
+                        );
+                        $system->printMessage();
+                        return true;
+                    }
                 }
+            } else {
+                echo "<br /><a href='" . $system->router->getUrl('travel') . " '>Return to Travel</a>";
             }
 
             echo "<br />
@@ -455,6 +546,10 @@ function runActiveMission(): bool {
 
         return true;
     }
+}
+
+function processMissionBattleStart(): bool
+{
 }
 
 /**
@@ -479,55 +574,10 @@ function processMissionBattleEnd(BattleManager|BattleManagerV2 $battle, Mission 
         $continue_mission = boolval($_GET['continue']);
     }
 
-    if($mission->mission_type == Mission::TYPE_SURVIVAL) {
-        if ($player->mission_stage['round_complete'] && !$continue_mission) {
-            echo "<table class='table'>
-                <tr><th>Battle Results</th></tr>
-                <tr><td>You have defeated your enemy. Either turn back now or push on.</td></tr>
-            </table>";
-        }
-        else if($battle->isPlayerWinner() && !$player->mission_stage['round_complete']) {
-            $money_gain = $mission->money;
-            $level_difference = $player->level - $opponent->level;
-            if($level_difference > 9) {
-                $level_difference = 9;
-            }
-            $money_gain = round($money_gain * (1 - $level_difference * 0.05));
-            if($money_gain < 5) {
-                $money_gain = 5;
-            }
 
-            if($player->mission_stage['ai_defeated'] > 1 && $player->mission_stage['ai_defeated'] % 5 == 0){
-                $player->mission_stage['stage_id'] += 1;
-            }
-            else if($player->mission_stage['stage_id'] > 2){
-                $player->mission_stage['stage_id'] -= 1;
-            }
-
-            if ($player->location == $player->village_location) {
-                $player->mission_stage['stage_id'] = 4;
-            }
-
-            $player->mission_stage['ai_defeated']++;
-            $player->mission_stage['mission_money'] += $money_gain;
-            $player->mission_stage['round_complete'] = true;
-        }
-        else if($battle->isOpponentWinner() || $battle->isDraw()) {
-            $player->mission_stage['mission_money'] = round($player->mission_stage['mission_money'] * 0.75);
-            $player->mission_stage['stage_id'] = 4;
-            $player->moveToVillage();
-
-            $result_text .= "You have been defeated.";
-        }
-        else {
-            $player->clearMission();
-            return $result_text;
-        }
-    }
     else if($battle->isPlayerWinner()) {
         $player->mission_stage['stage_id'] += 1;
-        $mission->nextStage($player->mission_stage['stage_id']);
-        $result_text .= "You have defeated your opponent! " . "<br>" . $player->mission_stage['description'];
+        $result_text .= "You have defeated your opponent!";
     }
     else if($battle->isOpponentWinner()) {
         $result_text .= "You have been defeated. You have failed your mission.";

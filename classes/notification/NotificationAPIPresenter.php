@@ -15,6 +15,7 @@ class NotificationApiPresenter
                         'user_id' => $notification->user_id,
                         'created' => $notification->created,
                         'duration' => $notification->duration,
+                        'expires' => $notification->expires,
                         'alert' => $notification->alert,
                         'mission_rank' => $notification->mission_rank,
                     ];
@@ -28,6 +29,7 @@ class NotificationApiPresenter
                         'user_id' => $notification->user_id,
                         'created' => $notification->created,
                         'duration' => $notification->duration,
+                        'expires' => $notification->expires,
                         'alert' => $notification->alert,
                     ];
                 }

@@ -8,12 +8,15 @@ require_once __DIR__ . '/API.php';
 require_once __DIR__ . '/Layout.php';
 require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/Route.php';
+require_once __DIR__ . '/../classes/event/DoubleExpEvent.php';
+require_once __DIR__ . '/../classes/event/DoubleReputationEvent.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
 */
 class System {
     const ENVIRONMENT_DEV = 'dev';
+    const ENABLE_DEV_ONLY_FEATURES = true;
     const ENVIRONMENT_PROD = 'prod';
     const LOCAL_HOST = true;
 
@@ -47,6 +50,7 @@ class System {
     public bool $enable_mobile_layout = false;
 
     public string $environment;
+    public bool $enable_dev_only_features;
 
     public bool $SC_OPEN;
     public bool $register_open;
@@ -63,6 +67,7 @@ class System {
     // Training boost switches
     public int $TRAIN_BOOST = 0; // Extra points per training, 0 for none
     public int $LONG_TRAIN_BOOST = 0; // Extra points per long training, 0 for none
+    const EXTENDED_BOOST_MULTIPLIER = 5; // Multiples long by this value to calc extended boost
 
     public array $SC_STAFF_COLORS = array(
         User::STAFF_MODERATOR => array(
@@ -94,13 +99,15 @@ class System {
 
     // Default layout
     const DEFAULT_LAYOUT = 'new_geisha';
-    const VERSION_NUMBER = '0.9.0';
-    const VERSION_NAME = '0.9 Flickering Ambitions';
+    const VERSION_NUMBER = '0.10.0';
+    const VERSION_NAME = '0.10 Warring Shadows';
 
     // Misc stuff
     const SC_MAX_RANK = 4;
 
     const MAX_LINK_DISPLAY_LENGTH = 60;
+
+    public bool $war_enabled = false;
 
     public static array $explicit_words = [
         'fuck',
@@ -185,6 +192,7 @@ class System {
         $this->db = new Database($host, $username, $password, $database);
 
         $this->environment = $ENVIRONMENT ?? self::ENVIRONMENT_DEV;
+        $this->enable_dev_only_features = $ENABLE_DEV_ONLY_FEATURES ?? self::ENABLE_DEV_ONLY_FEATURES; // Will only ever effect dev envs
         $this->register_open = $register_open ?? false;
         $this->SC_OPEN = $SC_OPEN ?? false;
         $this->USE_NEW_BATTLES = $USE_NEW_BATTLES ?? false;
@@ -194,6 +202,8 @@ class System {
         $this->timezoneOffset = date('Z');
 
         $this->checkForActiveEvent();
+
+        $this->war_enabled = true;
     }
 
     /**
@@ -318,7 +328,7 @@ class System {
         return $meme_array;
     }
 
-    public function html_parse($text, $img = false, $faces = false): array|string {
+    public function html_parse($text, $img = false, $faces = false, $youtube = false): array|string {
         $search_array = array(
             "[b]","[/b]","[u]","[/u]","[i]","[/i]",
             "&lt;3","[strike]","[/strike]","[super]","[/super]","[sub]","[/sub]", "[center]", "[/center]", "[right]", "[/right]",
@@ -333,13 +343,18 @@ class System {
         $memes = $this->getMemes();
         $text = str_replace($memes['codes'], ($faces ? $memes['images'] : $memes['texts']), $text);
 
+        // Exclude images
         if($img) {
-            $search_array[count($search_array)] = "[img]https://";
-            $search_array[count($search_array)] = "[img]http://";
-            $search_array[count($search_array)] = "[/img]";
-            $replace_array[count($replace_array)] = "<img src='[image_prefix]";
-            $replace_array[count($replace_array)] = "<img src='[image_prefix]";
-            $replace_array[count($replace_array)] = "' />";
+            $search_array[] = "[img]https://";
+            $search_array[] = "[img]http://";
+            $search_array[] = "[/img]";
+            $replace_array[] = "<img src='[https_prefix]";
+            $replace_array[] = "<img src='[https_prefix]";
+            $replace_array[] = "' />";
+        }
+        if($youtube) {
+            $search_array[] = "[youtube]https://";
+            $replace_array[] = "[youtube][https_prefix]";
         }
 
         $text = str_ireplace($search_array,$replace_array,$text);
@@ -347,6 +362,7 @@ class System {
         $search_array = [];
         $replace_array = [];
 
+        // Process links
         $reg_exUrl = '/((?:http|https):\/\/(?:[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
         if(self::LOCAL_HOST) {
             //Allow regex to work with local links if system is set to local host
@@ -364,7 +380,9 @@ class System {
             $text
         );
 
-        $search_array[] = '[image_prefix]';
+        // process tags
+
+        $search_array[] = '[https_prefix]';
         $replace_array[] = 'https://';
 
         $search_array[] = '\r\n';
@@ -378,8 +396,31 @@ class System {
         $search_array[] = '&amp;gt;';
         $replace_array[] = "&gt;";
 
-        return str_ireplace($search_array, $replace_array, $text);
+        $text = str_ireplace($search_array, $replace_array, $text);
 
+        // Youtube videos
+        if($youtube) {
+            $text = preg_replace_callback(
+                pattern: "!\[youtube\]https:\/\/"
+                . "(?#full URL or short URL)(?:(?>www\.youtube\.com\/watch\?v=)|(?>youtu\.be\/))"
+                . "(?#capture video ID)([\w-]+)"
+                . "(?#capture optional time specifier)(?:[?&]t=(\d+))?"
+                . "(?#any extra chars before ending tag, discard)(.*)?\[\/youtube\]!",
+                callback: function($matches) {
+                    return "<iframe
+                     width='750'
+                     height='600'
+                     src='https://www.youtube.com/embed/{$matches[1]}" . ($matches[2] ? "?start={$matches[2]}" : "") . "'
+                     frameborder='0'
+                     allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+                     allowfullscreen
+                 ></iframe>";
+                },
+                subject: str_replace("&amp;", "&", $text)
+            );
+        }
+
+        return $text;
     }
 
     public function parseMarkdown($text, $allow_images = false, $strip_breaks = true, $faces = false): string {
@@ -560,6 +601,12 @@ class System {
                 $this->enable_mobile_layout = true;
                 $this->layout = getNewGeishaLayout($this, $this->enable_mobile_layout);
                 break;
+            case 'sumu':
+                require_once __DIR__ . "/../layout/sumu.php";
+                // This needs to be first so the function can read it
+                $this->enable_mobile_layout = true;
+                $this->layout = getSumuLayout($this, $this->enable_mobile_layout);
+                break;
             default:
                 $this->layout = require "layout/" . self::DEFAULT_LAYOUT . ".php";
                 break;
@@ -589,16 +636,40 @@ class System {
         return $this->environment == System::ENVIRONMENT_DEV;
     }
 
+    // Note: The system can currently only support one event type
     public function checkForActiveEvent(): void {
+        // Base data
         $current_datetime = new DateTimeImmutable();
         $this->event = null;
-        // July 2023 Lantern Event
-        $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
-        $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
+
+        // Dev Environment Event start times
         if($this->isDevEnvironment()) {
-            $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-15');
+            $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-15');
+            $double_exp_start_time = new DateTimeImmutable('2023-09-13');
+            $double_reputation_start_time = new DateTimeImmutable('2023-10-16');
+        }
+        // Production Event start times
+        else {
+            $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
+            $double_exp_start_time = new DateTimeImmutable('2023-09-19');
+            $double_reputation_start_time = new DateTimeImmutable('2023-10-18');
+        }
+        /*****CORE EVENTS*****/
+        // TODO: Make core events more manageable
+        // Double exp gains
+        $double_exp_end_time = new DateTimeImmutable('2023-10-4');
+        if($current_datetime > $double_exp_start_time && $current_datetime < $double_exp_end_time) {
+            $this->event = new DoubleExpEvent($double_exp_end_time);
+        }
+        // Double reputation gains
+        $double_reputation_end_time = new DateTimeImmutable('2023-10-30');
+        if($current_datetime > $double_reputation_start_time && $current_datetime < $double_reputation_end_time) {
+            $this->event = new DoubleReputationEvent($double_reputation_end_time);
         }
 
+        /*****LIMITED TIME EVENTS*****/
+        // July 2023 Lantern Event
+        $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
         if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
             $this->event = new LanternEvent($july_2023_lantern_event_end_time);
         }
@@ -793,5 +864,30 @@ class System {
 
     public function getCssFileLink(string $file_name): string {
         return $this->router->base_url . $file_name . "?v=" .  filemtime($file_name);
+    }
+
+    public static function clampNumber($number, $min, $max)
+    {
+        return max(min($number, $max), $min);
+    }
+
+    /**
+     * Example:
+     * php -f somefile.php a=1 b[]=2 b[]=3
+     *
+     * This will return an an array of
+     * [
+     *   'a' => '1',
+     *   'b' => ['2', '3']
+     * ]
+     *
+     * @return array
+     */
+    public static function parseCommandLineArgs(): array {
+        $result = [];
+
+        parse_str(implode('&', array_slice($_SERVER['argv'], 1)), $result);
+
+        return $result;
     }
 }

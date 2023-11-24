@@ -10,7 +10,7 @@ function premiumShop(): void {
     global $system;
     global $player;
     global $self_link;
-    
+
     $premiumShopManager = new PremiumShopManager($system, $player);
 
     $available_clans = $premiumShopManager->getAvailableClans();
@@ -30,8 +30,7 @@ function premiumShop(): void {
                     form_submit_prompt: "Reset my Account",
                     additional_form_data: []
                 );
-            }
-            else {
+            } else {
                 $result = $premiumShopManager->resetUser();
 
                 renderPurchaseComplete(
@@ -44,8 +43,7 @@ function premiumShop(): void {
         } catch (Exception $e) {
             $system->message($e->getMessage());
         }
-    }
-    else if (isset($_POST['name_change'])) {
+    } else if (isset($_POST['name_change'])) {
         $new_name = $system->db->clean($_POST['new_name']);
 
         try {
@@ -54,7 +52,7 @@ function premiumShop(): void {
 
                 $confirmation_string = "Changing your username to: <b>{$new_name}</b>
                 <p style='max-width:500px;margin: 10px auto -15px;'>
-                Doing this will also change your login name to the name you select, and make your old name 
+                Doing this will also change your login name to the name you select, and make your old name
                 available for anyone else to use. Would you like to proceed?
                 </p>";
 
@@ -67,13 +65,12 @@ function premiumShop(): void {
                     additional_form_data: ['new_name' => ['input_type' => 'hidden', 'value' => $new_name]]
                 );
             } else {
-               $result = $premiumShopManager->changeUserName($new_name);
+                $result = $premiumShopManager->changeUserName($new_name);
             }
         } catch (Exception $e) {
             $system->message($e->getMessage());
         }
-    }
-    else if (isset($_POST['change_gender'])) {
+    } else if (isset($_POST['change_gender'])) {
         try {
             $new_gender = $system->db->clean($_POST['new_gender']);
 
@@ -98,8 +95,7 @@ function premiumShop(): void {
         } catch (Exception $e) {
             $system->message($e->getMessage());
         }
-    }
-    else if (isset($_POST['stat_reset'])) {
+    } else if (isset($_POST['stat_reset'])) {
         try {
             $stat = $system->db->clean($_POST['stat']);
             if (!in_array($stat, $player->stats)) {
@@ -107,10 +103,7 @@ function premiumShop(): void {
             }
 
             // Amount to reset to
-            $reset_amount = 5;
-            if (strpos($stat, 'skill')) {
-                $reset_amount = 10;
-            }
+            $reset_amount = 0;
 
             if (!isset($_POST['confirm_stat_reset'])) {
                 renderPurchaseConfirmation(
@@ -133,12 +126,11 @@ function premiumShop(): void {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    }
-    else if (isset($_POST['stat_allocate'])) {
+    } else if (isset($_POST['stat_allocate'])) {
         try {
             $original_stat = $system->db->clean($_POST['original_stat']);
             $target_stat = $system->db->clean($_POST['target_stat']);
-            $transfer_amount = (int)$_POST['transfer_amount'];
+            $transfer_amount = (int) $_POST['transfer_amount'];
             $transfer_speed = $system->db->clean($_POST['transfer_speed']);
 
             $time = $premiumShopManager->statTransferTime(
@@ -163,7 +155,7 @@ function premiumShop(): void {
                     . ($player->{$original_stat} - $transfer_amount) . "<br />"
                     . System::unSlug($target_stat) . ": {$player->{$target_stat}} -> "
                     . ($player->{$target_stat} + $transfer_amount) . "<br />"
-                    . "Cost: {$premiumShopManager->statTransferPremiumCreditCost($transfer_amount,$transfer_speed)} AK / "
+                    . "Cost: {$premiumShopManager->statTransferPremiumCreditCost($transfer_amount, $transfer_speed)} AK / "
                     . "{$premiumShopManager->statTransferYenCost($transfer_amount, $transfer_speed)} yen<br />"
                     . " This will take "
                     . System::timeRemaining($time * 60, 'long', true, true);
@@ -192,8 +184,8 @@ function premiumShop(): void {
                 renderPurchaseComplete(
                     'Stat Transfer Started',
                     "You have started transferring {$transfer_amount} " . System::unSlug($original_stat)
-                        . " to " . System::unSlug($target_stat) . ". This will take "
-                        . System::timeRemaining($time * 60, 'long', true, true)
+                    . " to " . System::unSlug($target_stat) . ". This will take "
+                    . System::timeRemaining($time * 60, 'long', true, true)
 
                 );
             }
@@ -201,8 +193,7 @@ function premiumShop(): void {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    }
-    else if (isset($_POST['reset_ai_battles'])) {
+    } else if (isset($_POST['reset_ai_battles'])) {
         try {
             $cost = $premiumShopManager->costs['reset_ai_battles'];
             if ($player->getPremiumCredits() < $cost) {
@@ -228,8 +219,7 @@ function premiumShop(): void {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    }
-    else if (isset($_POST['reset_pvp_battles'])) {
+    } else if (isset($_POST['reset_pvp_battles'])) {
         try {
             $cost = $premiumShopManager->costs['reset_pvp_battles'];
             if ($player->getPremiumCredits() < $cost) {
@@ -255,8 +245,7 @@ function premiumShop(): void {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    }
-    else if (isset($_POST['purchase_bloodline'])) {
+    } else if (isset($_POST['purchase_bloodline'])) {
         try {
             $self_link .= '&view=bloodlines';
             $bloodline_id = (int) $_POST['bloodline_id'];
@@ -280,8 +269,7 @@ function premiumShop(): void {
                 if ($player->bloodline) {
                     $confirmation_string .= "<br /><b>WARNING:</b><br />
                     Purchasing the Bloodline $bloodline_name will result in the loss of your current Bloodline
-                    {$player->bloodline_name}. This will result in loss of all Bloodline jutsu level and unlocks and 10%
-                    of your Bloodline skill!<br />
+                    {$player->bloodline_name}. This will result in loss of all Bloodline jutsu levels!<br />
                     <b>This process can not be undone!</b><br />
                     If you are part of a clan, you may also be removed from any office and be assigned a new clan.";
                 }
@@ -328,7 +316,7 @@ function premiumShop(): void {
                     display: false
                 );
 
-                $message = "You now have the bloodline <b>$bloodline_name</b>.";
+                $message = "You have gained the bloodline <b>$bloodline_name</b>!";
 
                 // Set clan
                 $clan_id = $result['clan_id'];
@@ -338,7 +326,98 @@ function premiumShop(): void {
 
                     $player->clan = Clan::loadFromId($system, $clan_id);
                     $player->clan_id = $clan_id;
-                    $message .= "<br />With your new bloodline you have been kicked out of your previous clan, and have been accepted by
+                    $message .= "<br />With your new bloodline you have been removed from your previous clan, and have been accepted by
+				    the " . $clan_result['name'] . " Clan.";
+                }
+
+                renderPurchaseComplete('New Bloodline!', $message);
+            }
+        } catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+    } else if (isset($_POST['purchase_bloodline_random'])) {
+        try {
+            $bloodline_rank = (int) $_POST['bloodline_rank'];
+            $self_link .= '&view=bloodlines';
+            // get list of bloodlines
+            if (!isset($_POST['confirm_bloodline_purchase'])) {
+                $confirmation_string = "Are you sure you want to purchase a random " . Bloodline::$public_ranks[$bloodline_rank] . " Bloodline?";
+                if ($player->bloodline) {
+                    $confirmation_string .= "<br /><b>WARNING:</b><br />
+                    Purchasing a Bloodline will result in the loss of your current Bloodline
+                    {$player->bloodline_name}. This will result in loss of all Bloodline jutsu levels!<br />
+                    <b>This process can not be undone!</b><br />
+                    If you are part of a clan, you may also be removed from any office and be assigned a new clan.";
+                }
+
+                renderPurchaseConfirmation(
+                    purchase_type: 'purchase_bloodline_random',
+                    confirmation_type: 'confirm_bloodline_purchase',
+                    confirmation_string: $confirmation_string,
+                    form_action_link: $self_link,
+                    form_submit_prompt: 'Receive Bloodline',
+                    additional_form_data: [
+                        'bloodline_rank' => ['input_type' => 'hidden', 'value' => $bloodline_rank]
+                    ]
+                );
+            } else {
+                $current_bloodline = $player->bloodline ? $player->bloodline_id : 0;
+                $ak_cost = $premiumShopManager->costs['bloodline_random'][$bloodline_rank];
+                $result = $system->db->query(
+                    "SELECT `bloodline_id`, `name`, `clan_id` FROM `bloodlines`
+                    WHERE `rank` = {$bloodline_rank}
+                    AND `bloodline_id` != {$player->bloodline_id}
+                ");
+                if ($system->db->last_num_rows == 0) {
+                    throw new RuntimeException("Invalid bloodline!");
+                }
+                $bloodlines = $system->db->fetch_all($result);
+                // select random bloodline
+                $new_bloodline = array_rand($bloodlines);
+                $bloodline_name = $bloodlines[$new_bloodline]['name'];
+                $bloodline_id = $bloodlines[$new_bloodline]['bloodline_id'];
+                // give bloodline
+                if ($player->bloodline_id == $bloodline_id) {
+                    throw new RuntimeException("You already have this bloodline!");
+                }
+                if ($player->getPremiumCredits() < $ak_cost) {
+                    throw new RuntimeException("You do not have enough Ancient Kunai!");
+                }
+                //Check clan office detail & remove player from clan data if present
+                if ($player->clan && $player->clan->leader_id == $player->user_id) {
+                    $system->db->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                } else if ($player->clan && $player->clan->elder_1_id == $player->user_id) {
+                    $system->db->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                } else if ($player->clan && $player->clan->elder_2_id == $player->user_id) {
+                    $system->db->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                }
+                //Remove office from player data if present
+                if ($player->clan_office) {
+                    $player->clan_office = 0;
+                }
+
+                //Process purchase
+                $player->subtractPremiumCredits($ak_cost, "Purchased bloodline {$bloodline_name} (#$bloodline_id)");
+
+                // Give bloodline
+                $status = Bloodline::giveBloodline(
+                    system: $system,
+                    bloodline_id: $bloodline_id,
+                    user_id: $player->user_id,
+                    display: false
+                );
+
+                $message = "You have gained the bloodline <b>$bloodline_name</b>!";
+
+                // Set clan
+                $clan_id = $bloodlines[$new_bloodline]['clan_id'];
+                $result = $system->db->query("SELECT `name` FROM `clans` WHERE `clan_id` = '$clan_id' LIMIT 1");
+                if ($system->db->last_num_rows > 0) {
+                    $clan_result = $system->db->fetch($result);
+
+                    $player->clan = Clan::loadFromId($system, $clan_id);
+                    $player->clan_id = $clan_id;
+                    $message .= "<br />With your new bloodline you have been removed from your previous clan, and have been accepted by
 				    the " . $clan_result['name'] . " Clan.";
                 }
 
@@ -381,17 +460,35 @@ function premiumShop(): void {
                 if (!isset($_POST['change_forbidden_seal'])) {
                     // Convert remaining premium time to days and calculate AK value
                     $akCredit = $player->forbidden_seal->calcRemainingCredit();
+                    $new_seal = new ForbiddenSeal($system, $seal_level);
+
+                    // TEMPORARY SALE LOGIC
+                    $remainingCredit = max(0, $akCredit - $ak_cost);
 
                     // Adjust purchase cost with minimum 0
+                    $original_ak_cost = $ak_cost;
                     $ak_cost -= $akCredit;
                     if ($ak_cost < 0) {
                         $ak_cost = 0;
                     }
 
-                    $confirmation_string = "Are you sure you would like to change from your {$player->forbidden_seal->name}?<br />
-                    You will lose {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of premium time.<br />
-                    Up to {$akCredit} Ancient Kunai will be credited toward your purchase from existing premium time.<br />
+                    $credit_used = min($akCredit, $original_ak_cost);
+
+                    $confirmation_string = "Are you sure you would like to upgrade to {$new_seal->name}?<br />
+                    You will lose your remaining {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of {$player->forbidden_seal->name}.<br />
+                    <br />
+                    Cost for $seal_length days of {$new_seal->name}: {$original_ak_cost} AK<br />
+                    Credit from existing seal time: {$credit_used} AK<br />
                     <b>This can not be undone!</b>";
+
+                    // TEMPORARY SALE LOGIC
+                    if($premiumShopManager->tierThreeSaleActive() && ($player->forbidden_seal->level == 1 || $player->forbidden_seal->level == 2) && $seal_level == 3) {
+                        if($remainingCredit > 1) {
+                            $confirmation_string .= "<br /><br />
+                            <b>" . ForbiddenSeal::$forbidden_seal_names[3] . " Sale!</b><br />
+                            You will also receive a refund of " . floor($remainingCredit * (PremiumShopManager::SALE_REFUND_RATE/100)) . " AK.";
+                        }
+                    }
 
                     renderPurchaseConfirmation(
                         purchase_type: 'forbidden_seal',
@@ -406,14 +503,22 @@ function premiumShop(): void {
                         ak_cost: $ak_cost
                     );
                 } else {
-                    $message = "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level] . " seal for {$seal_length} days.";
-                    if ($overwrite) {
-                        $message .= " This purchase removed {$system->time_remaining($player->forbidden_seal->seal_time_remaining)}" .
-                            " of their {$player->forbidden_seal->name}.";
-                    }
+                    $message = "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level] . " seal for {$seal_length} days.
+                    This purchase removed {$system->time_remaining($player->forbidden_seal->seal_time_remaining)}
+                        of their {$player->forbidden_seal->name}.";
                     // Recalculate adjusted akCost
                     if ($player->forbidden_seal->level > 0) {
                         $akCredit = $player->forbidden_seal->calcRemainingCredit();
+
+                        //TEMPORARY SALE LOGIC
+                        if($premiumShopManager->tierThreeSaleActive() && $seal_level == 3) {
+                            $remainingCredit = $akCredit - $ak_cost;
+                            if($remainingCredit > 1) {
+                                $refund = floor($remainingCredit * (PremiumShopManager::SALE_REFUND_RATE/100));
+                                $player->addPremiumCredits($refund, "Tier 3 seal sale refund.");
+                            }
+                        }
+
                         $ak_cost -= $akCredit;
                         if ($ak_cost < 0) {
                             $ak_cost = 0;
@@ -523,6 +628,10 @@ function premiumShop(): void {
                     throw new RuntimeException("Invalid village!");
                     break;
             }
+            $target_village = new Village($system, $village);
+            if ($target_village->policy->free_transfer) {
+                $ak_cost = 0;
+            }
 
             if ($player->team) {
                 $debug = ($player->layout == 'classic_blue') ? "<br /><br />" : "";
@@ -546,9 +655,10 @@ function premiumShop(): void {
 
             if (!isset($_POST['confirm_village_change'])) {
                 $confirmation_string = "Are you sure you want to move from the {$player->village->name} village to the $village
-                village? You will be kicked out of your clan and placed in a random clan in the new village.<br />
-                <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village
-                you will have to pay a higher transfer fee)</b>";
+                village?"
+                    . (!$player->clan->bloodline_only ? " You will be kicked out of your clan and placed in a random clan in the new village." : "")
+                    . ((!$target_village->policy->free_transfer && $player->village_changes > 0) ? "<br />You will lose 20% of your Reputation for this village change (you can not fall below Shinobi)." : "")
+                    . "<br><b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village you will have to pay a higher transfer fee)</b>";
 
                 renderPurchaseConfirmation(
                     purchase_type: 'change_village',
@@ -562,23 +672,34 @@ function premiumShop(): void {
                 );
             } else {
                 //Update clan data if player holds a seat
-                if ($player->clan->leader_id == $player->user_id) {
-                    $system->db->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
-                } else if ($player->clan->elder_1_id == $player->user_id) {
-                    $system->db->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
-                } else if ($player->clan->elder_2_id == $player->user_id) {
-                    $system->db->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
-                }
-                //Remove clan seat from player if they hold seat
-                if ($player->clan_office) {
-                    $player->clan_office = 0;
+                if (!$player->clan->bloodline_only) {
+                    if ($player->clan->leader_id == $player->user_id) {
+                        $system->db->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    } else if ($player->clan->elder_1_id == $player->user_id) {
+                        $system->db->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    } else if ($player->clan->elder_2_id == $player->user_id) {
+                        $system->db->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    }
+                    // Remove clan seat from player if they hold seat
+                    if ($player->clan_office) {
+                        $player->clan_office = 0;
+                    }
                 }
 
-                //Remove active student applications
+                // Remove held village seats
+                VillageManager::resign($system, $player);
+
+                // Remove active student applications
                 if (SenseiManager::isSensei($player->user_id, $system)) {
                     SenseiManager::closeApplicationsBySensei($player->user_id, $system);
                 } else if ($player->rank_num < 3) {
                     SenseiManager::closeApplicationsByStudent($player->user_id, $system);
+                }
+
+                // Lose rep tier for subsequent village changes (5k minimum rep)
+                if ($player->village_changes > 0 && $player->reputation->rank >= 3 && !$target_village->policy->free_transfer) {
+                    $new_reputation = floor(max($player->village_rep * 0.8, UserReputation::$VillageRep[3]['min_rep']));
+                    $player->village_rep = $new_reputation;
                 }
 
                 // Cost
@@ -589,69 +710,76 @@ function premiumShop(): void {
                 $player->village = new Village($system, $village);
 
                 // Clan
-                $result = $system->db->query(
-                    "SELECT `clan_id`, `name` FROM `clans`
+                if (!$player->clan->bloodline_only) {
+                    $result = $system->db->query(
+                        "SELECT `clan_id`, `name` FROM `clans`
                         WHERE `village`='{$player->village->name}' AND `bloodline_only`='0'"
-                );
-                if ($system->db->last_num_rows == 0) {
-                    $result = $system->db->query("SELECT `clan_id`, `name` FROM `clans` WHERE `bloodline_only`='0'");
-                }
-
-                if (!$system->db->last_num_rows) {
-                    throw new RuntimeException("No clans available!");
-                }
-
-                $clans = array();
-                $count = 0;
-                while ($row = $system->db->fetch($result)) {
-                    $clans[$row['clan_id']] = $row;
-                    $count++;
-                }
-
-                $query = "SELECT ";
-                $x = 0;
-                foreach ($clans as $id => $clan) {
-                    $query .= "SUM(IF(`clan_id` = $id, 1, 0)) as `$id`";
-                    $x++;
-                    if ($x < $count) {
-                        $query .= ', ';
+                    );
+                    if ($system->db->last_num_rows == 0) {
+                        $result = $system->db->query("SELECT `clan_id`, `name` FROM `clans` WHERE `bloodline_only`='0'");
                     }
-                }
-                $query .= " FROM `users`";
 
-                $clan_counts = array();
-                $result = $system->db->query($query);
-                $row = $system->db->fetch($result);
-                $total_users = 0;
-                foreach ($row as $id => $user_count) {
-                    $clan_counts[$id] = $user_count;
-                    $total_users += $user_count;
-                }
+                    if (!$system->db->last_num_rows) {
+                        throw new RuntimeException("No clans available!");
+                    }
 
-                $average_users = round($total_users / $count);
+                    $clans = array();
+                    $count = 0;
+                    while ($row = $system->db->fetch($result)) {
+                        $clans[$row['clan_id']] = $row;
+                        $count++;
+                    }
 
-                $clan_rolls = array();
-                foreach ($clans as $id => $clan) {
-                    $entries = 4;
-                    if ($clan_counts[$id] > $average_users) {
-                        $entries--;
-                        if ($clan_counts[$id] / 3 > $average_users) {
+                    $query = "SELECT ";
+                    $x = 0;
+                    foreach ($clans as $id => $clan) {
+                        $query .= "SUM(IF(`clan_id` = $id, 1, 0)) as `$id`";
+                        $x++;
+                        if ($x < $count) {
+                            $query .= ', ';
+                        }
+                    }
+                    $query .= " FROM `users`";
+
+                    $clan_counts = array();
+                    $result = $system->db->query($query);
+                    $row = $system->db->fetch($result);
+                    $total_users = 0;
+                    foreach ($row as $id => $user_count) {
+                        $clan_counts[$id] = $user_count;
+                        $total_users += $user_count;
+                    }
+
+                    $average_users = round($total_users / $count);
+
+                    $clan_rolls = array();
+                    foreach ($clans as $id => $clan) {
+                        $entries = 4;
+                        if ($clan_counts[$id] > $average_users) {
                             $entries--;
+                            if ($clan_counts[$id] / 3 > $average_users) {
+                                $entries--;
+                            }
+
+
+                        }
+                        for ($i = 0; $i < $entries; $i++) {
+                            $clan_rolls[] = $id;
                         }
 
+                        $clan_id = $clan_rolls[mt_rand(0, count($clan_rolls) - 1)];
 
+                        $player->clan = Clan::loadFromId($system, $clan_id);
+                        $player->clan_id = $clan_id;
+                        $clan_name = $clans[$clan_id]['name'];
+
+                        $system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
+                        $player->location->x = $player->village->coords->x;
+                        $player->location->y = $player->village->coords->y;
+                        $player->location->map_id = $player->village->coords->map_id;
                     }
-                    for ($i = 0; $i < $entries; $i++) {
-                        $clan_rolls[] = $id;
-                    }
-
-                    $clan_id = $clan_rolls[mt_rand(0, count($clan_rolls) - 1)];
-
-                    $player->clan = Clan::loadFromId($system, $clan_id);
-                    $player->clan_id = $clan_id;
-                    $clan_name = $clans[$clan_id]['name'];
-
-                    $system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
+                } else {
+                    $system->message("You have moved to the $village village.");
                     $player->location->x = $player->village->coords->x;
                     $player->location->y = $player->village->coords->y;
                     $player->location->map_id = $player->village->coords->map_id;
@@ -747,11 +875,17 @@ function premiumShop(): void {
     }
 
     //Load premium seals
-    $baseDisplay = ForbiddenSeal::$benefits[0];
+    $baseDisplay = new ForbiddenSeal($system, 0);
+    $baseDisplay->setBenefits();
+
     $twinSeal = new ForbiddenSeal($system, 1);
     $twinSeal->setBenefits();
+
     $fourDragonSeal = new ForbiddenSeal($system, 2);
     $fourDragonSeal->setBenefits();
+
+    $eightDeitiesSeal = new ForbiddenSeal($system, 3);
+    $eightDeitiesSeal->setBenefits();
 
     require "templates/premium/premium.php";
 }

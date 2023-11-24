@@ -33,6 +33,11 @@ function store() {
             "SELECT * FROM `jutsu` WHERE `purchase_type` = '2' AND `rank` <= '$player->rank_num' ORDER BY `rank` ASC, `purchase_cost` ASC"
         );
 		while($row = $system->db->fetch($result)) {
+			// Reputation jutsu discount benefit
+			if($player->reputation->benefits[UserReputation::BENEFIT_JUTSU_SCROLL_DISCOUNT]) {
+				$row['purchase_cost'] = floor($row['purchase_cost'] * (1-UserReputation::ITEM_SHOP_DISCOUNT_RATE/100));
+			}
+
 			$shop_jutsu[$row['jutsu_id']] = $row;
 		}
 	}
@@ -43,7 +48,19 @@ function store() {
             "SELECT * FROM `items` WHERE `purchase_type` = '1' AND `rank` <= '$player->rank_num' ORDER BY `rank` ASC, `purchase_cost` ASC"
         );
 		while($row = $system->db->fetch($result)) {
-			$shop_items[$row['item_id']] = Item::fromDb($row);
+			$item = Item::fromDb($row);
+
+			// Reputation discount benefit consumables
+			if($item->use_type == Item::USE_TYPE_CONSUMABLE && $player->reputation->benefits[UserReputation::BENEFIT_CONSUMABLE_DISCOUNT]) {
+				$item->purchase_cost = floor($item->purchase_cost * (1-UserReputation::ITEM_SHOP_DISCOUNT_RATE/100));
+			}
+			// Reputation discount benefit gear
+			if(($item->use_type == Item::USE_TYPE_ARMOR || $item->use_type == Item::USE_TYPE_WEAPON) && $player->reputation->benefits[UserReputation::BENEFIT_GEAR_DISCOUNT]) {
+				$item->purchase_cost = floor($item->purchase_cost * (1-UserReputation::ITEM_SHOP_DISCOUNT_RATE/100));
+			}
+
+			// Insert item into shop array
+			$shop_items[$row['item_id']] = $item;
 		}
 	}
 	
@@ -58,17 +75,12 @@ function store() {
 			}
 			
 			// check if already owned
-			if($player->hasItem($item_id) && $shop_items[$item_id]->use_type != 3) {
+			if($player->hasItem($item_id) && $shop_items[$item_id]->use_type != Item::USE_TYPE_CONSUMABLE) {
 				throw new RuntimeException("You already own this item!");
 			}
 			
 			if (isset($_GET['max'])) { // Code for handling buying bulk
-				$max_missing = 0;
-				if ($player->hasItem($item_id)) {
-					$max_missing = $max_consumables - $player->items[$item_id]->quantity;
-				} else {
-					$max_missing = $max_consumables;
-				}
+				$max_missing = ($player->hasItem($item_id)) ? $max_consumables - $player->items[$item_id]->quantity : $max_consumables;
 
 				if($player->items[$item_id]->quantity >= $max_consumables) {
 					throw new RuntimeException("Your supply of this item is already full!");
@@ -76,13 +88,13 @@ function store() {
 
 				if ($player->getMoney() < $shop_items[$item_id]->purchase_cost * $max_missing) {
 					throw new RuntimeException("You do not have enough money to buy the max amount!");
-
 				}
+
 				$player->subtractMoney(
                     $shop_items[$item_id]->purchase_cost * $max_missing,
                     "Purchased {$max_missing} of item #{$item_id}"
                 );
-                $player->giveItem(item: $shop_items[$item_id], quantity: $max_consumables);
+                $player->giveItem(item: $shop_items[$item_id], quantity: $max_missing);
 
 			} else { //code for handling single purchases
                 // Check for money requirement

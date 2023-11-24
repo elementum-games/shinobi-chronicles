@@ -26,7 +26,7 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
         })
     }
 
-    function closeNotification(notificationId) {
+    function closeNotification(notificationId, actionUrl) {
         apiFetch(links.notification_api, {
             request: 'closeNotification',
             notification_id: notificationId
@@ -34,6 +34,9 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
             if (response.errors.length) {
                 handleErrors(response.errors);
                 return;
+            }
+            if (actionUrl !== undefined) {
+                window.location.href = actionUrl;
             }
 
             getNotificationData();
@@ -61,30 +64,18 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
     }
 
     function createNotification(message) {
-        if (!window.Notification) {
-            console.log('Browser does not support notifications.');
-        } else {
-            // check if permission is already granted
-            if (Notification.permission === 'granted') {
-                // show notification here
-                var notify = new Notification('Shinobi Chronicles', {
-                    body: message,
-                });
-            } else {
-                // request permission from user
-                Notification.requestPermission().then(function (p) {
-                    if (p === 'granted') {
-                        // show notification here
-                        var notify = new Notification('Shinobi Chronicles', {
-                            body: message,
-                        });
-                    } else {
-                        console.log('User blocked notifications.');
+        // Check for Notification API support
+        if ("Notification" in window) {
+            // Request permission if needed, then show notification
+            Notification.requestPermission()
+                .then(permission => {
+                    if (permission === "granted") {
+                        new Notification("Shinobi Chronicles", { body: message });
                     }
-                }).catch(function (err) {
-                    console.error(err);
-                });
-            }
+                })
+                .catch(err => console.error(err));
+        } else {
+            console.log("Browser does not support notifications.");
         }
     }
 
@@ -128,7 +119,26 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
          "student",
          "inbox",
          "chat",
-         "event"
+         "caravan",
+         "raid_ally",
+         "raid_enemy",
+         "event",
+         "seat_challenge",
+         "lock_challenge",
+         "proposal_created",
+         "proposal_passed",
+         "proposal_canceled",
+         "proposal_expired",
+         "policy_change",
+         "diplomacy_declare_war",
+         "diplomacy_form_alliance",
+         "diplomacy_end_war",
+         "diplomacy_end_alliance",
+         "news",
+         "challenge_pending",
+         "challenge_accepted",
+         "kage_change",
+         "achievement"
     ];
 
     return (

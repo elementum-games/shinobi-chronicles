@@ -26,8 +26,12 @@ export type PlayerDataType = {|
     +villageName: string,
     +villageRepTier: string,
     +villageRep: number,
-    +weeklyRep: number,
-    +maxWeeklyRep: number,
+    +weeklyPveRep: number,
+    +maxWeeklyPveRep: number,
+    +weeklyWarRep: number,
+    +maxWeeklyWarRep: number,
+    +weeklyPvpRep: number,
+    +maxWeeklyPvpRep: number,
     +clanId: ?number,
     +clanName: ?string,
     +teamId: ?number,
@@ -89,7 +93,7 @@ export type DailyTaskType = {|
 |};
 
 export type PlayerAchievementsType = {|
-    +completedAchievements: {|
+    +completedAchievements: $ReadOnlyArray<{|
         +id: string,
         +achievedAt: number,
         +rank: "Legendary" | "Elite" | "Greater" | "Common",
@@ -101,7 +105,7 @@ export type PlayerAchievementsType = {|
         |}>,
         +progressLabel: string,
         +progressPercent: number,
-    |};
+    |}>;
 |};
 
 // UserApiPresenter::playerInventoryResponse

@@ -361,6 +361,6 @@ class Layout {
     }
 
     public function usesV2Interface(): bool {
-        return $this->key == 'new_geisha';
+        return $this->key == 'new_geisha' || $this->key == 'sumu';
     }
 }

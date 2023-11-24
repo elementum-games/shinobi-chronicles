@@ -5,8 +5,8 @@ require_once __DIR__ . "/MapLocation.php";
 class Travel {
 
     const TRAVEL_DELAY_MOVEMENT = 300; // milliseconds
-    const TRAVEL_DELAY_PVP = 500; // milliseconds
-    const TRAVEL_DELAY_AI = 250; // milliseconds
+    const TRAVEL_DELAY_PVP = 1500; // milliseconds
+    const TRAVEL_DELAY_AI = 750; // milliseconds
     const TRAVEL_DELAY_DEATH = 15000; // milliseconds
     const HOME_VILLAGE_COLOR = 'FFEF30';
     const PLAYER_ICON = '/images/ninja_head.png';
@@ -72,6 +72,21 @@ class Travel {
     }
 
     public static function getLocation(System $system, string $x, string $y, string $z): MapLocation {
+        if (isset($system->font_location) && $x == $system->font_location->x && $y == $system->font_location->y && $z == $system->font_location->map_id) {
+            $result = $system->db->query(
+                "SELECT * FROM `maps_locations` WHERE `name` = 'Font of Vitality' LIMIT 1"
+            );
+            if ($system->db->last_num_rows) {
+                $map_location = $system->db->fetch($result);
+                $map_location['x'] = $system->font_location->x;
+                $map_location['y'] = $system->font_location->y;
+                $map_location['map_id'] = $system->font_location->map_id;
+                $map_location['regen'] = $system->font_regen;
+                return new MapLocation($map_location);
+            } else {
+                return new MapLocation([]);
+            }
+        }
         $result = $system->db->query(
             "SELECT * FROM `maps_locations` WHERE `x`='{$x}' AND `y`='{$y} 'AND `map_id`='{$z}' LIMIT 1"
         );

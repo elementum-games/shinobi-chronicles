@@ -39,6 +39,8 @@ class Router {
         'account_record' => 34,
         'send_money' => 35,
         'forbiddenShop' => 36,
+        'war' => 37,
+        'challenge' => 38,
     ];
 
     /** @var Route[] $routes */
@@ -70,6 +72,7 @@ class Router {
         $this->api_links['chat'] = $this->base_url . 'api/chat.php';
         $this->api_links['news'] = $this->base_url . 'api/news.php';
         $this->api_links['forbidden_shop'] = $this->base_url . 'api/forbidden_shop.php';
+        $this->api_links['village'] = $this->base_url . 'api/village.php';
     }
 
     /**
@@ -137,6 +140,13 @@ class Router {
             }
         }
 
+        // Check if challenge locked
+        if (isset($route->challenge_lock_ok) && $route->challenge_lock_ok === false) {
+            if ($player->locked_challenge > 0) {
+                throw new RuntimeException("You are unable to access this page while locked-in for battle!");
+            }
+        }
+
         if(isset($route->user_check)) {
             if(!($route->user_check instanceof Closure)) {
                 throw new RuntimeException("Invalid user check!");
@@ -169,6 +179,24 @@ class Router {
                 $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
 
                 throw new RuntimeException("You must be in your village to access this page!");
+            }
+
+            if ($route->village_ok === Route::VILLAGE_OR_COLOSSEUM && !$player->location->equals($player->village_location)) {
+                $result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
+                $location_result = $system->db->fetch($result);
+                $arena_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
+                if (!$player->location->equals($arena_coords)) {
+                    $contents_arr = [];
+                    foreach($_GET as $key => $val) {
+                        $contents_arr[] = "GET[{$key}]=$val";
+                    }
+                    foreach($_POST as $key => $val) {
+                        $contents_arr[] = "POST[{$key}]=$val";
+                    }
+                    $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
+
+                    throw new RuntimeException("You must be in your village or Underground Colosseum to access this page!");
+                }
             }
         }
         if(isset($route->min_rank)) {

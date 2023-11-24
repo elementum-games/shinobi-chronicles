@@ -24,11 +24,16 @@ try {
     $TravelAPIResponse = new TravelAPIResponse();
     $TravelManager = new TravelManager($system, $player);
 
+    // for optimization testing
+    //$start_time = microtime(true) * 1000;
+
     switch($request) {
         case 'LoadTravelData':
             $TravelAPIResponse->response = [
-                'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $TravelManager),
+                'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $TravelManager, system: $system),
                 'nearbyPlayers' => TravelApiPresenter::nearbyPlayersResponse(travelManager: $TravelManager),
+                'nearbyPatrols' => TravelApiPresenter::nearbyPatrolsResponse(travelManager: $TravelManager),
+                'travel_message' => $TravelManager->travel_message,
             ];
             break;
 
@@ -36,14 +41,14 @@ try {
             $direction = $system->db->clean($_POST['direction']);
 
             $success = $TravelManager->movePlayer($direction);
-            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
             break;
 
         case 'EnterPortal':
             $portal_id = $system->db->clean($_POST['portal_id']);
 
             $success = $TravelManager->enterPortal($portal_id);
-            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
             break;
 
         case 'UpdateFilter':
@@ -51,7 +56,7 @@ try {
             $filter_value = $system->db->clean($_POST['filter_value']);
 
             $success = $TravelManager->updateFilter($filter, $filter_value);
-            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
             break;
 
         case 'AttackPlayer':
@@ -60,9 +65,30 @@ try {
             $success = $TravelManager->attackPlayer($target_attack_id);
             $TravelAPIResponse->response = TravelApiPresenter::attackPlayerResponse($success, $system);
             break;
+
+        case 'BeginOperation':
+            $operation_type = $system->db->clean($_POST['operation_type']);
+
+            $success = $TravelManager->beginOperation($operation_type);
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
+            break;
+
+        case 'CancelOperation':
+            $success = $TravelManager->cancelOperation();
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
+            break;
+
+        case 'ClaimLoot':
+            $success = $TravelManager->claimLoot();
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
+            break;
+
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
     }
+
+    //$duration = microtime(true) * 1000 - $start_time;
+    //$TravelAPIResponse->response['time'] = $duration;
 
     API::exitWithData(
         data: $TravelAPIResponse->response,

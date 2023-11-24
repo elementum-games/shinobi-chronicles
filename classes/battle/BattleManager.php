@@ -1,5 +1,7 @@
 <?php
 
+use DDTrace\Trace;
+
 require_once __DIR__ . '/Battle.php';
 // require_once __DIR__ . '/BattleField.php';
 require_once __DIR__ . '/BattleEffectsManager.php';
@@ -7,8 +9,8 @@ require_once __DIR__ . '/BattleAttack.php';
 require_once __DIR__ . '/LegacyFighterAction.php';
 
 class BattleManager {
-    const SPEED_DAMAGE_REDUCTION_RATIO = 0.4;
-    const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 0.4;
+    const SPEED_DAMAGE_REDUCTION_RATIO = 0.47;
+    const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 0.47;
     const MAX_EVASION_DAMAGE_REDUCTION = 0.35;
 
     private System $system;
@@ -19,6 +21,9 @@ class BattleManager {
 
     public User $player;
     public Fighter $opponent;
+
+    public bool $is_retreat = false;
+    public int $turn_count = 0;
 
     public string $player_side;
     public string $opponent_side;
@@ -45,12 +50,15 @@ class BattleManager {
      * @param bool   $load_fighters
      * @throws RuntimeException
      */
+    #[Trace]
     public function __construct(System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true) {
         $this->system = $system;
         $this->battle_id = $battle_id;
         $this->player = $player;
         $this->spectate = $spectate;
         $this->battle = new Battle($system, $player, $battle_id);
+        $this->is_retreat = $this->battle->is_retreat;
+        $this->turn_count = $this->battle->turn_count;
 
         $this->default_attacks = $this->getDefaultAttacks();
 
@@ -78,6 +86,7 @@ class BattleManager {
      * @return BattleManager
      * @throws RuntimeException
      */
+    #[Trace]
     public static function init(System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true): BattleManager {
         return new BattleManager($system, $player, $battle_id, $spectate, $load_fighters);
     }
@@ -85,6 +94,7 @@ class BattleManager {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     protected function loadFighters() {
         if($this->player->id == $this->battle->player1_id) {
             $this->player_side = Battle::TEAM1;
@@ -168,6 +178,7 @@ class BattleManager {
      * @return string|null
      * @throws RuntimeException
      */
+    #[Trace]
     public function checkInputAndRunTurn(): ?string {
         // If someone is not in battle, this will be set
         if($this->battle->winner) {
@@ -181,7 +192,7 @@ class BattleManager {
             try {
                 if (isset($_POST['attack'])) {
                     $item_id = $_POST['item_id'] ?? null;
-                    if ($item_id && $this->player->hasItem($item_id)) {
+                    if ($item_id && $this->player->itemQuantity($item_id) > 0) {
                         $item = $this->player->items[$item_id];
 
                         $max_health = $this->player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100);
@@ -201,10 +212,20 @@ class BattleManager {
 
                             $this->player->updateData();
                             $this->player->updateInventory();
-                            $this->battle->battle_text .= sprintf("%s used a %s and healed for %.2f[br]", $this->player->user_name, $item->name, $item->effect_amount);
+                            $this->battle->battle_text .= sprintf("%s used a %s and healed for %.0f[br]", $this->player->user_name, $item->name, $item->effect_amount);
                             $this->updateData();
                         }
                     }
+                }
+                if (isset($_POST['retreat'])) {
+                    $this->battle->is_retreat = true;
+                    $this->is_retreat = true;
+                    if ($this->player->id == $this->battle->player1_id) {
+                        $this->battle->winner = Battle::TEAM2;
+                    } else if ($this->player->id == $this->battle->player2_id) {
+                        $this->battle->winner = Battle::TEAM1;
+                    }
+                    $this->updateData();
                 }
             }
             catch(RuntimeException $e) {
@@ -213,7 +234,7 @@ class BattleManager {
             return false;
         }
         // If turn is still active and user hasn't submitted their move, check for action
-        if($this->battle->timeRemaining() > 0 && !$this->playerActionSubmitted()) {
+        if($this->battle->timeRemaining($this->player->id) > 0 && !$this->playerActionSubmitted()) {
             if(!empty($_POST['attack'])) {
                 // Run player attack
                 try {
@@ -261,8 +282,9 @@ class BattleManager {
                         throw new RuntimeException("Cannot use that jutsu, it is on cooldown for " . $this->battle->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!");
                     }
 
-                    if(!$this->player->useJutsu($player_jutsu)) {
-                        throw new RuntimeException($this->system->message);
+                    $result = $this->player->useJutsu($player_jutsu);
+                    if($result->failed) {
+                        throw new RuntimeException($result->error_message);
                     }
 
                     // Check for weapon if non-BL taijutsu
@@ -288,6 +310,9 @@ class BattleManager {
                     // Log jutsu used
                     $this->setPlayerAction($this->player, $player_jutsu, $weapon_id, $weapon_element);
 
+                    //update player turn time
+                    $this->battle->updatePlayerTime($this->player->id);
+
                     if($this->opponent instanceof NPC) {
                         $this->chooseAndSetAIAction($this->opponent);
                     }
@@ -301,13 +326,24 @@ class BattleManager {
         }
 
         // If time is up or both people have submitted moves, RUN TURN
-        if($this->battle->timeRemaining() <= 0 || $this->allActionsSubmitted()) {
+        $player1_submitted = isset($this->battle->fighter_actions[$this->battle->player1->combat_id]);
+        $player2_submitted = isset($this->battle->fighter_actions[$this->battle->player2->combat_id]);
+        if(($this->battle->timeRemaining($this->battle->player1_id) <= 0 || $player1_submitted) && ($this->battle->timeRemaining($this->battle->player2_id) <= 0 || $player2_submitted)) {
             if(!empty($this->battle->fighter_actions)) {
                 $this->runActions();
+                // if a player did not submit action, update timer
+                if (!$player1_submitted) {
+                    $this->battle->updatePlayerTime($this->battle->player1_id, min: true);
+                }
+                if (!$player2_submitted) {
+                    $this->battle->updatePlayerTime($this->battle->player2_id, min: true);
+                }
             }
             // If neither player moved, update turn timer only
             else {
                 $this->battle->turn_time = time();
+                $this->battle->updatePlayerTime($this->battle->player1_id, min: true);
+                $this->battle->updatePlayerTime($this->battle->player2_id, min: true);
             }
         }
 
@@ -438,7 +474,7 @@ class BattleManager {
         );
     }
 
-    private static function getJutsuTextColor($jutsu_type): string {
+    public static function getJutsuTextColor($jutsu_type): string {
         switch ($jutsu_type) {
             case Jutsu::TYPE_NINJUTSU:
                 return "blue";
@@ -458,6 +494,7 @@ class BattleManager {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     protected function runActions(): void {
         $this->processTurnEffects();
 
@@ -524,7 +561,7 @@ class BattleManager {
             $collision_text = $this->parseCombatText($collision_text, $this->battle->player1, $this->battle->player2);
             $this->battle->battle_text .= '[br][hr]' . $this->system->db->clean($collision_text);
         }
-        $this->battle->battle_text .= '[br][hr]';
+        $this->battle->battle_text .= '[br][hr][br]';
 
         // Apply damage/effects and set display
         if($player2_attack) {
@@ -545,11 +582,20 @@ class BattleManager {
         $this->finishTurn();
     }
 
+    #[Trace]
     private function finishTurn() {
         $this->battle->turn_time = time();
         $this->battle->turn_count++;
+        $this->turn_count = $this->battle->turn_count;
 
         $this->battle->fighter_actions = [];
+
+        if ($this->battle->player1->health > $this->battle->player1->max_health) {
+            $this->battle->player1->health = $this->battle->player1->max_health;
+        }
+        if ($this->battle->player2->health > $this->battle->player2->max_health) {
+            $this->battle->player2->health = $this->battle->player2->max_health;
+        }
 
         $this->battle->fighter_health[$this->battle->player1->combat_id] = $this->battle->player1->health;
         $this->battle->fighter_health[$this->battle->player2->combat_id] = $this->battle->player2->health;
@@ -561,6 +607,7 @@ class BattleManager {
         $this->battle->player2->updateInventory();
     }
 
+    #[Trace]
     private function checkForWinner(): string {
         if($this->battle->isComplete()) {
             return $this->battle->winner;
@@ -586,6 +633,7 @@ class BattleManager {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     private function processTurnEffects() {
         // Run turn effects
         $this->effects->applyActiveEffects($this->battle->player1, $this->battle->player2);
@@ -601,11 +649,13 @@ class BattleManager {
         }
     }
 
+    #[Trace]
     protected function stopBattle() {
-        $this->battle->winner = Battle::DRAW;
+        $this->battle->winner = Battle::STOP;
         $this->updateData();
     }
 
+    #[Trace]
     public function updateData() {
         if($this->spectate) {
             return;
@@ -618,7 +668,6 @@ class BattleManager {
         $this->battle->updateData();
     }
 
-
     // PRIVATE API - ATTACK PROCESSING
 
     /**
@@ -627,6 +676,7 @@ class BattleManager {
      * @return BattleAttack
      * @throws RuntimeException
      */
+    #[Trace]
     protected function setupFighterAttack(Fighter $fighter, LegacyFighterAction $action): BattleAttack {
         $attack = new BattleAttack();
         if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_DEFAULT) {
@@ -634,7 +684,7 @@ class BattleManager {
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASABLE) {
             $attack->jutsu = $fighter->jutsu[$action->jutsu_id];
-        } 
+        }
         else if ($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
             $attack->jutsu = $fighter->jutsu[$action->jutsu_id];
         }
@@ -665,13 +715,11 @@ class BattleManager {
                 $attack->raw_damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
             }
             // Set effect in jutsu
-            else {
-                $attack->jutsu->setWeapon(
-                    $action->weapon_id,
-                    $fighter->items[$action->weapon_id]->effect,
-                    $fighter->items[$action->weapon_id]->effect_amount,
-                );
-            }
+            $attack->jutsu->setWeapon(
+                $action->weapon_id,
+                $fighter->items[$action->weapon_id]->effect,
+                $fighter->items[$action->weapon_id]->effect_amount,
+            );
         }
 
         if($attack->jutsu->isAllyTargetType()) {
@@ -688,6 +736,7 @@ class BattleManager {
         return $attack;
     }
 
+    #[Trace]
     protected function applyAttack(BattleAttack $attack, Fighter $user, Fighter $target) {
         $attack_damage = $attack->raw_damage;
         if(empty($attack->jutsu->effect_only)) {
@@ -702,8 +751,8 @@ class BattleManager {
         }
 
         // Weapon effect for taijutsu (IN PROGRESS)
-        if($attack->jutsu->weapon_id) {
-            if($user->items[$attack->jutsu->weapon_id]->effect != 'diffuse') {
+        if($attack->jutsu->weapon_id && !empty($user->items[$attack->jutsu->weapon_id])) {
+            if($user->items[$attack->jutsu->weapon_id]->effect != 'diffuse' && $user->items[$attack->jutsu->weapon_id]->effect != 'element') {
                 $this->effects->setEffect(
                     $user,
                     $target->combat_id,
@@ -735,8 +784,16 @@ class BattleManager {
             );
         }
 
-        $text = $attack->jutsu->battle_text;
+        $text = '';
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
+        if (!$user instanceof NPC) {
+            if ($attack->jutsu->weapon_id) {
+                $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . " / " . System::unSlug($user->items[$attack->jutsu->weapon_id]->name) . "</br>" . '</i></span></b>';
+            } else {
+                $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
+            }
+        }
+        $text .= $attack->jutsu->battle_text;
         $has_element = ($attack->jutsu->element != Jutsu::ELEMENT_NONE && $attack->jutsu->element != "none");
         $element_text = ' with ' . $attack->jutsu->element;
 
@@ -744,22 +801,22 @@ class BattleManager {
               if($damage_resisted > 0 ) {
                     $text .= "<p style=\"font-weight:bold;\">
                             {$user->getName()} deals
-                                <span style=\"color:{$attack_jutsu_color}\">
-                                    " . sprintf('%.2f', $attack_damage) . " damage
+                                <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
+                                    " . sprintf('%.0f', $attack_damage) . " damage
                                 </span>
                                     to {$target->getName()}" . ($has_element ? $element_text : "") . ".
                                 <span style=\"font-weight:bold;\">
                                     (resists
-                                 <span style=\"color:{$attack_jutsu_color}\">
-                                    " . sprintf('%.2f', $damage_resisted) . "
+                                 <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
+                                    " . sprintf('%.0f', $damage_resisted) . "
                                 </span>
                                  damage)
                             </p>"; }
                 else {
                         $text .= "<p style=\"font-weight:bold;\">
                             {$user->getName()} deals
-                                <span style=\"color:{$attack_jutsu_color}\">
-                                    " . sprintf('%.2f', $attack_damage) . " damage
+                                <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
+                                    " . sprintf('%.0f', $attack_damage) . " damage
                                 </span>
                                     to {$target->getName()}" . ($has_element ? $element_text : "") . ".
                                 </p>"; }
@@ -790,6 +847,7 @@ class BattleManager {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     public function jutsuCollision(
         Fighter $player1, Fighter $player2, &$player1_damage, &$player2_damage, Jutsu $player1_jutsu, Jutsu $player2_jutsu
     ) {
@@ -961,7 +1019,7 @@ class BattleManager {
                     $collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
                 }
                 else {
-                    $collision_text .= "[player] cast [gender2] jutsu before [opponent] cast, negating " .
+                    $collision_text .= "[player] cast [gender2] jutsu before [opponent], negating " .
                         ($damage_reduction * 100) . "% of [opponent]'s damage!";
                 }
             }
@@ -983,7 +1041,7 @@ class BattleManager {
                     $collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
                 }
                 else {
-                    $collision_text .= "[opponent] cast [targetGender2] jutsu before [player] cast, negating " .
+                    $collision_text .= "[opponent] cast [targetGender2] jutsu before [player], negating " .
                         ($damage_reduction * 100) . "% of [player]'s damage!";
                 }
             }
@@ -1018,8 +1076,6 @@ class BattleManager {
 
         return $evasion_stat_amount;
     }
-
-
 
     // PRIVATE API - PLAYER ACTIONS
 
@@ -1081,6 +1137,7 @@ class BattleManager {
         return $fighter_jutsu;
     }
 
+    #[Trace]
     protected function setPlayerAction(Fighter $player, Jutsu $jutsu, int $weapon_id, string $weapon_element) {
         $this->battle->fighter_actions[$player->combat_id] = new LegacyFighterAction(
             $jutsu->id,
@@ -1103,6 +1160,7 @@ class BattleManager {
      * @param Fighter $ai
      * @throws RuntimeException
      */
+    #[Trace]
     protected function chooseAndSetAIAction(Fighter $ai) {
         if(!($ai instanceof NPC)) {
             throw new RuntimeException("Calling chooseAndSetAIAction on non-AI!");
@@ -1116,5 +1174,9 @@ class BattleManager {
             0,
             Jutsu::ELEMENT_NONE
         );
+    }
+
+    public function getPatrolId(): int {
+        return $this->battle->patrol_id;
     }
 }

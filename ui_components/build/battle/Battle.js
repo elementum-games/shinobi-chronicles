@@ -3,7 +3,6 @@ import BattleActionPrompt from "./BattleActionPrompt.js";
 import { apiFetch } from "../utils/network.js";
 import { findPlayerJutsu } from "./playerUtils.js";
 import { FightersAndField } from "./FightersAndField.js";
-
 function Battle({
   battle: initialBattle,
   battleApiLink,
@@ -20,38 +19,37 @@ function Battle({
     weaponId: 0,
     targetTileIndex: null
   });
-  const [error, setError] = React.useState(null); // DERIVED STATE
+  const [error, setError] = React.useState(null);
 
+  // DERIVED STATE
   const isAttackSelected = battle.isAttackPhase && (attackInput.jutsuId !== -1 || attackInput.handSeals.length > 0);
   const isSelectingTile = battle.isMovementPhase || isAttackSelected;
-  const selectedJutsu = battle.isAttackPhase ? findPlayerJutsu(battle, attackInput.jutsuId, attackInput.jutsuCategory === 'bloodline') : null; // STATE MUTATORS
+  const selectedJutsu = battle.isAttackPhase ? findPlayerJutsu(battle, attackInput.jutsuId, attackInput.jutsuCategory === 'bloodline') : null;
 
+  // STATE MUTATORS
   const updateAttackInput = newAttackInput => {
-    setAttackInput(prevSelectedAttack => ({ ...prevSelectedAttack,
+    setAttackInput(prevSelectedAttack => ({
+      ...prevSelectedAttack,
       ...newAttackInput
     }));
   };
-
   const handleApiResponse = response => {
     if (response.data.battle != null && Object.keys(response.data.battle).length > 0) {
       setBattle(response.data.battle);
     }
-
     if (response.data.battleResult != null) {
       setBattleResult(response.data.battleResult);
     }
-
     if (response.errors.length > 0) {
       setError(response.errors.join(' '));
     } else {
       setError(null);
     }
-  }; // ACTIONS
+  };
 
-
+  // ACTIONS
   const handleTileSelect = tileIndex => {
     console.log('selected tile', tileIndex);
-
     if (battle.isMovementPhase) {
       apiFetch(battleApiLink, {
         submit_movement_action: "yes",
@@ -68,13 +66,11 @@ function Battle({
       }).then(handleApiResponse);
     }
   };
-
   const handleForfeit = () => {
     apiFetch(battleApiLink, {
       forfeit: "yes"
     }).then(handleApiResponse);
   };
-
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
     className: "systemMessage"
   }, error), /*#__PURE__*/React.createElement(FightersAndField, {
@@ -99,9 +95,9 @@ function Battle({
     isBattleComplete: battle.isComplete
   }));
 }
-
 function SpectateStatus() {
   return /*#__PURE__*/React.createElement("div", null, "Spectate Status");
+
   /*
       <table class='table' style='margin-top:2px;'>
       <tr><td style='text-align:center;'>
@@ -124,9 +120,10 @@ function BattleResult({
   description,
   isBattleComplete
 }) {
-  const secondUrlParamIndex = window.location.href.indexOf('&'); // Exclude whatever section is after ?id=XYZ because it might trigger an action.
-  // We can probably remove this after we migrate to POST actions via APIs
+  const secondUrlParamIndex = window.location.href.indexOf('&');
 
+  // Exclude whatever section is after ?id=XYZ because it might trigger an action.
+  // We can probably remove this after we migrate to POST actions via APIs
   const continueUrl = window.location.href.substring(0, secondUrlParamIndex);
   return /*#__PURE__*/React.createElement("table", {
     className: "table"
@@ -138,5 +135,4 @@ function BattleResult({
     onClick: () => window.location.assign(continueUrl)
   }, "Continue")))));
 }
-
 window.Battle = Battle;

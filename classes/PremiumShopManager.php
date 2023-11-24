@@ -12,8 +12,12 @@ class PremiumShopManager {
     const SUPER_EXPEDITED_AK_COST_MULTIPLIER = 2;
     const SUPER_EXPEDITED_YEN_COST_MULTIPLIER = 2;
 
-    const EXCHANGE_MIN_YEN_PER_AK = 1.0;
-    const EXCHANGE_MAX_YEN_PER_AK = 20.0;
+    const EXCHANGE_MIN_YEN_PER_AK = 10.0;
+    const EXCHANGE_MAX_YEN_PER_AK = 100.0;
+
+    const TIER_THREE_SALE_END = '2023-11-30';
+    const SALE_REFUND_RATE = 50;
+    const EDS_90_DAY_DISCOUNT = 0.17;
 
     public System $system;
     public User $player;
@@ -42,6 +46,30 @@ class PremiumShopManager {
         $this->initStatTransferVars();
     }
 
+    ///TEMPORARY SALE LOGIC
+    public function tierThreeSaleActive(): bool {
+        $sale_end = new DateTimeImmutable(self::TIER_THREE_SALE_END);
+        $current_time = new DateTimeImmutable();
+
+        return $current_time < $sale_end;
+    }
+
+    public function saleTimeRemaining(): int {
+        $sale_end = new DateTimeImmutable(self::TIER_THREE_SALE_END);
+        return $sale_end->getTimestamp() - time();
+    }
+
+    public function loadTierThreeSalePrices($current_seal_level): void {
+        if($this->tierThreeSaleActive() && ($current_seal_level == 0 || $current_seal_level == 3)) {
+            $this->costs['forbidden_seal'][3][60] -= 5;
+            $this->costs['forbidden_seal'][3][90] -= 15;
+        }
+        else {
+            $this->costs['forbidden_seal'][3][60] = $this->costs['forbidden_seal_monthly_cost'][3] * 2;
+            $this->costs['forbidden_seal'][3][90] = $this->costs['forbidden_seal_monthly_cost'][3] * 3;
+        }
+    }
+
     private function initCosts(): void {
         $this->costs['name_change'] = 15;
         $this->costs['gender_change'] = 10;
@@ -49,9 +77,12 @@ class PremiumShopManager {
         $this->costs['bloodline'][2] = 60;
         $this->costs['bloodline'][3] = 40;
         $this->costs['bloodline'][4] = 20;
+        $this->costs['bloodline_random'][1] = 40;
+        $this->costs['bloodline_random'][2] = 20;
         $this->costs['forbidden_seal_monthly_cost'] = [
             1 => 5,
-            2 => 15
+            2 => 15,
+            3 => 30,
         ];
         $this->costs['forbidden_seal'] = [
             1 => [
@@ -63,6 +94,11 @@ class PremiumShopManager {
                 30 => $this->costs['forbidden_seal_monthly_cost'][2],
                 60 => $this->costs['forbidden_seal_monthly_cost'][2] * 2,
                 90 => $this->costs['forbidden_seal_monthly_cost'][2] * 3
+            ],
+            3 => [
+                30 => $this->costs['forbidden_seal_monthly_cost'][3],
+                60 => $this->costs['forbidden_seal_monthly_cost'][3] * 2,
+                90 => $this->calcSealDiscount($this->costs['forbidden_seal_monthly_cost'][3] * 3, self::EDS_90_DAY_DISCOUNT)
             ]
         ];
         $this->costs['element_change'] = 10;
@@ -77,6 +113,10 @@ class PremiumShopManager {
 
         $this->costs['reset_ai_battles'] = 10;
         $this->costs['reset_pvp_battles'] = 20;
+    }
+
+    private function calcSealDiscount(int $cost, float $discount_rate): int {
+        return $cost - floor($cost * $discount_rate);
     }
 
     private function initStatTransferVars(): void {
@@ -100,6 +140,15 @@ class PremiumShopManager {
         $this->expedited_stat_transfer_points_per_yen = round($this->stat_transfer_points_per_ak / 1000, 5);
 
         // Free stat transfers
+        $base_free_stat_change = $this->max_free_stat_change_amount;
+        if ($this->player->rank_num >= 3) {
+            $this->max_free_stat_change_amount = floor($this->player->rank->stat_cap / 100);
+            $base_free_stat_change = $this->max_free_stat_change_amount;
+        }
+        if ($this->player->reputation->benefits[UserReputation::BENEFIT_FREE_TRANSFER_BONUS]) {
+            $this->max_free_stat_change_amount += floor($base_free_stat_change * UserReputation::FREE_TRANSFER_BONUS / 100);
+        }
+        $this->max_free_stat_change_amount += floor($base_free_stat_change * $this->player->forbidden_seal->free_transfer_bonus / 100);
         self::$free_stat_change_cooldown_hours = self::$free_stat_change_cooldown / 3600;
 
         $this->free_stat_change_cooldown_left = $this->player->last_free_stat_change - (time() - self::$free_stat_change_cooldown);
@@ -149,6 +198,13 @@ class PremiumShopManager {
         $this->player->intelligence = 0;
         $this->player->willpower = 0;
 
+        //Reset Village Reputation Data
+        $this->player->village_rep = 0;
+        $this->player->weekly_pve_rep = 0;
+        $this->player->weekly_war_rep = 0;
+        $this->player->weekly_pvp_rep = 0;
+        $this->player->mission_rep_cd = 0;
+
         //Bug fix: Elements previously was not cleared. -- Shadekun
         $this->player->elements = array();
         $this->player->missions_completed = array(); //Reset missions complete -- Hitori
@@ -158,6 +214,7 @@ class PremiumShopManager {
         $this->player->updateData();
 
         $this->system->db->query("DELETE FROM `user_bloodlines` WHERE `user_id`='{$this->player->user_id}'");
+        $this->system->db->query("UPDATE `daily_tasks` SET `last_reset`='0' WHERE `user_id`='{$this->player->user_id}'");
         $this->system->db->query(
             "UPDATE `user_inventory` SET
                     `jutsu` = '',
@@ -170,7 +227,7 @@ class PremiumShopManager {
 
         return ActionResult::succeeded();
     }
-    
+
     // Name change
     public function userNameChangeCost(string $new_name): int {
         $cost = $this->costs['name_change'];
@@ -180,14 +237,14 @@ class PremiumShopManager {
         }
         elseif (strtolower($this->player->user_name) == strtolower($new_name)) {
             $cost = 0;
-        } 
+        }
 
         return $cost;
     }
 
     public function assertUserCanChangeName(string $new_name): void {
         $ak_cost = $this->userNameChangeCost($new_name);
-        
+
         if ($this->player->getPremiumCredits() < $ak_cost) {
             throw new RuntimeException("You do not have enough Ancient Kunai!");
         }
@@ -226,8 +283,8 @@ class PremiumShopManager {
             $free_name_changes_used = 1;
         }
 
-        $this->system->db->query("UPDATE `users` SET 
-            `user_name` = '{$new_name}', 
+        $this->system->db->query("UPDATE `users` SET
+            `user_name` = '{$new_name}',
             `username_changes` = `username_changes` - {$free_name_changes_used}
            WHERE `user_id` = {$this->player->user_id} LIMIT 1;");
         $this->player->subtractPremiumCredits($cost, "Username change");
@@ -423,7 +480,7 @@ class PremiumShopManager {
             throw new RuntimeException("You do not have enough Ancient Kunai!");
         }
     }
-    
+
     public function changeElement(int $editing_element_index, string $new_element): ActionResult {
         $this->assertUserCanChangeElement($editing_element_index, $new_element);
 

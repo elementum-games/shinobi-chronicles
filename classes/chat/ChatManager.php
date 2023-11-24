@@ -63,10 +63,10 @@ class ChatManager {
      */
     private function fetchPosts(?int $starting_post_id = null, int $max_posts = self::MAX_POSTS_PER_PAGE, bool $is_quote = false): array {
         if($starting_post_id != null) {
-            $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id ORDER BY `post_id` DESC LIMIT $max_posts";
+            $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id  AND `deleted` = 0 ORDER BY `post_id` DESC LIMIT $max_posts";
         }
         else {
-            $query = "SELECT * FROM `chat` ORDER BY `post_id` DESC LIMIT $max_posts";
+            $query = "SELECT * FROM `chat` WHERE `deleted` = 0 ORDER BY `post_id` DESC LIMIT $max_posts";
         }
         $result = $this->system->db->query($query);
 
@@ -76,10 +76,15 @@ class ChatManager {
 
             //Skip post if user blacklisted
             $blacklisted = false;
-            foreach($this->player->blacklist as $id => $blacklist) {
-                if($post->user_name == $blacklist[$id]['user_name']) {
+            // Legacy posts blocking
+            if($post->user_id == 0) {
+                if($this->player->blacklist->userBlockedByName($post->user_name)) {
                     $blacklisted = true;
-                    break;
+                }
+            }
+            else {
+                if($this->player->blacklist->userBlocked($post->user_id)) {
+                    $blacklisted = true;
                 }
             }
 
@@ -162,7 +167,7 @@ class ChatManager {
             $post->message = nl2br($this->system->html_parse($post->message, false, true));
 
             // Handle Mention
-            $pattern = "/@([^ \n\s!?.<>:@\[\]()]+)(?=[^A-Za-z0-9_]|$)/";
+            $pattern = "/@([^\r\n\s@,<>:\[\]()]+[a-zA-Z0-9_-]|$)/";
             $has_mention = preg_match_all($pattern, $post->message, $matches);
             $mention_count = 0;
             if ($has_mention) {
@@ -172,6 +177,10 @@ class ChatManager {
                         // if at limit, stop
                         if ($mention_count > 3) {
                             break;
+                        }
+                        // only display formatted mention if user exists
+                        if(!User::findByName($this->system, str_replace("\\", "", $match), true)) {
+                            continue;
                         }
                         // format each mention
                         $formatted_mention = "<div class='mention_container'><a class='chat_user_name userLink' href='" . $this->system->router->getURL("members", ["user" => $match]) . "'>@" . $match . "</a></div>";
@@ -227,7 +236,7 @@ class ChatManager {
     public function submitPost(string $message) {
         $chat_max_post_length = $this->maxPostLength();
 
-        $message_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($message)));
+        $message_length = strlen(preg_replace('/(\\\\[rn])+/', '', trim($message)));
 
         try {
             $result = $this->system->db->query(
@@ -252,6 +261,13 @@ class ChatManager {
             }
 
             $title = $this->player->rank->name;
+            $seat = $this->player->village_seat;
+            if (!empty($seat->seat_title)) {
+                $title = $seat->seat_title;
+                if ($seat->seat_type == 'kage') {
+                    $title = VillageManager::KAGE_NAMES[$this->player->village->village_id];
+                }
+            }
             $staff_level = $this->player->staff_level;
             $supported_colors = $this->player->getNameColors();
 
@@ -305,10 +321,11 @@ class ChatManager {
                             message: $this->player->user_name . " replied to your post!",
                             user_id: $result['user_id'],
                             created: time(),
+                            expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_CHAT * 86400),
                             alert: false,
                             post_id: $new_post_id,
                         );
-                        NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+                        NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_MULTIPLE, limit: 3);
                     }
                 }
             }
@@ -348,10 +365,11 @@ class ChatManager {
                         message: $this->player->user_name . " mentioned you in chat!",
                         user_id: $result['user_id'],
                         created: time(),
+                        expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_CHAT * 86400),
                         alert: false,
                         post_id: $new_post_id,
                     );
-                    NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+                    NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_MULTIPLE, limit: 3);
                 }
             }
 
@@ -370,7 +388,10 @@ class ChatManager {
      * @throws RuntimeException
      */
     public function deletePost(int $post_id): array {
-        $this->system->db->query("DELETE FROM `chat` WHERE `post_id` = $post_id LIMIT 1");
+        $this->system->db->query("UPDATE `chat` SET `deleted`=1 WHERE `post_id`=$post_id LIMIT 1");
+        $this->player->staff_manager->staffLog(StaffManager::STAFF_LOG_MOD,
+    "{$this->player->user_name}({$this->player->user_id}) deleted post_id: $post_id"
+        );
 
         if($this->system->db->last_affected_rows == 0) {
             throw new RuntimeException("Error deleting post!");

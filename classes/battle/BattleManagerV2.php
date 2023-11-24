@@ -1,5 +1,6 @@
 <?php
 
+use DDTrace\Trace;
 use JetBrains\PhpStorm\Pure;
 
 require_once __DIR__ . '/BattleV2.php';
@@ -105,6 +106,7 @@ class BattleManagerV2 {
      * @param array  $default_attacks
      * @param bool   $spectate
      */
+    #[Trace]
     public function __construct(
         System $system,
         User $player,
@@ -151,6 +153,7 @@ class BattleManagerV2 {
      *
      * @throws RuntimeException
      */
+    #[Trace]
     public static function init(
         System $system,
         User $player,
@@ -180,6 +183,7 @@ class BattleManagerV2 {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     protected function loadFighters(): void {
         if($this->player->id == $this->battle->player1_id) {
             $this->player_side = BattleV2::TEAM1;
@@ -255,6 +259,7 @@ class BattleManagerV2 {
      * @return string|null
      * @throws RuntimeException
      */
+    #[Trace]
     public function checkInputAndRunTurn(): ?string {
         // If someone is not in battle, this will be set
         if($this->battle->winner) {
@@ -437,6 +442,7 @@ class BattleManagerV2 {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     protected function runActions(): void {
         $this->processTurnEffects();
 
@@ -453,6 +459,7 @@ class BattleManagerV2 {
         $this->finishTurn();
     }
 
+    #[Trace]
     private function finishTurn() {
         $this->battle->turn_time = time();
         $this->battle->turn_count++;
@@ -480,6 +487,7 @@ class BattleManagerV2 {
         }
     }
 
+    #[Trace]
     private function checkForWinner(): string {
         if($this->battle->isComplete()) {
             return $this->battle->winner;
@@ -505,6 +513,7 @@ class BattleManagerV2 {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     private function processTurnEffects(): void {
         // Run turn effects
         $this->effects->applyActiveEffects($this->battle->player1, $this->battle->player2);
@@ -520,6 +529,7 @@ class BattleManagerV2 {
         }
     }
 
+    #[Trace]
     private function setEffectDescriptions(): void {
         if($this->effects->hasEffectHits($this->battle->player1)) {
             foreach($this->effects->getEffectHits($this->battle->player1) as $effect_hit) {
@@ -548,11 +558,13 @@ class BattleManagerV2 {
     }
 
 
+    #[Trace]
     protected function stopBattle() {
         $this->battle->winner = BattleV2::DRAW;
         $this->updateData();
     }
 
+    #[Trace]
     public function updateData() {
         if($this->spectate) {
             return;
@@ -573,6 +585,7 @@ class BattleManagerV2 {
      * @param FighterAction $action
      * @throws RuntimeException
      */
+    #[Trace]
     protected function setPlayerAction(Fighter $player, FighterAction $action) {
         if($this->battle->isAttackPhase() && $action instanceof FighterAttackAction) {
             $this->battle->fighter_actions[$player->combat_id] = $action;
@@ -598,6 +611,7 @@ class BattleManagerV2 {
         }
     }
 
+    #[Trace]
     protected function runPlayerHealItemAction(array $FORM_DATA) {
         try {
             if(isset($FORM_DATA['submit_prep_action'])) {
@@ -642,6 +656,7 @@ class BattleManagerV2 {
      * @param Fighter $npc
      * @throws RuntimeException
      */
+    #[Trace]
     protected function chooseAndSetNPCAction(Fighter $npc): void {
         if(!($npc instanceof NPC)) {
             throw new RuntimeException("Calling chooseAndSetNPCAction on non-NPC!");
@@ -668,6 +683,7 @@ class BattleManagerV2 {
         $this->debug(self::DEBUG_OPPONENT_ACTION, 'choosingOpponentAction', print_r($action, true));
     }
 
+    #[Trace]
     protected function chooseNPCMovementAction(Fighter $npc, int $target_fighter_location): FighterMovementAction {
         $npc_location = $this->field->getFighterLocation($npc->combat_id);
 
@@ -738,6 +754,7 @@ class BattleManagerV2 {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     protected function chooseNPCAttackAction(NPC $npc, Fighter $target): FighterAttackAction {
         $jutsu = $npc->chooseAttack();
         $jutsu->setCombatId($npc->combat_id);
@@ -991,4 +1008,7 @@ class BattleManagerV2 {
         return $default_attacks;
     }
 
+    public function getPatrolId(): int {
+        return $this->battle->patrol_id;
+    }
 }

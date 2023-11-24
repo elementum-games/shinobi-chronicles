@@ -15,6 +15,7 @@ class NotificationDto {
         public int $created = 0,
         public int $duration = 0,
         public bool $alert = false,
+        public ?int $expires = null,
     ) {
     }
 
@@ -27,6 +28,7 @@ class NotificationDto {
             user_id: $row['user_id'],
             created: $row['created'],
             duration: $row['duration'],
+            expires: $row['expires'],
             alert: $row['alert'],
         );
     }

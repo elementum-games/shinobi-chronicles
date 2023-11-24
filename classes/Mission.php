@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+
 /* Class:		Mission
 */
 class Mission {
@@ -9,11 +11,25 @@ class Mission {
     const RANK_A = 4;
     const RANK_S = 5;
 
+    const TYPE_VILLAGE = 1;
     const TYPE_CLAN = 2;
     const TYPE_TEAM = 3;
     const TYPE_SPECIAL = 4;
-    const TYPE_SURVIVAL = 5;
+    const TYPE_SURVIVAL = 5; // legacy
     const TYPE_EVENT = 6;
+    const TYPE_FACTION = 7;
+
+    const FACTION_AYAKASHI = 1; // for future possible use
+
+    public static array $type_names = [
+        self::TYPE_VILLAGE => 'Village',
+        self::TYPE_CLAN => 'Clan',
+        self::TYPE_TEAM => 'Team',
+        self::TYPE_SPECIAL => 'Special',
+        self::TYPE_SURVIVAL => 'Survival',
+        self::TYPE_EVENT => 'Event',
+        self::TYPE_FACTION => 'Faction'
+    ];
 
     const STATUS_IN_PROGRESS = 1;
     const STATUS_COMPLETE = 2;
@@ -33,6 +49,7 @@ class Mission {
     public $stages;
     public $money;
     public $rewards = [];
+    public ?TravelCoords $custom_start_location;
 
     public User $player;
     public ?Team $team;
@@ -60,9 +77,13 @@ class Mission {
         $this->mission_id = $mission_data['mission_id'];
         $this->name = $mission_data['name'];
         $this->rank = $mission_data['rank'];
-        $this->mission_type = $mission_data['mission_type'];
+        $this->mission_type = (int) $mission_data['mission_type'];
         $this->money = $mission_data['money'];
         $this->rewards = json_decode($mission_data['rewards'], true);
+
+        if (isset($mission_data['custom_start_location']) && !empty($mission_data['custom_start_location'])) {
+            $this->custom_start_location = TravelCoords::fromDbString($mission_data['custom_start_location']);
+        }
 
         // Unset team if normal mission
         if($this->mission_type != Mission::TYPE_TEAM) {
@@ -108,20 +129,79 @@ class Mission {
             return Mission::STATUS_COMPLETE;
         }
         // Set to completion stage if all stages have been completed
-        if($stage_id > count($this->stages)) {
-            $this->current_stage = array(
-                'stage_id' => $stage_id + 1,
-                'action_type' => 'travel',
-                'action_data' => $this->player->village_location->fetchString(),
-                'description' => 'Report back to the village to complete the mission.'
-            );
-            if($this->mission_type == Mission::TYPE_SURVIVAL) {
-                $this->current_stage['ai_defeated'] = $this->player->mission_stage['ai_defeated'] ?? 0;
-                $this->current_stage['mission_money'] = $this->player->mission_stage['mission_money'] ?? 0;
-                $this->current_stage['round_complete'] = $this->player->mission_stage['round_complete'] ?? false;
+        if ($stage_id > count($this->stages)) {
+            // if custom_start_location set
+            if (isset($this->custom_start_location) && !empty($this->custom_start_location)) {
+                $this->current_stage = array(
+                    'stage_id' => $stage_id + 1,
+                    'action_type' => 'travel',
+                    'action_data' => $this->custom_start_location->toString(),
+                    'description' => 'Return to ' . $this->custom_start_location->toString() . ' to complete the mission.'
+                );
+            }
+            // otherwise use village
+            else {
+                $this->current_stage = array(
+                    'stage_id' => $stage_id + 1,
+                    'action_type' => 'travel',
+                    'action_data' => $this->player->village_location->toString(),
+                    'description' => 'Report back to the village to complete the mission.'
+                );
             }
             $this->player->mission_stage = $this->current_stage;
+
+            //notifications
+            $mission_result = $this->system->db->query("SELECT * FROM `missions` where `mission_id` = {$this->player->mission_id} LIMIT 1");
+            $mission_result = $this->system->db->fetch($mission_result);
+            $notification_rank = '';
+            $notification_type = '';
+            switch ($mission_result['mission_type']) {
+                case 2:
+                    $notification_rank = 'C';
+                    $notification_type = 'mission_clan';
+                    break;
+                case 6:
+                    $notification_rank = 'E';
+                    $notification_type = 'mission';
+                    break;
+                case 7:
+                    $notification_rank = 'F';
+                    $notification_type = 'mission';
+                    break;
+                default:
+                    $notification_rank = Mission::$rank_names[$mission_result['rank']];
+                    $notification_type = 'mission';
+                    break;
+
+            }
+            $new_notification = new MissionNotificationDto(
+                type: $notification_type,
+                message: $this->current_stage['description'],
+                user_id: $this->player->user_id,
+                created: time(),
+                mission_rank: $notification_rank,
+                alert: false,
+            );
+            NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+
             return Mission::STATUS_IN_PROGRESS;
+        }
+
+        // Get last location
+        if (isset($this->custom_start_location) && !empty($this->custom_start_location)) {
+            // use custom_start_location as default
+            $last_location = $this->custom_start_location->toString();
+        } else {
+            // else use village as default
+            $last_location = $this->player->village_location->toString();
+        }
+        if (isset($this->current_stage['action_type'])) {
+            if ($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
+                $last_location = $this->current_stage['action_data'];
+            } else if ($this->current_stage['action_type'] == 'combat') {
+                $last_location = $this->player->location->toString();
+            }
+
         }
 
         // Load new stage data
@@ -138,13 +218,64 @@ class Mission {
 
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
             for($i = 0; $i < 3; $i++) {
-                $location = $this->rollLocation($this->player->village_location);
-                if(!isset($villages[$location->fetchString()]) || $location->equals($this->player->village_location)) {
+                // if location is specified and not multi-stage
+                if (isset($this->current_stage['action_data']) && $this->current_stage['action_data'] != '0' && $new_stage == true) {
+                    $location = TravelCoords::fromDbString($this->current_stage['action_data']);
+                }
+                // if target type is set
+                else if (isset($this->current_stage['target_type']) && $this->current_stage['target_type'] != "default") {
+                    // get village in home region
+                    if ($this->current_stage['target_type'] == "home_village") {
+                        $village_query = $this->system->db->query("SELECT `x`, `y` FROM `region_locations`
+                            INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
+                            WHERE `regions`.`region_id` = '{$this->player->village->region_id}' AND `type` = 'village'
+                        ");
+                    }
+                    // get any ally village
+                    else if ($this->current_stage['target_type'] == "ally_village") {
+                        $village_query = $this->system->db->query("SELECT `x`, `y` FROM `region_locations`
+                            INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
+                            WHERE `regions`.`village` = '{$this->player->village->village_id}' AND `type` = 'village'
+                        ");
+                    }
+                    // get any enemy village
+                    else if ($this->current_stage['target_type'] == "enemy_village") {
+                        $village_query = $this->system->db->query("SELECT `x`, `y` FROM `region_locations`
+                            INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
+                            WHERE `regions`.`village` != '{$this->player->village->village_id}' AND `type` = 'village'
+                        ");
+                    }
+                    $village_result = $this->system->db->fetch_all($village_query);
+                    $random_village = array_rand($village_result);
+                    $location = $this->rollLocation(new TravelCoords($village_result[$random_village]['x'], $village_result[$random_village]['y'], 1));
+                }
+                // if first stage and custom_start_location set, use custom_start_location as root
+                else if ($stage_id == 1 && isset($this->custom_start_location) && !empty($this->custom_start_location)) {
+                    $location = $this->rollLocation($this->custom_start_location);
+                }
+                // if basic mission and first stage, use village as root
+                else if ($stage_id == 1 && $this->mission_type != $this::TYPE_EVENT) {
+                    $location = $this->rollLocation($this->player->village_location);
+                }
+                // if last_location is set, use last_location
+                else if (!empty($this->current_stage['last_location'])) {
+                    $location = $this->rollLocation(TravelCoords::fromDbString($this->current_stage['last_location']));
+                }
+                // otherwise, use player current location
+                else {
+                    $location = $this->rollLocation($this->player->location);
+                }
+                if(!isset($villages[$location->toString()]) || $location->equals($this->player->village_location)) {
                     break;
                 }
             }
 
-            $this->current_stage['action_data'] = $location->fetchString();
+            // if not multi-stage, update last location
+            if ($new_stage) {
+                $this->current_stage['last_location'] = $last_location;
+            }
+
+            $this->current_stage['action_data'] = $location->toString();
         }
 
         $search_array = array('[action_data]', '[location_radius]');
@@ -152,12 +283,57 @@ class Mission {
 
         $this->current_stage['description'] = str_replace($search_array, $replace_array, $this->current_stage['description']);
 
-        if($this->mission_type == Mission::TYPE_SURVIVAL) {
-            $this->current_stage['ai_defeated'] = $this->player->mission_stage['ai_defeated'] ?? 0;
-            $this->current_stage['mission_money'] = $this->player->mission_stage['mission_money'] ?? 0;
-            $this->current_stage['round_complete'] = $this->player->mission_stage['round_complete'] ?? false;
-        }
         $this->player->mission_stage = $this->current_stage;
+
+        //notifications
+        if ($this->player->mission_id > 0) {
+            $mission_result = $this->system->db->query("SELECT * FROM `missions` where `mission_id` = {$this->player->mission_id} LIMIT 1");
+            $mission_result = $this->system->db->fetch($mission_result);
+            $notification_rank = '';
+            $notification_type = '';
+            switch ($mission_result['mission_type']) {
+                case 2:
+                    $notification_rank = 'C';
+                    $notification_type = 'mission_clan';
+                    break;
+                case 6:
+                    $notification_rank = 'E';
+                    $notification_type = 'mission';
+                    break;
+                case 7:
+                    $notification_rank = 'F';
+                    $notification_type = 'mission';
+                    break;
+                default:
+                    $notification_rank = Mission::$rank_names[$mission_result['rank']];
+                    $notification_type = 'mission';
+                    break;
+
+            }
+            if ($this->player->mission_stage['action_type'] == 'travel') {
+                $mission_location = TravelCoords::fromDbString($this->player->mission_stage['action_data']);
+                $new_notification = new MissionNotificationDto(
+                    type: $notification_type,
+                    message: $mission_result['name'] . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                    user_id: $this->player->user_id,
+                    created: time(),
+                    mission_rank: $notification_rank,
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+            } else {
+                $new_notification = new MissionNotificationDto(
+                    type: $notification_type,
+                    message: $mission_result['name'] . " in progress",
+                    user_id: $this->player->user_id,
+                    created: time(),
+                    mission_rank: $notification_rank,
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+            }
+        }
+
         return Mission::STATUS_IN_PROGRESS;
     }
 
@@ -199,13 +375,37 @@ class Mission {
 
         // Set to completion stage if all stages have been completed
         if($stage_id > count($this->stages)) {
-            $this->current_stage = array(
-                'stage_id' => $stage_id + 1,
-                'action_type' => 'travel',
-                'action_data' => $this->player->village_location->fetchString(),
-                'description' => 'Report back to the village to complete the mission.'
-            );
+            // if custom_start_location set
+            if (isset($this->custom_start_location) && !empty($this->custom_start_location)) {
+                $this->current_stage = array(
+                    'stage_id' => $stage_id + 1,
+                    'action_type' => 'travel',
+                    'action_data' => $this->custom_start_location->toString(),
+                    'description' => 'Return to ' . $this->custom_start_location->toString() . ' to complete the mission.'
+                );
+            }
+            // otherwise use village
+            else {
+                $this->current_stage = array(
+                    'stage_id' => $stage_id + 1,
+                    'action_type' => 'travel',
+                    'action_data' => $this->player->village_location->toString(),
+                    'description' => 'Report back to the village to complete the mission.'
+                );
+            }
             $this->player->mission_stage = $this->current_stage;
+
+            //notifications
+            $new_notification = new MissionNotificationDto(
+                type: "mission_team",
+                message: $this->current_stage['description'],
+                user_id: $this->player->user_id,
+                created: time(),
+                mission_rank: 'T',
+                alert: false,
+            );
+            NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+
             return Mission::STATUS_IN_PROGRESS;
         }
 
@@ -241,12 +441,12 @@ class Mission {
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
             for($i = 0; $i < 3; $i++) {
                 $location = $this->rollLocation($this->player->village_location);
-                if(!isset($villages[$location->fetchString()]) || $location->equals($this->player->village_location)) {
+                if(!isset($villages[$location->toString()]) || $location->equals($this->player->village_location)) {
                     break;
                 }
             }
 
-            $this->current_stage['action_data'] = $location->fetchString();
+            $this->current_stage['action_data'] = $location->toString();
         }
 
         $search_array = array('[action_data]', '[location_radius]');
@@ -254,17 +454,49 @@ class Mission {
         $this->current_stage['description'] = str_replace($search_array, $replace_array, $this->current_stage['description']);
 
         $this->player->mission_stage = $this->current_stage;
+
+        //notifications
+        if ($this->player->mission_id > 0) {
+            $mission_result = $this->system->db->query("SELECT * FROM `missions` where `mission_id` = {$this->player->mission_id} LIMIT 1");
+            $mission_result = $this->system->db->fetch($mission_result);
+            if ($this->player->mission_stage['action_type'] == 'travel') {
+                $mission_location = TravelCoords::fromDbString($this->player->mission_stage['action_data']);
+                $new_notification = new MissionNotificationDto(
+                    type: "mission_team",
+                    message: $mission_result['name'] . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                    user_id: $this->player->user_id,
+                    created: time(),
+                    mission_rank: 'T',
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+            } else {
+                $new_notification = new MissionNotificationDto(
+                    type: "mission_team",
+                    message: $mission_result['name'] . " in progress",
+                    user_id: $this->player->user_id,
+                    created: time(),
+                    mission_rank: 'T',
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+            }
+        }
+
         return Mission::STATUS_IN_PROGRESS;
     }
 
     public function rollLocation(TravelCoords $starting_location): TravelCoords {
-
         $max = $this->current_stage['location_radius'] * 2;
         $x = mt_rand(0, $max) - $this->current_stage['location_radius'];
         $y = mt_rand(0, $max) - $this->current_stage['location_radius'];
         $map_id = $starting_location->map_id;
-        if($x == 0 && $y == 0) {
-            $x++;
+
+        // minimum 1 tile off target if radius > 0;
+        if ($this->current_stage['location_radius'] > 0) {
+            if ($x == 0 && $y == 0) {
+                $x++;
+            }
         }
 
         $x += $starting_location->x;
@@ -384,6 +616,17 @@ class Mission {
             }
         }
 
+        // Faction Mission Logic
+        if ($mission->mission_type == Mission::TYPE_FACTION) {
+            if (isset($mission->custom_start_location) && !empty($mission->custom_start_location)) {
+                if ($player->location != $mission->custom_start_location) {
+                    throw new RuntimeException("Invalid location!");
+                }
+            } else {
+                throw new RuntimeException("Invalid custom_start_location!");
+            }
+        }
+
         $player->mission_id = $mission_id;
 
         return $mission;
@@ -427,7 +670,12 @@ class Mission {
                             $reward_items[$item['item_id']],
                             $item['quantity']
                         );
-                        $reward_text .= "Gained " . $reward_items[$item['item_id']]->name . " x" . $item['quantity'] . " " . $item['chance'] . "%<br>";
+                        if ($item['chance'] < 100) {
+                            $reward_text .= "Gained " . $reward_items[$item['item_id']]->name . " x" . $item['quantity'] . " " . $item['chance'] . "%<br>";
+                        } else {
+                            $reward_text .= "Gained " . $reward_items[$item['item_id']]->name . " x" . $item['quantity'] . "<br>";
+                        }
+
                     }
                 }
 

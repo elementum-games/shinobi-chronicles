@@ -85,7 +85,7 @@ if(!isset($_SESSION['user_id'])) {
 
             // Get result
             $result = $system->db->query(
-                "SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified`
+                "SELECT `user_id`, `staff_level`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified`, `last_login_attempt`
                     FROM `users` WHERE `user_name`='$user_name' LIMIT 1"
             );
             if ($system->db->last_num_rows == 0) {
@@ -96,17 +96,19 @@ if(!isset($_SESSION['user_id'])) {
                 throw new RuntimeException("Your account has not been verified. Please check your email for the activation code or use the following link to resend your activation email: {$system->router->base_url}?act=resend_verification&username=$user_name");
             }
 
-            // Check failed logins
+            // Check failed logins - New location
             if ($result['failed_logins'] >= User::PARTIAL_LOCK && $_SERVER['REMOTE_ADDR'] != $result['current_ip'] && $_SERVER['REMOTE_ADDR'] != $result['last_ip']) {
-                $system->log(
-                    'malicious_lockout',
-                    $result['user_id'],
-                    "IP address {$_SERVER['REMOTE_ADDR']} failed login on account {$result['user_name']} not matching previous IPs {$result['current_ip']} or {$result['last_ip']}."
-                );
+                if(time() - $result['last_login_attempt'] <= User::PARTIAL_LOCK_CD) {
+                    $system->log(
+                        'malicious_lockout',
+                        $result['user_id'],
+                        "IP address {$_SERVER['REMOTE_ADDR']} failed login on account {$result['user_name']} not matching previous IPs {$result['current_ip']} or {$result['last_ip']}."
+                    );
 
-                throw new RuntimeException("Account has been locked out!");
-            } else if ($result['failed_logins'] >= User::FULL_LOCK) {
-                throw new RuntimeException("Account has been locked out!");
+                    throw new RuntimeException("Account has been locked out, please try again in a few minutes!");
+                }
+            } else if ($result['failed_logins'] >= User::FULL_LOCK && time() - $result['last_login_attempt'] <= User::FULL_LOCK_CD) {
+                throw new RuntimeException("Account has been locked out, please try again in a few minutes!");
             }
 
             // Check password (NOTE: Due to importance of login, it is inclusive instead of exclusive (if statement must be true for user to be logged in) )
@@ -127,9 +129,19 @@ if(!isset($_SESSION['user_id'])) {
             }
             // If wrong, increment failed logins
             else {
-                $system->db->query(
-                    "UPDATE `users` SET `failed_logins` = `failed_logins` + 1 WHERE `user_id`='{$result['user_id']}' LIMIT 1"
-                );
+                //Use longest timer to determine failed attempt resets
+                if(time() - $result['last_login_attempt'] >= User::PARTIAL_LOCK_CD) {
+                    $system->db->query(
+                        "UPDATE `users` SET `failed_logins` = 1, `last_login_attempt` = "
+                        . time() . " WHERE `user_id`='{$result['user_id']}' LIMIT 1"
+                    );
+                }
+                else {
+                    $system->db->query(
+                        "UPDATE `users` SET `failed_logins` = `failed_logins` + 1, `last_login_attempt` = "
+                        . time() . " WHERE `user_id`='{$result['user_id']}' LIMIT 1"
+                    );
+                }
                 throw new RuntimeException("Invalid password!");
             }
         } catch (Exception $e) {
@@ -356,7 +368,9 @@ address and requested a password reset. If this is not your account, please disr
 
             // Village
             // Load villages
-            $result = $system->db->query("SELECT `name`, `location` FROM `villages`");
+            $result = $system->db->query("SELECT `villages`.`name`, `x`, `y`, `map_id` FROM `villages`
+                INNER JOIN `maps_locations` on `villages`.`map_location_id` = `maps_locations`.`location_id`
+            ");
             $villages = [];
             while ($row = mysqli_fetch_array($result)) {
                 $villages[$row['name']] = $row;
@@ -370,6 +384,9 @@ address and requested a password reset. If this is not your account, please disr
 
             $verification_code = sha1(mt_rand(1, 1337000));
 
+            $village_coords = new TravelCoords($villages[$village]['x'], $villages[$village]['y'], $villages[$village]['map_id']);
+
+            // TEMP FIX - AUTOMATICALLY VERIFIES - DO NOT FORGET TO CHANGE LATER
             User::create(
                 $system,
                 $user_name,
@@ -377,7 +394,7 @@ address and requested a password reset. If this is not your account, please disr
                 $email,
                 $gender,
                 $village,
-                $villages[$village]['location'],
+                $village_coords->toString(),
                 $verification_code
             );
 
@@ -389,11 +406,12 @@ address and requested a password reset. If this is not your account, please disr
             if(mail($email, $subject, $message, $headers)) {
                 ;
                 $system->message("Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!");
-                $login_message_text = "Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!";
+                //$login_message_text = "Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!";
+                $login_message_text = "Account created! Log in to continue.";
             }
             else {
-                $system->message("There was a problem sending the email to the address provided: $email Please contact a staff member on the forums for manual activation.");
-                $login_message_text = "There was a problem sending the email to the address provided: $email Please contact a staff member on the forums for manual activation.";
+                $system->message("There was a problem sending the email to the address provided: $email. If you are unable to log in please submit a ticket or contact a staff member on discord for manual activation.");
+                $login_message_text = "Account created! Log in to continue.";
             }
         } catch (Exception $e) {
             $system->db->rollbackTransaction();
@@ -529,11 +547,11 @@ if($LOGGED_IN) {
         $route = Router::$routes[$id] ?? null;
 
         try {
-            if ($layout->key == "new_geisha") {
+            if ($layout->usesV2Interface()) {
                 $location_name = $player->current_location->location_id
                     ? ' ' . ' <div id="contentHeaderLocation">' . " | " . $player->current_location->name . '</div>'
                     : null;
-                $location_coords = "<div id='contentHeaderCoords'>" . " (" . $player->location->x . "." . $player->location->y . ")" . '</div>';
+                $location_coords = "<div id='contentHeaderCoords'>" . " | " . $player->region->name . " (" . $player->location->x . "." . $player->location->y . ")" . '</div>';
                 $content_header_divider = '<div class="contentHeaderDivider"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#77694e" stroke-width="1"></line></svg></div>';
             } else {
                 $location_name = $player->current_location->location_id
@@ -575,7 +593,7 @@ if($LOGGED_IN) {
 
             // EVENT
             if($system->event != null) {
-                if ($layout->key != "new_geisha") {
+                if (!$layout->usesV2Interface()) {
                     require 'templates/temp_event_header.php';
                 }
             }
@@ -610,20 +628,20 @@ if($LOGGED_IN) {
         }
     }
     else if (isset($_GET['home'])) {
-        $home_view = "default";
+        $initial_home_view = "default";
         if (isset($_GET['view'])) {
             switch ($_GET['view']) {
                 case "news":
-                    $home_view = "news";
+                    $initial_home_view = "news";
                     break;
                 case "contact":
-                    $home_view = "contact";
+                    $initial_home_view = "contact";
                     break;
                 case "rules":
-                    $home_view = "rules";
+                    $initial_home_view = "rules";
                     break;
                 case "terms":
-                    $home_view = "terms";
+                    $initial_home_view = "terms";
                     break;
             }
         }

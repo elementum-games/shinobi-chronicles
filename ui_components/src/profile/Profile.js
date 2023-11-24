@@ -9,7 +9,10 @@ import type {
     PlayerAchievementsType
 } from "../_schema/userSchema.js";
 
+import RadarNinjaChart from '../charts/Chart.js';
+
 type Props = {|
+    +isDevEnvironment: boolean,
     +links: {|
         +clan: string,
         +team: string,
@@ -24,6 +27,7 @@ type Props = {|
     +playerAchievements: PlayerAchievementsType,
 |};
 function Profile({
+    isDevEnvironment,
     links,
     playerData,
     playerStats,
@@ -31,6 +35,15 @@ function Profile({
     playerDailyTasks,
     playerAchievements,
 }: Props) {
+
+    //Chart.js variables
+    const [showChart, setShowChart] = React.useState(false);
+    function handleShowGraph() {
+        setShowChart(!showChart);
+    }
+    //marginRight temp fix for wrapping to same row as chart when window width changes
+    let showChartButtonStyle={display:'block', marginRight: '75%', backgroundColor: 'rgb(20, 19, 23)', color: 'rgb(209, 197, 173)', borderRadius: '12px 12px 0 0', marginTop: '10px'}
+
     return (
         <div className="profile_container">
             {/* First row */}
@@ -41,14 +54,32 @@ function Profile({
                     playerSettings={playerSettings}
                 />
             </div>
+
+            {isDevEnvironment &&
+                <button style={showChartButtonStyle} onClick={handleShowGraph}>
+                    {(!showChart) ? "Show Graph" : "Show Stats"}
+                </button>
+            }
             
             {/* Second row */}
             <div className="profile_row_second">
-                <PlayerStats
-                    playerData={playerData}
-                    playerStats={playerStats}
-                />
+                {/* Show Chart or Graph */}
+                {
+                    (!showChart) ? 
+                    <PlayerStats
+                        playerData={playerData}
+                        playerStats={playerStats}
+                    />
+                    :
+                    <RadarNinjaChart 
+                        playerStats={playerStats}
+                    />
+                }
+
                 <div className="profile_row_second_col2">
+                    <PlayerUserRep
+                        playerData={playerData}
+                    />
                     <PlayerBloodline
                         bloodlinePageUrl={links.bloodlinePage}
                         buyBloodlineUrl={links.buyBloodline}
@@ -59,6 +90,7 @@ function Profile({
                     />
                 </div>
             </div>
+
             <div className="profile_row_third">
                 <h2>Achievements</h2>
                 <PlayerAchievements
@@ -138,17 +170,8 @@ function StatusAttributes({ playerData, playerSettings, links }) {
                     </div>
                     <div className="status_info_section section3" style={{ flexBasis: "34%" }}>
                         <p>
-                            <label>Village:</label>
-                            <span>{playerData.villageName}</span>
+                            <label>Village:</label>{playerData.villageName}
                         </p>
-                        <p>
-                            <label>Village Rep:</label>
-                            <span>{playerData.villageRepTier} ({playerData.villageRep} rep)</span>
-                        </p>
-                        {/*<p>
-                            <label>Weekly Rep Gained:</label>
-                            <span>{playerData.weeklyRep} / {playerData.maxWeeklyRep}</span>
-                        </p>*/}
                         {playerData.clanId != null &&
                             <p>
                                 <label>Clan:</label>
@@ -156,13 +179,13 @@ function StatusAttributes({ playerData, playerSettings, links }) {
                             </p>
                         }
                         {/*<span>Branch Family</span>*/}
-                        {/*<p>
+                        <p>
                             <label>Team:</label>
                             <span>{playerData.teamId == null
                                 ? "None"
                                 : <a href={links.team}>{playerData.teamName}</a>}
                             </span>
-                        </p>*/}
+                        </p>
 
                     </div>
                 </div>
@@ -177,54 +200,55 @@ function PlayerStats({ playerData, playerStats }) {
         <div className="stats_container">
             <h2>Character stats</h2>
             <div className="total_stats box-primary">
-                <span className="ft-c3">Total stats trained: {playerData.totalStats.toLocaleString()} / {playerData.totalStatCap.toLocaleString()}</span><br />
+                <span className="ft-c3">Total stats trained: {playerData.totalStats.toLocaleString()} / {playerData.totalStatCap.toLocaleString()}</span>
                 <div className="progress_bar_container total_stats_bar_container">
                     <div className="progress_bar_fill" style={{width: `${totalStatsPercent}%`}}></div>
                 </div>
             </div>
-            <div className="stat_list skills">
-                <div className="stat box-secondary">
-                    <h3>Ninjutsu skill: {playerStats.ninjutsuSkill.toLocaleString()}</h3>
-                    <div className="badge">忍術</div>
-                    <span className="ft-c3">Focuses on the use of hand signs and chakra based/elemental attacks.</span>
+            <div className="stat_lists">
+                <div className="stat_list skills">
+                    <div className="stat box-secondary">
+                        <h3>Ninjutsu skill: {playerStats.ninjutsuSkill.toLocaleString()}</h3>
+                        <div className="badge">忍術</div>
+                        <span className="ft-c3">Focuses on the use of hand signs and chakra based/elemental attacks.</span>
+                    </div>
+                    <div className="stat box-secondary">
+                        <h3>Taijutsu skill: {playerStats.taijutsuSkill.toLocaleString()}</h3>
+                        <div className="badge">体術</div>
+                        <span className="ft-c3">Focuses on the use of hand to hand combat and various weapon effects.</span>
+                    </div>
+                    <div className="stat box-secondary">
+                        <h3>Genjutsu skill: {playerStats.genjutsuSkill.toLocaleString()}</h3>
+                        <div className="badge">幻術</div>
+                        <span className="ft-c3">Focuses on the use of illusions and high residual damage.</span>
+                    </div>
+                    <div className="stat box-secondary">
+                        <h3>Bloodline skill: {playerStats.bloodlineSkill.toLocaleString()}</h3>
+                        <div className="badge">血継</div>
+                        <span className="ft-c3">Increases control and mastery over one's bloodline.</span>
+                    </div>
                 </div>
-                <div className="stat box-secondary">
-                    <h3>Taijutsu skill: {playerStats.taijutsuSkill.toLocaleString()}</h3>
-                    <div className="badge">体術</div>
-                    <span className="ft-c3">Focuses on the use of hand to hand combat and various weapon effects.</span>
-                </div>
-                <div className="stat box-secondary">
-                    <h3>Genjutsu skill: {playerStats.genjutsuSkill.toLocaleString()}</h3>
-                    <div className="badge">幻術</div>
-                    <span className="ft-c3">Focuses on the use of illusions and high residual damage.</span>
-                </div>
-                <div className="stat box-secondary">
-                    <h3>Bloodline skill: {playerStats.bloodlineSkill.toLocaleString()}</h3>
-                    <div className="badge">血継</div>
-                    <span className="ft-c3">Increases the control over one's bloodline.<br />
-                        Helps with its mastery.</span>
-                </div>
-            </div>
-            <div className="stat_list attributes">
-                <div className="stat box-secondary">
-                    <h3>Cast speed: {playerStats.castSpeed.toLocaleString()}</h3>
-                    <div className="badge">印術</div>
-                    <span className="ft-c3">Increases Ninjutsu/Genjutsu attack speed, affecting damage dealt and received.</span>
-                </div>
-                <div className="stat box-secondary">
-                    <h3>Speed: {playerStats.speed.toLocaleString()}</h3>
-                    <div className="badge">速度</div>
-                    <span className="ft-c3">Increases Taijutsu attack speed, affecting damage dealt and received.</span>
-                </div>
-                <div className="stat box-secondary">
-                    <h3>Intelligence: {playerStats.intelligence.toLocaleString()}</h3>
-                    <div className="badge">知能</div>
-                    <span className="ft-c3"></span>
-                </div>
-                <div className="stat box-secondary">
-                    <h3>Willpower: {playerStats.willpower.toLocaleString()}</h3>
-                    <div className="badge">根性</div>
-                    <span className="ft-c3"></span>
+                <div className="stat_list attributes">
+                    <div className="stat box-secondary">
+                        <h3>Cast speed: {playerStats.castSpeed.toLocaleString()}</h3>
+                        <div className="badge">印術</div>
+                        <span className="ft-c3">Increases Ninjutsu/Genjutsu attack speed, affecting damage dealt and received.</span>
+                    </div>
+                    <div className="stat box-secondary">
+                        <h3>Speed: {playerStats.speed.toLocaleString()}</h3>
+                        <div className="badge">速度</div>
+                        <span className="ft-c3">Increases Taijutsu attack speed, affecting damage dealt and received.</span>
+                    </div>
+                    <div className="stat box-secondary">
+                        <h3>Intelligence: {playerStats.intelligence.toLocaleString()}</h3>
+                        <div className="badge">知能</div>
+                        <span className="ft-c3"></span>
+                    </div>
+                    <div className="stat box-secondary">
+                        <h3>Willpower: {playerStats.willpower.toLocaleString()}</h3>
+                        <div className="badge">根性</div>
+                        <span className="ft-c3"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -252,6 +276,33 @@ function PlayerBloodline({ playerData, bloodlinePageUrl, buyBloodlineUrl }) {
             </div>
         </div>
     );
+}
+
+type PlayerUserRepProps = {|
+    +playerData: PlayerDataType
+|};
+function PlayerUserRep({playerData}: PlayerUserRepProps) {
+    let img_link = "images/village_icons/" + playerData.villageName.toLowerCase() + ".png";
+    return (
+        <div className="reputation_display">
+            <div className="reputation_indicator">
+                <img src={img_link} />
+                <span className="village_name">{playerData.villageName}</span>
+            </div>
+            <div className="reputation_info ft-c3">
+                <span className="reputation_name">
+                    <b>{playerData.villageRepTier}</b>&nbsp;({playerData.villageRep} rep)
+                </span>
+                <span className="weekly_reputation">
+                    {playerData.weeklyPveRep}/{playerData.maxWeeklyPveRep} PvE
+                    &nbsp;|&nbsp;
+                    {playerData.weeklyWarRep}/{playerData.maxWeeklyWarRep} War
+                    &nbsp;|&nbsp;
+                    {playerData.weeklyPvpRep}/{playerData.maxWeeklyPvpRep} PvP
+                </span>
+            </div>
+        </div>
+    )
 }
 
 type DailyTasksProps = {|

@@ -30,8 +30,8 @@ function battle(): bool {
         $battle->renderBattle();
 
         if($battle->isComplete()) {
+            $result = processBattleFightEnd($battle, $player, $system);
             $player->battle_id = 0;
-            $result = processBattleFightEnd($battle, $player);
 
 			echo "<table class='table'>
                 <tr><th>Battle complete</th></tr>
@@ -88,14 +88,20 @@ function battle(): bool {
 			if($user->last_active < time() - 120) {
 				throw new RuntimeException("Target is inactive/offline!");
 			}
-			if($player->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
+            /*
+            if ($user->pvp_immunity_ms > System::currentTimeMs()) {
+            throw new RuntimeException("You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
+                ceil(($user->pvp_immunity_ms - System::currentTimeMs()) / 1000) . " more seconds.");
+            }*/
+			if($player->last_death_ms > System::currentTimeMs() - (User::PVP_IMMUNITY_SECONDS * 1000)) {
 				throw new RuntimeException("You died within the last minute, please wait " .
-					ceil((($player->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+					ceil((($player->last_death_ms + (User::PVP_IMMUNITY_SECONDS * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}
+            /*
 			if($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
 				throw new RuntimeException("Target has died within the last minute, please wait " .
 					ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
-			}
+			}*/
 
             if($system->USE_NEW_BATTLES) {
                 BattleV2::start($system, $player, $user, Battle::TYPE_FIGHT);
@@ -123,92 +129,192 @@ function battle(): bool {
 /**
  * @throws RuntimeException
  */
-function processBattleFightEnd(BattleManager $battle, User $player): string {
+function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $player, System $system): string {
     $pvp_yen = $player->rank_num * 50;
 
     $result = "";
 
-    if($battle->isPlayerWinner()) {
+    $player_alignment = VillageRelation::RELATION_NEUTRAL;
+    $opponent_alignment = VillageRelation::RELATION_NEUTRAL;
+    $region_objective = $system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`
+        FROM `region_locations`
+        INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+        WHERE `x` = {$player->location->x}
+        AND `y` = {$player->location->y}
+        AND `map_id` = {$player->location->map_id} LIMIT 1");
+    $region_objective = $system->db->fetch($region_objective);
+    if ($system->db->last_num_rows > 0) {
+        if (isset($player->village->relations[$region_objective['village']])) {
+            $player_alignment = $player->village->relations[$region_objective['village']]->relation_type;
+        }
+        else if ($player->village->village_id == $region_objective['village']) {
+            $player_alignment = VillageRelation::RELATION_ALLIANCE;
+        }
+        if (isset($battle->opponent->village->relations[$region_objective['village']])) {
+            $opponent_alignment = $battle->opponent->village->relations[$region_objective['village']]->relation_type;
+        }
+        else if ($battle->opponent->village->village_id == $region_objective['village']) {
+            $opponent_alignment = VillageRelation::RELATION_ALLIANCE;
+        }
+    }
+
+    if ($battle->isPlayerWinner()) {
         $player->pvp_wins++;
         $player->monthly_pvp++;
         $player->last_pvp_ms = System::currentTimeMs();
-        $village_point_gain = 1;
+
+        /* prevent chain sniping the same player
+        if ($battle->player_side == Battle::TEAM2) {
+            $player->pvp_immunity_ms = System::currentTimeMs() + (5 * 1000);
+        }*/
+
+        $village_point_gain = 1 + $player->village->policy->pvp_village_point;
         $team_point_gain = 1;
 
         $player->addMoney($pvp_yen, "PVP win");
         $result .= "You win the fight and earn ¥$pvp_yen![br]";
 
-        $player->system->db->query(
+        $system->db->query(
             "UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='{$player->village->name}' LIMIT 1"
         );
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
-        // Calculate rep gains
-        $rep_gain = $player->village->calcPvpRep($player->level, $player->rep_rank, $battle->opponent->level, $battle->opponent->rep_rank);
-        if($rep_gain > 0) {
-            $result .= "You have earned $rep_gain village reputation.[br]";
-            $player->addRep($rep_gain);
+        if ($battle->is_retreat) {
+            // Calculate rep gains
+            if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVP) && UserReputation::PVP_REP_ENABLED) {
+                $rep_gained = $player->reputation->handlePvPWin($player, $battle->opponent, true);
+                if ($rep_gained > 0) {
+                    $result .= "You have earned $rep_gained village reputation.[br]";
+                }
+            }
+            // Loot - winner takes half loser's if retreat, which is all remaining since loser has left battle in order to flag as retreat
+            $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}");
+            if ($system->db->last_affected_rows > 0) {
+                $result .= "You have taken half the loot carried by your opponent.[br]";
+            }
+        } else {
+            // Calculate rep gains
+            if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVP) && UserReputation::PVP_REP_ENABLED) {
+                $rep_gained = $player->reputation->handlePvPWin($player, $battle->opponent);
+                if ($rep_gained > 0) {
+                    $result .= "You have earned $rep_gained village reputation.[br]";
+                }
+            }
+            // Loot
+            $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}");
+            if ($system->db->last_affected_rows > 0) {
+                $result .= "You have taken all loot carried by your opponent.[br]";
+            }
         }
 
         // Team points
-        if($player->team != null) {
+        if ($player->team != null) {
             $player->team->addPoints($team_point_gain);
 
             $result .= "You have earned $team_point_gain point for your team.[br]";
         }
         // Daily Tasks
-        foreach ($player->daily_tasks as $task) {
-            if ($task->activity == DailyTask::ACTIVITY_PVP && !$task->complete) {
-                $task->progress++;
-            }
+        if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1);
         }
-    }
-    else if($battle->isOpponentWinner()) {
+        // Objective
+        // if player is allied with location owner
+        if ($player_alignment == VillageRelation::RELATION_ALLIANCE) {
+            if ($region_objective['defense'] < 100) {
+                $region_objective['defense']++;
+                $system->db->query("UPDATE `region_locations` SET `defense` = {$region_objective['defense']} WHERE `id` = {$region_objective['id']}");
+                WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_DEFENSE_GAINED, $region_objective['village']);
+                $result .= "Increased objective defense by 1.[br]";
+            } 
+        }
+        // if opponent is allied with location owner
+        else if ($opponent_alignment == VillageRelation::RELATION_ALLIANCE) {
+            if ($region_objective['defense'] > 0) {
+                $region_objective['defense']--;
+                $system->db->query("UPDATE `region_locations` SET `defense` = {$region_objective['defense']} WHERE `id` = {$region_objective['id']}");
+                WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_DEFENSE_REDUCED, $region_objective['village']);
+                $result .= "Decreased objective defense by 1.[br]";
+            } 
+        }
+
+        // War Log
+        WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_PVP_WINS, $battle->opponent->village->village_id);
+        WarLogManager::logAction($system, $player, $village_point_gain, WarLogManager::WAR_LOG_POINTS_GAINED, $battle->opponent->village->village_id);
+
+    } else if ($battle->isOpponentWinner()) {
         $result .= "You lose. You were taken back to your village by some allied ninja.[br]";
-        $player->health = 5;
         $player->pvp_losses++;
         $player->last_pvp_ms = System::currentTimeMs();
         $player->last_death_ms = System::currentTimeMs();
-        $player->moveToVillage();
+        $player->pvp_immunity_ms = System::currentTimeMs() + (5 * 60 * 1000); // 5 minutes
 
-        // Calc rep loss (if any)
-        // Calculate rep gains
-        $rep_loss = $player->village->calcPvpRep($player->level, $player->rep_rank, $battle->opponent->level,
-            $battle->opponent->rep_rank, false);
-        if($rep_loss < 0) {
-            $result .= "You have lost " . abs($rep_loss) . " village reputation.[br]";
-            $player->subtractRep(abs($rep_loss));
+        if ($battle->is_retreat) {
+            $player->health = 5;
+            $player->moveToVillage();
+            // Calc rep loss (if any)
+            if (UserReputation::PVP_REP_ENABLED) {
+                $rep_lost = $player->reputation->handlePvPLoss($player, $battle->opponent, true);
+                if ($rep_lost > 0) {
+                    $result .= "You have lost $rep_lost village reputation.[br]";
+                }
+                // Loot - winner takes half loser's if retreat
+                $loot_result = $system->db->query("SELECT COUNT(*) as total_loot FROM `loot` WHERE `user_id` = {$player->user_id} AND `battle_id` = {$player->battle_id}");
+                $loot_result = $system->db->fetch($loot_result);
+                if ($system->db->last_num_rows > 0) {
+                    $total_loot = $loot_result['total_loot'];
+                    $half_loot = floor($total_loot / 2);
+                    $query = "UPDATE `loot` SET `battle_id` = NULL WHERE `battle_id` = {$player->battle_id} ORDER BY `id` ASC LIMIT $half_loot";
+                    $system->db->query($query);
+                    if ($system->db->last_affected_rows > 0) {
+                        $result .= "Half of your loot was taken by your opponent.[br]";
+                    }
+                }
+            }
+        } else {
+            $player->health = 5;
+            $player->moveToVillage();
+            // Calc rep loss (if any)
+            if (UserReputation::PVP_REP_ENABLED) {
+                $rep_lost = $player->reputation->handlePvPLoss($player, $battle->opponent);
+                if ($rep_lost > 0) {
+                    $result .= "You have lost $rep_lost village reputation.[br]";
+                }
+            }
         }
 
         // If player is killed during a survival mission as a result of PVP, clear the survival mission
-        if($player->mission_id != null) {
+        if ($player->mission_id != null) {
             check_survival_missions($player->mission_id);
         }
 
         // Daily Tasks
-        foreach ($player->daily_tasks as $task) {
-            if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
-                $task->progress++;
-            }
+        if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1, DailyTask::SUB_TASK_COMPLETE);
         }
-    }
-    else {
+    } else if ($battle->isDraw()) {
         $result .= "You both knocked each other out. You were taken back to your village by some allied ninja.[br]";
         $player->health = 5;
         $player->moveToVillage();
-        $player->last_pvp_ms = System::currentTimeMs();
+        $player->last_pvp_ms = System::currentTimeMs(); 
 
         // If player is killed during a survival mission as a result of PVP, clear the survival mission
-        if($player->mission_id != null) {
+        if ($player->mission_id != null) {
             check_survival_missions($player->mission_id);
         }
 
         // Daily Tasks
-        foreach ($player->daily_tasks as $task) {
-            if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
-                $task->progress++;
-            }
+        if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1, DailyTask::SUB_TASK_COMPLETE);
         }
+
+        // Loot
+        $system->db->query("UPDATE `loot` SET `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}"); // clear hold on loot
+    }
+    else {
+        // Loot
+        $system->db->query("UPDATE `loot` SET `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}"); // clear hold on loot
+
+        $result .= "Battle Stopped.[br]";
     }
 
     return $result;
@@ -235,7 +341,7 @@ function battleFightAPI(System $system, User $player): BattlePageAPIResponse {
         $response->battle_data = $battle->getApiResponse();
 
         if($battle->isComplete()) {
-            $response->battle_result = processBattleFightEnd($battle, $player);
+            $response->battle_result = processBattleFightEnd($battle, $player, $system);
         }
     }
     catch (Exception $e) {

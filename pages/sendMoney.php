@@ -46,7 +46,7 @@ function sendMoney() {
                     throw new RuntimeException("You do not have that much money/AK!");
                 }
                 $player->subtractMoney($amount, "Sent money to {$recipient->user_name} (#{$recipient->user_id})");
-                $recipient->addMoney($amount, "Received money from $player->user_name (#$player->user_id)");
+                $recipient->addMoney($amount, "Received money from $player->user_name (#$player->user_id)", false);
 
                 // Player will be auto-updated later
                 $recipient->updateData();
@@ -57,8 +57,11 @@ function sendMoney() {
                     "{$amount} yen - #{$player->user_id} ($player->user_name) to #{$recipient->user_id}"
                 );
 
-                $alert_message = $player->user_name . " has sent you &yen;$amount.";
-                Inbox::sendAlert($system, Inbox::ALERT_YEN_RECEIVED, $player->user_id, $recipient->user_id, $alert_message);
+                // Adding yen threshold to block spam alerts
+                if(!$recipient->blacklist->userBlocked($player->user_id) && $amount > 500) {
+                    $alert_message = $player->user_name . " has sent you &yen;$amount.";
+                    Inbox::sendAlert($system, Inbox::ALERT_YEN_RECEIVED, $player->user_id, $recipient->user_id, $alert_message);
+                }
 
                 $system->message("&yen;{$amount} sent to {$recipient->user_name}!");
 
@@ -79,8 +82,10 @@ function sendMoney() {
                     "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient->user_id}"
                 );
 
-                $alert_message = $player->user_name . " has sent you $amount Ancient Kunai.";
-                Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $recipient->user_id, $alert_message);
+                if (!$recipient->blacklist->userBlocked($player->user_id)) {
+                    $alert_message = $player->user_name . " has sent you $amount Ancient Kunai.";
+                    Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $recipient->user_id, $alert_message);
+                }
 
                 $system->message("{$amount} AK sent to {$recipient->user_name}!");
             }
@@ -95,7 +100,7 @@ function sendMoney() {
     $current_amount_ak = $player->getPremiumCredits();
 
     $recipient = $_GET['recipient'] ?? '';
-    
+
     if (isset($_GET['recipient'])) {
         echo "<table class='table' style='width: 125px''><tr><td style='text-align: center'><a style='tab-index: 0' href='" . $system->router->getUrl("members",["user" => $recipient]) . "'>Back to Profile</a></td></tr></table>";
     }

@@ -115,6 +115,7 @@
                         <label for="combat_boosts[<?= $i ?>][power]">Power:</label>
                         <input
                             type="number"
+                            step="0.1"
                             name="combat_boosts[<?= $i ?>][power]"
                             value="<?= $existing_bloodline?->combat_boosts[$i]['power'] ?? 0 ?>"
                         >

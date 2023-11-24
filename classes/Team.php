@@ -126,7 +126,7 @@ class Team {
     public function getDefenseBoost(User $player): float {
         $result = $this->system->db->query(
             "SELECT COUNT(`user_id`) as `count` FROM `users`
-                        WHERE `team_id`='{$this->id}' AND `location`='".$player->location->fetchString()."' AND `last_active` > UNIX_TIMESTAMP() - 120"
+                        WHERE `team_id`='{$this->id}' AND `location`='".$player->location->toString()."' AND `last_active` > UNIX_TIMESTAMP() - 120"
         );
         $location_count = $this->system->db->fetch($result)['count'];
         

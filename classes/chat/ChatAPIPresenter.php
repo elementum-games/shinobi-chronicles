@@ -7,6 +7,7 @@ class ChatAPIPresenter {
     public static function chatPostResponse(System $system, ChatPostDto $chatPost) {
         return [
             'id' => $chatPost->id,
+            'userId' => $chatPost->user_id,
             'userName' => $chatPost->user_name,
             'message' => $chatPost->message,
             'userTitle' => $chatPost->title,
@@ -68,7 +69,7 @@ class ChatAPIPresenter {
         array $posts,
         ?int $previous_page_post_id,
         ?int $next_page_post_id,
-        int $latest_post_id
+        ?int $latest_post_id
     ): array {
         return [
             'posts' => array_map(function(ChatPostDto $post) use($system) {

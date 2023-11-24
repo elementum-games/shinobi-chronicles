@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../event/LanternEvent.php';
+require_once __DIR__ . '/../forbidden_shop/ForbiddenShopManager.php';
 
 class ForbiddenShopApiPresenter {
 

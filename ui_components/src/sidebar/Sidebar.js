@@ -41,6 +41,9 @@ function Sidebar({ links, navigationAPIData, userAPIData }) {
                 handleErrors(response.errors);
                 return;
             }
+            if (response.data.battle_url) {
+                window.location.href = response.data.battle_url;
+            }
             else {
                 setPlayerResources(response.data.playerResources);
                 setRegenTime(response.data.playerResources.regen_time);
@@ -67,11 +70,24 @@ function Sidebar({ links, navigationAPIData, userAPIData }) {
         return offset;
     }
 
+    const toggleNav = (e) => {
+        const currentClass = e.target.parentElement.className;
+        if (currentClass.includes('toggle')) {
+            e.target.parentElement.className = currentClass.replace('toggle', '').trim();
+        } else {
+            e.target.parentElement.className += ' toggle';
+        }
+    };
+
+    const parentClick = (e) => {
+        e.target.parentElement.click();
+    }
+
     // Content
-    function displaySection(section_data, title) {
+    function displaySection(section_data, title, toggleNav, sidebarCollapse, parentClick) {
         return (
-            <div className="sb_section_container">
-                <div className={"sb_header_bar d-flex"}>
+            <div className={sidebarCollapse == "closed" ? "sb_section_container " + title : "sb_section_container toggle " + title} onClick={toggleNav}>
+                <div className={"sb_header_bar d-flex"} onClick={parentClick}>
                     <div className={"sb_header_image_wrapper"}>
                         <img src="/images/v2/icons/menudecor.png" className="sb_header_image" />
                     </div>
@@ -128,10 +144,10 @@ function Sidebar({ links, navigationAPIData, userAPIData }) {
                 regenTime={regenTime}
                 regenOffset={regenOffset}
             />
-            {displaySection(userMenu, "Player Menu")}
-            {displaySection(activityMenu, "Action Menu")}
-            {displaySection(villageMenu, "Village Menu")}
-            {staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null}
+            {displaySection(userMenu, "Player Menu", toggleNav, playerSettings.sidebar_collapse, parentClick)}
+            {displaySection(activityMenu, "Action Menu", toggleNav, playerSettings.sidebar_collapse, parentClick)}
+            {displaySection(villageMenu, "Village Menu", toggleNav, playerSettings.sidebar_collapse, parentClick)}
+            {staffMenu.length ? displaySection(staffMenu, "Staff Menu", toggleNav, playerSettings.sidebar_collapse, parentClick) : null}
         </div>
     )
 }
@@ -196,16 +212,19 @@ function SBCharacterProfile({playerData, playerResources, playerSettings, regenT
                     resourceType="health"
                     resourceAmount={playerResources.health}
                     resourceMaxAmount={playerResources.max_health}
+                    regenRate={playerResources.health_regen}
                 />
                 <SBResourceBar
                     resourceType="chakra"
                     resourceAmount={playerResources.chakra}
                     resourceMaxAmount={playerResources.max_chakra}
+                    regenRate={playerResources.pool_regen}
                 />
                 <SBResourceBar
                     resourceType="stamina"
                     resourceAmount={playerResources.stamina}
                     resourceMaxAmount={playerResources.max_stamina}
+                    regenRate={playerResources.pool_regen}
                 />
             </div>
         </>
@@ -216,11 +235,13 @@ type SBResourceBarProps = {|
     +resourceType: "health",
     +resourceAmount: number,
     +resourceMaxAmount: number,
+    +regenRate: number,
 |};
 function SBResourceBar({
     resourceType,
     resourceAmount,
     resourceMaxAmount,
+    regenRate,
 }: SBResourceBarProps) {
     const fillPercent = Math.max(Math.round((resourceAmount / resourceMaxAmount) * 100), 6);
 
@@ -230,6 +251,9 @@ function SBResourceBar({
                 <img className="sb_resource_corner_left" src="/images/v2/decorations/barrightcorner.png" />
                 <label className="sb_innerResourceBarLabel">
                     {resourceAmount} / {resourceMaxAmount}
+                </label>
+                <label className="sb_innerResourceBarLabel_hover">
+                    {resourceAmount} / {resourceMaxAmount} (+{regenRate})
                 </label>
                 <div className={`sb_${resourceType} sb_fill`} style={{ width: fillPercent + "%" }}>
                     <svg className="sb_resource_highlight_wrapper" viewBox="0 0 50 50">

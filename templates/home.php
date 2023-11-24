@@ -31,6 +31,7 @@ else $NewsManager = new NewsManager($system);
                 isLoggedIn: "<?= isset($player) ?>",
                 isAdmin: "<?= isset($player) ? $player->hasAdminPanel() : false ?>",
                 version: "<?= System::VERSION_NAME ?>",
+                versionNumber: "<?= System::VERSION_NUMBER ?>",
                 initialView: "<?= $initial_home_view ?>",
                 loginURL: "<?= $system->router->base_url ?>",
                 registerURL: "<?= $system->router->base_url ?>",

@@ -10,7 +10,12 @@ function formPreloadData($variables, &$data, $post = true, $post_array = false) 
                 $data_array = [];
                 for($i = 0; $i < $variable['count']; $i++) {
                     $data_array[$i] = [];
-                    formPreloadData($variable['variables'], $data_array[$i], $post, $post_array[$var_name][$i]);
+					if(isset($post_array[$var_name][$i]) && $post) {
+                    	formPreloadData($variable['variables'], $data_array[$i], $post, $post_array[$var_name][$i]);
+					}
+					else {
+						preloadVariablesFromConstraints($data_array, $variable['variables']);
+					}
                 }
                 $data[$var_name] = json_encode($data_array);
             }
@@ -23,6 +28,12 @@ function formPreloadData($variables, &$data, $post = true, $post_array = false) 
                 $data[$var_name] = '';
             }
         }
+    }
+}
+
+function preloadVariablesFromConstraints(&$pre_data_array, $pre_variables): void {
+    foreach($pre_variables as $pre_var_name => $pre_variable) {
+        $pre_data_array[$pre_var_name] = '';
     }
 }
 
@@ -48,12 +59,6 @@ function validateFormData($entity_constraints, &$data, $content_id = null, $FORM
                     for($i = 0; $i < $variable['count']; $i++) {
                         $data_array[$count] = [];
                         foreach($variable['variables'] as $name => $var) {
-                            if(isset($FORM_DATA[$var_name][$i]["disabled"])) {
-                                if ($FORM_DATA[$var_name][$i]["disabled"] == "disabled") {
-                                    unset($FORM_DATA[$var_name][$i]);
-                                    continue;
-                                }
-                            }
                             if(!isset($FORM_DATA[$var_name][$i][$name])) {
                                 continue;
                             }
@@ -113,6 +118,12 @@ function validateField(
 
     $data[$var_name] = $system->db->clean($input);
 
+    // Option data
+    if(isset($field_constraints['field_required']) && $field_constraints['field_required'] === false) {
+        if(is_null($data[$var_name]) || $data[$var_name] == '') {
+            return true;
+        }
+    }
     // Check for entry
     if(strlen($data[$var_name]) < 1) {
         throw new RuntimeException("Please enter " . System::unSlug($var_name) . "!");
@@ -199,6 +210,11 @@ function displayFormFields($variables, $data, $input_name_prefix = ''): bool {
                 $data_vars = json_decode($data[$var_name], true);
 
                 for($i = 0; $i < $variable['count']; $i++) {
+                    // Prevent form warnings
+                    if(!isset($data_vars[$i])) {
+                        preloadVariablesFromConstraints($data_vars[$i], $variable['variables']);
+                    }
+
                     $name = $var_name . '[' . $i . ']';
                     echo "<span style='display:block;margin-top:10px;font-weight:bold;'>#" . ($i + 1) .
                         ": <button onclick='$(\"#" . $var_name . '_' . $i . "\").toggle();return false;'>Show/Hide</button></span>";
@@ -242,6 +258,10 @@ function displayFormFields($variables, $data, $input_name_prefix = ''): bool {
             }
         }
         else {
+            // Prevent form warnings
+            if(!isset($data[$var_name])) {
+                $data[$var_name] = '';
+            }
             displayVariable($var_name, $variable, $data[$var_name], $input_name_prefix);
         }
     }

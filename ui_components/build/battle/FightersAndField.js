@@ -16,13 +16,10 @@ export function FightersAndField({
     field,
     isSpectating
   } = battle;
-
   const handleTileSelect = tileIndex => {
     onTileSelect(tileIndex);
   };
-
   let status = '';
-
   if (battle.isPreparationPhase) {
     status = 'Prepare to Fight';
   } else if (battle.isMovementPhase) {
@@ -30,7 +27,6 @@ export function FightersAndField({
   } else {
     status = 'Attack';
   }
-
   return /*#__PURE__*/React.createElement("table", {
     className: "table"
   }, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
@@ -82,7 +78,6 @@ export function FightersAndField({
     onTileSelect: handleTileSelect
   })))));
 }
-
 function TimeRemaining({
   turnSecondsRemaining,
   turnCount
@@ -95,7 +90,6 @@ function TimeRemaining({
     const decrementTimeRemaining = () => {
       setSecondsRemaining(prevSeconds => prevSeconds <= 0 ? 0 : prevSeconds - 1);
     };
-
     const intervalId = setInterval(decrementTimeRemaining, 1000);
     return () => clearInterval(intervalId);
   }, []);

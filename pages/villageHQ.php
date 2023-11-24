@@ -109,8 +109,8 @@ function villageHQ() {
 		}
 
 		$result = $system->db->query(
-            "SELECT `user_name`, `rank`, `level`, `exp` FROM `users`
-                WHERE `village`='{$player->village->name}' ORDER BY `rank` DESC, `exp` DESC LIMIT $min, $users_per_page"
+            "SELECT `user_name`, `rank`, `level`, `exp`, `village_rep` FROM `users`
+                WHERE `village`='{$player->village->name}' ORDER BY `exp` DESC, ABS(`village_rep`) DESC LIMIT $min, $users_per_page"
         );
 
 		echo "<table class='table'><tr><th colspan='4'>Village Members</th></tr>
@@ -132,7 +132,7 @@ function villageHQ() {
 			}
 
 			echo "<tr id='villagemembertd' class='fourColGrid table_multicolumns'>
-				<td style='width:29%;' class='$class'><a href='{$system->router->links['members']}&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
+				<td style='width:29%;text-align:center;' class='$class'><a href='{$system->router->links['members']}&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $ranks[$row['rank']]['name'] . "</td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $row['level'] . "</td>
 				<td style='width:30%;text-align:center;' class='$class'>" . $row['exp'] . "</td>
@@ -205,7 +205,7 @@ function villageHQ() {
 			<th>Points</th>
 		</tr>";
 		foreach($clans as $row) {
-			echo "<tr class='table_multicolumns'>
+			echo "<tr class='table_multicolumns' style='text-align:center;'>
 				<td>" . $row['name'] . "</td>
 				<td>" . ($row['leader'] ? $user_names[$row['leader']] : 'None') . "</td>
 				<td>" . $row['points']  . "</td>
@@ -221,7 +221,7 @@ function villageHQ() {
 		</tr>";
 		foreach($teams as $row) {
 			echo "<tr class='table_multicolumns'>
-				<td><a href='{$system->router->links['members']}&view_team={$row['team_id']}'>" . $row['name'] . "</td>
+				<td style='text-align:center;'><a href='{$system->router->links['members']}&view_team={$row['team_id']}'>" . $row['name'] . "</td>
 				<td style='text-align: center;'>" . $user_names[$row['leader']] . "</td>
 				<td style='text-align:center;'>" . $row['points']  . "</td>
 			</tr>";
@@ -247,7 +247,7 @@ function villageHQ() {
 		$result = $system->db->query($count_query);
 		$village_counts = $system->db->fetch($result);
 
-		echo "<table class='table'><tr><th colspan='4'>Villages</th></tr>
+		echo "<table class='table' style='text-align:center;'><tr><th colspan='4'>Villages</th></tr>
 		<tr>
 			<th style='width:25%;'>Village</th>
 			<th style='width:25%;'>Points</th>

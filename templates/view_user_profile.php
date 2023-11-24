@@ -58,8 +58,8 @@ $clan_positions = array(
             <?php endif; ?>
 
 			<label style='width:6.5em;'>Village:</label> <?= $viewUser->village->name ?><br />
-            <label style='width:6.5em;'>Reputation:</label> <?= $viewUser->village->getRepName($viewUser->village_rep) ?>
-            (<?=$viewUser->village_rep?>)<br />
+            <label style='width:6.5em;'>Reputation:</label> <?= $viewUser->reputation->rank_name ?>
+            (<?=$viewUser->reputation->getRepAmount()?>)<br />
 			<label style='width:6.5em;'>Bloodline:</label> <?= ($viewUser->bloodline_id ? $viewUser->bloodline_name : "None") ?>
             <br />
             <?php if (SenseiManager::isActiveSensei($viewUser->user_id, $system)): ?>
@@ -102,9 +102,7 @@ $clan_positions = array(
 
             <br />
 			<label style='width:6.5em;'>PvP wins:</label>	<?= $viewUser->pvp_wins ?><br />
-			<label style='width:6.5em;'>PvP losses:</label>	<?= $viewUser->pvp_losses ?><br />
 			<label style='width:6.5em;'>AI wins:</label> <?= $viewUser->ai_wins ?><br />
-			<label style='width:6.5em;'>AI losses:</label> <?= $viewUser->ai_losses ?><br />
         </td></tr>
 
         <!--//send message/money/ak-->
@@ -135,7 +133,13 @@ $clan_positions = array(
 
             <?php if(!empty($journal)): ?>
                 <?php
-                    $journal = $system->html_parse(stripslashes($journal), true, true);
+                    $journal = $system->html_parse(
+                        text: stripslashes($journal),
+                        img: true,
+                        faces: true,
+                        youtube: $viewUser->forbidden_seal->journal_youtube_embed,
+                    );
+
                     $journal = $system->explicitLanguageReplace(
                         text: $journal,
                         allow_non_banned_words: !$player->censor_explicit_language
@@ -155,6 +159,7 @@ $clan_positions = array(
                 <tr><th colspan='2'>Journal</th></tr>
                 <tr><td colspan='2'>
                     <div id='journal' class='<?= $class_name ?>'><?= $journal ?></div>
+                        
                 </td></tr>
             <?php endif; ?>
 
@@ -245,6 +250,18 @@ $clan_positions = array(
         <?php endif; ?>
         <?php if($player->isUserAdmin()): ?>
             &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['admin'] ?>&page=edit_user&user_name=<?= $viewUser->user_name ?>'>Edit user</a>
+            <?php if($viewUser->team): ?>
+                &nbsp;|&nbsp; <a href='<?= $system->router->getUrl(
+                    page_name: 'admin',
+                    url_params: ['page' => 'edit_team', 'team_id' => $viewUser->team->id]
+                ) ?>'
+                > Edit Team</a>
+            <?php endif ?>
+            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->getUrl(
+                    'admin',
+                        ['page' => 'logs', 'log_type' => 'currency_logs', 'character_id' => $viewUser->user_id]
+                    ) ?>'
+                 >View Currency Logs</a>
         <?php endif; ?>
     </td></tr>
 <?php endif; ?>

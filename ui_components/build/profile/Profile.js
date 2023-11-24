@@ -1,6 +1,8 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
+import RadarNinjaChart from '../charts/Chart.js';
 
 function Profile({
+  isDevEnvironment,
   links,
   playerData,
   playerStats,
@@ -8,6 +10,22 @@ function Profile({
   playerDailyTasks,
   playerAchievements
 }) {
+  //Chart.js variables
+  const [showChart, setShowChart] = React.useState(false);
+
+  function handleShowGraph() {
+    setShowChart(!showChart);
+  } //marginRight temp fix for wrapping to same row as chart when window width changes
+
+
+  let showChartButtonStyle = {
+    display: 'block',
+    marginRight: '75%',
+    backgroundColor: 'rgb(20, 19, 23)',
+    color: 'rgb(209, 197, 173)',
+    borderRadius: '12px 12px 0 0',
+    marginTop: '10px'
+  };
   return /*#__PURE__*/React.createElement("div", {
     className: "profile_container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -16,14 +34,21 @@ function Profile({
     playerData: playerData,
     links: links,
     playerSettings: playerSettings
-  })), /*#__PURE__*/React.createElement("div", {
+  })), isDevEnvironment && /*#__PURE__*/React.createElement("button", {
+    style: showChartButtonStyle,
+    onClick: handleShowGraph
+  }, !showChart ? "Show Graph" : "Show Stats"), /*#__PURE__*/React.createElement("div", {
     className: "profile_row_second"
-  }, /*#__PURE__*/React.createElement(PlayerStats, {
+  }, !showChart ? /*#__PURE__*/React.createElement(PlayerStats, {
     playerData: playerData,
+    playerStats: playerStats
+  }) : /*#__PURE__*/React.createElement(RadarNinjaChart, {
     playerStats: playerStats
   }), /*#__PURE__*/React.createElement("div", {
     className: "profile_row_second_col2"
-  }, /*#__PURE__*/React.createElement(PlayerBloodline, {
+  }, /*#__PURE__*/React.createElement(PlayerUserRep, {
+    playerData: playerData
+  }), /*#__PURE__*/React.createElement(PlayerBloodline, {
     bloodlinePageUrl: links.bloodlinePage,
     buyBloodlineUrl: links.buyBloodline,
     playerData: playerData
@@ -99,9 +124,11 @@ function StatusAttributes({
     style: {
       flexBasis: "34%"
     }
-  }, /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Village:"), /*#__PURE__*/React.createElement("span", null, playerData.villageName)), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Village Rep:"), /*#__PURE__*/React.createElement("span", null, playerData.villageRepTier, " (", playerData.villageRep, " rep)")), playerData.clanId != null && /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Clan:"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("a", {
+  }, /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Village:"), playerData.villageName), playerData.clanId != null && /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Clan:"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("a", {
     href: links.clan
-  }, playerData.clanName)))))));
+  }, playerData.clanName))), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Team:"), /*#__PURE__*/React.createElement("span", null, playerData.teamId == null ? "None" : /*#__PURE__*/React.createElement("a", {
+    href: links.team
+  }, playerData.teamName)))))));
 }
 
 function PlayerStats({
@@ -115,7 +142,7 @@ function PlayerStats({
     className: "total_stats box-primary"
   }, /*#__PURE__*/React.createElement("span", {
     className: "ft-c3"
-  }, "Total stats trained: ", playerData.totalStats.toLocaleString(), " / ", playerData.totalStatCap.toLocaleString()), /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("div", {
+  }, "Total stats trained: ", playerData.totalStats.toLocaleString(), " / ", playerData.totalStatCap.toLocaleString()), /*#__PURE__*/React.createElement("div", {
     className: "progress_bar_container total_stats_bar_container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "progress_bar_fill",
@@ -123,6 +150,8 @@ function PlayerStats({
       width: `${totalStatsPercent}%`
     }
   }))), /*#__PURE__*/React.createElement("div", {
+    className: "stat_lists"
+  }, /*#__PURE__*/React.createElement("div", {
     className: "stat_list skills"
   }, /*#__PURE__*/React.createElement("div", {
     className: "stat box-secondary"
@@ -148,7 +177,7 @@ function PlayerStats({
     className: "badge"
   }, "\u8840\u7D99"), /*#__PURE__*/React.createElement("span", {
     className: "ft-c3"
-  }, "Increases the control over one's bloodline.", /*#__PURE__*/React.createElement("br", null), "Helps with its mastery."))), /*#__PURE__*/React.createElement("div", {
+  }, "Increases control and mastery over one's bloodline."))), /*#__PURE__*/React.createElement("div", {
     className: "stat_list attributes"
   }, /*#__PURE__*/React.createElement("div", {
     className: "stat box-secondary"
@@ -174,7 +203,7 @@ function PlayerStats({
     className: "badge"
   }, "\u6839\u6027"), /*#__PURE__*/React.createElement("span", {
     className: "ft-c3"
-  }))));
+  })))));
 }
 
 function PlayerBloodline({
@@ -197,6 +226,27 @@ function PlayerBloodline({
   }, playerData.bloodlineName.replace(/&#039;/g, "'")) : /*#__PURE__*/React.createElement("a", {
     href: buyBloodlineUrl
   }, "None")));
+}
+
+function PlayerUserRep({
+  playerData
+}) {
+  let img_link = "images/village_icons/" + playerData.villageName.toLowerCase() + ".png";
+  return /*#__PURE__*/React.createElement("div", {
+    className: "reputation_display"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "reputation_indicator"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: img_link
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "village_name"
+  }, playerData.villageName)), /*#__PURE__*/React.createElement("div", {
+    className: "reputation_info ft-c3"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "reputation_name"
+  }, /*#__PURE__*/React.createElement("b", null, playerData.villageRepTier), "\xA0(", playerData.villageRep, " rep)"), /*#__PURE__*/React.createElement("span", {
+    className: "weekly_reputation"
+  }, playerData.weeklyPveRep, "/", playerData.maxWeeklyPveRep, " PvE \xA0|\xA0", playerData.weeklyWarRep, "/", playerData.maxWeeklyWarRep, " War \xA0|\xA0", playerData.weeklyPvpRep, "/", playerData.maxWeeklyPvpRep, " PvP")));
 }
 
 function DailyTasks({

@@ -107,9 +107,9 @@
                     onKeyUp='calcPreview()'
                     onchange='calcPreview()'
                 /><br />
-                <label class="currency_label">Yen Each:</label>
+                <label class="currency_label" style='margin-top: 7px'>Yen Each:</label>
                 <select name='money' id='money' onchange='calcPreview();'>
-                    <?php for($i = PremiumShopManager::EXCHANGE_MIN_YEN_PER_AK; $i <= PremiumShopManager::EXCHANGE_MAX_YEN_PER_AK; $i += 1): ?>
+                    <?php for($i = PremiumShopManager::EXCHANGE_MIN_YEN_PER_AK; $i <= PremiumShopManager::EXCHANGE_MAX_YEN_PER_AK; $i += 10): ?>
                         <option value='<?=sprintf("%.1f", $i)?>'>&yen;<?=number_format(sprintf("%.0f", $i*1000))?></option>
                     <?php endfor ?>
                 </select>

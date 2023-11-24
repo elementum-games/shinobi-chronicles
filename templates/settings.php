@@ -8,11 +8,47 @@
  * @var string $journal
  * @var string $list
  *
+ * @var Layout $current_layout
+ *
  * @var array $layouts
  *
  * @var int $max_journal_length
  */
 ?>
+
+<style>
+    .player_card {
+        height: 220px;
+        width: 435px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+        .player_card .avatar_frame {
+            flex-basis: 50%;
+        }
+    .player_card_background {
+        min-height: 250px;
+        min-width: 450px;
+        opacity: 0.75;
+        position: relative;
+    }
+    .player_card_bg_wrapper {
+        height: 220px;
+        width: 435px;
+        overflow: hidden;
+        position: absolute;
+    }
+    .player_card_details {
+        flex-basis: 50%;
+        display: flex;
+        flex-direction: column;
+        color: var(--font-color-3);
+        font-family: var(--font-secondary);
+        z-index: 1;
+        height:200px;
+    }
+</style>
 
 <div class='submenu'>
     <ul class='submenu'>
@@ -47,12 +83,30 @@
             <?php endif ?>
         </td>
     </tr>
-    <?php if ($system->isDevEnvironment()): ?> 
+    <?php if ($system->isDevEnvironment() && $system->enable_dev_only_features): ?>
     <tr><th colspan='2'>Player Card</th></tr>
     <tr>
         <td colspan="2">
+           <div style="display: flex">
             <?php if(!$player->checkBan(StaffManager::BAN_TYPE_AVATAR)):?>
-                <div>
+                <div class="player_card">
+                    <div class="player_card_bg_wrapper">
+                        <img class="player_card_background" src="<?= $card_image ?>" />
+                    </div>
+                    <div style="max-width: 200px; max-height: 200px;" class="avatar_frame <?= $avatar_style ?> <?= $user_color ?> <?= $avatar_frame ?>">
+                        <img class="<?= $avatar_style ?>" src="<?= $player->avatar_link ?>" />
+                    </div>
+                    <div class="player_card_details">
+                        <div class="player_card_name <?= $user_color ?>"> <?= $player->user_name ?></div>
+                        <div class="player_card_title"></div>
+                        <div class="player_card_rank"></div>
+                        <div class="player_card_village"><?= $player->village->name ?></div>
+                        <div class="player_card_clan"><?= $player->clan?->name ?></div>
+                        <div class="player_card_team"><?= $player->team?->name ?></div>
+                        <div class="player_card_bloodline"><?= $player->bloodline?->name ?></div>
+                    </div>
+                </div>
+                <div style="margin-left: 5px">
                     <b>Player Card info:</b><br />
                     Images must be hosted on another website<br />
                     Background Limit: 450 x 250 pixels<br />
@@ -61,19 +115,20 @@
                     Max filesize: <?=$player->getAvatarFileSizeDisplay()?><br />
                     <br />
                     <form action='<?=$self_link?>' method='post'>
-                        <input type='text' name='card_image' value='<?=$card_link?>' style='width:250px;margin-bottom:5px;' />
-                        <input type='submit' name='change_card' value='Change' />
+                        <input type='text' name='card_image' value='<?=$card_image?>' style='width:250px;margin-bottom:5px;' />
+                        <input type='submit' name='change_card_image' value='Change' />
                     </form>
                     <br />
                     <form action='<?=$self_link?>' method='post'>
-                        <input type='text' name='banner_image' value='<?=$banner_link?>' style='width:250px;margin-bottom:5px;' />
-                        <input type='submit' name='change_banner' value='Change' />
+                        <input type='text' name='banner_image' value='<?=$banner_image?>' style='width:250px;margin-bottom:5px;' />
+                        <input type='submit' name='change_banner_image' value='Change' />
                     </form>
                 </div>
                 <br style='clear:both;' />
             <?php else: ?>
                 <p style="margin-top:90px;">You are currently banned from changing your avatar.</p>
             <?php endif ?>
+            </div>
         </td>
     </tr>
     <?php endif; ?>
@@ -81,15 +136,15 @@
     <tr>
         <td colspan='2'>
             <form action='<?=$self_link?>' method='post'>
-                <div style="margin-left:145px;">
+                <div style="text-align: center">
                     <label for='current_password' style='width:150px;margin-bottom:5px;'>Current password:</label>
                     <input type='password' name='current_password' /><br />
                     <label for='new_password' style='width:150px;margin-bottom:5px;'>New password:</label>
                     <input type='password' name='new_password' /><br />
-                    <label for='confirm_new_password' style='width:150px;margin-bottom:5px;'>Confirm new password:</label>
+                    <label for='confirm_new_password' style='width:150px;margin-bottom:0px;'>Confirm new password:</label>
                     <input type='password' name='confirm_new_password' />
                 </div>
-                <p style='text-align:center;margin:0;'>
+                <p style='text-align:center;'>
                     <input type='submit' name='change_password' value='Change' />
                 </p>
             </form>
@@ -106,7 +161,7 @@
             <form action="<?=$self_link?>" method="post">
                 Allow level up<input type="checkbox" name="level_up" <?=($player->level_up ? "checked='checked'" : "")?> /><br />
                 Allow rank up<input type="checkbox" name="rank_up" <?=($player->rank_up ? "checked='checked'" : "")?> /><br />
-                <input type="submit" name="level_rank_up" value="Update" />
+                <input type="submit" style='margin-top: 5px' name="level_rank_up" value="Update" />
             </form>
         </td>
         <td style="text-align: center;">
@@ -114,12 +169,13 @@
             <form action='<?=$self_link?>' method='post'>
                 <select name='layout'>";
                     <?php foreach($layouts as $layout):?>
-                        <option value='<?=$layout?>' <?=($player->layout == $layout ? "selected='selected'" : "")?>><?=ucwords(str_replace("_", " ", $layout))?></option>
+                        <option value='<?=$layout?>' <?=($player->layout == $layout ? "selected='selected'" : "")?>><?=ucwords(str_replace("_", " ", $layout_names[$layout]))?></option>
                     <?php endforeach ?>
                 </select>
                 <input type='submit' name='change_layout' value='Change' />
             </form>
-            <?php if($player->layout == "new_geisha"): ?>
+            <span><i>Note: Legacy layouts may not be compatible with all pages</i></span>
+            <?php if($system->layout->usesV2Interface()): ?>
             <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap">
                 <div>
                     <label>Avatar Style</label>
@@ -130,7 +186,7 @@
                             <?php endforeach; ?>
                         </select>
                         <br />
-                        <input type='submit' name='change_avatar_style' value='Change' />
+                        <input type='submit' style='margin-top: 7px' name='change_avatar_style' value='Change' />
                     </form>
                 </div>
                 <div>
@@ -142,7 +198,7 @@
                             <?php endforeach; ?>
                         </select>
                         <br />
-                        <input type='submit' name='change_avatar_frame' value='Change' />
+                        <input type='submit' style='margin-top: 5px' name='change_avatar_frame' value='Change' />
                     </form>
                 </div>
                 <div>
@@ -153,7 +209,7 @@
                             <option value='right' <?=($sidebar_position == "right" ? "selected='selected'" : "")?>>Right</option>
                         </select>
                         <br />
-                        <input type='submit' name='change_sidebar_position' value='Change' />
+                        <input type='submit' style='margin-top: 5px' name='change_sidebar_position' value='Change' />
                     </form>
                 </div>
                 <div>
@@ -164,7 +220,18 @@
                             <option value='0' <?=($enable_alerts == false ? "selected='selected'" : "")?>>False</option>
                         </select>
                         <br />
-                        <input type='submit' name='change_enable_alerts' value='Change' />
+                        <input type='submit' style='margin-top: 5px' name='change_enable_alerts' value='Change' />
+                    </form>
+                </div>
+                <div>
+                    <label>Sidebar Collapsed (Mobile)</label>
+                    <form action='<?=$system->router->getUrl('settings')?>' method='post'>
+                        <select name='sidebar_collapse'>";
+                            <option value='closed' <?=($sidebar_collapse == "closed" ? "selected='selected'" : "")?>>Closed</option>
+                            <option value='open' <?=($sidebar_collapse == "open" ? "selected='selected'" : "")?>>Open</option>
+                        </select>
+                        <br />
+                        <input type='submit' style='margin-top: 5px' name='change_sidebar_collapse' value='Change' />
                     </form>
                 </div>
             </div>
@@ -187,11 +254,7 @@
             </form>
         </td>
         <td style='text-align:center;'>
-            <?php if(!empty($player->blacklist)): ?>
-                <?=$list?>
-            <?php else: ?>
-                <p style="text-align: center;">No blocked users!</p>
-            <?php endif ?>
+            <?= $player->blacklist->generateSettingsList($self_link) ?>
             <br />
             <form action='<?=$self_link?>' method='post'>
                 <input type='text' name='blacklist_name' style='width:250px;margin-bottom:5px;' /> <br />

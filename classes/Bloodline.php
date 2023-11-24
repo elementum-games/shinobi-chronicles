@@ -3,7 +3,7 @@
 /* Class:		Bloodline
 */
 class Bloodline {
-    const SKILL_REDUCTION_ON_CHANGE = 0.1;
+    const SKILL_REDUCTION_ON_CHANGE = 0;
 
     const RANK_ADMIN = 5;
     const RANK_LESSER = 4;
@@ -157,7 +157,7 @@ class Bloodline {
             'defense_boost' => 0.045,
             'speed_boost' => 0.08,
             'mental_boost' => 0.1,
-            'heal' => 0.03,
+            'heal' => 0.036,
             'regen' => 0.15,
         ];
         $bloodline_skill += self::BASE_BLOODLINE_SKILL;

@@ -43,6 +43,9 @@ function Sidebar({
       if (response.errors.length) {
         handleErrors(response.errors);
         return;
+      }
+      if (response.data.battle_url) {
+        window.location.href = response.data.battle_url;
       } else {
         setPlayerResources(response.data.playerResources);
         setRegenTime(response.data.playerResources.regen_time);
@@ -66,13 +69,26 @@ function Sidebar({
     var offset = 126 - 126 * percent / 100;
     return offset;
   }
+  const toggleNav = e => {
+    const currentClass = e.target.parentElement.className;
+    if (currentClass.includes('toggle')) {
+      e.target.parentElement.className = currentClass.replace('toggle', '').trim();
+    } else {
+      e.target.parentElement.className += ' toggle';
+    }
+  };
+  const parentClick = e => {
+    e.target.parentElement.click();
+  };
 
   // Content
-  function displaySection(section_data, title) {
+  function displaySection(section_data, title, toggleNav, sidebarCollapse, parentClick) {
     return /*#__PURE__*/React.createElement("div", {
-      className: "sb_section_container"
+      className: sidebarCollapse == "closed" ? "sb_section_container " + title : "sb_section_container toggle " + title,
+      onClick: toggleNav
     }, /*#__PURE__*/React.createElement("div", {
-      className: "sb_header_bar d-flex"
+      className: "sb_header_bar d-flex",
+      onClick: parentClick
     }, /*#__PURE__*/React.createElement("div", {
       className: "sb_header_image_wrapper"
     }, /*#__PURE__*/React.createElement("img", {
@@ -131,7 +147,7 @@ function Sidebar({
     playerSettings: playerSettings,
     regenTime: regenTime,
     regenOffset: regenOffset
-  }), displaySection(userMenu, "Player Menu"), displaySection(activityMenu, "Action Menu"), displaySection(villageMenu, "Village Menu"), staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null);
+  }), displaySection(userMenu, "Player Menu", toggleNav, playerSettings.sidebar_collapse, parentClick), displaySection(activityMenu, "Action Menu", toggleNav, playerSettings.sidebar_collapse, parentClick), displaySection(villageMenu, "Village Menu", toggleNav, playerSettings.sidebar_collapse, parentClick), staffMenu.length ? displaySection(staffMenu, "Staff Menu", toggleNav, playerSettings.sidebar_collapse, parentClick) : null);
 }
 function SBCharacterProfile({
   playerData,
@@ -203,21 +219,25 @@ function SBCharacterProfile({
   }, regenTime))))), /*#__PURE__*/React.createElement(SBResourceBar, {
     resourceType: "health",
     resourceAmount: playerResources.health,
-    resourceMaxAmount: playerResources.max_health
+    resourceMaxAmount: playerResources.max_health,
+    regenRate: playerResources.health_regen
   }), /*#__PURE__*/React.createElement(SBResourceBar, {
     resourceType: "chakra",
     resourceAmount: playerResources.chakra,
-    resourceMaxAmount: playerResources.max_chakra
+    resourceMaxAmount: playerResources.max_chakra,
+    regenRate: playerResources.pool_regen
   }), /*#__PURE__*/React.createElement(SBResourceBar, {
     resourceType: "stamina",
     resourceAmount: playerResources.stamina,
-    resourceMaxAmount: playerResources.max_stamina
+    resourceMaxAmount: playerResources.max_stamina,
+    regenRate: playerResources.pool_regen
   })));
 }
 function SBResourceBar({
   resourceType,
   resourceAmount,
-  resourceMaxAmount
+  resourceMaxAmount,
+  regenRate
 }) {
   const fillPercent = Math.max(Math.round(resourceAmount / resourceMaxAmount * 100), 6);
   return /*#__PURE__*/React.createElement("div", {
@@ -230,7 +250,9 @@ function SBResourceBar({
     src: "/images/v2/decorations/barrightcorner.png"
   }), /*#__PURE__*/React.createElement("label", {
     className: "sb_innerResourceBarLabel"
-  }, resourceAmount, " / ", resourceMaxAmount), /*#__PURE__*/React.createElement("div", {
+  }, resourceAmount, " / ", resourceMaxAmount), /*#__PURE__*/React.createElement("label", {
+    className: "sb_innerResourceBarLabel_hover"
+  }, resourceAmount, " / ", resourceMaxAmount, " (+", regenRate, ")"), /*#__PURE__*/React.createElement("div", {
     className: `sb_${resourceType} sb_fill`,
     style: {
       width: fillPercent + "%"

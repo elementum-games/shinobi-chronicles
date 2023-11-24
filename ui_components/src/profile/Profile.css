@@ -123,12 +123,13 @@
 
 /* Reusable */
 #content .profile_container a {
-    color: #9e97ba;
+    color: var(--font-link);
     text-decoration: none;
     font-weight: normal;
+    text-decoration: underline;
 }
 #content .profile_container a:hover {
-    color: #bdb3e3;
+    color: var(--font-link-hover);
 }
 
 .progress_bar_container {
@@ -157,19 +158,30 @@
 
 /* Stats */
 .stats_container {
-    flex-basis: 65%;
+    flex-basis: 60%;
     flex-shrink: 1;
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
     justify-content: space-between;
+
     gap: 8px;
 }
 .total_stats {
     width: 100%;
     box-sizing: border-box;
-    padding: 5px 10px;
+    padding: 6px 10px;
+
+    /* weird hack to get this to line up with village rep badge on the right */
+    margin-top: -10px;
+
     margin-bottom: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: 2px;
+
+    max-height: 47px;
 }
 
 .total_stats_bar_container {
@@ -177,12 +189,18 @@
     margin-bottom: 5px;
 }
 
+.stat_lists {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 .stat_list {
     width: 47%;
 
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 .stat_list.attributes {
     width: 50%;
@@ -231,7 +249,7 @@
 
 .profile_row_second {
     display: flex;
-    gap: 20px;
+    gap: 15px;
     flex-grow: 1;
 }
 .profile_row_second_col2 {
@@ -247,7 +265,8 @@
     position: relative;
     align-self: stretch;
 
-    margin-top: 40px;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 .bloodline_mastery_indicator {
     width: 50px;
@@ -300,7 +319,12 @@
     align-items: center;
     justify-content: center;
 
+    font-weight: bold;
+
     z-index: 1;
+}
+#content .bloodline_name a {
+    font-weight: bold;
 }
 .bloodline_name::before {
     content: '';
@@ -335,6 +359,131 @@
     background-image: url(/images/v2/decorations/bar_right_corner_30px.png);
     background-repeat: no-repeat;
     z-index: 2;
+}
+
+/* User Reputation */
+.reputation_display {
+    position: relative;
+    align-self: stretch;
+
+    margin-top: 35px;
+    margin-bottom: 15px;
+}
+
+.reputation_indicator {
+    --height: 60px;
+
+    width: 50px;
+    height: var(--height);
+
+    position: absolute;
+    top: -11px;
+    left: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 2px;
+
+    z-index: 3;
+    clip-path: var(--clip-tall-hexagon);
+    background: #433b30;
+}
+.reputation_indicator img {
+    max-width: 26px;
+    max-height: 22px;
+
+    position: relative;
+    z-index: 4;
+}
+.reputation_indicator::after {
+    content: '';
+    position: absolute;
+
+    width: 50px;
+    height: var(--height);
+
+    top: 2px;
+    right: 2px;
+
+    clip-path: var(--clip-tall-hexagon);
+    background:  var(--box-color-default);
+    z-index: 2;
+}
+
+.reputation_info {
+    --height: 43px;
+
+    height: var(--height);
+
+    margin-left: 45px;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 1;
+}
+.reputation_info::before {
+    content: '';
+
+    position: absolute;
+    height: calc(var(--height) + 2px);
+    top: -1px;
+    left: 0;
+    right: -1px;
+    bottom: 0;
+
+    z-index: -2;
+
+    background-color: var(--border-color-default);
+    clip-path: polygon(
+        0 0,
+        calc(100% - 13px) 0px,
+        100% 50%,
+        calc(100% - 13px) 100%,
+        0 100%,
+        0 50%
+    );
+}
+.reputation_info::after {
+    content: '';
+
+    position: absolute;
+    height: var(--height);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    z-index: -1;
+
+    background-color: var(--box-color-default);
+    clip-path: polygon(
+            0 0,
+            calc(100% - 13px) 0px,
+            100% 50%,
+            calc(100% - 13px) 100%,
+            0 100%,
+            0 50%
+    );
+}
+
+.village_name {
+    z-index: 3;
+    color: var(--font-color-3);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.weekly_reputation {
+    margin: 1px 0 2px;
+    font-size: var(--font-small);
+    color: var(--font-color-6)
 }
 
 /* Daily Tasks */

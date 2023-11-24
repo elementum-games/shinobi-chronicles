@@ -36,6 +36,27 @@ function viewBattles() {
         }
     }
 
+    /* Begin Scheduled Battles */
+
+    $scheduled_battles = [];
+    $scheduled_battles_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `end_time` IS NULL AND `start_time` IS NOT NULL");
+    $scheduled_battles_result = $system->db->fetch_all($scheduled_battles_result);
+    foreach ($scheduled_battles_result as $challenge) {
+        $challenger_result = $system->db->query("SELECT `user_name` FROM `users` WHERE `user_id` = {$challenge['challenger_id']}");
+        $challenger_result = $system->db->fetch($challenger_result);
+        $seat_holder_result = $system->db->query("SELECT `user_name` FROM `users` WHERE `user_id` = {$challenge['seat_holder_id']}");
+        $seat_holder_result = $system->db->fetch($seat_holder_result);
+        $scheduled_battles[] = [
+            'challenger_name' => $challenger_result['user_name'],
+            'seat_holder_name' => $seat_holder_result['user_name'],
+            'time' => $challenge['start_time'],
+            'battle_id' => $challenge['battle_id'],
+        ];
+    }
+
+    /* End Scheduled Battles */
+
+    $winner_stop = Battle::STOP;
     $battles_result = $system->db->query(
         "SELECT `battle_id`, `player1`, `player2`, `winner` FROM `battles`
             WHERE `battle_type` IN (" . implode(",", $battle_types) . ")
@@ -88,6 +109,9 @@ function viewBattles() {
         switch($battleManager['winner']) {
             case Battle::DRAW:
                 $winner = 'Draw';
+                break;
+            case Battle::STOP:
+                $winner = 'Stopped';
                 break;
             case Battle::TEAM1:
                 $winner = $p1_name;
@@ -166,6 +190,9 @@ function viewBattles() {
             switch ($battleManager['winner']) {
                 case Battle::DRAW:
                     $winner = 'Draw';
+                    break;
+                case Battle::STOP:
+                    $winner = 'Stopped';
                     break;
                 case Battle::TEAM1:
                     $winner = $p1_name;

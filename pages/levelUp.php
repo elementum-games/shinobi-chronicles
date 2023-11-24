@@ -206,7 +206,7 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 
             // Bloodline roll
             if($bloodline_rolled) {
-                // Chances: 10% legendary, 20% elite, 40% common, 30% lesser
+                // Chances: 10% legendary, 20% elite, 70% common
                 $x = mt_rand(1, 100);
                 if($x < 10) {
                     $bloodline_rank = 1;
@@ -214,11 +214,8 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                 else if($x < 30) {
                     $bloodline_rank = 2;
                 }
-                else if($x < 70) {
-                    $bloodline_rank = 3;
-                }
                 else {
-                    $bloodline_rank = 4;
+                    $bloodline_rank = 3;
                 }
 
                 // Delete current BL
@@ -383,16 +380,16 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
             $rankManager->increasePlayerRank($player);
 
             if($bloodline_rolled) {
-                $bloodline_display = "Suddenly the elder senses something inside of you, and you feel a surge in power
-					as a strange force wells up inside you, answering the call of the elder's chakra. The elder withdraws $gender hand
-					and smiles, saying calmly 'You have the <b>$bloodline_name</b>. This is the
-					bloodline of the <b>$clan_name</b> clan. From this day forward you shall join them, and study with them to train
+                $bloodline_display = "Suddenly the elder senses something as a strange force wells up inside you, 
+                    answering the call of the elder's chakra. The elder withdraws $gender hand
+					and smiles, 'You have awakened <b>$bloodline_name</b>. This is the
+					bloodline of the <b>$clan_name</b> clan. From this day forward you shall join them and train
 					your bloodline to its fullest potential.'<br />
 					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p>";
             }
             else {
-                $bloodline_display = "After focusing deeply for several minutes, the elder withdraws $gender hand and says 'It appears you do not
-					have a bloodline. You are free to train as you wish, we will place you in the <b>$clan_name</b> clan. Train
+                $bloodline_display = "After focusing deeply for several minutes, the elder withdraws $gender hand and says 'The power within your lineage remains dormant. 
+                    You are free to train as you wish in the <b>$clan_name</b> clan. Train
 					hard with them and become a strong ninja for your clan and village.'<br />
 					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p>";
             }
