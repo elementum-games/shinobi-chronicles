@@ -435,6 +435,7 @@ class Battle {
                         $linked_jutsu = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` = {$jutsu->linked_jutsu_id}");
                         $linked_jutsu = $this->system->db->fetch($linked_jutsu);
                         $this->player1->jutsu[$jutsu->linked_jutsu_id] = Jutsu::fromArray($jutsu->linked_jutsu_id, $linked_jutsu);
+                        $this->player1->jutsu[$jutsu->linked_jutsu_id]->setLevel($jutsu->level, 0);
                         end($this->player1->equipped_jutsu);
                         $last_array_key = key($this->player1->equipped_jutsu);
                         $this->player1->equipped_jutsu[$last_array_key + 1]['id'] = $jutsu->linked_jutsu_id;
@@ -451,6 +452,7 @@ class Battle {
                         $linked_jutsu = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` = {$jutsu->linked_jutsu_id}");
                         $linked_jutsu = $this->system->db->fetch($linked_jutsu);
                         $this->player2->jutsu[$jutsu->linked_jutsu_id] = Jutsu::fromArray($jutsu->linked_jutsu_id, $linked_jutsu);
+                        $this->player2->jutsu[$jutsu->linked_jutsu_id]->setLevel($jutsu->level, 0);
                         end($this->player2->equipped_jutsu);
                         $last_array_key = key($this->player2->equipped_jutsu);
                         $this->player2->equipped_jutsu[$last_array_key + 1]['id'] = $jutsu->linked_jutsu_id;
