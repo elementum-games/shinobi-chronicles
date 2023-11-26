@@ -4,7 +4,7 @@ class BattleEffect {
     public static array $buff_effects = [
         'heal','ninjutsu_boost','taijutsu_boost','genjutsu_boost',
         'cast_speed_boost','speed_boost','lighten','intelligence_boost','willpower_boost',
-        'ninjutsu_resist','genjutsu_resist','taijutsu_resist','harden'
+        'ninjutsu_resist','genjutsu_resist','taijutsu_resist','harden','evasion_boost'
     ];
 
     // combat id

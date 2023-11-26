@@ -22,6 +22,14 @@ $jutsu_effects = [
     'endurance_nerf',
     'intelligence_nerf',
     'willpower_nerf',
+    'vulnerability',
+    'fire_weakness',
+    'wind_weakness',
+    'lightning_weakness',
+    'earth_weakness', 
+    'water_weakness',
+    'evasion_boost',
+    'evasion_nerf',
 ];
 
 $ranks = [];
@@ -133,6 +141,19 @@ return [
         'input_type' => 'text',
     ],
     'effect_length' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
+    ],
+    'effect2' => [
+        'data_type' => 'string',
+        'input_type' => 'select',
+        'options' => $jutsu_effects,
+    ],
+    'effect2_amount' => [
+        'data_type' => 'float',
+        'input_type' => 'text',
+    ],
+    'effect2_length' => [
         'data_type' => 'int',
         'input_type' => 'text',
     ],

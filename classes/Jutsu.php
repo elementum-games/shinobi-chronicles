@@ -42,8 +42,8 @@ class Jutsu {
     const CHUUNIN_SCALE_MULTIPLIER = 1.4; // 2.9 => 3.9 = +34.4%
     const JONIN_SCALE_MULTIPLIER = 1.75; // 2.9 => 4.9 = +69%
 
-    // Genjutsu gets declared with full power and effect instead of a tradeoff between them, we balance in code
-    const GENJUTSU_ATTACK_POWER_MODIFIER = 0.55;
+    /* Genjutsu gets declared with full power and effect instead of a tradeoff between them, we balance in code
+    const GENJUTSU_ATTACK_POWER_MODIFIER = 0.55;*/
 
     public static array $elements = [
         self::ELEMENT_FIRE,
@@ -82,6 +82,9 @@ class Jutsu {
     public float $effect_amount;
 
     public int $effect_length;
+
+    /** @var Effect[] */
+    public array $effects;
 
     public string $description;
     public string $battle_text;
@@ -127,9 +130,12 @@ class Jutsu {
      * @param string      $jutsu_type
      * @param float       $base_power
      * @param int         $range
-     * @param string|null $effect
-     * @param float|null  $base_effect_amount
-     * @param int|null    $effect_length
+     * @param string|null $effect_1
+     * @param float|null  $base_effect_amount_1
+     * @param int|null    $effect_length_1
+     * @param string|null $effect_2
+     * @param float|null  $base_effect_amount_2
+     * @param int|null    $effect_length_2
      * @param string      $description
      * @param string      $battle_text
      * @param int         $cooldown
@@ -143,7 +149,8 @@ class Jutsu {
      * @param string      $hand_seals
      */
     public function __construct(int $id, string $name, int $rank, string $jutsu_type, float $base_power, int $range,
-        ?string $effect, ?float $base_effect_amount, ?int $effect_length, string $description, string $battle_text, int $cooldown,
+        ?string $effect_1, ?float $base_effect_amount_1, ?int $effect_length_1, ?string $effect_2, ?float $base_effect_amount_2, ?int $effect_length_2,
+        string $description, string $battle_text, int $cooldown,
         string $use_type, string $target_type, int $use_cost, int $purchase_cost, int $purchase_type, ?int $parent_jutsu, string $element,
         string $hand_seals, int $linked_jutsu_id = 0
     ) {
@@ -159,17 +166,21 @@ class Jutsu {
         if($this->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
             $this->range = 1;
         }
+        /*
         if($this->jutsu_type == Jutsu::TYPE_GENJUTSU && in_array($use_type, self::$attacking_use_types)) {
             $this->power = round($this->base_power * self::GENJUTSU_ATTACK_POWER_MODIFIER, 2);
             // $this->effect_only = true; // toggle this if you turn the power back to 1
-        }
+        }*/
 
-        $this->effect = $effect;
-
-        $this->base_effect_amount = $base_effect_amount ?? 0;
+        // legacy
+        $this->effect = $effect_1;
+        $this->base_effect_amount = $base_effect_amount_1;
         $this->effect_amount = $this->base_effect_amount;
+        $this->effect_length = $effect_length_1 ?? 0;
 
-        $this->effect_length = $effect_length ?? 0;
+        // new effect array
+        $this->effects[] = new Effect($effect_1, $base_effect_amount_1, $effect_length_1);
+        $this->effects[] = new Effect($effect_2, $base_effect_amount_2, $effect_length_2);
 
         $this->description = $description;
         $this->battle_text = $battle_text;
@@ -202,9 +213,12 @@ class Jutsu {
             jutsu_type: $jutsu_data['jutsu_type'],
             base_power: $jutsu_data['power'],
             range: $jutsu_data['range'],
-            effect: $jutsu_data['effect'],
-            base_effect_amount: $jutsu_data['effect_amount'],
-            effect_length: $jutsu_data['effect_length'],
+            effect_1: $jutsu_data['effect'],
+            base_effect_amount_1: $jutsu_data['effect_amount'],
+            effect_length_1: $jutsu_data['effect_length'],
+            effect_2: $jutsu_data['effect2'],
+            base_effect_amount_2: $jutsu_data['effect2_amount'],
+            effect_length_2: $jutsu_data['effect2_length'],
             description: $jutsu_data['description'],
             battle_text: $jutsu_data['battle_text'],
             cooldown: $jutsu_data['cooldown'],
@@ -227,9 +241,11 @@ class Jutsu {
         $this->recalculatePower();
 
         $level_effect_multiplier = self::EFFECT_PER_LEVEL_PERCENT / 100;
-        if($this->effect && $this->effect != 'none') {
-            $this->effect_amount = $this->base_effect_amount *
-                (1 + round($this->level * $level_effect_multiplier, 3));
+        foreach ($this->effects as $index => $effect) {
+            if ($effect->effect && $effect->effect != 'none') {
+                $this->effects[$index]->effect_amount = $effect->base_effect_amount *
+                    (1 + round($this->level * $level_effect_multiplier, 3));
+            }
         }
     }
 
@@ -240,7 +256,7 @@ class Jutsu {
         $is_genjutsu_attack = $this->jutsu_type == Jutsu::TYPE_GENJUTSU && in_array($this->use_type, self::$attacking_use_types);
 
         $this->power = $this->base_power
-            * ($is_genjutsu_attack ? self::GENJUTSU_ATTACK_POWER_MODIFIER : 1)
+            //* ($is_genjutsu_attack ? self::GENJUTSU_ATTACK_POWER_MODIFIER : 1)
             * (1 + ($this->level * $level_power_multiplier));
         $this->power = round($this->power, 2);
     }
@@ -254,9 +270,12 @@ class Jutsu {
             jutsu_type: Jutsu::TYPE_TAIJUTSU,
             base_power: $this->power,
             range: 0,
-            effect: $effect,
-            base_effect_amount: $effect_amount,
-            effect_length: 2,
+            effect_1: $effect,
+            base_effect_amount_1: $effect_amount,
+            effect_length_1: 2,
+            effect_2: 'none',
+            base_effect_amount_2: 0,
+            effect_length_2: 0,
             description: $this->description,
             battle_text: $this->battle_text,
             cooldown: $this->cooldown,
@@ -280,7 +299,13 @@ class Jutsu {
     }
 
     public function hasEffect(): bool {
-        return $this->effect && $this->effect != 'none';
+        $has_effect = false;
+        foreach ($this->effects as $effect) {
+            if ($effect && $effect->effect != 'none') {
+                $has_effect = true;
+            }
+        }
+        return $has_effect;
     }
 
     #[Pure]
