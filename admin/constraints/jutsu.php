@@ -22,6 +22,11 @@ $jutsu_effects = [
     'endurance_nerf',
     'intelligence_nerf',
     'willpower_nerf',
+    'fire_weakness',
+    'wind_weakness',
+    'lightning_weakness',
+    'earth_weakness', 
+    'water_weakness',
     'evasion_boost',
     'evasion_nerf',
 ];
