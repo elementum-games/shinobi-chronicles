@@ -89,11 +89,11 @@ class BattleEffectsManager {
             case Jutsu::USE_TYPE_BARRIER:
                 $jutsu->effect_amount = $raw_damage;
                 break;
-            case 'weakness_fire':
-            case 'weakness_wind':
-            case 'weakness_lightning':
-            case 'weakness_earth':
-            case 'weakness_water':
+            case 'fire_weakness':
+            case 'wind_weakness':
+            case 'lightning_weakness':
+            case 'earth_weakness':
+            case 'water_weakness':
                 $jutsu->effect_amount = self::ELEMENTAL_WEAKNESS_MODIFIER;
                 break;
             default:
@@ -263,19 +263,19 @@ class BattleEffectsManager {
         else if($effect->effect == 'willpower_nerf') {
             $target->willpower_nerf += $effect_amount;
         }
-        else if ($effect->effect == 'weakness_fire') {
+        else if ($effect->effect == 'fire_weakness') {
             $target->fire_weakness += $effect_amount;
         }
-        else if ($effect->effect == 'weakness_wind') {
+        else if ($effect->effect == 'wind_weakness') {
             $target->wind_weakness += $effect_amount;
         }
-        else if ($effect->effect == 'weakness_lightning') {
+        else if ($effect->effect == 'lightning_weakness') {
             $target->lightning_weakness += $effect_amount;
         }
-        else if ($effect->effect == 'weakness_earth') {
+        else if ($effect->effect == 'earth_weakness') {
             $target->earth_weakness += $effect_amount;
         }
-        else if ($effect->effect == 'weakness_water') {
+        else if ($effect->effect == 'water_weakness') {
             $target->water_weakness += $effect_amount;
         }
         return false;
@@ -522,19 +522,19 @@ class BattleEffectsManager {
             case 'cast_speed_boost':
                 $announcement_text = "[player]'s Cast Speed is being increased";
                 break;
-            case 'weakness_fire':
+            case 'fire_weakness':
                 $announcement_text = "[opponent] is vulnerable to Fire";
                 break;
-            case 'weakness_wind':
+            case 'wind_weakness':
                 $announcement_text = "[opponent] is vulnerable to Wind";
                 break;
-            case 'weakness_lightning':
+            case 'lightning_weakness':
                 $announcement_text = "[opponent] is vulnerable to Lightning";
                 break;
-            case 'weakness_earth':
+            case 'earth_weakness':
                 $announcement_text = "[opponent] is vulnerable to Earth";
                 break;
-            case 'weakness_water':
+            case 'water_weakness':
                 $announcement_text = "[opponent] is vulnerable to Water";
                 break;
             default:

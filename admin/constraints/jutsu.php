@@ -22,11 +22,11 @@ $jutsu_effects = [
     'endurance_nerf',
     'intelligence_nerf',
     'willpower_nerf',
-    'weakness_fire',
-    'weakness_wind',
-    'weakness_lighting',
-    'weakness_earth', 
-    'weakness_water',
+    'fire_weakness',
+    'wind_weakness',
+    'lightning_weakness',
+    'earth_weakness', 
+    'water_weakness',
 ];
 
 $ranks = [];
