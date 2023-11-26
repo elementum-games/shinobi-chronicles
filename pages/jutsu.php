@@ -83,11 +83,11 @@ function jutsu(): void {
             // Parent jutsu check
             if($player->jutsu_scrolls[$jutsu_id]->parent_jutsu) {
                 $id = $player->jutsu_scrolls[$jutsu_id]->parent_jutsu;
-                if(!isset($player->jutsu[$id])) {
+                if(!isset($player->jutsu[$id]) && !$system->isDevEnvironment()) {
                     throw new RuntimeException("You need to learn " . $player->jutsu[$id]->name . " first!");
                 }
 
-                if($player->jutsu[$id]->level < 50) {
+                if($player->jutsu[$id]->level < 50 && !$system->isDevEnvironment()) {
                     throw new RuntimeException(
                         "You are not skilled enough with " . $player->jutsu[$id]->name .
                         "! (Level " . $player->jutsu[$id]->level . "/50)"
@@ -96,7 +96,11 @@ function jutsu(): void {
             }
 
             $player->jutsu[$jutsu_id] = $player->jutsu_scrolls[$jutsu_id];
-            $player->jutsu[$jutsu_id]->setLevel(1, 0);
+            if ($system->isDevEnvironment()) {
+                $player->jutsu[$jutsu_id]->setLevel(100, 0);
+            } else {
+                $player->jutsu[$jutsu_id]->setLevel(1, 0);
+            }
             $jutsu_name = $player->jutsu_scrolls[$jutsu_id]->name;
 
             switch($player->jutsu[$jutsu_id]->jutsu_type) {
