@@ -15,7 +15,8 @@ class Jutsu {
     const PURCHASE_TYPE_NON_PURCHASABLE = 3;
     const PURCHASE_TYPE_BLOODLINE = 4;
     const PURCHASE_TYPE_EVENT_SHOP = 5;
-
+    const PURCHASE_TYPE_LINKED = 6;
+  
     const MAX_LEVEL = 100;
     const REFUND_AMOUNT = 0.1;
 
@@ -119,6 +120,8 @@ class Jutsu {
 
     public ?string $combat_id = null;
 
+    public int $linked_jutsu_id = 0;
+
     /**
      * Jutsu constructor.
      * @param int         $id
@@ -149,7 +152,7 @@ class Jutsu {
         ?string $effect_1, ?float $base_effect_amount_1, ?int $effect_length_1, ?string $effect_2, ?float $base_effect_amount_2, ?int $effect_length_2,
         string $description, string $battle_text, int $cooldown,
         string $use_type, string $target_type, int $use_cost, int $purchase_cost, int $purchase_type, ?int $parent_jutsu, string $element,
-        string $hand_seals
+        string $hand_seals, int $linked_jutsu_id = 0
     ) {
         $this->id = $id;
         $this->name = $name;
@@ -194,6 +197,8 @@ class Jutsu {
         $this->element = $element;
         $this->hand_seals = $hand_seals;
 
+        $this->linked_jutsu_id = $linked_jutsu_id;
+
         if($this->purchase_type == Jutsu::PURCHASE_TYPE_EVENT_SHOP && $this->purchase_cost === 0) {
             $this->purchase_cost = 1;
         }
@@ -224,7 +229,8 @@ class Jutsu {
             purchase_type: $jutsu_data['purchase_type'],
             parent_jutsu: $jutsu_data['parent_jutsu'],
             element: $jutsu_data['element'],
-            hand_seals: $jutsu_data['hand_seals']
+            hand_seals: $jutsu_data['hand_seals'],
+            linked_jutsu_id: $jutsu_data['linked_jutsu_id'],
         );
     }
 

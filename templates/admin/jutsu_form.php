@@ -152,6 +152,9 @@
     <label for="effect2_length">Effect Length:</label>
     <input type="number" name="<?= $fieldName("effect2_length") ?>" value="<?= $existing_jutsu->effects[1]->effect_length ?? 0 ?>" min="0" max="10" /><br />
 
+    <br /><label for="linked_jutsu_id">Linked Jutsu ID:</label>
+    <input type="number" name="<?= $fieldName("linked_jutsu_id") ?>" value="<?= $existing_jutsu->linked_jutsu_id ?>" min="0" /><br />
+    
     <?php if(!$disable_hand_seals): ?>
         <?php $hand_seal_options = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; ?>
         <label style='margin-top: 10px;'>Hand Seals:</label>
