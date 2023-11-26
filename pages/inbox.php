@@ -162,7 +162,7 @@ function SendMessage(System $system, User $player, int|string $convo_id, string 
 
         //Disallow sending 1-to-1 messages if blacklisted
         if(sizeof($inbox->getConvoMembers($convo_id)) == 2) {
-            if(Inbox::checkBlacklist($inbox->getConvoMembers($convo_id))) {
+            if(Inbox::checkBlacklist($system, $inbox->getConvoMembers($convo_id))) {
                 $response->errors[] = "Blacklist is active!";
                 return $response;
             }
@@ -283,7 +283,7 @@ function AddPlayer(System $system, User $player, int|string $convo_id, string $n
 		// get the blacklist for the new member
 		$convo_members[] = $new_user_data;
 		// check each members blacklist
-		if (Inbox::checkBlacklist($convo_members)) {
+		if (Inbox::checkBlacklist($system, $convo_members)) {
 			$response->errors[] = 'Blacklist active';
 			return $response;
 		}
@@ -499,7 +499,7 @@ function CreateNewConvo(System $system, User $player, string $members, ?string $
 		}
 
 		// check all blacklists
-		if (Inbox::checkBlacklist($all_player_data)) {
+		if (Inbox::checkBlacklist($system, $all_player_data)) {
 			$response->errors[] = 'Blacklist is active';
 			return $response;
 		}

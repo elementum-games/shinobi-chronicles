@@ -252,6 +252,10 @@ class TrainingManager {
                     if ($clan_boost) {
                         $train_length *= 1 - ($clan_boost / 100);
                     }
+                    // Policy boost
+                    if ($this->policy->training_speed > 0) {
+                        $train_length = round($train_length * (100 / (100 + $this->policy->training_speed)));
+                    }
                     return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 case self::TRAIN_LEN_LONG:
                     $train_length = self::BASE_TRAIN_TIME * 4;
@@ -264,6 +268,10 @@ class TrainingManager {
                     // Clan boost
                     if ($clan_boost) {
                         $train_length *= 1 - ($clan_boost / 100);
+                    }
+                    // Policy boost
+                    if ($this->policy->training_speed > 0) {
+                        $train_length = round($train_length * (100 / (100 + $this->policy->training_speed)));
                     }
                     return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 case self::TRAIN_LEN_EXTENDED:

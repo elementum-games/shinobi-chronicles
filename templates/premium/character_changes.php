@@ -249,6 +249,7 @@
 
     function statAllocateCostDisplay() {
         let ak_cost = 0, yen_cost = 0;
+        let is_dev = <?= $system->isDevEnvironment() ?>;
 
         const transferAmount = parseInt(transferAmountEl.value);
         const transferSpeed = transferSpeedEl.value;
@@ -278,6 +279,12 @@
             yen_cost = Math.round(yen_cost / 100) * 100;
         }
         time = Math.floor(time);
+
+        if (is_dev) {
+            ak_cost = 0;
+            yen_cost = 0;
+            time = 0;
+        }
 
         statCostEl.innerHTML = `${ak_cost} AK / ${yen_cost} yen / ${time} minutes`;
     }
@@ -374,8 +381,8 @@
                 own village.
                 However to get the other village to accept you, you must offer them <?= $premiumShopManager->costs['village_change'] ?>
                 Ancient Kunai.<br/>
+                <p>You will lose 20% of your Reputation for all village changes after the first (you can not fall below Shinobi).</p>
                 <p>Villages with "From the Ashes" policy may be transferred to at no cost.</p>
-                <p>You will lose 1 Reputation tier for all village changes after the first (you can not fall below Shinobi).</p>
                 <br/>
                 <b>(IMPORTANT: This is non-reversable once completed<br />If you want to return to your original village you
                     will have to pay

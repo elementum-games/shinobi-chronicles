@@ -63,10 +63,10 @@ class ChatManager {
      */
     private function fetchPosts(?int $starting_post_id = null, int $max_posts = self::MAX_POSTS_PER_PAGE, bool $is_quote = false): array {
         if($starting_post_id != null) {
-            $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id ORDER BY `post_id` DESC LIMIT $max_posts";
+            $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id  AND `deleted` = 0 ORDER BY `post_id` DESC LIMIT $max_posts";
         }
         else {
-            $query = "SELECT * FROM `chat` ORDER BY `post_id` DESC LIMIT $max_posts";
+            $query = "SELECT * FROM `chat` WHERE `deleted` = 0 ORDER BY `post_id` DESC LIMIT $max_posts";
         }
         $result = $this->system->db->query($query);
 
@@ -76,10 +76,15 @@ class ChatManager {
 
             //Skip post if user blacklisted
             $blacklisted = false;
-            foreach($this->player->blacklist as $id => $blacklist) {
-                if($post->user_name == $blacklist[$id]['user_name']) {
+            // Legacy posts blocking
+            if($post->user_id == 0) {
+                if($this->player->blacklist->userBlockedByName($post->user_name)) {
                     $blacklisted = true;
-                    break;
+                }
+            }
+            else {
+                if($this->player->blacklist->userBlocked($post->user_id)) {
+                    $blacklisted = true;
                 }
             }
 
@@ -383,7 +388,10 @@ class ChatManager {
      * @throws RuntimeException
      */
     public function deletePost(int $post_id): array {
-        $this->system->db->query("DELETE FROM `chat` WHERE `post_id` = $post_id LIMIT 1");
+        $this->system->db->query("UPDATE `chat` SET `deleted`=1 WHERE `post_id`=$post_id LIMIT 1");
+        $this->player->staff_manager->staffLog(StaffManager::STAFF_LOG_MOD,
+    "{$this->player->user_name}({$this->player->user_id}) deleted post_id: $post_id"
+        );
 
         if($this->system->db->last_affected_rows == 0) {
             throw new RuntimeException("Error deleting post!");

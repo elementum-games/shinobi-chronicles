@@ -16,6 +16,7 @@ require_once __DIR__ . '/../classes/event/DoubleReputationEvent.php';
 */
 class System {
     const ENVIRONMENT_DEV = 'dev';
+    const ENABLE_DEV_ONLY_FEATURES = true;
     const ENVIRONMENT_PROD = 'prod';
     const LOCAL_HOST = true;
 
@@ -49,6 +50,7 @@ class System {
     public bool $enable_mobile_layout = false;
 
     public string $environment;
+    public bool $enable_dev_only_features;
 
     public bool $SC_OPEN;
     public bool $register_open;
@@ -190,6 +192,7 @@ class System {
         $this->db = new Database($host, $username, $password, $database);
 
         $this->environment = $ENVIRONMENT ?? self::ENVIRONMENT_DEV;
+        $this->enable_dev_only_features = $ENABLE_DEV_ONLY_FEATURES ?? self::ENABLE_DEV_ONLY_FEATURES; // Will only ever effect dev envs
         $this->register_open = $register_open ?? false;
         $this->SC_OPEN = $SC_OPEN ?? false;
         $this->USE_NEW_BATTLES = $USE_NEW_BATTLES ?? false;
@@ -651,10 +654,11 @@ class System {
             $double_exp_start_time = new DateTimeImmutable('2023-09-19');
             $double_reputation_start_time = new DateTimeImmutable('2023-10-18');
         }
+
         /*****CORE EVENTS*****/
         // TODO: Make core events more manageable
         // Double exp gains
-        $double_exp_end_time = new DateTimeImmutable('2023-10-4');
+        $double_exp_end_time = new DateTimeImmutable('2023-11-28');
         if($current_datetime > $double_exp_start_time && $current_datetime < $double_exp_end_time) {
             $this->event = new DoubleExpEvent($double_exp_end_time);
         }

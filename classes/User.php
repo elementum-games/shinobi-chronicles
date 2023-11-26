@@ -56,7 +56,9 @@ class User extends Fighter {
     const MAX_NAME_LENGTH = 18;
     const MIN_PASSWORD_LENGTH = 6;
     const PARTIAL_LOCK = 3;
+    const PARTIAL_LOCK_CD = 300; // 5 minutes (this gets hit on new locations)
     const FULL_LOCK = 5;
+    const FULL_LOCK_CD = 180; // 3 minutes (this gets hit on existing locations)
 
     const BASE_EXP = 0;
     const BASE_REGEN = 25;
@@ -98,7 +100,7 @@ class User extends Fighter {
     public int $user_id;
     public string $user_name;
     public int $free_username_changes;
-    public $blacklist;
+    public Blacklist $blacklist;
     public $original_blacklist;
 
     /** @var DailyTask[] */
@@ -224,6 +226,7 @@ class User extends Fighter {
     public $chat_color;
     public $chat_effect;
     public $last_login;
+    public int $last_login_attempt;
 
     /** @var Jutsu[] */
     public array $jutsu_scrolls = [];
@@ -372,6 +375,7 @@ class User extends Fighter {
         $user->song_ban = $user_data['song_ban'];
 
         $user->last_login = $user_data['last_login'];
+        $user->last_login_attempt = $user_data['last_login_attempt'];
 
         $user->regen_rate = $user_data['regen_rate'];
         $user->regen_boost = 0;
@@ -470,22 +474,10 @@ class User extends Fighter {
         $this->censor_explicit_language = (bool)$user_data['censor_explicit_language'];
 
         // Message blacklist
-        $this->blacklist = [];
-        $result = $this->system->db->query(
-            "SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='$this->user_id' LIMIT 1"
+        $this->blacklist = new Blacklist(
+            system: $this->system,
+            user_id: $this->user_id
         );
-        if($result->num_rows != 0) {
-            $blacklist = $this->system->db->fetch($result);
-            $this->blacklist = json_decode($blacklist['blocked_ids'], true);
-            $this->original_blacklist = $this->blacklist;
-        }
-        else {
-            $blacklist_json = json_encode($this->blacklist);
-            $this->system->db->query(
-                "INSERT INTO `blacklist` (`user_id`, `blocked_ids`) VALUES ('{$this->user_id}', '{$blacklist_json}')"
-            );
-            $this->original_blacklist = []; // Default an empty array, user did not have an original.
-        }
 
         // Rank stuff
         $this->rank_num = $user_data['rank'];
@@ -1769,6 +1761,7 @@ class User extends Fighter {
 		`last_ip` = '$this->last_ip',
 		`failed_logins` = '$this->failed_logins',
 		`last_login` = '$this->last_login',
+		`last_login_attempt` = '$this->last_login_attempt',
 		`last_update` = '$this->last_update',
 		`last_active` = '" . time() . "',
 		`avatar_link` = '$this->avatar_link',
@@ -1905,11 +1898,8 @@ class User extends Fighter {
         $this->system->db->query($query);
 
         // Update Blacklist
-        if(count($this->blacklist) != count($this->original_blacklist)) {
-            $blacklist_json = json_encode($this->blacklist);
-            $this->system->db->query(
-                "UPDATE `blacklist` SET `blocked_ids`='{$blacklist_json}' WHERE `user_id`='{$this->user_id}' LIMIT 1"
-            );
+        if($this->blacklist->update) {
+            $this->blacklist->updateData();
         }
 
         // Update Daily Tasks

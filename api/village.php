@@ -79,6 +79,14 @@ try {
                     $target_village_id = $system->db->clean($_POST['target_village_id']);
                     $message = VillageManager::createBreakAllianceProposal($system, $player, $target_village_id);
                     break;
+                case "offer_trade":
+                    $target_village_id = $system->db->clean($_POST['target_village_id']);
+                    $offered_resources = $_POST['offered_resources'];
+                    $offered_regions = isset($_POST['offered_regions']) ? $_POST['offered_regions'] : [];
+                    $requested_resources = $_POST['requested_resources'];
+                    $requested_regions = isset($_POST['requested_regions']) ? $_POST['requested_regions'] : [];
+                    $message = VillageManager::createTradeProposal($system, $player, $target_village_id, $offered_resources, $offered_regions, $requested_resources, $requested_regions);
+                    break;
                 default:
                     break;
             }

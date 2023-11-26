@@ -814,9 +814,9 @@ class BattleManager {
                                     " . sprintf('%.0f', $damage_resisted) . "
                                 </span>
                                  damage)
-                            </p>"; }
-                else {
-                        $text .= "<p style=\"font-weight:bold;\">
+                            </p>";
+            } else {
+                $text .= "<p style=\"font-weight:bold;\">
                             {$user->getName()} deals
                                 <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
                                     " . sprintf('%.0f', $attack_damage) . " damage
@@ -830,9 +830,13 @@ class BattleManager {
         }
 
         if($attack->jutsu->hasEffect()){
-            $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                $this->system->db->clean($this->effects->getAnnouncementText($attack->jutsu->effect)) .
-                "</p>";
+            foreach ($attack->jutsu->effects as $effect) {
+                if ($effect && $effect->effect != 'none') {
+                    $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
+                        $this->system->db->clean($this->effects->getAnnouncementText($effect->effect)) .
+                        "</p>";
+                }
+            }
         }
 
 

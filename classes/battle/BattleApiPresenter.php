@@ -130,9 +130,12 @@ class BattleApiPresenter {
             'range' => $jutsu->range,
             'element' => $jutsu->element,
             'cooldown' => $jutsu->cooldown,
-            'effect' => $jutsu->effect,
-            'effectAmount' => $jutsu->effect_amount,
-            'effectDuration' => $jutsu->effect_length,
+            'effect' => $jutsu->effects[0]->effect,
+            'effectAmount' => $jutsu->effects[0]->effect_amount,
+            'effectDuration' => $jutsu->effects[0]->effect_length,
+            'effect2' => $jutsu->effects[1]->effect,
+            'effect2Amount' => $jutsu->effects[1]->effect_amount,
+            'effect2Duration' => $jutsu->effects[1]->effect_length,
         ];
     }
 

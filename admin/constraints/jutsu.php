@@ -137,4 +137,17 @@ return [
         'data_type' => 'int',
         'input_type' => 'text',
     ],
+    'effect2' => [
+        'data_type' => 'string',
+        'input_type' => 'select',
+        'options' => $jutsu_effects,
+    ],
+    'effect2_amount' => [
+        'data_type' => 'float',
+        'input_type' => 'text',
+    ],
+    'effect2_length' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
+    ],
 ];
