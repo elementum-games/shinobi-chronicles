@@ -36,88 +36,93 @@ class BattleEffectsManager {
         if(!$jutsu->combat_id) {
             $jutsu->setCombatId($effect_user->combat_id);
         }
-        if($jutsu->effect == 'release_genjutsu') {
-            $this->releaseGenjutsu($effect_user, $jutsu);
-            return;
-        }
 
-        $apply_effect = true;
-
-        $debuff_power = ($jutsu->power <= 0) ? 0 : $raw_damage / $jutsu->power / 15;
-
-        if($this->system->debug['battle_effects']) {
-            echo sprintf("JP: %s (%s)<br />", $jutsu->power, $jutsu->effect);
-            echo sprintf("%s / %s<br />", $raw_damage, $debuff_power);
-        }
-
-        switch($jutsu->effect) {
-            case 'residual_damage':
-            case 'ninjutsu_nerf':
-            case 'taijutsu_nerf':
-            case 'genjutsu_nerf':
-            case 'daze':
-            case 'ninjutsu_resist':
-            case 'taijutsu_resist':
-            case 'genjutsu_resist':
-                $jutsu->effect_amount = round($raw_damage * ($jutsu->effect_amount / 100), 2);
-                break;
-            case 'absorb_chakra':
-            case 'absorb_stamina':
-                $jutsu->effect_amount = round($raw_damage * ($jutsu->effect_amount / 600), 2);
-                break;
-            case 'drain_chakra':
-            case 'drain_stamina':
-                $jutsu->effect_amount = round($raw_damage * ($jutsu->effect_amount / 300), 2);
-                break;
-            case 'ninjutsu_boost':
-            case 'taijutsu_boost':
-            case 'genjutsu_boost':
-            case 'speed_boost':
-            case 'cast_speed_boost':
-            case 'speed_nerf':
-            case 'cripple':
-                // No changes needed to base number, calculated in applyPassiveEffects
-                break;
-            case 'intelligence_boost':
-            case 'willpower_boost':
-            case 'intelligence_nerf':
-            case 'willpower_nerf':
-                $jutsu->effect_amount = round($debuff_power * ($jutsu->effect_amount / 100), 2);
-                break;
-            case Jutsu::USE_TYPE_BARRIER:
-                $jutsu->effect_amount = $raw_damage;
-                break;
-            default:
-                $apply_effect = false;
-                break;
-        }
-
-        if($apply_effect) {
-            $effect_id = $jutsu->combat_id;
-            if($jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
-                $effect_id = self::barrierId($effect_user);
-            }
-            else if($jutsu->is_weapon) {
-                $effect_id = $effect_user->combat_id . ':WE:' . $jutsu->effect;
+        foreach ($jutsu->effects as $index => &$effect) {
+            if ($effect->effect == 'release_genjutsu') {
+                $this->releaseGenjutsu($effect_user, $jutsu);
+                unset($effect);
+                continue;
             }
 
-            $this->active_effects[$effect_id] = new BattleEffect(
-                user: $effect_user->combat_id,
-                target: $target_id,
-                turns: $jutsu->effect_length,
-                effect: $jutsu->effect,
-                effect_amount: $jutsu->effect_amount,
-                damage_type: $jutsu->jutsu_type
-            );
+            $apply_effect = true;
 
-            if($jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
-                $intelligence = ($effect_user->intelligence + $effect_user->intelligence_boost - $effect_user->intelligence_nerf);
-                if($intelligence <= 0) {
-                    $intelligence = 1;
+            $debuff_power = ($jutsu->power <= 0) ? 0 : $raw_damage / $jutsu->power / 15;
+
+            if ($this->system->debug['battle_effects']) {
+                echo sprintf("JP: %s (%s)<br />", $jutsu->power, $effect->effect);
+                echo sprintf("%s / %s<br />", $raw_damage, $debuff_power);
+            }
+
+            switch ($effect->effect) {
+                case 'residual_damage':
+                case 'ninjutsu_nerf':
+                case 'taijutsu_nerf':
+                case 'genjutsu_nerf':
+                case 'daze':
+                case 'ninjutsu_resist':
+                case 'taijutsu_resist':
+                case 'genjutsu_resist':
+                    $effect->effect_amount = round($raw_damage * ($effect->effect_amount / 100), 2);
+                    break;
+                case 'absorb_chakra':
+                case 'absorb_stamina':
+                    $effect->effect_amount = round($raw_damage * ($effect->effect_amount / 600), 2);
+                    break;
+                case 'drain_chakra':
+                case 'drain_stamina':
+                    $effect->effect_amount = round($raw_damage * ($effect->effect_amount / 300), 2);
+                    break;
+                case 'ninjutsu_boost':
+                case 'taijutsu_boost':
+                case 'genjutsu_boost':
+                case 'speed_boost':
+                case 'cast_speed_boost':
+                case 'speed_nerf':
+                case 'cripple':
+                    // No changes needed to base number, calculated in applyPassiveEffects
+                    break;
+                case 'intelligence_boost':
+                case 'willpower_boost':
+                case 'intelligence_nerf':
+                case 'willpower_nerf':
+                    $effect->effect_amount = round($debuff_power * ($effect->effect_amount / 100), 2);
+                    break;
+                case Jutsu::USE_TYPE_BARRIER:
+                    $effect->effect_amount = $raw_damage;
+                    break;
+                default:
+                    $apply_effect = false;
+                    break;
+            }
+
+            if ($apply_effect) {
+                $effect_id = $jutsu->combat_id;
+                if ($jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
+                    $effect_id = self::barrierId($effect_user);
+                } else if ($jutsu->is_weapon) {
+                    $effect_id = $effect_user->combat_id . ':WE:' . $effect->effect;
                 }
-                $this->active_effects[$effect_id]->power = $intelligence * $jutsu->power;
-                $this->active_effects[$effect_id]->first_turn = true;
+
+                $effect_id = $effect_id . "_" . $index;
+                $this->active_effects[$effect_id] = new BattleEffect(
+                    user: $effect_user->combat_id,
+                    target: $target_id,
+                    turns: $effect->effect_length,
+                    effect: $effect->effect,
+                    effect_amount: $effect->effect_amount,
+                    damage_type: $jutsu->jutsu_type
+                );
+
+                if ($jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
+                    $intelligence = ($effect_user->intelligence + $effect_user->intelligence_boost - $effect_user->intelligence_nerf);
+                    if ($intelligence <= 0) {
+                        $intelligence = 1;
+                    }
+                    $this->active_effects[$effect_id]->power = $intelligence * $jutsu->power;
+                    $this->active_effects[$effect_id]->first_turn = true;
+                }
             }
+            unset($effect);
         }
     }
 
@@ -442,8 +447,8 @@ class BattleEffectsManager {
         }
         else if($fighter_jutsu->use_type == Jutsu::USE_TYPE_BARRIER && $fighter->barrier) {
             $barrier_jutsu = $fighter_jutsu;
-            $barrier_jutsu->effect = Jutsu::USE_TYPE_BARRIER;
-            $barrier_jutsu->effect_length = 1;
+            $barrier_jutsu->effects[0]->effect = Jutsu::USE_TYPE_BARRIER;
+            $barrier_jutsu->effects[0]->effect_length = 1;
             $this->setEffect($fighter, $fighter->combat_id, $barrier_jutsu, $fighter->barrier);
         }
     }

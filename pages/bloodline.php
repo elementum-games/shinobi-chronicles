@@ -233,10 +233,12 @@ function bloodline() {
 			if($jutsu->cooldown) {
 				echo "<label style='width:6.5em;'>Cooldown:</label>" . $jutsu->cooldown . " turn(s)<br />";
 			}
-			if($jutsu->effect) {
-				echo "<label style='width:6.5em;'>Effect:</label>" .
-					System::unSlug($jutsu->effect) . ' (' . round($jutsu->effect_amount, 0) . '%) ' . ' - ' . $jutsu->effect_length . " turns<br />";
-			}
+            foreach ($jutsu->effects as $effect) {
+                if ($effect->effect && $effect->effect != 'none') {
+                    echo "<label style='width:6.5em;'>Effect:</label>" .
+                        System::unSlug($effect->effect) . ' (' . round($effect->effect_amount, 0) . '%) ' . ' - ' . $effect->effect_length . " turns<br />";
+                }
+            }
 			echo "<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type) . "<br />
 			<label style='width:6.5em;'>Power:</label>" . round($jutsu->power, 1) . "<br />
 

@@ -88,11 +88,17 @@ $current_rank = 1;
                         </p>
                         <p>Power: <?= $jutsu->base_power ?></p>
                         <p>
-                            <?php if($jutsu->effect !== 'none'): ?>
-                                <?= System::unSlug($jutsu->effect) ?>
-                                (<?= $jutsu->effect_amount ?>% / <?= $jutsu->effect_length ?> turns)
+                            <?php if($jutsu->effects[0]->effect !== 'none'): ?>
+                                <?= System::unSlug($jutsu->effects[0]->effect) ?>
+                                (<?= $jutsu->effects[0]->effect_amount ?>% / <?= $jutsu->effects[0]->effect_length ?> turns)
                             <?php else: ?>
                                 No effect
+                            <?php endif; ?>
+                        </p>
+                        <p>
+                            <?php if($jutsu->effects[1]->effect !== 'none'): ?>
+                                <?= System::unSlug($jutsu->effects[1]->effect) ?>
+                                (<?= $jutsu->effects[1]->effect_amount ?>% / <?= $jutsu->effects[1]->effect_length ?> turns)
                             <?php endif; ?>
                         </p>
                         <p>Use Cost: <?= $jutsu->use_cost ?></p>
