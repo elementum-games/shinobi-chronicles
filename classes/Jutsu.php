@@ -41,8 +41,8 @@ class Jutsu {
     const CHUUNIN_SCALE_MULTIPLIER = 1.4; // 2.9 => 3.9 = +34.4%
     const JONIN_SCALE_MULTIPLIER = 1.75; // 2.9 => 4.9 = +69%
 
-    // Genjutsu gets declared with full power and effect instead of a tradeoff between them, we balance in code
-    const GENJUTSU_ATTACK_POWER_MODIFIER = 0.55;
+    /* Genjutsu gets declared with full power and effect instead of a tradeoff between them, we balance in code
+    const GENJUTSU_ATTACK_POWER_MODIFIER = 0.55;*/
 
     public static array $elements = [
         self::ELEMENT_FIRE,
@@ -163,10 +163,11 @@ class Jutsu {
         if($this->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
             $this->range = 1;
         }
+        /*
         if($this->jutsu_type == Jutsu::TYPE_GENJUTSU && in_array($use_type, self::$attacking_use_types)) {
             $this->power = round($this->base_power * self::GENJUTSU_ATTACK_POWER_MODIFIER, 2);
             // $this->effect_only = true; // toggle this if you turn the power back to 1
-        }
+        }*/
 
         // legacy
         $this->effect = $effect_1;
@@ -249,7 +250,7 @@ class Jutsu {
         $is_genjutsu_attack = $this->jutsu_type == Jutsu::TYPE_GENJUTSU && in_array($this->use_type, self::$attacking_use_types);
 
         $this->power = $this->base_power
-            * ($is_genjutsu_attack ? self::GENJUTSU_ATTACK_POWER_MODIFIER : 1)
+            //* ($is_genjutsu_attack ? self::GENJUTSU_ATTACK_POWER_MODIFIER : 1)
             * (1 + ($this->level * $level_power_multiplier));
         $this->power = round($this->power, 2);
     }
