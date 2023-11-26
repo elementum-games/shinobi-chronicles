@@ -83,6 +83,7 @@ class BattleEffectsManager {
                 case 'cripple':
                 case 'evasion_boost':
                 case 'evasion_nerf':
+                case 'vulnerability':
                     // No changes needed to base number, calculated in applyPassiveEffects
                     break;
                 case 'intelligence_boost':
@@ -261,7 +262,7 @@ class BattleEffectsManager {
         else if($effect->effect == 'genjutsu_nerf' or $effect->effect == 'daze') {
             $target->genjutsu_nerf += $effect_amount;
         }
-        else if($effect->effect == 'speed_nerf' or $effect->effect == 'cripple') {
+        else if($effect->effect == 'speed_nerf') {
             $target->speed_nerf += $target->getSpeed(true) * ($effect->effect_amount / 100);
             $target->cast_speed_nerf += $target->getCastSpeed(true) * ($effect->effect_amount / 100);
 
@@ -276,6 +277,11 @@ class BattleEffectsManager {
         }
         else if($effect->effect == 'willpower_nerf') {
             $target->willpower_nerf += $effect_amount;
+        }
+        else if ($effect->effect == 'vulnerability') {
+            $target->ninjutsu_weakness += ($effect->effect_amount / 100);
+            $target->taijutsu_weakness += ($effect->effect_amount / 100);
+            $target->genjutsu_weakness += ($effect->effect_amount / 100);
         }
         else if ($effect->effect == 'fire_weakness') {
             $target->fire_weakness += $effect_amount;
@@ -537,6 +543,9 @@ class BattleEffectsManager {
             case 'cast_speed_boost':
                 $announcement_text = "[player]'s Cast Speed is being increased";
                 break;
+            case 'vulnerability':
+                $announcement_text = "[opponent]'s is taking increased damage from attacks";
+                break;
             case 'fire_weakness':
                 $announcement_text = "[opponent] is vulnerable to Fire";
                 break;
@@ -551,6 +560,7 @@ class BattleEffectsManager {
                 break;
             case 'water_weakness':
                 $announcement_text = "[opponent] is vulnerable to Water";
+                break;
             case 'evasion_boost':
                 $announcement_text = "[player]'s Evasion is being increased";
                 break;
