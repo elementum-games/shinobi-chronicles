@@ -76,6 +76,7 @@ class BattleEffectsManager {
             case 'cast_speed_boost':
             case 'speed_nerf':
             case 'cripple':
+            case 'vulnerability':
                 // No changes needed to base number, calculated in applyPassiveEffects
                 break;
             case 'intelligence_boost':
@@ -247,12 +248,16 @@ class BattleEffectsManager {
 
             $target->speed_nerf = min($target->speed_nerf, $target->getSpeed(true) * self::MAX_SPEED_REDUCTION);
             $target->cast_speed_nerf = min($target->cast_speed_nerf, $target->getCastSpeed(true) * self::MAX_SPEED_REDUCTION);
-        }
-        else if($effect->effect == 'intelligence_nerf') {
+        } else if ($effect->effect == 'intelligence_nerf') {
             $target->intelligence_nerf += $effect_amount;
         }
         else if($effect->effect == 'willpower_nerf') {
             $target->willpower_nerf += $effect_amount;
+        }
+        else if ($effect->effect == 'vulnerability') {
+            $target->ninjutsu_weakness += ($effect->effect_amount / 100);
+            $target->taijutsu_weakness += ($effect->effect_amount / 100);
+            $target->genjutsu_weakness += ($effect->effect_amount / 100);
         }
         return false;
     }
@@ -497,6 +502,9 @@ class BattleEffectsManager {
                 break;
             case 'cast_speed_boost':
                 $announcement_text = "[player]'s Cast Speed is being increased";
+                break;
+            case 'vulnerability':
+                $announcement_text = "[opponent]'s is taking increased damage from attacks";
                 break;
             default:
                 break;

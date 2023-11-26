@@ -1047,6 +1047,30 @@ class BattleManager {
             }
         }
 
+        // Apply type weakness
+        switch ($player1_jutsu->jutsu_type) {
+            case 'ninjutsu':
+                $player1_damage *= 1 + $player2->ninjutsu_weakness;
+                break;
+            case 'taijutsu':
+                $player1_damage *= 1 + $player2->taijutsu_weakness;
+                break;
+            case 'genjutsu':
+                $player1_damage *= 1 + $player2->genjutsu_weakness;
+                break;
+        }
+        switch ($player2_jutsu->jutsu_type) {
+            case 'ninjutsu':
+                $player2_damage *= 1 + $player1->ninjutsu_weakness;
+                break;
+            case 'taijutsu':
+                $player2_damage *= 1 + $player1->taijutsu_weakness;
+                break;
+            case 'genjutsu':
+                $player2_damage *= 1 + $player1->genjutsu_weakness;
+                break;
+        }
+
         return $this->parseCombatText($collision_text, $player1, $player2);
     }
 

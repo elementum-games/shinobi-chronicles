@@ -104,6 +104,10 @@ abstract class Fighter {
     public $intelligence_nerf = 0;
     public $willpower_nerf = 0;
 
+    public $taijutsu_weakness = 0;
+    public $ninjutsu_weakness = 0;
+    public $genjutsu_weakness = 0;
+
     // Getters
     abstract public function getName(): string;
 

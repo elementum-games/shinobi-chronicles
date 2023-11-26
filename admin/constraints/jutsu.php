@@ -22,6 +22,7 @@ $jutsu_effects = [
     'endurance_nerf',
     'intelligence_nerf',
     'willpower_nerf',
+    'vulnerability',
 ];
 
 $ranks = [];
