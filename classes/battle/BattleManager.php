@@ -9,9 +9,12 @@ require_once __DIR__ . '/BattleAttack.php';
 require_once __DIR__ . '/LegacyFighterAction.php';
 
 class BattleManager {
-    const SPEED_DAMAGE_REDUCTION_RATIO = 0.47;
-    const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 0.47;
-    const MAX_EVASION_DAMAGE_REDUCTION = 0.35;
+    const SPEED_DAMAGE_REDUCTION_RATIO = 1; // e.g. 10% of your stats in speed = 10% evasion
+    const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 1; // e.g. 10% of your stats in speed = 10% evasion
+    const MAX_EVASION_DAMAGE_REDUCTION = 0.5; // LEGACY
+    const EVASION_SOFT_CAP = 0.5; // caps at 50% evasion
+    const EVASION_SOFT_CAP_RATIO = 0.5; // evasion beyond soft cap only 50% as effective
+    const EVASION_HARD_CAP = 0.75; // caps at 75% evasion
 
     private System $system;
 
@@ -811,9 +814,9 @@ class BattleManager {
                                     " . sprintf('%.0f', $damage_resisted) . "
                                 </span>
                                  damage)
-                            </p>"; }
-                else {
-                        $text .= "<p style=\"font-weight:bold;\">
+                            </p>";
+            } else {
+                $text .= "<p style=\"font-weight:bold;\">
                             {$user->getName()} deals
                                 <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
                                     " . sprintf('%.0f', $attack_damage) . " damage
@@ -827,9 +830,13 @@ class BattleManager {
         }
 
         if($attack->jutsu->hasEffect()){
-            $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                $this->system->db->clean($this->effects->getAnnouncementText($attack->jutsu->effect)) .
-                "</p>";
+            foreach ($attack->jutsu->effects as $effect) {
+                if ($effect && $effect->effect != 'none') {
+                    $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
+                        $this->system->db->clean($this->effects->getAnnouncementText($effect->effect)) .
+                        "</p>";
+                }
+            }
         }
 
 
@@ -853,53 +860,87 @@ class BattleManager {
     ) {
         $collision_text = '';
 
-        // Elemental interactions
-        if(!empty($player1_jutsu->element) && !empty($player2_jutsu->element)) {
-            $player1_jutsu->element = strtolower($player1_jutsu->element);
-            $player2_jutsu->element = strtolower($player2_jutsu->element);
+        // Fire > Wind > Lightning > Earth > Water > Fire
+        $elemental_clash_damage_modifier = 0.2;
+        $player1_elemental_damage_modifier = 1;
+        $player2_elemental_damage_modifier = 1;
 
-            // Fire > Wind > Lightning > Earth > Water > Fire
-            if($player1_jutsu->element == 'fire') {
-                if($player2_jutsu->element == 'wind') {
-                    $player2_damage *= 0.8;
-                }
-                else if($player2_jutsu->element == 'water') {
-                    $player1_damage *= 0.8;
-                }
-            }
-            else if($player1_jutsu->element == 'wind') {
-                if($player2_jutsu->element == 'lightning') {
-                    $player2_damage *= 0.8;
-                }
-                else if($player2_jutsu->element == 'fire') {
-                    $player1_damage *= 0.8;
-                }
-            }
-            else if($player1_jutsu->element == 'lightning') {
-                if($player2_jutsu->element == 'earth') {
-                    $player2_damage *= 0.8;
-                }
-                else if($player2_jutsu->element == 'wind') {
-                    $player1_damage *= 0.8;
-                }
-            }
-            else if($player1_jutsu->element == 'earth') {
-                if($player2_jutsu->element == 'water') {
-                    $player2_damage *= 0.8;
-                }
-                else if($player2_jutsu->element == 'lightning') {
-                    $player1_damage *= 0.8;
-                }
-            }
-            else if($player1_jutsu->element == 'water') {
-                if($player2_jutsu->element == 'fire') {
-                    $player2_damage *= 0.8;
-                }
-                else if($player2_jutsu->element == 'earth') {
-                    $player1_damage *= 0.8;
-                }
+        // Calculate player1 elemental damage modifier
+        if (!empty($player1_jutsu->element)) {
+            switch (strtolower($player1_jutsu->element)) {
+                case 'fire':
+                    $player1_elemental_damage_modifier += $player2->fire_weakness;
+                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'water') {
+                        $player1_elemental_damage_modifier -= $elemental_clash_damage_modifier;
+                    }
+                    break;
+                case 'wind':
+                    $player1_elemental_damage_modifier += $player2->wind_weakness;
+                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'fire') {
+                        $player1_elemental_damage_modifier -= $elemental_clash_damage_modifier;
+                    }
+                    break;
+                case 'lightning':
+                    $player1_elemental_damage_modifier += $player2->lightning_weakness;
+                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'wind') {
+                        $player1_elemental_damage_modifier -= $elemental_clash_damage_modifier;
+                    }
+                    break;
+                case 'earth':
+                    $player1_elemental_damage_modifier += $player2->earth_weakness;
+                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'lightning') {
+                        $player1_elemental_damage_modifier -= $elemental_clash_damage_modifier;
+                    }
+                    break;
+                case 'water':
+                    $player1_elemental_damage_modifier += $player2->water_weakness;
+                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'earth') {
+                        $player1_elemental_damage_modifier -= $elemental_clash_damage_modifier;
+                    }
+                    break;
             }
         }
+
+        // Calculate player2 elemental damage modifier
+        if (!empty($player2_jutsu->element)) {
+            switch (strtolower($player2_jutsu->element)) {
+                case 'fire':
+                    $player2_elemental_damage_modifier += $player1->fire_weakness;
+                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'water') {
+                        $player2_elemental_damage_modifier -= $elemental_clash_damage_modifier;
+                    }
+                    break;
+                case 'wind':
+                    $player2_elemental_damage_modifier += $player1->fire_weakness;
+                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'fire') {
+                        $player2_elemental_damage_modifier -= $elemental_clash_damage_modifier;
+                    }
+                    break;
+                case 'lightning':
+                    $player2_elemental_damage_modifier += $player1->fire_weakness;
+                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'wind') {
+                        $player2_elemental_damage_modifier -= $elemental_clash_damage_modifier;
+                    }
+                    break;
+                case 'earth':
+                    $player2_elemental_damage_modifier += $player1->fire_weakness;
+                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'lightning') {
+                        $player2_elemental_damage_modifier -= $elemental_clash_damage_modifier;
+                    }
+                    break;
+                case 'water':
+                    $player2_elemental_damage_modifier += $player1->fire_weakness;
+                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'warth') {
+                        $player2_elemental_damage_modifier -= $elemental_clash_damage_modifier;
+                    }
+                    break;
+            }
+        }
+
+        // Apply elemental damage modifier
+        echo $player1_elemental_damage_modifier;
+        $player1_damage *= $player1_elemental_damage_modifier;
+        $player2_damage *= $player2_elemental_damage_modifier;
 
         // Apply barrier
         $player1_jutsu_is_attack = in_array($player1_jutsu->use_type, Jutsu::$attacking_use_types);
@@ -999,19 +1040,21 @@ class BattleManager {
             }
         }
 
-        $player1_evasion_stat_amount = $this->getEvasionStatAmount($player1, $player1_jutsu);
-        $player2_evasion_stat_amount = $this->getEvasionStatAmount($player2, $player2_jutsu);
+        $player1_evasion_stat_amount = $this->getEvasionPercent($player1, $player1_jutsu, $player2->getBaseStatTotal());
+        $player2_evasion_stat_amount = $this->getEvasionPercent($player2, $player2_jutsu, $player1->getBaseStatTotal());
 
         if($player1_evasion_stat_amount >= $player2_evasion_stat_amount && $player2_jutsu_is_attack) {
-            $damage_reduction = ($player1_evasion_stat_amount / $player2_evasion_stat_amount) - 1.0;
+            $damage_reduction = round($player1_evasion_stat_amount - $player2_evasion_stat_amount, 2);
 
-            $damage_reduction = $player1_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU
-                ? round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2)
-                : round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
-
-            if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
+            // if higher than soft cap, apply penalty
+            if ($damage_reduction > self::EVASION_SOFT_CAP) {
+                $damage_reduction = (($damage_reduction - self::EVASION_SOFT_CAP) * self::EVASION_SOFT_CAP_RATIO) + self::EVASION_SOFT_CAP;
             }
+            // if still higher than cap cap, set to hard cap
+            if ($damage_reduction > self::EVASION_HARD_CAP) {
+                $damage_reduction = self::EVASION_HARD_CAP;
+            }
+
             if($damage_reduction >= 0.01) {
                 $player2_damage *= 1 - $damage_reduction;
 
@@ -1025,15 +1068,17 @@ class BattleManager {
             }
         }
         else if($player2_evasion_stat_amount >= $player1_evasion_stat_amount && $player1_jutsu_is_attack) {
-            $damage_reduction = ($player2_evasion_stat_amount / $player1_evasion_stat_amount) - 1.0;
+            $damage_reduction = round($player2_evasion_stat_amount - $player1_evasion_stat_amount, 2);
 
-            $damage_reduction = $player2_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU
-                ? round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2)
-                : round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
-
-            if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
+            // if higher than soft cap, apply penalty
+            if ($damage_reduction > self::EVASION_SOFT_CAP) {
+                $damage_reduction = (($damage_reduction - self::EVASION_SOFT_CAP) * self::EVASION_SOFT_CAP_RATIO) + self::EVASION_SOFT_CAP;
             }
+            // if still higher than cap cap, set to hard cap
+            if ($damage_reduction > self::EVASION_HARD_CAP) {
+                $damage_reduction = self::EVASION_HARD_CAP;
+            }
+
             if($damage_reduction >= 0.01) {
                 $player1_damage *= 1 - $damage_reduction;
 
@@ -1077,22 +1122,26 @@ class BattleManager {
     /**
      * @throws RuntimeException
      */
-    private function getEvasionStatAmount(Fighter $fighter, Jutsu $fighter_jutsu): float|int {
+    private function getEvasionPercent(Fighter $fighter, Jutsu $fighter_jutsu, int $target_stat_total): float|int {
         switch($fighter_jutsu->jutsu_type) {
             case Jutsu::TYPE_TAIJUTSU:
-                $evasion_stat_amount = $fighter->speed + $fighter->speed_boost - $fighter->speed_nerf;
-                $evasion_stat_amount = 50 + ($evasion_stat_amount * 0.5);
-                if($evasion_stat_amount <= 0) {
-                    $evasion_stat_amount = 1;
-                }
+                // get speed stat total
+                $evasion_stat_amount = $fighter->speed + $fighter->speed_boost;
+                // determine base evasion against opponent
+                $evasion_stat_amount *= BattleManager::SPEED_DAMAGE_REDUCTION_RATIO / max($target_stat_total, 1);
+                // apply all boosts/nerfs to evasion
+                $evasion_stat_amount += $fighter->evasion_boost;
+                $evasion_stat_amount -= $fighter->evasion_nerf;
                 break;
             case Jutsu::TYPE_GENJUTSU:
             case Jutsu::TYPE_NINJUTSU:
-                $evasion_stat_amount = $fighter->cast_speed + $fighter->cast_speed_boost - $fighter->cast_speed_nerf;
-                $evasion_stat_amount = 50 + ($evasion_stat_amount * 0.5);
-                if($evasion_stat_amount <= 0) {
-                    $evasion_stat_amount = 1;
-                }
+                // get speed stat total
+                $evasion_stat_amount = $fighter->cast_speed + $fighter->cast_speed_boost;
+                // determine base evasion against opponent
+                $evasion_stat_amount *= BattleManager::SPEED_DAMAGE_REDUCTION_RATIO / max($target_stat_total, 1);
+                // apply all boosts/nerfs to evasion
+                $evasion_stat_amount += $fighter->evasion_boost;
+                $evasion_stat_amount -= $fighter->evasion_nerf;
                 break;
             default:
                 throw new RuntimeException("Invalid jutsu type!");

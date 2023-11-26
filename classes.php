@@ -7,6 +7,7 @@ require_once __DIR__ . "/classes/Bloodline.php";
 require_once __DIR__ . "/classes/Database.php";
 require_once __DIR__ . "/classes/EntityId.php";
 require_once __DIR__ . "/classes/Item.php";
+require_once __DIR__ . "/classes/Effect.php";
 require_once __DIR__ . "/classes/Jutsu.php";
 require_once __DIR__ . "/classes/Mission.php";
 require_once __DIR__ . "/classes/NPC.php";
