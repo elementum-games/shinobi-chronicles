@@ -73,8 +73,8 @@ class PremiumShopManager {
     private function initCosts(): void {
         $this->costs['name_change'] = 15;
         $this->costs['gender_change'] = 10;
-        $this->costs['bloodline'][1] = 80;
-        $this->costs['bloodline'][2] = 60;
+        $this->costs['bloodline'][1] = $this->system->isDevEnvironment() ? 0 : 80;
+        $this->costs['bloodline'][2] = $this->system->isDevEnvironment() ? 0 : 60;
         $this->costs['bloodline'][3] = 40;
         $this->costs['bloodline'][4] = 20;
         $this->costs['bloodline_random'][1] = 40;
@@ -101,8 +101,8 @@ class PremiumShopManager {
                 90 => $this->calcSealDiscount($this->costs['forbidden_seal_monthly_cost'][3] * 3, self::EDS_90_DAY_DISCOUNT)
             ]
         ];
-        $this->costs['element_change'] = 10;
-        $this->costs['village_change'] = 5 * $this->player->village_changes;
+        $this->costs['element_change'] = $this->system->isDevEnvironment() ? 0 : 10;
+        $this->costs['village_change'] = $this->system->isDevEnvironment() ? 0 : 5 * $this->player->village_changes;
         $this->costs['clan_change'] = 5 * $this->player->clan_changes;
         if ($this->costs['village_change'] > 40) {
             $this->costs['village_change'] = 40;
@@ -295,6 +295,9 @@ class PremiumShopManager {
 
     // Stat transfer
     public function statTransferPremiumCreditCost(int $transfer_amount, string $transfer_speed): int {
+        if ($this->system->isDevEnvironment()) {
+            return 0;
+        }
         $is_free_stat_change =
             $transfer_amount <= $this->max_free_stat_change_amount
             && $this->free_stat_change_cooldown_left <= 0;
@@ -317,6 +320,9 @@ class PremiumShopManager {
     }
 
     public function statTransferYenCost(int $transfer_amount, string $transfer_speed): int {
+        if ($this->system->isDevEnvironment()) {
+            return 0;
+        }
        switch($transfer_speed) {
            case self::STAT_TRANSFER_STANDARD:
                return 0;
@@ -426,6 +432,9 @@ class PremiumShopManager {
     }
 
     public function statTransferTime(int $transfer_amount, string $transfer_speed): int {
+        if ($this->system->isDevEnvironment()) {
+            return 0;
+        }
         switch($transfer_speed) {
             case self::STAT_TRANSFER_STANDARD:
                 return $transfer_amount / $this->stat_transfer_points_per_min;
