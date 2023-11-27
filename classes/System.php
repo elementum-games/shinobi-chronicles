@@ -62,6 +62,14 @@ class System {
     public bool $is_api_request = false;
     public bool $is_legacy_ajax_request = false;
 
+    //New server time
+    const SERVER_TIME_ZONE = "America/New_York";
+    const REPUTATION_RESET_DAY = "next friday";
+    const REPUTATION_RESET_HOUR = 17;
+    const REPUTATION_RESET_MINUTE = 0;
+    public DateTimeImmutable $SERVER_TIME;
+    public DateTimeImmutable $REPUTATION_RESET;
+    // Old server time
     public $timezoneOffset;
 
     // Training boost switches
@@ -183,6 +191,14 @@ class System {
         'stat_cut' => false,
     ];
 
+    const GLOBAL_TEST_NOTIFICATION_SPAWN = false;
+    public array $testNotifications = [
+        'caravan' => self::GLOBAL_TEST_NOTIFICATION_SPAWN,
+        'raid' => self::GLOBAL_TEST_NOTIFICATION_SPAWN,
+        'event' => self::GLOBAL_TEST_NOTIFICATION_SPAWN,
+        'diplomacy' => self::GLOBAL_TEST_NOTIFICATION_SPAWN,
+    ];
+
     public function __construct() {
         require __DIR__ . "/../secure/vars.php";
         /** @var $host */
@@ -199,6 +215,11 @@ class System {
 
         $this->router = new Router($web_url ?? 'http://localhost/');
 
+        // New Server Time
+        $this->SERVER_TIME = new DateTimeImmutable(datetime: "now", timezone: new DateTimeZone(self::SERVER_TIME_ZONE));
+        $this->REPUTATION_RESET = $this->SERVER_TIME->modify(self::REPUTATION_RESET_DAY);
+        $this->REPUTATION_RESET = $this->REPUTATION_RESET->setTime(hour: self::REPUTATION_RESET_HOUR, minute: self::REPUTATION_RESET_MINUTE);
+        // Old Server Time
         $this->timezoneOffset = date('Z');
 
         $this->checkForActiveEvent();
@@ -673,6 +694,10 @@ class System {
         $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
         if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
             $this->event = new LanternEvent($july_2023_lantern_event_end_time);
+        }
+
+        if($this->testNotifications['event'] && is_null($this->event) && $this->isDevEnvironment()) {
+            $this->event = new DoubleExpEvent($current_datetime->modify("+2 weeks"));
         }
     }
 

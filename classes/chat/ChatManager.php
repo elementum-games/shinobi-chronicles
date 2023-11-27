@@ -291,6 +291,8 @@ class ChatManager {
                 $this->system->message("Message posted!");
             }
 
+            // Master notification array
+            $notification_blocks = [];
             // Handle Quotes
             $pattern = "/\[quote:\d+\]/";
             $has_quote = preg_match_all($pattern, $message, $matches);
@@ -309,12 +311,26 @@ class ChatManager {
                             continue;
                         }
                         $result = $this->system->db->query(
-                            "SELECT `user_id` FROM `users` WHERE `user_name`='{$quote[0]->user_name}' LIMIT 1"
+                            "SELECT `user_id`, `blocked_notifications` FROM `users` WHERE `user_name`='{$quote[0]->user_name}' LIMIT 1"
                         );
 			            if($this->system->db->last_num_rows == 0) {
 				            throw new RuntimeException("User does not exist!");
 			            }
 			            $result = $this->system->db->fetch($result);
+
+                        // Load notification blocker
+                        if(!isset($notification_blocks[$result['user_id']])) {
+                            $notification_blocks[$result['user_id']] =
+                                BlockedNotificationManager::BlockedNotificationManagerFromDb(
+                                    system: $this->system,
+                                    blocked_notifications_string: $result['blocked_notifications']
+                            );
+                        }
+                        // Notification blocked
+                        if($notification_blocks[$result['user_id']]->notificationBlocked(NotificationManager::NOTIFICATION_CHAT)) {
+                            continue;
+                        }
+
                         require_once __DIR__ . '/../notification/NotificationManager.php';
                         $new_notification = new ChatNotificationDto(
                             type: "chat",
@@ -353,12 +369,26 @@ class ChatManager {
 
                 foreach($mentioned_users as $mentioned_user) {
                     $result = $this->system->db->query(
-                        "SELECT `user_id` FROM `users` WHERE `user_name`='{$mentioned_user}' LIMIT 1"
+                        "SELECT `user_id`, `blocked_notifications` FROM `users` WHERE `user_name`='{$mentioned_user}' LIMIT 1"
                     );
                     if ($this->system->db->last_num_rows == 0) {
                         throw new RuntimeException("User does not exist!");
                     }
                     $result = $this->system->db->fetch($result);
+
+                    //Blocked notifs
+                    if(!isset($notification_blocks[$result['user_id']])) {
+                        $notification_blocks[$result['user_id']] =
+                            BlockedNotificationManager::BlockedNotificationManagerFromDb(
+                                system: $this->system,
+                                blocked_notifications_string: $result['blocked_notifications']
+                            );
+                    }
+
+                    if($notification_blocks[$result['user_id']]->notificationBlocked(NotificationManager::NOTIFICATION_CHAT)) {
+                        continue;
+                    }
+
                     require_once __DIR__ . '/../notification/NotificationManager.php';
                     $new_notification = new ChatNotificationDto(
                         type: "chat",

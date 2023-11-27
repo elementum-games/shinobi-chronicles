@@ -104,6 +104,10 @@ class Router {
         $system = $player->system;
         $routes = self::$routes;
 
+        // Dev only page
+        if($route->dev_only && !$system->isDevEnvironment()) {
+            throw new RuntimeException("Invalid page!");
+        }
 
         // Check for battle if page is restricted
         if(isset($route->battle_ok) && $route->battle_ok === false) {

@@ -521,16 +521,16 @@ class UserReputation {
         }
 
         // Weekly rep limit
-        if($this->weekly_pvp_rep > $this->weekly_pvp_cap) {
+        if($this->weekly_pvp_rep >= $this->weekly_pvp_cap) {
             return 0;
         }
 
         // Hard limits - no gains if >20 levels over opponent or >2 rep tiers
         if($player_levels_above_opponent > self::MAX_PVP_LEVEL_DIFFERENCE) {
-            return self::$VillageRep[$opponent->reputation->rank]['base_pvp_rep_reward'];
+            return $player->reputation->addRep(self::$VillageRep[$opponent->reputation->rank]['base_pvp_rep_reward'], UserReputation::ACTIVITY_TYPE_PVP);
         }
         if($player_rep_tiers_above_opponent > self::MAX_PVP_REP_TIER_DIFFERENCE) {
-            return self::$VillageRep[$opponent->reputation->rank]['base_pvp_rep_reward'];
+            return $player->reputation->addRep(self::$VillageRep[$opponent->reputation->rank]['base_pvp_rep_reward'], UserReputation::ACTIVITY_TYPE_PVP);
         }
 
         /* This is so we can adjust from maximum level difference (say, 20 levels) to maximum gain difference (say, +/- 4 rep)
@@ -583,9 +583,7 @@ class UserReputation {
             $rep_gain = ceil($rep_gain / 2);
         }
 
-        $player->reputation->addRep($rep_gain, UserReputation::ACTIVITY_TYPE_PVP);
-
-        return $rep_gain;
+        return $player->reputation->addRep($rep_gain, UserReputation::ACTIVITY_TYPE_PVP);
     }
 
     public function handlePvPLoss(User $player, Fighter $opponent, bool $retreat = false): int {

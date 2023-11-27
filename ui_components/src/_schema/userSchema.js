@@ -38,6 +38,7 @@ export type PlayerDataType = {|
     +teamName: ?string,
     +forbiddenSealName: string,
     +forbiddenSealTimeLeft: ?string,
+    +dailyTaskTimeLeft: number,
 |};
 
 // KEEP IN SYNC WITH UserApiPresenter::playerStatsResponse
