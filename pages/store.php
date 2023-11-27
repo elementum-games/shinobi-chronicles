@@ -275,9 +275,9 @@ function store() {
 		<b>Your money:</b> &yen;{$player->getMoney()}</td></tr></table>
 
 		<p style='text-align:center;margin-bottom:0;'>
-			<a href='$self_link&view=jutsu&jutsu_type=ninjutsu' " . ($jutsu_type == 'ninjutsu' ? $style : "") . ">Ninjutsu</a> |
-			<a href='$self_link&view=jutsu&jutsu_type=taijutsu' " . ($jutsu_type == 'taijutsu' ? $style : "") . ">Taijutsu</a> |
-			<a href='$self_link&view=jutsu&jutsu_type=genjutsu' " . ($jutsu_type == 'genjutsu' ? $style : "") . ">Genjutsu</a>
+			<a href='$self_link&view=jutsu&jutsu_type=ninjutsu' " . ($jutsu_type == 'ninjutsu' ? $style : "") . " style='text-decoration:none'>Ninjutsu</a> |
+			<a href='$self_link&view=jutsu&jutsu_type=taijutsu' " . ($jutsu_type == 'taijutsu' ? $style : "") . " style='text-decoration:none'>Taijutsu</a> |
+			<a href='$self_link&view=jutsu&jutsu_type=genjutsu' " . ($jutsu_type == 'genjutsu' ? $style : "") . " style='text-decoration:none'>Genjutsu</a>
 		</p>
 
 		<table class='table' style='margin-top:15px;'>
@@ -285,6 +285,7 @@ function store() {
 			<th style='width:15%;'>Name</th>
 			<th style='width:15%;'>Effect</th>
 			<th style='width:10%;'>Type</th>
+			<th style='width:10%;'>Element</th>
 			<th style='width:10%;'>Cost</th>
 			<th style='width:10%;'></th>
 		</tr>";
@@ -311,12 +312,13 @@ function store() {
 				$count++;
 
 				echo "<tr class='table_multicolumns'>
-					<td style='width:30%;'><a href='$self_link&view=jutsu&view_jutsu=$id'>{$jutsu['name']}</a></td>
+					<td style='width:30%;text-align:center;'><a href='$self_link&view=jutsu&view_jutsu=$id' style='text-decoration:none'>{$jutsu['name']}</a></td>
 					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['effect'])) . "</td>
 					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['jutsu_type'])) . "</td>
+					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['element'])) . "</td>
 					<td style='width:26%;text-align:center;'>&yen;{$jutsu['purchase_cost']}</td>
 					<td style='width:28%;text-align:center;'>
-						<a href='$self_link&view=jutsu&purchase_jutsu={$jutsu['jutsu_id']}&jutsu_type={$jutsu['jutsu_type']}'>Purchase</a></td>
+						<a href='$self_link&view=jutsu&purchase_jutsu={$jutsu['jutsu_id']}&jutsu_type={$jutsu['jutsu_type']}' style='text-decoration:none'>Purchase</a></td>
 				</tr>";
 			}
 
