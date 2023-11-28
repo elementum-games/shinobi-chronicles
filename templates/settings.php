@@ -186,34 +186,6 @@
                 <input type="submit" style='margin-top: 5px' name="update_notifications" value="Update" />
             </form>
         </td>
-        <td style="text-align: center;">
-            <form action="<?=$self_link?>" method="post">
-                <b>General Notifications</b><br />
-                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_SPAR?>"
-                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_SPAR) ? "checked='checked'" : "")?> />Spar</p>
-                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_TEAM ?>"
-                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_TEAM) ? "checked='checked'" : "")?> />Team Invites</p><br />
-                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_MARRIAGE ?>"
-                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_MARRIAGE) ? "checked='checked'" : "")?> />Proposals</p>
-                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_EVENT ?>"
-                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_EVENT) ? "checked='checked'" : "")?> />Events</p><br />
-                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_CHAT ?>"
-                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_CHAT) ? "checked='checked'" : "")?> />Chat Mentions</p>
-                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_NEWS ?>"
-                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_NEWS) ? "checked='checked'" : "")?> />News</p><br />
-                <br />
-                <b>War-based Notifications</b><br />
-                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_CARAVAN ?>"
-                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_CARAVAN) ? "checked='checked'" : "")?> />Caravan</p>
-                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_RAID ?>"
-                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_RAID) ? "checked='checked'" : "")?> />Raid</p><br />
-                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_KAGE_CHANGE ?>"
-                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_KAGE_CHANGE) ? "checked='checked'" : "")?> />Kage Change</p>
-                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_DIPLOMACY ?>"
-                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_DIPLOMACY) ? "checked='checked'" : "")?> />Diplomatic</p><br />
-                <input type="submit" style='margin-top: 5px' name="update_notifications" value="Update" />
-            </form>
-        </td>
     </tr>
     <tr>
         <th>Level and Rank Settings</th>
