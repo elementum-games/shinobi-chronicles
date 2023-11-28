@@ -76,6 +76,8 @@ class BattleEffectsManager {
             case 'cast_speed_boost':
             case 'speed_nerf':
             case 'cripple':
+            case 'evasion_boost':
+            case 'evasion_nerf':
                 // No changes needed to base number, calculated in applyPassiveEffects
                 break;
             case 'intelligence_boost':
@@ -204,8 +206,11 @@ class BattleEffectsManager {
         else if($effect->effect == 'cast_speed_boost') {
             $target->cast_speed_boost += $target->getCastSpeed(true) * ($effect->effect_amount / 100);
         }
-        else if($effect->effect == 'speed_boost' or $effect->effect == 'lighten') {
+        else if($effect->effect == 'speed_boost') {
             $target->speed_boost += $target->getSpeed(true) * ($effect->effect_amount / 100);
+        }
+        else if($effect->effect == 'evasion_boost' or $effect->effect == 'lighten') {
+            $target->evasion_boost += ($effect->effect_amount / 100);
         }
         else if($effect->effect == 'intelligence_boost') {
             $target->intelligence_boost += $effect->effect_amount;
@@ -226,11 +231,12 @@ class BattleEffectsManager {
             $target->barrier += $effect->effect_amount;
         }
 
-        // Debuffs
-        $effect_amount = $effect->effect_amount - $target->getDebuffResist();
+        // Debuffs - Temp disable, will need reworked later and only impacts NPCs
+        /*$effect_amount = $effect->effect_amount - $target->getDebuffResist();
         if($effect_amount < $effect->effect_amount * Battle::MIN_DEBUFF_RATIO) {
             $effect_amount = $effect->effect_amount * Battle::MIN_DEBUFF_RATIO;
-        }
+        }*/
+        $effect_amount = $effect->effect_amount;
 
         if($effect->effect == 'ninjutsu_nerf') {
             $target->ninjutsu_nerf += $effect_amount;
@@ -247,6 +253,9 @@ class BattleEffectsManager {
 
             $target->speed_nerf = min($target->speed_nerf, $target->getSpeed(true) * self::MAX_SPEED_REDUCTION);
             $target->cast_speed_nerf = min($target->cast_speed_nerf, $target->getCastSpeed(true) * self::MAX_SPEED_REDUCTION);
+        }
+        else if($effect->effect == 'evasion_nerf' or $effect->effect == 'cripple') {
+            $target->evasion_nerf += ($effect_amount / 100);
         }
         else if($effect->effect == 'intelligence_nerf') {
             $target->intelligence_nerf += $effect_amount;
@@ -371,6 +380,7 @@ class BattleEffectsManager {
         }
         else if($effect->effect == 'heal') {
             $heal = $effect->effect_amount;
+
             $this->addDisplay($target, $target->getName() . " heals " . "<span class=\"battle_text_heal\" style=\"color:green\">" . round($heal) . "</span>" . " health");
 
             $target->health += $heal;
@@ -497,6 +507,12 @@ class BattleEffectsManager {
                 break;
             case 'cast_speed_boost':
                 $announcement_text = "[player]'s Cast Speed is being increased";
+                break;
+            case 'evasion_boost':
+                $announcement_text = "[player]'s Evasion is being increased";
+                break;
+            case 'evasion_nerf':
+                $announcement_text = "[opponent]'s Evasion is being lowered";
                 break;
             default:
                 break;

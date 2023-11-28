@@ -69,7 +69,7 @@ function bloodline() {
 	$bloodline_ranks = array(4 => 'Lesser', 3 => 'Common', 2 => 'Elite', 1 => 'Legendary', 5 => 'Admin');
 	echo "<label style='width: 8.8em;font-weight:bold;'>Name:</label>" . $player->bloodline->name . "<br />
 		<label style='width: 8.8em;font-weight:bold;'>Rank:</label>" . $bloodline_ranks[$player->bloodline->rank] . "<br />
-		<label style='width: 8.8em;font-weight:bold;'>Bloodline skill:</label>" . $player->bloodline_skill . " (+100 Base)<br />";
+		<label style='width: 8.8em;font-weight:bold;'>Bloodline skill:</label>" . $player->bloodline_skill . "<br />";
 	echo "<br />";
 
 
@@ -105,14 +105,17 @@ function bloodline() {
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] per turn</span>"
 		),
 		'ninjutsu_resist' => array(
-			'text' => "[BL_SKILL] * [RATIO] * [0.7] -> <span class='amount'>[AMOUNT] less Ninjutsu damage taken</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] less Ninjutsu damage taken</span>"
 		),
 		'genjutsu_resist' => array(
-			'text' => "[BL_SKILL] * [RATIO] * [0.7] -> <span class='amount'>[AMOUNT] less Genjutsu damage taken</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] less Genjutsu damage taken</span>"
 		),
 		'taijutsu_resist' => array(
-			'text' => "[BL_SKILL] * [RATIO] * [0.7] -> <span class='amount'>[AMOUNT] less Taijutsu damage taken</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] less Taijutsu damage taken</span>"
 		),
+        'damage_resist' => array(
+            'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] effective resist stat, [AMOUNT2]% less damage taken</span>"
+        ),
 		'speed_boost' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra Speed</span>"
 		),
@@ -129,7 +132,7 @@ function bloodline() {
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra willpower</span>"
 		)
 	);
-	$bloodline_skill = 100 + $player->bloodline_skill;
+	$bloodline_skill = $player->bloodline_skill < 100 ? 100 : $player->bloodline_skill;
 
 	echo "
 	<style>
@@ -137,7 +140,7 @@ function bloodline() {
 		color:#00C000;
 	}
 	</style>";
-	$search_array = array('[BL_SKILL]', '[RATIO]', '[AMOUNT]', '[PERCENTAGE]');
+	$search_array = array('[BL_SKILL]', '[RATIO]', '[AMOUNT]', '[PERCENTAGE]', '[AMOUNT2]');
 	if($player->bloodline->passive_boosts) {
 		echo "
 		<label style='font-weight:bold;'>Passive boosts</label>
@@ -208,7 +211,10 @@ function bloodline() {
                         ($boost['effect_amount'] * Fighter::BLOODLINE_DEFENSE_MULTIPLIER) / Fighter::BASE_DEFENSE,
                         0
                     );
-					break;
+                    break;
+				case 'damage_resist':
+                    $replace_array[4] = round(($replace_array[2] / $player->total_stats) * 100, 0);
+                    break;
             }
 
             $replace_array[1] = round($replace_array[1], 3);
