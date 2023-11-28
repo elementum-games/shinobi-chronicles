@@ -366,15 +366,19 @@
     position: relative;
     align-self: stretch;
 
-    margin-top: 35px;
+    margin-top: 25px;
     margin-bottom: 15px;
 }
 
 .reputation_display #reputationTimer {
-    margin-top: 15px;
+    position: absolute;
+    margin-top: 5px;
     text-align: center;
+    left: 0;
+    right: 0;
+
     color: #9498a9;
-    font-size: 16px;
+    font-size: 10px;
     font-weight: bolder;
 }
 
