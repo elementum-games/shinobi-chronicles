@@ -247,7 +247,7 @@ class BattleEffectsManager {
         else if($effect->effect == 'genjutsu_nerf' or $effect->effect == 'daze') {
             $target->genjutsu_nerf += $effect_amount;
         }
-        else if($effect->effect == 'speed_nerf' or $effect->effect == 'cripple') {
+        else if($effect->effect == 'speed_nerf') {
             $target->speed_nerf += $target->getSpeed(true) * ($effect->effect_amount / 100);
             $target->cast_speed_nerf += $target->getCastSpeed(true) * ($effect->effect_amount / 100);
 
