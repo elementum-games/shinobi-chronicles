@@ -30,6 +30,12 @@ $jutsu_effects = [
     'water_weakness',
     'evasion_boost',
     'evasion_nerf',
+    'offense_nerf',
+    'resist_boost',
+    'piercing',
+    'substitution',
+    'counter',
+    'immolate',
 ];
 
 $ranks = [];
