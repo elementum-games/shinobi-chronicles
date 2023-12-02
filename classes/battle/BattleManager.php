@@ -795,7 +795,7 @@ class BattleManager {
                     $user,
                     $target->combat_id,
                     $attack->jutsu->weapon_effect,
-                    $attack->jutsu->weapon_effect->effect,
+                    $attack->jutsu->weapon_effect->effects[0],
                     0,
                     $attack->raw_damage
                 );

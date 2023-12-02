@@ -159,8 +159,8 @@ class Bloodline {
     ): void {
         $ratios = [
             'offense_boost' => 0.02,
-            'defense_boost' => 0.1,
-            'speed_boost' => 0.0825,
+            'defense_boost' => 0.095,
+            'speed_boost' => 0.08,
             'mental_boost' => 0.1,
             'heal' => 0.033333,
             'regen' => 0.15,
