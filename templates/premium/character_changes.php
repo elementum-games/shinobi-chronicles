@@ -249,7 +249,7 @@
 
     function statAllocateCostDisplay() {
         let ak_cost = 0, yen_cost = 0;
-        let is_dev = <?= $system->isDevEnvironment() ?>;
+        let is_dev = <?= $system->isDevEnvironment() ? '1' : '0'; ?>;
 
         const transferAmount = parseInt(transferAmountEl.value);
         const transferSpeed = transferSpeedEl.value;
