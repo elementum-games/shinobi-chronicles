@@ -15,6 +15,10 @@ abstract class Fighter {
     const MIN_RAND = 33;
     const MAX_RAND = 36;
 
+    const RESIST_SOFT_CAP = 0.5; // caps at 50% evasion
+    const RESIST_SOFT_CAP_RATIO = 0.5; // evasion beyond soft cap only 50% as effective
+    const RESIST_HARD_CAP = 0.75; // caps at 75% evasion
+
     public System $system;
 
     public string $combat_id;
@@ -360,6 +364,7 @@ abstract class Fighter {
             $off_modifier = 1 - $nerf_percent;
         }
         $damage = round($damage * $off_modifier, 2);
+
         if($damage < 0) {
             $damage = 0;
         }

@@ -20,12 +20,19 @@ function premiumShop(): void {
         try {
             $premiumShopManager->assertUserCanReset();
 
+            $confirmation_string = "Are you sure you want to reset your character?<br />
+                You will lose all your stats, bloodline, rank and clan. You will keep your money.";
+
+            if($player->stat_transfer_completion_time) {
+                $confirmation_string .= "<br />
+                Your active stat transfer will be cancelled and any AK and yen spent will be lost.";
+            }
+
             if (!isset($_POST['confirm_reset'])) {
                 renderPurchaseConfirmation(
                     purchase_type: "user_reset",
                     confirmation_type: "confirm_reset",
-                    confirmation_string: "Are you sure you want to reset your character? You will lose all your stats,
-                bloodline, rank and clan. You will keep your money.",
+                    confirmation_string: $confirmation_string,
                     form_action_link: $self_link,
                     form_submit_prompt: "Reset my Account",
                     additional_form_data: []

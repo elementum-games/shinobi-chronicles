@@ -162,7 +162,7 @@ class Bloodline {
             'defense_boost' => 0.095,
             'speed_boost' => 0.08,
             'mental_boost' => 0.1,
-            'heal' => 0.033333,
+            'heal' => 0.03,
             'regen' => 0.15,
         ];
         $bloodline_skill += $bloodline_skill < 100 ? self::BASE_BLOODLINE_SKILL : 0;

@@ -27,5 +27,6 @@ class Route {
         public bool $challenge_lock_ok = true,
 
         public ?Closure $user_check = null,
+        public bool $dev_only = false,
     ) {}
 }

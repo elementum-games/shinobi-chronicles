@@ -113,9 +113,9 @@ function bloodline() {
 		'taijutsu_resist' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] less Taijutsu damage taken</span>"
 		),
-        'damage_resist' => array(
-            'text' => "[BL_SKILL] * [RATIO] / [AMOUNT2] (stat total) -> <span class='amount'>[AMOUNT]% less damage taken</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Scales based on relative strength of opponent (stat total)</span>"
-        ),
+    'damage_resist' => array(
+        'text' => "[BL_SKILL] * [RATIO] / [AMOUNT2] (stat total) -> <span class='amount'>[AMOUNT]% less damage taken</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Scales based on relative strength of opponent (stat total)</span>"
+    ),
 		'speed_boost' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra Speed</span>"
 		),

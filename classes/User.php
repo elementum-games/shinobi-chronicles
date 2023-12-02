@@ -316,6 +316,8 @@ class User extends Fighter {
     public Region $region;
     public int $locked_challenge;
 
+    public BlockedNotificationManager $blocked_notifications;
+
     /**
      * User constructor.
      * @param System $system
@@ -918,6 +920,9 @@ class User extends Fighter {
         // Apply policy benefits
         $this->scout_range += $this->village->policy->scouting;
         $this->stealth += $this->village->policy->stealth;
+
+        // Blocked Notifications
+        $this->blocked_notifications = BlockedNotificationManager::BlockedNotificationManagerFromDb(system: $this->system, blocked_notifications_string: $user_data['blocked_notifications']);
 
         // Challenge
         $this->locked_challenge = $user_data['locked_challenge'];
@@ -1894,7 +1899,8 @@ class User extends Fighter {
 		`village_changes` = '$this->village_changes',
 		`clan_changes` = '$this->clan_changes',
         `locked_challenge` = '$this->locked_challenge',
-		`censor_explicit_language` = " . (int)$this->censor_explicit_language . "
+		`censor_explicit_language` = " . (int)$this->censor_explicit_language . ",
+		`blocked_notifications` = '{$this->blocked_notifications->dbEncode()}'
 		WHERE `user_id` = '{$this->user_id}' LIMIT 1";
         $this->system->db->query($query);
 

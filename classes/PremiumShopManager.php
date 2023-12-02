@@ -208,6 +208,14 @@ class PremiumShopManager {
         //Bug fix: Elements previously was not cleared. -- Shadekun
         $this->player->elements = array();
         $this->player->missions_completed = array(); //Reset missions complete -- Hitori
+        // Remove stat transfers
+        $this->player->stat_transfer_completion_time = 0;
+        $this->player->stat_transfer_amount = 0;
+        $this->player->stat_transfer_target_stat = '';
+        // Remove training
+        $this->player->trainingManager->train_time = 0;
+        $this->player->train_gain = 0;
+        $this->player->train_type = '';
 
         $this->player->exam_stage = 0;
 

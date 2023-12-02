@@ -273,10 +273,15 @@ class VillageManager {
                 $player->village_seat = self::getPlayerSeat($system, $player);
                 // create notifiction
                 $active_threshold = time() - (NotificationManager::ACTIVE_PLAYER_DAYS_LAST_ACTIVE * 86400);
-                $user_ids = $system->db->query("SELECT `user_id` FROM `users` WHERE `village` = '{$player->village->name}' AND `last_login` > {$active_threshold}");
+                $user_ids = $system->db->query("SELECT `user_id`, `blocked_notifications` FROM `users` WHERE `village` = '{$player->village->name}' AND `last_login` > {$active_threshold}");
                 $user_ids = $system->db->fetch_all($user_ids);
                 $notification_message = $reclaim ? $player->user_name . " has reclaimed the title of " . $seat_title . "!" : $player->user_name . " has claimed the title of " . $seat_title . "!";
                 foreach ($user_ids as $user) {
+                    $blockedNotifManager = BlockedNotificationManager::BlockedNotificationManagerFromDb(system: $system, blocked_notifications_string: $user['blocked_notifications']);
+                    if($blockedNotifManager->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_KAGE_CHANGE)) {
+                        continue;
+                    }
+
                     $new_notification = new NotificationDto(
                         type: NotificationManager::NOTIFICATION_KAGE_CHANGE,
                         message: $notification_message,
@@ -2073,7 +2078,7 @@ class VillageManager {
         $initator_village_name = self::VILLAGE_NAMES[$initiator_village_id];
         $recipient_village_name = self::VILLAGE_NAMES[$recipient_village_id];
         $active_threshold = time() - (NotificationManager::ACTIVE_PLAYER_DAYS_LAST_ACTIVE * 86400);
-        $user_ids = $system->db->query("SELECT `user_id` FROM `users` WHERE (`village` = '{$initator_village_name}' OR `village` = '{$recipient_village_name}') AND `last_login` > {$active_threshold}");
+        $user_ids = $system->db->query("SELECT `user_id`, `blocked_notifications` FROM `users` WHERE (`village` = '{$initator_village_name}' OR `village` = '{$recipient_village_name}') AND `last_login` > {$active_threshold}");
         $user_ids = $system->db->fetch_all($user_ids);
         // create notifcations
         $message;
@@ -2103,6 +2108,11 @@ class VillageManager {
                 break;
         }
         foreach ($user_ids as $user) {
+            $blockedNotifManager = new BlockedNotificationManager(system: $system, blockedNotifications: $user['blocked_notifications']);
+            if($blockedNotifManager->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_DIPLOMACY)) {
+                continue;
+            }
+
             $new_notification = new NotificationDto(
                 type: $notification_type,
                 message: $message,

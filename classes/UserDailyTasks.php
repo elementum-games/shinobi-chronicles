@@ -74,6 +74,9 @@ class UserDailyTasks {
             $this->update(true);
         }
     }
+    public function timeUntilReset(): int {
+        return ($this->last_reset + self::TASK_RESET) - time();
+    }
     public function loadTasksFromDb(): void {
         $task_result = $this->system->db->query("SELECT `tasks`, `last_reset` FROM `daily_tasks` WHERE `user_id`='{$this->user_id}'");
         if($this->system->db->last_num_rows !== 0) {
