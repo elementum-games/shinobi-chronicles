@@ -498,7 +498,7 @@ class BattleEffectsManager {
             $barrier_jutsu = $fighter_jutsu;
             $barrier_jutsu->effects[0]->effect = Jutsu::USE_TYPE_BARRIER;
             $barrier_jutsu->effects[0]->effect_length = 1;
-            $this->setEffect($fighter, $fighter->combat_id, $barrier_jutsu, $fighter->barrier);
+            $this->setEffect($fighter, $fighter->combat_id, $barrier_jutsu, $barrier_jutsu->effects[0], 0, $fighter->barrier);
         }
     }
 

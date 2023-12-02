@@ -834,7 +834,11 @@ class BattleManager {
             if ($attack->jutsu->weapon_id) {
                 $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . " / " . System::unSlug($user->items[$attack->jutsu->weapon_id]->name) . "</br>" . '</i></span></b>';
             } else {
-                $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
+                if ($attack->jutsu->element != Jutsu::ELEMENT_NONE && $attack->jutsu->element != "none") {
+                    $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->element) . " Release: " . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
+                } else {
+                    $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
+                }
             }
         }
         $text .= $attack->jutsu->battle_text;
@@ -973,7 +977,7 @@ class BattleManager {
                     break;
                 case 'water':
                     $player2_elemental_damage_modifier *= 1 + $player1->fire_weakness;
-                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'warth') {
+                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'earth') {
                         $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -981,18 +985,17 @@ class BattleManager {
         }
 
         // Apply elemental damage modifier
-        echo $player1_elemental_damage_modifier;
         $player1_damage *= $player1_elemental_damage_modifier;
         $player2_damage *= $player2_elemental_damage_modifier;
 
         // Output piercing message
         if ($player1->piercing_percent > 0) {
             $pierce_percent = round($player1->piercing_percent * 100, 1);
-            $collision_text .= "{$player1->getName()} pierces {$pierce_percent} of {$player2->getName()}'s defenses![br]";
+            $collision_text .= "{$player1->getName()} pierces {$pierce_percent}% of {$player2->getName()}'s defenses![br] ";
         }
-        if ($player2->piercing_percent < 0) {
+        if ($player2->piercing_percent > 0) {
             $pierce_percent = round($player2->piercing_percent * 100, 1);
-            $collision_text .= "{$player2->getName()} pierces {$pierce_percent} of {$player1->getName()}'s defenses![br]";
+            $collision_text .= "{$player2->getName()} pierces {$pierce_percent}% of {$player1->getName()}'s defenses![br] ";
         }
 
         /* Calculate speed values */
