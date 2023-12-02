@@ -149,12 +149,14 @@ class Bloodline {
     public function setBoostAmounts(
         int $user_rank,
         int $ninjutsu_skill, int $taijutsu_skill, int $genjutsu_skill, int $bloodline_skill,
-        int $base_stats, int $total_stats, int $stats_max_level,
+        int $base_stats,
+        int $total_stats,
+        int $stats_max_level,
         int $regen_rate
     ): void {
         $ratios = [
             'offense_boost' => 0.02,
-            'defense_boost' => 0.09,
+            'defense_boost' => 0.095,
             'speed_boost' => 0.08,
             'mental_boost' => 0.1,
             'heal' => 0.03,
