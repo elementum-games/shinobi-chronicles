@@ -1000,11 +1000,11 @@ class BattleManager {
 
         // Output piercing message
         if ($player1->piercing_percent > 0) {
-            $pierce_percent = round($player1->piercing_percent * 100, 1);
+            $pierce_percent = round($player1->piercing_percent * 100, 0);
             $collision_text .= "{$player1->getName()} pierces {$pierce_percent}% of {$player2->getName()}'s defenses![br] ";
         }
         if ($player2->piercing_percent > 0) {
-            $pierce_percent = round($player2->piercing_percent * 100, 1);
+            $pierce_percent = round($player2->piercing_percent * 100, 0);
             $collision_text .= "{$player2->getName()} pierces {$pierce_percent}% of {$player1->getName()}'s defenses![br] ";
         }
 
@@ -1176,7 +1176,7 @@ class BattleManager {
             }
 
             // Set display
-            $block_percent = round($block_percent, 1);
+            $block_percent = round($block_percent, 0);
             $collision_text .= "[br][opponent]'s barrier blocked $block_percent% of [player]'s damage!";
         }
 
@@ -1187,7 +1187,7 @@ class BattleManager {
             // Apply reduction
             $player2_damage *= (1 - $player1->substitution_percent);
             // Set display
-            $block_percent = round($player1->substitution_percent * 100, 1);
+            $block_percent = round($player1->substitution_percent * 100, 0);
             $collision_text .= "[br][player]'s substitute took $block_percent% of [opponent]'s damage!";
         }
         if ($player2->substitution_percent > 0 && $player1_jutsu_is_attack) {
@@ -1196,7 +1196,7 @@ class BattleManager {
             // Apply reduction
             $player1_damage *= (1 - $player2->substitution_percent);
             // Set display
-            $block_percent = round($player2->substitution_percent * 100, 1);
+            $block_percent = round($player2->substitution_percent * 100, 0);
             $collision_text .= "[br][opponent]'s substitute took $block_percent% of [player]'s damage!";
         }
 
@@ -1209,7 +1209,7 @@ class BattleManager {
             // Apply damage bonus
             $player1_damage *= (1 + $player1->counter_percent);
             // Set display
-            $block_percent = round($player1->counter_percent * 100, 1);
+            $block_percent = round($player1->counter_percent * 100, 0);
             $collision_text .= "[br][player] countered $block_percent% of [opponent]'s damage!";
         }
         if ($player2->counter_percent > 0 && $player1_jutsu_is_attack) {
@@ -1220,32 +1220,8 @@ class BattleManager {
             // Apply damage bonus
             $player2_damage *= (1 + $player2->counter_percent);
             // Set display
-            $block_percent = round($player2->counter_percent * 100, 1);
+            $block_percent = round($player2->counter_percent * 100, 0);
             $collision_text .= "[br][opponent] countered $block_percent% of [player]'s damage!";
-        }
-
-        // Apply type weakness
-        switch ($player1_jutsu->jutsu_type) {
-            case 'ninjutsu':
-                $player1_damage *= 1 + $player2->ninjutsu_weakness;
-                break;
-            case 'taijutsu':
-                $player1_damage *= 1 + $player2->taijutsu_weakness;
-                break;
-            case 'genjutsu':
-                $player1_damage *= 1 + $player2->genjutsu_weakness;
-                break;
-        }
-        switch ($player2_jutsu->jutsu_type) {
-            case 'ninjutsu':
-                $player2_damage *= 1 + $player1->ninjutsu_weakness;
-                break;
-            case 'taijutsu':
-                $player2_damage *= 1 + $player1->taijutsu_weakness;
-                break;
-            case 'genjutsu':
-                $player2_damage *= 1 + $player1->genjutsu_weakness;
-                break;
         }
 
         return $this->parseCombatText($collision_text, $player1, $player2);
