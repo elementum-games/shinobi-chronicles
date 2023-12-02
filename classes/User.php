@@ -921,6 +921,9 @@ class User extends Fighter {
         $this->scout_range += $this->village->policy->scouting;
         $this->stealth += $this->village->policy->stealth;
 
+        // Blocked Notifications
+        $this->blocked_notifications = BlockedNotificationManager::BlockedNotificationManagerFromDb(system: $this->system, blocked_notifications_string: $user_data['blocked_notifications']);
+
         // Challenge
         $this->locked_challenge = $user_data['locked_challenge'];
         if ($UPDATE >= User::UPDATE_FULL) {
@@ -928,9 +931,6 @@ class User extends Fighter {
                 VillageManager::checkChallengeLock($this->system, $this);
             }
         }
-
-        // Blocked Notifications
-        $this->blocked_notifications = BlockedNotificationManager::BlockedNotificationManagerFromDb(system: $this->system, blocked_notifications_string: $user_data['blocked_notifications']);
 
         return;
     }
