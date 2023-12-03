@@ -235,7 +235,7 @@ $constraints['ai'] = [
             'effect' => [
                 'data_type' => 'string',
                 'input_type' => 'text',
-                'options' => ['none', 'residual_damage', 'taijutsu_boost', 'ninjutsu_boost', 'genjutsu_boost', 'speed_boost', 'cast_speed_boost', 'speed_nerf', 'evasion_boost', 'evasion_nerf'],
+                'options' => ['none', 'residual_damage', 'taijutsu_boost', 'ninjutsu_boost', 'genjutsu_boost', 'speed_boost', 'cast_speed_boost', 'speed_nerf', 'weakness_fire', 'weakness_wind', 'weakness_lighting', 'weakness_earth', 'weakness_water', 'evasion_boost', 'evasion_nerf', 'vulnerability', 'offense_nerf', 'resist_boost', 'piercing', 'substitution', 'counter', 'immolate'],
             ],
             'effect_amount' => [
                 'data_type' => 'string',

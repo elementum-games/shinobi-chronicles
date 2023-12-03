@@ -220,9 +220,12 @@ if(isset($_POST['run_simulation']) && $mode == 'vs') {
             jutsu_type: $player1_data['jutsu_type'],
             base_power: (int)$player1_data['jutsu_power'],
             range: 1,
-            effect: 'none',
-            base_effect_amount: 0,
-            effect_length: 0,
+            effect_1: 'none',
+            base_effect_amount_1: 0,
+            effect_length_1: 0,
+            effect_2: 'none',
+            base_effect_amount_2: 0,
+            effect_length_2: 0,
             description: 'nope',
             battle_text: 'no',
             cooldown: 0,
@@ -245,9 +248,12 @@ if(isset($_POST['run_simulation']) && $mode == 'vs') {
             jutsu_type: $player2_data['jutsu_type'],
             base_power: (int)$player2_data['jutsu_power'],
             range: 1,
-            effect: 'none',
-            base_effect_amount: 0,
-            effect_length: 0,
+            effect_1: 'none',
+            base_effect_amount_1: 0,
+            effect_length_1: 0,
+            effect_2: 'none',
+            base_effect_amount_2: 0,
+            effect_length_2: 0,
             description: 'no',
             battle_text: 'nope',
             cooldown: 0,
@@ -382,9 +388,12 @@ else if($mode == 'speed_graph') {
                 jutsu_type: Jutsu::TYPE_TAIJUTSU,
                 base_power: $jutsu_power,
                 range: 1,
-                effect: 'none',
-                base_effect_amount: 0,
-                effect_length: 0,
+                effect_1: 'none',
+                base_effect_amount_1: 0,
+                effect_length_1: 0,
+                effect_2: 'none',
+                base_effect_amount_2: 0,
+                effect_length_2: 0,
                 description: 'no',
                 battle_text: 'nope',
                 cooldown: 0,
@@ -423,9 +432,12 @@ else if($mode == 'speed_graph') {
                 jutsu_type: Jutsu::TYPE_TAIJUTSU,
                 base_power: $jutsu_power,
                 range: 1,
-                effect: 'none',
-                base_effect_amount: 0,
-                effect_length: 0,
+                effect_1: 'none',
+                base_effect_amount_1: 0,
+                effect_length_1: 0,
+                effect_2: 'none',
+                base_effect_amount_2: 0,
+                effect_length_2: 0,
                 description: 'no',
                 battle_text: 'nope',
                 cooldown: 0,
@@ -463,11 +475,11 @@ else if($mode == 'speed_graph') {
                 border:1px solid #000000;
                 border-radius:10px;
             }
-            
+
             .scenario {
                 margin: 5px auto 10px auto;
             }
-            
+
             label {
                 display: inline-block;
                 text-align: left;
@@ -478,7 +490,7 @@ else if($mode == 'speed_graph') {
             .statsLabel {
                 width: 260px;
             }
-            
+
         </style>
         <div class='speedGraphContainer'>
         Evasion DR Ratio: " . BattleManager::SPEED_DAMAGE_REDUCTION_RATIO . "<br />
@@ -521,12 +533,12 @@ else if($mode == 'speed_graph') {
 else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
     $base_level = $_POST['base_level'];
     $max_level = $_POST['max_level'];
-    
+
     $base_stats = $_POST['base_stats'];
     $original_attribute_ratio = round($_POST['attribute_ratio'] / 100, 2);
     $base_health = $_POST['base_health'];
     $base_jutsu_power = $_POST['base_jutsu_power'];
-    
+
     $max_level_health = $_POST['max_level_health'];
     $max_level_stats = $_POST['max_level_stats'];
     $max_level_jutsu_power = $_POST['max_level_jutsu_power'];
@@ -558,9 +570,12 @@ else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
         jutsu_type: Jutsu::TYPE_NINJUTSU,
         base_power: $base_jutsu_power,
         range: 1,
-        effect: 'none',
-        base_effect_amount: 0,
-        effect_length: 0,
+        effect_1: 'none',
+        base_effect_amount_1: 0,
+        effect_length_1: 0,
+        effect_2: 'none',
+        base_effect_amount_2: 0,
+        effect_length_2: 0,
         description: 'no',
         battle_text: 'nope',
         cooldown: 0,
@@ -592,9 +607,12 @@ else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
         jutsu_type: Jutsu::TYPE_TAIJUTSU,
         base_power: $base_jutsu_power,
         range: 1,
-        effect: 'none',
-        base_effect_amount: 0,
-        effect_length: 0,
+        effect_1: 'none',
+        base_effect_amount_1: 0,
+        effect_length_1: 0,
+        effect_2: 'none',
+        base_effect_amount_2: 0,
+        effect_length_2: 0,
         description: 'no',
         battle_text: 'nope',
         cooldown: 0,
@@ -718,10 +736,10 @@ else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
 		padding:8px;border:1px solid #000000;border-radius:10px;'>
 		<label style='width:{$label_width}px;'>Health gain:</label>
         <label style='width:80px;'>" . round($health_gain, 2) . "</label><br />
-        
+
         <label style='width:{$label_width}px;'>Stats gain:</label>
         <label style='width:80px;'>" . round($stat_gain, 2) . "</label><br />
-        
+
         <label style='width:{$label_width}px;'>Jutsu power gain:</label>
         <label style='width:80px;'>" . round($jutsu_power_gain, 2) . "</label><br />
         <br />";
