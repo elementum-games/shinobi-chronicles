@@ -95,6 +95,10 @@ abstract class Fighter {
     public $defense_boost = 0;
 
     public $barrier;
+    public $substitution_percent = 0;
+    public $counter_percent = 0;
+    public $piercing_percent = 0;
+    public $immolate_percent = 0;
 
     public $reputation_defense_boost = 0;
 
@@ -112,7 +116,15 @@ abstract class Fighter {
     public $willpower_nerf = 0;
 
     public $evasion_nerf = 0;
-    public $resist_nerf = 0;
+
+    public $taijutsu_weakness = 0;
+    public $ninjutsu_weakness = 0;
+    public $genjutsu_weakness = 0;
+    public $fire_weakness = 0;
+    public $wind_weakness = 0;
+    public $lightning_weakness = 0;
+    public $earth_weakness = 0;
+    public $water_weakness = 0;
 
     // Getters
     abstract public function getName(): string;
@@ -272,6 +284,7 @@ abstract class Fighter {
             case Jutsu::PURCHASE_TYPE_DEFAULT:
             case Jutsu::PURCHASE_TYPE_PURCHASABLE:
             case Jutsu::PURCHASE_TYPE_EVENT_SHOP:
+            case Jutsu::PURCHASE_TYPE_LINKED:
                 $offense = self::BASE_OFFENSE + ($off_skill * self::SKILL_OFFENSE_RATIO);
                 break;
             case Jutsu::PURCHASE_TYPE_BLOODLINE:
@@ -319,12 +332,10 @@ abstract class Fighter {
             $offense = $extra_offense + 900;
         }
 
-
-        // Make up for genjutsu's delayed damage. This assumes fights are about 10 turns
+        /* Make up for genjutsu's delayed damage. This assumes fights are about 10 turns
         if($attack->jutsu_type == Jutsu::TYPE_GENJUTSU) {
             $offense *= 1.15;
-        }
-
+        }*/
 
         $rand = mt_rand(self::MIN_RAND, self::MAX_RAND);
         if($disable_randomness) {
@@ -338,10 +349,22 @@ abstract class Fighter {
             echo "Damage/boost/nerf: $damage / {$off_boost} / {$off_nerf}} <br />";
         }
 
-        $damage = round(
-          ($damage * (1 + $off_boost)) - $off_nerf,
-          2
-        );
+        $off_modifier = 1 + $off_boost - $off_nerf;
+        // if net offense nerf, apply caps
+        if ($off_modifier < 1) {
+            $nerf_percent = 1 - $off_modifier;
+            // if higher than soft cap, apply penalty
+            if ($nerf_percent > BattleManager::OFFENSE_NERF_SOFT_CAP) {
+                $nerf_percent = (
+                    ($nerf_percent - BattleManager::OFFENSE_NERF_SOFT_CAP) *    BattleManager::OFFENSE_NERF_SOFT_CAP_RATIO
+                ) + BattleManager::OFFENSE_NERF_SOFT_CAP;
+            }
+            // if still higher than cap cap, set to hard cap
+           $nerf_percent = min($nerf_percent, BattleManager::OFFENSE_NERF_HARD_CAP);
+            $off_modifier = 1 - $nerf_percent;
+        }
+        $damage = round($damage * $off_modifier, 2);
+
         if($damage < 0) {
             $damage = 0;
         }
@@ -385,13 +408,16 @@ abstract class Fighter {
             case 'ninjutsu':
                 // Resist unfairly applies to nin/tai residuals which only have a 25% or so effect amount, so we lower its effectiveness compared to a regular hit
                 $raw_damage -= $residual_damage ? $this->ninjutsu_resist * 0.5 : $this->ninjutsu_resist;
+                $raw_damage *= 1 + $this->ninjutsu_weakness;
                 break;
             case 'genjutsu':
                 $raw_damage -= $this->genjutsu_resist;
+                $raw_damage *= 1 + $this->genjutsu_weakness;
                 break;
             case 'taijutsu':
                 // Resist unfairly applies to residuals, so we lower its effectiveness compared to a regular hit
                 $raw_damage -= $residual_damage ? $this->taijutsu_resist * 0.5 : $this->taijutsu_resist;
+                $raw_damage *= 1 + $this->taijutsu_weakness;
                 break;
             default:
                 error_log("Invalid defense type! {$defense_type}");
@@ -412,12 +438,12 @@ abstract class Fighter {
 
         if ($apply_resists) {
             // if higher than soft cap, apply penalty
-            if ($this->resist_boost > self::RESIST_SOFT_CAP) {
-                $this->resist_boost = (($this->resist_boost - self::RESIST_SOFT_CAP) * self::RESIST_SOFT_CAP_RATIO) + self::RESIST_SOFT_CAP;
+            if ($this->resist_boost > BattleManager::RESIST_SOFT_CAP) {
+                $this->resist_boost = (($this->resist_boost - BattleManager::RESIST_SOFT_CAP) * BattleManager::RESIST_SOFT_CAP_RATIO) + BattleManager::RESIST_SOFT_CAP;
             }
             // if still higher than cap cap, set to hard cap
-            if ($this->resist_boost > self::RESIST_HARD_CAP) {
-                $this->resist_boost = self::RESIST_HARD_CAP;
+            if ($this->resist_boost > BattleManager::RESIST_HARD_CAP) {
+                $this->resist_boost = BattleManager::RESIST_HARD_CAP;
             }
             $damage *= 1 - $this->resist_boost;
         }

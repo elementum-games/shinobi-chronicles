@@ -1115,7 +1115,7 @@ class User extends Fighter {
 
             $result = $this->system->db->query(
                 "SELECT * FROM `jutsu` WHERE `jutsu_id` IN ({$player_jutsu_string})
-				AND `purchase_type` != '1' AND `rank` <= '{$this->rank_num}'"
+				AND `purchase_type` != '1' AND `purchase_type` != '" . Jutsu::PURCHASE_TYPE_LINKED . "' AND `rank` <= '{$this->rank_num}'"
             );
             if($this->system->db->last_num_rows > 0) {
                 while($jutsu_data = $this->system->db->fetch($result)) {
@@ -1650,6 +1650,7 @@ class User extends Fighter {
                 $this->{$energy_type} -= $jutsu_use_cost;
                 break;
             case Jutsu::PURCHASE_TYPE_DEFAULT:
+            case Jutsu::PURCHASE_TYPE_LINKED:
                 $this->{$energy_type} -= $jutsu_use_cost;
                 break;
 
@@ -1937,12 +1938,14 @@ class User extends Fighter {
 
         if(!empty($this->jutsu)) {
             foreach($this->jutsu as $jutsu) {
-                $player_jutsu[$jutsu_count] = [
-                    'jutsu_id' => $jutsu->id,
-                    'level' => $jutsu->level,
-                    'exp' => $jutsu->exp,
-                ];
-                $jutsu_count++;
+                if ($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_LINKED) {
+                    $player_jutsu[$jutsu_count] = [
+                        'jutsu_id' => $jutsu->id,
+                        'level' => $jutsu->level,
+                        'exp' => $jutsu->exp,
+                    ];
+                    $jutsu_count++;
+                }
             }
         }
 
