@@ -358,9 +358,7 @@ abstract class Fighter {
                 $nerf_percent = (($nerf_percent - BattleManager::OFFENSE_NERF_SOFT_CAP) * BattleManager::OFFENSE_NERF_SOFT_CAP_RATIO) + BattleManager::OFFENSE_NERF_SOFT_CAP;
             }
             // if still higher than cap cap, set to hard cap
-            if ($nerf_percent > BattleManager::OFFENSE_NERF_HARD_CAP) {
-                $nerf_percent = BattleManager::OFFENSE_NERF_HARD_CAP;
-            }
+           $nerf_percent = min($nerf_percent, BattleManager::OFFENSE_NERF_HARD_CAP);
             $off_modifier = 1 - $nerf_percent;
         }
         $damage = round($damage * $off_modifier, 2);
