@@ -95,12 +95,12 @@ $current_rank = 1;
                                 No effect
                             <?php endif; ?>
                         </p>
-                        <p>
-                            <?php if($jutsu->effects[1]->effect !== 'none'): ?>
+                        <?php if($jutsu->effects[1]->effect !== 'none'): ?>
+                            <p>
                                 <?= System::unSlug($jutsu->effects[1]->effect) ?>
                                 (<?= $jutsu->effects[1]->effect_amount ?>% / <?= $jutsu->effects[1]->effect_length ?> turns)
-                            <?php endif; ?>
-                        </p>
+                            </p>   
+                        <?php endif; ?>
                         <p>Use Cost: <?= $jutsu->use_cost ?></p>
                         <p>Purchase Cost: &yen;<?= $jutsu->purchase_cost ?></p>
                     </div>
