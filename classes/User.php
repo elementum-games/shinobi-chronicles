@@ -1115,7 +1115,7 @@ class User extends Fighter {
 
             $result = $this->system->db->query(
                 "SELECT * FROM `jutsu` WHERE `jutsu_id` IN ({$player_jutsu_string})
-				AND `purchase_type` != '1' AND `purchase_type` != '6' AND `rank` <= '{$this->rank_num}'"
+				AND `purchase_type` != '1' AND `purchase_type` != '" . Jutsu::PURCHASE_TYPE_LINKED . "' AND `rank` <= '{$this->rank_num}'"
             );
             if($this->system->db->last_num_rows > 0) {
                 while($jutsu_data = $this->system->db->fetch($result)) {
