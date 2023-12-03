@@ -1069,9 +1069,6 @@ class BattleManager {
                 $damage_reduction = self::EVASION_HARD_CAP;
             }
 
-            // Apply piercing
-            $damage_reduction = round($damage_reduction * (1 - $player2->piercing_percent), 2);
-
             if($damage_reduction >= 0.01) {
                 $player2_damage *= 1 - $damage_reduction;
                 $player2->barrier *= 1 - $damage_reduction;
@@ -1096,9 +1093,6 @@ class BattleManager {
             if ($damage_reduction > self::EVASION_HARD_CAP) {
                 $damage_reduction = self::EVASION_HARD_CAP;
             }
-
-            // Apply piercing
-            $damage_reduction = round($damage_reduction * (1 - $player1->piercing_percent), 2);
 
             if($damage_reduction >= 0.01) {
                 $player1_damage *= 1 - $damage_reduction;
