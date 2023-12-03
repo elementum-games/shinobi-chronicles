@@ -580,7 +580,7 @@ class BattleEffectsManager {
                 $announcement_text = "[opponent]'s offense is being lowered";
                 break;
             case 'resist_boost':
-                $announcement_text = "[player]'s defenses are being are being increased";
+                $announcement_text = "[player]'s defenses are being increased";
                 break;
             default:
                 break;

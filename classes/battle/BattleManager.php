@@ -1001,10 +1001,12 @@ class BattleManager {
         // Output piercing message
         if ($player1->piercing_percent > 0) {
             $pierce_percent = round($player1->piercing_percent * 100, 0);
+            $player2->resist_boost *= 1 - $player1->piercing_percent;
             $collision_text .= "{$player1->getName()} pierces {$pierce_percent}% of {$player2->getName()}'s defenses![br] ";
         }
         if ($player2->piercing_percent > 0) {
             $pierce_percent = round($player2->piercing_percent * 100, 0);
+            $player1->resist_boost *= 1 - $player2->piercing_percent;
             $collision_text .= "{$player2->getName()} pierces {$pierce_percent}% of {$player1->getName()}'s defenses![br] ";
         }
 
@@ -1069,9 +1071,6 @@ class BattleManager {
                 $damage_reduction = self::EVASION_HARD_CAP;
             }
 
-            // Apply piercing
-            $damage_reduction = round($damage_reduction * (1 - $player2->piercing_percent), 2);
-
             if($damage_reduction >= 0.01) {
                 $player2_damage *= 1 - $damage_reduction;
                 $player2->barrier *= 1 - $damage_reduction;
@@ -1096,9 +1095,6 @@ class BattleManager {
             if ($damage_reduction > self::EVASION_HARD_CAP) {
                 $damage_reduction = self::EVASION_HARD_CAP;
             }
-
-            // Apply piercing
-            $damage_reduction = round($damage_reduction * (1 - $player1->piercing_percent), 2);
 
             if($damage_reduction >= 0.01) {
                 $player1_damage *= 1 - $damage_reduction;
