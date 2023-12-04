@@ -26,7 +26,7 @@ class BattleManager {
 
     const GENJUTSU_BARRIER_PENALTY = 0.5; // 50% reduction against Genjutsu
 
-    const ELEMENTAL_CLASH_DAMAGE_MODIFIER = 0.2; // 20% damage loss
+    const ELEMENTAL_CLASH_PENALTY = 0.20; // 20% damage and effect loss
 
     private System $system;
 
@@ -544,7 +544,7 @@ class BattleManager {
             $collision_text = $this->jutsuCollision(
                 $this->battle->player1, $this->battle->player2,
                 $player1_attack->raw_damage, $player2_attack->raw_damage,
-                $player1_attack->jutsu, $player2_attack->jutsu
+                $player1_attack, $player2_attack
             );
         }
 
@@ -777,9 +777,20 @@ class BattleManager {
     #[Trace]
     protected function applyAttack(BattleAttack $attack, Fighter $user, Fighter $target) {
         $attack_damage = $attack->raw_damage;
+        $counter_damage = 0;
+
         if(empty($attack->jutsu->effect_only)) {
             $attack_damage = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type);
             $attack_damage_raw = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type, apply_resists : false);
+            if ($attack->countered_percent > 0) {
+                $counter_damage = $attack_damage * $attack->countered_percent;
+                $attack_damage *= (1 - $attack->countered_percent);
+                $attack_damage_raw *= (1 - $attack->countered_percent);
+                $user->health -= $counter_damage;
+                if ($user->health < 0) {
+                    $user->health = 0;
+                }
+            }
             $damage_resisted = round($attack_damage_raw - $attack_damage, 2);
 
             $target->health -= $attack_damage;
@@ -870,6 +881,10 @@ class BattleManager {
                                 </p>"; }
                     }
 
+        if ($attack->countered_percent > 0) {
+            $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">" . round($counter_damage, 0) . "</span> counter damage-" . '</span></br>';
+        }
+
         if($this->effects->hasDisplays($user)) {
             $text .= '<p>' . $this->effects->getDisplayText($user) . '</p>';
         }
@@ -901,16 +916,21 @@ class BattleManager {
      */
     #[Trace]
     public function jutsuCollision(
-        Fighter $player1, Fighter $player2, &$player1_damage, &$player2_damage, Jutsu $player1_jutsu, Jutsu $player2_jutsu
+        Fighter $player1, Fighter $player2, &$player1_damage, &$player2_damage, BattleAttack &$player1_attack, BattleAttack &$player2_attack
     ) {
         $collision_text = '';
+        $player1_jutsu = $player1_attack->jutsu;
+        $player2_jutsu = $player2_attack->jutsu;
         $player1_jutsu_is_attack = in_array($player1_jutsu->use_type, Jutsu::$attacking_use_types);
         $player2_jutsu_is_attack = in_array($player2_jutsu->use_type, Jutsu::$attacking_use_types);
 
         // Fire > Wind > Lightning > Earth > Water > Fire
-        $elemental_clash_damage_modifier = self::ELEMENTAL_CLASH_DAMAGE_MODIFIER;
+        $elemental_clash_damage_modifier = self::ELEMENTAL_CLASH_PENALTY;
+        $elemental_clash_effect_modifier = self::ELEMENTAL_CLASH_PENALTY;
         $player1_elemental_damage_modifier = 1;
         $player2_elemental_damage_modifier = 1;
+        $player1_elemental_effect_modifier = 1;
+        $player2_elemental_effect_modifier = 1;
 
         // Calculate player1 elemental damage modifier
         if (!empty($player1_jutsu->element)) {
@@ -919,6 +939,7 @@ class BattleManager {
                     $player1_elemental_damage_modifier *= 1 + $player2->fire_weakness;
                     if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'water') {
                         $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player1_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player1->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -926,6 +947,7 @@ class BattleManager {
                     $player1_elemental_damage_modifier *= 1 + $player2->wind_weakness;
                     if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'fire') {
                         $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player1_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player1->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -933,6 +955,7 @@ class BattleManager {
                     $player1_elemental_damage_modifier *= 1 + $player2->lightning_weakness;
                     if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'wind') {
                         $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player1_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player1->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -940,6 +963,7 @@ class BattleManager {
                     $player1_elemental_damage_modifier *= 1 + $player2->earth_weakness;
                     if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'lightning') {
                         $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player1_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player1->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -947,6 +971,7 @@ class BattleManager {
                     $player1_elemental_damage_modifier *= 1 + $player2->water_weakness;
                     if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'earth') {
                         $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player1_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player1->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -960,6 +985,7 @@ class BattleManager {
                     $player2_elemental_damage_modifier *= 1 + $player1->fire_weakness;
                     if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'water') {
                         $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player2_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player2->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -967,6 +993,7 @@ class BattleManager {
                     $player2_elemental_damage_modifier *= 1 + $player1->fire_weakness;
                     if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'fire') {
                         $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player2_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player2->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -974,6 +1001,7 @@ class BattleManager {
                     $player2_elemental_damage_modifier *= 1 + $player1->fire_weakness;
                     if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'wind') {
                         $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player2_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player2->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -981,6 +1009,7 @@ class BattleManager {
                     $player2_elemental_damage_modifier *= 1 + $player1->fire_weakness;
                     if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'lightning') {
                         $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player2_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player2->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -988,6 +1017,7 @@ class BattleManager {
                     $player2_elemental_damage_modifier *= 1 + $player1->fire_weakness;
                     if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'earth') {
                         $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player2_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player2->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -997,6 +1027,20 @@ class BattleManager {
         // Apply elemental damage modifier
         $player1_damage *= $player1_elemental_damage_modifier;
         $player2_damage *= $player2_elemental_damage_modifier;
+
+        foreach ($player1_jutsu->effects as $effect) {
+            $effect->effect_amount *= $player1_elemental_effect_modifier;
+        }
+        foreach ($player2_jutsu->effects as $effect) {
+            $effect->effect_amount *= $player2_elemental_effect_modifier;
+        }
+        // update this bit later
+        $player1->piercing_percent *= $player1_elemental_effect_modifier;
+        $player1->substitution_percent *= $player1_elemental_effect_modifier;
+        $player1->counter_percent *= $player1_elemental_effect_modifier;
+        $player2->piercing_percent *= $player2_elemental_effect_modifier;
+        $player2->substitution_percent *= $player2_elemental_effect_modifier;
+        $player2->counter_percent *= $player2_elemental_effect_modifier;
 
         // Output piercing message
         if ($player1->piercing_percent > 0) {
@@ -1179,7 +1223,7 @@ class BattleManager {
         // Apply substitution effect
         if ($player1->substitution_percent > 0 && $player2_jutsu_is_attack) {
             // Apply piercing
-            $player1->substitution_percent *= (1 - $player2->piercing_percent);
+            //$player1->substitution_percent *= (1 - $player2->piercing_percent);
             // Apply reduction
             $player2_damage *= (1 - $player1->substitution_percent);
             // Set display
@@ -1188,7 +1232,7 @@ class BattleManager {
         }
         if ($player2->substitution_percent > 0 && $player1_jutsu_is_attack) {
             // Apply piercing
-            $player2->substitution_percent *= (1 - $player1->piercing_percent);
+            //$player2->substitution_percent *= (1 - $player1->piercing_percent);
             // Apply reduction
             $player1_damage *= (1 - $player2->substitution_percent);
             // Set display
@@ -1201,9 +1245,10 @@ class BattleManager {
             // Apply piercing
             $player1->counter_percent *= (1 - $player2->piercing_percent);
             // Apply reduction
-            $player2_damage *= (1 - $player1->counter_percent);
+            $player2_attack->countered_percent = $player1->counter_percent;
+            //$player2_damage *= (1 - $player1->counter_percent);
             // Apply damage bonus
-            $player1_damage *= (1 + $player1->counter_percent);
+            //$player1_damage *= (1 + $player1->counter_percent);
             // Set display
             $block_percent = round($player1->counter_percent * 100, 0);
             $collision_text .= "[br][player] countered $block_percent% of [opponent]'s damage!";
@@ -1212,9 +1257,10 @@ class BattleManager {
             // Apply piercing
             $player2->counter_percent *= (1 - $player1->piercing_percent);
             // Apply reduction
-            $player1_damage *= (1 - $player2->counter_percent);
+            $player1_attack->countered_percent = $player2->counter_percent;
+            //$player1_damage *= (1 - $player2->counter_percent);
             // Apply damage bonus
-            $player2_damage *= (1 + $player2->counter_percent);
+            //$player2_damage *= (1 + $player2->counter_percent);
             // Set display
             $block_percent = round($player2->counter_percent * 100, 0);
             $collision_text .= "[br][opponent] countered $block_percent% of [player]'s damage!";

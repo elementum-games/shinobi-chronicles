@@ -103,7 +103,7 @@ class BattleEffectsManager {
             case 'lightning_weakness':
             case 'earth_weakness':
             case 'water_weakness':
-                $effect->effect_amount = self::ELEMENTAL_WEAKNESS_MODIFIER;
+                // No changes needed to base number, calculated in applyPassiveEffects
                 break;
             default:
                 $apply_effect = false;
