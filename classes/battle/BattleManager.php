@@ -26,7 +26,7 @@ class BattleManager {
 
     const GENJUTSU_BARRIER_PENALTY = 0.5; // 50% reduction against Genjutsu
 
-    const ELEMENTAL_CLASH_DAMAGE_MODIFIER = 0.2; // 20% damage loss
+    const ELEMENTAL_CLASH_PENALTY = 0.20; // 20% damage and effect loss
 
     private System $system;
 
@@ -925,9 +925,12 @@ class BattleManager {
         $player2_jutsu_is_attack = in_array($player2_jutsu->use_type, Jutsu::$attacking_use_types);
 
         // Fire > Wind > Lightning > Earth > Water > Fire
-        $elemental_clash_damage_modifier = self::ELEMENTAL_CLASH_DAMAGE_MODIFIER;
+        $elemental_clash_damage_modifier = self::ELEMENTAL_CLASH_PENALTY;
+        $elemental_clash_effect_modifier = self::ELEMENTAL_CLASH_PENALTY;
         $player1_elemental_damage_modifier = 1;
         $player2_elemental_damage_modifier = 1;
+        $player1_elemental_effect_modifier = 1;
+        $player2_elemental_effect_modifier = 1;
 
         // Calculate player1 elemental damage modifier
         if (!empty($player1_jutsu->element)) {
@@ -936,6 +939,7 @@ class BattleManager {
                     $player1_elemental_damage_modifier *= 1 + $player2->fire_weakness;
                     if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'water') {
                         $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player1_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player1->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -943,6 +947,7 @@ class BattleManager {
                     $player1_elemental_damage_modifier *= 1 + $player2->wind_weakness;
                     if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'fire') {
                         $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player1_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player1->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -950,6 +955,7 @@ class BattleManager {
                     $player1_elemental_damage_modifier *= 1 + $player2->lightning_weakness;
                     if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'wind') {
                         $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player1_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player1->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -957,6 +963,7 @@ class BattleManager {
                     $player1_elemental_damage_modifier *= 1 + $player2->earth_weakness;
                     if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'lightning') {
                         $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player1_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player1->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -964,6 +971,7 @@ class BattleManager {
                     $player1_elemental_damage_modifier *= 1 + $player2->water_weakness;
                     if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'earth') {
                         $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player1_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player1->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -977,6 +985,7 @@ class BattleManager {
                     $player2_elemental_damage_modifier *= 1 + $player1->fire_weakness;
                     if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'water') {
                         $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player2_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player2->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -984,6 +993,7 @@ class BattleManager {
                     $player2_elemental_damage_modifier *= 1 + $player1->fire_weakness;
                     if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'fire') {
                         $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player2_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player2->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -991,6 +1001,7 @@ class BattleManager {
                     $player2_elemental_damage_modifier *= 1 + $player1->fire_weakness;
                     if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'wind') {
                         $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player2_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player2->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -998,6 +1009,7 @@ class BattleManager {
                     $player2_elemental_damage_modifier *= 1 + $player1->fire_weakness;
                     if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'lightning') {
                         $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player2_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player2->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -1005,6 +1017,7 @@ class BattleManager {
                     $player2_elemental_damage_modifier *= 1 + $player1->fire_weakness;
                     if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'earth') {
                         $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
+                        $player2_elemental_effect_modifier *= 1 - $elemental_clash_effect_modifier;
                         $player2->barrier *= 1 - $elemental_clash_damage_modifier;
                     }
                     break;
@@ -1014,6 +1027,20 @@ class BattleManager {
         // Apply elemental damage modifier
         $player1_damage *= $player1_elemental_damage_modifier;
         $player2_damage *= $player2_elemental_damage_modifier;
+
+        foreach ($player1_jutsu->effects as $effect) {
+            $effect->effect_amount *= $player1_elemental_effect_modifier;
+        }
+        foreach ($player2_jutsu->effects as $effect) {
+            $effect->effect_amount *= $player2_elemental_effect_modifier;
+        }
+        // update this bit later
+        $player1->piercing_percent *= $player1_elemental_effect_modifier;
+        $player1->substitution_percent *= $player1_elemental_effect_modifier;
+        $player1->counter_percent *= $player1_elemental_effect_modifier;
+        $player2->piercing_percent *= $player2_elemental_effect_modifier;
+        $player2->substitution_percent *= $player2_elemental_effect_modifier;
+        $player2->counter_percent *= $player2_elemental_effect_modifier;
 
         // Output piercing message
         if ($player1->piercing_percent > 0) {
