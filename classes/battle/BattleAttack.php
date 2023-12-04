@@ -7,4 +7,5 @@
 class BattleAttack {
     public Jutsu $jutsu;
     public float $raw_damage;
+    public float $countered_percent = 0;
 }
