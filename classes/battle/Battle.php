@@ -450,7 +450,7 @@ class Battle {
         foreach ($this->player1->jutsu as $jutsu) {
             if ($jutsu->linked_jutsu_id > 0) {
                 $id = "J" . $jutsu->id . ":T1:U:" . $this->player1->user_id;
-                if (isset($this->jutsu_cooldowns[$id]) && $this->jutsu_cooldowns[$id] == $jutsu->cooldown) {
+                if (isset($this->jutsu_cooldowns[$id]) && $this->jutsu_cooldowns[$id] > 0) {
                     if (!isset($this->player1->jutsu[$jutsu->linked_jutsu_id])) {
                         $linked_jutsu = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` = {$jutsu->linked_jutsu_id}");
                         $linked_jutsu = $this->system->db->fetch($linked_jutsu);
@@ -467,7 +467,7 @@ class Battle {
         foreach ($this->player2->jutsu as $jutsu) {
             if ($jutsu->linked_jutsu_id > 0) {
                 $id = "J" . $jutsu->id . ":T2:U:" . $this->player2->user_id;
-                if (isset($this->jutsu_cooldowns[$id]) && $this->jutsu_cooldowns[$id] == $jutsu->cooldown) {
+                if (isset($this->jutsu_cooldowns[$id]) && $this->jutsu_cooldowns[$id] > 0) {
                     if (!isset($this->player1->jutsu[$jutsu->linked_jutsu_id])) {
                         $linked_jutsu = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` = {$jutsu->linked_jutsu_id}");
                         $linked_jutsu = $this->system->db->fetch($linked_jutsu);

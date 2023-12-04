@@ -36,7 +36,7 @@ class Jutsu {
     const TARGET_TYPE_DIRECTION = 'direction';
 
     const POWER_PER_LEVEL_PERCENT = 0.3;
-    const BL_POWER_PER_LEVEL_PERCENT = 0.5;
+    const BL_POWER_PER_LEVEL_PERCENT = 0.3;
     const EFFECT_PER_LEVEL_PERCENT = 0.2;
 
     const CHUUNIN_SCALE_MULTIPLIER = 1.4; // 2.9 => 3.9 = +34.4%
