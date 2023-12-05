@@ -85,7 +85,8 @@ class Bloodline {
                     purchase_type: Jutsu::PURCHASE_TYPE_BLOODLINE,
                     parent_jutsu: $j['parent_jutsu'] ?? 0,
                     element: $j['element'],
-                    hand_seals: $j['hand_seals'] ?? ""
+                    hand_seals: $j['hand_seals'] ?? "",
+                    linked_jutsu_id: $j['linked_jutsu_id'] ?? 0,
                 );
                 $this->base_jutsu[$id]->is_bloodline = true;
             }

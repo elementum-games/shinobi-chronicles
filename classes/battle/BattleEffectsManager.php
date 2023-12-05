@@ -293,19 +293,19 @@ class BattleEffectsManager {
             $target->genjutsu_weakness += ($effect->effect_amount / 100);
         }
         else if ($effect->effect == 'fire_weakness') {
-            $target->fire_weakness += $effect_amount;
+            $target->fire_weakness += ($effect->effect_amount / 100);
         }
         else if ($effect->effect == 'wind_weakness') {
-            $target->wind_weakness += $effect_amount;
+            $target->wind_weakness += ($effect->effect_amount / 100);
         }
         else if ($effect->effect == 'lightning_weakness') {
-            $target->lightning_weakness += $effect_amount;
+            $target->lightning_weakness += ($effect->effect_amount / 100);
         }
         else if ($effect->effect == 'earth_weakness') {
-            $target->earth_weakness += $effect_amount;
+            $target->earth_weakness += ($effect->effect_amount / 100);
         }
         else if ($effect->effect == 'water_weakness') {
-            $target->water_weakness += $effect_amount;
+            $target->water_weakness += ($effect->effect_amount / 100);
         }
         return false;
     }
