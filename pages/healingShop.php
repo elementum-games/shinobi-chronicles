@@ -48,13 +48,15 @@ function healingShop() {
 			if(!isset($ramen_choices[$heal])) {
 				throw new RuntimeException("Invalid choice!");
 			}
-			if($player->getMoney() < $ramen_choices[$heal]['cost']) {
+			if($player->getMoney() < $ramen_choices[$heal]['cost'] && !$system->isDevEnvironment()) {
 				throw new RuntimeException("You do not have enough money!");
 			}
           	if($player->health >= $player->max_health) {
 				throw new RuntimeException("Your health is already maxed out!");
 			}
-			$player->subtractMoney($ramen_choices[$heal]['cost'], "Purchased {$heal} health");
+            if (!$system->isDevEnvironment()) {
+                $player->subtractMoney($ramen_choices[$heal]['cost'], "Purchased {$heal} health");
+            }
 			$player->health += $ramen_choices[$heal]['health_amount'];
 			if($player->health > $player->max_health) {
 				$player->health = $player->max_health;
