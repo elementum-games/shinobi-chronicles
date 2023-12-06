@@ -13,15 +13,15 @@ class BattleManager {
     const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 1; // e.g. 10% of your stats in speed = 10% evasion
     const MAX_EVASION_DAMAGE_REDUCTION = 0.5; // LEGACY
     const EVASION_SOFT_CAP = 0.35; // caps at 50% evasion
-    const EVASION_SOFT_CAP_RATIO = 0.5; // evasion beyond soft cap only 50% as effective
+    const EVASION_SOFT_CAP_RATIO = 0.65; // evasion beyond soft cap only 65% as effective
     const EVASION_HARD_CAP = 0.65; // caps at 75% evasion
 
     const RESIST_SOFT_CAP = 0.35; // caps at 35% resist
-    const RESIST_SOFT_CAP_RATIO = 0.5; // resist beyond soft cap only 50% as effective
+    const RESIST_SOFT_CAP_RATIO = 0.65; // resist beyond soft cap only 50% as effective
     const RESIST_HARD_CAP = 0.65; // caps at 65% resist
 
     const OFFENSE_NERF_SOFT_CAP = 0.35; // caps at 35% reduced damage
-    const OFFENSE_NERF_SOFT_CAP_RATIO = 0.5; // nerf beyond soft cap only 50% as effective
+    const OFFENSE_NERF_SOFT_CAP_RATIO = 0.65; // nerf beyond soft cap only 50% as effective
     const OFFENSE_NERF_HARD_CAP = 0.65; // caps at 65% reduced damage
 
     const GENJUTSU_BARRIER_PENALTY = 0.5; // 50% reduction against Genjutsu
@@ -278,7 +278,6 @@ class BattleManager {
                     // Check BL jutsu ID if bloodline jutsu
                     else if($jutsu_type == 'bloodline_jutsu' && $this->player->bloodline_id) {
                         $jutsu_id = (int)$_POST['jutsu_id'];
-
                         $player_jutsu = null;
                         if(isset($this->player->bloodline->jutsu[$jutsu_id])) {
                             $player_jutsu = $this->player->bloodline->jutsu[$jutsu_id];

@@ -135,10 +135,10 @@ function store() {
 			// check if already learned
 			if($player->hasJutsu($jutsu_id)) {
 				throw new RuntimeException("You have already learned this jutsu!");
-			}
+            }
 
 			// Check for money requirement
-			if($player->getMoney() < $shop_jutsu[$jutsu_id]['purchase_cost']) {
+			if($player->getMoney() < $shop_jutsu[$jutsu_id]['purchase_cost'] && !$system->isDevEnvironment()) {
 				throw new RuntimeException("You do not have enough money!");
 			}
 
@@ -159,7 +159,9 @@ function store() {
 
 
 			// Add to inventory
-			$player->subtractMoney($shop_jutsu[$jutsu_id]['purchase_cost'], "Purchased jutsu #{$jutsu_id}");
+            if (!$system->isDevEnvironment()) {
+                $player->subtractMoney($shop_jutsu[$jutsu_id]['purchase_cost'], "Purchased jutsu #{$jutsu_id}");
+            }
 
 			$player->jutsu_scrolls[$jutsu_id] = Jutsu::fromArray($jutsu_id, $shop_jutsu[$jutsu_id]);
 

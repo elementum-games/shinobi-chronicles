@@ -8,9 +8,11 @@ abstract class Fighter {
 
     const SKILL_OFFENSE_RATIO = 0.10;
     const BLOODLINE_OFFENSE_RATIO = self::SKILL_OFFENSE_RATIO * 0.8;
+    const BLOODLINE_JUTSU_OFFENSE_RATIO = self::SKILL_OFFENSE_RATIO * 0.9;
+    const BLOODLINE_JUTSU_SKILL_RATIO = self::SKILL_OFFENSE_RATIO * 0.6;
     const BLOODLINE_DEFENSE_MULTIPLIER = 50;
 
-    const SPEED_OFFENSE_RATIO = 0.25;
+    const SPEED_OFFENSE_RATIO = 0.2;
 
     const MIN_RAND = 33;
     const MAX_RAND = 36;
@@ -289,7 +291,7 @@ abstract class Fighter {
                 break;
             case Jutsu::PURCHASE_TYPE_BLOODLINE:
                 $offense = self::BASE_OFFENSE +
-                    ($off_skill * self::BLOODLINE_OFFENSE_RATIO) + ($this->bloodline_skill * self::BLOODLINE_OFFENSE_RATIO);
+                    ($off_skill * self::BLOODLINE_JUTSU_OFFENSE_RATIO) + ($this->bloodline_skill * self::BLOODLINE_JUTSU_SKILL_RATIO);
                 break;
             default:
                 throw new RuntimeException("Invalid jutsu type!");
