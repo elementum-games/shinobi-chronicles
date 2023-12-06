@@ -13,7 +13,7 @@ class BattleManager {
     const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 1; // e.g. 10% of your stats in speed = 10% evasion
     const MAX_EVASION_DAMAGE_REDUCTION = 0.5; // LEGACY
     const EVASION_SOFT_CAP = 0.35; // caps at 50% evasion
-    const EVASION_SOFT_CAP_RATIO = 0.65; // evasion beyond soft cap only 50% as effective
+    const EVASION_SOFT_CAP_RATIO = 0.65; // evasion beyond soft cap only 65% as effective
     const EVASION_HARD_CAP = 0.65; // caps at 75% evasion
 
     const RESIST_SOFT_CAP = 0.35; // caps at 35% resist
