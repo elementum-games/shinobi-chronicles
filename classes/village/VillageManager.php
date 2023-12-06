@@ -2078,8 +2078,8 @@ class VillageManager {
         $initator_village_name = self::VILLAGE_NAMES[$initiator_village_id];
         $recipient_village_name = self::VILLAGE_NAMES[$recipient_village_id];
         $active_threshold = time() - (NotificationManager::ACTIVE_PLAYER_DAYS_LAST_ACTIVE * 86400);
-        $users_result = $system->db->query("SELECT `user_id`, `blocked_notifications` FROM `users` WHERE (`village` = '{$initator_village_name}' OR `village` = '{$recipient_village_name}') AND `last_login` > {$active_threshold}");
-        $users = $system->db->fetch_all($users_result);
+        $village_users_result = $system->db->query("SELECT `user_id`, `blocked_notifications` FROM `users` WHERE (`village` = '{$initator_village_name}' OR `village` = '{$recipient_village_name}') AND `last_login` > {$active_threshold}");
+        $village_users = $system->db->fetch_all($village_users_result);
         // create notifcations
         $message;
         $notification_type;
@@ -2107,7 +2107,7 @@ class VillageManager {
             default:
                 break;
         }
-        foreach ($users as $user) {
+        foreach ($village_users as $user) {
             $blockedNotifManager = BlockedNotificationManager::fromDb(
                 system: $system,
                 blocked_notifications_string: $user['blocked_notifications']
