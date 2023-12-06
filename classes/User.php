@@ -912,7 +912,7 @@ class User extends Fighter {
         $this->stealth += $this->village->policy->stealth;
 
         // Blocked Notifications
-        $this->blocked_notifications = BlockedNotificationManager::BlockedNotificationManagerFromDb(system: $this->system, blocked_notifications_string: $user_data['blocked_notifications']);
+        $this->blocked_notifications = BlockedNotificationManager::fromDb(system: $this->system, blocked_notifications_string: $user_data['blocked_notifications']);
 
         // Challenge
         $this->locked_challenge = $user_data['locked_challenge'];
