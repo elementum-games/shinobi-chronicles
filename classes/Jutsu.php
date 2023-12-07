@@ -16,7 +16,7 @@ class Jutsu {
     const PURCHASE_TYPE_BLOODLINE = 4;
     const PURCHASE_TYPE_EVENT_SHOP = 5;
     const PURCHASE_TYPE_LINKED = 6;
-  
+
     const MAX_LEVEL = 100;
     const REFUND_AMOUNT = 0.1;
 
@@ -245,6 +245,7 @@ class Jutsu {
             if ($effect->effect && $effect->effect != 'none') {
                 $this->effects[$index]->effect_amount = $effect->base_effect_amount *
                     (1 + round($this->level * $level_effect_multiplier, 3));
+                $this->effects[$index]->display_effect_amount = $this->effects[$index]->effect_amount;
             }
         }
     }
@@ -298,7 +299,8 @@ class Jutsu {
         $this->combat_id = $prefix . $this->id . ':' . $fighter_combat_id;
     }
 
-    public function hasEffect(): bool {
+    public function hasEffect(): bool
+    {
         $has_effect = false;
         foreach ($this->effects as $effect) {
             if ($effect && $effect->effect != 'none') {
@@ -306,6 +308,14 @@ class Jutsu {
             }
         }
         return $has_effect;
+    }
+
+    public function hasElement(): bool {
+        $has_element = false;
+        if (isset($this->element) && $this->element != self::ELEMENT_NONE && $this->element != 'none') {
+            $has_element = true;
+        }
+        return $has_element;
     }
 
     #[Pure]
