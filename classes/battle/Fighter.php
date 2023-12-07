@@ -108,9 +108,6 @@ abstract class Fighter {
     public $earth_boost = 0;
     public $water_boost = 0;
 
-    public $immolate_percent = 0;
-    public $immolate_raw_effect = 0;
-
     // Combat nerfs
     public $ninjutsu_nerf = 0;
     public $taijutsu_nerf = 0;
