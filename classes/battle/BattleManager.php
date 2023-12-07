@@ -1350,7 +1350,7 @@ class BattleManager {
             $player1_attack->counter_percent *= (1 - $player2_attack->piercing_percent);
             // Apply reduction
             $player2_attack->countered_percent = $player1_attack->counter_percent;
-            $player2_attack->countered_raw_damage = $player2_damage * (1 - $player1_attack->counter_percent);
+            $player2_attack->countered_raw_damage = $player2_damage * $player1_attack->counter_percent;
             $player2_attack->countered_jutsu_type = $player1_attack->jutsu->jutsu_type;
             $player2_damage *= (1 - $player1_attack->counter_percent);
             // Set display
@@ -1365,7 +1365,7 @@ class BattleManager {
             $player2_attack->counter_percent *= (1 - $player1_attack->piercing_percent);
             // Apply reduction
             $player1_attack->countered_percent = $player2_attack->counter_percent;
-            $player1_attack->countered_raw_damage = $player1_damage * (1 - $player2_attack->counter_percent);
+            $player1_attack->countered_raw_damage = $player1_damage *  $player2_attack->counter_percent;
             $player1_attack->countered_jutsu_type = $player2_attack->jutsu->jutsu_type;
             $player1_damage *= (1 - $player2_attack->counter_percent);
             // Set display

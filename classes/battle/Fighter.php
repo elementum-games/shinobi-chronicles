@@ -482,10 +482,6 @@ abstract class Fighter {
             $raw_damage *= (100 - $this->reputation_defense_boost) / 100;
         }
 
-        if($this instanceof NPC && $defense_type == 'genjutsu') {
-            $defense *= 0.8;
-        }
-
         $damage = round($raw_damage / $defense, 2);
         if($damage < 0.0) {
             $damage = 0;
