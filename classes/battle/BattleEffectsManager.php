@@ -574,19 +574,19 @@ class BattleEffectsManager {
             case 'vulnerability':
                 $announcement_text = "[opponent] is taking increased damage" . $effect_details;
                 break;
-            case 'fire_weakness':
+            case 'fire_vulnerability':
                 $announcement_text = "[opponent] is vulnerable to Fire" . $effect_details;
                 break;
-            case 'wind_weakness':
+            case 'wind_vulnerability':
                 $announcement_text = "[opponent] is vulnerable to Wind" . $effect_details;
                 break;
-            case 'lightning_weakness':
+            case 'lightning_vulnerability':
                 $announcement_text = "[opponent] is vulnerable to Lightning" . $effect_details;
                 break;
-            case 'earth_weakness':
+            case 'earth_vulnerability':
                 $announcement_text = "[opponent] is vulnerable to Earth" . $effect_details;
                 break;
-            case 'water_weakness':
+            case 'water_vulnerability':
                 $announcement_text = "[opponent] is vulnerable to Water" . $effect_details;
                 break;
             case 'evasion_boost':
