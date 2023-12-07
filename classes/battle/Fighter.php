@@ -97,15 +97,16 @@ abstract class Fighter {
     public $defense_boost = 0;
 
     public $barrier;
-    public $substitution_percent = 0;
-    public $counter_percent = 0;
-    public $piercing_percent = 0;
-    public $immolate_percent = 0;
 
     public $reputation_defense_boost = 0;
 
     public $evasion_boost = 0;
     public $resist_boost = 0;
+    public $fire_boost = 0;
+    public $wind_boost = 0;
+    public $lightning_boost = 0;
+    public $earth_boost = 0;
+    public $water_boost = 0;
 
     // Combat nerfs
     public $ninjutsu_nerf = 0;
@@ -254,7 +255,7 @@ abstract class Fighter {
      * @return float|int
      * @throws RuntimeException
      */
-    public function calcDamage(Jutsu $attack, bool $disable_randomness = false): float|int {
+    public function calcDamage(Jutsu $attack, bool $disable_randomness = false, float $immolate_raw_damage = 0): float|int {
         if($this->system->debug['damage'])  {
             echo "Debugging damage for {$this->getName()}<br />";
         }
@@ -280,6 +281,28 @@ abstract class Fighter {
                 break;
             default:
                 throw new RuntimeException("Invalid jutsu type!");
+        }
+
+        if ($attack->hasElement()) {
+            switch (System::unSlug($attack->element)) {
+                case 'Fire':
+                    $off_boost += $this->fire_boost;
+                    break;
+                case 'Wind':
+                    $off_boost += $this->wind_boost;
+                    break;
+                case 'Lightning':
+                    $off_boost += $this->lightning_boost;
+                    break;
+                case 'Earth':
+                    $off_boost += $this->earth_boost;
+                    break;
+                case 'Water':
+                    $off_boost += $this->water_boost;
+                    break;
+                default:
+                    break;
+            }
         }
 
         switch($attack->purchase_type) {
@@ -346,6 +369,8 @@ abstract class Fighter {
 
         $damage = $offense * $attack->power * $rand;
 
+        $damage += $immolate_raw_damage;
+
         // Add non-BL damage boosts
         if($this->system->debug['damage']) {
             echo "Damage/boost/nerf: $damage / {$off_boost} / {$off_nerf}} <br />";
@@ -380,7 +405,7 @@ abstract class Fighter {
      * @param bool   $residual_damage
      * @return float|int
      */
-    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false, bool $apply_resists = true): float|int {
+    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false, bool $apply_resists = true, string $element = Jutsu::ELEMENT_NONE): float|int {
         $defense = self::BASE_DEFENSE;
 
         if($defense <= 0) {
@@ -406,24 +431,52 @@ abstract class Fighter {
                 }
             }
         }
+
+        $weakness_modifier = 0;
         switch($defense_type) {
             case 'ninjutsu':
                 // Resist unfairly applies to nin/tai residuals which only have a 25% or so effect amount, so we lower its effectiveness compared to a regular hit
-                $raw_damage -= $residual_damage ? $this->ninjutsu_resist * 0.5 : $this->ninjutsu_resist;
-                $raw_damage *= 1 + $this->ninjutsu_weakness;
+                if ($apply_resists) {
+                    $raw_damage -= $residual_damage ? $this->ninjutsu_resist * 0.5 : $this->ninjutsu_resist;
+                }
+                $weakness_modifier += $this->ninjutsu_weakness;
                 break;
             case 'genjutsu':
-                $raw_damage -= $this->genjutsu_resist;
-                $raw_damage *= 1 + $this->genjutsu_weakness;
+                if ($apply_resists) {
+                    $raw_damage -= $this->genjutsu_resist;
+                }
+                $weakness_modifier += $this->genjutsu_weakness;
                 break;
             case 'taijutsu':
                 // Resist unfairly applies to residuals, so we lower its effectiveness compared to a regular hit
-                $raw_damage -= $residual_damage ? $this->taijutsu_resist * 0.5 : $this->taijutsu_resist;
-                $raw_damage *= 1 + $this->taijutsu_weakness;
+                if ($apply_resists) {
+                    $raw_damage -= $residual_damage ? $this->taijutsu_resist * 0.5 : $this->taijutsu_resist;
+                }
+                $weakness_modifier += $this->taijutsu_weakness;
                 break;
             default:
                 error_log("Invalid defense type! {$defense_type}");
         }
+        switch (System::unSlug($element)) {
+            case 'Fire':
+                $weakness_modifier += $this->fire_weakness;
+                break;
+            case 'Wind':
+                $weakness_modifier += $this->wind_weakness;
+                break;
+            case 'Lightning':
+                $weakness_modifier += $this->lightning_weakness;
+                break;
+            case 'Earth':
+                $weakness_modifier += $this->earth_weakness;
+                break;
+            case 'Water':
+                $weakness_modifier += $this->water_weakness;
+                break;
+            default:
+                break;
+        }
+        $raw_damage *= 1 + $weakness_modifier;
 
         if ($apply_resists && $this->reputation_defense_boost > 0) {
             $raw_damage *= (100 - $this->reputation_defense_boost) / 100;
