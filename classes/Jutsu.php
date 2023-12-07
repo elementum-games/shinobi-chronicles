@@ -311,11 +311,10 @@ class Jutsu {
     }
 
     public function hasElement(): bool {
-        $has_element = false;
         if (isset($this->element) && $this->element != self::ELEMENT_NONE && $this->element != 'none') {
-            $has_element = true;
+           return true;
         }
-        return $has_element;
+        return false;
     }
 
     #[Pure]
