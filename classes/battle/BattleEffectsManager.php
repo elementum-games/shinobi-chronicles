@@ -589,6 +589,21 @@ class BattleEffectsManager {
             case 'water_vulnerability':
                 $announcement_text = "[opponent] is vulnerable to Water" . $effect_details;
                 break;
+            case 'fire_boost':
+                $announcement_text = "[player]'s Fire jutsu are empowered" . $effect_details;
+                break;
+            case 'wind_boost':
+                $announcement_text = "[player]'s Wind jutsu are empowered" . $effect_details;
+                break;
+            case 'lightning_boost':
+                $announcement_text = "[player]'s Lightning jutsu are empowered" . $effect_details;
+                break;
+            case 'earth_boost':
+                $announcement_text = "[player]'s Earth jutsu are empowered" . $effect_details;
+                break;
+            case 'water_boost':
+                $announcement_text = "[player]'s Water jutsu are empowered" . $effect_details;
+                break;
             case 'evasion_boost':
                 $announcement_text = "[player]'s Evasion is being increased" . $effect_details;
                 break;
