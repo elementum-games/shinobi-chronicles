@@ -882,7 +882,7 @@ class BattleManager {
                 $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . " / " . System::unSlug($user->items[$attack->jutsu->weapon_id]->name) . "</br>" . '</i></span></b>';
             } else {
                 if ($attack->jutsu->element != Jutsu::ELEMENT_NONE && $attack->jutsu->element != "none") {
-                    $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->element) . " Release: " . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
+                    $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->element) . " Style: " . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
                 } else {
                     $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
                 }
