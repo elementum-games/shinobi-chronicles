@@ -1378,8 +1378,6 @@ class BattleManager {
             $player2_attack->reflected_percent = $player1_attack->reflect_percent;
             $player2_attack->reflected_raw_damage = $player2_damage * $player1_attack->reflect_percent;
             $player2_damage *= (1 - $player1_attack->reflect_percent);
-            // Set residual
-            $player1_jutsu->effects[] = new Effect('reflect_damage', $player2_attack->reflected_raw_damage / $player1_attack->reflect_duration, $player1_attack->reflect_duration);
             // Set display
             $block_percent = round($player1_attack->reflect_percent * 100, 0);
             if (!empty($collision_text)) {
@@ -1394,14 +1392,26 @@ class BattleManager {
             $player1_attack->reflected_percent = $player2_attack->reflect_percent;
             $player1_attack->reflected_raw_damage = $player1_damage *  $player2_attack->reflect_percent;
             $player1_damage *= (1 - $player2_attack->reflect_percent);
-            // Set residual
-            $player2_jutsu->effects[] = new Effect('reflect_damage', $player1_attack->reflected_raw_damage / $player2_attack->reflect_duration, $player2_attack->reflect_duration);
             // Set display
             $block_percent = round($player2_attack->reflect_percent * 100, 0);
             if (!empty($collision_text)) {
                 $collision_text .= "[br]";
             }
             $collision_text .= "[opponent] reflected $block_percent% of [player]'s damage!";
+        }
+
+        // cap reflect/counter based on the jutsu used
+        $player2_attack->reflected_raw_damage = min($player2_attack->reflected_raw_damage, $player1_damage);
+        $player1_attack->reflected_raw_damage = min($player1_attack->reflected_raw_damage, $player2_damage);
+        $player2_attack->countered_raw_damage = min($player2_attack->countered_raw_damage, $player1_damage);
+        $player1_attack->countered_raw_damage = min($player1_attack->countered_raw_damage, $player2_damage);
+
+        // set reflect damage
+        if ($player1_attack->reflect_percent > 0) {
+            $player1_jutsu->effects[] = new Effect('reflect_damage', $player2_attack->reflected_raw_damage / $player1_attack->reflect_duration, $player1_attack->reflect_duration);
+        }
+        if ($player2_attack->reflect_percent > 0) {
+            $player2_jutsu->effects[] = new Effect('reflect_damage', $player1_attack->reflected_raw_damage / $player2_attack->reflect_duration, $player2_attack->reflect_duration);
         }
 
         return $this->parseCombatText($collision_text, $player1, $player2);
