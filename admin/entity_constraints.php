@@ -230,7 +230,7 @@ $constraints['ai'] = [
             'use_type' => [
                 'data_type' => 'string',
                 'input_type' => 'text',
-                'options' => [Jutsu::USE_TYPE_MELEE, Jutsu::USE_TYPE_PROJECTILE, Jutsu::USE_TYPE_BUFF, Jutsu::USE_TYPE_BARRIER],
+                'options' => [Jutsu::USE_TYPE_MELEE, Jutsu::USE_TYPE_PROJECTILE, Jutsu::USE_TYPE_BUFF, Jutsu::USE_TYPE_BARRIER, Jutsu::USE_TYPE_INDIRECT],
             ],
             'effect' => [
                     'data_type' => 'string',
@@ -277,6 +277,8 @@ $constraints['ai'] = [
                         'counter',
                         'immolate',
                         'recoil',
+                        'delayed_residual',
+                        'reflect',
                     ],
             ],
             'effect_amount' => [
