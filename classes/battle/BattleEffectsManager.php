@@ -94,11 +94,11 @@ class BattleEffectsManager {
             case 'lightning_boost':
             case 'earth_boost':
             case 'water_boost':
-            case 'fire_weakness':
-            case 'wind_weakness':
-            case 'lightning_weakness':
-            case 'earth_weakness':
-            case 'water_weakness':
+            case 'fire_vulnerability':
+            case 'wind_vulnerability':
+            case 'lightning_vulnerability':
+            case 'earth_vulnerability':
+            case 'water_vulnerability':
                 // No changes needed to base number, calculated in applyPassiveEffects
                 break;
             case 'intelligence_boost':
