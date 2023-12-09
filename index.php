@@ -150,7 +150,8 @@ if(!isset($_SESSION['user_id'])) {
             error_log($e->getMessage());
             $login_error_text = $e->getMessage();
         }
-    } else if (!empty($_POST['reset'])) {
+    }
+    else if (!empty($_POST['reset'])) {
         try {
             $con = $system->db->connect();
             $user_name = $system->db->clean($_POST['username']);
