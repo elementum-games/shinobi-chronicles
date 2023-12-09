@@ -30,6 +30,7 @@ class Jutsu {
     const USE_TYPE_REMOTE_SPAWN = 'spawn';
     const USE_TYPE_BUFF = 'buff';
     const USE_TYPE_BARRIER = 'barrier';
+    const USE_TYPE_INDIRECT = 'indirect';
 
     const TARGET_TYPE_FIGHTER_ID = 'fighter_id';
     const TARGET_TYPE_TILE = 'tile';
@@ -59,6 +60,7 @@ class Jutsu {
         self::USE_TYPE_REMOTE_SPAWN,
         self::USE_TYPE_BUFF,
         self::USE_TYPE_BARRIER,
+        self::USE_TYPE_INDIRECT,
     ];
 
     public static array $attacking_use_types = [

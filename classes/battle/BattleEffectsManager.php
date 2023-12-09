@@ -53,6 +53,7 @@ class BattleEffectsManager {
 
         switch ($effect->effect) {
             case 'residual_damage':
+            case 'delayed_residual':
             case 'ninjutsu_nerf':
             case 'taijutsu_nerf':
             case 'genjutsu_nerf':
@@ -87,16 +88,17 @@ class BattleEffectsManager {
             case 'piercing':
             case 'immolate':
             case 'recoil':
+            case 'reflect':
             case 'fire_boost':
             case 'wind_boost':
             case 'lightning_boost':
             case 'earth_boost':
             case 'water_boost':
-            case 'fire_weakness':
-            case 'wind_weakness':
-            case 'lightning_weakness':
-            case 'earth_weakness':
-            case 'water_weakness':
+            case 'fire_vulnerability':
+            case 'wind_vulnerability':
+            case 'lightning_vulnerability':
+            case 'earth_vulnerability':
+            case 'water_vulnerability':
                 // No changes needed to base number, calculated in applyPassiveEffects
                 break;
             case 'intelligence_boost':
@@ -107,6 +109,9 @@ class BattleEffectsManager {
                 break;
             case Jutsu::USE_TYPE_BARRIER:
                 $effect->effect_amount = $raw_damage;
+                break;
+            case 'reflect_damage':
+                // No changes need to base number, calculated in jutsu collision
                 break;
             default:
                 $apply_effect = false;
@@ -423,7 +428,7 @@ class BattleEffectsManager {
             return false;
         }
 
-        if($effect->effect == 'residual_damage' || $effect->effect == 'bleed') {
+        if($effect->effect == 'residual_damage' || $effect->effect == 'bleed' || $effect->effect == 'delayed_residual' || $effect->effect == 'reflect_damage') {
             $damage = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true);
             $residual_damage_raw = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true, apply_resists: false);
             $residual_damage_resisted = $residual_damage_raw - $damage;
@@ -548,6 +553,7 @@ class BattleEffectsManager {
                 $announcement_text = "[opponent]'s Speed is being lowered" . $effect_details;
                 break;
             case 'residual_damage':
+            case 'delayed_residual':
                 $announcement_text = "[opponent] is taking Residual Damage" . $effect_details;
                 break;
             case 'drain_chakra':
@@ -693,7 +699,7 @@ class BattleEffectsManager {
     public function processImmolate(BattleAttack $battleAttack, Fighter $target): int {
         $immolate_raw_damage = 0;
         foreach ($this->active_effects as $index => $effect) {
-            if ($effect->effect == 'residual_damage' && $effect->target == $target->combat_id) {
+            if (($effect->effect == 'residual_damage' || $effect->effect == 'bleed' || $effect->effect == 'delayed_residual' || $effect->effect == 'reflect_damage') && $effect->target == $target->combat_id) {
                 $immolate_raw_damage += ($effect->turns * $effect->effect_amount);
                 unset($this->active_effects[$index]);
             }

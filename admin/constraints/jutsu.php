@@ -42,6 +42,8 @@ $jutsu_effects = [
     'counter',
     'immolate',
     'recoil',
+    'delayed_residual',
+    'reflect',
 ];
 
 $ranks = [];

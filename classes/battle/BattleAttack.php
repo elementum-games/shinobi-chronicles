@@ -10,6 +10,8 @@ class BattleAttack {
     public float $piercing_percent = 0;
     public float $substitution_percent = 0;
     public float $counter_percent = 0;
+    public float $reflect_percent = 0;
+    public float $reflect_duration = 0;
     public float $immolate_percent = 0;
     public float $immolate_raw_damage = 0;
     public float $recoil_percent = 0;
@@ -17,4 +19,6 @@ class BattleAttack {
     public float $countered_percent = 0; // opponent's counter
     public float $countered_raw_damage = 0; // damage dealt from opponent
     public string $countered_jutsu_type; // jutsu type of opponent's counter
+    public float $reflected_percent = 0; // opponent's counter
+    public float $reflected_raw_damage = 0; // damage dealt from opponent
 }
