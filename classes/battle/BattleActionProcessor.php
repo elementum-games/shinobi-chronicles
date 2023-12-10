@@ -818,6 +818,7 @@ class BattleActionProcessor {
         $attack_damage = $raw_damage;
         if(empty($attack->jutsu->effect_only)) {
             $attack_damage = $target->calcDamageTaken($attack->starting_raw_damage, $attack->jutsu->jutsu_type);
+            $target->last_damage_taken += $attack_damage;
             $target->health -= $attack_damage;
             if($target->health < 0) {
                 $target->health = 0;

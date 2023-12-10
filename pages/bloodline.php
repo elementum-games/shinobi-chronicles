@@ -106,7 +106,7 @@ function bloodline() {
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Genjutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost gradually  decreases to 75% strength as Bloodline Skill exceeds Genjutsu skill</span>"
 		),
 		'heal' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] per turn</span>"
+            'text' => "[BL_SKILL] * [RATIO] / [AMOUNT2] (stat total) -> <span class='amount'>[AMOUNT]% damage recovery</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>(assuming opponent of equal total stats)</span>"
 		),
 		'ninjutsu_resist' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] less Ninjutsu damage taken</span>"
@@ -117,9 +117,9 @@ function bloodline() {
 		'taijutsu_resist' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] less Taijutsu damage taken</span>"
 		),
-    'damage_resist' => array(
-        'text' => "[BL_SKILL] * [RATIO] / [AMOUNT2] (stat total) -> <span class='amount'>[AMOUNT]% less damage taken</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>(assuming opponent of equal total stats)</span>"
-    ),
+		'damage_resist' => array(
+			'text' => "[BL_SKILL] * [RATIO] / [AMOUNT2] (stat total) -> <span class='amount'>[AMOUNT]% less damage taken</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>(assuming opponent of equal total stats)</span>"
+		),
 		'speed_boost' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra Speed</span>"
 		),
@@ -217,6 +217,10 @@ function bloodline() {
                     );
                     break;
 				case 'damage_resist':
+                    $replace_array[2] = round(($replace_array[2] / $player->total_stats) * 100, 0);
+                    $replace_array[4] = $player->total_stats;
+                    break;
+                case 'heal':
                     $replace_array[2] = round(($replace_array[2] / $player->total_stats) * 100, 0);
                     $replace_array[4] = $player->total_stats;
                     break;

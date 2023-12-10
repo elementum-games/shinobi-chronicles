@@ -24,7 +24,11 @@ class BattleManager {
     const OFFENSE_NERF_SOFT_CAP_RATIO = 0.65; // nerf beyond soft cap only 65% as effective
     const OFFENSE_NERF_HARD_CAP = 0.65; // caps at 65% reduced damage
 
-    const GENJUTSU_BARRIER_PENALTY = 0.5; // 50% reduction against Genjutsu
+    const HEAL_SOFT_CAP = 0.35; // caps at 35% previous turn damage heal
+    const HEAL_SOFT_CAP_RATIO = 0.65; // heal beyond soft cap only 65% as effective
+    const HEAL_HARD_CAP = 0.65; // caps at 65% previous turn damage heal
+
+    const GENJUTSU_BARRIER_PENALTY = 0; // 0% reduction against Genjutsu
 
     const ELEMENTAL_CLASH_MODIFIER = 0.20; // 20% damage loss and gain
 
@@ -655,6 +659,10 @@ class BattleManager {
         // Run turn effects
         $this->effects->applyActiveEffects($this->battle->player1, $this->battle->player2);
 
+        // Clear previous turn damage tracking
+        $this->battle->player1->last_damage_taken = 0;
+        $this->battle->player2->last_damage_taken = 0;
+
         // Decrement cooldowns
         if(!empty($this->battle->jutsu_cooldowns)) {
             foreach($this->battle->jutsu_cooldowns as $id=>$cooldown) {
@@ -798,6 +806,7 @@ class BattleManager {
             $counter_damage = $user->calcDamageTaken($attack->countered_raw_damage, $attack->countered_jutsu_type);
             $counter_damage_raw = $user->calcDamageTaken($attack->countered_raw_damage, $attack->countered_jutsu_type, apply_resists: false);
             $counter_damage_resisted = round($counter_damage_raw - $counter_damage, 2);
+            $user->last_damage_taken += $counter_damage;
             $user->health -= $counter_damage;
             if ($user->health < 0) {
                 $user->health = 0;
@@ -808,6 +817,7 @@ class BattleManager {
             $recoil_damage = $user->calcDamageTaken($attack->recoil_raw_damage, $attack->jutsu->jutsu_type);
             $recoil_damage_raw = $user->calcDamageTaken($attack->recoil_raw_damage, $attack->jutsu->jutsu_type, apply_resists: false);
             $recoil_damage_resisted = round($recoil_damage_raw - $recoil_damage, 2);
+            $user->last_damage_taken += $recoil_damage;
             $user->health -= $recoil_damage;
             if ($user->health < 0) {
                 $user->health = 0;
@@ -829,6 +839,7 @@ class BattleManager {
             $attack_damage_raw = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type, apply_resists : false, element: $attack->jutsu->element);
             $damage_resisted = round($attack_damage_raw - $attack_damage, 2);
 
+            $target->last_damage_taken += $attack_damage;
             $target->health -= $attack_damage;
             if($target->health < 0) {
                 $target->health = 0;
@@ -933,13 +944,13 @@ class BattleManager {
             }
         }
 
-        if ($attack->immolate_raw_damage > 0) {
+        /*if ($attack->immolate_raw_damage > 0) {
             if ($immolate_damage_resisted > 0) {
                 $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . round($immolate_damage, 0) . "</span> immolation damage- (resists " . "<span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . round($immolate_damage_resisted) . "</span>" . " immolation damage)" . '</span></br>';
             } else {
                 $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . round($immolate_damage, 0) . "</span> immolation damage-" . '</span></br>';
             }
-        }
+        }*/
 
         if($this->effects->hasDisplays($user)) {
             $text .= '<p>' . $this->effects->getDisplayText($user) . '</p>';

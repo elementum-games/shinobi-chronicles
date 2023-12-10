@@ -400,13 +400,25 @@ class BattleEffectsManager {
             }
         }
 
-        $this->applyBloodlineActiveBoosts($player1);
-        $this->applyBloodlineActiveBoosts($player2);
+        $this->applyBloodlineActiveBoosts($player1, $player2);
+        $this->applyBloodlineActiveBoosts($player2, $player1);
     }
 
-    public function applyBloodlineActiveBoosts(Fighter $fighter) {
+    public function applyBloodlineActiveBoosts(Fighter $fighter, Fighter $opponent) {
         if(!empty($fighter->bloodline->combat_boosts)) {
             foreach($fighter->bloodline->combat_boosts as $id=>$effect) {
+                if ($effect['effect'] == 'heal') {
+                    $heal_power = $effect['effect_amount'] / max($opponent->getBaseStatTotal(), 1);
+                    // if higher than soft cap, apply penalty
+                    if ($heal_power > BattleManager::HEAL_SOFT_CAP) {
+                        $heal_power = (($heal_power - BattleManager::HEAL_SOFT_CAP) * BattleManager::HEAL_SOFT_CAP_RATIO) + BattleManager::HEAL_SOFT_CAP;
+                    }
+                    // if still higher than cap cap, set to hard cap
+                    if ($heal_power > BattleManager::HEAL_HARD_CAP) {
+                        $heal_power = BattleManager::HEAL_HARD_CAP;
+                    }
+                    $effect['effect_amount'] = $heal_power * $fighter->last_damage_taken;
+                }
                 $this->applyActiveEffect(
                     $fighter,
                     $fighter,
@@ -440,6 +452,7 @@ class BattleEffectsManager {
                 $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($damage) . "</span>" . " residual damage");
             }
 
+            $target->last_damage_taken += $damage;
             $target->health -= $damage;
             if ($target->health < 0) {
                 $target->health = 0;
@@ -448,9 +461,11 @@ class BattleEffectsManager {
         else if($effect->effect == 'heal') {
             $heal = $effect->effect_amount;
 
-            $this->addDisplay($target, $target->getName() . " heals " . "<span class=\"battle_text_heal\" style=\"color:green\">" . round($heal) . "</span>" . " health");
+            if ($effect->effect_amount > 0) {
+                $this->addDisplay($target, $target->getName() . " heals " . "<span class=\"battle_text_heal\" style=\"color:green\">" . round($heal) . "</span>" . " health");
 
-            $target->health += $heal;
+                $target->health += $heal;
+            }
         }
         else if($effect->effect == 'drain_chakra') {
             $drain = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type);

@@ -75,6 +75,9 @@ class Battle {
 
     public ?int $patrol_id;
 
+    public int $player1_last_damage_taken;
+    public int $player2_last_damage_taken;
+
     /**
      * @param System  $system
      * @param Fighter $player1
@@ -249,6 +252,9 @@ class Battle {
         else {
             $this->battle_text = '';
         }
+
+        $this->player1_last_damage_taken = $battle['player1_last_damage_taken'];
+        $this->player2_last_damage_taken = $battle['player2_last_damage_taken'];
     }
 
     /**
@@ -291,6 +297,8 @@ class Battle {
                 }
 		    }
 	    }
+        $this->player1->last_damage_taken = $this->player1_last_damage_taken;
+        $this->player2->last_damage_taken = $this->player2_last_damage_taken;
 
         $this->fetchPlayerInventories();
 
@@ -426,7 +434,10 @@ class Battle {
             `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
 
             `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
-            `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
+            `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "',
+
+            `player1_last_damage_taken` = {$this->player1->last_damage_taken},
+            `player2_last_damage_taken` = {$this->player2->last_damage_taken}
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
         );
 
