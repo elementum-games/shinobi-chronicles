@@ -11,7 +11,7 @@ class BattleAttack {
     public float $substitution_percent = 0;
     public float $counter_percent = 0;
     public float $reflect_percent = 0;
-    public float $reflect_duration = 0;
+    public float $reflect_duration = 1;
     public float $immolate_percent = 0;
     public float $immolate_raw_damage = 0;
     public float $recoil_percent = 0;
