@@ -5,8 +5,6 @@ require_once __DIR__ . '/BattleEffect.php';
 class BattleEffectsManager {
     const MAX_SPEED_REDUCTION = 50;
 
-    const ELEMENTAL_WEAKNESS_MODIFIER = 0.2;
-
     protected System $system;
 
     /** @var BattleEffect[]  */
@@ -55,6 +53,7 @@ class BattleEffectsManager {
 
         switch ($effect->effect) {
             case 'residual_damage':
+            case 'delayed_residual':
             case 'ninjutsu_nerf':
             case 'taijutsu_nerf':
             case 'genjutsu_nerf':
@@ -87,6 +86,19 @@ class BattleEffectsManager {
             case 'substitution':
             case 'counter':
             case 'piercing':
+            case 'immolate':
+            case 'recoil':
+            case 'reflect':
+            case 'fire_boost':
+            case 'wind_boost':
+            case 'lightning_boost':
+            case 'earth_boost':
+            case 'water_boost':
+            case 'fire_vulnerability':
+            case 'wind_vulnerability':
+            case 'lightning_vulnerability':
+            case 'earth_vulnerability':
+            case 'water_vulnerability':
                 // No changes needed to base number, calculated in applyPassiveEffects
                 break;
             case 'intelligence_boost':
@@ -98,12 +110,8 @@ class BattleEffectsManager {
             case Jutsu::USE_TYPE_BARRIER:
                 $effect->effect_amount = $raw_damage;
                 break;
-            case 'fire_weakness':
-            case 'wind_weakness':
-            case 'lightning_weakness':
-            case 'earth_weakness':
-            case 'water_weakness':
-                // No changes needed to base number, calculated in applyPassiveEffects
+            case 'reflect_damage':
+                // No changes need to base number, calculated in jutsu collision
                 break;
             default:
                 $apply_effect = false;
@@ -292,20 +300,35 @@ class BattleEffectsManager {
             $target->taijutsu_weakness += ($effect->effect_amount / 100);
             $target->genjutsu_weakness += ($effect->effect_amount / 100);
         }
-        else if ($effect->effect == 'fire_weakness') {
-            $target->fire_weakness += $effect_amount;
+        else if ($effect->effect == 'fire_vulnerability') {
+            $target->fire_weakness += ($effect->effect_amount / 100);
         }
-        else if ($effect->effect == 'wind_weakness') {
-            $target->wind_weakness += $effect_amount;
+        else if ($effect->effect == 'wind_vulnerability') {
+            $target->wind_weakness += ($effect->effect_amount / 100);
         }
-        else if ($effect->effect == 'lightning_weakness') {
-            $target->lightning_weakness += $effect_amount;
+        else if ($effect->effect == 'lightning_vulnerability') {
+            $target->lightning_weakness += ($effect->effect_amount / 100);
         }
-        else if ($effect->effect == 'earth_weakness') {
-            $target->earth_weakness += $effect_amount;
+        else if ($effect->effect == 'earth_vulnerability') {
+            $target->earth_weakness += ($effect->effect_amount / 100);
         }
-        else if ($effect->effect == 'water_weakness') {
-            $target->water_weakness += $effect_amount;
+        else if ($effect->effect == 'water_vulnerability') {
+            $target->water_weakness += ($effect->effect_amount / 100);
+        }
+        else if ($effect->effect == 'fire_boost') {
+            $target->fire_boost += ($effect->effect_amount / 100);
+        }
+        else if ($effect->effect == 'wind_boost') {
+            $target->wind_boost += ($effect->effect_amount / 100);
+        }
+        else if ($effect->effect == 'lightning_boost') {
+            $target->lightning_boost += ($effect->effect_amount / 100);
+        }
+        else if ($effect->effect == 'earth_boost') {
+            $target->earth_boost += ($effect->effect_amount / 100);
+        }
+        else if ($effect->effect == 'water_boost') {
+            $target->water_boost += ($effect->effect_amount / 100);
         }
         return false;
     }
@@ -405,20 +428,20 @@ class BattleEffectsManager {
             return false;
         }
 
-        if($effect->effect == 'residual_damage' || $effect->effect == 'bleed') {
+        if($effect->effect == 'residual_damage' || $effect->effect == 'bleed' || $effect->effect == 'delayed_residual' || $effect->effect == 'reflect_damage') {
             $damage = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true);
-            $residual_damage_raw = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true, apply_resists : false);
+            $residual_damage_raw = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true, apply_resists: false);
             $residual_damage_resisted = $residual_damage_raw - $damage;
             $attack_jutsu_color = BattleManager::getJutsuTextColor($effect->damage_type);
 
-            if($residual_damage_resisted > 0) {
+            if ($residual_damage_resisted > 0) {
                 $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($damage) . "</span>" . " residual damage (resists " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($residual_damage_resisted) . "</span>" . " residual damage)");
             } else {
                 $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($damage) . "</span>" . " residual damage");
             }
 
             $target->health -= $damage;
-            if($target->health < 0) {
+            if ($target->health < 0) {
                 $target->health = 0;
             }
         }
@@ -502,85 +525,102 @@ class BattleEffectsManager {
         }
     }
 
-    public function getAnnouncementText(string $effect) : string{
+    public function getAnnouncementText(Effect $effect) : string{
         $announcement_text = "";
-        switch($effect){
+        $effect_details = " (" . round($effect->display_effect_amount, 0) . "%, " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
+        switch($effect->effect){
             case 'taijutsu_nerf':
-                $announcement_text = "[opponent]'s Taijutsu offense is being lowered";
+                $announcement_text = "[opponent]'s Taijutsu offense is being lowered" . $effect_details;
                 break;
             case 'ninjutsu_nerf':
-                $announcement_text = "[opponent]'s Ninjutsu offense is being lowered";
+                $announcement_text = "[opponent]'s Ninjutsu offense is being lowered" . $effect_details;
                 break;
             case 'daze':
             case 'genjutsu_nerf':
-                $announcement_text = "[opponent]'s Genjutsu is being lowered";
+                $announcement_text = "[opponent]'s Genjutsu is being lowered" . $effect_details;
                 break;
             case 'intelligence_nerf':
-                $announcement_text = "[opponent]'s Intelligence is being lowered";
+                $announcement_text = "[opponent]'s Intelligence is being lowered" . $effect_details;
                 break;
             case 'willpower_nerf':
-                $announcement_text = "[opponent]'s Willpower is being lowered";
+                $announcement_text = "[opponent]'s Willpower is being lowered" . $effect_details;
                 break;
             case 'cast_speed_nerf':
-                $announcement_text = "[opponent]'s Cast Speed is being lowered";
+                $announcement_text = "[opponent]'s Cast Speed is being lowered" . $effect_details;
                 break;
             case 'speed_nerf':
             case 'cripple':
-                $announcement_text = "[opponent]'s Speed is being lowered";
+                $announcement_text = "[opponent]'s Speed is being lowered" . $effect_details;
                 break;
             case 'residual_damage':
-                $announcement_text = "[opponent] is taking Residual Damage";
+            case 'delayed_residual':
+                $announcement_text = "[opponent] is taking Residual Damage" . $effect_details;
                 break;
             case 'drain_chakra':
-                $announcement_text = "[opponent]'s Chakra is being drained";
+                $announcement_text = "[opponent]'s Chakra is being drained" . $effect_details;
                 break;
             case 'drain_stamina':
-                $announcement_text = "[opponent]'s Stamina is being drained";
+                $announcement_text = "[opponent]'s Stamina is being drained" . $effect_details;
                 break;
             case 'taijutsu_boost':
-                $announcement_text = "[player]'s Taijutsu offense is being increased";
+                $announcement_text = "[player]'s Taijutsu offense is being increased" . $effect_details;
                 break;
             case 'ninjutsu_boost':
-                $announcement_text = "[player]'s Ninjutsu offense is being increased";
+                $announcement_text = "[player]'s Ninjutsu offense is being increased" . $effect_details;
                 break;
             case 'genjutsu_boost':
-                $announcement_text = "[player]'s Genjutsu offense is being increased";
+                $announcement_text = "[player]'s Genjutsu offense is being increased" . $effect_details;
                 break;
             case 'speed_boost':
-                $announcement_text = "[player]'s Speed is being increased";
+                $announcement_text = "[player]'s Speed is being increased" . $effect_details;
                 break;
             case 'cast_speed_boost':
-                $announcement_text = "[player]'s Cast Speed is being increased";
+                $announcement_text = "[player]'s Cast Speed is being increased" . $effect_details;
                 break;
             case 'vulnerability':
-                $announcement_text = "[opponent] is taking increased damage";
+                $announcement_text = "[opponent] is taking increased damage" . $effect_details;
                 break;
-            case 'fire_weakness':
-                $announcement_text = "[opponent] is vulnerable to Fire";
+            case 'fire_vulnerability':
+                $announcement_text = "[opponent] is vulnerable to Fire" . $effect_details;
                 break;
-            case 'wind_weakness':
-                $announcement_text = "[opponent] is vulnerable to Wind";
+            case 'wind_vulnerability':
+                $announcement_text = "[opponent] is vulnerable to Wind" . $effect_details;
                 break;
-            case 'lightning_weakness':
-                $announcement_text = "[opponent] is vulnerable to Lightning";
+            case 'lightning_vulnerability':
+                $announcement_text = "[opponent] is vulnerable to Lightning" . $effect_details;
                 break;
-            case 'earth_weakness':
-                $announcement_text = "[opponent] is vulnerable to Earth";
+            case 'earth_vulnerability':
+                $announcement_text = "[opponent] is vulnerable to Earth" . $effect_details;
                 break;
-            case 'water_weakness':
-                $announcement_text = "[opponent] is vulnerable to Water";
+            case 'water_vulnerability':
+                $announcement_text = "[opponent] is vulnerable to Water" . $effect_details;
+                break;
+            case 'fire_boost':
+                $announcement_text = "[player]'s Fire jutsu are empowered" . $effect_details;
+                break;
+            case 'wind_boost':
+                $announcement_text = "[player]'s Wind jutsu are empowered" . $effect_details;
+                break;
+            case 'lightning_boost':
+                $announcement_text = "[player]'s Lightning jutsu are empowered" . $effect_details;
+                break;
+            case 'earth_boost':
+                $announcement_text = "[player]'s Earth jutsu are empowered" . $effect_details;
+                break;
+            case 'water_boost':
+                $announcement_text = "[player]'s Water jutsu are empowered" . $effect_details;
                 break;
             case 'evasion_boost':
-                $announcement_text = "[player]'s Evasion is being increased";
+                $announcement_text = "[player]'s Evasion is being increased" . $effect_details;
                 break;
             case 'evasion_nerf':
-                $announcement_text = "[opponent]'s Evasion is being lowered";
+                $announcement_text = "[opponent]'s Evasion is being lowered" . $effect_details;
                 break;
             case 'offense_nerf':
-                $announcement_text = "[opponent]'s offense is being lowered";
+                $announcement_text = "[opponent]'s offense is being lowered" . $effect_details;
                 break;
             case 'resist_boost':
-                $announcement_text = "[player]'s defenses are being increased";
+                $announcement_text = "[player]'s defenses are being increased" . $effect_details;
                 break;
             default:
                 break;
@@ -654,5 +694,16 @@ class BattleEffectsManager {
         }
 
         $this->displays[$fighter->combat_id][] = $display;
+    }
+
+    public function processImmolate(BattleAttack $battleAttack, Fighter $target): int {
+        $immolate_raw_damage = 0;
+        foreach ($this->active_effects as $index => $effect) {
+            if (($effect->effect == 'residual_damage' || $effect->effect == 'bleed' || $effect->effect == 'delayed_residual' || $effect->effect == 'reflect_damage') && $effect->target == $target->combat_id) {
+                $immolate_raw_damage += ($effect->turns * $effect->effect_amount);
+                unset($this->active_effects[$index]);
+            }
+        }
+        return $immolate_raw_damage;
     }
 }

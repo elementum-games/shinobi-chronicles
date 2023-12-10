@@ -47,7 +47,11 @@ function bloodline() {
 			}
 			$player->bloodline->jutsu[$jutsu_id] = $base_bloodline->jutsu[$jutsu_id];
 			$player->bloodline->jutsu[$jutsu_id]->id = $jutsu_id;
-			$player->bloodline->jutsu[$jutsu_id]->level = 1;
+            if ($system->isDevEnvironment()) {
+                $player->bloodline->jutsu[$jutsu_id]->level = 100;
+            } else {
+                $player->bloodline->jutsu[$jutsu_id]->level = 1;
+            }
 			$player->bloodline->jutsu[$jutsu_id]->exp = 0;
 			$player->updateInventory();
 			$system->message("Learned " . $base_bloodline->jutsu[$jutsu_id]->name . "!");

@@ -258,12 +258,15 @@ class NotificationAPIManager {
         //Battle
         if ($this->player->battle_id > 0) {
             $result = $this->system->db->query(
-                "SELECT `battle_type` FROM `battles` WHERE `battle_id`='{$this->player->battle_id}' LIMIT 1"
+                "SELECT `battle_type`, `winner` FROM `battles` WHERE `battle_id`='{$this->player->battle_id}' LIMIT 1"
             );
             if ($this->system->db->last_num_rows == 0) {
                 $this->player->battle_id = 0;
             } else {
                 $result = $this->system->db->fetch($result);
+                if ($result['winner'] == 'STOP') {
+                    $this->player->battle_id = 0;
+                }
                 $link = null;
                 switch ($result['battle_type']) {
                     case Battle::TYPE_AI_ARENA:
