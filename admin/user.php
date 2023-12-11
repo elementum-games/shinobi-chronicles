@@ -90,23 +90,23 @@ function editUserPage(System $system, User $player): void {
             $FORM_DATA = $_POST;
 
             // Additional data checking for Elements
-            if($user_data['rank'] >= 3 && $player->isHeadAdmin()) {
+            if($FORM_DATA['rank'] >= 3 && $player->isHeadAdmin()) {
                 $new_elements = array();
 
                 if($user_data['staff_level'] != StaffManager::STAFF_HEAD_ADMINISTRATOR) {
-                    $required_elements = (int)$_POST['rank'] - 2;
-                    if(count($_POST['elements']) > $required_elements) {
+                    $required_elements = (int)$FORM_DATA['rank'] - 2;
+                    if(count($FORM_DATA['elements']) > $required_elements) {
                         throw new RuntimeException("Only $required_elements element(s) allowed!");
                     }
-                    if(count($_POST['elements']) < $required_elements) {
+                    if(count($FORM_DATA['elements']) < $required_elements) {
                         throw new RuntimeException("There must be at least $required_elements element(s)!");
                     }
                 }
 
-                if(!is_array($_POST['elements'])) {
+                if(!is_array($FORM_DATA['elements'])) {
                     throw new RuntimeException("Elements form data must be of type array!");
                 }
-                foreach($_POST['elements'] as $element) {
+                foreach($FORM_DATA['elements'] as $element) {
                     if(!in_array($element, User::$ELEMENTS)) {
                         throw new RuntimeException("Invalid element ($element).");
                     }
@@ -119,7 +119,7 @@ function editUserPage(System $system, User $player): void {
             else {
                 //Remove elements in case rank has been reduced
                 if($player->isHeadAdmin()) {
-                    unset($_POST['elements']);
+                    unset($FORM_DATA['elements']);
                     unset($variables['elements']);
                 }
             }
