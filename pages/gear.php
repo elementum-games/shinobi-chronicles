@@ -2,10 +2,7 @@
 
 function gear(): void {
 	global $system;
-
 	global $player;
-
-	global $self_link;
 
     $player->getInventory();
 
@@ -29,20 +26,26 @@ function gear(): void {
         $equip_ok = true;
         $equipped_armor = 0;
         $equipped_weapons = 0;
+
+        $equipped_weapon_ids = [];
+        $equipped_armor_ids = [];
+
         foreach($items as $id) {
             $id = (int)$id;
 
-            if($player->hasItem($id) && $player->items[$id]->use_type != 3) {
+            if($player->hasItem($id) && $player->items[$id]->use_type != Item::USE_TYPE_CONSUMABLE) {
                 $equipped_items[] = $id;
-                if($player->items[$id]->use_type == 1) {
+                if($player->items[$id]->use_type == Item::USE_TYPE_WEAPON) {
                     $equipped_weapons++;
+                    $equipped_weapon_ids[] = $id;
                     if($equipped_weapons > $max_equipped_weapons) {
                         $system->message("You can only have " . $max_equipped_weapons . " equipped!");
                         $equip_ok = false;
                     }
                 }
-                if($player->items[$id]->use_type == 2) {
+                if($player->items[$id]->use_type == Item::USE_TYPE_ARMOR) {
                     $equipped_armor++;
+                    $equipped_armor_ids[] = $id;
                     if($equipped_armor > $max_equipped_armor) {
                         $system->message("You can only have " . $max_equipped_armor . " equipped!");
                         $equip_ok = false;
@@ -53,6 +56,8 @@ function gear(): void {
 
         if($equip_ok) {
             $player->equipped_items = $equipped_items;
+            $player->equipped_armor_ids = $equipped_armor_ids;
+            $player->equipped_weapon_ids = $equipped_weapon_ids;
             $system->message("Items equipped!");
         }
     }
@@ -90,173 +95,7 @@ function gear(): void {
         }
     }
 
-    $system->printMessage();
-
-    echo "<table id='equipment gear' class='table' style='text-align:center;'>";
-
-    echo "<tr class='threeColumns'>
-		<th style='width:33%;'>Weapons</th>
-		<th style='width:33%;'>Armor</th>
-		<th style='width:33%;'>Consumables</th>
-	</tr>";
-
-    // Use type: 1 = weapon, 2 = armor, 3 = consumable
-    echo "<tr class='threeColumns'><td>";
-    if($player->items) {
-        foreach($player->items as $item) {
-            if($item->use_type != 1) {
-                continue;
-            }
-
-            $item->effect = str_replace("_", " ", $item->effect);
-
-            echo sprintf(
-                "%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount, System::unSlug($item->effect)
-            );
-        }
-    }
-    echo "</td>";
-
-    echo "<td>";
-    if($player->items) {
-        foreach($player->items as $item) {
-            if($item->use_type != 2) {
-                continue;
-            }
-
-            echo sprintf(
-                "%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount, System::unSlug($item->effect)
-            );
-
-        }
-    }
-    echo "</td>";
-
-    echo "<td>";
-    if($player->items) {
-        foreach($player->items as $item) {
-            if($item->use_type != 3) {
-                continue;
-            }
-
-            echo sprintf(
-                "%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount, System::unSlug($item->effect)
-            );
-        }
-    }
-    echo "</td>";
-
-    echo "</td></tr>";
-
-    if($player->special_items) {
-        $header_displayed = false;
-        foreach($player->items as $item) {
-            if($item->use_type == 4) {
-                if(!$header_displayed) {
-                    echo "<tr><th colspan='3'>Special</th></tr>";
-                    echo "<td colspan='3'>";
-                    $header_displayed = true;
-                }
-                echo $item->name;
-                if ($item->quantity > 1) {
-                    echo ' x' . $item->quantity;
-                }
-                if ($item->effect_amount > 0) {
-                    echo "<sup style='font-size:9px;'>" . ' (' . $item->effect_amount . ' ' . $item->effect . ')' . "</sup>";
-                }
-                echo '<br>';
-            }
-        }
-        if($header_displayed) {
-            echo "</td>";
-        }
-    }
-
-    echo "
-	<form action='$self_link' method='post' style='margin:0;'>
-	<tr class='twoHeaders'>
-		<th>Equipped Weapons</th>
-        <th>Equipped Gear</th>
-		<th>Use Items</th>
-	</tr>";
-
-    echo "<tr class='threeColumns'>";
-
-    $item_count = 1;
-    echo "<td class='fullwidth' style='width:33%;'>";
-    $equipped_weapons = [];
-    for($i = 0; $i < $max_equipped_weapons; $i++) {
-        $selected_displayed = false;
-        echo "<select style='margin-top: 7px' name='items[" . ($item_count++) . "]'>
-		<option value='none'>None</option>";
-        foreach($player->items as $item) {
-            if($item->use_type != 1) {
-                continue;
-            }
-            echo "<option value='{$item->id}'";
-            if(in_array($item->id, $player->equipped_items) && !isset($equipped_weapons[$item->id])
-                && !$selected_displayed) {
-                $selected_displayed = true;
-                echo " selected='selected' ";
-                $equipped_weapons[$item->id] = $item->id;
-            }
-            echo ">{$item->name}</option>";
-        }
-        echo "</select><br />";
-    }
-    echo "</td>";
-
-    echo "<td class='fullwidth' style='width:33%;'>";
-    $equipped_armor = [];
-    for($i = 0; $i < $max_equipped_armor; $i++) {
-        $selected_displayed = false;
-        echo "<select style='margin-top: 7px' name='items[" . ($item_count++) . "]'>
-		<option value='none'>None</option>";
-        foreach($player->items as $item) {
-            if($item->use_type != 2) {
-                continue;
-            }
-            echo "<option value='{$item->id}'";
-            if(in_array($item->id, $player->equipped_items) && !isset($equipped_armor[$item->id])
-                && !$selected_displayed) {
-                $selected_displayed = true;
-                echo " selected='selected' ";
-                $equipped_armor[$item->id] = $item->id;
-            }
-
-            echo ">{$item->name}</option>";
-        }
-        echo "</select><br />";
-    }
-    echo "</td>";
-
-    echo "<td class='fullwidth' style='text-align:center;'><div style='display: flex; gap: 10px; align-items: center; justify-content: center; flex-direction: column'>";
-    foreach($player->items as $id => $item) {
-        if($item->use_type != 3) {
-            continue;
-        }
-
-        if($item->quantity <= 0) {
-            continue;
-        }
-
-        echo "<a href='$self_link&use_item=$id'><span class='button' style='min-width:8em; margin: 0'>" . $item->name . '<br />';
-        echo "<span style='font-weight:normal;'>Amount: {$item->quantity}</span><br/>";
-        if($item->effect == 'heal') {
-            echo "<span style='font-weight:normal;'>(Heal " . $item->effect_amount . " HP)</span></span></a>";
-        }
-    }
-    echo "</select>
-	</div></td>
-
-
-	<br />
-	<tr><td colspan='3' style='text-align:center;'>";
-
-    echo "<input type='submit' name='equip_item' value='Equip' />
-	</td></tr>
-	</form>
-	</table>";
-
     $player->updateInventory();
+
+    require 'templates/gear.php';
 }

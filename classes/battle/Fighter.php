@@ -63,7 +63,7 @@ abstract class Fighter {
 
     public array $equipped_jutsu;
     public array $equipped_weapon_ids;
-    public array $equipped_armor;
+    public array $equipped_armor_ids;
 
     public int $bloodline_id;
     public ?Bloodline $bloodline;

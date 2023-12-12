@@ -10,6 +10,7 @@ class Router {
         'profile' => 1,
         'inbox' => 2,
         'settings' => 3,
+        'gear' => 5,
         'members' => 6,
         'chat' => 7,
         'villageHQ' => 9,

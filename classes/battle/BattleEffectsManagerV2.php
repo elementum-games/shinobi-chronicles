@@ -180,8 +180,8 @@ class BattleEffectsManagerV2 {
     }
 
     public function applyArmorEffects(Fighter $fighter) {
-        if(!empty($fighter->equipped_armor)) {
-            foreach($fighter->equipped_armor as $item_id) {
+        if(!empty($fighter->equipped_armor_ids)) {
+            foreach($fighter->equipped_armor_ids as $item_id) {
                 if($fighter->hasItem($item_id)) {
                     $effect = new BattleEffect(
                         user: $fighter->combat_id,

@@ -178,7 +178,7 @@ class UserApiPresenter {
             'items' => array_map(function (Item $item){
                 return self::itemResponse($item);
             }, $player->items),
-            'equippedArmorIds' => $player->equipped_armor,
+            'equippedArmorIds' => $player->equipped_armor_ids,
             'equippedWeaponIds' => $player->equipped_weapon_ids,
         ];
     }

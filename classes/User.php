@@ -198,6 +198,7 @@ class User extends Fighter {
     /** @var Item[] */
     public array $items;
     public array $equipped_weapon_ids;
+    public array $equipped_armor_ids;
 
     public ?Bloodline $bloodline = null;
     public float $bloodline_skill;
@@ -287,7 +288,6 @@ class User extends Fighter {
 
     public int $clan_office;
 
-    public array $equipped_armor;
     public array $bloodline_offense_boosts;
     public array $bloodline_defense_boosts;
 
@@ -1204,16 +1204,16 @@ class User extends Fighter {
 
         $this->equipped_items = [];
         $this->equipped_weapon_ids = [];
-        $this->equipped_armor = [];
+        $this->equipped_armor_ids = [];
         if($equipped_items) {
             foreach($equipped_items as $item_id) {
                 if($this->hasItem($item_id)) {
                     $this->equipped_items[] = $item_id;
-                    if($this->items[$item_id]->use_type == 1) {
+                    if($this->items[$item_id]->use_type == Item::USE_TYPE_WEAPON) {
                         $this->equipped_weapon_ids[] = $item_id;
                     }
-                    else if($this->items[$item_id]->use_type == 2) {
-                        $this->equipped_armor[] = $item_id;
+                    else if($this->items[$item_id]->use_type == Item::USE_TYPE_ARMOR) {
+                        $this->equipped_armor_ids[] = $item_id;
                     }
                 }
             }
