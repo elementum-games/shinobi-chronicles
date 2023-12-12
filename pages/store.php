@@ -9,23 +9,23 @@ function store() {
 	global $self_link;
 
     $RANK_NAMES = RankManager::fetchNames($system);
-	
+
 	$store_name = '';
 	if($player->rank_num == 1) {
 		$store_name = 'Academy';
 	}
-	
+
 	$player->getInventory();
-	
+
 	$max_consumables = User::MAX_CONSUMABLES;
-	
+
 	if(!empty($_GET['view'])) {
 		$view = $_GET['view'];
 	}
 	else {
 		$view = 'jutsu';
 	}
-	
+
 	// Load jutsu/items
 	if($view == 'jutsu') {
 		$shop_jutsu = array();
@@ -63,7 +63,7 @@ function store() {
 			$shop_items[$row['item_id']] = $item;
 		}
 	}
-	
+
 	if(isset($_GET['purchase_item'])) {
 		// Use type of 3, okay to purchase more, increment quantity
 		// Use type of 1-2, only okay to purchase one
@@ -73,12 +73,12 @@ function store() {
 			if(!isset($shop_items[$item_id])) {
 				throw new RuntimeException("Invalid item!");
 			}
-			
+
 			// check if already owned
 			if($player->hasItem($item_id) && $shop_items[$item_id]->use_type != Item::USE_TYPE_CONSUMABLE) {
 				throw new RuntimeException("You already own this item!");
 			}
-			
+
 			if (isset($_GET['max'])) { // Code for handling buying bulk
 				$max_missing = ($player->hasItem($item_id)) ? $max_consumables - $player->items[$item_id]->quantity : $max_consumables;
 
@@ -135,42 +135,44 @@ function store() {
 			// check if already learned
 			if($player->hasJutsu($jutsu_id)) {
 				throw new RuntimeException("You have already learned this jutsu!");
-			}
-			
+            }
+
 			// Check for money requirement
-			if($player->getMoney() < $shop_jutsu[$jutsu_id]['purchase_cost']) {
+			if($player->getMoney() < $shop_jutsu[$jutsu_id]['purchase_cost'] && !$system->isDevEnvironment()) {
 				throw new RuntimeException("You do not have enough money!");
 			}
-			
+
 			// Parent jutsu check
 			if($shop_jutsu[$jutsu_id]['parent_jutsu']) {
 				$id = $shop_jutsu[$jutsu_id]['parent_jutsu'];
-				if(!isset($player->jutsu[$id])) {
-					throw new RuntimeException("You need to learn " . $shop_jutsu[$id]['name'] . " first!");
+				if(!isset($player->jutsu[$id]) && !$system->isDevEnvironment()) {
+                    throw new RuntimeException("You need to learn " . $shop_jutsu[$id]['name'] . " first!");
 				}
-			}	
-			
+			}
+
 			// Element check
 			if($shop_jutsu[$jutsu_id]['element'] != 'None') {
 				if(!$player->elements or !in_array($shop_jutsu[$jutsu_id]['element'], $player->elements)) {
 					throw new RuntimeException("You do not have the elemental chakra for this jutsu!");
 				}
 			}
-			
-			
+
+
 			// Add to inventory
-			$player->subtractMoney($shop_jutsu[$jutsu_id]['purchase_cost'], "Purchased jutsu #{$jutsu_id}");
+            if (!$system->isDevEnvironment()) {
+                $player->subtractMoney($shop_jutsu[$jutsu_id]['purchase_cost'], "Purchased jutsu #{$jutsu_id}");
+            }
 
 			$player->jutsu_scrolls[$jutsu_id] = Jutsu::fromArray($jutsu_id, $shop_jutsu[$jutsu_id]);
-			
+
 			$system->message("Jutsu purchased!");
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
 	}
-	
+
 	$player->updateInventory();
-	
+
 
 	// Display
 	echo "<div class='submenu'>
@@ -181,8 +183,8 @@ function store() {
 	</ul>
 	</div>
 	<div class='submenuMargin'></div>";
-	$system->printMessage();	
-	
+	$system->printMessage();
+
 	// View single jutsu
 	if(!empty($_GET['view_jutsu'])) {
 		$jutsu_list = false;
@@ -198,7 +200,7 @@ function store() {
 			<tr><td>
 				<label style='width:6.5em;'>Rank:</label>" . $RANK_NAMES[$jutsu['rank']] . "<br />";
 				if($jutsu['parent_jutsu']) {
-					echo "<label style='width:6.5em;'>Parent Jutsu:</label>" . 
+					echo "<label style='width:6.5em;'>Parent Jutsu:</label>" .
 						$shop_jutsu[$jutsu['parent_jutsu']]['name'] . "<br />";
 				}
 				if($jutsu['element'] != 'None') {
@@ -216,10 +218,10 @@ function store() {
 					echo "<label style='width:6.5em;'>Cooldown:</label>" . $jutsu['cooldown'] . " turn(s)<br />";
 				}
 				if($jutsu['effect']) {
-					
+
 					echo "<label style='width:6.5em;'>Effect:</label>" . ucwords(str_replace('_', ' ', $jutsu['effect'])) . "<br />";
 				}
-				echo "<label style='width:6.5em;float:left;'>Description:</label> 
+				echo "<label style='width:6.5em;float:left;'>Description:</label>
 					<p style='display:inline-block;margin:0px;width:37.1em;'>" . $jutsu['description'] . "</p>
 				<br style='clear:both;' />
 				<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu['jutsu_type']);
@@ -233,13 +235,13 @@ function store() {
 					}
 					echo "</p>";
 				}
-				
+
 				echo "</td></tr></table>";
 		}
 		$view = false;
 	}
-	
-	
+
+
 	if($view == 'jutsu') {
 		$jutsu_type = '';
 		if(!empty($_GET['jutsu_type'])) {
@@ -332,22 +334,20 @@ function store() {
 		// Set use type to passive(gear) or consumable - Default consumable
 		$category = 'consumables';
 		if($view == 'gear') {
-			$category = 'gear';		
+			$category = 'gear';
 		}
-		
+
 		echo "<table class='table'><tr><th>" . ucwords($category) . "</th></tr>
 		<tr><td style='text-align:center;'>You can buy armor/consumable items in this section for your rank or below.<br />
 		<br />
-		
 		<b>Your Yen:</b> &yen;" . number_format($player->getMoney()) . "</td></tr></table>
-		
 		<table class='table'><tr>
 			<th style='width:35%;'>Name</th>
 			<th style='width:25%;'>Effect</th>
 			<th style='width:20%;'>Cost</th>
 			<th style='width:20%;'></th>
 		</tr>";
-		
+
 		if(!$shop_items) {
 			echo "<tr><td colspan='4'>No items found!</td></tr>";
 		}

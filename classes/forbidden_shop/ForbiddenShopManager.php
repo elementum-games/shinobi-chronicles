@@ -50,7 +50,7 @@ class ForbiddenShopManager {
         }
 
         // Check for money requirement or process exchange
-        if($this->player->itemQuantity(LanternEvent::$static_item_ids['forbidden_jutsu_scroll_id']) < $jutsu->purchase_cost) {
+        if(!$this->system->isDevEnvironment() && $this->player->itemQuantity(LanternEvent::$static_item_ids['forbidden_jutsu_scroll_id']) < $jutsu->purchase_cost) {
             // Does not have scroll or forbidden jutsu/scroll to exchange
             throw new RuntimeException("You do not have enough forbidden jutsu scrolls!");
         }

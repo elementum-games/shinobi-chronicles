@@ -14,6 +14,7 @@ $bloodline_combat_boosts = [
     'intelligence_boost',
     'willpower_boost',
     'heal',
+    'damage_resist',
 ];
 $passive_boosts = [
     'scout_range',

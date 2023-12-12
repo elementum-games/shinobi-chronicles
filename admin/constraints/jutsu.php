@@ -22,6 +22,28 @@ $jutsu_effects = [
     'endurance_nerf',
     'intelligence_nerf',
     'willpower_nerf',
+    'vulnerability',
+    'fire_vulnerability',
+    'wind_vulnerability',
+    'lightning_vulnerability',
+    'earth_vulnerability',
+    'water_vulnerability',
+    'fire_boost',
+    'wind_boost',
+    'lightning_boost',
+    'earth_boost',
+    'water_boost',
+    'evasion_boost',
+    'evasion_nerf',
+    'offense_nerf',
+    'resist_boost',
+    'piercing',
+    'substitution',
+    'counter',
+    'immolate',
+    'recoil',
+    'delayed_residual',
+    'reflect',
 ];
 
 $ranks = [];
@@ -120,6 +142,7 @@ return [
             Jutsu::PURCHASE_TYPE_PURCHASABLE => 'purchasable',
             Jutsu::PURCHASE_TYPE_NON_PURCHASABLE => 'non-purchasable',
             Jutsu::PURCHASE_TYPE_EVENT_SHOP => 'event',
+            Jutsu::PURCHASE_TYPE_LINKED => 'linked',
         ],
     ],
     'effect' => [
@@ -132,6 +155,23 @@ return [
         'input_type' => 'text',
     ],
     'effect_length' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
+    ],
+    'effect2' => [
+        'data_type' => 'string',
+        'input_type' => 'select',
+        'options' => $jutsu_effects,
+    ],
+    'effect2_amount' => [
+        'data_type' => 'float',
+        'input_type' => 'text',
+    ],
+    'effect2_length' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
+    ],
+    'linked_jutsu_id' => [
         'data_type' => 'int',
         'input_type' => 'text',
     ],

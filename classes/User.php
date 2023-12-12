@@ -316,6 +316,8 @@ class User extends Fighter {
     public Region $region;
     public int $locked_challenge;
 
+    public BlockedNotificationManager $blocked_notifications;
+
     /**
      * User constructor.
      * @param System $system
@@ -746,24 +748,14 @@ class User extends Fighter {
                 bloodline_id: $this->bloodline_id,
                 user_id: $this->user_id
             );
-
             // Scale Jutsu Power
             foreach ($this->bloodline->jutsu as $jutsu) {
-                $rank_diff = $this->rank_num - $jutsu->rank;
-                switch ($jutsu->rank) {
-                    case 2:
-                        // based on scale 2.5 -> 3.5
-                        $factor = 0.2;
-                        break;
-                    case 3:
-                        // based on scale 3.5 -> 4.4
-                        $factor = 0.1285;
-                        break;
-                    default:
-                        $factor = 0;
-                        break;
+                if ($this->rank_num >= 3 && $jutsu->rank < 3) {
+                    $jutsu->power *= 1.4;
                 }
-                $jutsu->power *= 1 + ($rank_diff * $factor);
+                if ($this->rank_num >= 4 && $jutsu->rank < 4) {
+                    $jutsu->power *= 1.25;
+                }
             }
 
             // Debug info
@@ -918,6 +910,9 @@ class User extends Fighter {
         // Apply policy benefits
         $this->scout_range += $this->village->policy->scouting;
         $this->stealth += $this->village->policy->stealth;
+
+        // Blocked Notifications
+        $this->blocked_notifications = BlockedNotificationManager::fromDb(system: $this->system, blocked_notifications_string: $user_data['blocked_notifications']);
 
         // Challenge
         $this->locked_challenge = $user_data['locked_challenge'];
@@ -1110,7 +1105,7 @@ class User extends Fighter {
 
             $result = $this->system->db->query(
                 "SELECT * FROM `jutsu` WHERE `jutsu_id` IN ({$player_jutsu_string})
-				AND `purchase_type` != '1' AND `rank` <= '{$this->rank_num}'"
+				AND `purchase_type` != '1' AND `purchase_type` != '" . Jutsu::PURCHASE_TYPE_LINKED . "' AND `rank` <= '{$this->rank_num}'"
             );
             if($this->system->db->last_num_rows > 0) {
                 while($jutsu_data = $this->system->db->fetch($result)) {
@@ -1645,6 +1640,7 @@ class User extends Fighter {
                 $this->{$energy_type} -= $jutsu_use_cost;
                 break;
             case Jutsu::PURCHASE_TYPE_DEFAULT:
+            case Jutsu::PURCHASE_TYPE_LINKED:
                 $this->{$energy_type} -= $jutsu_use_cost;
                 break;
 
@@ -1893,7 +1889,8 @@ class User extends Fighter {
 		`village_changes` = '$this->village_changes',
 		`clan_changes` = '$this->clan_changes',
         `locked_challenge` = '$this->locked_challenge',
-		`censor_explicit_language` = " . (int)$this->censor_explicit_language . "
+		`censor_explicit_language` = " . (int)$this->censor_explicit_language . ",
+		`blocked_notifications` = '{$this->blocked_notifications->dbEncode()}'
 		WHERE `user_id` = '{$this->user_id}' LIMIT 1";
         $this->system->db->query($query);
 
@@ -1931,12 +1928,14 @@ class User extends Fighter {
 
         if(!empty($this->jutsu)) {
             foreach($this->jutsu as $jutsu) {
-                $player_jutsu[$jutsu_count] = [
-                    'jutsu_id' => $jutsu->id,
-                    'level' => $jutsu->level,
-                    'exp' => $jutsu->exp,
-                ];
-                $jutsu_count++;
+                if ($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_LINKED) {
+                    $player_jutsu[$jutsu_count] = [
+                        'jutsu_id' => $jutsu->id,
+                        'level' => $jutsu->level,
+                        'exp' => $jutsu->exp,
+                    ];
+                    $jutsu_count++;
+                }
             }
         }
 

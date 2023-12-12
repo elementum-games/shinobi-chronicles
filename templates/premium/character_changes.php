@@ -249,6 +249,7 @@
 
     function statAllocateCostDisplay() {
         let ak_cost = 0, yen_cost = 0;
+        let is_dev = <?= $system->isDevEnvironment() ? '1' : '0'; ?>;
 
         const transferAmount = parseInt(transferAmountEl.value);
         const transferSpeed = transferSpeedEl.value;
@@ -278,6 +279,12 @@
             yen_cost = Math.round(yen_cost / 100) * 100;
         }
         time = Math.floor(time);
+
+        if (is_dev) {
+            ak_cost = 0;
+            yen_cost = 0;
+            time = 0;
+        }
 
         statCostEl.innerHTML = `${ak_cost} AK / ${yen_cost} yen / ${time} minutes`;
     }

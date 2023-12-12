@@ -69,9 +69,12 @@ class Bloodline {
                     jutsu_type: $j['jutsu_type'],
                     base_power: $j['power'],
                     range: 2,
-                    effect: $j['effect'],
-                    base_effect_amount: $j['effect_amount'] ?? 0,
-                    effect_length: $j['effect_length'] ?? 0,
+                    effect_1: $j['effect'],
+                    base_effect_amount_1: $j['effect_amount'] ?? 0,
+                    effect_length_1: $j['effect_length'] ?? 0,
+                    effect_2: $j['effect2'] ?? 'none',
+                    base_effect_amount_2: $j['effect2_amount'] ?? 0,
+                    effect_length_2: $j['effect2_length'] ?? 0,
                     description: $j['description'],
                     battle_text: $j['battle_text'],
                     cooldown: $j['cooldown'] ?? 0,
@@ -82,7 +85,8 @@ class Bloodline {
                     purchase_type: Jutsu::PURCHASE_TYPE_BLOODLINE,
                     parent_jutsu: $j['parent_jutsu'] ?? 0,
                     element: $j['element'],
-                    hand_seals: $j['hand_seals'] ?? ""
+                    hand_seals: $j['hand_seals'] ?? "",
+                    linked_jutsu_id: $j['linked_jutsu_id'] ?? 0,
                 );
                 $this->base_jutsu[$id]->is_bloodline = true;
             }
@@ -149,18 +153,20 @@ class Bloodline {
     public function setBoostAmounts(
         int $user_rank,
         int $ninjutsu_skill, int $taijutsu_skill, int $genjutsu_skill, int $bloodline_skill,
-        int $base_stats, int $total_stats, int $stats_max_level,
+        int $base_stats,
+        int $total_stats,
+        int $stats_max_level,
         int $regen_rate
     ): void {
         $ratios = [
             'offense_boost' => 0.02,
-            'defense_boost' => 0.045,
+            'defense_boost' => 0.095,
             'speed_boost' => 0.08,
             'mental_boost' => 0.1,
-            'heal' => 0.036,
+            'heal' => 0.095,
             'regen' => 0.15,
         ];
-        $bloodline_skill += self::BASE_BLOODLINE_SKILL;
+        $bloodline_skill += $bloodline_skill < 100 ? self::BASE_BLOODLINE_SKILL : 0;
 
         if($this->raw_passive_boosts) {
             $this->passive_boosts = json_decode($this->raw_passive_boosts, true);
@@ -233,6 +239,7 @@ class Bloodline {
                 case 'ninjutsu_resist':
                 case 'genjutsu_resist':
                 case 'taijutsu_resist':
+                case 'damage_resist':
                     $this->combat_boosts[$id]['power'] =
                         round($boost_power * $ratios['defense_boost'], Bloodline::BOOST_POWER_PRECISION);
                     break;
@@ -268,9 +275,6 @@ class Bloodline {
 
         $ratio_max = 1.0;
         $ratio_min = 0.75;
-
-        // Adjust to use invested skill only
-        $bloodline_skill -= self::BASE_BLOODLINE_SKILL;
 
         // Handle case with no skill investment
         if ($bloodline_skill <= 0) {

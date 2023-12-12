@@ -37,6 +37,7 @@ https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js
                 playerSettings: <?= json_encode(UserAPIPresenter::playerSettingsResponse($player)) ?>,
                 playerDailyTasks: <?= json_encode(UserApiPresenter::dailyTasksResponse($player->daily_tasks->tasks)) ?>,
                 playerAchievements: <?= json_encode(UserApiPresenter::playerAchievementsResponse($player)) ?>,
+                repReset: <?= $system->REPUTATION_RESET->getTimestamp() - time() ?>,
             }),
             profileContainer
         );
