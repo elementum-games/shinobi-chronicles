@@ -90,7 +90,7 @@ function editUserPage(System $system, User $player): void {
             $FORM_DATA = $_POST;
 
             // Additional data checking for Elements
-            if($user_data['rank'] >= 3) {
+            if($user_data['rank'] >= 3 && $player->isHeadAdmin()) {
                 $new_elements = array();
 
                 if($user_data['staff_level'] != StaffManager::STAFF_HEAD_ADMINISTRATOR) {

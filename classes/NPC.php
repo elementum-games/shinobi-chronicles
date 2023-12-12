@@ -148,9 +148,9 @@ class NPC extends Fighter {
                     break;
                 case Jutsu::TYPE_GENJUTSU:
                     $jutsu->use_type = $jutsu->use_type != Jutsu::USE_TYPE_MELEE ? $jutsu->use_type : Jutsu::USE_TYPE_PROJECTILE;
-                    $jutsu->effect = $jutsu->effect != "none" ? $jutsu->effect : 'residual_damage';
-                    $jutsu->effect_amount = $jutsu->effect_amount != 0 ? $jutsu->effect_amount : 30;
-                    $jutsu->effect_length = $jutsu->effect_length != 0 ? $jutsu->effect_length : 3;
+                    $jutsu->effects[0]->effect = $jutsu->effects[0]->effect != "none" ? $jutsu->effects[0]->effect : 'residual_damage';
+                    $jutsu->effects[0]->effect_amount = $jutsu->effects[0]->effect_amount != 0 ? $jutsu->effects[0]->effect_amount : 30;
+                    $jutsu->effects[0]->effect_length = $jutsu->effects[0]->effect_length != 0 ? $jutsu->effects[0]->effect_length : 3;
                     break;
                 default:
                     throw new RuntimeException("Invalid jutsu type!");
@@ -256,9 +256,12 @@ class NPC extends Fighter {
             jutsu_type: $jutsu_type,
             base_power: $power,
             range: 2,
-            effect: $effect,
-            base_effect_amount: $effect_amount,
-            effect_length: $effect_length,
+            effect_1: $effect,
+            base_effect_amount_1: $effect_amount,
+            effect_length_1: $effect_length,
+            effect_2: 'none',
+            base_effect_amount_2: 0,
+            effect_length_2: 0,
             description: "N/A",
             battle_text: $battle_text_swapped,
             cooldown: 0,

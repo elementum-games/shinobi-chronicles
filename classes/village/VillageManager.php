@@ -277,7 +277,7 @@ class VillageManager {
                 $user_ids = $system->db->fetch_all($user_ids);
                 $notification_message = $reclaim ? $player->user_name . " has reclaimed the title of " . $seat_title . "!" : $player->user_name . " has claimed the title of " . $seat_title . "!";
                 foreach ($user_ids as $user) {
-                    $blockedNotifManager = BlockedNotificationManager::BlockedNotificationManagerFromDb(system: $system, blocked_notifications_string: $user['blocked_notifications']);
+                    $blockedNotifManager = BlockedNotificationManager::fromDb(system: $system, blocked_notifications_string: $user['blocked_notifications']);
                     if($blockedNotifManager->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_KAGE_CHANGE)) {
                         continue;
                     }
@@ -643,8 +643,13 @@ class VillageManager {
         if ($system->db->last_num_rows > 0) {
             return "You can only have one challenge request in progress at a time.";
         }
-        // check challenge cooldown
-        $last_challenge = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
+
+        // check challenge cooldown, ignoring cancelled challenges (complete, but winner is not null)
+        $last_challenge = $system->db->query(
+            "SELECT * FROM `challenge_requests` 
+                WHERE `challenger_id` = {$player->user_id} 
+                AND `winner` IS NOT NULL
+                ORDER BY `start_time` DESC LIMIT 1");
         $last_challenge = $system->db->fetch($last_challenge);
         if ($system->db->last_num_rows > 0) {
             $cooldown_remaining = ($last_challenge['created_time'] + (self::CHALLENGE_COOLDOWN_DAYS * 86400)) - time();
@@ -655,18 +660,23 @@ class VillageManager {
                 return $message;
             }
         }
+
         // get seat holder
         $seat_result = $system->db->query("SELECT * FROM `village_seats` WHERE `seat_id` = {$seat_id} AND `village_id` = {$player->village->village_id} AND `seat_end` IS NULL LIMIT 1");
         $seat_result = $system->db->fetch($seat_result);
         if ($system->db->last_num_rows == 0) {
             return "Invalid challenge target.";
         }
+
         // if elder, check if other seat available
-        $elder_count = $system->db->query("SELECT count(*) as `elder_count` FROM `village_seats` WHERE `seat_type` = 'elder' AND `village_id` = {$player->village->village_id} AND `seat_end` IS NULL");
-        $elder_count = $system->db->fetch($elder_count);
-        if (isset($elder_count['elder_count']) && $elder_count['elder_count'] < 3) {
-            return "Cannot challenge Elder with open seat available for claim.";
+        if($seat_result['seat_type'] == 'elder') {
+            $elder_count = $system->db->query("SELECT count(*) as `elder_count` FROM `village_seats` WHERE `seat_type` = 'elder' AND `village_id` = {$player->village->village_id} AND `seat_end` IS NULL");
+            $elder_count = $system->db->fetch($elder_count);
+            if (isset($elder_count['elder_count']) && $elder_count['elder_count'] < 3) {
+                return "Cannot challenge Elder with open seat available for claim.";
+            }
         }
+
         // check if already has seat
         if (isset($player->village_seat->seat_id) && $seat_result['seat_type'] != 'kage') {
             return "Invalid challenge target.";
@@ -688,7 +698,8 @@ class VillageManager {
         // create challenge
         $time = time();
         $selected_times = json_encode($selected_times);
-        $system->db->query("INSERT INTO `challenge_requests` (`challenger_id`, `seat_holder_id`, `seat_id`, `created_time`, `selected_times`) VALUES ({$player->user_id}, {$seat_result['user_id']}, {$seat_id}, {$time}, '{$selected_times}')");
+        $system->db->query("INSERT INTO `challenge_requests` (`challenger_id`, `seat_holder_id`, `seat_id`, `created_time`, `selected_times`) 
+            VALUES ({$player->user_id}, {$seat_result['user_id']}, {$seat_id}, {$time}, '{$selected_times}')");
         // create notification
         $new_notification = new NotificationDto(
             type: NotificationManager::NOTIFICATION_CHALLENGE_PENDING,
@@ -702,10 +713,15 @@ class VillageManager {
     }
 
     /**
+     * Forfeits a challenge. Note this is different from cancelling a challenge (e.g. due to seat claim) as it sets
+     * the challenge as if the seat holder fought and won. This preserves the challenge cooldown if the challenger
+     * tries to make another challenge.
+     *
+     * @param System $system
+     * @param User   $player
      * @return string
      */
-    public static function cancelChallenge(System $system, User $player): string
-    {
+    public static function forfeitChallenge(System $system, User $player): string {
         // verify challenge target is valid
         $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} AND `end_time` IS NULL LIMIT 1");
         $challenge_result = $system->db->fetch($challenge_result);
@@ -714,7 +730,7 @@ class VillageManager {
         }
         $time = time();
         $system->db->query("UPDATE `challenge_requests` SET `winner` = 'seat_holder', `end_time` = {$time} WHERE `request_id` = {$challenge_result['request_id']}");
-        return "Challenge canceled.";
+        return "Challenge forfeited.";
     }
 
     /**
@@ -805,9 +821,20 @@ class VillageManager {
         }
     }
 
-    public static function cancelUserChallenges(System $system, int $user_id) {
+    /**
+     * Cancels active challenges. Note that winner is not set, in order to represent that this challenge was not completed
+     * and not trigger the new challenge cooldown.
+     *
+     * @param System $system
+     * @param int    $user_id
+     * @return void
+     */
+    public static function cancelUserChallenges(System $system, int $user_id): void {
         $time = time();
-        $system->db->query("UPDATE `challenge_requests` SET `end_time` = {$time} WHERE `end_time` IS NULL AND (`seat_holder_id` = {$user_id} OR `challenger_id` = {$user_id})");
+        $system->db->query("
+            UPDATE `challenge_requests` SET `end_time` = {$time} 
+            WHERE `end_time` IS NULL AND (`seat_holder_id` = {$user_id} OR `challenger_id` = {$user_id})
+        ");
     }
 
     public static function checkChallengeLock(System $system, User $player) {
@@ -2078,8 +2105,8 @@ class VillageManager {
         $initator_village_name = self::VILLAGE_NAMES[$initiator_village_id];
         $recipient_village_name = self::VILLAGE_NAMES[$recipient_village_id];
         $active_threshold = time() - (NotificationManager::ACTIVE_PLAYER_DAYS_LAST_ACTIVE * 86400);
-        $user_ids = $system->db->query("SELECT `user_id`, `blocked_notifications` FROM `users` WHERE (`village` = '{$initator_village_name}' OR `village` = '{$recipient_village_name}') AND `last_login` > {$active_threshold}");
-        $user_ids = $system->db->fetch_all($user_ids);
+        $village_users_result = $system->db->query("SELECT `user_id`, `blocked_notifications` FROM `users` WHERE (`village` = '{$initator_village_name}' OR `village` = '{$recipient_village_name}') AND `last_login` > {$active_threshold}");
+        $village_users = $system->db->fetch_all($village_users_result);
         // create notifcations
         $message;
         $notification_type;
@@ -2107,8 +2134,11 @@ class VillageManager {
             default:
                 break;
         }
-        foreach ($user_ids as $user) {
-            $blockedNotifManager = new BlockedNotificationManager(system: $system, blockedNotifications: $user['blocked_notifications']);
+        foreach ($village_users as $user) {
+            $blockedNotifManager = BlockedNotificationManager::fromDb(
+                system: $system,
+                blocked_notifications_string: $user['blocked_notifications']
+            );
             if($blockedNotifManager->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_DIPLOMACY)) {
                 continue;
             }

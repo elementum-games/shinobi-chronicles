@@ -49,11 +49,12 @@ $RANK_NAMES = RankManager::fetchNames($system);
         <th style='width:25%;'>Name</th>
         <th style='width:8%;'>Power</th>
         <th style='width:30%;'>Effect</th>
+        <th style='width:30%;'>Effect</th>
         <th style='width:14%;'>Element</th>
         <th style='width:19%;'>Cost</th>
         <th style='width:4%;'>CD</th>
     </tr>
-    <tr><th colspan='6'><?= $RANK_NAMES[1] ?></th></tr>
+    <tr><th colspan='7'><?= $RANK_NAMES[1] ?></th></tr>
     <?php $current_rank = 1; ?>
     <?php foreach($all_jutsu as $id => $jutsu): ?>
         <?php
@@ -62,7 +63,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
         }
         if($jutsu->rank > $current_rank) {
             $current_rank = $jutsu->rank;
-            echo "<tr><th colspan='6'>$RANK_NAMES[$current_rank]</th></tr>";
+            echo "<tr><th colspan='7'>$RANK_NAMES[$current_rank]</th></tr>";
         }
         ?>
         <tr>
@@ -74,10 +75,16 @@ $RANK_NAMES = RankManager::fetchNames($system);
                 <?php if($jutsu->use_type == Jutsu::USE_TYPE_BARRIER): ?>
                     Barrier
                 <?php else: ?>
-                    <?= System::unSlug($jutsu->effect) ?>
-                    <?php if($jutsu->effect !== 'none'): ?>
-                        (<?= $jutsu->effect_amount ?>% / <?= $jutsu->effect_length ?> turns)
+                    <?= System::unSlug($jutsu->effects[0]->effect) ?>
+                    <?php if($jutsu->effects[0]->effect !== 'none'): ?>
+                        (<?= $jutsu->effects[0]->effect_amount ?>% / <?= $jutsu->effects[0]->effect_length ?> turns)
                     <?php endif; ?>
+                <?php endif; ?>
+            </td>
+            <td>
+                <?= System::unSlug($jutsu->effects[1]->effect) ?>
+                <?php if ($jutsu->effects[1]->effect !== 'none'): ?>
+                            (<?= $jutsu->effects[1]->effect_amount ?>% / <?= $jutsu->effects[1]->effect_length ?> turns)
                 <?php endif; ?>
             </td>
             <td><?= ucwords($jutsu->element) ?></td>

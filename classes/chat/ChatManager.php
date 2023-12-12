@@ -321,7 +321,7 @@ class ChatManager {
                         // Load notification blocker
                         if(!isset($notification_blocks[$result['user_id']])) {
                             $notification_blocks[$result['user_id']] =
-                                BlockedNotificationManager::BlockedNotificationManagerFromDb(
+                                BlockedNotificationManager::fromDb(
                                     system: $this->system,
                                     blocked_notifications_string: $result['blocked_notifications']
                             );
@@ -379,7 +379,7 @@ class ChatManager {
                     //Blocked notifs
                     if(!isset($notification_blocks[$result['user_id']])) {
                         $notification_blocks[$result['user_id']] =
-                            BlockedNotificationManager::BlockedNotificationManagerFromDb(
+                            BlockedNotificationManager::fromDb(
                                 system: $this->system,
                                 blocked_notifications_string: $result['blocked_notifications']
                             );

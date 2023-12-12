@@ -47,7 +47,11 @@ function bloodline() {
 			}
 			$player->bloodline->jutsu[$jutsu_id] = $base_bloodline->jutsu[$jutsu_id];
 			$player->bloodline->jutsu[$jutsu_id]->id = $jutsu_id;
-			$player->bloodline->jutsu[$jutsu_id]->level = 1;
+            if ($system->isDevEnvironment()) {
+                $player->bloodline->jutsu[$jutsu_id]->level = 100;
+            } else {
+                $player->bloodline->jutsu[$jutsu_id]->level = 1;
+            }
 			$player->bloodline->jutsu[$jutsu_id]->exp = 0;
 			$player->updateInventory();
 			$system->message("Learned " . $base_bloodline->jutsu[$jutsu_id]->name . "!");
@@ -102,7 +106,7 @@ function bloodline() {
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Genjutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost gradually  decreases to 75% strength as Bloodline Skill exceeds Genjutsu skill</span>"
 		),
 		'heal' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] per turn</span>"
+            'text' => "[BL_SKILL] * [RATIO] / [AMOUNT2] (stat total) -> <span class='amount'>[AMOUNT]% damage recovery</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>(assuming opponent of equal total stats)</span>"
 		),
 		'ninjutsu_resist' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] less Ninjutsu damage taken</span>"
@@ -113,9 +117,9 @@ function bloodline() {
 		'taijutsu_resist' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] less Taijutsu damage taken</span>"
 		),
-        'damage_resist' => array(
-            'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] effective resist stat, [AMOUNT2]% less damage taken</span>"
-        ),
+		'damage_resist' => array(
+			'text' => "[BL_SKILL] * [RATIO] / [AMOUNT2] (stat total) -> <span class='amount'>[AMOUNT]% less damage taken</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>(assuming opponent of equal total stats)</span>"
+		),
 		'speed_boost' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra Speed</span>"
 		),
@@ -213,7 +217,12 @@ function bloodline() {
                     );
                     break;
 				case 'damage_resist':
-                    $replace_array[4] = round(($replace_array[2] / $player->total_stats) * 100, 0);
+                    $replace_array[2] = round(($replace_array[2] / $player->total_stats) * 100, 0);
+                    $replace_array[4] = $player->total_stats;
+                    break;
+                case 'heal':
+                    $replace_array[2] = round(($replace_array[2] / $player->total_stats) * 100, 0);
+                    $replace_array[4] = $player->total_stats;
                     break;
             }
 
@@ -239,10 +248,12 @@ function bloodline() {
 			if($jutsu->cooldown) {
 				echo "<label style='width:6.5em;'>Cooldown:</label>" . $jutsu->cooldown . " turn(s)<br />";
 			}
-			if($jutsu->effect) {
-				echo "<label style='width:6.5em;'>Effect:</label>" .
-					System::unSlug($jutsu->effect) . ' (' . round($jutsu->effect_amount, 0) . '%) ' . ' - ' . $jutsu->effect_length . " turns<br />";
-			}
+            foreach ($jutsu->effects as $effect) {
+                if ($effect->effect && $effect->effect != 'none') {
+                    echo "<label style='width:6.5em;'>Effect:</label>" .
+                        System::unSlug($effect->effect) . ' (' . round($effect->effect_amount, 0) . '%) ' . ' - ' . $effect->effect_length . " turns<br />";
+                }
+            }
 			echo "<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type) . "<br />
 			<label style='width:6.5em;'>Power:</label>" . round($jutsu->power, 1) . "<br />
 

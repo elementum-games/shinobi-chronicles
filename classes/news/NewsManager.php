@@ -45,7 +45,7 @@ class NewsManager {
                 // create notifications
                 foreach ($user_ids as $user) {
                     // Blocked notification
-                    $blockedNotifManager = BlockedNotificationManager::BlockedNotificationManagerFromDb(
+                    $blockedNotifManager = BlockedNotificationManager::fromDb(
                         system: $this->system,
                         blocked_notifications_string: $user['blocked_notifications']
                     );

@@ -15,7 +15,7 @@ class BlockedNotificationManager {
     public function dbEncode(): string {
         return json_encode($this->blockedNotifications);
     }
-    public static function BlockedNotificationManagerFromDb(System $system, string $blocked_notifications_string): BlockedNotificationManager {
+    public static function fromDb(System $system, string $blocked_notifications_string): BlockedNotificationManager {
         $blocked_notifications = json_decode($blocked_notifications_string, true);
         if(!is_array($blocked_notifications)) {
             $blocked_notifications = array();

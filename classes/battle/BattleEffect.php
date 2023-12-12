@@ -4,7 +4,12 @@ class BattleEffect {
     public static array $buff_effects = [
         'heal','ninjutsu_boost','taijutsu_boost','genjutsu_boost',
         'cast_speed_boost','speed_boost','lighten','intelligence_boost','willpower_boost',
-        'ninjutsu_resist','genjutsu_resist','taijutsu_resist','harden','evasion_boost'
+        'ninjutsu_resist','genjutsu_resist','taijutsu_resist','harden','evasion_boost','resist_boost',
+        'fire_boost',
+        'wind_boost',
+        'lightning_boost',
+        'earth_boost',
+        'water_boost',
     ];
 
     // combat id
@@ -58,6 +63,6 @@ class BattleEffect {
             power: $raw_data['power'] ?? 0,
             first_turn: $raw_data['first_turn'] ?? false,
             layer_active: $raw_data['layer_active'] ?? false,
-        );    
+        );
     }
 }

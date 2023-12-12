@@ -35,12 +35,12 @@
         <?php foreach($scheduled_battles as $battle): ?>
         <tr id='viewBattles_data'>
             <td>
-                <a href="<?= $system->router->links['members']?>&user=<?= $battle['challenger_name'] ?>" style='text-decoration:none'>
+                <a href="<?= $system->router->links['members']?>&user=<?= $battle['challenger_name'] ?>">
                     <?= $battle['challenger_name'] ?>
                 </a>
             </td>
             <td>
-                <a href="<?= $system->router->links['members']?>&user=<?= $battle['seat_holder_name'] ?>" style='text-decoration:none'>
+                <a href="<?= $system->router->links['members']?>&user=<?= $battle['seat_holder_name'] ?>">
                     <?= $battle['seat_holder_name'] ?>
                 </a>
             </td>
@@ -64,8 +64,8 @@
     </tr>
     <?php foreach($battles as $battle): ?>
         <tr id='viewBattles_data'>
-            <td><a href="<?= $system->router->links['members']?>&user=<?= $battle['player1'] ?>" style='text-decoration:none'><?= $battle['player1'] ?></a></td>
-            <td><a href="<?= $system->router->links['members']?>&user=<?= $battle['player2'] ?>" style='text-decoration:none'><?= $battle['player2'] ?></a></td>
+            <td><a href="<?= $system->router->links['members']?>&user=<?= $battle['player1'] ?>"><?= $battle['player1'] ?></a></td>
+            <td><a href="<?= $system->router->links['members']?>&user=<?= $battle['player2'] ?>"><?= $battle['player2'] ?></a></td>
             <td>
             <?php if($battle['winner']): ?>
                     <?= $battle['winner'] ?>

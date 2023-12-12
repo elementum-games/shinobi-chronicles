@@ -180,7 +180,7 @@ class BattleActionProcessor {
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASABLE) {
             $jutsu = $fighter->jutsu[$action->jutsu_id] ?? null;
-        } 
+        }
         else if ($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
             $jutsu = $fighter->jutsu[$action->jutsu_id] ?? null;
         }
@@ -267,7 +267,7 @@ class BattleActionProcessor {
             }
         }
 
-        if($attack->jutsu->isAllyTargetType()) {
+        if($attack->jutsu->isAllyTargetType() || $attack->jutsu->use_type == Jutsu::USE_TYPE_INDIRECT) {
             $attack->jutsu->weapon_id = 0;
             $attack->jutsu->effect_only = true;
         }
@@ -818,6 +818,7 @@ class BattleActionProcessor {
         $attack_damage = $raw_damage;
         if(empty($attack->jutsu->effect_only)) {
             $attack_damage = $target->calcDamageTaken($attack->starting_raw_damage, $attack->jutsu->jutsu_type);
+            $target->last_damage_taken += $attack_damage;
             $target->health -= $attack_damage;
             if($target->health < 0) {
                 $target->health = 0;

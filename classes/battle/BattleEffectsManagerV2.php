@@ -178,7 +178,7 @@ class BattleEffectsManagerV2 {
         $this->applyArmorEffects($player1);
         $this->applyArmorEffects($player2);
     }
-    
+
     public function applyArmorEffects(Fighter $fighter) {
         if(!empty($fighter->equipped_armor)) {
             foreach($fighter->equipped_armor as $item_id) {
@@ -332,7 +332,7 @@ class BattleEffectsManagerV2 {
         $this->applyBloodlineActiveBoosts($player1);
         $this->applyBloodlineActiveBoosts($player2);
     }
-    
+
     public function applyBloodlineActiveBoosts(Fighter $fighter): void {
         if(!empty($fighter->bloodline->combat_boosts)) {
             foreach($fighter->bloodline->combat_boosts as $id=>$effect) {
@@ -369,6 +369,7 @@ class BattleEffectsManagerV2 {
                 description: $target->getName() . " takes $damage residual damage"
             ));
 
+            $target->last_damage_taken += $damage;
             $target->health -= $damage;
             if($target->health < 0) {
                 $target->health = 0;

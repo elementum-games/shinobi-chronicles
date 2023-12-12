@@ -75,6 +75,9 @@ class Battle {
 
     public ?int $patrol_id;
 
+    public int $player1_last_damage_taken;
+    public int $player2_last_damage_taken;
+
     /**
      * @param System  $system
      * @param Fighter $player1
@@ -249,6 +252,9 @@ class Battle {
         else {
             $this->battle_text = '';
         }
+
+        $this->player1_last_damage_taken = $battle['player1_last_damage_taken'];
+        $this->player2_last_damage_taken = $battle['player2_last_damage_taken'];
     }
 
     /**
@@ -291,9 +297,10 @@ class Battle {
                 }
 		    }
 	    }
+        $this->player1->last_damage_taken = $this->player1_last_damage_taken;
+        $this->player2->last_damage_taken = $this->player2_last_damage_taken;
 
-        $this->player1->getInventory();
-        $this->player2->getInventory();
+        $this->fetchPlayerInventories();
 
         $this->player1->applyBloodlineBoosts();
         $this->player2->applyBloodlineBoosts();
@@ -427,7 +434,10 @@ class Battle {
             `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
 
             `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
-            `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
+            `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "',
+
+            `player1_last_damage_taken` = {$this->player1->last_damage_taken},
+            `player2_last_damage_taken` = {$this->player2->last_damage_taken}
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
         );
 
@@ -438,5 +448,49 @@ class Battle {
 
     public static function combatId(string $team, Fighter $fighter): string {
         return $team . ':' . $fighter->id;
+    }
+
+    public function fetchPlayerInventories() {
+        $this->player1->getInventory();
+        $this->player2->getInventory();
+
+        // for each jutsu:
+        // - check if has linked jutsu
+        // - check if used last turn
+        // - add linked jutsu if not exists
+        foreach ($this->player1->jutsu as $jutsu) {
+            if ($jutsu->linked_jutsu_id > 0) {
+                $id = "J" . $jutsu->id . ":T1:U:" . $this->player1->user_id;
+                if (isset($this->jutsu_cooldowns[$id]) && $this->jutsu_cooldowns[$id] > 0) {
+                    if (!isset($this->player1->jutsu[$jutsu->linked_jutsu_id])) {
+                        $linked_jutsu = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` = {$jutsu->linked_jutsu_id}");
+                        $linked_jutsu = $this->system->db->fetch($linked_jutsu);
+                        $this->player1->jutsu[$jutsu->linked_jutsu_id] = Jutsu::fromArray($jutsu->linked_jutsu_id, $linked_jutsu);
+                        $this->player1->jutsu[$jutsu->linked_jutsu_id]->setLevel($jutsu->level, 0);
+                        end($this->player1->equipped_jutsu);
+                        $last_array_key = key($this->player1->equipped_jutsu);
+                        $this->player1->equipped_jutsu[$last_array_key + 1]['id'] = $jutsu->linked_jutsu_id;
+                        $this->player1->equipped_jutsu[$last_array_key + 1]['type'] = $jutsu->jutsu_type;
+                    }
+                }
+            }
+        }
+        foreach ($this->player2->jutsu as $jutsu) {
+            if ($jutsu->linked_jutsu_id > 0) {
+                $id = "J" . $jutsu->id . ":T2:U:" . $this->player2->user_id;
+                if (isset($this->jutsu_cooldowns[$id]) && $this->jutsu_cooldowns[$id] > 0) {
+                    if (!isset($this->player1->jutsu[$jutsu->linked_jutsu_id])) {
+                        $linked_jutsu = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` = {$jutsu->linked_jutsu_id}");
+                        $linked_jutsu = $this->system->db->fetch($linked_jutsu);
+                        $this->player2->jutsu[$jutsu->linked_jutsu_id] = Jutsu::fromArray($jutsu->linked_jutsu_id, $linked_jutsu);
+                        $this->player2->jutsu[$jutsu->linked_jutsu_id]->setLevel($jutsu->level, 0);
+                        end($this->player2->equipped_jutsu);
+                        $last_array_key = key($this->player2->equipped_jutsu);
+                        $this->player2->equipped_jutsu[$last_array_key + 1]['id'] = $jutsu->linked_jutsu_id;
+                        $this->player2->equipped_jutsu[$last_array_key + 1]['type'] = $jutsu->jutsu_type;
+                    }
+                }
+            }
+        }
     }
 }

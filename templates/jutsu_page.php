@@ -216,8 +216,8 @@ $rank_names = RankManager::fetchNames($system);
                 $("#jutsu_seals").text($("#" + $(this).attr("data-target")).attr("data-jutsu_seals"));
                 $("#jutsu_power").text($("#" + $(this).attr("data-target")).attr("data-jutsu_power"));
                 $("#jutsu_cooldown").text($("#" + $(this).attr("data-target")).attr("data-jutsu_cooldown"));
-                $("#jutsu_effect").text($("#" + $(this).attr("data-target")).attr("data-jutsu_effect"));
-                $("#jutsu_duration").text($("#" + $(this).attr("data-target")).attr("data-jutsu_duration"));
+                $("#jutsu_effect_1").text($("#" + $(this).attr("data-target")).attr("data-jutsu_effect_1"));
+                $("#jutsu_effect_2").text($("#" + $(this).attr("data-target")).attr("data-jutsu_effect_2"));
                 $("#jutsu_description").text($("#" + $(this).attr("data-target")).attr("data-jutsu_description"));
                 $("#jutsu_child").text($("#" + $(this).attr("data-target")).attr("data-jutsu_child"));
                 // set forget jutsu url
@@ -257,40 +257,55 @@ $rank_names = RankManager::fetchNames($system);
         // get list of jutsu, filter and hide based on jutsu_filter input
         function filter() {
             var jutsu = $(".jutsu_block_table").removeClass('hidden');
-            // if no type selected display all
-            if ($("#jutsu_filter_taijutsu").hasClass('active') || $("#jutsu_filter_ninjutsu").hasClass('active') || $("#jutsu_filter_genjutsu").hasClass('active')) {
-                if (!$("#jutsu_filter_taijutsu").hasClass('active')) {
-                    jutsu.filter('[data-jutsu_type="Taijutsu"]').addClass('hidden');
+            jutsu.each(function() {
+                var jutsuElement = $(this);
+                var jutsuEffect = jutsuElement.data('jutsu_effect');
+                var hideJutsu = true;
+
+                // Tag filters
+                if ($("#jutsu_filter_damage").is(':checked')) {
+                    if (jutsuEffect.includes('Residual Damage') || jutsuEffect.includes('None') || jutsuEffect.includes('Piercing') || jutsuEffect.includes('Recoil') || jutsuEffect.includes('Immolate')) {
+                        hideJutsu = false;
+                    }
                 }
-                if (!$("#jutsu_filter_ninjutsu").hasClass('active')) {
-                    jutsu.filter('[data-jutsu_type="Ninjutsu"]').addClass('hidden');
+                if ($("#jutsu_filter_buff").is(':checked')) {
+                    if (jutsuEffect.includes('Taijutsu Boost') || jutsuEffect.includes('Ninjutsu Boost') ||
+                        jutsuEffect.includes('Genjutsu Boost') || jutsuEffect.includes('Speed Boost') ||
+                        jutsuEffect.includes('Cast Speed Boost') || jutsuEffect.includes('Barrier') ||
+                        jutsuEffect.includes('Release Genjutsu') || jutsuEffect.includes('Counter') ||
+                        jutsuEffect.includes('Substitution') || jutsuEffect.includes('Resist Boost') ||
+                        jutsuEffect.includes('Evasion Boost')) {
+                        hideJutsu = false;
+                    }
                 }
-                if (!$("#jutsu_filter_genjutsu").hasClass('active')) {
-                    jutsu.filter('[data-jutsu_type="Genjutsu"]').addClass('hidden');
+                if ($("#jutsu_filter_debuff").is(':checked')) {
+                    if (jutsuEffect.includes('Taijutsu Nerf') || jutsuEffect.includes('Ninjutsu Nerf') ||
+                        jutsuEffect.includes('Genjutsu Nerf') || jutsuEffect.includes('Speed Nerf') ||
+                        jutsuEffect.includes('Cast Speed Nerf') || jutsuEffect.includes('Willpower Nerf') ||
+                        jutsuEffect.includes('Intelligence Nerf') || jutsuEffect.includes('Vulnerability') ||
+                        jutsuEffect.includes('Offense Nerf') || jutsuEffect.includes('Weakness') ||
+                        jutsuEffect.includes('Evasion Nerf')) {
+                        hideJutsu = false;
+                    }
                 }
-            }
-            if (!$("#jutsu_filter_damage").is(':checked')) {
-                jutsu.filter('[data-jutsu_effect*="None"]').addClass('hidden');
-                jutsu.filter('[data-jutsu_effect*="Residual Damage"]').addClass('hidden');
-            }
-            if (!$("#jutsu_filter_buff").is(':checked')) {
-                jutsu.filter('[data-jutsu_effect="Taijutsu Boost"]').addClass('hidden');
-                jutsu.filter('[data-jutsu_effect="Ninjutsu Boost"]').addClass('hidden');
-                jutsu.filter('[data-jutsu_effect="Genjutsu Boost"]').addClass('hidden');
-                jutsu.filter('[data-jutsu_effect="Speed Boost"]').addClass('hidden');
-                jutsu.filter('[data-jutsu_effect="Cast Speed Boost"]').addClass('hidden');
-                jutsu.filter('[data-jutsu_effect="Barrier"]').addClass('hidden');
-                jutsu.filter('[data-jutsu_effect="Release Genjutsu"]').addClass('hidden');
-            }
-            if (!$("#jutsu_filter_debuff").is(':checked')) {
-                jutsu.filter('[data-jutsu_effect="Taijutsu Nerf"]').addClass('hidden');
-                jutsu.filter('[data-jutsu_effect="Ninjutsu Nerf"]').addClass('hidden');
-                jutsu.filter('[data-jutsu_effect="Genjutsu Nerf"]').addClass('hidden');
-                jutsu.filter('[data-jutsu_effect="Speed Nerf"]').addClass('hidden');
-                jutsu.filter('[data-jutsu_effect="Cast Speed Nerf"]').addClass('hidden');
-                jutsu.filter('[data-jutsu_effect="Willpower Nerf"]').addClass('hidden');
-                jutsu.filter('[data-jutsu_effect="Intelligence Nerf"]').addClass('hidden');
-            }
+
+                // Type filters
+                var jutsuType = jutsuElement.data('jutsu_type');
+                if ($("#jutsu_filter_taijutsu").hasClass('active') && jutsuType != 'Taijutsu') {
+                    hideJutsu = true;
+                }
+                if ($("#jutsu_filter_ninjutsu").hasClass('active') && jutsuType != 'Ninjutsu') {
+                    hideJutsu = true;
+                }
+                if ($("#jutsu_filter_genjutsu").hasClass('active') && jutsuType != 'Genjutsu') {
+                    hideJutsu = true;
+                }
+
+                // Hide or show based on the flags
+                if (hideJutsu) {
+                    jutsuElement.addClass('hidden');
+                }
+            });
         }
         // Drag and drop functionality
         $(".jutsu_block_table").on('dragstart', function (e) {
@@ -400,15 +415,15 @@ $rank_names = RankManager::fetchNames($system);
                             <p>Hand seals:</p>
                             <p>Power:</p>
                             <p>Cooldown:</p>
-                            <p>Effect:</p>
-                            <p>Duration:</p>
+                            <p>Effect 1:</p>
+                            <p>Effect 2:</p>
                         </div>
                         <div class="jutsu_details_info_column">
                             <p id="jutsu_seals"></p>
                             <p id="jutsu_power"></p>
                             <p id="jutsu_cooldown"></p>
-                            <p id="jutsu_effect"></p>
-                            <p id="jutsu_duration"></p>
+                            <p id="jutsu_effect_1"></p>
+                            <p id="jutsu_effect_2"></p>
                         </div>
                     </td>
                 </tr>
@@ -472,53 +487,74 @@ $rank_names = RankManager::fetchNames($system);
             <div class="jutsu_list">
                 <?php foreach ($jutsu_list as $jutsu): ?>
                     <!--data attributes used for filter logic-->
-                    <table class="table jutsu_block_table" title="<?= $jutsu->name ?> (<?= $jutsu->level ?>)" draggable="true" data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>" data-jutsu_effect="<?= System::unSlug($jutsu->effect) ?>" data-jutsu_select="<?= $jutsu->jutsu_type . '-' . $jutsu->id ?>">
-                        <tr class="jutsu_block_title">
-                            <th colspan="2">
-                                <?= strlen($jutsu->name) > 20 ? substr($jutsu->name,0,18)."..." : $jutsu->name; ?>
-                                <!--data attributes used to populate details modal-->
-                                <div id="jutsu_<?=  $jutsu->id?>" class="jutsu_data" 
-                                     data-jutsu_id="<?= $jutsu->id ?>"
-                                     data-jutsu_name="<?= $jutsu->name ?>"
-                                     data-jutsu_rank="<?= $rank_names[$jutsu->rank] ?>"
-                                     data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>"
-                                     data-jutsu_element="<?= $jutsu->element ?>"
-                                     data-jutsu_cost="<?= $jutsu->use_cost ?>"
-                                     data-jutsu_level="<?php echo $jutsu->level == 100 ? $jutsu->level : $jutsu->level . " (" . $jutsu->exp . "/1000)" ?>"
-                                     data-jutsu_experience="<?= $jutsu->exp ?>"
-                                     data-jutsu_seals="<?= $jutsu->jutsu_type == "taijutsu" ? "None" : $jutsu->hand_seals ?>"
-                                     data-jutsu_power="<?= $jutsu->power ?> (+<?= round($jutsu->power - $jutsu->base_power, 2) ?>)"
-                                     data-jutsu_cooldown="<?php echo $jutsu->cooldown == 1 ? $jutsu->cooldown . " turn" :  $jutsu->cooldown . " turns" ?>"
-                                     data-jutsu_effect="<?php echo ($jutsu->effect == "none" || $jutsu->effect == "barrier") ? System::unSlug($jutsu->effect) : System::unSlug($jutsu->effect) . " (" . round($jutsu->effect_amount, 0) . "%)" ?>"
-                                     data-jutsu_duration="<?php echo $jutsu->effect_length == 1 ? $jutsu->effect_length . " turn" :  $jutsu->effect_length . " turns" ?>"
-                                     data-jutsu_description="<?= $jutsu->description ?>"
-                                     data-jutsu_child="<?php echo array_key_exists($jutsu->id, $child_jutsu) ? implode(', ' , $child_jutsu[$jutsu->id][0]) : "None" ?>">
-                                </div>
-                            </th>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><b>Power</b></p>
-                                <p><?= $jutsu->power ?></p>
-                            </td>
-                            <td>
-                                <p><b>Cooldown</b></p>
-                                <p><?= $jutsu->cooldown ?></p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                <?php if ($jutsu->effect == "none" || $jutsu->effect == "barrier"): ?>
-                                <p><?= System::unSlug($jutsu->effect) ?></p>
-                                <?php else : ?>
-                                <p><?= System::unSlug($jutsu->effect) ?> (<?= round($jutsu->effect_amount, 0) ?>%)</p>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="jutsu_block_expand" colspan="2" data-target="jutsu_<?= $jutsu->id?>">+</th>
-                        </tr>
-                    </table>
+                <table class="table jutsu_block_table" title="<?= $jutsu->name ?> (<?= $jutsu->level ?>)" draggable="true" data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>" data-jutsu_effect="<?= System::unSlug($jutsu->effects[0]->effect) . ($jutsu->effects[1]->effect == 'none' ? '' : ', ' . System::unSlug($jutsu->effects[1]->effect)) ?>" data-jutsu_select="<?= $jutsu->jutsu_type . '-' . $jutsu->id ?>">
+                    <tr class="jutsu_block_title">
+                        <th colspan="2">
+                            <?= strlen($jutsu->name) > 20 ? substr($jutsu->name,0,18)."..." : $jutsu->name; ?>
+                            <!--data attributes used to populate details modal-->
+                            <div id="jutsu_<?=  $jutsu->id?>" class="jutsu_data"
+                                data-jutsu_id="<?= $jutsu->id ?>"
+                                data-jutsu_name="<?= $jutsu->name ?>"
+                                data-jutsu_rank="<?= $rank_names[$jutsu->rank] ?>"
+                                data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>"
+                                data-jutsu_element="<?= $jutsu->element ?>"
+                                data-jutsu_cost="<?= $jutsu->use_cost ?>"
+                                data-jutsu_level="<?php echo $jutsu->level == 100 ? $jutsu->level : $jutsu->level . " (" . $jutsu->exp . "/1000)" ?>"
+                                data-jutsu_experience="<?= $jutsu->exp ?>"
+                                data-jutsu_seals="<?= $jutsu->jutsu_type == "taijutsu" ? "None" : $jutsu->hand_seals ?>"
+                                data-jutsu_power="<?= $jutsu->power ?> (+<?= round($jutsu->power - $jutsu->base_power, 2) ?>)"
+                                data-jutsu_cooldown="<?php echo $jutsu->cooldown == 1 ? $jutsu->cooldown . " turn" :  $jutsu->cooldown . " turns" ?>"
+                                data-jutsu_effect_1="<?php
+                                echo in_array($jutsu->effects[0]->effect, ["substitution", "counter", "piercing"])
+                                    ? System::unSlug($jutsu->effects[0]->effect) . " (" . round($jutsu->effects[0]->effect_amount, 0) . "%)"
+                                    : (($jutsu->effects[0]->effect == "none" || $jutsu->effects[0]->effect == "barrier")
+                                        ? System::unSlug($jutsu->effects[0]->effect)
+                                        : System::unSlug($jutsu->effects[0]->effect) . " (" . round($jutsu->effects[0]->effect_amount, 0) . "%)" . ", " . ($jutsu->effects[0]->effect_length == 1
+                                            ? $jutsu->effects[0]->effect_length . " turn"
+                                            : $jutsu->effects[0]->effect_length . " turns"))
+                                    ?>"
+                                data-jutsu_effect_2="<?php
+                                echo in_array($jutsu->effects[1]->effect, ["substitution", "counter", "piercing"])
+                                    ? System::unSlug($jutsu->effects[1]->effect) . " (" . round($jutsu->effects[1]->effect_amount, 0) . "%)"
+                                    : (($jutsu->effects[1]->effect == "none" || $jutsu->effects[1]->effect == "barrier")
+                                        ? System::unSlug($jutsu->effects[1]->effect)
+                                        : System::unSlug($jutsu->effects[1]->effect) . " (" . round($jutsu->effects[1]->effect_amount, 0) . "%)" . ", " . ($jutsu->effects[1]->effect_length == 1
+                                            ? $jutsu->effects[1]->effect_length . " turn"
+                                            : $jutsu->effects[1]->effect_length . " turns"))
+                                    ?>"
+                                data-jutsu_description="<?= $jutsu->description ?>"
+                                data-jutsu_child="<?php echo array_key_exists($jutsu->id, $child_jutsu) ? implode(', ' , $child_jutsu[$jutsu->id][0]) : "None" ?>"
+                                data-jutsu_use_type="<?= $jutsu->use_type ?>"></div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p><b>Power</b></p>
+                            <p><?= $jutsu->power ?></p>
+                        </td>
+                        <td>
+                            <p><b>Cooldown</b></p>
+                            <p><?= $jutsu->cooldown ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <?php if ($jutsu->effects[0]->effect == "none" || $jutsu->effects[0]->effect == "barrier"): ?>
+                            <p><?= System::unSlug($jutsu->effects[0]->effect) ?></p>
+                            <?php else : ?>
+                            <p><?= System::unSlug($jutsu->effects[0]->effect) ?> (<?= round($jutsu->effects[0]->effect_amount, 0) ?>%)</p>
+                            <?php endif; ?>
+                            <?php if ($jutsu->effects[1]->effect == "barrier"): ?>
+                            <p><?= System::unSlug($jutsu->effects[1]->effect) ?></p>
+                            <?php elseif ($jutsu->effects[1]->effect != "none"): ?>
+                            <p><?= System::unSlug($jutsu->effects[1]->effect) ?> (<?= round($jutsu->effects[1]->effect_amount, 0) ?>%)</p>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="jutsu_block_expand" colspan="2" data-target="jutsu_<?= $jutsu->id?>">+</th>
+                    </tr>
+                </table>
                 <?php endforeach; ?>
             </div>
         </td>
