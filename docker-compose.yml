@@ -44,8 +44,8 @@ services:
     ports:
       - "80:80"
     image: shinobi_chronicles_web_app
-#    volumes:
-#      - sc_app:/var/www/html
+    volumes:
+      - ./:/var/www/html
     depends_on:
       - shinobi-chronicles-db
 

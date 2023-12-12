@@ -5,6 +5,7 @@
 /tools
 .htaccess
 /node_modules
+docker/
 
 /vendor/
 /images/_image_library/raw
@@ -12,3 +13,6 @@
 /planning/combat
 
 .vscode/settings.json
+docker-compose.yml
+.vscode/tasks.json
+docker/seed_db.sh
