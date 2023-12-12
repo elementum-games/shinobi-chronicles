@@ -313,9 +313,9 @@ function store() {
 
 				echo "<tr class='table_multicolumns'>
 					<td style='width:30%; text-align:center;'><a href='$self_link&view=jutsu&view_jutsu=$id'>{$jutsu['name']}</a></td>
-					<td style='width:25%; text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['effect'])) . "</td>
-					<td style='width:25%; text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['jutsu_type'])) . "</td>
-					<td style='width:25%; text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['element'])) . "</td>
+					<td style='width:25%; text-align:center;'>" . System::unSlug($jutsu['effect']) . "</td>
+					<td style='width:25%; text-align:center;'>" . System::unSlug($jutsu['jutsu_type']) . "</td>
+					<td style='width:25%; text-align:center;'>" . System::unSlug($jutsu['element']) . "</td>
 					<td style='width:25%; text-align:center;'>&yen;" . number_format($jutsu['purchase_cost']) . "</td>
 					<td style='width:25%; text-align:center;'>
 						<a href='$self_link&view=jutsu&purchase_jutsu={$jutsu['jutsu_id']}&jutsu_type={$jutsu['jutsu_type']}' style='text-align:center';>Purchase</a></td>
