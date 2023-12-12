@@ -266,23 +266,23 @@ function store() {
             }
         }
 
-		$style = "style='text-decoration:none;'";
-
 		echo "<table class='table'><tr><th>Jutsu Scrolls</th></tr>
 		<tr><td style='text-align:center;'>You can buy Jutsu Scrolls in this section for any jutsu of your rank or below.
 		Once you have purchased a scroll, go to the Jutsu page to learn the jutsu.<br />
 		<br />
-		<b>Your money:</b> &yen;{$player->getMoney()}</td></tr></table>
+		<b>Your Yen:</b> &yen;" . number_format($player->getMoney()) . "</td></tr></table>
 
-		<p style='text-align:center;margin-bottom:0;'>
-			<a href='$self_link&view=jutsu&jutsu_type=ninjutsu' " . ($jutsu_type == 'ninjutsu' ? $style : "") . " style='text-decoration:none'>Ninjutsu</a> |
-			<a href='$self_link&view=jutsu&jutsu_type=taijutsu' " . ($jutsu_type == 'taijutsu' ? $style : "") . " style='text-decoration:none'>Taijutsu</a> |
-			<a href='$self_link&view=jutsu&jutsu_type=genjutsu' " . ($jutsu_type == 'genjutsu' ? $style : "") . " style='text-decoration:none'>Genjutsu</a>
-		</p>
+		<h2>
+			<p style='text-align:center;margin-bottom:0;'>
+				<a href='$self_link&view=jutsu&jutsu_type=ninjutsu' class='" . ($jutsu_type == 'ninjutsu' ? 'selected' : "") . "'> Ninjutsu</a> |
+				<a href='$self_link&view=jutsu&jutsu_type=taijutsu' class='" . ($jutsu_type == 'taijutsu' ? 'selected' : "") . "'> Taijutsu</a> |
+				<a href='$self_link&view=jutsu&jutsu_type=genjutsu' class='" . ($jutsu_type == 'genjutsu' ? 'selected' : "") . "'> Genjutsu</a>
+			</p>
+		</h2>
 
 		<table class='table' style='margin-top:15px;'>
-		<tr id='shop_table_header' >
-			<th style='width:15%;'>Name</th>
+		<tr id='shop_table_header'>
+			<th style='width:25%;'>Name</th>
 			<th style='width:15%;'>Effect</th>
 			<th style='width:10%;'>Type</th>
 			<th style='width:10%;'>Element</th>
@@ -312,13 +312,13 @@ function store() {
 				$count++;
 
 				echo "<tr class='table_multicolumns'>
-					<td style='width:30%;text-align:center;'><a href='$self_link&view=jutsu&view_jutsu=$id' style='text-decoration:none'>{$jutsu['name']}</a></td>
-					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['effect'])) . "</td>
-					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['jutsu_type'])) . "</td>
-					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['element'])) . "</td>
-					<td style='width:26%;text-align:center;'>&yen;{$jutsu['purchase_cost']}</td>
-					<td style='width:28%;text-align:center;'>
-						<a href='$self_link&view=jutsu&purchase_jutsu={$jutsu['jutsu_id']}&jutsu_type={$jutsu['jutsu_type']}' style='text-decoration:none'>Purchase</a></td>
+					<td style='width:30%; text-align:center;'><a href='$self_link&view=jutsu&view_jutsu=$id'>{$jutsu['name']}</a></td>
+					<td style='width:25%; text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['effect'])) . "</td>
+					<td style='width:25%; text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['jutsu_type'])) . "</td>
+					<td style='width:25%; text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['element'])) . "</td>
+					<td style='width:25%; text-align:center;'>&yen;" . number_format($jutsu['purchase_cost']) . "</td>
+					<td style='width:25%; text-align:center;'>
+						<a href='$self_link&view=jutsu&purchase_jutsu={$jutsu['jutsu_id']}&jutsu_type={$jutsu['jutsu_type']}' style='text-align:center';>Purchase</a></td>
 				</tr>";
 			}
 
@@ -338,7 +338,8 @@ function store() {
 		echo "<table class='table'><tr><th>" . ucwords($category) . "</th></tr>
 		<tr><td style='text-align:center;'>You can buy armor/consumable items in this section for your rank or below.<br />
 		<br />
-		<b>Your money:</b> &yen;{$player->getMoney()}</td></tr></table>
+		
+		<b>Your Yen:</b> &yen;" . number_format($player->getMoney()) . "</td></tr></table>
 		
 		<table class='table'><tr>
 			<th style='width:35%;'>Name</th>
@@ -382,7 +383,7 @@ function store() {
 					($owned ? "<br />(Owned: $owned/$max_consumables)" : "") .
 					"</td>
 					<td style='width:25%;'>" . ucwords(str_replace('_', ' ', $item->effect)) . "</td>
-					<td style='width:20%;'>&yen;{$item->purchase_cost}</td>
+					<td style='width:20%; text-align:center;'>&yen;" . number_format($item->purchase_cost) . "</td>
 					<td style='width:20%;'><a href='$self_link&view=$category&purchase_item={$item->id}'>Purchase</a>" .
 					($category == 'consumables' ? "/<br><a href='$self_link&view=$category&purchase_item={$item->id}&max=true'>Purchase Max</a>" : "") .
 					"</td>

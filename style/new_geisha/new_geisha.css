@@ -754,6 +754,14 @@ a#spec_miss_cancel {
 }
 #content a, a:visited {
     color: var(--font-link);
+  text-decoration: none !important;
+}
+#content a:hover {
+    color: var(--font-link);
+    text-decoration: underline !important;
+}
+#content a.selected {
+    color:#b3a176 !important;
 }
 #content table.table td.row1 {
     background-color: var(--sidebar-button-background-color);
