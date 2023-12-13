@@ -1158,6 +1158,13 @@ class User extends Fighter {
             $count = 0;
             foreach($equipped_jutsu as $jutsu_data) {
                 if($this->hasJutsu($jutsu_data->id)) {
+                    // We double-check this in useJutsu() as well, but removing from equipped helps users understand
+                    // before getting into a fight they cannot use a jutsu they don't have the element for
+                    $jutsu = $this->jutsu[$jutsu_data->id];
+                    if(!$this->hasElement($jutsu->element)) {
+                        continue;
+                    }
+
                     $this->equipped_jutsu[$count]['id'] = $jutsu_data->id;
                     $this->equipped_jutsu[$count]['type'] = $jutsu_data->type;
                     $count++;
@@ -1521,6 +1528,14 @@ class User extends Fighter {
         return isset($this->items[$item_id]) ? $this->items[$item_id]->quantity : 0;
     }
 
+    public function hasElement(string $element): bool {
+        if($element == Jutsu::ELEMENT_NONE) {
+            return true;
+        }
+
+        return in_array($element, $this->elements);
+    }
+
     public function giveItem(Item $item, int $quantity = 1): void {
         if ($this->hasItem($item->id)) {
             $this->items[$item->id]->quantity += $quantity;
@@ -1595,15 +1610,8 @@ class User extends Fighter {
             case Jutsu::PURCHASE_TYPE_PURCHASABLE:
             case Jutsu::PURCHASE_TYPE_EVENT_SHOP:
                 // Element check
-                if($jutsu->element && $jutsu->element != Jutsu::ELEMENT_NONE) {
-                    if($this->elements) {
-                        if(!in_array($jutsu->element, $this->elements)) {
-                            return ActionResult::failed("You do not possess the elemental chakra for this jutsu!");
-                        }
-                    }
-                    else {
-                        return ActionResult::failed("You do not possess the elemental chakra for this jutsu!");
-                    }
+                if($jutsu->element && !$this->hasElement($jutsu->element)) {
+                    return ActionResult::failed("You do not possess the elemental chakra for this jutsu!");
                 }
 
                 if($this->jutsu[$jutsu->id]->level < 100) {
@@ -1716,7 +1724,6 @@ class User extends Fighter {
     public function addPremiumCredits(int $amount, string $description) {
         $this->setPremiumCredits($this->premium_credits + $amount, $description);
     }
-
 
     /**
      * @throws RuntimeException

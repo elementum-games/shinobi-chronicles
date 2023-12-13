@@ -305,9 +305,8 @@
                 A gift offering of <?= $premiumShopManager->costs['element_change'] ?> Ancient Kunai is required.
                 <br/>
                 <br/>
-                <b>(IMPORTANT: This is non-reversable once completed<br />If you want to return to your original element you
-                    will have to pay another fee.<br />You will forget any elemental jutsu you currently have of this
-                    nature.)</b><br />
+                <b>(IMPORTANT: This is non-reversible once completed<br />If you want to return to your original element you
+                    will have to pay another fee.)</b><br />
 
                 <br/>Choose your element to reattune:
                 <br/>

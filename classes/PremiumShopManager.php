@@ -510,19 +510,11 @@ class PremiumShopManager {
             "Changed element #{$editing_element_index} from {$this->player->elements[$editing_element_index]} to $new_element"
         );
 
-        $this->player->getInventory();
-
         if (isset($this->player->elements[$editing_element_index])) {
-            foreach ($this->player->jutsu as $jutsu) {
-                if ($jutsu->element == $this->player->elements[$editing_element_index]) {
-                    $this->player->removeJutsu($jutsu->id);
-                }
-            }
             $this->player->elements[$editing_element_index] = $new_element;
         }
 
         $this->player->updateData();
-        $this->player->updateInventory();
 
         $message = '';
         switch ($new_element) {
@@ -577,8 +569,7 @@ class PremiumShopManager {
                 break;
         }
 
-        $message .=  "<b style='color:green'>You have forgotten the {$previous_element} nature and all its
-                jutsu and are now attuned to the {$new_element} nature.</b>";
+        $message .=  "<b style='color:green'>You have forgotten the {$previous_element} nature and are now attuned to the {$new_element} nature.</b>";
 
         return ActionResult::succeeded($message);
     }

@@ -588,10 +588,10 @@ function premiumShop(): void {
             //Confirm purchase
             if (!isset($_POST['confirm_chakra_element_change'])) {
                 $confirmation_string = "Are you sure you want to <b>forget the {$player->elements[$editing_element_index]} nature</b>
-                and any jutsus you have to <b>attune to the $new_element nature</b>?<br />
+                and <b>attune to the $new_element nature</b>?<br />
                 <br />
                 <b>(IMPORTANT: This is non-reversable once completed! If you want to return to your original element you
-                will have to pay another fee. You will forget any elemental jutsu you currently have of this nature.)</b>";
+                will have to pay another fee.)</b>";
 
                 renderPurchaseConfirmation(
                     purchase_type: 'change_element',
