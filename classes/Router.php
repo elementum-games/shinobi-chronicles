@@ -13,6 +13,7 @@ class Router {
         'gear' => 5,
         'members' => 6,
         'chat' => 7,
+        'store' => 8,
         'villageHQ' => 9,
         'bloodline' => 10,
         'travel' => 11,
