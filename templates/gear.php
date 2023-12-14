@@ -12,22 +12,22 @@
 <form action='<?= $system->router->getUrl('gear') ?>' method='post' style='margin:0;'>
 <table id='equipment gear' class='table' style='text-align:center;'>
     <tr class='threeColumns'>
-        <th style='width:33%;'>Weapons</th>
-        <th style='width:33%;'>Armor</th>
-        <th style='width:33%;'>Consumables</th>
+        <!--<th style='width:33%;'>Weapons</th>-->
+        <th style='width:50%;'>Armor</th>
+        <th style='width:50%;'>Consumables</th>
     </tr>
     <tr class='threeColumns'>
-        <td>
-            <?php if($player->items): ?>
-                <?php foreach($player->items as $item): ?>
-                    <?php if($item->use_type != Item::USE_TYPE_WEAPON) continue; ?>
+<!--        <td>
+            <?php /*if($player->items): */?>
+                <?php /*foreach($player->items as $item): */?>
+                    <?php /*if($item->use_type != Item::USE_TYPE_WEAPON) continue; */?>
 
-                    <?= $item->name ?>
-                    <sup style='font-size:9px;'>(<?= $item->effect_amount ?> <?= System::unSlug($item->effect) ?>)</sup>
+                    <?/*= $item->name */?>
+                    <sup style='font-size:9px;'>(<?/*= $item->effect_amount */?> <?/*= System::unSlug($item->effect) */?>)</sup>
                     <br />
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </td>
+                <?php /*endforeach; */?>
+            <?php /*endif; */?>
+        </td>-->
         <td>
             <?php if($player->items): ?>
                 <?php foreach($player->items as $item): ?>
@@ -53,8 +53,8 @@
     </tr>
 
     <?php if($player->special_items): ?>
-        <tr><th colspan='3'>Special</th></tr>
-        <tr><td colspan='3' style='text-align:center;'>
+        <tr><th colspan='2'>Special</th></tr>
+        <tr><td colspan='2' style='text-align:center;'>
             <?php foreach($player->items as $item): ?>
                 <?php if($item->use_type != Item::USE_TYPE_SPECIAL) continue; ?>
 
@@ -72,7 +72,7 @@
     
     <tr class='twoHeaders'>
         <!--<th>Equipped Weapons</th>-->
-        <th colspan='2'>Equipped Gear</th>
+        <th>Equipped Gear</th>
         <th>Use Items</th>
     </tr>
     <tr class='threeColumns'>
@@ -95,7 +95,7 @@
                 <br />
             <?php /*endfor; */?>
         </td>-->
-        <td class='fullwidth' style='width:66%;' colspan='2'>
+        <td class='fullwidth' style='width:50%;'>
             <?php for($i = 0; $i < $max_equipped_armor; $i++): ?>
                 <select style='margin-top: 7px' name='items[<?= $item_count++ ?>]'>
                     <option value='none'>None</option>
