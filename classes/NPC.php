@@ -157,6 +157,11 @@ class NPC extends Fighter {
             }
 
             $this->jutsu[] = $jutsu;
+            // this is important so battle logic treats all NPC jutsu as equipped jutsu
+            $this->equipped_jutsu[] = [
+                'id' => $jutsu->id,
+                'type' => $jutsu->jutsu_type
+            ];
         }
 
         $this->loadDefaultJutsu();

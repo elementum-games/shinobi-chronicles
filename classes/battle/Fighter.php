@@ -66,7 +66,7 @@ abstract class Fighter {
     public array $equipped_armor_ids;
 
     public int $bloodline_id;
-    public ?Bloodline $bloodline;
+    public ?Bloodline $bloodline = null;
 
     public array $bloodline_offense_boosts;
     public array $bloodline_defense_boosts;
@@ -246,6 +246,38 @@ abstract class Fighter {
         $avg_rand = floor((self::MIN_RAND + self::MAX_RAND) / 2);
 
         return $final_amount * (self::SKILL_OFFENSE_RATIO * 2) * $avg_rand;
+    }
+
+    public function getPrimaryJutsuType(): string {
+        // First, is one of the offenses higher than the others
+        if($this->ninjutsu_skill > max($this->taijutsu_skill, $this->genjutsu_skill)) {
+            return 'ninjutsu';
+        }
+        if($this->taijutsu_skill > max($this->ninjutsu_skill, $this->genjutsu_skill)) {
+            return 'taijutsu';
+        }
+        if($this->genjutsu_skill > max($this->ninjutsu_skill, $this->taijutsu_skill)) {
+            return 'genjutsu';
+        }
+
+        // What's the offense boost on bloodline, if any
+        if($this->bloodline != null) {
+            foreach($this->bloodline->combat_boosts as $combat_boost) {
+                switch($combat_boost['effect']) {
+                    case 'ninjutsu_boost':
+                        return 'ninjutsu';
+                    case 'taijutsu_boost':
+                        return 'taijutsu';
+                    case 'genjutsu_boost':
+                        return 'genjutsu';
+                    default:
+                        break;
+                }
+            }
+        }
+
+        // Fuck it, you're a ninja, you use ninjutsu
+        return 'ninjutsu';
     }
 
     /**

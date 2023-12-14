@@ -368,6 +368,10 @@ class PremiumShopManager {
             throw new RuntimeException("Invalid target stat!");
         }
 
+        if($this->player->battle_id > 0) {
+            throw new RuntimeException("Cannot transfer stats mid fight!");
+        }
+
         // Check for same stat
         if ($original_stat == $target_stat) {
             throw new RuntimeException("You cannot transfer points to the same stat!");
