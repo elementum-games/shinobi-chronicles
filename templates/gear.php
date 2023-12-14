@@ -71,31 +71,31 @@
     <?php endif; ?>
     
     <tr class='twoHeaders'>
-        <th>Equipped Weapons</th>
-        <th>Equipped Gear</th>
+        <!--<th>Equipped Weapons</th>-->
+        <th colspan='2'>Equipped Gear</th>
         <th>Use Items</th>
     </tr>
     <tr class='threeColumns'>
         <?php $item_count = 1; ?>
-        <td class='fullwidth' style='width:33%;'>
-            <?php for($i = 0; $i < $max_equipped_weapons; $i++): ?>
-                <select style='margin-top: 7px' name='items[<?= $item_count++ ?>]'>
+       <!-- <td class='fullwidth' style='width:33%;'>
+            <?php /*for($i = 0; $i < $max_equipped_weapons; $i++): */?>
+                <select style='margin-top: 7px' name='items[<?/*= $item_count++ */?>]'>
                     <option value='none'>None</option>
-                    <?php foreach($player->items as $item): ?>
-                        <?php if($item->use_type != Item::USE_TYPE_WEAPON) continue; ?>
-                        <option value='<?= $item->id ?>'
-                            <?php if(!empty($player->equipped_weapon_ids[$i]) && $item->id == $player->equipped_weapon_ids[$i]): ?>
+                    <?php /*foreach($player->items as $item): */?>
+                        <?php /*if($item->use_type != Item::USE_TYPE_WEAPON) continue; */?>
+                        <option value='<?/*= $item->id */?>'
+                            <?php /*if(!empty($player->equipped_weapon_ids[$i]) && $item->id == $player->equipped_weapon_ids[$i]): */?>
                                 selected='selected'
-                            <?php endif; ?>
+                            <?php /*endif; */?>
                         >
-                            <?= $item->name ?>
+                            <?/*= $item->name */?>
                         </option>
-                    <?php endforeach; ?>
+                    <?php /*endforeach; */?>
                 </select>
                 <br />
-            <?php endfor; ?>
-        </td>
-        <td class='fullwidth' style='width:33%;'>
+            <?php /*endfor; */?>
+        </td>-->
+        <td class='fullwidth' style='width:66%;' colspan='2'>
             <?php for($i = 0; $i < $max_equipped_armor; $i++): ?>
                 <select style='margin-top: 7px' name='items[<?= $item_count++ ?>]'>
                     <option value='none'>None</option>

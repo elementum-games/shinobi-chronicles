@@ -46,7 +46,10 @@ function store() {
 		$shop_items = array();
 		$result = $system->db->query("
             SELECT * FROM `items`
-            WHERE `purchase_type` = " . Item::PURCHASE_TYPE_PURCHASABLE . " AND `rank` <= '$player->rank_num' 
+            WHERE `purchase_type` = " . Item::PURCHASE_TYPE_PURCHASABLE . " 
+            AND `rank` <= '$player->rank_num' 
+            -- Disable purchasing weapons for now
+            AND `use_type` != " . Item::USE_TYPE_WEAPON . "
             ORDER BY `rank` ASC, `purchase_cost` ASC
         ");
 		while($row = $system->db->fetch($result)) {
