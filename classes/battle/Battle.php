@@ -15,6 +15,7 @@ class Battle {
 
     const TURN_LENGTH = 20;
     const INITIAL_TURN_LENGTH = 20;
+    const MAX_TURN_LENGTH = 40;
     const PREP_LENGTH = 20;
 
     const MAX_PRE_FIGHT_HEAL_PERCENT = 85;
@@ -453,14 +454,14 @@ class Battle {
                 if ($min) {
                     $this->player1_time = self::TURN_LENGTH;
                 } else {
-                    $this->player1_time = min(max(($this->player1_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::INITIAL_TURN_LENGTH);
+                    $this->player1_time = min(max(($this->player1_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::MAX_TURN_LENGTH);
                 }
                 break;
             case $this->player2_id:
                 if ($min) {
                     $this->player2_time = self::TURN_LENGTH;
                 } else {
-                    $this->player2_time = min(max(($this->player2_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::INITIAL_TURN_LENGTH);
+                    $this->player2_time = min(max(($this->player2_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::MAX_TURN_LENGTH);
                 }
                 break;
             default:
