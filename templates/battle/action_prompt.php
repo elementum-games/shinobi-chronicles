@@ -78,24 +78,15 @@ $prefill_item_id = $_POST['item_id'] ?? '';
     #jutsu {
         padding-left: 5px;
     }
-    #jutsu .jutsuCategory {
-        display:inline-block;
-        margin:0;
-        vertical-align:top;
-        margin-right:1%;
-        text-align:center;
+    #jutsu .jutsuList {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
-    #jutsu .jutsuName {
-        display: inline-block;
-        padding: 5px 7px;
-        margin-bottom: 10px;
-        /* Style */
-        background: linear-gradient(#EFEFEF, #E4E4E4);
-        border: 1px solid #E0E0E0;
-        border-radius: 15px;
-        text-align:center;
-        box-shadow: 0 0 4px 0 rgba(0,0,0,0);
+    #jutsu .jutsuName .title {
+        color: #d2cbef;
+        font-family: "Segoe UI";
     }
     #jutsu .jutsuName:last-child {
         margin-bottom: 1px;
@@ -450,25 +441,183 @@ $prefill_item_id = $_POST['item_id'] ?? '';
         </div>
     </td></tr>
 <?php else: ?>
-    <tr><td style="text-align: center;" id="handSeal_td" colspan='2'>
-        <div style='margin:0;position:relative;'>
-            <div id='handSeals'>
-                <?php for ($i = 1; $i <= 12; $i++): ?>
-                    <p id='handseal_<?= $i ?>' data-selected='no' data-handseal='<?= $i ?>'>
-                        <img src='./images/v2/handseals/Seal<?= $i ?>.png' draggable='false' />
-                        <span class='handsealNumber'>1</span>
-                        <span class='handsealTooltip'><?= $i ?></span>
-                    </p>
-                    <?php if($i == 6): ?>
-                        <br />
+        <tr><td colspan='2'>
+            <div id='jutsu'>
+                <script type='text/javascript'>$(document).keyup(handleKeyUp);</script>
+                <?php
+                $c1_count = 0;
+                $c2_count = 0;
+                $c3_count = 0;
+
+                // Attack list
+                $jutsu_types = array(Jutsu::TYPE_NINJUTSU, Jutsu::TYPE_TAIJUTSU, Jutsu::TYPE_GENJUTSU);
+                ?>
+                <div class='jutsuList'>
+                <?php for ($i = 0; $i < 3; $i++): ?>
+                    <?php foreach ($battleManager->default_attacks as $attack): ?>
+                        <?php if ($attack->jutsu_type != $jutsu_types[$i]) continue; ?>
+                        <div id='default<?= $c1_count ?>' class='jutsuName <?= $jutsu_types[$i] ?>' data-handseals='<?= ($attack->jutsu_type != Jutsu::TYPE_TAIJUTSU ? $attack->hand_seals : '') ?>' data-id='<?= $attack->id ?>'>
+                            <span class="jutsu_name"><?= $attack->name ?></span>
+                            <span class="jutsu_type"><?php echo $attack->hasElement() ? System::unSlug($attack->jutsu_type) . " - " . $attack->element : System::unSlug($attack->jutsu_type) ?></span>
+                            <div class="jutsu_details">
+                                <div class="jutsu_details_row">
+                                    <span class="jutsu_details_power">Power: <?= round($attack->power, 2) ?></span>
+                                    <span class="jutsu_details_cooldown">
+                                        <?php if ($cd_left > 0): ?>
+                                                CD: (<?= $cd_left ?>) <?= $attack->cooldown ?> turns
+                                        <?php else: ?>
+                                                CD: <?= $attack->cooldown ?> turns
+                                        <?php endif; ?>
+                                    </span>
+                                </div>
+                                <?php foreach ($attack->effects as $effect): ?>
+                                        <div class="jutsu_effect">
+                                            <?php
+                                            if ($effect->effect != "none") {
+                                                echo in_array($effect->effect, ["substitution", "counter", "piercing", "recoil"])
+                                                    ? System::unSlug($effect->effect) . " (" . round($effect->effect_amount, 0) . "%)"
+                                                    : (($effect->effect == "none" && $attack->use_type == Jutsu::USE_TYPE_BARRIER)
+                                                        ? "Barrier"
+                                                        : System::unSlug($effect->effect) . " (" . round($effect->effect_amount, 0) . "%" . ", " . ($effect->effect_length == 1
+                                                            ? $effect->effect_length . " turn)"
+                                                            : $effect->effect_length . " turns)"));
+                                            }
+                                            ?>
+                                        </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <?php $c1_count++; ?>
+                    <?php endforeach; ?>
+                    <?php if (is_array($player->equipped_jutsu)): ?>
+                            <?php foreach ($player->equipped_jutsu as $jutsu): ?>
+                                    <?php
+                                    /** @var Jutsu jutsu */
+                                    if ($player->jutsu[$jutsu['id']]->jutsu_type != $jutsu_types[$i]) {
+                                        continue;
+                                    }
+
+                                    $player_jutsu = $player->jutsu[$jutsu['id']];
+                                    $player_jutsu->setCombatId($player->combat_id);
+
+                                    $cd_left = $battle->jutsu_cooldowns[$player_jutsu->combat_id] ?? 0;
+                                    ?>
+
+                                    <div id='<?= $jutsu_types[$i] ?><?= $c2_count ?>' class='jutsuName <?= $jutsu_types[$i] ?>' data-handseals='<?= $player_jutsu->hand_seals ?>' data-id='<?= $jutsu['id'] ?>' aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'>
+                                        <span class="jutsu_name"><?= $player_jutsu->name ?></span>
+                                        <span class="jutsu_type"><?php echo $player_jutsu->hasElement() ? System::unSlug($player_jutsu->jutsu_type) . " - " . $player_jutsu->element : System::unSlug($player_jutsu->jutsu_type) ?></span>
+                                        <div class="jutsu_details">
+                                            <div class="jutsu_details_row">
+                                                <span class="jutsu_details_power">Power: <?= round($player_jutsu->power, 2) ?></span>
+                                                <span class="jutsu_details_cooldown">
+                                                    <?php if ($cd_left > 0): ?>
+                                                        CD: (<?= $cd_left ?>) <?= $player_jutsu->cooldown ?> turns
+                                                    <?php else: ?>
+                                                        CD: <?= $player_jutsu->cooldown ?> turns
+                                                    <?php endif; ?>
+                                                </span>
+                                            </div>
+                                            <?php foreach ($player_jutsu->effects as $effect): ?>
+                                                <div class="jutsu_effect">
+                                                    <?php
+                                                        if ($effect->effect != "none") {
+                                                            echo in_array($effect->effect, ["substitution", "counter", "piercing", "recoil"])
+                                                                ? System::unSlug($effect->effect) . " (" . round($effect->effect_amount, 0) . "%)"
+                                                                : (($effect->effect == "none" && $player_jutsu->use_type == Jutsu::USE_TYPE_BARRIER)
+                                                                    ? "Barrier"
+                                                                    : System::unSlug($effect->effect) . " (" . round($effect->effect_amount, 0) . "%" . ", " . ($effect->effect_length == 1
+                                                                        ? $effect->effect_length . " turn)"
+                                                                        : $effect->effect_length . " turns)"));
+                                                        }
+                                                    ?>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                    <?php $c2_count++; ?>
+                            <?php endforeach; ?>
+                            <?php $c2_count = 0; ?>
                     <?php endif; ?>
                 <?php endfor; ?>
+                <!-- Display bloodline jutsu-->
+                <?php if ($player->bloodline_id): ?>
+                    <?php if (!empty($player->bloodline->jutsu)): ?>
+                                <?php foreach ($player->bloodline->jutsu as $id => $jutsu): ?>
+                                            <?php
+                                            $jutsu->setCombatId($player->combat_id);
+                                            $cd_left = $battle->jutsu_cooldowns[$jutsu->combat_id] ?? 0;
+                                            ?>
+
+                                            <div id='bloodline<?= $c3_count ?>' class='jutsuName bloodline_jutsu' data-handseals='<?= $jutsu->hand_seals ?>' data-id='<?= $id ?>' aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'>
+                                                <span class="jutsu_name"><?= $jutsu->name ?></span>
+                                                <span class="jutsu_type"><?php echo $jutsu->hasElement() ? System::unSlug($jutsu->jutsu_type) . " - " . $jutsu->element : System::unSlug($jutsu->jutsu_type) ?></span>
+                                                <div class="jutsu_details">
+                                                    <div class="jutsu_details_row">
+                                                        <span class="jutsu_details_power">Power: <?= round($jutsu->power, 2) ?></span>
+                                                        <span class="jutsu_details_cooldown">
+                                                            <?php if ($cd_left > 0): ?>
+                                                                    CD: (<?= $cd_left ?>) <?= $jutsu->cooldown ?> turns
+                                                            <?php else: ?>
+                                                                    CD: <?= $jutsu->cooldown ?> turns
+                                                            <?php endif; ?>
+                                                        </span>
+                                                    </div>
+                                                    <?php foreach ($jutsu->effects as $effect): ?>
+                                                            <div class="jutsu_effect">
+                                                                <?php
+                                                                if ($effect->effect != "none") {
+                                                                    echo in_array($effect->effect, ["substitution", "counter", "piercing", "recoil"])
+                                                                        ? System::unSlug($effect->effect) . " (" . round($effect->effect_amount, 0) . "%)"
+                                                                        : (($effect->effect == "none" && $jutsu->use_type == Jutsu::USE_TYPE_BARRIER)
+                                                                            ? "Barrier"
+                                                                            : System::unSlug($effect->effect) . " (" . round($effect->effect_amount, 0) . "%" . ", " . ($effect->effect_length == 1
+                                                                                ? $effect->effect_length . " turn)"
+                                                                                : $effect->effect_length . " turns)"));
+                                                                }
+                                                                ?>
+                                                            </div>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            </div>
+                                            <?php $c3_count++; ?>
+                                <?php endforeach; ?>
+                    <?php endif; ?>
+                <?php endif; ?>
+                </div>
+                <?php if (!$battle->isPreparationPhase() || ($show_submit_button)): ?>
+                    <form action='<?= $self_link ?>' method='post'>
+                        <input type='hidden' id='hand_seal_input' name='hand_seals' value='<?= $prefill_hand_seals ?>' />
+                        <input type='hidden' id='jutsuType' name='jutsu_type' value='<?= $prefill_jutsu_type ?>' />
+                        <input type='hidden' id='weaponID' name='weapon_id' value='<?= $prefill_weapon_id ?>' />
+                        <input type='hidden' id='weaponElement' name='weapon_element' value='<?= $prefill_weapon_element ?>' />
+                        <input type='hidden' id='jutsuID' name='jutsu_id' value='<?= $prefill_jutsu_id ?>' />
+                        <input type='hidden' id='itemID' name='item_id' value='<?= $prefill_item_id ?>' />
+                        <p style='display:block;text-align:center;margin:auto;'>
+                            <input id='submitbtn' type='submit' name='attack' value='Submit' />
+                        </p>
+                    </form>
+                <?php endif; ?>
             </div>
-            <div id='weapons' style='display:none;'>
-                <!--<p class='weapon' data-id='0' style='box-shadow: 0 0 4px 0 #000000;margin-top:14px;'>
+        </td></tr>
+        <tr><td style="text-align: center;" id="handSeal_td" colspan='2'>
+            <div style='margin:0;position:relative;'>
+                <div id='handSeals'>
+                    <?php for ($i = 1; $i <= 12; $i++): ?>
+                            <p id='handseal_<?= $i ?>' data-selected='no' data-handseal='<?= $i ?>'>
+                                <img src='./images/v2/handseals/Seal<?= $i ?>.png' draggable='false' />
+                                <span class='handsealNumber'>1</span>
+                                <span class='handsealTooltip'><?= $i ?></span>
+                            </p>
+                            <?php if ($i == 6): ?>
+                                    <br />
+                            <?php endif; ?>
+                    <?php endfor; ?>
+                </div>
+                <div id='weapons' style='display:none;'>
+                    <!--<p class='weapon' data-id='0' style='box-shadow: 0 0 4px 0 #000000;margin-top:14px;'>
                     <b>No Weapon</b>
                 </p>-->
-                <?php /*foreach($player->equipped_weapon_ids as $item_id): */?><!--
+                    <?php /*foreach($player->equipped_weapon_ids as $item_id): */?><!--
                     <?php /*if($player->items[$item_id]->effect == "element"): */?>
                         <?php /*foreach($player->elements as $element): */?>
                             <p class='weapon' data-id='<?/*= $item_id */?>' data-element='<?/*= $element */?>'>
@@ -490,127 +639,4 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                 </div>
             </div>
         </td></tr>
-        <tr><th colspan='2'>
-            <?php
-            if ($player->bloodline_id) {
-                $width = '23.5%';
-            } else {
-                $width = '31.8%';
-            }
-            ?>
-            <span style='display:inline-block;width:<?= $width ?>;'>Ninjutsu</span>
-            <span style='display:inline-block;width:<?= $width ?>;'>Taijutsu</span>
-            <span style='display:inline-block;width:<?= $width ?>;'>Genjutsu</span>
-            <?php if ($player->bloodline_id): ?>
-                    <span style='display:inline-block;width:<?= $width ?>;'>Bloodline</span>
-            <?php endif; ?>
-        </th></tr>
-        <tr><td colspan='2'>
-            <div id='jutsu'>
-                <script type='text/javascript'>$(document).keyup(handleKeyUp);</script>
-                <?php
-                $c1_count = 0;
-                $c2_count = 0;
-                $c3_count = 0;
-
-                // Attack list
-                $jutsu_types = array(Jutsu::TYPE_NINJUTSU, Jutsu::TYPE_TAIJUTSU, Jutsu::TYPE_GENJUTSU);
-                ?>
-
-                <?php for ($i = 0; $i < 3; $i++): ?>
-                        <div class='jutsuCategory' style='width:<?= $width ?>;'>
-                            <?php foreach ($battleManager->default_attacks as $attack): ?>
-                                    <?php if ($attack->jutsu_type != $jutsu_types[$i])
-                                        continue; ?>
-                                    <span   id='default<?= $c1_count ?>'
-                                            class='jutsuName <?= $jutsu_types[$i] ?>'
-                                            data-handseals='<?= ($attack->jutsu_type != Jutsu::TYPE_TAIJUTSU ? $attack->hand_seals : '') ?>'
-                                            data-id='<?= $attack->id ?>'
-                                    >
-                            <?= $attack->name ?><br />
-                            <strong>D<?= $c1_count ?></strong>
-                        </span><br />
-                                    <?php $c1_count++; ?>
-                            <?php endforeach; ?>
-
-                            <?php if (is_array($player->equipped_jutsu)): ?>
-                                    <?php foreach ($player->equipped_jutsu as $jutsu): ?>
-                                            <?php
-                                            /** @var Jutsu jutsu */
-                                            if ($player->jutsu[$jutsu['id']]->jutsu_type != $jutsu_types[$i]) {
-                                                continue;
-                                            }
-
-                                            $player_jutsu = $player->jutsu[$jutsu['id']];
-                                            $player_jutsu->setCombatId($player->combat_id);
-
-                                            $cd_left = $battle->jutsu_cooldowns[$player_jutsu->combat_id] ?? 0;
-                                            ?>
-
-                                            <div
-                                                    id='<?= $jutsu_types[$i] ?><?= $c2_count ?>'
-                                                    class='jutsuName <?= $jutsu_types[$i] ?>'
-                                                    data-handseals='<?= $player_jutsu->hand_seals ?>'
-                                                    data-id='<?= $jutsu['id'] ?>'
-                                                    aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'
-                                            >
-                                                <?= $player_jutsu->name ?><br />
-                                                <?php if ($cd_left > 0): ?>
-                                                        (CD: <?= $cd_left ?> turns)
-                                                <?php else: ?>
-                                                        <strong><?= strtoupper($jutsu_types[$i][0]) ?><?= $c2_count ?></strong>
-                                                <?php endif; ?>
-                                            </div><br />
-                                            <?php $c2_count++; ?>
-                                    <?php endforeach; ?>
-                                    <?php $c2_count = 0; ?>
-                            <?php endif; ?>
-                        </div>
-                <?php endfor; ?>
-
-                <!-- Display bloodline jutsu-->
-                <?php if ($player->bloodline_id): ?>
-                        <div class='jutsuCategory' style='width:<?= $width ?>;margin-right:0;'>
-                            <?php if (!empty($player->bloodline->jutsu)): ?>
-                                    <?php foreach ($player->bloodline->jutsu as $id => $jutsu): ?>
-                                            <?php
-                                            $jutsu->setCombatId($player->combat_id);
-                                            $cd_left = $battle->jutsu_cooldowns[$jutsu->combat_id] ?? 0;
-                                            ?>
-
-                                            <div
-                                                    id='bloodline<?= $c3_count ?>'
-                                                    class='jutsuName bloodline_jutsu'
-                                                    data-handseals='<?= $jutsu->hand_seals ?>'
-                                                    data-id='<?= $id ?>'
-                                                    aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'
-                                            >
-                                                <?= $jutsu->name ?><br />
-                                                <?php if ($cd_left > 0): ?>
-                                                        (CD: <?= $cd_left ?> turns)
-                                                <?php else: ?>
-                                                        <strong>B<?= $c3_count ?></strong>
-                                                <?php endif; ?>
-                                            </div><br />
-                                            <?php $c3_count++; ?>
-                                    <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
-                <?php endif; ?>
-
-                <?php if (!$battle->isPreparationPhase() || ($show_submit_button)): ?>
-                        <form action='<?= $self_link ?>' method='post'>
-                            <input type='hidden' id='hand_seal_input' name='hand_seals' value='<?= $prefill_hand_seals ?>' />
-                            <input type='hidden' id='jutsuType' name='jutsu_type' value='<?= $prefill_jutsu_type ?>' />
-                            <input type='hidden' id='weaponID' name='weapon_id' value='<?= $prefill_weapon_id ?>' />
-                            <input type='hidden' id='weaponElement' name='weapon_element' value='<?= $prefill_weapon_element ?>' />
-                            <input type='hidden' id='jutsuID' name='jutsu_id' value='<?= $prefill_jutsu_id ?>' />
-                            <input type='hidden' id='itemID' name='item_id' value='<?= $prefill_item_id ?>' />
-                            <p style='display:block;text-align:center;margin:auto;'>
-                                <input id='submitbtn' type='submit' name='attack' value='Submit' />
-                            </p>
-                        </form>
-                <?php endif; ?>
-        </div>
-    </td></tr>
 <?php endif; ?>
