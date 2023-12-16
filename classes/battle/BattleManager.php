@@ -754,7 +754,7 @@ class BattleManager {
                     break;
                 case 'reflect':
                     $attack->reflect_percent += $effect->effect_amount / 100;
-                    $attack->reflect_duration = $effect->effect_length;
+                    $attack->reflect_duration = min($effect->effect_length, 1);
                     break;
                 default:
                     break;
@@ -952,11 +952,7 @@ class BattleManager {
             }
         }*/
 
-        if($this->effects->hasDisplays($user)) {
-            $text .= '<p>' . $this->effects->getDisplayText($user) . '</p>';
-        }
-
-        if($attack->jutsu->hasEffect()){
+       if($attack->jutsu->hasEffect()){
             foreach ($attack->jutsu->effects as $effect) {
                 if ($effect && $effect->effect != 'none') {
                     $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
@@ -966,12 +962,15 @@ class BattleManager {
             }
         }
 
+        if($this->effects->hasDisplays($user)) {
+            $text .= '<p>' . $this->effects->getDisplayText($user) . '</p>';
+        }
 
-        if($attack->jutsu->weapon_id) {
+        /*if($attack->jutsu->weapon_id) {
             $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
                 $this->system->db->clean($this->effects->getAnnouncementText($attack->jutsu->weapon_effect->effects[0])) .
                 "</p>";
-        }
+        }*/
 
         $this->battle->battle_text .= $this->parseCombatText($text, $user, $target);
 
@@ -1185,7 +1184,7 @@ class BattleManager {
         $player1_evasion_stat_amount = $this->getEvasionPercent($player1, $player1_jutsu, $player2->getBaseStatTotal());
         $player2_evasion_stat_amount = $this->getEvasionPercent($player2, $player2_jutsu, $player1->getBaseStatTotal());
 
-        if($player1_evasion_stat_amount >= $player2_evasion_stat_amount && $player2_jutsu_is_attack) {
+        if($player1_evasion_stat_amount >= $player2_evasion_stat_amount) {
             $damage_reduction = round($player1_evasion_stat_amount - $player2_evasion_stat_amount, 2);
 
             // if higher than soft cap, apply penalty
@@ -1213,7 +1212,7 @@ class BattleManager {
                 }
             }
         }
-        else if($player2_evasion_stat_amount >= $player1_evasion_stat_amount && $player1_jutsu_is_attack) {
+        else if($player2_evasion_stat_amount >= $player1_evasion_stat_amount) {
             $damage_reduction = round($player2_evasion_stat_amount - $player1_evasion_stat_amount, 2);
 
             // if higher than soft cap, apply penalty
@@ -1255,7 +1254,7 @@ class BattleManager {
         if($player1->barrier && $player2_jutsu_is_attack) {
             // Apply penalty against Genjutsu
             if ($player2_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
-                $player1->barrier *= self::GENJUTSU_BARRIER_PENALTY;
+                $player1->barrier *= 1 - (self::GENJUTSU_BARRIER_PENALTY / 100);
             }
 
             // Apply piercing
@@ -1290,7 +1289,7 @@ class BattleManager {
         if($player2->barrier && $player1_jutsu_is_attack) {
             // Apply penalty against Genjutsu
             if ($player1_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
-                $player2->barrier *= self::GENJUTSU_BARRIER_PENALTY;
+                $player2->barrier *= 1 - (self::GENJUTSU_BARRIER_PENALTY / 100);
             }
 
             // Apply piercing
