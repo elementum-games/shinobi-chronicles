@@ -235,7 +235,7 @@ class ForbiddenSeal {
             'long_training_gains' => 2.2,
             'extended_training_time' => 2,
             'extended_training_gains' => 3,
-            'stat_transfer_boost' => 15,
+            'stat_transfer_boost' => 20,
             'extra_stat_transfer_points_per_ak' => 150,
             'max_battle_history_view' => 50,
             'free_transfer_bonus' => 100,
