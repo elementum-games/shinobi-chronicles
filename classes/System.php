@@ -10,6 +10,7 @@ require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/Route.php';
 require_once __DIR__ . '/../classes/event/DoubleExpEvent.php';
 require_once __DIR__ . '/../classes/event/DoubleReputationEvent.php';
+require_once __DIR__ . '/../classes/event/BonusExpWeekend.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -698,6 +699,12 @@ class System {
 
         if($this->testNotifications['event'] && is_null($this->event) && $this->isDevEnvironment()) {
             $this->event = new DoubleExpEvent($current_datetime->modify("+2 weeks"));
+        }
+
+        // If no other event active on weekend, activate bonus XP
+        if (!isset($this->event) && (date('w') == 0 || date('w') == 6)) {
+            $endTime = new DateTimeImmutable('next Monday');
+            $this->event = new BonusExpWeekend($endTime);
         }
     }
 

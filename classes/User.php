@@ -1246,9 +1246,14 @@ class User extends Fighter {
                 $this->getInventory();
 
                 $gain = User::$jutsu_train_gain;
-                if ($this->system->TRAIN_BOOST) {
-                    $gain += $this->system->TRAIN_BOOST;
+                // check event bonus
+                if ($this->system->event->exp_modifier > 1) {
+                    $gain = floor($gain * $this->system->event->exp_modifier);
                 }
+                // commenting this out, I'm not sure of the purpose but it doesn't seem like a flat training bonus is supposed to add to jutsu levels
+                /*if ($this->system->TRAIN_BOOST) {
+                    $gain += $this->system->TRAIN_BOOST;
+                }*/
                 if ($this->bloodline->jutsu[$jutsu_id]->level + $gain > 100) {
                     $gain = 100 - $this->bloodline->jutsu[$jutsu_id]->level;
                 }
@@ -1302,9 +1307,14 @@ class User extends Fighter {
                 $this->getInventory();
 
                 $gain = User::$jutsu_train_gain;
-                if ($this->system->TRAIN_BOOST) {
-                    $gain += $this->system->TRAIN_BOOST;
+                // check event bonus
+                if ($this->system->event->exp_modifier > 1) {
+                    $gain = floor($gain * $this->system->event->exp_modifier);
                 }
+                // commenting this out, I'm not sure of the purpose but it doesn't seem like a flat training bonus is supposed to add to jutsu levels
+                /*if ($this->system->TRAIN_BOOST) {
+                    $gain += $this->system->TRAIN_BOOST;
+                }*/
                 if ($this->jutsu[$jutsu_id]->level + $gain > 100) {
                     $gain = 100 - $this->jutsu[$jutsu_id]->level;
                 }
@@ -1454,8 +1464,8 @@ class User extends Fighter {
             throw new RuntimeException("Invalid stat!");
         }
 
-        if ($event_boost && !empty($this->system->event) && $this->system->event instanceof DoubleExpEvent) {
-            $stat_gain *= DoubleExpEvent::exp_modifier;
+        if ($event_boost && !empty($this->system->event) && $this->system->event->exp_modifier > 1) {
+            $stat_gain *= $this->system->event->exp_modifier;
         }
 
         $new_total_stats = $this->total_stats + $stat_gain;

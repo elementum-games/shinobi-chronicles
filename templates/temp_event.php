@@ -180,6 +180,15 @@
             <td>Double Reputation is active until <?= $system->event->end_time->format("l, M jS, Y")?>.</td>
         </tr>
     </table>
+<?php elseif ($system->event instanceof BonusExpWeekend): ?>
+    <table class="table">
+        <tr>
+            <th>Event Details</th>
+        </tr>
+        <tr style="text-align: center">
+            <td>Weekend Bonus Experience ends on <?= $system->event->end_time->format("l, M jS, Y") ?>.</td>
+    </tr>
+</table>
 <?php else: ?>
     <table class="table">
         <tr><th>Event Details</th></tr>
