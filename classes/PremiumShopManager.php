@@ -7,10 +7,10 @@ class PremiumShopManager {
     const STAT_TRANSFER_EXPEDITED = 'expedited';
     const STAT_TRANSFER_SUPER_EXPEDITED = 'super_expedited';
 
-    const EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 2;
-    const SUPER_EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 10;
-    const SUPER_EXPEDITED_AK_COST_MULTIPLIER = 2;
-    const SUPER_EXPEDITED_YEN_COST_MULTIPLIER = 2;
+    const EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 10;
+    const SUPER_EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 150;
+    const SUPER_EXPEDITED_AK_COST_MULTIPLIER = 4;
+    const SUPER_EXPEDITED_YEN_COST_MULTIPLIER = 0.5;
 
     const EXCHANGE_MIN_YEN_PER_AK = 10.0;
     const EXCHANGE_MAX_YEN_PER_AK = 100.0;
@@ -121,23 +121,23 @@ class PremiumShopManager {
 
     private function initStatTransferVars(): void {
         $this->stat_transfer_points_per_min = 10;
-        $this->stat_transfer_points_per_ak = 300;
+        $this->stat_transfer_points_per_ak = 600;
 
         if ($this->player->rank_num >= 3) {
-            $this->stat_transfer_points_per_min += 5;
-
-            $this->stat_transfer_points_per_ak = 600;
-        }
-        if ($this->player->rank_num >= 4) {
-            $this->stat_transfer_points_per_min += 5;
+            $this->stat_transfer_points_per_min += 10;
 
             $this->stat_transfer_points_per_ak = 1200;
+        }
+        if ($this->player->rank_num >= 4) {
+            $this->stat_transfer_points_per_min += 10;
+
+            $this->stat_transfer_points_per_ak = 2400;
         }
 
         $this->stat_transfer_points_per_min += $this->player->forbidden_seal->stat_transfer_boost;
         $this->stat_transfer_points_per_ak += $this->player->forbidden_seal->extra_stat_transfer_points_per_ak;
 
-        $this->expedited_stat_transfer_points_per_yen = round($this->stat_transfer_points_per_ak / 1000, 5);
+        $this->expedited_stat_transfer_points_per_yen = round($this->stat_transfer_points_per_ak / 10000, 5);
 
         // Free stat transfers
         $base_free_stat_change = $this->max_free_stat_change_amount;
