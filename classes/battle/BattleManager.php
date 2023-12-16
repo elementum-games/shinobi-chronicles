@@ -1560,4 +1560,8 @@ class BattleManager {
     public function getPatrolId(): int {
         return $this->battle->patrol_id;
     }
+
+    public function getEffects(): BattleEffectsManager {
+        return $this->effects;
+    }
 }
