@@ -10,6 +10,7 @@ require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/Route.php';
 require_once __DIR__ . '/../classes/event/DoubleExpEvent.php';
 require_once __DIR__ . '/../classes/event/DoubleReputationEvent.php';
+require_once __DIR__ . '/../classes/event/BonusExpWeekend.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -699,6 +700,12 @@ class System {
         if($this->testNotifications['event'] && is_null($this->event) && $this->isDevEnvironment()) {
             $this->event = new DoubleExpEvent($current_datetime->modify("+2 weeks"));
         }
+
+        // If no other event active on weekend, activate bonus XP
+        if (!isset($this->event) && (System::currentDayOfWeek() == 0 || System::currentDayOfWeek() == 6)) {
+            $endTime = new DateTimeImmutable('next Monday');
+            $this->event = new BonusExpWeekend($endTime);
+        }
     }
 
     /**
@@ -807,7 +814,8 @@ class System {
         };
     }
 
-    public static function currentYear(): int {
+    public static function currentYear(): int
+    {
         return (int) date('Y', time());
     }
 
@@ -837,6 +845,13 @@ class System {
      */
     public static function currentMinute(): int {
         return (int)date('i');
+    }
+
+    /**
+     * @return int day of the week: 0 (Sunday) - 6 (Saturday)
+     */
+    public static function currentDayOfWeek(): int {
+        return (int) date('w');
     }
 
     public static function getKunaiPacks(): array {
