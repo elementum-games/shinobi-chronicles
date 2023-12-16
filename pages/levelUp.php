@@ -393,7 +393,7 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                     You are free to train as you wish in the <b>$clan_name</b> clan. Train
 					hard with them and become a strong ninja for your clan and village.'<br />
 					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p><br />
-                    <p style='text-align:center;'>You may reset <a href='{$system->router->links['premium']}'>Here</a> to roll again or view available bloodlines.</p>";
+                    <p style='text-align:center;'>Visit the <a href='{$system->router->links['premium']}'>Ancient Market</a> to reset your character and try again, or purchase a bloodline.</p>";
             }
         } catch(RuntimeException $e) {
             $system->message($e->getMessage());
