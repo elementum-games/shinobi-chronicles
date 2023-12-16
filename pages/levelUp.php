@@ -206,12 +206,12 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 
             // Bloodline roll
             if($bloodline_rolled) {
-                // Chances: 10% legendary, 20% elite, 70% common
+                // Chances: 10% (5%) legendary, 40% (20%) elite, 50% (25%) common
                 $x = mt_rand(1, 100);
-                if($x < 10) {
+                if ($x < 10) {
                     $bloodline_rank = 1;
                 }
-                else if($x < 30) {
+                else if ($x < 50) {
                     $bloodline_rank = 2;
                 }
                 else {
@@ -380,18 +380,20 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
             $rankManager->increasePlayerRank($player);
 
             if($bloodline_rolled) {
-                $bloodline_display = "Suddenly the elder senses something as a strange force wells up inside you, 
+                $bloodline_display = "Suddenly the elder senses something as a strange force wells up inside you,
                     answering the call of the elder's chakra. The elder withdraws $gender hand
 					and smiles, 'You have awakened <b>$bloodline_name</b>. This is the
 					bloodline of the <b>$clan_name</b> clan. From this day forward you shall join them and train
 					your bloodline to its fullest potential.'<br />
-					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p>";
+					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p><br />
+                    <p style='text-align:center;'>Visit the <a href='{$system->router->links['premium']}'>Ancient Market</a> to reset your character and try again, or purchase a bloodline.</p>";
             }
             else {
-                $bloodline_display = "After focusing deeply for several minutes, the elder withdraws $gender hand and says 'The power within your lineage remains dormant. 
+                $bloodline_display = "After focusing deeply for several minutes, the elder withdraws $gender hand and says 'The power within your lineage remains dormant.
                     You are free to train as you wish in the <b>$clan_name</b> clan. Train
 					hard with them and become a strong ninja for your clan and village.'<br />
-					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p>";
+					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p><br />
+                    <p style='text-align:center;'>Visit the <a href='{$system->router->links['premium']}'>Ancient Market</a> to reset your character and try again, or purchase a bloodline.</p>";
             }
         } catch(RuntimeException $e) {
             $system->message($e->getMessage());
