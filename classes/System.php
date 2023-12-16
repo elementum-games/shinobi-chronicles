@@ -107,8 +107,8 @@ class System {
 
     // Default layout
     const DEFAULT_LAYOUT = 'new_geisha';
-    const VERSION_NUMBER = '0.10.1';
-    const VERSION_NAME = '0.10.1 Warring Shadows';
+    const VERSION_NUMBER = '0.11';
+    const VERSION_NAME = '0.11 Warring Shadows';
 
     // Misc stuff
     const SC_MAX_RANK = 4;
