@@ -206,13 +206,16 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 
             // Bloodline roll
             if($bloodline_rolled) {
-                // Chances: 20% (5%) legendary, 80% (25%) elite
+                // Chances: 10% (5%) legendary, 40% (20%) elite, 50% (25%) common
                 $x = mt_rand(1, 100);
-                if($x < 20) {
+                if ($x < 10) {
                     $bloodline_rank = 1;
                 }
-                else {
+                else if ($x < 50) {
                     $bloodline_rank = 2;
+                }
+                else {
+                    $bloodline_rank = 3;
                 }
 
                 // Delete current BL
