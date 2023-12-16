@@ -22,7 +22,7 @@ class System {
 
     const KUNAI_PER_DOLLAR = 2;
     const LOGOUT_LIMIT = 720;
-    const BLOODLINE_ROLL_CHANCE = 50;
+    const BLOODLINE_ROLL_CHANCE = 25;
     const ARENA_COOLDOWN = 4 * 1000;
 
     const CURRENCY_TYPE_MONEY = 'money';
