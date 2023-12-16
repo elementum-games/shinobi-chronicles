@@ -46,10 +46,6 @@ if($battle->battle_text) {
                 return;
             }
         }
-        player1_time--;
-        $("#player1_time").text(player1_time);
-        player2_time--;
-        $("#player2_time").text(player2_time);
         if ((player1_time <= 0 || player1_submitted) && (player2_time <= 0 || player2_submitted)) {
             updateContent();
             return;
@@ -60,6 +56,10 @@ if($battle->battle_text) {
                 if (data.data != undefined && data.data.turn_count > turn_count) {
                     updateContent();
                 } else {
+                    player1_time = data.data.player1_time;
+                    player2_time = data.data.player2_time;
+                    $("#player1_time").text(player1_time);
+                    $("#player2_time").text(player2_time);
                     setTimeout(checkTurn, 1000);
                 }
             })

@@ -13,8 +13,8 @@ class Battle {
     const TYPE_AI_RANKUP = 6;
     const TYPE_AI_WAR = 7;
 
-    const TURN_LENGTH = 15;
-    const INITIAL_TURN_LENGTH = 40;
+    const TURN_LENGTH = 20;
+    const INITIAL_TURN_LENGTH = 20;
     const PREP_LENGTH = 20;
 
     const MAX_PRE_FIGHT_HEAL_PERCENT = 85;
@@ -436,6 +436,10 @@ class Battle {
             default:
                 return 0;
         }
+    }
+
+    public static function calcTimeRemaining($turn_time, $player_time): int {
+        return $player_time - (time() - $turn_time);
     }
 
     public function prepTimeRemaining(): int {
