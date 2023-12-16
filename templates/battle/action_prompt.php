@@ -96,7 +96,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
         cursor: pointer;
     }
     #jutsu .jutsuName[aria-disabled='true'] {
-        opacity: 0.75;
+        opacity: 0.5;
     }
     #jutsu .jutsuName[aria-disabled='true']:hover {
         background: linear-gradient(#EFEFEF, #E4E4E4);
@@ -550,7 +550,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
 
                                             <div id='bloodline<?= $c3_count ?>' class='jutsuName bloodline_jutsu' data-handseals='<?= $jutsu->hand_seals ?>' data-id='<?= $id ?>' aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'>
                                                 <span class="jutsu_name"><?= $jutsu->name ?></span>
-                                                <span class="jutsu_type"><?php echo $jutsu->hasElement() ? System::unSlug($jutsu->jutsu_type) . " - " . $jutsu->element : System::unSlug($jutsu->jutsu_type) ?></span>
+                                                <span class="jutsu_type"><?php echo "bloodline " . ($jutsu->hasElement() ? System::unSlug($jutsu->jutsu_type) . " - " . $jutsu->element : System::unSlug($jutsu->jutsu_type)) ?></span>
                                                 <div class="jutsu_details">
                                                     <div class="jutsu_details_row">
                                                         <span class="jutsu_details_power">Power: <?= round($jutsu->power, 2) ?></span>

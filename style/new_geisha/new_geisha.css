@@ -826,6 +826,7 @@ button {
     display: flex;
     flex-direction: column;
     gap: 1px;
+    user-select: none;
 }
     #jutsu .jutsuName:hover {
         background: #221920 !important;
@@ -863,6 +864,13 @@ button {
         display: flex;
         justify-content: space-between;
         text-align: center;
+    }
+    #jutsu .jutsuName[aria-disabled='true'] {
+        opacity: 0.5;
+    }
+    #jutsu .jutsuName[aria-disabled='true']:hover {
+        background: var(--box-color-default) !important;
+        cursor: default;
     }
 .weapon {
     background: var(--content-background-color) !important;
