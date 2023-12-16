@@ -839,7 +839,7 @@ a#spec_miss_cancel {
         flex-direction: column !important;
         padding-bottom: 0px;
         transform: scale(1.35);
-        transform-origin: top left; /* Keeps the zoom anchored to the top-left corner */
+        transform-origin: top left;
         width: calc(100% / 1.35) !important;
         margin-left: 0;
     }
