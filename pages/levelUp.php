@@ -386,7 +386,7 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 					bloodline of the <b>$clan_name</b> clan. From this day forward you shall join them and train
 					your bloodline to its fullest potential.'<br />
 					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p><br />
-                    <p style='text-align:center;'>You may reset <a href='{$system->router->links['premium']}'>Here</a> to roll again or view available bloodlines.</p>";
+                    <p style='text-align:center;'>Visit the <a href='{$system->router->links['premium']}'>Ancient Market</a> to reset your character and try again, or purchase a bloodline.</p>";
             }
             else {
                 $bloodline_display = "After focusing deeply for several minutes, the elder withdraws $gender hand and says 'The power within your lineage remains dormant.
