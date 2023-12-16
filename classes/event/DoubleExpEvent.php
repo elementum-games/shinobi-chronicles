@@ -8,6 +8,6 @@ class DoubleExpEvent extends Event
     {
         $this->name = "Double EXP Event";
         $this->end_time = $end_time;
-        $this->exp_modifier = 2;
+        $this->exp_gain_multiplier = 2;
     }
 }

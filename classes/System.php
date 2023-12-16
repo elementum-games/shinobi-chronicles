@@ -702,7 +702,7 @@ class System {
         }
 
         // If no other event active on weekend, activate bonus XP
-        if (!isset($this->event) && (date('w') == 0 || date('w') == 6)) {
+        if (!isset($this->event) && (System::currentDayOfWeek() == 0 || System::currentDayOfWeek() == 6)) {
             $endTime = new DateTimeImmutable('next Monday');
             $this->event = new BonusExpWeekend($endTime);
         }
@@ -814,7 +814,8 @@ class System {
         };
     }
 
-    public static function currentYear(): int {
+    public static function currentYear(): int
+    {
         return (int) date('Y', time());
     }
 
@@ -844,6 +845,13 @@ class System {
      */
     public static function currentMinute(): int {
         return (int)date('i');
+    }
+
+    /**
+     * @return int day of the week: 0 (Sunday) - 6 (Saturday)
+     */
+    public static function currentDayOfWeek(): int {
+        return (int) date('w');
     }
 
     public static function getKunaiPacks(): array {

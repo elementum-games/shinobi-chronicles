@@ -1247,8 +1247,8 @@ class User extends Fighter {
 
                 $gain = User::$jutsu_train_gain;
                 // check event bonus
-                if ($this->system->event->exp_modifier > 1) {
-                    $gain = floor($gain * $this->system->event->exp_modifier);
+                if ($this->system->event->exp_gain_multiplier > 1) {
+                    $gain = floor($gain * $this->system->event->exp_gain_multiplier);
                 }
                 // commenting this out, I'm not sure of the purpose but it doesn't seem like a flat training bonus is supposed to add to jutsu levels
                 /*if ($this->system->TRAIN_BOOST) {
@@ -1308,8 +1308,8 @@ class User extends Fighter {
 
                 $gain = User::$jutsu_train_gain;
                 // check event bonus
-                if ($this->system->event->exp_modifier > 1) {
-                    $gain = floor($gain * $this->system->event->exp_modifier);
+                if ($this->system->event->exp_gain_multiplier > 1) {
+                    $gain = floor($gain * $this->system->event->exp_gain_multiplier);
                 }
                 // commenting this out, I'm not sure of the purpose but it doesn't seem like a flat training bonus is supposed to add to jutsu levels
                 /*if ($this->system->TRAIN_BOOST) {
@@ -1464,8 +1464,8 @@ class User extends Fighter {
             throw new RuntimeException("Invalid stat!");
         }
 
-        if ($event_boost && !empty($this->system->event) && $this->system->event->exp_modifier > 1) {
-            $stat_gain *= $this->system->event->exp_modifier;
+        if ($event_boost && !empty($this->system->event) && $this->system->event->exp_gain_multiplier > 1) {
+            $stat_gain *= $this->system->event->exp_gain_multiplier;
         }
 
         $new_total_stats = $this->total_stats + $stat_gain;

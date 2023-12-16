@@ -330,8 +330,8 @@ class TrainingManager {
 
     public function trainingDisplay() {
         $train_gain = $this->train_gain;
-        if (!empty($this->system->event) && $this->system->event->exp_modifier > 1) {
-            $train_gain *= $this->system->event->exp_modifier;
+        if (!empty($this->system->event) && $this->system->event->exp_gain_multiplier > 1) {
+            $train_gain *= $this->system->event->exp_gain_multiplier;
         }
         if(str_contains($this->train_type, 'jutsu:')) {
             return "You will gain " . User::$jutsu_train_gain . " jutsu levels once training is complete!";
