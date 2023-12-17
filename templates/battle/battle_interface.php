@@ -284,7 +284,7 @@ if($battle->battle_text) {
     <tr>
         <td>
             <div class="active_effects_container">
-                <?php foreach ($battleManager->getEffects()->active_effects as $effect): ?>
+                <?php foreach ($battleManager->getEffects() as $effect): ?>
                 <?php if ($effect->target == $player->combat_id && $effect->turns > 0): ?>
                 <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
                     <div class="effect_name">
@@ -303,7 +303,7 @@ if($battle->battle_text) {
         </td>
         <td>
             <div class="active_effects_container">
-                <?php foreach ($battleManager->getEffects()->active_effects as $effect): ?>
+                <?php foreach ($battleManager->getEffects() as $effect): ?>
                     <?php if ($effect->target == $opponent->combat_id && $effect->turns > 0): ?>
                         <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
                             <div class="effect_name">

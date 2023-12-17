@@ -1561,7 +1561,10 @@ class BattleManager {
         return $this->battle->patrol_id;
     }
 
-    public function getEffects(): BattleEffectsManager {
-        return $this->effects;
+    /**
+    * @return BattleEffect[]
+    */
+    public function getEffects(): array {
+        return $this->effects->active_effects;
     }
 }
