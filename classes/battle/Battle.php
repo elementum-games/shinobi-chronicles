@@ -14,7 +14,7 @@ class Battle {
     const TYPE_AI_WAR = 7;
 
     const TURN_LENGTH = 20;
-    const INITIAL_TURN_LENGTH = 20;
+    const INITIAL_TURN_LENGTH = 40;
     const MAX_TURN_LENGTH = 40;
     const PREP_LENGTH = 20;
 
