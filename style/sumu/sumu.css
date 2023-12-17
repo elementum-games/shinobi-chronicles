@@ -955,7 +955,7 @@ button {
 #jutsu .jutsuList {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-evenly;
+    justify-content: center;
     margin-bottom: 30px;
     box-sizing: border-box;
     padding-top: 20px;
@@ -974,6 +974,7 @@ button {
     gap: 1px;
     outline: 1px solid #E0E0E0;
     user-select: none;
+    overflow: hidden;
 }
     #jutsu .jutsuName:hover {
         background: var(--box-color-default) !important;
@@ -988,6 +989,8 @@ button {
         color: #6e0e11;
         font-size: 16px;
         font-weight: bold;
+        overflow: hidden;
+        white-space: nowrap;
     }
     #jutsu .jutsuName .jutsu_type {
         font-family: var(--font-secondary);
@@ -1000,17 +1003,23 @@ button {
         font-family: var(--font-secondary);
         color: var(--font-color-2);
         font-size: 12px;
+        overflow: hidden;
+        white-space: nowrap;
     }
     #jutsu .jutsuName .jutsu_details_row {
         display: flex;
         justify-content: space-between;
         text-align: center;
         margin-bottom: 5px;
+        overflow: hidden;
+        white-space: nowrap;
     }
     #jutsu .jutsuName .jutsu_effect {
         display: flex;
         justify-content: space-between;
         text-align: center;
+        overflow: hidden;
+        white-space: nowrap;
     }
     #jutsu .jutsuName[aria-disabled='true'] {
         opacity: 0.5;
