@@ -2,6 +2,7 @@
 
 require __DIR__ . '/NewsPostDto.php';
 require_once __DIR__ . "/../notification/NotificationManager.php";
+require_once __DIR__ . '/../notification/BlockedNotificationManager.php';
 
 class NewsManager {
     private System $system;

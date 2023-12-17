@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../ReportManager.php';
 require_once __DIR__ . '/ChatPostDto.php';
+require_once __DIR__ . '/../notification/BlockedNotificationManager.php';
 
 class ChatManager {
     const MAX_POST_LENGTH = 350;
@@ -69,6 +70,11 @@ class ChatManager {
             $query = "SELECT * FROM `chat` WHERE `deleted` = 0 ORDER BY `post_id` DESC LIMIT $max_posts";
         }
         $result = $this->system->db->query($query);
+
+/*        $user_names = array_map()
+
+        $users_result = $this->system->db->query("SELECT `user_id`, `staff_level`, `premium_credits_purchased`, `chat_effect`, `avatar_link` FROM `users`
+                WHERE `user_name` = '{$this->system->db->clean($post->user_name)}'");*/
 
         $posts = [];
         while($row = $this->system->db->fetch($result)) {
@@ -279,11 +285,11 @@ class ChatManager {
             }
 
             $sql = "INSERT INTO `chat`
-                    (`user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES
-                           ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
+                    (`user_id`, `user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES
+                           (%s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
             $this->system->db->query(
                 sprintf(
-                    $sql, $this->player->user_name, $message, $title, $this->player->village->name, $staff_level, $user_color, time(), 0
+                    $sql, $this->player->user_id, $this->player->user_name, $message, $title, $this->player->village->name, $staff_level, $user_color, time(), 0
                 )
             );
             $new_post_id = $this->system->db->last_insert_id;
