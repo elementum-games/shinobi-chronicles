@@ -188,6 +188,9 @@ $prefill_item_id = $_POST['item_id'] ?? '';
         var currentlySelectedJutsu = false;
         var lastJutsu, firstJutsu = false;
         $('.jutsuName').click(function(){
+            if (lastJutsu == this) {
+                document.getElementById('submitbtn').click();
+            }
 
             if(lastJutsu !== this && firstJutsu) {
 
@@ -288,12 +291,10 @@ $prefill_item_id = $_POST['item_id'] ?? '';
         });
         $('#jutsu .taijutsu').click(function(){
             if(display_state !== 'taijutsu') {
-                $('#textPrompt').text(weapons_prompt);
-                $('#handSeals').hide();
-                $('#weapons').show();
-                if(display_state === 'bloodline_jutsu') {
-                    $('#handsealOverlay').fadeOut();
-                }
+                //$('#textPrompt').text(weapons_prompt);
+                //$('#handSeals').hide();
+                //$('#weapons').show();
+                $('#handsealOverlay').fadeIn();
             }
             display_state = 'taijutsu';
             $('#jutsuType').val('taijutsu');
@@ -462,13 +463,6 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                             <div class="jutsu_details">
                                 <div class="jutsu_details_row">
                                     <span class="jutsu_details_power">Power: <?= round($attack->power, 2) ?></span>
-                                    <span class="jutsu_details_cooldown">
-                                        <?php if ($cd_left > 0): ?>
-                                                CD: (<?= $cd_left ?>) <?= $attack->cooldown ?> turns
-                                        <?php else: ?>
-                                                CD: <?= $attack->cooldown ?> turns
-                                        <?php endif; ?>
-                                    </span>
                                 </div>
                                 <?php foreach ($attack->effects as $effect): ?>
                                         <div class="jutsu_effect">

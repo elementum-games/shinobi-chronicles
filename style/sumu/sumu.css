@@ -949,6 +949,9 @@ button {
         color: var(--font-color-2);
         border-color: var(--font-color-2);
     }
+#handsealOverlay {
+    background-color: var(--sidebar-button-background-color) !important;
+}
 #jutsu .jutsuList {
     display: flex;
     flex-wrap: wrap;
