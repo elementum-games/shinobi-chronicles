@@ -446,10 +446,12 @@ class BattleEffectsManager {
             $residual_damage_resisted = $residual_damage_raw - $damage;
             $attack_jutsu_color = BattleManager::getJutsuTextColor($effect->damage_type);
 
+            $damage_label = $effect->effect == 'reflect_damage' ? 'reflect damage' : 'residual damage';
+
             if ($residual_damage_resisted > 0) {
-                $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($damage) . "</span>" . " residual damage (resists " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($residual_damage_resisted) . "</span>" . " residual damage)");
+                $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($damage) . "</span>" . " $damage_label (resists " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($residual_damage_resisted) . "</span>" . " damage)");
             } else {
-                $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($damage) . "</span>" . " residual damage");
+                $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($damage) . "</span>" . " $damage_label");
             }
 
             $target->last_damage_taken += $damage;
@@ -571,6 +573,9 @@ class BattleEffectsManager {
             case 'delayed_residual':
                 $announcement_text = "[opponent] is taking Residual Damage" . $effect_details;
                 break;
+            case 'reflect_damage':
+                $announcement_text = "[opponent] is taking Reflect Damage";
+                break;
             case 'drain_chakra':
                 $announcement_text = "[opponent]'s Chakra is being drained" . $effect_details;
                 break;
@@ -632,10 +637,10 @@ class BattleEffectsManager {
                 $announcement_text = "[opponent]'s Evasion is being lowered" . $effect_details;
                 break;
             case 'offense_nerf':
-                $announcement_text = "[opponent]'s offense is being lowered" . $effect_details;
+                $announcement_text = "[opponent]'s Offense is being lowered" . $effect_details;
                 break;
             case 'resist_boost':
-                $announcement_text = "[player]'s defenses are being increased" . $effect_details;
+                $announcement_text = "[player]'s Defenses are being increased" . $effect_details;
                 break;
             default:
                 break;

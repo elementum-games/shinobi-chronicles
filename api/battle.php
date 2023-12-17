@@ -17,10 +17,12 @@ if (isset($_GET['check_turn'])) {
     try {
         $battle_id = $system->db->clean($_GET['check_turn']);
         $response = new APIResponse();
-        $battle_result = $system->db->query("SELECT `turn_count` FROM `battles` WHERE `battle_id`='{$battle_id}' LIMIT 1");
+        $battle_result = $system->db->query("SELECT `turn_count`, `turn_time`, `player1_time`, `player2_time` FROM `battles` WHERE `battle_id`='{$battle_id}' LIMIT 1");
         if ($system->db->last_num_rows) {
             $battle_result = $system->db->fetch($battle_result);
             $response->data['turn_count'] = $battle_result['turn_count'];
+            $response->data['player1_time'] = Battle::calcTimeRemaining($battle_result['turn_time'], $battle_result['player1_time']);
+            $response->data['player2_time'] = Battle::calcTimeRemaining($battle_result['turn_time'], $battle_result['player2_time']);
             API::exitWithData(
                 data: $response->data,
                 errors: $response->errors,

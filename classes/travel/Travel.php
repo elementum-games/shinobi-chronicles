@@ -6,7 +6,7 @@ class Travel {
 
     const TRAVEL_DELAY_MOVEMENT = 300; // milliseconds
     const TRAVEL_DELAY_PVP = 1500; // milliseconds
-    const TRAVEL_DELAY_AI = 750; // milliseconds
+    const TRAVEL_DELAY_AI = 0; // milliseconds
     const TRAVEL_DELAY_DEATH = 15000; // milliseconds
     const HOME_VILLAGE_COLOR = 'FFEF30';
     const PLAYER_ICON = '/images/ninja_head.png';

@@ -46,10 +46,6 @@ if($battle->battle_text) {
                 return;
             }
         }
-        player1_time--;
-        $("#player1_time").text(player1_time);
-        player2_time--;
-        $("#player2_time").text(player2_time);
         if ((player1_time <= 0 || player1_submitted) && (player2_time <= 0 || player2_submitted)) {
             updateContent();
             return;
@@ -60,6 +56,10 @@ if($battle->battle_text) {
                 if (data.data != undefined && data.data.turn_count > turn_count) {
                     updateContent();
                 } else {
+                    player1_time = data.data.player1_time;
+                    player2_time = data.data.player2_time;
+                    $("#player1_time").text(player1_time);
+                    $("#player2_time").text(player2_time);
                     setTimeout(checkTurn, 1000);
                 }
             })
@@ -169,6 +169,49 @@ if($battle->battle_text) {
     #forfeitDialog, #retreatDialog {
         display: none;
     }
+
+    .active_effects_container {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+    .active_effect {
+        display: inline-flex;
+        gap: 10px;
+        color: white;
+        font-family: var(--font-secondary);
+        font-weight: bold;
+        height: 26px;
+        align-items: center;
+        justify-content: center;
+    }
+        .active_effect.buff .effect_name {
+            background-color: #2a5e3c;
+        }
+        .active_effect.nerf .effect_name {
+            background-color: #7c2d2d;
+        }
+        .active_effect .effect_duration {
+            margin-left: -27px;
+            height: 21px;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            margin-top: 2px;
+        }
+        .active_effect .effect_duration_decoration {
+            margin-left: -22px;
+            margin-top: 1px;
+        }
+        .active_effect .effect_name {
+            line-height: 20px;
+            font-size: 12px;
+            height: 21px;
+            padding-left: 10px;
+            padding-right: 18px;
+            border-radius: 4px;
+            box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+        }
 </style>
 
 <div class='submenu'>
@@ -235,6 +278,46 @@ if($battle->battle_text) {
                         </label>
                     </div>
                 </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div class="active_effects_container">
+                <?php foreach ($battleManager->getEffects() as $effect): ?>
+                <?php if ($effect->target == $player->combat_id && $effect->turns > 0): ?>
+                <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
+                    <div class="effect_name">
+                        <?= System::unSlug($effect->effect) ?>
+                    </div>
+                    <svg class="effect_duration_decoration" width="26" height="26">
+                        <polygon points="0,13 13,0 26,13 13,26" fill="#ad9357" stroke="black" stroke-width="1"></polygon>
+                    </svg>
+                    <div class="effect_duration">
+                        <?= System::unSlug($effect->turns) ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        </td>
+        <td>
+            <div class="active_effects_container">
+                <?php foreach ($battleManager->getEffects() as $effect): ?>
+                    <?php if ($effect->target == $opponent->combat_id && $effect->turns > 0): ?>
+                        <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
+                            <div class="effect_name">
+                                <?= System::unSlug($effect->effect) ?>
+                            </div>
+                            <svg class="effect_duration_decoration" width="26" height="26">
+                                <polygon points="0,13 13,0 26,13 13,26" fill="#ad9357" stroke="black" stroke-width="1"></polygon>
+                            </svg>
+                            <div class="effect_duration">
+                                <?= System::unSlug($effect->turns) ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
             </div>
         </td>
     </tr>

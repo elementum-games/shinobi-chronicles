@@ -248,6 +248,9 @@ $rank_names = RankManager::fetchNames($system);
         $("#jutsu_filter_damage").on('click', function () {
             filter();
         });
+        $("#jutsu_filter_clash").on('click', function () {
+            filter();
+        });
         $("#jutsu_filter_buff").on('click', function () {
             filter();
         });
@@ -264,27 +267,23 @@ $rank_names = RankManager::fetchNames($system);
 
                 // Tag filters
                 if ($("#jutsu_filter_damage").is(':checked')) {
-                    if (jutsuEffect.includes('Residual Damage') || jutsuEffect.includes('None') || jutsuEffect.includes('Piercing') || jutsuEffect.includes('Recoil') || jutsuEffect.includes('Immolate')) {
+                    if (jutsuEffect.includes('Residual') || jutsuEffect.includes('None') || jutsuEffect.includes('Piercing') || jutsuEffect.includes('Recoil') || jutsuEffect.includes('Reflect') || jutsuEffect.includes('Immolate')) {
                         hideJutsu = false;
                     }
                 }
                 if ($("#jutsu_filter_buff").is(':checked')) {
-                    if (jutsuEffect.includes('Taijutsu Boost') || jutsuEffect.includes('Ninjutsu Boost') ||
-                        jutsuEffect.includes('Genjutsu Boost') || jutsuEffect.includes('Speed Boost') ||
-                        jutsuEffect.includes('Cast Speed Boost') || jutsuEffect.includes('Barrier') ||
-                        jutsuEffect.includes('Release Genjutsu') || jutsuEffect.includes('Counter') ||
-                        jutsuEffect.includes('Substitution') || jutsuEffect.includes('Resist Boost') ||
-                        jutsuEffect.includes('Evasion Boost')) {
+                    if (jutsuEffect.includes('Release Genjutsu') || jutsuEffect.includes('Boost')) {
+                        hideJutsu = false;
+                    }
+                }
+                if ($("#jutsu_filter_clash").is(':checked')) {
+                    if (jutsuEffect.includes('Barrier') || jutsuEffect.includes('Counter') ||
+                        jutsuEffect.includes('Substitution') || jutsuEffect.includes('Reflect') || jutsuEffect.includes('Piercing')) {
                         hideJutsu = false;
                     }
                 }
                 if ($("#jutsu_filter_debuff").is(':checked')) {
-                    if (jutsuEffect.includes('Taijutsu Nerf') || jutsuEffect.includes('Ninjutsu Nerf') ||
-                        jutsuEffect.includes('Genjutsu Nerf') || jutsuEffect.includes('Speed Nerf') ||
-                        jutsuEffect.includes('Cast Speed Nerf') || jutsuEffect.includes('Willpower Nerf') ||
-                        jutsuEffect.includes('Intelligence Nerf') || jutsuEffect.includes('Vulnerability') ||
-                        jutsuEffect.includes('Offense Nerf') || jutsuEffect.includes('Weakness') ||
-                        jutsuEffect.includes('Evasion Nerf')) {
+                    if (jutsuEffect.includes('Nerf') || jutsuEffect.includes('Vulnerability')) {
                         hideJutsu = false;
                     }
                 }
@@ -474,6 +473,8 @@ $rank_names = RankManager::fetchNames($system);
                 <div class="jutsu_filter_checkbox_container">
                     <input id="jutsu_filter_damage" class="jutsu_filter_checkbox" type="checkbox" name="damage_toggle" checked/>
                     <label for="damage_toggle">Damage</label>
+                    <input id="jutsu_filter_clash" class="jutsu_filter_checkbox" type="checkbox" name="clash_toggle" checked/ />
+                    <label for="clash_toggle">Clash</label>
                     <input id="jutsu_filter_buff" class="jutsu_filter_checkbox" type="checkbox" name="buff_toggle" checked/>
                     <label for="buff_toggle">Buff</label>
                     <input id="jutsu_filter_debuff" class="jutsu_filter_checkbox" type="checkbox" name="debuff_toggle" checked/>
@@ -505,7 +506,7 @@ $rank_names = RankManager::fetchNames($system);
                                 data-jutsu_power="<?= $jutsu->power ?> (+<?= round($jutsu->power - $jutsu->base_power, 2) ?>)"
                                 data-jutsu_cooldown="<?php echo $jutsu->cooldown == 1 ? $jutsu->cooldown . " turn" :  $jutsu->cooldown . " turns" ?>"
                                 data-jutsu_effect_1="<?php
-                                echo in_array($jutsu->effects[0]->effect, ["substitution", "counter", "piercing"])
+                                echo in_array($jutsu->effects[0]->effect, ["substitution", "counter", "piercing", "recoil", "immolate"])
                                     ? System::unSlug($jutsu->effects[0]->effect) . " (" . round($jutsu->effects[0]->effect_amount, 0) . "%)"
                                     : (($jutsu->effects[0]->effect == "none" || $jutsu->effects[0]->effect == "barrier")
                                         ? System::unSlug($jutsu->effects[0]->effect)
@@ -514,13 +515,13 @@ $rank_names = RankManager::fetchNames($system);
                                             : $jutsu->effects[0]->effect_length . " turns"))
                                     ?>"
                                 data-jutsu_effect_2="<?php
-                                echo in_array($jutsu->effects[1]->effect, ["substitution", "counter", "piercing"])
+                                echo in_array($jutsu->effects[1]->effect, ["substitution", "counter", "piercing", "recoil", "immolate"])
                                     ? System::unSlug($jutsu->effects[1]->effect) . " (" . round($jutsu->effects[1]->effect_amount, 0) . "%)"
                                     : (($jutsu->effects[1]->effect == "none" || $jutsu->effects[1]->effect == "barrier")
                                         ? System::unSlug($jutsu->effects[1]->effect)
-                                        : System::unSlug($jutsu->effects[1]->effect) . " (" . round($jutsu->effects[1]->effect_amount, 0) . "%)" . ", " . ($jutsu->effects[1]->effect_length == 1
-                                            ? $jutsu->effects[1]->effect_length . " turn"
-                                            : $jutsu->effects[1]->effect_length . " turns"))
+                                        : System::unSlug($jutsu->effects[1]->effect) . " (" . round($jutsu->effects[1]->effect_amount, 0) . "%" . ", " . ($jutsu->effects[1]->effect_length == 1
+                                            ? $jutsu->effects[1]->effect_length . " turn)"
+                                            : $jutsu->effects[1]->effect_length . " turns)"))
                                     ?>"
                                 data-jutsu_description="<?= $jutsu->description ?>"
                                 data-jutsu_child="<?php echo array_key_exists($jutsu->id, $child_jutsu) ? implode(', ' , $child_jutsu[$jutsu->id][0]) : "None" ?>"

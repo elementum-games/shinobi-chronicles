@@ -54,8 +54,11 @@
                     <?php if($jutsu_to_view['cooldown']): ?>
                         <label style='width:6.5em;'>Cooldown:</label><?= $jutsu_to_view['cooldown'] ?> turn(s)<br />
                     <?php endif; ?>
-                    <?php if($jutsu_to_view['effect']): ?>
-                        <label style='width:6.5em;'>Effect:</label><?= System::unSlug($jutsu_to_view['effect']) ?><br />
+                    <?php if($jutsu_to_view['effect'] || $jutsu_to_view['use_type'] == Jutsu::USE_TYPE_BARRIER): ?>
+                        <label style='width:6.5em;'>Effect:</label><?= $jutsu_to_view['use_type'] == Jutsu::USE_TYPE_BARRIER ? "Barrier" : System::unSlug($jutsu_to_view['effect']) ?><br />
+                    <?php endif; ?>
+                    <?php if ($jutsu_to_view['effect2'] != "none"): ?>
+                        <label style='width:6.5em;'>Effect:</label><?= System::unSlug($jutsu_to_view['effect2']) ?><br />
                     <?php endif; ?>
                     <label style='width:6.5em;float:left;'>Description:</label>
                         <p style='display:inline-block;margin:0;width:37.1em;'><?= $jutsu_to_view['description'] ?></p>
@@ -107,7 +110,7 @@
 <table class='table' style='margin-top:15px;'>
     <tr id='shop_table_header'>
         <th style='width:25%;'>Name</th>
-        <th style='width:15%;'>Effect</th>
+        <th style='width:15%;'>Effect(s)</th>
         <th style='width:10%;'>Type</th>
         <th style='width:10%;'>Element</th>
         <th style='width:10%;'>Cost</th>
@@ -135,7 +138,9 @@
                         <?= $jutsu['name'] ?>
                     </a>
                 </td>
-                <td style='width:25%; text-align:center;'><?= System::unSlug($jutsu['effect']) ?></td>
+                <td style='width:25%; text-align:center;'>
+                    <?php echo ($jutsu['use_type'] == Jutsu::USE_TYPE_BARRIER ? "Barrier" : System::unSlug($jutsu['effect'])) . ($jutsu['effect2'] != "none" ? "<br>" . System::unSlug($jutsu['effect2']) : "") ?>
+                </td>
                 <td style='width:25%; text-align:center;'><?= System::unSlug($jutsu['jutsu_type']) ?></td>
                 <td style='width:25%; text-align:center;'><?= System::unSlug($jutsu['element']) ?></td>
                 <td style='width:25%; text-align:center;'>&yen;<?= number_format($jutsu['purchase_cost']) ?></td>

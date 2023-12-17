@@ -810,18 +810,70 @@ button {
         color: var(--font-color-2);
         border-color: var(--font-color-2);
     }
+#jutsu .jutsuList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    margin-bottom: 30px;
+    box-sizing: border-box;
+    padding-top: 20px;
+}
 #jutsu .jutsuName {
-    background: var(--content-background-color) !important;
+    background: var(--box-color-default) !important;
     color: var(--font-color-3);
-    border-color: var(--font-color-3);
+    width: 200px;
+    height: 110px;
+    border-radius: 12px;
+    padding: 5px 10px 2px 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    user-select: none;
 }
     #jutsu .jutsuName:hover {
-        background: var(--box-color-default) !important;
+        background: #221920 !important;
     }
     #jutsu .jutsuName.selected_jutsu {
-        border-color: var(--font-color-2);
+        outline: #4e2a3c 1px solid;
         color: var(--font-color-2);
+        background: #221920 !important;
+    }
+    #jutsu .jutsuName .jutsu_name {
+        font-family: var(--font-secondary);
+        color: #d2cbef;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    #jutsu .jutsuName .jutsu_type {
+        font-family: var(--font-secondary);
+        color: #c0c7dc;
+        font-size: 13px;
+        font-variant: small-caps;
+        text-transform: lowercase;
+    }
+    #jutsu .jutsuName .jutsu_details {
+        font-family: var(--font-secondary);
+        color: #eee1c8;
+        font-size: 12px;
+    }
+    #jutsu .jutsuName .jutsu_details_row {
+        display: flex;
+        justify-content: space-between;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+    #jutsu .jutsuName .jutsu_effect {
+        display: flex;
+        justify-content: space-between;
+        text-align: center;
+    }
+    #jutsu .jutsuName[aria-disabled='true'] {
+        opacity: 0.5;
+    }
+    #jutsu .jutsuName[aria-disabled='true']:hover {
         background: var(--box-color-default) !important;
+        cursor: default;
     }
 .weapon {
     background: var(--content-background-color) !important;
