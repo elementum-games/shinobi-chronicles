@@ -456,7 +456,7 @@ if($LOGGED_IN) {
     $layout = $system->setLayoutByName($player->layout);
 
     // Master close
-    if(!$system->SC_OPEN && !$player->isUserAdmin()) {
+    if(!$system->SC_OPEN && !$player->isContentAdmin()) {
         $layout->renderBeforeContentHTML($system, $player, "Profile");
 
         echo "<table class='table'><tr><th>Game Maintenance</th></tr>
