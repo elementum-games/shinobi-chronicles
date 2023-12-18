@@ -94,8 +94,6 @@ abstract class Fighter {
     public $taijutsu_resist = 0;
     public $genjutsu_resist = 0;
 
-    public $defense_boost = 0;
-
     public $barrier;
 
     public $reputation_defense_boost = 0;
@@ -457,7 +455,6 @@ abstract class Fighter {
             $defense = 1;
         }
         if($apply_resists) {
-            $defense *= (1 + $this->defense_boost);
             if (!empty($this->bloodline_defense_boosts)) {
                 foreach ($this->bloodline_defense_boosts as $id => $boost) {
                     $boost_type = explode('_', $boost['effect'])[0];
