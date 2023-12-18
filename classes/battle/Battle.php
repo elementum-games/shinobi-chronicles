@@ -29,7 +29,7 @@ class Battle {
     const MIN_DEBUFF_RATIO = 0.1;
     const MAX_DIFFUSE_PERCENT = 0.75;
 
-    const REPUTATION_DAMAGE_RESISTANCE_BOOST = 15;
+    const REPUTATION_DAMAGE_RESISTANCE_BOOST = 5;
 
     private System $system;
 

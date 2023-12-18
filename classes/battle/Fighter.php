@@ -446,7 +446,8 @@ abstract class Fighter {
             $defense = 1;
         }
         if($apply_resists) {
-            $defense *= (1 + $this->defense_boost);
+            // disabling for future rework, weird math and unclear to players 
+            // $defense *= (1 + $this->defense_boost);
             if (!empty($this->bloodline_defense_boosts)) {
                 foreach ($this->bloodline_defense_boosts as $id => $boost) {
                     $boost_type = explode('_', $boost['effect'])[0];
