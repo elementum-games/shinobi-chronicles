@@ -216,7 +216,12 @@ if($battle->battle_text) {
 
 <div class='submenu'>
     <ul class='submenu'>
-        <li style='width:100%;'><a href='<?= $refresh_link ?>'>Refresh Battle</a></li>
+        <?php if ($battleManager->spectate): ?>
+            <li style='width:100%;'><a href='<?= $refresh_link ?>'>Refresh Battle</a></li>
+        <?php else: ?>
+            <li style='width:49%;'><a href='<?= $refresh_link ?>'>Refresh Battle</a></li>
+            <li style='width:49%;'><a href='#actionSelect'>Action Select</a></li>
+        <?php endif; ?>
     </ul>
 </div>
 <div class='submenuMargin'></div>
@@ -332,7 +337,7 @@ if($battle->battle_text) {
 
     <!--// Trigger win action or display action prompt-->
     <?php if(!$battle->isComplete() && !$battleManager->spectate): ?>
-        <tr><th colspan='2'>Select Action</th></tr>
+        <tr><th id="actionSelect" colspan='2'>Select Action</th></tr>
 
         <?php if(!$battleManager->playerActionSubmitted()): ?>
             <?php require 'templates/battle/action_prompt.php'; ?>
