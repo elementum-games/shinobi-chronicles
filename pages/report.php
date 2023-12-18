@@ -60,25 +60,23 @@ function report() {
                     break;
                 case ReportManager::REPORT_TYPE_CHAT:
                     $result = $system->db->query(
-                        "SELECT `user_name`, `message`, `time` FROM `chat` WHERE `post_id`='$content_id' LIMIT 1"
+                        "SELECT 
+                            `users`.`user_id`, `users`.`staff_level`,
+                            `chat`.`user_name`, `chat`.`message`, `chat`.`time` 
+                            FROM `chat`
+                            INNER JOIN `users` ON `chat`.`user_id`=`users`.`user_id`
+                            WHERE `post_id`='$content_id' LIMIT 1"
                     );
                     if($system->db->last_num_rows == 0) {
-                        throw new RuntimeException("Invalid user!");
+                        throw new RuntimeException("Invalid user / chat post!");
                     }
 
-                    $content_data = $system->db->fetch($result);
+                    $data = $system->db->fetch($result);
 
-                    $result = $system->db->query(
-                        "SELECT `user_id`, `staff_level` FROM `users` WHERE `user_name`='" . $content_data['user_name'] . "' LIMIT 1"
-                    );
-                    if(! $system->db->last_num_rows) {
-                        throw new RuntimeException("Invalid user!");
-                    }
-                    $result = $system->db->fetch($result);
-                    $user_id = $result['user_id'];
-                    $staff_level = $result['staff_level'];
-                    $time = $content_data['time'];
-                    $content = $content_data['message'];
+                    $user_id = $data['user_id'];
+                    $staff_level = $data['staff_level'];
+                    $time = $data['time'];
+                    $content = $data['message'];
                     break;
                 default:
                     throw new RuntimeException("Invalid report type!");
@@ -189,7 +187,7 @@ function report() {
                     break;
                 case ReportManager::REPORT_TYPE_CHAT:
                     $result = $system->db->query(
-                        "SELECT `user_name`, `message` FROM `chat` WHERE `post_id`='$content_id' LIMIT 1"
+                        "SELECT `user_id`, `user_name`, `message` FROM `chat` WHERE `post_id`='$content_id' LIMIT 1"
                     );
                     if($system->db->last_num_rows == 0) {
                         throw new RuntimeException("Invalid user!");
@@ -197,14 +195,7 @@ function report() {
 
                     $content_data = $system->db->fetch($result);
 
-                    $result = $system->db->query(
-                        "SELECT `user_id` FROM `users` WHERE `user_name`='" . $content_data['user_name'] . "' LIMIT 1"
-                    );
-                    if($system->db->last_num_rows == 0) {
-                        throw new RuntimeException("Invalid user!");
-                    }
-                    $result = $system->db->fetch($result);
-                    $user_id = $result['user_id'];
+                    $user_id = $content_data['user_id'];
                     $user_name = $content_data['user_name'];
                     break;
                 default:

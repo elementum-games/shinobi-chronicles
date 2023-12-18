@@ -33,8 +33,31 @@ class Blacklist {
     }
 
     // Check if player has anybody blocked
-    public function hasUsersBlocked(): bool {
+    public function hasAnyUsersBlocked(): bool {
         return !empty($this->blacklist);
+    }
+
+    /**
+     * @return int[] user IDs of accounts the player has blocked
+     */
+    public function blockedUserIds(bool $exclude_staff = false): array {
+        $blocked_user_ids = array_keys($this->blacklist);
+
+        if(!$exclude_staff) {
+            return $blocked_user_ids;
+        }
+        if(count($blocked_user_ids) <= 0) {
+            return $blocked_user_ids;
+        }
+
+        $result = $this->system->db->query("
+            SELECT `user_id` FROM `users` 
+            WHERE `user_id` IN (" . implode(",", $blocked_user_ids) . ")
+            AND `staff_level` < 1
+        ");
+        return array_map(function($user_record) {
+            return $user_record['user_id'];
+        }, $this->system->db->fetch_all($result));
     }
 
     // Check if user is blocked by id

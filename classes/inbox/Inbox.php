@@ -157,7 +157,7 @@ class Inbox {
                 system: $system,
                 user_id: $member->user_id
             );
-            if(!$blacklist->hasUsersBlocked()) {
+            if(!$blacklist->hasAnyUsersBlocked()) {
                 continue;
             }
             foreach($user_ids as $id) {

@@ -17,9 +17,14 @@ class ChatManager {
      * @throws RuntimeException
      */
     public function loadPosts(?int $current_page_post_id = null): array {
-        $result = $this->system->db->query(
-            "SELECT MAX(`post_id`) as `latest_post_id`, MIN(`post_id`) as `first_post_id` FROM `chat`"
-        );
+        $blocked_user_ids = $this->player->blacklist->blockedUserIds(exclude_staff: true);
+
+        $query = "SELECT MAX(`post_id`) as `latest_post_id`, MIN(`post_id`) as `first_post_id` FROM `chat`";
+        if(count($blocked_user_ids) > 0) {
+            $query .= " WHERE `user_id` NOT IN (" . implode(",", $blocked_user_ids) . ")";
+        }
+
+        $result = $this->system->db->query($query);
         if($this->system->db->last_num_rows) {
             $bookend_posts = $this->system->db->fetch($result);
             $latest_post_id = $bookend_posts['latest_post_id'];
@@ -64,35 +69,24 @@ class ChatManager {
      */
     private function fetchPosts(?int $starting_post_id = null, int $max_posts = self::MAX_POSTS_PER_PAGE, bool $is_quote = false): array {
         if($starting_post_id != null) {
-            $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id  AND `deleted` = 0 ORDER BY `post_id` DESC LIMIT $max_posts";
+            $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id AND `deleted`=0";
         }
         else {
-            $query = "SELECT * FROM `chat` WHERE `deleted` = 0 ORDER BY `post_id` DESC LIMIT $max_posts";
+            $query = "SELECT * FROM `chat` WHERE `deleted` = 0";
         }
+
+        $blocked_user_ids = $this->player->blacklist->blockedUserIds(exclude_staff: true);
+        if(count($blocked_user_ids) > 0) {
+            $query .= " AND `user_id` NOT IN (" . implode(",", $blocked_user_ids) . ")";
+        }
+
+        $query .= " ORDER BY `post_id` DESC LIMIT $max_posts";
+
         $result = $this->system->db->query($query);
-
-/*        $user_names = array_map()
-
-        $users_result = $this->system->db->query("SELECT `user_id`, `staff_level`, `premium_credits_purchased`, `chat_effect`, `avatar_link` FROM `users`
-                WHERE `user_name` = '{$this->system->db->clean($post->user_name)}'");*/
 
         $posts = [];
         while($row = $this->system->db->fetch($result)) {
             $post = ChatPostDto::fromDb($row);
-
-            //Skip post if user blacklisted
-            $blacklisted = false;
-            // Legacy posts blocking
-            if($post->user_id == 0) {
-                if($this->player->blacklist->userBlockedByName($post->user_name)) {
-                    $blacklisted = true;
-                }
-            }
-            else {
-                if($this->player->blacklist->userBlocked($post->user_id)) {
-                    $blacklisted = true;
-                }
-            }
 
             //Base data
             $post->avatar = './images/default_avatar.png';
@@ -115,15 +109,6 @@ class ChatManager {
                 } else {
                     $user_data['avatar_style'] = "avy_round";
                     $user_data['avatar_frame'] = "avy_frame_default";
-                }
-                //If blacklisted block content, only if blacklisted user is not currently a staff member
-                if($blacklisted && $user_data['staff_level'] == StaffManager::STAFF_NONE) {
-                    continue;
-                }
-            }
-            else {
-                if($blacklisted) {
-                    continue;
                 }
             }
 
@@ -247,7 +232,7 @@ class ChatManager {
         try {
             $result = $this->system->db->query(
                 "SELECT `message` FROM `chat`
-                     WHERE `user_name` = '{$this->player->user_name}' ORDER BY  `post_id` DESC LIMIT 1"
+                     WHERE `user_id` = '{$this->player->user_id}' ORDER BY  `post_id` DESC LIMIT 1"
             );
             if($this->system->db->last_num_rows) {
                 $post = $this->system->db->fetch($result);
