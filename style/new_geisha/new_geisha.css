@@ -700,9 +700,9 @@ a#spec_miss_cancel {
     #container {
         flex-direction: column !important;
         padding-bottom: 0px;
-        transform: scale(1.35);
+        transform: scale(1.2);
         transform-origin: top left;
-        width: calc(100% / 1.35) !important;
+        width: calc(100% / 1.2) !important;
         margin-left: 0;
     }
     #footer {

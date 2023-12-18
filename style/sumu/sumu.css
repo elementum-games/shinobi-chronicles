@@ -838,10 +838,7 @@ a#spec_miss_cancel {
     #container {
         flex-direction: column !important;
         padding-bottom: 0px;
-        transform: scale(1.35);
-        transform-origin: top left;
-        width: calc(100% / 1.35) !important;
-        margin-left: 0;
+        width: 100%;
     }
 
     #footer {
@@ -866,6 +863,9 @@ a#spec_miss_cancel {
     #content {
         width: 100%;
     }
+        #content::after {
+            background: none;
+        }
 
     .sb_header_bar::after {
         display: none;
