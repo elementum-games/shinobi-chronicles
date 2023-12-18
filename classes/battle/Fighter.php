@@ -250,7 +250,7 @@ abstract class Fighter {
 
     public function getPrimaryJutsuType(): string {
         // First, is one of the offenses higher than the others
-        if($this->bloodline_skill > max($this->ninjutsu_skill, $this->taijutsu_skill, $this->genjutsu_skill)) {
+        if($this->bloodline != null && $this->bloodline_skill > max($this->ninjutsu_skill, $this->taijutsu_skill, $this->genjutsu_skill)) {
             return $this->bloodline->getPrimaryJutsuType();
         }
         if($this->ninjutsu_skill > max($this->taijutsu_skill, $this->genjutsu_skill)) {
