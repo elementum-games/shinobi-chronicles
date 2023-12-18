@@ -637,8 +637,6 @@ class User extends Fighter {
         $this->intelligence_boost = 0;
         $this->willpower_boost = 0;
 
-        $this->defense_boost = 0;
-
         $this->ninjutsu_resist = 0;
         $this->taijutsu_resist = 0;
         $this->genjutsu_resist = 0;
@@ -724,9 +722,6 @@ class User extends Fighter {
             // Player team stuff
             else {
                 $this->team = Team::findById($this->system, $team_id);
-                if($this->team != null) {
-                    $this->defense_boost += $this->team->getDefenseBoost($this);
-                }
             }
         }
 
