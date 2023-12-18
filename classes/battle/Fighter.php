@@ -249,17 +249,36 @@ abstract class Fighter {
     }
 
     public function getPrimaryJutsuType(): string {
-        // First, is one of the offenses higher than the others
-        if($this->bloodline != null && $this->bloodline_skill > max($this->ninjutsu_skill, $this->taijutsu_skill, $this->genjutsu_skill)) {
-            return $this->bloodline->getPrimaryJutsuType();
+        // Get total offense value
+        $ninjutsu_skill = $this->ninjutsu_skill;
+        $taijutsu_skill = $this->taijutsu_skill;
+        $genjutsu_skill = $this->genjutsu_skill;
+        if ($this->bloodline != null) {
+            foreach ($this->bloodline->combat_boosts as $combat_boost) {
+                switch ($combat_boost['effect']) {
+                    case 'ninjutsu_boost':
+                        $ninjutsu_skill += $combat_boost['effect_amount'];
+                        break;
+                    case 'taijutsu_boost':
+                        $taijutsu_skill += $combat_boost['effect_amount'];
+                        break;
+                    case 'genjutsu_boost':
+                        $genjutsu_skill += $combat_boost['effect_amount'];
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
-        if($this->ninjutsu_skill > max($this->taijutsu_skill, $this->genjutsu_skill)) {
+
+        // First, is one of the offenses higher than the others
+        if($ninjutsu_skill > max($taijutsu_skill, $genjutsu_skill)) {
             return 'ninjutsu';
         }
-        if($this->taijutsu_skill > max($this->ninjutsu_skill, $this->genjutsu_skill)) {
+        if($taijutsu_skill > max($ninjutsu_skill, $genjutsu_skill)) {
             return 'taijutsu';
         }
-        if($this->genjutsu_skill > max($this->ninjutsu_skill, $this->taijutsu_skill)) {
+        if($genjutsu_skill > max($ninjutsu_skill, $taijutsu_skill)) {
             return 'genjutsu';
         }
 
