@@ -439,6 +439,12 @@ $prefill_item_id = $_POST['item_id'] ?? '';
             <?php else: ?>
                 <p style='text-align:center;'>You do not have any healing items.</p>
             <?php endif; ?>
+            <form action='<?= $self_link ?>' method='post'>
+                <input type='hidden' id='itemID' name='item_id' value='<?= $prefill_item_id ?>' />
+                <p style='display:block;text-align:center;margin:auto;'>
+                    <input id='submitbtn' type='submit' name='attack' value='Submit' />
+                </p>
+            </form>
         </div>
     </td></tr>
 <?php else: ?>
