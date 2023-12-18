@@ -294,6 +294,22 @@ class Bloodline {
         return $offense_to_bloodline;
     }
 
+    public function getPrimaryJutsuType(): string {
+        foreach($this->combat_boosts as $combat_boost) {
+            switch($combat_boost['effect']) {
+                case 'ninjutsu_boost':
+                    return 'ninjutsu';
+                case 'taijutsu_boost':
+                    return 'taijutsu';
+                case 'genjutsu_boost':
+                    return 'genjutsu';
+                default:
+                    return 'ninjutsu';
+                    break;
+            }
+        }
+    }
+
     /**
      * @param System $system
      * @param int    $bloodline_id

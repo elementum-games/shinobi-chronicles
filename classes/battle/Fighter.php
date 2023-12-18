@@ -284,18 +284,7 @@ abstract class Fighter {
 
         // What's the offense boost on bloodline, if any
         if($this->bloodline != null) {
-            foreach($this->bloodline->combat_boosts as $combat_boost) {
-                switch($combat_boost['effect']) {
-                    case 'ninjutsu_boost':
-                        return 'ninjutsu';
-                    case 'taijutsu_boost':
-                        return 'taijutsu';
-                    case 'genjutsu_boost':
-                        return 'genjutsu';
-                    default:
-                        break;
-                }
-            }
+            return $this->bloodline->getPrimaryJutsuType();
         }
 
         // Fuck it, you're a ninja, you use ninjutsu
