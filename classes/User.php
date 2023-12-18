@@ -1243,7 +1243,7 @@ class User extends Fighter {
 
                 $gain = User::$jutsu_train_gain;
                 // check event bonus
-                if ($this->system->event->exp_gain_multiplier > 1) {
+                if ($this->system->event != null && $this->system->event->exp_gain_multiplier > 1) {
                     $gain = floor($gain * $this->system->event->exp_gain_multiplier);
                 }
                 // commenting this out, I'm not sure of the purpose but it doesn't seem like a flat training bonus is supposed to add to jutsu levels
@@ -1304,7 +1304,7 @@ class User extends Fighter {
 
                 $gain = User::$jutsu_train_gain;
                 // check event bonus
-                if ($this->system->event->exp_gain_multiplier > 1) {
+                if ($this->system->event != null && $this->system->event->exp_gain_multiplier > 1) {
                     $gain = floor($gain * $this->system->event->exp_gain_multiplier);
                 }
                 // commenting this out, I'm not sure of the purpose but it doesn't seem like a flat training bonus is supposed to add to jutsu levels
