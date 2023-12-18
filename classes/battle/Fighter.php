@@ -250,6 +250,9 @@ abstract class Fighter {
 
     public function getPrimaryJutsuType(): string {
         // First, is one of the offenses higher than the others
+        if($this->bloodline_skill > max($this->ninjutsu_skill, $this->taijutsu_skill, $this->genjutsu_skill)) {
+            return $this->bloodline->getPrimaryJutsuType();
+        }
         if($this->ninjutsu_skill > max($this->taijutsu_skill, $this->genjutsu_skill)) {
             return 'ninjutsu';
         }
@@ -262,18 +265,7 @@ abstract class Fighter {
 
         // What's the offense boost on bloodline, if any
         if($this->bloodline != null) {
-            foreach($this->bloodline->combat_boosts as $combat_boost) {
-                switch($combat_boost['effect']) {
-                    case 'ninjutsu_boost':
-                        return 'ninjutsu';
-                    case 'taijutsu_boost':
-                        return 'taijutsu';
-                    case 'genjutsu_boost':
-                        return 'genjutsu';
-                    default:
-                        break;
-                }
-            }
+            return $this->bloodline->getPrimaryJutsuType();
         }
 
         // Fuck it, you're a ninja, you use ninjutsu
