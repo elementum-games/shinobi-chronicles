@@ -754,7 +754,7 @@ class BattleManager {
                     break;
                 case 'reflect':
                     $attack->reflect_percent += $effect->effect_amount / 100;
-                    $attack->reflect_duration = min($effect->effect_length, 1);
+                    $attack->reflect_duration = max($effect->effect_length, 1);
                     break;
                 default:
                     break;
