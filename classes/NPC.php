@@ -299,7 +299,7 @@ class NPC extends Fighter {
             $test_damage = $battle->simulateAIAttack($jutsu);
             $result = $test_damage['player_simulated_damage_taken'] - $test_damage['ai_simulated_damage_taken'];
             // debug
-            echo $jutsu->name . ": " . $result . "<br>";
+            //echo $jutsu->name . ": " . $result . "<br>";
             // if no other jutsu selected use this for basis of comparison
             if (empty($best_jutsu)) {
                 $best_damage = $result;
