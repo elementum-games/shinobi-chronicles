@@ -197,6 +197,10 @@
     justify-content: center;
 }
 
+html {
+    scroll-behavior: smooth
+}
+
 body {
     background-color: var(--main-background-color);
     background-image: linear-gradient(to right, var(--main-background-color) 0%, transparent 17%, transparent 83%, var(--main-background-color) 100%), url(../../images/v2/new_geisha/background_ng_1.jpg);
