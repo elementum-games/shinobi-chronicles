@@ -716,12 +716,14 @@ class BattleEffectsManager {
         $this->displays[$fighter->combat_id][] = $display;
     }
 
-    public function processImmolate(BattleAttack $battleAttack, Fighter $target): int {
+    public function processImmolate(BattleAttack $battleAttack, Fighter $target, bool $simulation = false): int {
         $immolate_raw_damage = 0;
         foreach ($this->active_effects as $index => $effect) {
             if (($effect->effect == 'residual_damage' || $effect->effect == 'bleed' || $effect->effect == 'delayed_residual' || $effect->effect == 'reflect_damage') && $effect->target == $target->combat_id) {
                 $immolate_raw_damage += ($effect->turns * $effect->effect_amount);
-                unset($this->active_effects[$index]);
+                if (!$simulation) {
+                    unset($this->active_effects[$index]);
+                }
             }
         }
         return $immolate_raw_damage;

@@ -273,11 +273,23 @@ class Battle {
         $this->player2->combat_id = Battle::combatId(Battle::TEAM2, $this->player2);
 
         if($this->player1 instanceof NPC) {
-            $this->player1->loadData();
+            // if opponent is player, pass to constructor for AI scaling
+            if ($this->player2 instanceof User) {
+                $this->player1->loadData($this->player2);
+            }
+            else {
+                $this->player1->loadData();
+            }
             $this->player1->health = $this->fighter_health[$this->player1->combat_id];
         }
         if($this->player2 instanceof NPC) {
-            $this->player2->loadData();
+            // if opponent is player, pass to constructor for AI scaling
+            if ($this->player1 instanceof User) {
+                $this->player2->loadData($this->player1);
+            }
+            else {
+                $this->player2->loadData();
+            }
             $this->player2->health = $this->fighter_health[$this->player2->combat_id];
         }
 
@@ -353,27 +365,30 @@ class Battle {
             }
             if($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player1_equipped_jutsu_ids[$jutsu->id])) {
                 $jutsu->power *= 0.75;
-                foreach($jutsu->effects as $effect) {
+                foreach ($jutsu->effects as $effect) {
                     $effect->display_effect_amount *= 0.75;
                     $effect->effect_amount *= 0.75;
                 }
             }
         }
-        foreach($this->player2->jutsu as $jutsu) {
-            if($jutsu->rank == 1) continue;
+        if (!$this->player2 instanceof NPC) {
+            foreach ($this->player2->jutsu as $jutsu) {
+                if ($jutsu->rank == 1)
+                    continue;
 
-            if($jutsu->jutsu_type != $player2_primary_jutsu_type) {
-                $jutsu->power *= 0.5;
-                foreach($jutsu->effects as $effect) {
-                    $effect->display_effect_amount *= 0.5;
-                    $effect->effect_amount *= 0.5;
+                if ($jutsu->jutsu_type != $player2_primary_jutsu_type) {
+                    $jutsu->power *= 0.5;
+                    foreach ($jutsu->effects as $effect) {
+                        $effect->display_effect_amount *= 0.5;
+                        $effect->effect_amount *= 0.5;
+                    }
                 }
-            }
-            if($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player2_equipped_jutsu_ids[$jutsu->id])) {
-                $jutsu->power *= 0.75;
-                foreach($jutsu->effects as $effect) {
-                    $effect->display_effect_amount *= 0.75;
-                    $effect->effect_amount *= 0.75;
+                if($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player2_equipped_jutsu_ids[$jutsu->id])) {
+                    $jutsu->power *= 0.75;
+                    foreach($jutsu->effects as $effect) {
+                        $effect->display_effect_amount *= 0.75;
+                        $effect->effect_amount *= 0.75;
+                    }
                 }
             }
         }
@@ -533,7 +548,7 @@ class Battle {
             }
         }
         foreach ($this->player2->jutsu as $jutsu) {
-            if ($jutsu->linked_jutsu_id > 0) {
+            if ($jutsu->linked_jutsu_id > 0 && $this->player2 instanceof User) {
                 $id = "J" . $jutsu->id . ":T2:U:" . $this->player2->user_id;
                 if (isset($this->jutsu_cooldowns[$id]) && $this->jutsu_cooldowns[$id] > 0) {
                     if (!isset($this->player1->jutsu[$jutsu->linked_jutsu_id])) {

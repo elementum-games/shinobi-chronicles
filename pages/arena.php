@@ -61,7 +61,7 @@ function arena(): bool {
                 try {
                     $ai_id = $_GET['fight'];
                     $ai = new NPC($system, $ai_id);
-                    $ai->loadData();
+                    $ai->loadData($player);
                     $ai->health = $ai->max_health;
 
                     $player->last_ai_ms = System::currentTimeMs();

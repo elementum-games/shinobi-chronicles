@@ -38,6 +38,10 @@ class NPC extends Fighter {
 
     public int $money;
 
+    public int $battle_iq = 0; // chance to use optimal jutsu over random
+    public bool $scaling = false; // whether AI will scale to the nearest possible level
+    public array $shop_jutsu_priority = []; // if set, AI will prioritize these jutsu on non-optimal roll
+
     /** @var Jutsu[] */
     public array $jutsu = [];
 
@@ -82,7 +86,7 @@ class NPC extends Fighter {
      * Loads NPC data from the database into class members
      * @throws RuntimeException
      */
-    public function loadData() {
+    public function loadData(?User $player = null) {
         $result = $this->system->db->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
         $ai_data = $this->system->db->fetch($result);
 
@@ -91,9 +95,16 @@ class NPC extends Fighter {
 
         $this->rank = $ai_data['rank'];
         $this->level = $ai_data['level'];
+        $this->scaling = $ai_data['scaling'];
 
         $base_level = $this->rankManager->ranks[$this->rank]->base_level;
         $max_level = $this->rankManager->ranks[$this->rank]->max_level;
+        // if player is set we can apply AI scaling
+        if (isset($player) && $this->scaling) {
+            $this->level = max(min($player->level, $max_level), $base_level);
+        }
+        // set jutsu level relative to base and max levels for the rank, minimum 1
+        $jutsu_level = max(1, intval((($this->level - $base_level) / ($max_level - $base_level)) * 100));
         $this->rank_progress = round(($this->level - $base_level) / ($max_level - $base_level), 2);
 
         $this->max_health = $this->rankManager->healthForRankAndLevel($this->rank, $this->level) * $ai_data['max_health'];
@@ -122,6 +133,8 @@ class NPC extends Fighter {
 
         $this->money = $ai_data['money'];
 
+        $this->battle_iq = $ai_data['battle_iq'];
+
         $moves = json_decode($ai_data['moves'], true);
 
         foreach($moves as $move) {
@@ -138,7 +151,7 @@ class NPC extends Fighter {
                 $move['effect_length'] = 0;
             }
             $jutsu = $this->initJutsu(count($this->jutsu), $move['jutsu_type'], $move['power'], $move['battle_text'], $move['use_type'], $move['effect'], $move['effect_amount'], $move['effect_length']);
-
+            $jutsu->setLevel($jutsu_level, 0);
             switch($jutsu->jutsu_type) {
                 case Jutsu::TYPE_NINJUTSU:
                     $jutsu->use_type = $jutsu->use_type != Jutsu::USE_TYPE_MELEE ? $jutsu->use_type : Jutsu::USE_TYPE_PROJECTILE;
@@ -161,6 +174,23 @@ class NPC extends Fighter {
             $this->equipped_jutsu[] = [
                 'id' => $jutsu->id,
                 'type' => $jutsu->jutsu_type
+            ];
+        }
+
+        // get array, safe formatting
+        $this->shop_jutsu_priority = array_map('intval', explode(",", str_replace(' ', '', $ai_data['shop_jutsu_priority'])));
+
+        // get shop jutsu
+        $jutsu_result = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` IN (" . $ai_data['shop_jutsu'] . ")");
+        $jutsu_result = $this->system->db->fetch_all($jutsu_result);
+        foreach ($jutsu_result as $jutsu_data) {
+            $shop_jutsu = Jutsu::fromArray($jutsu_data['jutsu_id'], $jutsu_data);
+            $shop_jutsu->setLevel($jutsu_level, 0);
+            $this->jutsu[] = $shop_jutsu;
+            // this is important so battle logic treats all NPC jutsu as equipped jutsu
+            $this->equipped_jutsu[] = [
+                'id' => $shop_jutsu->id,
+                'type' => $shop_jutsu->jutsu_type
             ];
         }
 
@@ -223,22 +253,76 @@ class NPC extends Fighter {
         }
     }
 
-    public function chooseAttack(): Jutsu {
-        // if special move not used
-        if (!$_SESSION['ai_logic']['special_move_used'] && $this->jutsu[1]) {
-            $this->current_move =& $this->jutsu[0];
-            $_SESSION['ai_logic']['special_move_used'] = true;
-        }
-        // if only special move plus standard strike
-        else if (count($this->jutsu) == 2) {
-            $this->current_move =& $this->jutsu[1];
+    public function chooseAttack(BattleManager|BattleManagerV2 $battle): Jutsu {
+        // probability of choosing best move
+        $x = mt_rand(1, 100);
+        $choose_best = $this->battle_iq >= $x ? true : false;
+        if ($choose_best) {
+            // determine best move
+            $this->current_move = $this->chooseBestAttack($battle);
         }
         else {
-            $randMove = rand(1, (count($this->jutsu) - 2));
-            $this->current_move =& $this->jutsu[$randMove];
+            // pick random move, or use priority list
+            $this->current_move = $this->chooseRandomAttack($battle);
         }
-
         return $this->current_move;
+    }
+
+    function chooseBestAttack(BattleManager|BattleManagerV2 $battle): Jutsu {
+        $best_damage = 0;
+        $best_jutsu = null;
+        // simulate each jutsu and determine best
+        foreach ($this->jutsu as $jutsu) {
+            $jutsu->setCombatId($this->combat_id);
+            // check jutsu cooldown
+            if (isset($battle->getCooldowns()[$jutsu->combat_id])) {
+                continue;
+            }
+            // get simulated result
+            $test_damage = $battle->simulateAIAttack($jutsu);
+            $result = $test_damage['player_simulated_damage_taken'] - $test_damage['ai_simulated_damage_taken'];
+            // debug
+            echo $jutsu->name . ": " . $result . "<br>";
+            // if no other jutsu selected use this for basis of comparison
+            if (empty($best_jutsu)) {
+                $best_damage = $result;
+                $best_jutsu = $jutsu;
+            } 
+            // if better than previous then best set as best
+            else if ($result > $best_damage) {
+                $best_damage = $result;
+                $best_jutsu = $jutsu;
+            }
+        }
+        return $best_jutsu;
+    }
+
+    function chooseRandomAttack(BattleManager|BattleManagerV2 $battle): Jutsu {
+        $random_jutsu = null;
+        $jutsu_list = array_keys($this->jutsu);
+        // if shop jutsu priority and not on cooldown use before random
+        foreach ($this->shop_jutsu_priority as $jutsu_id) {
+            foreach ($this->jutsu as $jutsu) {
+                $jutsu->setCombatId($this->combat_id);
+                if ($jutsu->id == $jutsu_id) {
+                    if (isset($battle->getCooldowns()[$jutsu->combat_id])) {
+                        continue;
+                    } else {
+                        return $jutsu;
+                    }
+                }
+            }
+        }
+        // randomize jutsu list and check until one without cooldown found (standard strike as fallback)
+        shuffle($jutsu_list);
+        foreach ($this->jutsu as $jutsu) {
+            $jutsu->setCombatId($this->combat_id);
+            if (isset($battle->getCooldowns()[$jutsu->combat_id])) {
+                continue;
+            } else {
+                return $jutsu;
+            }
+        }
     }
 
     public function initJutsu(int $id, $jutsu_type, float $power, string $battle_text, string $use_type = Jutsu::USE_TYPE_MELEE, string $effect = "none", int $effect_amount = 0, int $effect_length = 0): Jutsu {
