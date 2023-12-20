@@ -952,6 +952,7 @@ class BattleManager {
 
         $text = '';
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
+        if (!str_contains($attack->jutsu->name, "Move ")) {
             if ($attack->jutsu->weapon_id) {
                 $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . " / " . System::unSlug($user->items[$attack->jutsu->weapon_id]->name) . "</br>" . '</i></span></b>';
             } else {
@@ -961,6 +962,7 @@ class BattleManager {
                     $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
                 }
             }
+        }
         $text .= $attack->jutsu->battle_text;
         $has_element = ($attack->jutsu->element != Jutsu::ELEMENT_NONE && $attack->jutsu->element != "none");
         $element_text = ' with ' . $attack->jutsu->element;

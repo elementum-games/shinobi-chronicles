@@ -141,6 +141,12 @@ class NPC extends Fighter {
             if (!isset ($move['use_type'])) {
                 $move['use_type'] = Jutsu::USE_TYPE_MELEE;
             }
+            if (!isset($move['name'])) {
+                $move['name'] = '';
+            }
+            if (!isset($move['cooldown'])) {
+                $move['cooldown'] = 0;
+            }
             if (!isset($move['effect'])) {
                 $move['effect'] = "none";
             }
@@ -150,7 +156,16 @@ class NPC extends Fighter {
             if (!isset($move['effect_length'])) {
                 $move['effect_length'] = 0;
             }
-            $jutsu = $this->initJutsu(count($this->jutsu), $move['jutsu_type'], $move['power'], $move['battle_text'], $move['use_type'], $move['effect'], $move['effect_amount'], $move['effect_length']);
+            if (!isset($move['effect2'])) {
+                $move['effect2'] = "none";
+            }
+            if (!isset($move['effect2_amount'])) {
+                $move['effect2_amount'] = 0;
+            }
+            if (!isset($move['effect2_length'])) {
+                $move['effect2_length'] = 0;
+            }
+            $jutsu = $this->initJutsu(count($this->jutsu), $move['jutsu_type'], $move['name'], $move['power'], $move['cooldown'], $move['battle_text'], $move['use_type'], $move['effect'], $move['effect_amount'], $move['effect_length'], $move['effect2'], $move['effect2_amount'], $move['effect2_length']);
             $jutsu->setLevel($jutsu_level, 0);
             switch($jutsu->jutsu_type) {
                 case Jutsu::TYPE_NINJUTSU:
@@ -200,7 +215,7 @@ class NPC extends Fighter {
 
     private function loadDefaultJutsu() {
         $result = $this->system->db->query(
-            "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu`
+            "SELECT `name`, `cooldown`, `battle_text`, `power`, `jutsu_type` FROM `jutsu`
                     WHERE `rank` <= '{$this->rank}'
                     AND `purchase_type`='" . Jutsu::PURCHASE_TYPE_DEFAULT . "'
                     ORDER BY `rank` DESC LIMIT 1"
@@ -219,7 +234,9 @@ class NPC extends Fighter {
             $this->jutsu[] = $this->initJutsu(
                 count($this->jutsu),
                 $moveArr['jutsu_type'],
+                $moveArr['name'],
                 $moveArr['power'],
+                $moveArr['cooldown'],
                 $moveArr['battle_text']
             );
         }
@@ -287,7 +304,7 @@ class NPC extends Fighter {
             if (empty($best_jutsu)) {
                 $best_damage = $result;
                 $best_jutsu = $jutsu;
-            } 
+            }
             // if better than previous then best set as best
             else if ($result > $best_damage) {
                 $best_damage = $result;
@@ -325,7 +342,7 @@ class NPC extends Fighter {
         }
     }
 
-    public function initJutsu(int $id, $jutsu_type, float $power, string $battle_text, string $use_type = Jutsu::USE_TYPE_MELEE, string $effect = "none", int $effect_amount = 0, int $effect_length = 0): Jutsu {
+    public function initJutsu(int $id, $jutsu_type, string $name, float $power, int $cooldown, string $battle_text, string $use_type = Jutsu::USE_TYPE_MELEE, string $effect = "none", int $effect_amount = 0, int $effect_length = 0, string $effect2 = "none", int $effect2_amount = 0, int $effect2_length = 0): Jutsu {
         $battle_text_alt = str_replace(
             ['[player]', '[opponent]'],
             ['[playerX]', '[opponentX]'],
@@ -340,7 +357,7 @@ class NPC extends Fighter {
 
         $jutsu = new Jutsu(
             id: $id,
-            name: 'Move ' . $id,
+            name: !empty($name) ? $name : 'Move ' . $id,
             rank: $this->rank,
             jutsu_type: $jutsu_type,
             base_power: $power,
@@ -348,9 +365,9 @@ class NPC extends Fighter {
             effect_1: $effect,
             base_effect_amount_1: $effect_amount,
             effect_length_1: $effect_length,
-            effect_2: 'none',
-            base_effect_amount_2: 0,
-            effect_length_2: 0,
+            effect_2: $effect2,
+            base_effect_amount_2: $effect2_amount,
+            effect_length_2: $effect2_length,
             description: "N/A",
             battle_text: $battle_text_swapped,
             cooldown: 0,

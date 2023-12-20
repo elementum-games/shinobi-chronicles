@@ -215,6 +215,11 @@ $constraints['ai'] = [
         'count' => 4,
         'num_required' => 0,
         'variables' => [
+            'name' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
+                'max_length' => 35,
+            ],
             'battle_text' => [
                 'data_type' => 'string',
                 'input_type' => 'text',
