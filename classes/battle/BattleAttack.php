@@ -22,4 +22,6 @@ class BattleAttack {
     public float $reflected_percent = 0; // opponent's reflect
     public float $reflected_raw_damage = 0; // damage dealt from opponent
     public string $reflected_jutsu_type; // jutsu type of opponent's reflect
+    /** @var Effect[] */
+    public array $effects = [];
 }

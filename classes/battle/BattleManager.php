@@ -949,6 +949,25 @@ class BattleManager {
                 );
             }
         }
+        if (count($attack->effects) > 0) {
+            echo ($attack->effects[0]->effect);
+            foreach ($attack->effects as $index => $effect) {
+                if (in_array($effect->effect, BattleEffect::$buff_effects)) {
+                    $target_id = $user->combat_id;
+                } else {
+                    $target_id = $target->combat_id;
+                }
+
+                $this->effects->setEffect(
+                    $user,
+                    $target_id,
+                    $attack->jutsu,
+                    $effect,
+                    $index,
+                    $attack->raw_damage
+                );
+            }
+        }
 
         $text = '';
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
@@ -1018,6 +1037,15 @@ class BattleManager {
 
        if($attack->jutsu->hasEffect()){
             foreach ($attack->jutsu->effects as $effect) {
+                if ($effect && $effect->effect != 'none') {
+                    $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
+                        $this->system->db->clean($this->effects->getAnnouncementText($effect)) .
+                        "</p>";
+                }
+            }
+        }
+        if (count($attack->effects) > 0) {
+            foreach ($attack->effects as $effect) {
                 if ($effect && $effect->effect != 'none') {
                     $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
                         $this->system->db->clean($this->effects->getAnnouncementText($effect)) .
@@ -1484,10 +1512,10 @@ class BattleManager {
 
         // set reflect damage
         if ($player1_attack->reflect_percent > 0) {
-            $player1_jutsu->effects[] = new Effect('reflect_damage', $player2_attack->reflected_raw_damage / $player1_attack->reflect_duration, $player1_attack->reflect_duration);
+            $player1_attack->effects[] = new Effect('reflect_damage', $player2_attack->reflected_raw_damage / $player1_attack->reflect_duration, $player1_attack->reflect_duration);
         }
         if ($player2_attack->reflect_percent > 0) {
-            $player2_jutsu->effects[] = new Effect('reflect_damage', $player1_attack->reflected_raw_damage / $player2_attack->reflect_duration, $player2_attack->reflect_duration);
+            $player2_attack->effects[] = new Effect('reflect_damage', $player1_attack->reflected_raw_damage / $player2_attack->reflect_duration, $player2_attack->reflect_duration);
         }
 
         return $this->parseCombatText($collision_text, $player1, $player2);
@@ -1640,7 +1668,7 @@ class BattleManager {
         return $this->effects->active_effects;
     }
 
-    public function simulateAIAttack(Jutsu $ai_attack): array {
+    public function simulateAIAttack(Jutsu $ai_jutsu): array {
         // clone battlers for simulation
         $simulated_player = clone $this->battle->player1;
         $simulated_ai = clone $this->battle->player2;
@@ -1652,12 +1680,12 @@ class BattleManager {
             $this->battle->fighter_actions[$simulated_player->combat_id],
             simulation: true
         );
-        $ai_simulated_action = new LegacyFighterAction($ai_attack->id, Jutsu::PURCHASE_TYPE_DEFAULT, null, null);
+        $ai_simulated_action = new LegacyFighterAction($ai_jutsu->id, Jutsu::PURCHASE_TYPE_DEFAULT, null, null);
         $ai_simulated_attack = $this->setupFighterAttack(
             $simulated_ai,
             $simulated_player,
             $ai_simulated_action,
-            jutsu: $ai_attack,
+            jutsu: $ai_jutsu,
             simulation: true
         );
 
