@@ -524,6 +524,8 @@ abstract class Fighter {
 
         if ($is_raw_damage) {
             $damage = round($raw_damage / $defense, 2);
+        } else {
+            $damage = $raw_damage;
         }
         if ($damage < 0.0) {
             $damage = 0;
