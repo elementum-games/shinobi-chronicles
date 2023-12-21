@@ -446,7 +446,7 @@ abstract class Fighter {
      * @param bool   $residual_damage
      * @return float|int
      */
-    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false, bool $apply_resists = true, string $element = Jutsu::ELEMENT_NONE): float|int {
+    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false, bool $apply_resists = true, string $element = Jutsu::ELEMENT_NONE, bool $is_raw_damage = true): float|int {
         $defense = self::BASE_DEFENSE;
 
         if($defense <= 0) {
@@ -476,20 +476,20 @@ abstract class Fighter {
         switch($defense_type) {
             case 'ninjutsu':
                 // Resist unfairly applies to nin/tai residuals which only have a 25% or so effect amount, so we lower its effectiveness compared to a regular hit
-                if ($apply_resists) {
+                if ($apply_resists && $is_raw_damage) {
                     $raw_damage -= $residual_damage ? $this->ninjutsu_resist * 0.5 : $this->ninjutsu_resist;
                 }
                 $weakness_modifier += $this->ninjutsu_weakness;
                 break;
             case 'genjutsu':
-                if ($apply_resists) {
+                if ($apply_resists && $is_raw_damage) {
                     $raw_damage -= $this->genjutsu_resist;
                 }
                 $weakness_modifier += $this->genjutsu_weakness;
                 break;
             case 'taijutsu':
                 // Resist unfairly applies to residuals, so we lower its effectiveness compared to a regular hit
-                if ($apply_resists) {
+                if ($apply_resists && $is_raw_damage) {
                     $raw_damage -= $residual_damage ? $this->taijutsu_resist * 0.5 : $this->taijutsu_resist;
                 }
                 $weakness_modifier += $this->taijutsu_weakness;
@@ -522,7 +522,9 @@ abstract class Fighter {
             $raw_damage *= (100 - $this->reputation_defense_boost) / 100;
         }
 
-        $damage = round($raw_damage / $defense, 2);
+        if ($is_raw_damage) {
+            $damage = round($raw_damage / $defense, 2);
+        }
         if ($damage < 0.0) {
             $damage = 0;
         }

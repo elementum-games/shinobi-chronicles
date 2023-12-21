@@ -835,8 +835,8 @@ class BattleManager {
             }
 
             if ($attack->recoil_percent > 0) {
-                $recoil_damage = $user->calcDamageTaken($attack_damage * $attack->recoil_percent, $attack->jutsu->jutsu_type);
-                $recoil_damage_raw = $user->calcDamageTaken($attack_damage * $attack->recoil_percent, $attack->jutsu->jutsu_type, apply_resists: false);
+                $recoil_damage = $user->calcDamageTaken($attack_damage * $attack->recoil_percent, $attack->jutsu->jutsu_type, is_raw_damage: false);
+                $recoil_damage_raw = $user->calcDamageTaken($attack_damage * $attack->recoil_percent, $attack->jutsu->jutsu_type, apply_resists: false, is_raw_damage: false);
                 $recoil_damage_resisted = round($recoil_damage_raw - $recoil_damage, 2);
                 $user->last_damage_taken += $recoil_damage;
                 $user->health -= $recoil_damage;
