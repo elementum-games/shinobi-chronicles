@@ -31,6 +31,7 @@ function viewBattles() {
 
             return true;
         } catch(RuntimeException $e) {
+            System::checkAndThrowDeadlockException($e);
             $system->message($e->getMessage());
             $system->printMessage();
         }
@@ -236,6 +237,7 @@ function viewBattles() {
                     throw new RuntimeException("Invalid battle!");
                 }
             } catch (Exception $e) {
+                System::checkAndThrowDeadlockException($e);
                 $system->message($e->getMessage());
             }
         }
