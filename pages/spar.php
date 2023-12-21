@@ -38,6 +38,7 @@ function spar() {
             }
         }
         catch (RuntimeException $e) {
+            System::checkAndThrowDeadlockException($e);
             error_log($e->getMessage());
             $system->message($e->getMessage());
             $system->printMessage();
@@ -80,8 +81,9 @@ function spar() {
 
 			$system->db->query("UPDATE `users` SET `challenge`='$player->user_id' WHERE `user_id`='$challenge' LIMIT 1");
 			$system->message("Challenge sent!");
-			$system->printMessage();
+            $system->printMessage();
 		} catch (Exception $e) {
+			System::checkAndThrowDeadlockException($e);
 			$system->message($e->getMessage());
 			$system->printMessage();
 
@@ -127,6 +129,7 @@ function spar() {
 				<a class='link' href='$self_link'>To Battle</a>");
 			$system->printMessage();
 		} catch (Exception $e) {
+            System::checkAndThrowDeadlockException($e);
 			$player->challenge = 0;
 
 			$system->message($e->getMessage());
@@ -274,6 +277,7 @@ function sparFightAPI(System $system, User $player): BattlePageAPIResponse {
         }
     }
     catch (Exception $e) {
+        System::checkAndThrowDeadlockException($e);
         $response->errors[] = $e->getMessage();
     }
 
