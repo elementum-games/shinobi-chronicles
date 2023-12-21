@@ -35,6 +35,7 @@ function displayBattle(): bool
             <tr><td style='text-align: center;'>" . $battle_result . "</td></tr></table>";
             }
         } catch (RuntimeException $e) {
+            System::checkAndThrowDeadlockException($e);
             $system->message($e->getMessage());
             $system->printMessage();
             return false;

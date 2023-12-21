@@ -56,6 +56,7 @@ function battle(): bool {
 			    $user = User::loadFromId($system, $attack_id);
 			    $user->loadData(User::UPDATE_NOTHING, true);
             } catch(RuntimeException $e) {
+                System::checkAndThrowDeadlockException($e);
                 throw new RuntimeException("Invalid user! " . $e->getMessage());
             }
 
@@ -114,6 +115,7 @@ function battle(): bool {
 				<a class='link' href='$self_link'>To Battle</a>");
 			$system->printMessage();
 		} catch (Exception $e) {
+            System::checkAndThrowDeadlockException($e);
 			$system->message($e->getMessage());
 			$system->printMessage();
 
@@ -225,7 +227,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                 $system->db->query("UPDATE `region_locations` SET `defense` = {$region_objective['defense']} WHERE `id` = {$region_objective['id']}");
                 WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_DEFENSE_GAINED, $region_objective['village']);
                 $result .= "Increased objective defense by 1.[br]";
-            } 
+            }
         }
         // if opponent is allied with location owner
         else if ($opponent_alignment == VillageRelation::RELATION_ALLIANCE) {
@@ -234,7 +236,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                 $system->db->query("UPDATE `region_locations` SET `defense` = {$region_objective['defense']} WHERE `id` = {$region_objective['id']}");
                 WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_DEFENSE_REDUCED, $region_objective['village']);
                 $result .= "Decreased objective defense by 1.[br]";
-            } 
+            }
         }
 
         // War Log
@@ -295,7 +297,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $result .= "You both knocked each other out. You were taken back to your village by some allied ninja.[br]";
         $player->health = 5;
         $player->moveToVillage();
-        $player->last_pvp_ms = System::currentTimeMs(); 
+        $player->last_pvp_ms = System::currentTimeMs();
 
         // If player is killed during a survival mission as a result of PVP, clear the survival mission
         if ($player->mission_id != null) {
@@ -345,6 +347,7 @@ function battleFightAPI(System $system, User $player): BattlePageAPIResponse {
         }
     }
     catch (Exception $e) {
+        System::checkAndThrowDeadlockException($e);
         $response->errors[] = $e->getMessage();
     }
 
