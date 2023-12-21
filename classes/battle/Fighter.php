@@ -298,7 +298,7 @@ abstract class Fighter {
      * @return float|int
      * @throws RuntimeException
      */
-    public function calcDamage(Jutsu $attack, bool $disable_randomness = false, float $immolate_raw_damage = 0): float|int {
+    public function calcDamage(Jutsu $attack, bool $disable_randomness = false): float|int {
         if($this->system->debug['damage'])  {
             echo "Debugging damage for {$this->getName()}<br />";
         }
@@ -412,8 +412,6 @@ abstract class Fighter {
 
         $damage = $offense * $attack->power * $rand;
 
-        $damage += $immolate_raw_damage;
-
         // Add non-BL damage boosts
         if($this->system->debug['damage']) {
             echo "Damage/boost/nerf: $damage / {$off_boost} / {$off_nerf}} <br />";
@@ -525,20 +523,21 @@ abstract class Fighter {
         }
 
         $damage = round($raw_damage / $defense, 2);
-        if($damage < 0.0) {
+        if ($damage < 0.0) {
             $damage = 0;
         }
 
         if ($apply_resists) {
+            $resist_boost = $this->resist_boost;
             // if higher than soft cap, apply penalty
-            if ($this->resist_boost > BattleManager::RESIST_SOFT_CAP) {
-                $this->resist_boost = (($this->resist_boost - BattleManager::RESIST_SOFT_CAP) * BattleManager::RESIST_SOFT_CAP_RATIO) + BattleManager::RESIST_SOFT_CAP;
+            if ($resist_boost > BattleManager::RESIST_SOFT_CAP) {
+                $resist_boost = (($resist_boost - BattleManager::RESIST_SOFT_CAP) * BattleManager::RESIST_SOFT_CAP_RATIO) + BattleManager::RESIST_SOFT_CAP;
             }
             // if still higher than cap cap, set to hard cap
-            if ($this->resist_boost > BattleManager::RESIST_HARD_CAP) {
-                $this->resist_boost = BattleManager::RESIST_HARD_CAP;
+            if ($resist_boost > BattleManager::RESIST_HARD_CAP) {
+                $resist_boost = BattleManager::RESIST_HARD_CAP;
             }
-            $damage *= 1 - $this->resist_boost;
+            $damage *= 1 - $resist_boost;
         }
         return $damage;
     }
