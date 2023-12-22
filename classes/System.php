@@ -66,7 +66,7 @@ class System {
     //New server time
     const SERVER_TIME_ZONE = "America/New_York";
     const REPUTATION_RESET_DAY = "next friday";
-    const REPUTATION_RESET_HOUR = 17;
+    const REPUTATION_RESET_HOUR = 20;
     const REPUTATION_RESET_MINUTE = 0;
     public DateTimeImmutable $SERVER_TIME;
     public DateTimeImmutable $REPUTATION_RESET;
