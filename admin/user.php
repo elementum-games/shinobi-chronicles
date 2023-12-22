@@ -222,7 +222,7 @@ function statCutPage(System $system, User $player): void {
             if(!$user) {
                 throw new RuntimeException("Invalid user!");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -349,7 +349,7 @@ function statCutPage(System $system, User $player): void {
             else {
                 $system->message("Error cutting stats.");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -465,7 +465,7 @@ function devToolsPage(System $system, User $player): void {
             $user->updateInventory();
 
             $system->message("Jutsu capped for {$user->user_name}.");
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -523,7 +523,7 @@ function devToolsPage(System $system, User $player): void {
                 "Admin {$user->user_name} (#{$user->user_id}) capped stats for player {$user->user_name} (#{$user->user_id})"
             );
             $system->message("Stats capped for $name.");
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }

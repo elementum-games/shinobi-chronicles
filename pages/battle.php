@@ -56,7 +56,6 @@ function battle(): bool {
 			    $user = User::loadFromId($system, $attack_id);
 			    $user->loadData(User::UPDATE_NOTHING, true);
             } catch(RuntimeException $e) {
-                System::checkAndThrowDeadlockException($e);
                 throw new RuntimeException("Invalid user! " . $e->getMessage());
             }
 
@@ -114,8 +113,7 @@ function battle(): bool {
             $system->message("You have attacked!<br />
 				<a class='link' href='$self_link'>To Battle</a>");
 			$system->printMessage();
-		} catch (Exception $e) {
-            System::checkAndThrowDeadlockException($e);
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 			$system->printMessage();
 
@@ -346,8 +344,7 @@ function battleFightAPI(System $system, User $player): BattlePageAPIResponse {
             $response->battle_result = processBattleFightEnd($battle, $player, $system);
         }
     }
-    catch (Exception $e) {
-        System::checkAndThrowDeadlockException($e);
+    catch (RuntimeException $e) {
         $response->errors[] = $e->getMessage();
     }
 

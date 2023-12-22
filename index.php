@@ -604,9 +604,9 @@ if($LOGGED_IN) {
             try {
                 ($route->function_name)();
             } catch (DatabaseDeadlockException $e) {
-                // Wait random time between 100-1000ms, then retry deadlocked transaction
+                // Wait random time between 100-500ms, then retry deadlocked transaction
                 $system->db->rollbackTransaction();
-                usleep(mt_rand(100000, 1000000));
+                usleep(mt_rand(100000, 500000));
 
                 $system->db->startTransaction();
                 $player->loadData();

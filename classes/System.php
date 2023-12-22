@@ -931,14 +931,4 @@ class System {
 
         return $result;
     }
-
-    /**
-     * @param Exception $exception
-     * @throws DatabaseDeadlockException
-     */
-    public static function checkAndThrowDeadlockException($exception): void {
-        if ($exception->getCode() == Database::MYSQL_DEADLOCK_ERROR_CODE) {
-            throw new DatabaseDeadlockException($exception->getMessage());
-        }
-    }
 }

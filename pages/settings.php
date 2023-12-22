@@ -62,7 +62,7 @@ function userSettings() {
 
             $player->avatar_link = $avatar_link;
             $system->message("Avatar updated!");
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -113,7 +113,7 @@ function userSettings() {
             if ($system->db->last_affected_rows >= 1) {
                 $system->message("Password updated!");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -137,7 +137,7 @@ function userSettings() {
             if ($system->db->last_affected_rows == 1) {
                 $system->message("Journal updated!");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -182,7 +182,7 @@ function userSettings() {
                 }
             }
 
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();

@@ -334,7 +334,7 @@ class BattleManager {
                     if($this->opponent instanceof NPC) {
                         $this->chooseAndSetAIAction($this->opponent);
                     }
-                } catch (Exception $e) {
+                } catch (RuntimeException $e) {
                     $this->system->message($e->getMessage());
                 }
             }

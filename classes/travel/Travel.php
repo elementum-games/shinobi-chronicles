@@ -71,6 +71,9 @@ class Travel {
         return self::TRAVEL_DELAY_MOVEMENT - $diff;
     }
 
+    /**
+     * @throws DatabaseDeadlockException
+     */
     public static function getLocation(System $system, string $x, string $y, string $z): MapLocation {
         if (isset($system->font_location) && $x == $system->font_location->x && $y == $system->font_location->y && $z == $system->font_location->map_id) {
             $result = $system->db->query(
@@ -97,6 +100,9 @@ class Travel {
         }
     }
 
+    /**
+     * @throws DatabaseDeadlockException
+     */
     public static function getPortalData(System $system, int $portal_id): array {
         $result = $system->db->query("SELECT * FROM `maps_portals` WHERE `portal_id`={$portal_id} AND `active`=1");
         if ($system->db->last_num_rows < 1) {
@@ -105,6 +111,9 @@ class Travel {
         return $system->db->fetch($result);
     }
 
+    /**
+     * @throws DatabaseDeadlockException
+     */
     public static function getMapData(System $system, $map_id): array {
         $result = $system->db->query("SELECT * FROM `maps` WHERE `map_id`={$map_id}");
         if (!$system->db->last_num_rows) {

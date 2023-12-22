@@ -71,7 +71,7 @@ function modPanel() {
                     $system->message("Error banning user!");
                 }
 			}
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 	}
@@ -178,7 +178,7 @@ function modPanel() {
                 }
                 $system->message(substr($message_string, 0, strlen($message_string) - 2) . ".");
             }
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 	}
@@ -223,7 +223,7 @@ function modPanel() {
                     if($system->db->last_insert_id) {
                         $system->message("Note added.");
                     }
-                }catch (Exception $e) {
+                }catch (RuntimeException $e) {
                     $system->message($e->getMessage());
                 }
             }
@@ -241,7 +241,7 @@ function modPanel() {
                     } else {
                         $system->message("Error deleting record, or record already removed.");
                     }
-                }catch (Exception $e) {
+                }catch (RuntimeException $e) {
                     $system->message($e->getMessage());
                 }
             }
@@ -259,7 +259,7 @@ function modPanel() {
                     } else {
                         $system->message("Error recovering record, or record already recovered.");
                     }
-                }catch (Exception $e) {
+                }catch (RuntimeException $e) {
                     $system->message($e->getMessage());
                 }
             }
@@ -303,7 +303,7 @@ function modPanel() {
 
             //Do not display Mod/Head Mod menus
 			$display_menu = false;
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();
@@ -341,7 +341,7 @@ function modPanel() {
                     $system->message("Error sending warning.");
                 }
             }
-        }catch (Exception $e) {
+        }catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
 
@@ -396,7 +396,7 @@ function modPanel() {
 				else {
 					$system->message("Error banning IP address '$ip_address'!");
 				}
-			} catch (Exception $e) {
+			} catch (RuntimeException $e) {
 				$system->message($e->getMessage());
 			}
 		}
@@ -438,7 +438,7 @@ function modPanel() {
 						$system->message("Error unbanning user!");
 					}
 				}
-			} catch (Exception $e) {
+			} catch (RuntimeException $e) {
 				$system->message($e->getMessage());
 			}
 		}
@@ -458,7 +458,7 @@ function modPanel() {
 				else {
 					$system->message("Error unbanning IP address '$ip_address'!");
 				}
-			} catch (Exception $e) {
+			} catch (RuntimeException $e) {
 				$system->message($e->getMessage());
 			}
 		}
@@ -514,7 +514,7 @@ function modPanel() {
                 else {
                     $system->message("Error removing avatar/journal ban.");
                 }
-			} catch (Exception $e) {
+			} catch (RuntimeException $e) {
 				$system->message($e->getMessage());
 			}
 		}
@@ -534,7 +534,7 @@ function modPanel() {
                 $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD, "$player->user_name($player->user_id) posted global: <br />"
                 . $message);
 				$system->message("Message posted!");
-			} catch (Exception $e) {
+			} catch (RuntimeException $e) {
 				$system->message($e->getMessage());
 			}
 			$system->printMessage();
@@ -589,7 +589,7 @@ function modPanel() {
                 else {
                     $system->message("Error updating multi-list!");
                 }
-            } catch (Exception $e) {
+            } catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
