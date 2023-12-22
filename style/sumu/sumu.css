@@ -197,6 +197,10 @@
     justify-content: center;
 }
 
+html {
+    scroll-behavior: smooth
+}
+
 body {
     background-color: var(--main-background-color);
     background-image: url(../../images/v2/sumu/background.jpg);
