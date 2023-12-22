@@ -8,7 +8,7 @@ class SpecialMission {
 
     // Used for incrementing mission ranks & completing daily tasks
     public static array $UPGRADE_DIFFICULTIES = [self::DIFFICULTY_HARD, self::DIFFICULTY_NIGHTMARE];
-    public static int $MAX_MISSION_LEVEL = Mission::RANK_A;
+    public static int $MAX_MISSION_RANK = Mission::RANK_A;
 
     // Scale damage multiplier from this point in the rank to cap
     const BASE_STAT_CAP_PERCENT = 20;
@@ -133,6 +133,37 @@ class SpecialMission {
     const SPY_TARGET_SAND = 'Sand';
     const SPY_TARGET_CLOUD = 'Cloud';
     const SPY_TARGET_MIST = 'Mist';
+
+    const SPECIAL_MISSION_RANKS = [
+        // AS
+        1 => [
+            self::DIFFICULTY_EASY => Mission::RANK_D,
+            self::DIFFICULTY_NORMAL => Mission::RANK_D,
+            self::DIFFICULTY_HARD => Mission::RANK_D,
+            self::DIFFICULTY_NIGHTMARE => Mission::RANK_C,
+        ],
+        // Genin
+        2 => [
+            self::DIFFICULTY_EASY => Mission::RANK_D,
+            self::DIFFICULTY_NORMAL => Mission::RANK_C,
+            self::DIFFICULTY_HARD => Mission::RANK_C,
+            self::DIFFICULTY_NIGHTMARE => Mission::RANK_B,
+        ],
+        // Chuunin
+        3 => [
+            self::DIFFICULTY_EASY => Mission::RANK_C,
+            self::DIFFICULTY_NORMAL => Mission::RANK_B,
+            self::DIFFICULTY_HARD => Mission::RANK_B,
+            self::DIFFICULTY_NIGHTMARE => Mission::RANK_A,
+        ],
+        // Jonin
+        4 => [
+            self::DIFFICULTY_EASY => Mission::RANK_B,
+            self::DIFFICULTY_NORMAL => Mission::RANK_A,
+            self::DIFFICULTY_HARD => Mission::RANK_A,
+            self::DIFFICULTY_NIGHTMARE => Mission::RANK_S,
+        ],
+    ];
 
     public static array $valid_targets = [
         SpecialMission::SPY_TARGET_LEAF => [
@@ -802,62 +833,10 @@ class SpecialMission {
         return floor(($hp_lost_percent / 100) * $this->player->max_health);
     }
 
-    public function downgradeMissionRank(int $mission_rank): int {
-        return match ($mission_rank) {
-            Mission::RANK_S => Mission::RANK_A,
-            Mission::RANK_A => Mission::RANK_B,
-            Mission::RANK_B => Mission::RANK_C,
-            default => Mission::RANK_D,
-        };
-    }
-
-    public function upgradeMissionRank(int $mission_rank): int {
-        return match ($mission_rank) {
-            Mission::RANK_A => Mission::RANK_S,
-            Mission::RANK_B => Mission::RANK_A,
-            Mission::RANK_C => Mission::RANK_B,
-            default => Mission::RANK_C,
-        };
-    }
     public function getMissionRank(): int {
-        $mission_rank = match ($this->player->rank_num) {
-            5 => Mission::RANK_A,
-            4 => Mission::RANK_B,
-            3 => Mission::RANK_C,
-            default => Mission::RANK_D,
-        };
-
-        // Difficulty downgrade
-        if($this->difficulty == self::DIFFICULTY_EASY) {
-            $mission_rank = $this->downgradeMissionRank($mission_rank);
-        }
-        // Difficulty upgrade
-        if(in_array($this->difficulty, self::$UPGRADE_DIFFICULTIES)) {
-            $mission_rank = $this->upgradeMissionRank($mission_rank);
-        }
-
-        // Upgrade level for capped Chuunin
-        if($this->player->rank_num == 3 && $this->player->level >= 50) {
-            // This is intended to be INCLUSIVE w/difficulty below
-            $mission_rank = $this->upgradeMissionRank($mission_rank);
-            // Downgrade based on easy & normal difficulties (intended to STACK with easy downgrade above)
-            if(in_array($this->difficulty, [self::DIFFICULTY_NORMAL, self::DIFFICULTY_EASY])) {
-                $mission_rank = $this->downgradeMissionRank($mission_rank);
-            }
-        }
-        // Jonin level upgrade, begin at level 90
-        if($this->player->rank_num == 4 && $this->player->level >= 90) {
-            $mission_rank = $this->upgradeMissionRank($mission_rank);
-        }
-        // Jonin level downgrade based on NORMAL difficulty (intended to STACK with easy downgrade above)
-        if($this->player->rank_num == 4 && $this->player->level >= 75 && in_array($this->difficulty, [self::DIFFICULTY_EASY, self::DIFFICULTY_NORMAL])) {
-            $mission_rank = $this->downgradeMissionRank($mission_rank);
-        }
-        // TODO: Sennin level upgrade/downgrade
-
-
+        $mission_rank = self::SPECIAL_MISSION_RANKS[$this->player->rank_num][$this->difficulty];
         // Return mission rank, conforming to max mission level
-        return min($mission_rank, self::$MAX_MISSION_LEVEL);
+        return min($mission_rank, self::$MAX_MISSION_RANK);
     }
 
     // Cancel the mission
