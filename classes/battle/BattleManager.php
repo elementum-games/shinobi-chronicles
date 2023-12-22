@@ -858,6 +858,7 @@ class BattleManager {
                 $immolate_damage = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu->jutsu_type);
                 $immolate_damage_raw = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu->jutsu_type, apply_resists: false);
                 $immolate_damage_resisted = round($immolate_damage_raw - $immolate_damage, 2);
+                $target->last_damage_taken += $immolate_damage;
                 $target->health -= $immolate_damage;
                 if ($target->health < 0) {
                     $target->health = 0;
@@ -867,8 +868,9 @@ class BattleManager {
             // simulate residual effects
             foreach ($attack->jutsu->effects as $effect) {
                 if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual") {
-                    $effect_power = $attack_damage * ($effect->effect_amount / 100) * $effect->effect_length;
+                    $effect_power = $attack->raw_damage * ($effect->effect_amount / 100) * $effect->effect_length;
                     $residual_damage = $target->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type);
+                    $target->last_damage_taken += $residual_damage;
                     $target->health -= $residual_damage;
                     if ($target->health < 0) {
                         $target->health = 0;
@@ -894,6 +896,7 @@ class BattleManager {
             $immolate_damage = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu->jutsu_type);
             $immolate_damage_raw = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu->jutsu_type, apply_resists: false);
             $immolate_damage_resisted = round($immolate_damage_raw - $immolate_damage, 2);
+            $target->last_damage_taken += $immolate_damage;
             $target->health -= $immolate_damage;
             if ($target->health < 0) {
                 $target->health = 0;
