@@ -817,6 +817,7 @@ class BattleManager {
             $immolate_damage = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu->jutsu_type);
             $immolate_damage_raw = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu->jutsu_type, apply_resists: false);
             $immolate_damage_resisted = round($immolate_damage_raw - $immolate_damage, 2);
+            $target->last_damage_taken += $immolate_damage;
             $target->health -= $immolate_damage;
             if ($target->health < 0) {
                 $target->health = 0;
