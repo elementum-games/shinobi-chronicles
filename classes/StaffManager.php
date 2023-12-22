@@ -28,7 +28,11 @@ class StaffManager {
     ];
 
     public static array $ban_lengths = [
+        // NOTE: Perm ban is -1, can't use
+        -30 => '30 Minute',
+        -60 => '60 Minute',
         1 => '1 Day',
+        3 => '3 Days',
         7 => '1 Week',
         30 => '1 Month',
         90 => '3 Months'
@@ -252,9 +256,9 @@ class StaffManager {
     public function staffLog($type, $content) {
         $this->system->db->query(
             "INSERT INTO `staff_logs` 
-                (`time`, `type`, `content`) 
+                (`time`, `staff_id`, `type`, `content`) 
                 VALUES 
-                ('" . time() . "', '{$type}', '{$content}')
+                ('" . time() . "', {$this->user_id}, '{$type}', '{$content}')
             "
         );
     }
@@ -513,10 +517,19 @@ class StaffManager {
     }
 
     public function banUser($ban_type, $ban_length, $user_data) {
-        if($ban_length > 0 || $ban_length == self::PERM_BAN_VALUE) {
+        if(isset($this->getBanLengths()[$ban_length])) {
             $ban_data = json_decode($user_data['ban_data'], true);
-            $ban_expire = ($ban_length == self::PERM_BAN_VALUE ? $ban_length : time() + ($ban_length * 86400));
             $old_ban_remaining = false;
+
+            if($ban_length == self::PERM_BAN_VALUE) {
+                $ban_expire = $ban_length;
+            }
+            else if($ban_length < self::PERM_BAN_VALUE) {
+                $ban_expire = time() + (abs($ban_length) * 60);
+            }
+            else {
+                $ban_expire = time() + ($ban_length * 86400);
+            }
 
             //Create new ban data for storage
             if($ban_data == null || empty($ban_data)) {
@@ -540,8 +553,11 @@ class StaffManager {
                 //Log action into staff logs
                 $staff_log = "{$this->user_name}({$this->user_id}) $ban_type ban to " .
                 "{$user_data['user_name']}({$user_data['user_id']})";
-                if($ban_length != -1) {
+                if($ban_length > 0) {
                     $staff_log .= " for {$ban_length} day(s).";
+                }
+                else if ($ban_length < self::PERM_BAN_VALUE) {
+                    $staff_log .= " for " . abs($ban_length) . " minutes.";
                 }
                 else {
                     $staff_log .= " permanently.";
@@ -555,6 +571,9 @@ class StaffManager {
                 $record_string = "Received a ";
                 if($ban_length == self::PERM_BAN_VALUE) {
                     $record_string .= "permanent ";
+                }
+                else if ($ban_length < self::PERM_BAN_VALUE) {
+                    $record_string .= " for " . abs($ban_length) . " minute ";
                 }
                 else {
                     $record_string .= "{$ban_length} day ";

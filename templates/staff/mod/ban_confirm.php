@@ -13,6 +13,8 @@
         <td style="text-align: center;">
             <?php if($ban_length == StaffManager::PERM_BAN_VALUE): ?>
                 Issue permanent <?=ucwords($ban_type)?> Ban?
+            <?php elseif($ban_length < StaffManager::PERM_BAN_VALUE): ?>
+                <?=ucwords($ban_type)?> Ban <?=$user_data['user_name']?> for <?=abs($ban_length)?> minutes?<br />
             <?php else: ?>
                 <?=ucwords($ban_type)?> Ban <?=$user_data['user_name']?> for <?=$ban_length?> day(s)?<br />
             <?php endif ?>

@@ -23,9 +23,10 @@
         <td colspan="2" style="text-align: center">
             <div class='submenu'>
                 <ul class='submenu'>
-                    <li style='width:32.9%;'><a href="<?=$self_link?>&view=banned_ips">Banned IP Addresses</a></li>
-                    <li style='width:32.9%;'><a href="<?=$self_link?>&view=multi_accounts">Multi-account List</a></li>
-                    <li style='width:32.9%;'><a href="<?=$self_link?>&view=mod_logs">Mod Logs</a></li>
+                    <li style='width:24%;'><a href="<?=$self_link?>&view=banned_ips">Banned IP Addresses</a></li>
+                    <li style='width:24%;'><a href="<?=$self_link?>&view=multi_accounts">Multi-account List</a></li>
+                    <li style='width:24%;'><a href="<?=$self_link?>&view=mod_logs">Mod Logs</a></li>
+                    <li style='width:24%;'><a href="<?=$self_link?>&view=mod_stats">Mod Stats</a></li>
                 </ul>
             </div>
         </td>

@@ -52,6 +52,10 @@ function modPanel() {
                 throw new RuntimeException("Invalid ban length!");
             }
 
+            if($ban_length < StaffManager::PERM_BAN_VALUE && $ban_type == StaffManager::BAN_TYPE_GAME) {
+                throw new RuntimeException("This ban length is only valid for Chat and PM!");
+            }
+
             $user_data = $player->staff_manager->getUserByName($user_name);
 			if($user_data == false) {
 				throw new RuntimeException("Invalid username!");
@@ -670,6 +674,102 @@ function modPanel() {
 
         $logs = $player->staff_manager->getStaffLogs('staff_logs', StaffManager::STAFF_LOG_MOD, $offset, $limit);
         require_once 'templates/staff/mod/mod_logs.php';
+    }
+    //Mod stats
+    else if($view == 'mod_stats' && $player->staff_manager->isHeadModerator()) {
+        $display_menu = false;
+        $self_link = $system->router->getUrl('mod', ['view'=>'mod_stats']);
+        $PREVIOUS_MONTH = $system->SERVER_TIME;
+        $PREVIOUS_MONTH = $PREVIOUS_MONTH->modify('-30 days');
+        $min_year = (int) $system->SERVER_TIME->modify('-5years')->format('Y');
+        $max_year = (int) $system->SERVER_TIME->format('Y');
+        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        if(isset($_POST['load_stats'])) {
+            try {
+                $mod_staff = [];
+                $moderator_staff_levels = [StaffManager::STAFF_MODERATOR, StaffManager::STAFF_HEAD_MODERATOR, StaffManager::STAFF_ADMINISTRATOR, StaffManager::STAFF_HEAD_ADMINISTRATOR];
+                $mod_result = $system->db->query("SELECT `user_name`, `user_id` FROM `users` WHERE `staff_level` IN (" . implode(', ', $moderator_staff_levels) . ")");
+                if (!$system->db->last_num_rows) {
+                    echo "No staff m8.";
+                }
+
+                // Validate day to month
+                $start_day = $_POST['start_day'];
+                $end_day = $_POST['end_day'];
+
+                if($_POST['start_month'] == 'Feb') {
+                    $max_days = 28;
+                    if((($_POST['start_year'] % 4) == 0) && ((($_POST['start_year'] % 100) != 0) || (($_POST['start_year'] %400) == 0))) {
+                        $max_days = 29;
+                    }
+                    $start_day = min($start_day, $max_days);
+                }
+                if($_POST['end_month'] == 'Feb') {
+                    $max_days = 28;
+                    if((($_POST['end_year'] % 4) == 0) && ((($_POST['end_year'] % 100) != 0) || (($_POST['end_year'] %400) == 0))) {
+                        $max_days = 29;
+                    }
+                    $start_day = min($start_day, $max_days);
+                }
+                if(in_array($_POST['start_month'], ['Apr', 'Jun', 'Sep', 'Nov'])) {
+                    $start_day = min($start_day, 30);
+                }
+                if(in_array($_POST['end_month'], ['Apr', 'Jun', 'Sep', 'Nov'])) {
+                    $end_day = min($end_day, 30);
+                }
+
+                // Start from beginning of day these must be reported in GMT as logs are processed as such
+                $start_string = $_POST['start_month'] . ' ' . $start_day . ' ' . $_POST['start_year'] . ' 00:00:00';
+                $start_time = new DateTimeImmutable($start_string, new DateTimeZone('Europe/London'));
+                // End just prior to midnight these must be reported in GMT as logs are processed as such
+                $end_string = $_POST['end_month'] . ' ' . $end_day . ' ' . $_POST['end_year'] . ' 23:59:59';
+                $end_time = new DateTimeImmutable($end_string, new DateTimeZone('Europe/London'));
+
+                // Set stamps for queries
+                $start_time_stamp = $start_time->getTimestamp();
+                $end_time_stamp = $end_time->getTimestamp();
+
+                if ($end_time_stamp < $start_time_stamp) {
+                    throw new RuntimeException("End date must be after start date!");
+                }
+
+                $total_reports = (int)$system->db->fetch($system->db->query("SELECT COUNT(*) as `count` FROM `reports` WHERE `time` BETWEEN $start_time_stamp AND $end_time_stamp"))['count'];
+                $total_mod_actions = 0;
+                $total_chat_posts = 0;
+
+                while ($row = $system->db->fetch($mod_result)) {
+                    // Pull action data
+                    $staff_actions = $system->db->fetch(
+                        $system->db->query("
+                    SELECT
+                        (SELECT COUNT(*) FROM `chat` WHERE `user_id`='{$row['user_id']}' AND `time` BETWEEN $start_time_stamp AND $end_time_stamp) as post_count,
+                        (SELECT COUNT(*) FROM `reports` WHERE `moderator_id`='{$row['user_id']}' AND `time` BETWEEN $start_time_stamp AND $end_time_stamp) as report_count,
+                        (SELECT COUNT(*) FROM `staff_logs` WHERE `staff_id`='{$row['user_id']}' AND `time` BETWEEN $start_time_stamp AND $end_time_stamp) as action_count
+                ")
+                    );
+
+                    $total_mod_actions += (int)$staff_actions['action_count'];
+                    $total_chat_posts += (int)$staff_actions['post_count'];
+
+                    $mod_staff[$row['user_id']] = [
+                        'user_name' => $row['user_name'],
+                        'mod_actions' => $staff_actions['action_count'],
+                        'reports_handled' => $staff_actions['report_count'],
+                        'chat_posts' => $staff_actions['post_count'],
+                    ];
+                }
+
+                require 'templates/staff/mod/mod_stats.php';
+            } catch (RuntimeException $e) {
+                $system->message($e->getMessage());
+                $system->printMessage();
+                require 'templates/staff/mod/mod_stats_date_select.php';
+            }
+        }
+        else {
+            require 'templates/staff/mod/mod_stats_date_select.php';
+        }
     }
     //Main menu display [Mod panel rework complete -Hitori]
 	else if($display_menu) {
