@@ -771,6 +771,66 @@ function modPanel() {
             require 'templates/staff/mod/mod_stats_date_select.php';
         }
     }
+    else if($view == 'verbose_mod_log' && isset($_GET['mod_id']) && $player->staff_manager->isHeadModerator()) {
+        $user_id = (int)$_GET['mod_id'];
+
+        // Verbose log data to show
+        $days = (int)($_GET['days'] ?? 30);
+        $max_days = ($player->staff_manager->isHeadAdmin() ? 90 : 45);
+        $days = min($days, $max_days); // Limit maximum days, this is taxing!!
+        $staff_data = [
+            'action_log' => [],
+            'chat_posts' => [],
+            'reports_handled' => [],
+        ];
+
+        // Validate user & staff level
+        $result = $system->db->query("SELECT `user_name`, `user_id`, `staff_level` FROM `users` WHERE `user_id`=$user_id LIMIT 1");
+        if (!$system->db->last_num_rows) {
+            $system->message("Invalid user!");
+            $system->printMessage();
+            return false;
+        }
+
+        $record_user = $system->db->fetch($result);
+        if (!in_array($record_user['staff_level'], [StaffManager::STAFF_MODERATOR, StaffManager::STAFF_HEAD_MODERATOR, StaffManager::STAFF_ADMINISTRATOR, StaffManager::STAFF_HEAD_ADMINISTRATOR])) {
+            $system->message("Not a moderator!");
+            $system->printMessage();
+            return false;
+        }
+
+        // Set date range
+        $date = new DateTimeImmutable("now", new DateTimeZone('Europe/London'));
+        $date = $date->modify("-$days days");
+        $time_stamp = $date->getTimestamp();
+
+        // Query staff logs
+        $action_result = $system->db->query("SELECT * FROM `staff_logs` WHERE `staff_id`='{$record_user['user_id']}' AND `time` >= $time_stamp ORDER BY `log_id` DESC");
+        if ($system->db->last_num_rows) {
+            while ($row = $system->db->fetch($action_result)) {
+                $staff_data['action_log'][] = $row;
+            }
+        }
+
+        // Query chat logs
+        $chat_result = $system->db->query("SELECT * FROM `chat` WHERE `user_id`='{$record_user['user_id']}' AND `time` >= $time_stamp ORDER BY `post_id` DESC");
+        if($system->db->last_num_rows) {
+            while($row = $system->db->fetch($chat_result)) {
+                $staff_data['chat_posts'][] = $row;
+            }
+        }
+
+        // Query report logs
+        $report_result = $system->db->query("SELECT * FROM `reports` WHERE `moderator_id`='{$record_user['user_id']}' AND `time` >= $time_stamp ORDER BY `report_id` DESC");
+        if($system->db->last_num_rows) {
+            while($row = $system->db->fetch($report_result)) {
+                $staff_data['reports_handled'][] = $row;
+            }
+        }
+
+        require 'templates/staff/mod/verbose_mod_stats.php';
+        return true;
+    }
     //Main menu display [Mod panel rework complete -Hitori]
 	else if($display_menu) {
 		// Mod actions

@@ -19,12 +19,13 @@ function calc_percent(int $amount, int $total): string {
 
 
 <table class="table">
-    <tr><th colspan="4">Moderator Stats</th></tr>
+    <tr><th colspan="5">Moderator Stats</th></tr>
     <tr>
         <th>Name</th>
         <th>Actions</th>
         <th>Reports Handled</th>
         <th>Chat Posts</th>
+        <th></th>
     </tr>
     <?php foreach($mod_staff as $UID => $stats): ?>
         <tr style="text-align: center;">
@@ -32,6 +33,7 @@ function calc_percent(int $amount, int $total): string {
             <td><?=$stats['mod_actions']?> <?= calc_percent($stats['mod_actions'], $total_mod_actions) ?></td>
             <td><?=$stats['reports_handled']?> <?= calc_percent($stats['reports_handled'], $total_reports) ?></td>
             <td><?=$stats['chat_posts']?> <?= calc_percent($stats['chat_posts'], $total_chat_posts) ?></td>
+            <td><a href="<?=$system->router->getUrl('mod', ['view'=>'verbose_mod_log', 'mod_id'=>$UID, 'days'=>30])?>" target="_blank">Verbose Log</a></td>
         </tr>
     <?php endforeach ?>
     <tr style="text-align: center;">
@@ -39,6 +41,7 @@ function calc_percent(int $amount, int $total): string {
         <td><?= $total_mod_actions ?></td>
         <td><?= $total_reports ?></td>
         <td><?= $total_chat_posts ?></td>
+        <td></td>
     </tr>
 </table>
 <div style="width:100%;text-align: center;"><a href="<?=$system->router->getUrl('mod', ['view'=>'mod_stats'])?>">Return to Search</a></div>
