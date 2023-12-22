@@ -416,8 +416,16 @@ function deleteUserPage(System $system, User $player): void {
     }
 }
 
+/**
+ * Used only in the function below to generate a random string as a password.
+ * It is STRONGLY recommended that users reset their password after regaining access to their account.
+ * This method by NO MEANS generates a totally secure password!!!!
+ * @param $length
+ * @return string
+ * @throws Exception
+ */
 function generateRandPassword($length): string {
-    $keyspace = str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+    $keyspace = str_shuffle(string: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
     $str = '';
     $max = mb_strlen($keyspace, '8bit') - 1;
@@ -426,16 +434,25 @@ function generateRandPassword($length): string {
     }
 
     if (!preg_match('/[!@#$%&*]/', $str)) {
-        $special_chars = str_shuffle('!@#$%&*');
-        $insert_char = substr($special_chars, mt_rand(0, strlen($special_chars)-1), 1);
+        $special_chars = str_shuffle(string: '!@#$%&*');
+        $insert_char = substr($special_chars, offset: mt_rand(0, strlen($special_chars)-1), length: 1);
         $insert_location = mt_rand(ceil(strlen($str) * 0.25), floor(strlen($str)-1 * 0.75));
-        $first_half = substr($str, 0, $insert_location);
-        $second_half = substr($str, $insert_location, strlen($str));
+        $first_half = substr($str, offset: 0, length: $insert_location);
+        $second_half = substr($str, offset: $insert_location, length: strlen($str));
 
-        $str = str_shuffle($first_half . $insert_char . $second_half);
+        $str = $first_half . str_shuffle(string: $insert_char . $second_half);
     }
     return $str;
 }
+
+/**
+ * Temporary method to reset user passwords until system emails are restored.
+ * Note: This reset doesn't generate a truly secure password, users should reset password after recovery
+ * @param System $system
+ * @param User $player
+ * @return void
+ * @throws Exception
+ */
 function resetPasswordPage(System $system, User $player): void {
     $self_link = $system->router->getUrl('admin', ['page' => 'reset_password']);
     if(isset($_POST['user_name'])) {
