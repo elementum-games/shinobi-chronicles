@@ -145,4 +145,11 @@ class Blacklist {
             $this->system->db->query("INSERT INTO `blacklist` (`user_id`, `blocked_ids`) VALUES ('$this->user_id', '$this->encodedBlacklist')");
         }
     }
+
+    public static function fromDb(System $system, int $user_id): Blacklist {
+        return new Blacklist(
+            system: $system,
+            user_id: $user_id
+        );
+    }
 }
