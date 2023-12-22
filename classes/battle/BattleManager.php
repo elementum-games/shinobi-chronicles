@@ -758,7 +758,7 @@ class BattleManager {
                     break;
                 case 'immolate':
                     $attack->immolate_percent += $effect->effect_amount / 100;
-                    $attack->immolate_raw_damage += $this->effects->processImmolate($attack, $target, $simulation);
+                    $attack->immolate_raw_damage += $this->effects->processImmolate($attack, $target, $simulation) * $attack->immolate_percent;
                     break;
                 case 'reflect':
                     $attack->reflect_percent += $effect->effect_amount / 100;
@@ -769,7 +769,7 @@ class BattleManager {
             }
         }
 
-        $attack->raw_damage = $fighter->calcDamage(attack: $attack->jutsu, disable_randomness: $disable_randomness, immolate_raw_damage: $attack->immolate_raw_damage * $attack->immolate_percent);
+        $attack->raw_damage = $fighter->calcDamage(attack: $attack->jutsu, disable_randomness: $disable_randomness);
         // Set weapon data into jutsu
         if($attack->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $action->weapon_id) {
             // Apply element to jutsu
@@ -821,16 +821,6 @@ class BattleManager {
                 }
             }
 
-            // simulate recoil damage
-            if ($attack->recoil_percent > 0) {
-                $recoil_damage = $user->calcDamageTaken($attack->recoil_raw_damage, $attack->jutsu->jutsu_type);
-                $user->last_damage_taken += $recoil_damage;
-                $user->health -= $recoil_damage;
-                if ($user->health < 0) {
-                    $user->health = 0;
-                }
-            }
-
             // simulate direct damage
             if (empty($attack->jutsu->effect_only)) {
                 $attack_damage = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type, element: $attack->jutsu->element);
@@ -838,6 +828,18 @@ class BattleManager {
                 $target->health -= $attack_damage;
                 if ($target->health < 0) {
                     $target->health = 0;
+                }
+
+                // simulate recoil damage
+                if ($attack->recoil_percent > 0) {
+                    $recoil_damage = $user->calcDamageTaken($attack_damage * $attack->recoil_percent, $attack->jutsu->jutsu_type, is_raw_damage: false);
+                    $recoil_damage_raw = $user->calcDamageTaken($attack_damage * $attack->recoil_percent, $attack->jutsu->jutsu_type, apply_resists: false, is_raw_damage: false);
+                    $recoil_damage_resisted = round($recoil_damage_raw - $recoil_damage, 2);
+                    $user->last_damage_taken += $recoil_damage;
+                    $user->health -= $recoil_damage;
+                    if ($user->health < 0) {
+                        $user->health = 0;
+                    }
                 }
             }
 
@@ -848,6 +850,17 @@ class BattleManager {
                 $user->health -= $reflect_damage;
                 if ($user->health < 0) {
                     $user->health = 0;
+                }
+            }
+
+            // simulate immolate effects
+            if ($attack->immolate_raw_damage > 0) {
+                $immolate_damage = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu->jutsu_type);
+                $immolate_damage_raw = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu->jutsu_type, apply_resists: false);
+                $immolate_damage_resisted = round($immolate_damage_raw - $immolate_damage, 2);
+                $target->health -= $immolate_damage;
+                if ($target->health < 0) {
+                    $target->health = 0;
                 }
             }
 
@@ -877,18 +890,7 @@ class BattleManager {
             }
         }
 
-        if ($attack->recoil_percent > 0) {
-            $recoil_damage = $user->calcDamageTaken($attack->recoil_raw_damage, $attack->jutsu->jutsu_type);
-            $recoil_damage_raw = $user->calcDamageTaken($attack->recoil_raw_damage, $attack->jutsu->jutsu_type, apply_resists: false);
-            $recoil_damage_resisted = round($recoil_damage_raw - $recoil_damage, 2);
-            $user->last_damage_taken += $recoil_damage;
-            $user->health -= $recoil_damage;
-            if ($user->health < 0) {
-                $user->health = 0;
-            }
-        }
-
-        /*if ($attack->immolate_raw_damage > 0) {
+        if ($attack->immolate_raw_damage > 0) {
             $immolate_damage = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu->jutsu_type);
             $immolate_damage_raw = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu->jutsu_type, apply_resists: false);
             $immolate_damage_resisted = round($immolate_damage_raw - $immolate_damage, 2);
@@ -896,7 +898,7 @@ class BattleManager {
             if ($target->health < 0) {
                 $target->health = 0;
             }
-        }*/
+        }
 
         if(empty($attack->jutsu->effect_only)) {
             $attack_damage = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type, element: $attack->jutsu->element);
@@ -907,6 +909,17 @@ class BattleManager {
             $target->health -= $attack_damage;
             if($target->health < 0) {
                 $target->health = 0;
+            }
+
+            if ($attack->recoil_percent > 0) {
+                $recoil_damage = $user->calcDamageTaken($attack_damage * $attack->recoil_percent, $attack->jutsu->jutsu_type, is_raw_damage: false);
+                $recoil_damage_raw = $user->calcDamageTaken($attack_damage * $attack->recoil_percent, $attack->jutsu->jutsu_type, apply_resists: false, is_raw_damage: false);
+                $recoil_damage_resisted = round($recoil_damage_raw - $recoil_damage, 2);
+                $user->last_damage_taken += $recoil_damage;
+                $user->health -= $recoil_damage;
+                if ($user->health < 0) {
+                    $user->health = 0;
+                }
             }
         }
 
@@ -1027,13 +1040,13 @@ class BattleManager {
             }
         }
 
-        /*if ($attack->immolate_raw_damage > 0) {
+        if ($attack->immolate_raw_damage > 0) {
             if ($immolate_damage_resisted > 0) {
                 $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . round($immolate_damage, 0) . "</span> immolation damage- (resists " . "<span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . round($immolate_damage_resisted) . "</span>" . " immolation damage)" . '</span></br>';
             } else {
                 $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . round($immolate_damage, 0) . "</span> immolation damage-" . '</span></br>';
             }
-        }*/
+        }
 
        if($attack->jutsu->hasEffect()){
             foreach ($attack->jutsu->effects as $effect) {
@@ -1331,15 +1344,6 @@ class BattleManager {
                         round($damage_reduction * 100, 0) . "% of [player]'s damage!";
                 }
             }
-        }
-
-        // Recoil
-        // We do this after evasion otherwise the tag becomes unusable against players with higher baseline evasion (significantly decreased final damage output versus raw)
-        if ($player1_attack->recoil_percent > 0) {
-            $player1_attack->recoil_raw_damage = $player1_damage * $player1_attack->recoil_percent;
-        }
-        if ($player2_attack->recoil_percent > 0) {
-            $player2_attack->recoil_raw_damage = $player2_damage * $player2_attack->recoil_percent;
         }
 
         // Barriers
