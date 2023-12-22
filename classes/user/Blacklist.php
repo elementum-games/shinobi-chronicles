@@ -28,7 +28,7 @@ class Blacklist {
         }
         else {
             $this->blacklist = array();
-            $this->setEncodedBlacklist();
+            $this->createBlacklist();
         }
     }
 
@@ -132,7 +132,17 @@ class Blacklist {
     }
 
     // Update blacklist
-    public function updateData() {
+    public function updateData(): void {
         $this->system->db->query("UPDATE `blacklist` SET `blocked_ids`='$this->encodedBlacklist' WHERE `user_id` = $this->user_id LIMIT 1");
+    }
+
+    // Create blacklist
+    public function createBlacklist(): void {
+        // Redundancy check
+        $this->system->db->query("SELECT * FROM `blacklist` WHERE `user_id` = $this->user_id LIMIT 1");
+        if(!$this->system->db->last_num_rows) {
+            $this->encodedBlacklist = json_encode(array());
+            $this->system->db->query("INSERT INTO `blacklist` (`user_id`, `blocked_ids`) VALUES ('$this->user_id', '$this->encodedBlacklist')");
+        }
     }
 }
