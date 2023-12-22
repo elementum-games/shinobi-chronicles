@@ -966,7 +966,6 @@ class BattleManager {
             }
         }
         if (count($attack->effects) > 0) {
-            echo ($attack->effects[0]->effect);
             foreach ($attack->effects as $index => $effect) {
                 if (in_array($effect->effect, BattleEffect::$buff_effects)) {
                     $target_id = $user->combat_id;
