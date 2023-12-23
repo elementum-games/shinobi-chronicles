@@ -1,5 +1,10 @@
 <?php
 class Blacklist {
+    public static array $blockable_staff_levels = [
+        User::STAFF_NONE,
+        User::STAFF_CONTENT_ADMIN
+    ];
+
     public function __construct(
         public System $system,
         public int $user_id,
@@ -53,7 +58,7 @@ class Blacklist {
         $result = $this->system->db->query("
             SELECT `user_id` FROM `users` 
             WHERE `user_id` IN (" . implode(",", $blocked_user_ids) . ")
-            AND `staff_level` < 1
+            AND `staff_level` IN (" . implode(",", self::$blockable_staff_levels) . ")
         ");
         return array_map(function($user_record) {
             return $user_record['user_id'];

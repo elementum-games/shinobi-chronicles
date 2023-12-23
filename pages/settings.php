@@ -153,12 +153,14 @@ function userSettings() {
             } else {
                 $blacklist_user = $system->db->fetch($result);
             }
-            if ($blacklist_user['staff_level'] >= User::STAFF_MODERATOR) {
-                throw new RuntimeException("You are unable to blacklist staff members!");
+
+            if (!in_array($blacklist_user['staff_level'], Blacklist::$blockable_staff_levels)) {
+                throw new RuntimeException("You are unable to blacklist moderators or staff admins!");
             }
             if ($player->user_id == $blacklist_user['user_id']) {
                 throw new RuntimeException("You cannot blacklist yourself!");
             }
+
             // Add user
             if (isset($_POST['blacklist_add'])) {
                 if($player->blacklist->userBlocked($blacklist_user['user_id'])) {
