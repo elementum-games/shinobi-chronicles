@@ -57,6 +57,9 @@ class Travel {
     }
 
     public static function checkAIDelay(int $last_ai_ms): int {
+        if (self::TRAVEL_DELAY_AI == 0) {
+            return 0;
+        }
         $diff = System::currentTimeMs() - $last_ai_ms;
         return self::TRAVEL_DELAY_AI - $diff;
     }
