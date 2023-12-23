@@ -34,7 +34,7 @@ function arena(): bool {
         $ai_rank = min($player->rank_num, System::SC_MAX_RANK);
         $result = $system->db->query(
             "SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
-                WHERE `rank` = {$ai_rank} AND `money` > 0 ORDER BY `level` ASC"
+                WHERE `rank` = {$ai_rank} AND `arena_enabled` = 1 ORDER BY `level` ASC"
         );
 		if($system->db->last_num_rows == 0) {
 			$system->message("No NPC opponents found!");
@@ -47,49 +47,40 @@ function arena(): bool {
 			$ai_opponents[$row['ai_id']] = $row;
 		}
 
-		if(!empty($_GET['fight'])) {
+        if(!empty($_POST['difficulty'])) {
             $max_last_ai_ms = System::currentTimeMs() - $fight_timer;
-
             // check if the current location disallows ai fights
             if ($player->rank_num > 2 && $player->current_location->location_id && $player->current_location->ai_allowed == 0) {
                 $system->message('You cannot fight at this location');
             }
-            else if($player->last_ai_ms > $max_last_ai_ms) {
+            else if ($player->last_ai_ms > $max_last_ai_ms) {
 				$system->message("Please wait " . ceil(($player->last_ai_ms - $max_last_ai_ms) / 1000) . " more seconds!");
 			}
-			else if(isset($ai_opponents[$_GET['fight']])) {
-                try {
-                    $ai_id = $_GET['fight'];
-                    $ai = new NPC($system, $ai_id);
-                    $ai->loadData($player);
-                    $ai->health = $ai->max_health;
+            try {
+                $ai_difficulty = $_POST['difficulty'];
+                $ai = getRandomArenaOpponent($ai_difficulty, $player, $system);
+                $ai->loadData($player);
+                $ai->health = $ai->max_health;
 
-                    $player->last_ai_ms = System::currentTimeMs();
-                    if($system->USE_NEW_BATTLES) {
-                        BattleV2::start($system, $player, $ai, BattleV2::TYPE_AI_ARENA);
-                    }
-                    else {
-                        Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA);
-                    }
-
-                    arena();
-                    $player->log(User::LOG_ARENA, "Opponent {$ai->id} ({$ai->getName()})");
-                    return true;
-                } catch(RuntimeException $e) {
-                    $system->message("Invalid opponent!");
-                    $system->printMessage();
+                $player->last_ai_ms = System::currentTimeMs();
+                if($system->USE_NEW_BATTLES) {
+                    BattleV2::start($system, $player, $ai, BattleV2::TYPE_AI_ARENA);
                 }
-			}
-			else {
-				$system->message("Invalid opponent!");
-				$system->printMessage();
-			}
+                else {
+                    Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA);
+                }
+                $player->ai_cooldowns[$ai_difficulty] = NPC::AI_COOLDOWNS[$ai_difficulty] + time();
+
+                arena();
+                $player->log(User::LOG_ARENA, "Opponent {$ai->id} ({$ai->getName()})");
+                return true;
+            } catch(RuntimeException $e) {
+                $system->message($e->getMessage());
+                $system->printMessage();
+            }
 		}
 
-        $system->printMessage();
-        echo "<table class='table'><tr><th>Choose Opponent</th></tr>
-        <tr><td style='text-align: center;'>
-        Welcome to the Arena. Here you can fight against various opponents for cash prizes. Please select your opponent below:";
+        require 'templates/arena.php';
 	if(!$player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
 	$remaining = $player->mission_rep_cd - time();
 	echo "<br /><br />You can gain village reputation in: <div id='rep_cd' style='display: inline-block'>"
@@ -284,4 +275,32 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
     }
 
     return $battle_result;
+}
+
+/**
+ * @throws RuntimeException
+ */
+function getRandomArenaOpponent(string $difficulty_level, User $player, System $system): NPC {
+    switch ($difficulty_level) {
+        case NPC::DIFFICULTY_EASY:
+        case NPC::DIFFICULTY_NORMAL:
+        case NPC::DIFFICULTY_HARD:
+            if (!empty($player->ai_cooldowns[$difficulty_level]) && time() < $player->ai_cooldowns[$difficulty_level]) {
+                throw new RuntimeException("Please wait " . System::timeRemaining($player->ai_cooldowns[$difficulty_level] - time()) . "s to start another battle of this difficulty.");
+            }
+            $ai_result = $system->db->query("SELECT `ai_id` FROM `ai_opponents`
+                WHERE `rank` = {$player->rank_num}
+                AND `arena_enabled` = 1
+                AND `difficulty_level` = '{$difficulty_level}'
+                ORDER BY RAND() LIMIT 1
+            ");
+            $ai_result = $system->db->fetch($ai_result);
+            if (empty($ai_result['ai_id'])) {
+                throw new RuntimeException("No AI opponents available.");
+            }
+            $ai_opponent = new NPC($system, $ai_result['ai_id']);
+            return $ai_opponent;
+        default:
+            throw new RuntimeException("Invalid difficulty selection.");
+    }
 }

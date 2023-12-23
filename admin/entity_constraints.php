@@ -290,6 +290,21 @@ $constraints['ai'] = [
         'input_type' => 'radio',
         'options' => [0 => 'No', 1 => 'Yes'],
     ],
+    'difficulty_level' => [
+        'data_type' => 'string',
+        'input_type' => 'text',
+        'options' => [NPC::DIFFICULTY_NONE, NPC::DIFFICULTY_EASY, NPC::DIFFICULTY_NORMAL, NPC::DIFFICULTY_HARD],
+    ],
+    'arena_enabled' => [
+        'data_type' => 'int',
+        'input_type' => 'radio',
+        'options' => [0 => 'No', 1 => 'Yes'],
+    ],
+    'is_patrol' => [
+        'data_type' => 'int',
+        'input_type' => 'radio',
+        'options' => [0 => 'No', 1 => 'Yes'],
+    ],
 ];
 
 

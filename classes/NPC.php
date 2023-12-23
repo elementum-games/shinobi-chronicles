@@ -41,6 +41,9 @@ class NPC extends Fighter {
     public int $battle_iq = 0; // chance to use optimal jutsu over random
     public bool $scaling = false; // whether AI will scale to the nearest possible level
     public array $shop_jutsu_priority = []; // if set, AI will prioritize these jutsu on non-optimal roll
+    public string $difficulty_level = 'none'; // used for arena and patrol logic
+    public bool $arena_enabled = false; // used for arena logic
+    public bool $is_patrol = false; // used for patrol logic
 
     /** @var Jutsu[] */
     public array $jutsu = [];
@@ -50,6 +53,17 @@ class NPC extends Fighter {
     public $current_move;
 
     public int $staff_level = 0;
+
+    const DIFFICULTY_NONE = 'none';
+    const DIFFICULTY_EASY = 'easy';
+    const DIFFICULTY_NORMAL = 'normal';
+    const DIFFICULTY_HARD = 'hard';
+
+    const AI_COOLDOWNS = [
+        self::DIFFICULTY_EASY => 10,
+        self::DIFFICULTY_NORMAL => 60,
+        self::DIFFICULTY_HARD => 300
+    ];
 
     /**
      * NPC constructor.
@@ -96,6 +110,9 @@ class NPC extends Fighter {
         $this->rank = $ai_data['rank'];
         $this->level = $ai_data['level'];
         $this->scaling = $ai_data['scaling'];
+        $this->difficulty_level = $ai_data['difficulty_level'];
+        $this->arena_enabled = $ai_data['arena_enabled'];
+        $this->is_patrol = $ai_data['is_patrol'];
 
         $base_level = $this->rankManager->ranks[$this->rank]->base_level;
         $max_level = $this->rankManager->ranks[$this->rank]->max_level;
