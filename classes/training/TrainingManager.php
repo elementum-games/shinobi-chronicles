@@ -353,4 +353,24 @@ class TrainingManager {
         $this->train_time_remaining = $length;
         $this->train_gain = $amount;
     }
+
+    /**
+     * @param string $difficulty_level
+     * @param int $rank
+     * @return int
+     */
+    public static function getAIStatGain(string $difficulty_level, int $rank): int {
+        switch ($difficulty_level) {
+            case NPC::DIFFICULTY_NONE:
+                return 1;
+            case NPC::DIFFICULTY_EASY:
+                return 1;
+            case NPC::DIFFICULTY_NORMAL:
+                return 1 + $rank;
+            case NPC::DIFFICULTY_HARD:
+                return 2 * (1 + $rank);
+            default:
+                return 1;
+        }
+    }
 }

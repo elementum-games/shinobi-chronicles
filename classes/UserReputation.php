@@ -476,21 +476,18 @@ class UserReputation {
     }
 
     // Calculate and return reputation amount gain from arena fights
-    public function calcArenaReputation($player_level, $opponent_level): int {
-        if($player_level > $opponent_level) {
-            if($player_level - $opponent_level >= 2) {
-                return 0;
-            }
-            return 1;
-        }
-        else {
-            $level_difference = $opponent_level - $player_level;
-            if($level_difference <= 2) {
+    public function calcArenaReputation(string $difficulty_level, int $rank): int {
+        switch ($difficulty_level) {
+            case NPC::DIFFICULTY_NONE:
                 return 1;
-            }
-            else {
-                return 2;
-            }
+            case NPC::DIFFICULTY_EASY:
+                return 1;
+            case NPC::DIFFICULTY_NORMAL:
+                return 1 + $rank;
+            case NPC::DIFFICULTY_HARD:
+                return 2 * (1 + $rank);
+            default:
+                return 1;
         }
     }
 

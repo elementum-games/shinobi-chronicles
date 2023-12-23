@@ -93,7 +93,7 @@ function processWarBattleEnd($battle, User $player): string {
         $rep_gain_string = "";
         if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_WAR)) {
             $rep_gain = $player->reputation->addRep(
-                $player->reputation->calcArenaReputation($player->level, $opponent->level),
+                $player->reputation->calcArenaReputation($opponent->difficulty_level, $player->rank_num),
                 UserReputation::ACTIVITY_TYPE_WAR
             );
             if ($rep_gain > 0) {
