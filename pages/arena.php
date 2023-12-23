@@ -43,9 +43,6 @@ function arena(): bool {
 		}
 
 		$ai_opponents = array();
-		while($row = $system->db->fetch($result)) {
-			$ai_opponents[$row['ai_id']] = $row;
-		}
 
         if(!empty($_POST['difficulty'])) {
             $max_last_ai_ms = System::currentTimeMs() - $fight_timer;
@@ -87,13 +84,6 @@ function arena(): bool {
 	    . System::timeRemaining($remaining) . "</div>
 		<script type='text/javascript'>countdownTimer($remaining, 'rep_cd', false);</script>";
     	}
-        echo "</td></tr>
-        <tr><td style='text-align: center;'>";
-        foreach($ai_opponents as $ai) {
-            echo "<a href='$self_link&fight={$ai['ai_id']}'>
-                 <p class='button' style='margin-top:5px;'>" . $ai['name'] .
-                    " <span style='font-weight:normal;'>(Level {$ai['level']})</span></p></a><br />";
-        }
         echo "</td></tr></table>";
 	}
 

@@ -46,7 +46,10 @@
         <tr><th>Choose Opponent</th></tr>
         <tr>
             <td style='text-align: center;'>
-                Welcome to the Arena. Here you can fight against various opponents for cash prizes. Select your opponent below:
+                <span>Welcome to the Arena. </span>
+                <br />
+                <span>Here you can fight against various opponents for cash prizes.</span>
+                <br /><span>Fighting more difficult opponents will yield greater rewards. Select your opponent below:</span>
                 <svg style="height: 0px; width: 0px">
                     <radialGradient id="arena_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
                         <stop offset="0%" style="stop-color: #84314e; stop-opacity: 1"></stop>
