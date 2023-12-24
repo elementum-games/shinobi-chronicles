@@ -218,7 +218,12 @@ class System {
 
         // New Server Time
         $this->SERVER_TIME = new DateTimeImmutable(datetime: "now", timezone: new DateTimeZone(self::SERVER_TIME_ZONE));
-        $this->REPUTATION_RESET = $this->SERVER_TIME->modify(self::REPUTATION_RESET_DAY);
+		$this->REPUTATION_RESET = $this->SERVER_TIME; // Piggyback server time
+    	if($this->SERVER_TIME->format('D') != 'Fri') {
+			// Set day to Friday
+			$this->REPUTATION_RESET = $this->SERVER_TIME->modify(self::REPUTATION_RESET_DAY);
+		}
+		// Push time to 2000 ET
         $this->REPUTATION_RESET = $this->REPUTATION_RESET->setTime(hour: self::REPUTATION_RESET_HOUR, minute: self::REPUTATION_RESET_MINUTE);
         // Old Server Time
         $this->timezoneOffset = date('Z');
