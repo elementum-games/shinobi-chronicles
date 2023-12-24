@@ -44,6 +44,7 @@ class NPC extends Fighter {
     public string $difficulty_level = 'none'; // used for arena and patrol logic
     public bool $arena_enabled = false; // used for arena logic
     public bool $is_patrol = false; // used for patrol logic
+    public string $avatar_link = ''; // avatar link
 
     /** @var Jutsu[] */
     public array $jutsu = [];
@@ -113,12 +114,19 @@ class NPC extends Fighter {
         $this->difficulty_level = $ai_data['difficulty_level'];
         $this->arena_enabled = $ai_data['arena_enabled'];
         $this->is_patrol = $ai_data['is_patrol'];
+        $this->avatar_link = empty($ai_data['avatar_link']) ? '' : $ai_data['avatar_link'];
 
         $base_level = $this->rankManager->ranks[$this->rank]->base_level;
         $max_level = $this->rankManager->ranks[$this->rank]->max_level;
+        $stats_for_level = $this->rankManager->statsForRankAndLevel($this->rank, $this->level);
         // if player is set we can apply AI scaling
         if (isset($player) && $this->scaling) {
-            $this->level = max(min($player->level, $max_level), $base_level);
+            // scale to player level between the range from AI level and level cap of the rank (upward scaling)
+            $this->level = max(min($player->level, $max_level), $this->level);
+            // override stat total if level adjusted to player
+            if ($this->level == $player->level) {
+                $stats_for_level = $player->getBaseStatTotal();
+            }
         }
         // set jutsu level relative to base and max levels for the rank, minimum 1
         $jutsu_level = max(1, intval((($this->level - $base_level) / ($max_level - $base_level)) * 100));
@@ -129,7 +137,6 @@ class NPC extends Fighter {
 
         $this->gender = "Male";
 
-        $stats_for_level = $this->rankManager->statsForRankAndLevel($this->rank, $this->level);
         $this->ninjutsu_skill = $stats_for_level * $ai_data['ninjutsu_skill'];
         $this->genjutsu_skill = $stats_for_level * $ai_data['genjutsu_skill'];
         $this->taijutsu_skill = $stats_for_level * $ai_data['taijutsu_skill'];
@@ -413,7 +420,7 @@ class NPC extends Fighter {
     }
 
     public function getAvatarSize(): int {
-        return 125;
+        return 200;
     }
 
     public function getInventory() {

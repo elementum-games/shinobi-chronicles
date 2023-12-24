@@ -219,6 +219,7 @@ $constraints['ai'] = [
                 'data_type' => 'string',
                 'input_type' => 'text',
                 'max_length' => 35,
+                'field_required' => false,
             ],
             'battle_text' => [
                 'data_type' => 'string',
@@ -304,6 +305,12 @@ $constraints['ai'] = [
         'data_type' => 'int',
         'input_type' => 'radio',
         'options' => [0 => 'No', 1 => 'Yes'],
+    ],
+    'avatar_link' => [
+        'data_type' => 'string',
+        'input_type' => 'text',
+        'max_length' => 100,
+        'field_required' => false,
     ],
 ];
 

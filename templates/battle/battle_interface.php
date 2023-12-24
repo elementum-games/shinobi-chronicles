@@ -234,7 +234,7 @@ if($battle->battle_text) {
             <a href='<?= $system->router->links['members'] ?>&user=<?= $player->getName() ?>' style='text-decoration:none'><?= $player->getName() ?></a>
         </th>
         <th id='bi_th_opponent' style='width:50%;'>
-            <?php if($opponent instanceof AI): ?>
+            <?php if($opponent instanceof NPC): ?>
                 <?= $opponent->getName() ?>
             <?php else: ?>
                 <a href='<?= $system->router->links['members'] ?>&user=<?= $opponent->getName() ?>' style='text-decoration:none'><?= $opponent->getName() ?></a>
@@ -242,45 +242,57 @@ if($battle->battle_text) {
         </th>
     </tr>
     <tr>
-        <td style='text-align: center;' id='bi_td_player'>
-            <img src='<?= $player->avatar_link ?>' class='playerAvatar' alt='player_profile_img' />
-            <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
+        <td id='bi_td_player'>
+            <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center">
+                <img src='<?= $player->avatar_link ?>' class='playerAvatar' alt='player_profile_img' />
+                <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
 
-                <!-- Health -->
-                <div class='resourceBarOuter healthPreview'>
-                    <label class='innerResourceBarLabel' ><?= sprintf("%.0f", $player->health) ?> / <?= sprintf("%.0f", $player->max_health) ?></label>
-                    <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
-                </div>
+                    <!-- Health -->
+                    <div class='resourceBarOuter healthPreview'>
+                        <label class='innerResourceBarLabel'><?= sprintf("%.0f", $player->health) ?> / <?= sprintf("%.0f", $player->max_health) ?></label>
+                        <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
+                    </div>
 
-                <?php if(!$battleManager->spectate): ?>
+                    <?php if(!$battleManager->spectate): ?>
 
                     <!-- Chakra -->
-                <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
-                    <label class='innerResourceBarLabel'>
-                        <?= sprintf("%.0f", $player->chakra) ?> / <?= sprintf("%.0f", $player->max_chakra) ?>
-                    </label>
-                    <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
-                </div>
+                    <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
+                        <label class='innerResourceBarLabel'>
+                            <?= sprintf("%.0f", $player->chakra) ?> / <?= sprintf("%.0f", $player->max_chakra) ?>
+                        </label>
+                        <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
+                    </div>
 
                     <!-- Stamina -->
-                <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
-                    <label class='innerResourceBarLabel'>
-                        <?= sprintf("%.0f", $player->stamina) ?> / <?= sprintf("%.0f", $player->max_stamina) ?>
-                    </label>
-                    <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
-                </div>
+                    <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
+                        <label class='innerResourceBarLabel'>
+                            <?= sprintf("%.0f", $player->stamina) ?> / <?= sprintf("%.0f", $player->max_stamina) ?>
+                        </label>
+                        <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
+                    </div>
 
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </td>
         <td style='text-align: center;' id='bi_td_opponent'>
-            <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
-            <div id='ai_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
-                <div class='resourceBarOuter healthPreview' style='margin-top:8px;'>
-                    <div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
-                        <label class='innerResourceBarLabel'>
-                            <?= sprintf("%.0f", $opponent->health) ?> / <?= sprintf("%.0f", $opponent->max_health) ?>
-                        </label>
+            <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center">
+                <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
+                <div id='ai_battle_stats_container' style='display: inline-block; text-align: center'>
+                    <div class='resourceBarOuter healthPreview' style='margin-top:8px;'>
+                        <div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
+                            <label class='innerResourceBarLabel'>
+                                <?= sprintf("%.0f", $opponent->health) ?> / <?= sprintf("%.0f", $opponent->max_health) ?>
+                            </label>
+                        </div>
+                    </div>
+                    <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
+                        <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                        <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
+                    </div>
+                    <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
+                        <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                        <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
                     </div>
                 </div>
             </div>

@@ -41,70 +41,71 @@
 
 <?php $system->printMessage(); ?>
 
-<form action='<?= $system->router->getUrl('arena') ?>' method='post' style='margin:0;'>
-    <table id='arena_select' class='table' style='text-align:center;'>
-        <tr><th>Choose Opponent</th></tr>
-        <tr>
-            <td style='text-align: center;'>
-                <span>Welcome to the Arena. </span>
-                <br />
-                <span>Here you can fight against various opponents for cash prizes.</span>
-                <br /><span>Fighting more difficult opponents will yield greater rewards. Select your opponent below:</span>
-                <svg style="height: 0px; width: 0px">
-                    <radialGradient id="arena_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                        <stop offset="0%" style="stop-color: #84314e; stop-opacity: 1"></stop>
-                        <stop offset="100%" style="stop-color: #68293f; stop-opacity: 1"></stop>
-                    </radialGradient>
-                    <radialGradient id="arena_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                        <stop offset="0%" style="stop-color: #68293f; stop-opacity: 1"></stop>
-                        <stop offset="100%" style="stop-color: #84314e; stop-opacity: 1"></stop>
-                    </radialGradient>
-                </svg>
-                <div style="display: flex; gap: 45px; margin: 15px; justify-content: center">
-                    <label>
-                        <input type="submit" name="difficulty" value="easy" style="display: none" />
-                        <svg role="button" tabindex="0" name="arena_button" class="arena_button" width="128" height="24">
+<table id='arena_select' class='table' style='text-align:center;'>
+    <tr><th>Choose Opponent</th></tr>
+    <tr>
+        <td style='text-align: center;'>
+            <span>Welcome to the Arena. </span>
+            <br />
+            <span>Here you can fight against various opponents for cash prizes.</span>
+            <br /><span>Fighting more difficult opponents will yield greater rewards. Select your opponent below:</span>
+            <svg style="height: 0px; width: 0px">
+                <radialGradient id="arena_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                    <stop offset="0%" style="stop-color: #84314e; stop-opacity: 1"></stop>
+                    <stop offset="100%" style="stop-color: #68293f; stop-opacity: 1"></stop>
+                </radialGradient>
+                <radialGradient id="arena_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                    <stop offset="0%" style="stop-color: #68293f; stop-opacity: 1"></stop>
+                    <stop offset="100%" style="stop-color: #84314e; stop-opacity: 1"></stop>
+                </radialGradient>
+            </svg>
+            <div style="display: flex; gap: 45px; margin: 15px; justify-content: center">
+                <div>
+                    <a href="<?= $system->router->getUrl('arena') ?>&difficulty=easy" style="font-weight: normal">
+                        <svg role="button" tabindex="0" name="arena_button" class="arena_button" width="160" height="24">
                             <rect class="arena_button_background" width="100%" height="100%" fill="url(#arena_fill_default)"></rect>
-                            <text class="arena_button_shadow_text" x="64" y="14" text-anchor="middle" dominant-baseline="middle">Easy</text>
-                            <text class="arena_button_text" x="64" y="12" text-anchor="middle" dominant-baseline="middle">Easy</text>
+                            <text class="arena_button_shadow_text" x="50%" y="14" text-anchor="middle" dominant-baseline="middle">Easy</text>
+                            <text class="arena_button_text" x="50%" y="12" text-anchor="middle" dominant-baseline="middle">Easy</text>
                         </svg>
-                        <?php if (isset($player->ai_cooldowns[NPC::DIFFICULTY_EASY]) && time() < $player->ai_cooldowns[NPC::DIFFICULTY_EASY]): ?>
-                            <br /><span id="easy_cooldown"><?= System::timeRemaining($player->ai_cooldowns[NPC::DIFFICULTY_EASY] - time()) ?></span>
-                            <script type='text/javascript'>
-                                countdownTimer(<?php echo ($player->ai_cooldowns[NPC::DIFFICULTY_EASY] - time()) ?>, 'easy_cooldown', false);
-                            </script>
-                        <?php endif; ?>
-                    </label>
-                    <label>
-                        <input type="submit" name="difficulty" value="normal" style="display: none" />
-                        <svg role="button" tabindex="0" name="arena_button" class="arena_button" width="128" height="24">
-                            <rect class="arena_button_background" width="100%" height="100%" fill="url(#arena_fill_default)"></rect>
-                            <text class="arena_button_shadow_text" x="64" y="14" text-anchor="middle" dominant-baseline="middle">Normal</text>
-                            <text class="arena_button_text" x="64" y="12" text-anchor="middle" dominant-baseline="middle">Normal</text>
-                        </svg>
-                        <?php if (isset($player->ai_cooldowns[NPC::DIFFICULTY_NORMAL]) && time() < $player->ai_cooldowns[NPC::DIFFICULTY_NORMAL]): ?>
-                            <br /><span id="normal_cooldown"><?= System::timeRemaining($player->ai_cooldowns[NPC::DIFFICULTY_NORMAL] - time()) ?></span>
-                            <script type='text/javascript'>
-                                countdownTimer(<?php echo ($player->ai_cooldowns[NPC::DIFFICULTY_NORMAL] - time()) ?>, 'normal_cooldown', false);
-                            </script>
-                        <?php endif; ?>
-                    </label>
-                    <label>
-                        <input type="submit" name="difficulty" value="hard" style="display: none" />
-                        <svg role="button" tabindex="0" name="arena_button" class="arena_button" width="128" height="24">
-                            <rect class="arena_button_background" width="100%" height="100%" fill="url(#arena_fill_default)"></rect>
-                            <text class="arena_button_shadow_text" x="64" y="14" text-anchor="middle" dominant-baseline="middle">Hard</text>
-                            <text class="arena_button_text" x="64" y="12" text-anchor="middle" dominant-baseline="middle">Hard</text>
-                        </svg>
-                        <?php if (isset($player->ai_cooldowns[NPC::DIFFICULTY_HARD]) && time() < $player->ai_cooldowns[NPC::DIFFICULTY_HARD]): ?>
-                            <br /><span id="hard_cooldown"><?= System::timeRemaining($player->ai_cooldowns[NPC::DIFFICULTY_HARD] - time()) ?></span>
-                            <script type='text/javascript'>
-                                countdownTimer(<?php echo ($player->ai_cooldowns[NPC::DIFFICULTY_HARD] - time()) ?>, 'hard_cooldown', false);
-                            </script>
-                        <?php endif; ?>
-                    </label>
+                    </a>
+                    <?php if (isset($player->ai_cooldowns[NPC::DIFFICULTY_EASY]) && time() < $player->ai_cooldowns[NPC::DIFFICULTY_EASY]): ?>
+                        <br /><span id="easy_cooldown"><?= System::timeRemaining($player->ai_cooldowns[NPC::DIFFICULTY_EASY] - time()) ?></span>
+                        <script type='text/javascript'>
+                            countdownTimer(<?php echo ($player->ai_cooldowns[NPC::DIFFICULTY_EASY] - time()) ?>, 'easy_cooldown', false);
+                        </script>
+                    <?php endif; ?>
                 </div>
-            </td>
-        </tr>
-    </table>
-</form>
+                <div>
+                    <a href="<?= $system->router->getUrl('arena') ?>&difficulty=normal" style="font-weight: normal">
+                        <svg role="button" tabindex="0" name="arena_button" class="arena_button" width="160" height="24">
+                            <rect class="arena_button_background" width="100%" height="100%" fill="url(#arena_fill_default)"></rect>
+                            <text class="arena_button_shadow_text" x="50%" y="14" text-anchor="middle" dominant-baseline="middle">Normal</text>
+                            <text class="arena_button_text" x="50%" y="12" text-anchor="middle" dominant-baseline="middle">Normal</text>
+                        </svg>
+                    </a>
+                    <?php if (isset($player->ai_cooldowns[NPC::DIFFICULTY_NORMAL]) && time() < $player->ai_cooldowns[NPC::DIFFICULTY_NORMAL]): ?>
+                        <br /><span id="normal_cooldown"><?= System::timeRemaining($player->ai_cooldowns[NPC::DIFFICULTY_NORMAL] - time()) ?></span>
+                        <script type='text/javascript'>
+                            countdownTimer(<?php echo ($player->ai_cooldowns[NPC::DIFFICULTY_NORMAL] - time()) ?>, 'normal_cooldown', false);
+                        </script>
+                    <?php endif; ?>
+                </div>
+                <div>
+                    <a href="<?= $system->router->getUrl('arena') ?>&difficulty=hard" style="font-weight: normal">
+                        <svg role="button" tabindex="0" name="arena_button" class="arena_button" width="160" height="24">
+                            <rect class="arena_button_background" width="100%" height="100%" fill="url(#arena_fill_default)"></rect>
+                            <text class="arena_button_shadow_text" x="50%" y="14" text-anchor="middle" dominant-baseline="middle">Hard</text>
+                            <text class="arena_button_text" x="50%" y="12" text-anchor="middle" dominant-baseline="middle">Hard</text>
+                        </svg>
+                    </a>
+                    <?php if (isset($player->ai_cooldowns[NPC::DIFFICULTY_HARD]) && time() < $player->ai_cooldowns[NPC::DIFFICULTY_HARD]): ?>
+                        <br /><span id="hard_cooldown"><?= System::timeRemaining($player->ai_cooldowns[NPC::DIFFICULTY_HARD] - time()) ?></span>
+                        <script type='text/javascript'>
+                            countdownTimer(<?php echo ($player->ai_cooldowns[NPC::DIFFICULTY_HARD] - time()) ?>, 'hard_cooldown', false);
+                        </script>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
