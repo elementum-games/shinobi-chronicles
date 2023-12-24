@@ -279,11 +279,16 @@ function getArenaOpponent(string $difficulty_level, User $player, System $system
     }
     switch ($difficulty_level) {
         case NPC::DIFFICULTY_EASY:
-            $ai_result = $system->db->query("SELECT `ai_id` FROM `ai_opponents`
+            // random easy AI at given rank at the same or 5 levels less than player
+            $ai_result = $system->db->query("
+                SELECT `ai_id`
+                FROM `ai_opponents`
                 WHERE `rank` = {$player->rank_num}
                 AND `arena_enabled` = 1
                 AND `difficulty_level` = '{$difficulty_level}'
-                ORDER BY ABS(`level` - {$player->level})
+                AND `level` <= {$player->level}
+                AND {$player->level} - `level` <= 5
+                ORDER BY RAND()
                 LIMIT 1
             ");
             $ai_result = $system->db->fetch($ai_result);
@@ -294,6 +299,7 @@ function getArenaOpponent(string $difficulty_level, User $player, System $system
             return $ai_opponent;
         case NPC::DIFFICULTY_NORMAL:
         case NPC::DIFFICULTY_HARD:
+            // random AI at given rank and difficulty
             $ai_result = $system->db->query("SELECT `ai_id` FROM `ai_opponents`
                 WHERE `rank` = {$player->rank_num}
                 AND `arena_enabled` = 1
