@@ -416,6 +416,78 @@ function deleteUserPage(System $system, User $player): void {
     }
 }
 
+/**
+ * Used only in the function below to generate a random string as a password.
+ * It is STRONGLY recommended that users reset their password after regaining access to their account.
+ * This method by NO MEANS generates a totally secure password!!!!
+ * @param $length
+ * @return string
+ * @throws Exception
+ */
+function generateRandPassword($length): string {
+    $keyspace = str_shuffle(string: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+
+    $str = '';
+    $max = mb_strlen($keyspace, '8bit') - 1;
+    for ($i = 0; $i < $length; ++$i) {
+        $str .= $keyspace[random_int(0, $max)];
+    }
+
+    if (!preg_match('/[!@#$%&*]/', $str)) {
+        $special_chars = str_shuffle(string: '!@#$%&*');
+        $insert_char = substr($special_chars, offset: mt_rand(0, strlen($special_chars)-1), length: 1);
+        $insert_location = mt_rand(ceil(strlen($str) * 0.25), floor(strlen($str)-1 * 0.75));
+        $first_half = substr($str, offset: 0, length: $insert_location);
+        $second_half = substr($str, offset: $insert_location, length: strlen($str));
+
+        $str = $first_half . str_shuffle(string: $insert_char . $second_half);
+    }
+    return $str;
+}
+
+/**
+ * Temporary method to reset user passwords until system emails are restored.
+ * Note: This reset doesn't generate a truly secure password, users should reset password after recovery
+ * @param System $system
+ * @param User $player
+ * @return void
+ * @throws Exception
+ */
+function resetPasswordPage(System $system, User $player): void {
+    $self_link = $system->router->getUrl('admin', ['page' => 'reset_password']);
+    if(isset($_POST['user_name'])) {
+        try {
+            $user_name = $system->db->clean($_POST['user_name']);
+
+            $result = $system->db->query("SELECT `user_id`, `staff_level` FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
+            // User not found
+            if(!$system->db->last_num_rows) {
+                throw new RuntimeException("$user_name was not found!");
+            }
+            $result = $system->db->fetch($result);
+
+            // Disable for user admins and head admins
+            if(in_array($result['staff_level'], [StaffManager::STAFF_ADMINISTRATOR, StaffManager::STAFF_HEAD_ADMINISTRATOR]) && !$system->isDevEnvironment()) {
+                throw new RuntimeException("Password resets are disabled for User and Head Administrators.");
+            }
+
+            $password = generateRandPassword(mt_rand(7, 12));
+            $password_hash = $system->hash_password($password);
+
+            $system->db->query("UPDATE `users` SET `password`='$password_hash' WHERE `user_id`='{$result['user_id']}' LIMIT 1");
+            if($system->db->last_affected_rows) {
+                $system->message("Password set to: $password");
+                $system->printMessage();
+            }
+
+        } catch (RuntimeException $e) {
+            $system->message($e->getMessage());
+            $system->printMessage();
+        }
+    }
+    require 'templates/admin/reset_password.php';
+}
+
 function devToolsPage(System $system, User $player): void {
     $stats = [
         'ninjutsu_skill',
