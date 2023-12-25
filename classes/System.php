@@ -667,20 +667,20 @@ class System {
         // Dev Environment Event start times
         if($this->isDevEnvironment()) {
             $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-15');
-            $double_exp_start_time = new DateTimeImmutable('2023-09-13');
+            $double_exp_start_time = new DateTimeImmutable('2023-12-25');
             $double_reputation_start_time = new DateTimeImmutable('2023-10-16');
         }
         // Production Event start times
         else {
             $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
-            $double_exp_start_time = new DateTimeImmutable('2023-09-19');
+            $double_exp_start_time = new DateTimeImmutable('2023-12-25');
             $double_reputation_start_time = new DateTimeImmutable('2023-10-18');
         }
 
         /*****CORE EVENTS*****/
         // TODO: Make core events more manageable
         // Double exp gains
-        $double_exp_end_time = new DateTimeImmutable('2023-11-28');
+        $double_exp_end_time = new DateTimeImmutable('2023-12-27');
         if($current_datetime > $double_exp_start_time && $current_datetime < $double_exp_end_time) {
             $this->event = new DoubleExpEvent($double_exp_end_time);
         }
