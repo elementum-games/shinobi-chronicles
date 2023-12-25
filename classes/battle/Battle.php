@@ -79,6 +79,8 @@ class Battle {
     public int $player1_last_damage_taken;
     public int $player2_last_damage_taken;
 
+    public string $battle_background_link;
+
     /**
      * @param System  $system
      * @param Fighter $player1
@@ -88,7 +90,7 @@ class Battle {
      * @throws RuntimeException
      */
     public static function start(
-        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null
+        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null, string $battle_background_link = ''
     ) {
         $json_empty_array = '[]';
 
@@ -132,7 +134,8 @@ class Battle {
                 `jutsu_cooldowns` = '" . $json_empty_array . "',
                 `fighter_jutsu_used` = '" . $json_empty_array . "',
                 `is_retreat` = '" . (int)false . "',
-                `patrol_id` = " . (!empty($patrol_id) ? $patrol_id : "NULL") . "
+                `patrol_id` = " . (!empty($patrol_id) ? $patrol_id : "NULL") . ",
+                `battle_background_link` = '{$battle_background_link}'
         ");
         $battle_id = $system->db->last_insert_id;
 
@@ -256,6 +259,8 @@ class Battle {
 
         $this->player1_last_damage_taken = $battle['player1_last_damage_taken'];
         $this->player2_last_damage_taken = $battle['player2_last_damage_taken'];
+
+        $this->battle_background_link = empty($battle['battle_background_link']) ? '' : $battle['battle_background_link'];
     }
 
     /**

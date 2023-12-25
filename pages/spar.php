@@ -116,11 +116,11 @@ function spar() {
 			}
 
             $player->challenge = 0;
-            if($system->USE_NEW_BATTLES) {
-                BattleV2::start($system, $player, $user, Battle::TYPE_SPAR);
+            if ($system->USE_NEW_BATTLES) {
+                BattleV2::start($system, $player, $user, Battle::TYPE_SPAR, battle_background_link: $player->region->battle_background_link);
             }
             else {
-                Battle::start($system, $player, $user, Battle::TYPE_SPAR);
+                Battle::start($system, $player, $user, Battle::TYPE_SPAR, battle_background_link: $player->region->battle_background_link);
             }
 
 			$system->message("You have accepted the challenge!<br />

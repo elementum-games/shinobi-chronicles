@@ -241,7 +241,7 @@ if($battle->battle_text) {
             <?php endif; ?>
         </th>
     </tr>
-    <tr>
+    <tr style="background: url('<?= $battle->battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
         <td id='bi_td_player'>
             <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center">
                 <img src='<?= $player->avatar_link ?>' class='playerAvatar' alt='player_profile_img' />

@@ -61,10 +61,10 @@ function arena(): bool {
 
                 $player->last_ai_ms = System::currentTimeMs();
                 if($system->USE_NEW_BATTLES) {
-                    BattleV2::start($system, $player, $ai, BattleV2::TYPE_AI_ARENA);
+                    BattleV2::start($system, $player, $ai, BattleV2::TYPE_AI_ARENA, battle_background_link: $player->region->battle_background_link);
                 }
                 else {
-                    Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA);
+                    Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA, battle_background_link: $player->region->battle_background_link);
                 }
                 $player->ai_cooldowns[$ai_difficulty] = NPC::AI_COOLDOWNS[$ai_difficulty] + time();
 

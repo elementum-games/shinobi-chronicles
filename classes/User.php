@@ -2578,11 +2578,9 @@ class User extends Fighter {
         foreach ($this->system->db->fetch_all($result) as $region) {
             //return Region::fromDb($region, get_coordinates: false);
             $region_vertices = json_decode($region['vertices']);
-            foreach ($region_vertices as $vertex) {
-                $coord = new RegionCoords($this->location->x, $this->location->y, $this->location->map_id);
-                if (Region::coordInRegion($coord, $region_vertices)) {
-                    return Region::fromDb($region, get_coordinates: false);
-                }
+            $coord = new RegionCoords($this->location->x, $this->location->y, $this->location->map_id);
+            if (Region::coordInRegion($coord, $region_vertices)) {
+                return Region::fromDb($region, get_coordinates: false);
             }
         }
     }

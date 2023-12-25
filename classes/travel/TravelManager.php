@@ -665,9 +665,9 @@ class TravelManager {
         }
 
         if ($this->system->USE_NEW_BATTLES) {
-            BattleV2::start($this->system, $this->user, $user, Battle::TYPE_FIGHT);
+            BattleV2::start($this->system, $this->user, $user, Battle::TYPE_FIGHT, battle_background_link: $this->user->region->battle_background_link);
         } else {
-            Battle::start($this->system, $this->user, $user, Battle::TYPE_FIGHT);
+            Battle::start($this->system, $this->user, $user, Battle::TYPE_FIGHT, battle_background_link: $this->user->region->battle_background_link);
         }
         return true;
     }
