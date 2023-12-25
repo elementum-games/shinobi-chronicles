@@ -10,6 +10,7 @@ function arena(): bool {
 	global $self_link;
 
     $fight_timer = System::ARENA_COOLDOWN;
+    $arena_background = 'images/battle_backgrounds/Arena.jpg';
 
 	if($player->exam_stage > 0) {
 		$system->message("You cannot access this page during the exam!");
@@ -61,10 +62,10 @@ function arena(): bool {
 
                 $player->last_ai_ms = System::currentTimeMs();
                 if($system->USE_NEW_BATTLES) {
-                    BattleV2::start($system, $player, $ai, BattleV2::TYPE_AI_ARENA, battle_background_link: $player->region->battle_background_link);
+                    BattleV2::start($system, $player, $ai, BattleV2::TYPE_AI_ARENA, battle_background_link: $arena_background);
                 }
                 else {
-                    Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA, battle_background_link: $player->region->battle_background_link);
+                    Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA, battle_background_link: $arena_background);
                 }
                 $player->ai_cooldowns[$ai_difficulty] = NPC::AI_COOLDOWNS[$ai_difficulty] + time();
 

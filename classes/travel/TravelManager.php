@@ -664,10 +664,14 @@ class TravelManager {
             throw new RuntimeException("Target is protected by a higher rank ally! Attack them first.");
         }
 
+        $battle_background = TravelManager::getLocationBattleBackgroundLink($this->system, $this->user->location);
+        if (empty($battle_background)) {
+            $battle_background = $this->user->region->battle_background_link;
+        }
         if ($this->system->USE_NEW_BATTLES) {
-            BattleV2::start($this->system, $this->user, $user, Battle::TYPE_FIGHT, battle_background_link: $this->user->region->battle_background_link);
+            BattleV2::start($this->system, $this->user, $user, Battle::TYPE_FIGHT, battle_background_link: $battle_background);
         } else {
-            Battle::start($this->system, $this->user, $user, Battle::TYPE_FIGHT, battle_background_link: $this->user->region->battle_background_link);
+            Battle::start($this->system, $this->user, $user, Battle::TYPE_FIGHT, battle_background_link: $battle_background);
         }
         return true;
     }
@@ -1265,5 +1269,23 @@ class TravelManager {
             $loot_count = $loot_result['count'];
         }
         return $loot_count;
+    }
+
+    /**
+     * @return string
+     * @param System $system
+     * @param TravelCoords $location
+     */
+    public static function getLocationBattleBackgroundLink(System $system, TravelCoords $location): string {
+        $result = $system->db->query(
+            "SELECT `battle_background_link` FROM `maps_locations`
+            WHERE `x`='{$location->x}' AND `y`='{$location->y}' AND `map_id`='{$location->map_id}' LIMIT 1"
+        );
+        $result = $system->db->fetch($result);
+        if (isset($result['battle_background_link'])) {
+            return $result['battle_background_link'];
+        } else {
+            return '';
+        }
     }
 }

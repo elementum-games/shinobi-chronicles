@@ -103,11 +103,15 @@ function battle(): bool {
 					ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}*/
 
+            $battle_background = TravelManager::getLocationBattleBackgroundLink($system, $player->location);
+            if (empty($battle_background)) {
+                $battle_background = $player->region->battle_background_link;
+            }
             if($system->USE_NEW_BATTLES) {
-                BattleV2::start($system, $player, $user, Battle::TYPE_FIGHT, battle_background_link: $player->region->battle_background_link);
+                BattleV2::start($system, $player, $user, Battle::TYPE_FIGHT, battle_background_link: $battle_background);
             }
             else {
-                Battle::start($system, $player, $user, Battle::TYPE_FIGHT, battle_background_link: $player->region->battle_background_link);
+                Battle::start($system, $player, $user, Battle::TYPE_FIGHT, battle_background_link: $battle_background);
             }
 
             $system->message("You have attacked!<br />

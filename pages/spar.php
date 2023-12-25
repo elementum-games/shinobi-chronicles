@@ -116,11 +116,15 @@ function spar() {
 			}
 
             $player->challenge = 0;
+            $battle_background = TravelManager::getLocationBattleBackgroundLink($system, $player->location);
+            if (empty($battle_background)) {
+                $battle_background = $player->region->battle_background_link;
+            }
             if ($system->USE_NEW_BATTLES) {
-                BattleV2::start($system, $player, $user, Battle::TYPE_SPAR, battle_background_link: $player->region->battle_background_link);
+                BattleV2::start($system, $player, $user, Battle::TYPE_SPAR, battle_background_link: $battle_background);
             }
             else {
-                Battle::start($system, $player, $user, Battle::TYPE_SPAR, battle_background_link: $player->region->battle_background_link);
+                Battle::start($system, $player, $user, Battle::TYPE_SPAR, battle_background_link: $battle_background);
             }
 
 			$system->message("You have accepted the challenge!<br />

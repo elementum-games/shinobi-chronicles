@@ -241,8 +241,8 @@ if($battle->battle_text) {
             <?php endif; ?>
         </th>
     </tr>
-    <tr style="background: url('<?= $battle->battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
-        <td id='bi_td_player'>
+    <tr style="background: linear-gradient(to right, var(--main-background-color) 0%, transparent 10%, transparent 90%, var(--main-background-color) 100%), url('<?= $battle->battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
+        <td id='bi_td_player' style="border-right: none">
             <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center">
                 <img src='<?= $player->avatar_link ?>' class='playerAvatar' alt='player_profile_img' />
                 <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
@@ -275,7 +275,7 @@ if($battle->battle_text) {
                 </div>
             </div>
         </td>
-        <td style='text-align: center;' id='bi_td_opponent'>
+        <td style='text-align: center; border-left: none' id='bi_td_opponent'>
             <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center">
                 <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
                 <div id='ai_battle_stats_container' style='display: inline-block; text-align: center'>
