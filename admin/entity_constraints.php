@@ -223,7 +223,7 @@ $constraints['ai'] = [
             ],
             'battle_text' => [
                 'data_type' => 'string',
-                'input_type' => 'text',
+                'input_type' => 'text_area',
                 'max_length' => 375,
             ],
             'power' => [
