@@ -162,8 +162,6 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         $stat_gain_display = false;
         $opponent = $battle->opponent;
 
-        echo TrainingManager::getAIStatGain($opponent->difficulty_level, $player->rank_num) . "<br>" . $player->reputation->calcArenaReputation($opponent->difficulty_level, $player->rank_num);
-
         $money_gain = $battle->opponent->getMoney();
 
         if($player->level > $opponent->level) {
@@ -191,7 +189,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
             $stat_gain_display = '<br />During the fight you realized a way to use your ' . System::unSlug($stat_to_gain) . ' a little
             more effectively.';
             $stat_gain = TrainingManager::getAIStatGain($opponent->difficulty_level, $player->rank_num);
-            $stat_gain_display .= $player->addStatGain($stat_to_gain, 1) . '.';
+            $stat_gain_display .= $player->addStatGain($stat_to_gain, $stat_gain) . '.';
         }
 
         // Village Rep Gains
