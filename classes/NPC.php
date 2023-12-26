@@ -129,13 +129,14 @@ class NPC extends Fighter {
             }
         }
         // set jutsu level relative to base and max levels for the rank, minimum 1
-        $jutsu_level = max(1, intval((($this->level - $base_level) / ($max_level - $base_level)) * 100));
+        //$jutsu_level = max(1, intval((($this->level - $base_level) / ($max_level - $base_level)) * 100));
+        $jutsu_level = $this->level;
         $this->rank_progress = round(($this->level - $base_level) / ($max_level - $base_level), 2);
 
         $this->max_health = $this->rankManager->healthForRankAndLevel($this->rank, $this->level) * $ai_data['max_health'];
         $this->health = $this->max_health;
 
-        $this->gender = "Male";
+        $this->gender = "None";
 
         $this->ninjutsu_skill = $stats_for_level * $ai_data['ninjutsu_skill'];
         $this->genjutsu_skill = $stats_for_level * $ai_data['genjutsu_skill'];
@@ -147,6 +148,8 @@ class NPC extends Fighter {
         $this->strength = $stats_for_level * $ai_data['strength'];
         $this->intelligence = $stats_for_level * $ai_data['intelligence'];
         $this->willpower = $stats_for_level * $ai_data['willpower'];
+
+        echo $this->taijutsu_skill . " " . $this->ninjutsu_skill . " " . $this->genjutsu_skill . " " . $this->speed . " " . $this->cast_speed;
 
         /*$attributes = array('cast_speed', 'speed', 'strength', 'intelligence', 'willpower');
         foreach($attributes as $attribute) {
@@ -250,7 +253,7 @@ class NPC extends Fighter {
             foreach($row as $type => $data) {
                 if($type == 'battle_text') {
                     $search = ['[player]', '[opponent]', '[gender]', '[gender2]'];
-                    $replace = ['opponent1', 'player1', 'he', 'his'];
+                    $replace = ['opponent1', 'player1', 'they', 'their'];
                     $data = str_replace($search, $replace, $data);
                     $data = str_replace(['player1', 'opponent1'], ['[player]', '[opponent]'], $data);
                 }
@@ -280,7 +283,7 @@ class NPC extends Fighter {
             foreach($row as $type => $data) {
                 if($type == 'battle_text') {
                     $search = ['[player]', '[opponent]', '[gender]', '[gender2]'];
-                    $replace = ['opponent1', 'player1', 'he', 'his'];
+                    $replace = ['opponent1', 'player1', 'they', 'their'];
                     $data = str_replace($search, $replace, $data);
                     $data = str_replace(['player1', 'opponent1'], ['[player]', '[opponent]'], $data);
                 }
