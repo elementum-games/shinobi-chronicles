@@ -217,7 +217,9 @@ class NPC extends Fighter {
         }
 
         // get array, safe formatting
-        $this->shop_jutsu_priority = array_map('intval', explode(",", str_replace(' ', '', $ai_data['shop_jutsu_priority'])));
+        if (!empty($ai_data['shop_jutsu_priority'])) {
+            $this->shop_jutsu_priority = array_map('intval', explode(",", str_replace(' ', '', $ai_data['shop_jutsu_priority'])));
+        }
 
         // get shop jutsu
         if (!empty($ai_data['shop_jutsu'])) {
@@ -396,7 +398,7 @@ class NPC extends Fighter {
             effect_length_2: $effect2_length,
             description: "N/A",
             battle_text: $battle_text_swapped,
-            cooldown: 0,
+            cooldown: $cooldown,
             use_type: $use_type,
             target_type: Jutsu::TARGET_TYPE_FIGHTER_ID,
             use_cost: $this->rank * 5,
