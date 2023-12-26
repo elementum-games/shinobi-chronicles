@@ -12,7 +12,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
 ?>
 
 <table class='table' style="text-align: center">
-    <tr><th colspan='11'>Arena AI</th></tr>
+    <tr><th colspan='12'>Arena AI</th></tr>
     <tr>
         <th colspan="2">Name</th>
         <th>Level</th>
@@ -22,8 +22,9 @@ $RANK_NAMES = RankManager::fetchNames($system);
         <th>Tai</th>
         <th>CSpd</th>
         <th>Spd</th>
-        <th>Money</th>
-        <th>Scaling</th>
+        <th>Yen</th>
+        <th>Scales</th>
+        <th>Diff</th>
     </tr>
     <?php $current_rank = 0; ?>
     <?php foreach($all_npcs as $id => $npc): ?>
@@ -31,7 +32,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
     <?php
             if($npc['rank'] > $current_rank) {
                 $current_rank = $npc['rank'];
-                echo "<tr><th colspan='11'>$RANK_NAMES[$current_rank]</th></tr>";
+                echo "<tr><th colspan='12'>$RANK_NAMES[$current_rank]</th></tr>";
             }
     ?>
     <tr>
@@ -47,12 +48,13 @@ $RANK_NAMES = RankManager::fetchNames($system);
         <td><?= $npc['speed'] ?></td>
         <td><?= $npc['money'] ?></td>
         <td><?= $npc['scaling'] ? "True" : "False" ?></td>
+        <td><?= System::unSlug($npc['difficulty_level']) ?></td>
     </tr>
     <?php endif; ?>
     <?php endforeach; ?>
 </table>
 <table class='table' style="text-align: center">
-    <tr><th colspan='11'>Patrol AI</th></tr>
+    <tr><th colspan='12'>Patrol AI</th></tr>
     <tr>
         <th colspan="2">Name</th>
         <th>Level</th>
@@ -62,8 +64,9 @@ $RANK_NAMES = RankManager::fetchNames($system);
         <th>Tai</th>
         <th>CSpd</th>
         <th>Spd</th>
-        <th>Money</th>
-        <th>Scaling</th>
+        <th>Yen</th>
+        <th>Scales</th>
+        <th>Diff</th>
     </tr>
     <?php $current_rank = 0; ?>
     <?php foreach ($all_npcs as $id => $npc): ?>
@@ -71,7 +74,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
             <?php
             if ($npc['rank'] > $current_rank) {
                 $current_rank = $npc['rank'];
-                echo "<tr><th colspan='11'>$RANK_NAMES[$current_rank]</th></tr>";
+                echo "<tr><th colspan='12'>$RANK_NAMES[$current_rank]</th></tr>";
             }
             ?>
             <tr>
@@ -87,12 +90,13 @@ $RANK_NAMES = RankManager::fetchNames($system);
                 <td><?= $npc['speed'] ?></td>
                 <td><?= $npc['money'] ?></td>
                 <td><?= $npc['scaling'] ? "True" : "False" ?></td>
+                <td><?= System::unSlug($npc['difficulty_level']) ?></td>
             </tr>
         <?php endif; ?>
     <?php endforeach; ?>
 </table>
 <table class='table' style="text-align: center">
-    <tr><th colspan='11'>Other AI</th></tr>
+    <tr><th colspan='12'>Other AI</th></tr>
     <tr>
         <th colspan="2">Name</th>
         <th>Level</th>
@@ -102,8 +106,9 @@ $RANK_NAMES = RankManager::fetchNames($system);
         <th>Tai</th>
         <th>CSpd</th>
         <th>Spd</th>
-        <th>Money</th>
-        <th>Scaling</th>
+        <th>Yen</th>
+        <th>Scales</th>
+        <th>Diff</th>
     </tr>
     <?php $current_rank = 0; ?>
     <?php foreach ($all_npcs as $id => $npc): ?>
@@ -111,7 +116,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
     <?php
             if ($npc['rank'] > $current_rank) {
                 $current_rank = $npc['rank'];
-                echo "<tr><th colspan='11'>$RANK_NAMES[$current_rank]</th></tr>";
+                echo "<tr><th colspan='12'>$RANK_NAMES[$current_rank]</th></tr>";
             }
     ?>
     <tr>
@@ -127,6 +132,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
         <td><?= $npc['speed'] ?></td>
         <td><?= $npc['money'] ?></td>
         <td><?= $npc['scaling'] ? "True" : "False" ?></td>
+        <td><?= System::unSlug($npc['difficulty_level']) ?></td>
     </tr>
     <?php endif; ?>
     <?php endforeach; ?>

@@ -148,12 +148,12 @@ class NPC extends Fighter {
         $this->intelligence = $stats_for_level * $ai_data['intelligence'];
         $this->willpower = $stats_for_level * $ai_data['willpower'];
 
-        $attributes = array('cast_speed', 'speed', 'strength', 'intelligence', 'willpower');
+        /*$attributes = array('cast_speed', 'speed', 'strength', 'intelligence', 'willpower');
         foreach($attributes as $attribute) {
             if($this->{$attribute} <= 0) {
                 $this->{$attribute} = 1;
             }
-        }
+        }*/
 
         $this->money = $ai_data['money'];
 
@@ -200,9 +200,6 @@ class NPC extends Fighter {
                     break;
                 case Jutsu::TYPE_GENJUTSU:
                     $jutsu->use_type = $jutsu->use_type != Jutsu::USE_TYPE_MELEE ? $jutsu->use_type : Jutsu::USE_TYPE_PROJECTILE;
-                    $jutsu->effects[0]->effect = $jutsu->effects[0]->effect != "none" ? $jutsu->effects[0]->effect : 'residual_damage';
-                    $jutsu->effects[0]->effect_amount = $jutsu->effects[0]->effect_amount != 0 ? $jutsu->effects[0]->effect_amount : 30;
-                    $jutsu->effects[0]->effect_length = $jutsu->effects[0]->effect_length != 0 ? $jutsu->effects[0]->effect_length : 3;
                     break;
                 default:
                     throw new RuntimeException("Invalid jutsu type!");
@@ -237,7 +234,7 @@ class NPC extends Fighter {
             }
         }
 
-        $this->loadDefaultJutsu();
+        // $this->loadDefaultJutsu();
         // $this->loadRandomShopJutsu();
     }
 
@@ -358,9 +355,11 @@ class NPC extends Fighter {
                 }
             }
         }
-        // randomize jutsu list and check until one without cooldown found (standard strike as fallback)
+        // randomize jutsu list and check until one without cooldown found
         shuffle($jutsu_list);
-        foreach ($this->jutsu as $jutsu) {
+        foreach ($jutsu_list as $index) {
+            echo $index;
+            $jutsu = $this->jutsu[$index];
             $jutsu->setCombatId($this->combat_id);
             if (isset($battle->getCooldowns()[$jutsu->combat_id])) {
                 continue;
