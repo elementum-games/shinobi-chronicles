@@ -11,7 +11,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
 
 ?>
 
-<table class='table'>
+<table class='table' style="text-align: center">
     <tr><th colspan='11'>Arena AI</th></tr>
     <tr>
         <th colspan="2">Name</th>
@@ -27,28 +27,28 @@ $RANK_NAMES = RankManager::fetchNames($system);
     </tr>
     <?php $current_rank = 0; ?>
     <?php foreach($all_npcs as $id => $npc): ?>
-        <?php if ($npc['arena_enabled']): ?>
-            <?php
+    <?php if ($npc['arena_enabled']): ?>
+    <?php
             if($npc['rank'] > $current_rank) {
                 $current_rank = $npc['rank'];
-                echo "<tr><th colspan='11'>$RANK_NAMES[$current_rank] Arena AI</th></tr>";
+                echo "<tr><th colspan='11'>$RANK_NAMES[$current_rank]</th></tr>";
             }
-            ?>
-            <tr>
-                <td colspan="2">
-                    <a href="<?= $self_link ?>&npc_id=<?= $npc['ai_id'] ?>"><?= $npc['name'] ?></a>
-                </td>
-                <td><?= $npc['level'] ?></td>
-                <td><?= $npc['max_health'] ?></td>
-                <td><?= $npc['ninjutsu_skill'] ?></td>
-                <td><?= $npc['genjutsu_skill'] ?></td>
-                <td><?= $npc['taijutsu_skill'] ?></td>
-                <td><?= $npc['cast_speed'] ?></td>
-                <td><?= $npc['speed'] ?></td>
-                <td><?= $npc['money'] ?></td>
-                <td><?= $npc['scaling'] ? "True" : "False" ?></td>
-            </tr>
-        <?php endif; ?>
+    ?>
+    <tr>
+        <td style="text-align: left" colspan="2">
+            <a href="<?= $self_link ?>&npc_id=<?= $npc['ai_id'] ?>"><?= $npc['name'] ?></a>
+        </td>
+        <td><?= $npc['level'] ?></td>
+        <td><?= $npc['max_health'] ?></td>
+        <td><?= $npc['ninjutsu_skill'] ?></td>
+        <td><?= $npc['genjutsu_skill'] ?></td>
+        <td><?= $npc['taijutsu_skill'] ?></td>
+        <td><?= $npc['cast_speed'] ?></td>
+        <td><?= $npc['speed'] ?></td>
+        <td><?= $npc['money'] ?></td>
+        <td><?= $npc['scaling'] ? "True" : "False" ?></td>
+    </tr>
+    <?php endif; ?>
     <?php endforeach; ?>
 </table>
 <table class='table' style="text-align: center">
@@ -75,7 +75,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
             }
             ?>
             <tr>
-                <td colspan="2">
+                <td style="text-align: left" colspan="2">
                     <a href="<?= $self_link ?>&npc_id=<?= $npc['ai_id'] ?>"><?= $npc['name'] ?></a>
                 </td>
                 <td><?= $npc['level'] ?></td>
@@ -115,7 +115,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
             }
     ?>
     <tr>
-        <td style="text-align: left; padding-left: 5px" colspan="2">
+        <td style="text-align: left" colspan="2">
             <a href="<?= $self_link ?>&npc_id=<?= $npc['ai_id'] ?>"><?= $npc['name'] ?></a>
         </td>
         <td><?= $npc['level'] ?></td>

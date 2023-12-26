@@ -276,35 +276,42 @@ $constraints['ai'] = [
         'data_type' => 'string',
         'input_type' => 'text',
         'max_length' => 200,
+        'field_required' => false,
     ],
     'shop_jutsu_priority' => [
         'data_type' => 'string',
         'input_type' => 'text',
         'max_length' => 200,
+        'field_required' => false,
     ],
     'battle_iq' => [
         'data_type' => 'int',
         'input_type' => 'text',
+        'field_required' => false,
     ],
     'scaling' => [
         'data_type' => 'int',
         'input_type' => 'radio',
         'options' => [0 => 'No', 1 => 'Yes'],
+        'field_required' => false,
     ],
     'difficulty_level' => [
         'data_type' => 'string',
         'input_type' => 'text',
         'options' => [NPC::DIFFICULTY_NONE, NPC::DIFFICULTY_EASY, NPC::DIFFICULTY_NORMAL, NPC::DIFFICULTY_HARD],
+        'field_required' => false,
     ],
     'arena_enabled' => [
         'data_type' => 'int',
         'input_type' => 'radio',
         'options' => [0 => 'No', 1 => 'Yes'],
+        'field_required' => false,
     ],
     'is_patrol' => [
         'data_type' => 'int',
         'input_type' => 'radio',
         'options' => [0 => 'No', 1 => 'Yes'],
+        'field_required' => false,
     ],
     'avatar_link' => [
         'data_type' => 'string',

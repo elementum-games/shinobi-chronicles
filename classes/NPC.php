@@ -220,17 +220,19 @@ class NPC extends Fighter {
         $this->shop_jutsu_priority = array_map('intval', explode(",", str_replace(' ', '', $ai_data['shop_jutsu_priority'])));
 
         // get shop jutsu
-        $jutsu_result = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` IN (" . $ai_data['shop_jutsu'] . ")");
-        $jutsu_result = $this->system->db->fetch_all($jutsu_result);
-        foreach ($jutsu_result as $jutsu_data) {
-            $shop_jutsu = Jutsu::fromArray($jutsu_data['jutsu_id'], $jutsu_data);
-            $shop_jutsu->setLevel($jutsu_level, 0);
-            $this->jutsu[] = $shop_jutsu;
-            // this is important so battle logic treats all NPC jutsu as equipped jutsu
-            $this->equipped_jutsu[] = [
-                'id' => $shop_jutsu->id,
-                'type' => $shop_jutsu->jutsu_type
-            ];
+        if (!empty($ai_data['shop_jutsu'])) {
+            $jutsu_result = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` IN (" . $ai_data['shop_jutsu'] . ")");
+            $jutsu_result = $this->system->db->fetch_all($jutsu_result);
+            foreach ($jutsu_result as $jutsu_data) {
+                $shop_jutsu = Jutsu::fromArray($jutsu_data['jutsu_id'], $jutsu_data);
+                $shop_jutsu->setLevel($jutsu_level, 0);
+                $this->jutsu[] = $shop_jutsu;
+                // this is important so battle logic treats all NPC jutsu as equipped jutsu
+                $this->equipped_jutsu[] = [
+                    'id' => $shop_jutsu->id,
+                    'type' => $shop_jutsu->jutsu_type
+                ];
+            }
         }
 
         $this->loadDefaultJutsu();
