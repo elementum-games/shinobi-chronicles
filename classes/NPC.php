@@ -149,7 +149,6 @@ class NPC extends Fighter {
         $this->intelligence = $stats_for_level * $ai_data['intelligence'];
         $this->willpower = $stats_for_level * $ai_data['willpower'];
 
-        echo $this->taijutsu_skill . " " . $this->ninjutsu_skill . " " . $this->genjutsu_skill . " " . $this->speed . " " . $this->cast_speed;
 
         /*$attributes = array('cast_speed', 'speed', 'strength', 'intelligence', 'willpower');
         foreach($attributes as $attribute) {
@@ -361,7 +360,6 @@ class NPC extends Fighter {
         // randomize jutsu list and check until one without cooldown found
         shuffle($jutsu_list);
         foreach ($jutsu_list as $index) {
-            echo $index;
             $jutsu = $this->jutsu[$index];
             $jutsu->setCombatId($this->combat_id);
             if (isset($battle->getCooldowns()[$jutsu->combat_id])) {
