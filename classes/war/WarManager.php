@@ -368,20 +368,21 @@ class WarManager {
         if ($this->user->special_mission > 0) {
             return;
         }
-        $ai = $this->getRandomPatrolAI($patrol->tier, $patrol->ai_id);
-        if ($this->system->db->last_num_rows == 0) {
-            return;
-        }
         if ($this->user->operation > 0) {
             $this->cancelOperation();
         }
-        $ai = new NPC($this->system, $patrol->ai_id);
+        $ai = $this->getRandomPatrolAI($patrol->tier, $patrol->ai_id);
+        $ai = new NPC($this->system, $ai);
         $ai->loadData();
         $ai->health = $ai->max_health;
+        $battle_background = TravelManager::getLocationBattleBackgroundLink($this->system, $this->user->location);
+        if (empty($battle_background)) {
+            $battle_background = $this->user->region->battle_background_link;
+        }
         if ($this->system->USE_NEW_BATTLES) {
-            BattleV2::start($this->system, $this->user, $ai, BattleV2::TYPE_AI_WAR, $patrol->id);
+            BattleV2::start($this->system, $this->user, $ai, BattleV2::TYPE_AI_WAR, $patrol->id, $battle_background);
         } else {
-            Battle::start($this->system, $this->user, $ai, Battle::TYPE_AI_WAR, $patrol->id);
+            Battle::start($this->system, $this->user, $ai, Battle::TYPE_AI_WAR, $patrol->id, $battle_background);
         }
     }
 
