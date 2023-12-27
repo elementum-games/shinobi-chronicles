@@ -128,9 +128,9 @@ class NPC extends Fighter {
                 $stats_for_level = $player->getBaseStatTotal();
             }
         }
-        // set jutsu level relative to base and max levels for the rank, minimum 1
-        //$jutsu_level = max(1, intval((($this->level - $base_level) / ($max_level - $base_level)) * 100));
-        $jutsu_level = $this->level;
+        // set jutsu level relative to base and max levels for the rank
+        // minimum 1, max twice the NPC level (e.g. lv1-20 at Academy, lv1-100 at Chuunin)
+        $jutsu_level = min(max(1, intval((($this->level - $base_level) / ($max_level - $base_level)) * 100)), $max_level);
         $this->rank_progress = round(($this->level - $base_level) / ($max_level - $base_level), 2);
 
         $this->max_health = $this->rankManager->healthForRankAndLevel($this->rank, $this->level) * $ai_data['max_health'];
