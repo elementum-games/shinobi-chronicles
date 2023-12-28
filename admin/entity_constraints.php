@@ -212,7 +212,7 @@ $constraints['ai'] = [
         'input_type' => 'text',
     ],
     'moves' => [
-        'count' => 4,
+        'count' => 5,
         'num_required' => 0,
         'variables' => [
             'name' => [

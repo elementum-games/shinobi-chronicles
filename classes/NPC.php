@@ -61,7 +61,7 @@ class NPC extends Fighter {
     const DIFFICULTY_HARD = 'hard';
 
     const AI_COOLDOWNS = [
-        self::DIFFICULTY_EASY => 10,
+        self::DIFFICULTY_EASY => 0,
         self::DIFFICULTY_NORMAL => 60,
         self::DIFFICULTY_HARD => 300
     ];
@@ -123,7 +123,8 @@ class NPC extends Fighter {
         if (isset($player) && $this->scaling) {
             // scale to player level between the range from AI level and level cap of the rank (upward scaling)
             $this->level = max(min($player->level, $max_level), $this->level);
-            // override stat total if level adjusted to player
+            $stats_for_level = $this->rankManager->statsForRankAndLevel($this->rank, $this->level);
+            // override stat total if same level as player
             if ($this->level == $player->level) {
                 $stats_for_level = $player->getBaseStatTotal();
             }

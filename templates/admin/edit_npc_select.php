@@ -8,7 +8,22 @@
 
 require_once __DIR__ . '/../../classes/RankManager.php';
 $RANK_NAMES = RankManager::fetchNames($system);
-
+$difficulty = [NPC::DIFFICULTY_NONE => 0, NPC::DIFFICULTY_EASY => 1, NPC::DIFFICULTY_NORMAL => 2, NPC::DIFFICULTY_HARD => 3];
+usort($all_npcs, function ($a, $b) use ($difficulty) {
+    if ($a['rank'] !== $b['rank']) {
+        return $a['rank'] < $b['rank'] ? -1 : 1;
+    }
+    if ($a['level'] !== $b['level']) {
+        return $a['level'] < $b['level'] ? -1 : 1;
+    }
+    if ($difficulty[$a['difficulty_level']] !== $difficulty[$b['difficulty_level']]) {
+        return $difficulty[$a['difficulty_level']] < $difficulty[$b['difficulty_level']] ? -1 : 1;
+    }
+    if ($a['scaling'] !== $b['scaling']) {
+        return $a['scaling'] > $b['scaling'] ? -1 : 1;
+    }
+    return 0;
+});
 ?>
 
 <table class='table' style="text-align: center">

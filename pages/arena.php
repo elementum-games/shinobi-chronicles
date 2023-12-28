@@ -278,15 +278,12 @@ function getArenaOpponent(string $difficulty_level, User $player, System $system
     }
     switch ($difficulty_level) {
         case NPC::DIFFICULTY_EASY:
-            // random easy AI at given rank at the same or 5 levels less than player
+            // random easy AI - for now just training dummy
             $ai_result = $system->db->query("
-                SELECT `ai_id`
-                FROM `ai_opponents`
+                SELECT `ai_id` FROM `ai_opponents`
                 WHERE `rank` = {$player->rank_num}
                 AND `arena_enabled` = 1
                 AND `difficulty_level` = '{$difficulty_level}'
-                AND `level` <= {$player->level}
-                AND {$player->level} - `level` <= 5
                 ORDER BY RAND()
                 LIMIT 1
             ");
@@ -297,8 +294,41 @@ function getArenaOpponent(string $difficulty_level, User $player, System $system
             $ai_opponent = new NPC($system, $ai_result['ai_id']);
             return $ai_opponent;
         case NPC::DIFFICULTY_NORMAL:
+            $ai_opponents = [];
+            // get nearest non-scaling Normal AI of player rank within 5 levels
+            $ai_result = $system->db->query("SELECT `ai_id` FROM `ai_opponents`
+                WHERE `rank` = {$player->rank_num}
+                AND `arena_enabled` = 1
+                AND `difficulty_level` = '{$difficulty_level}'
+                AND `scaling` = 0
+                AND `level` BETWEEN {$player->level} - 5 AND {$player->level}
+                ORDER BY ABS({$player->level} - `level`)
+                LIMIT 1
+            ");
+            $ai_result = $system->db->fetch($ai_result);
+            if (isset($ai_result['ai_id'])) {
+                $ai_opponents[] = $ai_result['ai_id'];
+            }
+            // get scaling Normal AI of player rank
+            $ai_result = $system->db->query("SELECT `ai_id` FROM `ai_opponents`
+                WHERE `rank` = {$player->rank_num}
+                AND `arena_enabled` = 1
+                AND `difficulty_level` = '{$difficulty_level}'
+                AND `scaling` = 1
+                AND `level` <= {$player->level}
+            ");
+            $ai_result = $system->db->fetch_all($ai_result);
+            foreach ($ai_result as $ai) {
+                $ai_opponents[] = $ai['ai_id'];
+            }
+            // select random AI
+            if (empty($ai_opponents)) {
+                throw new RuntimeException("No AI opponents available.");
+            }
+            $ai_opponent = new NPC($system, $ai_opponents[array_rand($ai_opponents)]);
+            return $ai_opponent;
         case NPC::DIFFICULTY_HARD:
-            // random AI at given rank and difficulty
+            // random Hard AI at player rank
             $ai_result = $system->db->query("SELECT `ai_id` FROM `ai_opponents`
                 WHERE `rank` = {$player->rank_num}
                 AND `arena_enabled` = 1
