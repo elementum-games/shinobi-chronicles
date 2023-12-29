@@ -133,8 +133,9 @@ class NPC extends Fighter {
         }
         $this->total_stats = $stats_for_level;
         // set jutsu level relative to base and max levels for the rank
-        // minimum 1, max twice the NPC level (e.g. lv1-20 at Academy, lv1-100 at Chuunin)
-        $jutsu_level = min(max(1, intval((($this->level - $base_level) / ($max_level - $base_level)) * 100)), $max_level);
+        $jutsu_level = ($this->level - $base_level) / ($max_level - $base_level) * 100;
+        // minimum 1, maximum twice the NPC level (e.g. lv1-20 at Academy, lv1-100 at Chuunin)
+        $jutsu_level = min(max(1, $jutsu_level), $max_level * 2);
         $this->rank_progress = round(($this->level - $base_level) / ($max_level - $base_level), 2);
 
         $this->max_health = $this->rankManager->healthForRankAndLevel($this->rank, $this->level) * $ai_data['max_health'];
@@ -194,7 +195,10 @@ class NPC extends Fighter {
             if (!isset($move['effect2_length'])) {
                 $move['effect2_length'] = 0;
             }
-            $jutsu = $this->initJutsu(count($this->jutsu), $move['jutsu_type'], $move['name'], $move['power'], $move['cooldown'], $move['battle_text'], $move['use_type'], $move['effect'], $move['effect_amount'], $move['effect_length'], $move['effect2'], $move['effect2_amount'], $move['effect2_length']);
+            if (!isset($move['element'])) {
+                $move['element'] = Jutsu::ELEMENT_NONE;
+            }
+            $jutsu = $this->initJutsu(count($this->jutsu), $move['jutsu_type'], $move['name'], $move['power'], $move['cooldown'], $move['battle_text'], $move['use_type'], $move['effect'], $move['effect_amount'], $move['effect_length'], $move['effect2'], $move['effect2_amount'], $move['effect2_length'], $move['element']);
             $jutsu->setLevel($jutsu_level, 0);
             switch($jutsu->jutsu_type) {
                 case Jutsu::TYPE_NINJUTSU:
@@ -229,7 +233,11 @@ class NPC extends Fighter {
             $jutsu_result = $this->system->db->fetch_all($jutsu_result);
             foreach ($jutsu_result as $jutsu_data) {
                 $shop_jutsu = Jutsu::fromArray($jutsu_data['jutsu_id'], $jutsu_data);
-                $shop_jutsu->setLevel($jutsu_level, 0);
+                if ($jutsu_data['rank'] < $this->rank) {
+                    $shop_jutsu->setLevel(100, 0);
+                } else {
+                    $shop_jutsu->setLevel($jutsu_level, 0);
+                }
                 $this->jutsu[] = $shop_jutsu;
                 // this is important so battle logic treats all NPC jutsu as equipped jutsu
                 $this->equipped_jutsu[] = [
@@ -373,7 +381,7 @@ class NPC extends Fighter {
         }
     }
 
-    public function initJutsu(int $id, $jutsu_type, string $name, float $power, int $cooldown, string $battle_text, string $use_type = Jutsu::USE_TYPE_MELEE, string $effect = "none", int $effect_amount = 0, int $effect_length = 0, string $effect2 = "none", int $effect2_amount = 0, int $effect2_length = 0): Jutsu {
+    public function initJutsu(int $id, $jutsu_type, string $name, float $power, int $cooldown, string $battle_text, string $use_type = Jutsu::USE_TYPE_MELEE, string $effect = "none", int $effect_amount = 0, int $effect_length = 0, string $effect2 = "none", int $effect2_amount = 0, int $effect2_length = 0, string $element = Jutsu::ELEMENT_NONE): Jutsu {
         $battle_text_alt = str_replace(
             ['[player]', '[opponent]'],
             ['[playerX]', '[opponentX]'],
@@ -385,7 +393,6 @@ class NPC extends Fighter {
             ['[opponent]', '[player]'],
             $battle_text_alt
         );
-
         $jutsu = new Jutsu(
             id: $id,
             name: !empty($name) ? $name : 'Move ' . $id,
@@ -408,7 +415,7 @@ class NPC extends Fighter {
             purchase_cost: $this->rank * 1000,
             purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
             parent_jutsu: 0,
-            element: Jutsu::ELEMENT_NONE,
+            element: $element,
             hand_seals: ''
         );
 
