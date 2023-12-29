@@ -10,7 +10,7 @@ function arena(): bool {
 	global $self_link;
 
     $fight_timer = System::ARENA_COOLDOWN;
-    $arena_background = 'images/battle_backgrounds/Arena.jpg';
+    $arena_background = 'images/battle_backgrounds/FightingGrounds.jpg';
 
 	if($player->exam_stage > 0) {
 		$system->message("You cannot access this page during the exam!");

@@ -244,6 +244,18 @@ $constraints['ai'] = [
                 'input_type' => 'text',
                 'options' => [Jutsu::USE_TYPE_MELEE, Jutsu::USE_TYPE_PROJECTILE, Jutsu::USE_TYPE_BUFF, Jutsu::USE_TYPE_BARRIER, Jutsu::USE_TYPE_INDIRECT],
             ],
+            'element' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
+                'options' => [
+                    Jutsu::ELEMENT_NONE,
+                    Jutsu::ELEMENT_FIRE,
+                    Jutsu::ELEMENT_EARTH,
+                    Jutsu::ELEMENT_WIND,
+                    Jutsu::ELEMENT_WATER,
+                    Jutsu::ELEMENT_LIGHTNING,
+                ],
+            ],
             'effect' => [
                 'data_type' => 'string',
                 'input_type' => 'text',
