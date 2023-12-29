@@ -2584,4 +2584,8 @@ class User extends Fighter {
             }
         }
     }
+
+    public function getBaseStatTotal(): int {
+        return max(1, $this->total_stats);
+    }
 }

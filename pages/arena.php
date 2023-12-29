@@ -258,7 +258,90 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->last_pvp_ms = System::currentTimeMs();
     }
     else if($battle->isDraw()) {
-        $battle_result .= "The battle ended in a draw. You receive no reward.";
+        $battle_result .= "The battle ended in a draw.";
+
+        $stat_gain_display = false;
+        $opponent = $battle->opponent;
+
+        $money_gain = floor($battle->opponent->getMoney() / 2);
+
+        if ($player->level > $opponent->level) {
+            $level_difference = $player->level - $opponent->level;
+            if ($level_difference > 9) {
+                $level_difference = 9;
+            }
+            $money_gain = round($money_gain * (1 - $level_difference * 0.1));
+            if ($money_gain < 5) {
+                $money_gain = 5;
+            }
+        }
+
+        // 5 levels below = -75% chance
+        if ($opponent->level < $player->level) {
+            $stat_gain_chance -= ($player->level - $opponent->level) * 15;
+        }
+
+        if (
+            $player->total_stats < $player->rank->stat_cap
+            && $stat_gain_chance >= mt_rand(1, 100)
+            && $player->getTrainingStatForArena() != null
+        ) {
+            $stat_to_gain = $player->getTrainingStatForArena();
+
+            $stat_gain_display = '<br />During the fight you realized a way to use your ' . System::unSlug($stat_to_gain) . ' a little
+            more effectively.<br />';
+            $stat_gain = TrainingManager::getAIStatGain($opponent->difficulty_level, $player->rank_num);
+            $stat_gain = floor($stat_gain / 2);
+            $stat_gain_display .= $player->addStatGain($stat_to_gain, $stat_gain) . '.';
+        }
+
+        // Village Rep Gains
+        $rep_gain_string = "";
+        if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
+            $rep_gain = $player->reputation->addRep(
+                amount: floor($player->reputation->calcArenaReputation($opponent->difficulty_level, $player->rank_num) / 2),
+                activity_type: UserReputation::ACTIVITY_TYPE_PVE
+            );
+            if ($rep_gain > 0) {
+                $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
+                $rep_gain_string = "Fellow " . $player->village->name . " Shinobi learned from your battle, earning you $rep_gain Reputation.<br />";
+            }
+        }
+
+        // TEAM BOOST NPC GAINS
+        if ($player->team != null) {
+            $boost_percent = $player->team->getAIMoneyBoostAmount();
+            if ($boost_percent != null) {
+                $boost_amount = ceil($boost_percent * $money_gain);
+                $money_gain += $boost_amount;
+            }
+        }
+
+        $extra_yen = 0;
+        $append_message = "";
+        if ($player->special_items) {
+            foreach ($player->special_items as $item) {
+                if ($item->effect == 'yen_boost') {
+                    $amount = ceil($money_gain * ($item->effect_amount / 100));
+                    $extra_yen += $amount;
+                    $append_message .= "Your $item->name has provided you with an extra &yen;$amount.<br />";
+                }
+            }
+        }
+
+        $battle_result = "This battle ended in a draw.<br />";
+        if ($rep_gain_string != "") {
+            $battle_result .= $rep_gain_string;
+        }
+        $battle_result .= "You split the prize of &yen;$money_gain with your opponent.<br />";
+        if ($append_message != "") {
+            $battle_result .= $append_message;
+        }
+        if ($stat_gain_display) {
+            $battle_result .= $stat_gain_display;
+        }
+
+        $player->addMoney(($money_gain + $extra_yen), 'arena');
 
         $player->health = 5;
         //$player->moveToVillage();

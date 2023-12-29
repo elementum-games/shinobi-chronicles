@@ -553,24 +553,7 @@ abstract class Fighter {
         return $include_bloodline ? $this->speed + $this->bloodline_speed_boost : $this->speed;
     }
 
-    public function getBaseStatTotal(): int {
-        if ($this instanceof NPC) {
-            $rankManager = new RankManager($this->system);
-            $rankManager->loadRanks();
-            return $rankManager->statsForRankAndLevel($this->rank, $this->level);
-        } else if ($this instanceof User) {
-            return $this->total_stats;
-        }
-        $stat_total = $this->taijutsu_skill
-            + $this->ninjutsu_skill
-            + $this->genjutsu_skill
-            + (!empty($this->bloodline_skill) ? $this->bloodline_skill : 0)
-            + $this->willpower
-            + $this->intelligence
-            + $this->speed
-            + $this->cast_speed;
-        return max(1, $stat_total);
-    }
+    abstract function getBaseStatTotal(): int;
 
     // Actions
     abstract public function useJutsu(Jutsu $jutsu);

@@ -64,8 +64,8 @@
                     <a href="<?= $system->router->getUrl('arena') ?>&difficulty=easy" style="font-weight: normal">
                         <svg role="button" tabindex="0" name="arena_button" class="arena_button" width="160" height="24">
                             <rect class="arena_button_background" width="100%" height="100%" fill="url(#arena_fill_default)"></rect>
-                            <text class="arena_button_shadow_text" x="50%" y="14" text-anchor="middle" dominant-baseline="middle">Easy</text>
-                            <text class="arena_button_text" x="50%" y="12" text-anchor="middle" dominant-baseline="middle">Easy</text>
+                            <text class="arena_button_shadow_text" x="50%" y="14" text-anchor="middle" dominant-baseline="middle">Practice</text>
+                            <text class="arena_button_text" x="50%" y="12" text-anchor="middle" dominant-baseline="middle">Practice</text>
                         </svg>
                     </a>
                     <?php if (isset($player->ai_cooldowns[NPC::DIFFICULTY_EASY]) && time() < $player->ai_cooldowns[NPC::DIFFICULTY_EASY]): ?>
@@ -79,8 +79,8 @@
                     <a href="<?= $system->router->getUrl('arena') ?>&difficulty=normal" style="font-weight: normal">
                         <svg role="button" tabindex="0" name="arena_button" class="arena_button" width="160" height="24">
                             <rect class="arena_button_background" width="100%" height="100%" fill="url(#arena_fill_default)"></rect>
-                            <text class="arena_button_shadow_text" x="50%" y="14" text-anchor="middle" dominant-baseline="middle">Normal</text>
-                            <text class="arena_button_text" x="50%" y="12" text-anchor="middle" dominant-baseline="middle">Normal</text>
+                            <text class="arena_button_shadow_text" x="50%" y="14" text-anchor="middle" dominant-baseline="middle">Spar</text>
+                            <text class="arena_button_text" x="50%" y="12" text-anchor="middle" dominant-baseline="middle">Spar</text>
                         </svg>
                     </a>
                     <?php if (isset($player->ai_cooldowns[NPC::DIFFICULTY_NORMAL]) && time() < $player->ai_cooldowns[NPC::DIFFICULTY_NORMAL]): ?>
@@ -94,8 +94,8 @@
                     <a href="<?= $system->router->getUrl('arena') ?>&difficulty=hard" style="font-weight: normal">
                         <svg role="button" tabindex="0" name="arena_button" class="arena_button" width="160" height="24">
                             <rect class="arena_button_background" width="100%" height="100%" fill="url(#arena_fill_default)"></rect>
-                            <text class="arena_button_shadow_text" x="50%" y="14" text-anchor="middle" dominant-baseline="middle">Hard</text>
-                            <text class="arena_button_text" x="50%" y="12" text-anchor="middle" dominant-baseline="middle">Hard</text>
+                            <text class="arena_button_shadow_text" x="50%" y="14" text-anchor="middle" dominant-baseline="middle">Challenge</text>
+                            <text class="arena_button_text" x="50%" y="12" text-anchor="middle" dominant-baseline="middle">Challenge</text>
                         </svg>
                     </a>
                     <?php if (isset($player->ai_cooldowns[NPC::DIFFICULTY_HARD]) && time() < $player->ai_cooldowns[NPC::DIFFICULTY_HARD]): ?>

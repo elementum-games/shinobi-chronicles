@@ -89,13 +89,17 @@ if($battle->battle_text) {
 <style type='text/css'>
     .playerAvatar {
         display:block;
-        margin: auto;
+        margin-top:auto;
+        margin-left:auto;
+        margin-right:auto;
         max-width:<?= $player_avatar_size ?> !important;
         max-height:<?= $player_avatar_size ?> !important;
     }
     .opponentAvatar {
         display:block;
-        margin:auto;
+        margin-top:auto;
+        margin-left:auto;
+        margin-right:auto;
         max-width:<?= $opponent_avatar_size ?> !important;
         max-height:<?= $opponent_avatar_size ?> !important;
     }
@@ -243,9 +247,9 @@ if($battle->battle_text) {
     </tr>
     <tr style="background: linear-gradient(to right, var(--main-background-color) 0%, transparent 10%, transparent 90%, var(--main-background-color) 100%), url('<?= $battle->battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
         <td id='bi_td_player' style="border-right: none">
-            <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center">
+            <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
                 <img src='<?= $player->avatar_link ?>' class='playerAvatar' alt='player_profile_img' />
-                <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
+                <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 8px;'>
 
                     <!-- Health -->
                     <div class='resourceBarOuter healthPreview'>
@@ -276,7 +280,7 @@ if($battle->battle_text) {
             </div>
         </td>
         <td style='text-align: center; border-left: none' id='bi_td_opponent'>
-            <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center">
+            <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
                 <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
                 <div id='ai_battle_stats_container' style='display: inline-block; text-align: center'>
                     <div class='resourceBarOuter healthPreview' style='margin-top:8px;'>

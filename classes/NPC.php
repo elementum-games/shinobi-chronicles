@@ -36,6 +36,8 @@ class NPC extends Fighter {
     public float $intelligence;
     public float $willpower;
 
+    public int $total_stats;
+
     public int $money;
 
     public int $battle_iq = 0; // chance to use optimal jutsu over random
@@ -129,6 +131,7 @@ class NPC extends Fighter {
                 $stats_for_level = $player->getBaseStatTotal();
             }
         }
+        $this->total_stats = $stats_for_level;
         // set jutsu level relative to base and max levels for the rank
         // minimum 1, max twice the NPC level (e.g. lv1-20 at Academy, lv1-100 at Chuunin)
         $jutsu_level = min(max(1, intval((($this->level - $base_level) / ($max_level - $base_level)) * 100)), $max_level);
@@ -149,7 +152,6 @@ class NPC extends Fighter {
         $this->strength = $stats_for_level * $ai_data['strength'];
         $this->intelligence = $stats_for_level * $ai_data['intelligence'];
         $this->willpower = $stats_for_level * $ai_data['willpower'];
-
 
         /*$attributes = array('cast_speed', 'speed', 'strength', 'intelligence', 'willpower');
         foreach($attributes as $attribute) {
@@ -452,6 +454,10 @@ class NPC extends Fighter {
 
     public function updateInventory() {
 
+    }
+
+    public function getBaseStatTotal(): int {
+        return max(1, $this->total_stats);
     }
 
     /**
