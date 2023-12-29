@@ -121,7 +121,7 @@ function store() {
 			}
 			$system->message("Item purchased!");
 		}
-        catch (Exception $e) {
+        catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 	}
@@ -171,7 +171,7 @@ function store() {
 			$player->jutsu_scrolls[$jutsu_id] = Jutsu::fromArray($jutsu_id, $shop_jutsu[$jutsu_id]);
 
 			$system->message("Jutsu purchased!");
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 	}

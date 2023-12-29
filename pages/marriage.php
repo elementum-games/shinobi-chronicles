@@ -80,7 +80,7 @@ function marriage() {
             else {
                 $system->message("Error proposing!");
             }
-        }catch (Exception $e) {
+        }catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -123,7 +123,7 @@ function marriage() {
             $player->updateData();
 
             $system->message("You got hitched!");
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -229,7 +229,7 @@ function marriage() {
             $player->spouse_name = '';
             $player->marriage_time = 0;
             $player->updateData();
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }

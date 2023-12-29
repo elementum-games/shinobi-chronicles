@@ -49,7 +49,7 @@ function news() {
 				throw new RuntimeException("There was an error posting.");
 			}
 
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 			$page = "create_post";
 		}
@@ -94,7 +94,7 @@ function news() {
 				throw new RuntimeException("There was an error posting.");
 			}
 
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 			$page = "edit_post";
 		}

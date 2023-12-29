@@ -107,7 +107,7 @@ function report() {
 			else {
 				$system->message("Error submitting report!");
 			}
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();
@@ -151,7 +151,7 @@ function report() {
 			else {
 				$system->message("Error handling report!");
 			}
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();
@@ -217,7 +217,7 @@ function report() {
 			}
 						
 			require 'templates/submit_report.php';
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();
@@ -249,7 +249,7 @@ function report() {
 			}
 			
 			require 'templates/staff/mod/view_report.php';
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 			$system->printMessage();
 		}

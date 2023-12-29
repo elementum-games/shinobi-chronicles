@@ -26,7 +26,7 @@ function specialMissions() {
                 alert: false,
             );
             NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }

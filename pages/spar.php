@@ -80,8 +80,8 @@ function spar() {
 
 			$system->db->query("UPDATE `users` SET `challenge`='$player->user_id' WHERE `user_id`='$challenge' LIMIT 1");
 			$system->message("Challenge sent!");
-			$system->printMessage();
-		} catch (Exception $e) {
+            $system->printMessage();
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 			$system->printMessage();
 
@@ -130,7 +130,7 @@ function spar() {
 			$system->message("You have accepted the challenge!<br />
 				<a class='link' href='$self_link'>To Battle</a>");
 			$system->printMessage();
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$player->challenge = 0;
 
 			$system->message($e->getMessage());
@@ -277,7 +277,7 @@ function sparFightAPI(System $system, User $player): BattlePageAPIResponse {
            $response->battle_result = processSparFightEnd($battle, $player, $system);
         }
     }
-    catch (Exception $e) {
+    catch (RuntimeException $e) {
         $response->errors[] = $e->getMessage();
     }
 

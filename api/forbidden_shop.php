@@ -8,7 +8,7 @@ $system = API::init(row_lock: true);
 try {
     $player = Auth::getUserFromSession($system);
     $player->loadData(User::UPDATE_NOTHING);
-} catch (Exception $e) {
+} catch (RuntimeException $e) {
     API::exitWithException($e, system: $system);
 }
 # End standard auth

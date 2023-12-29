@@ -55,7 +55,7 @@ function bloodline() {
 			$player->bloodline->jutsu[$jutsu_id]->exp = 0;
 			$player->updateInventory();
 			$system->message("Learned " . $base_bloodline->jutsu[$jutsu_id]->name . "!");
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();

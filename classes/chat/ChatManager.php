@@ -207,7 +207,8 @@ class ChatManager {
                                 $post->message = preg_replace("/" . preg_quote($match, '/') . '/', $formatted_quote, $post->message, 1);
                             }
                             else {
-                                $post->message = str_replace($matches[0], "<i>(removed)</i>", $post->message);
+                                // Just remove quote tags for deleted posts/blacklisted users
+                                $post->message = str_replace($matches[0], "", $post->message);
                             }
                         }
                     }
@@ -284,6 +285,9 @@ class ChatManager {
 
             // Master notification array
             $notification_blocks = [];
+            // Master bl array
+            $master_bl = [];
+
             // Handle Quotes
             $pattern = "/\[quote:\d+\]/";
             $has_quote = preg_match_all($pattern, $message, $matches);
@@ -319,6 +323,14 @@ class ChatManager {
                         }
                         // Notification blocked
                         if($notification_blocks[$result['user_id']]->notificationBlocked(NotificationManager::NOTIFICATION_CHAT)) {
+                            continue;
+                        }
+
+                        // Blacklist user
+                        if(!isset($master_bl[$result['user_id']])) {
+                            $master_bl[$result['user_id']] = Blacklist::fromDb(system: $this->system, user_id: $result['user_id']);
+                        }
+                        if($master_bl[$result['user_id']]->userBlocked($this->player->user_id)) {
                             continue;
                         }
 
@@ -377,6 +389,14 @@ class ChatManager {
                     }
 
                     if($notification_blocks[$result['user_id']]->notificationBlocked(NotificationManager::NOTIFICATION_CHAT)) {
+                        continue;
+                    }
+
+                    // Blacklist user
+                    if(!isset($master_bl[$result['user_id']])) {
+                        $master_bl[$result['user_id']] = Blacklist::fromDb(system: $this->system, user_id: $result['user_id']);
+                    }
+                    if($master_bl[$result['user_id']]->userBlocked($this->player->user_id)) {
                         continue;
                     }
 

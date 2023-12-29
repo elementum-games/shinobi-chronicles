@@ -187,6 +187,7 @@ class TravelManager {
 
     /**
      * @throws RuntimeException
+     * @throws DatabaseDeadlockException
      */
     public function enterPortal($portal_id): bool {
         $ignore_travel_restrictions = $this->user->isHeadAdmin();
@@ -223,6 +224,8 @@ class TravelManager {
 
     /**
      * @return NearbyPlayerDto[]
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function fetchNearbyPlayers(): array {
@@ -496,6 +499,7 @@ class TravelManager {
 
     /**
      * @return MapLocation[]
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function fetchCurrentMapLocations(): array {
@@ -560,6 +564,7 @@ class TravelManager {
 
     /**
      * @return array|null
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function fetchCurrentLocationPortal(): ?array {
@@ -585,6 +590,8 @@ class TravelManager {
 
     /**
      * @throws RuntimeException
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function attackPlayer(string $target_attack_id): bool {
@@ -704,6 +711,7 @@ class TravelManager {
      *
      * @param User $user
      * @return bool
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function dbFetchIsProtectedByAlly(User $user): bool {
@@ -729,6 +737,7 @@ class TravelManager {
 
     /**
      * @return array village names, keyed by travel coords str
+     * @throws DatabaseDeadlockException
      */
     public static function fetchVillageLocationsByCoordsStr(System $system): array {
         $village_locations = [];
@@ -759,6 +768,7 @@ class TravelManager {
 
     /**
      * @return Region[]
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function getRegions(User $player): array {
@@ -812,6 +822,7 @@ class TravelManager {
 
     /**
      * @return TravelCoords
+     * @throws DatabaseDeadlockException
      */
     public function getColosseumCoords(): TravelCoords {
         $result = $this->system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
@@ -821,6 +832,9 @@ class TravelManager {
 
     /**
      * @return Patrol[]
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function fetchNearbyPatrols(): array {
@@ -876,6 +890,8 @@ class TravelManager {
 
     /**
      * @return MapObjective[]
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function fetchMapObjectives(): array
@@ -1019,6 +1035,7 @@ class TravelManager {
 
     /**
      * @return RegionObjective[]
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function fetchRegionObjectives(): array
@@ -1111,6 +1128,7 @@ class TravelManager {
 
     /**
      * @return string
+     * @throws DatabaseDeadlockException
      */
     function getPlayerBattleUrl(): ?string {
         $link = null;
@@ -1147,6 +1165,9 @@ class TravelManager {
 
     /**
      * @return bool
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     function beginOperation($operation_type): bool {
@@ -1259,6 +1280,7 @@ class TravelManager {
 
     /**
      * @return int
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     function getPlayerLootCount(): int {
