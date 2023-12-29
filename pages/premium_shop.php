@@ -47,7 +47,7 @@ function premiumShop(): void {
                 );
                 return;
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     } else if (isset($_POST['name_change'])) {
@@ -74,7 +74,7 @@ function premiumShop(): void {
             } else {
                 $result = $premiumShopManager->changeUserName($new_name);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     } else if (isset($_POST['change_gender'])) {
@@ -99,7 +99,7 @@ function premiumShop(): void {
                 $result = $premiumShopManager->changeGender($new_gender);
                 $system->message($result->success_message);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     } else if (isset($_POST['stat_reset'])) {
@@ -129,7 +129,7 @@ function premiumShop(): void {
                 $player->exp -= $exp;
                 $system->message("You have reset your " . System::unSlug($stat) . " to $reset_amount.");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -196,7 +196,7 @@ function premiumShop(): void {
 
                 );
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -222,7 +222,7 @@ function premiumShop(): void {
 
                 $system->message("You have reset your AI wins and losses to 0.");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -248,7 +248,7 @@ function premiumShop(): void {
 
                 $system->message("You have reset your PvP wins and losses to 0.");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -339,7 +339,7 @@ function premiumShop(): void {
 
                 renderPurchaseComplete('New Bloodline!', $message);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     } else if (isset($_POST['purchase_bloodline_random'])) {
@@ -430,7 +430,7 @@ function premiumShop(): void {
 
                 renderPurchaseComplete('New Bloodline!', $message);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -554,7 +554,7 @@ function premiumShop(): void {
 
                 $system->message("Seal infused!");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
             $system->printMessage();
         }

@@ -15,7 +15,7 @@ function travel(): void {
             if($travel_ok) {
                 $system->message("You have moved to {$player->location->displayString()}");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
 

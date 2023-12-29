@@ -337,7 +337,7 @@ class BattleManager {
                     if($this->opponent instanceof NPC) {
                         $this->chooseAndSetAIAction($this->opponent);
                     }
-                } catch (Exception $e) {
+                } catch (RuntimeException $e) {
                     $this->system->message($e->getMessage());
                 }
             }
@@ -762,7 +762,7 @@ class BattleManager {
                     break;
                 case 'reflect':
                     $attack->reflect_percent += $effect->effect_amount / 100;
-                    $attack->reflect_duration = min($effect->effect_length, 1);
+                    $attack->reflect_duration = max($effect->effect_length, 1);
                     break;
                 default:
                     break;
@@ -770,6 +770,7 @@ class BattleManager {
         }
 
         $attack->raw_damage = $fighter->calcDamage(attack: $attack->jutsu, disable_randomness: $disable_randomness);
+
         // Set weapon data into jutsu
         if($attack->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $action->weapon_id) {
             // Apply element to jutsu
@@ -903,9 +904,9 @@ class BattleManager {
             }
         }
 
-        if(empty($attack->jutsu->effect_only)) {
+        if (empty($attack->jutsu->effect_only)) {
             $attack_damage = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type, element: $attack->jutsu->element);
-            $attack_damage_raw = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type, apply_resists : false, element: $attack->jutsu->element);
+            $attack_damage_raw = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type, apply_resists: false, element: $attack->jutsu->element);
             $damage_resisted = round($attack_damage_raw - $attack_damage, 2);
 
             $target->last_damage_taken += $attack_damage;

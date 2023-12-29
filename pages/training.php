@@ -134,7 +134,7 @@ function training() {
             else {
                 throw new RuntimeException("Invalid training type_2!");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }

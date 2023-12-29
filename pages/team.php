@@ -71,7 +71,7 @@ function team() {
             else {
                 $system->message("Error create team! If this continues, contact support.");
             }
-        }catch (Exception $e) {
+        }catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -86,7 +86,7 @@ function team() {
             $team->addMember($player);
 
             $system->message("You have joined <b>{$team->name}</b>!");
-        }catch (Exception $e) {
+        }catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -153,7 +153,7 @@ function team() {
                     }
                 }
             }
-        }catch (Exception $e) {
+        }catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -261,7 +261,7 @@ function team() {
                             $system->messsage("Error transferring leadership!");
                         }
                     }
-                } catch (Exception $e) {
+                } catch (RuntimeException $e) {
                     $system->message($e->getMessage());
                 }
             }
@@ -281,7 +281,7 @@ function team() {
 
                     $player->team->setBoost($boost_type, $boost_size);
                     $system->message("Boost set!");
-                }catch (Exception $e) {
+                }catch (RuntimeException $e) {
                     $system->message($e->getMessage());
                 }
             }
@@ -317,7 +317,7 @@ function team() {
                     else {
                         $system->message("Error inviting player!");
                     }
-                }catch (Exception $e) {
+                }catch (RuntimeException $e) {
                     $system->message($e->getMessage());
                 }
             }
@@ -373,7 +373,7 @@ function team() {
                             $system->message("Error kicking <b>$user_name</b>!");
                         }
                     }
-                }catch (Exception $e) {
+                }catch (RuntimeException $e) {
                     $system->message($e->getMessage());
                 }
             }
@@ -390,7 +390,7 @@ function team() {
                     else {
                         $system->message("Error updating logo!");
                     }
-                }catch (Exception $e) {
+                }catch (RuntimeException $e) {
                     $system->message($e->getMessage());
                 }
             }
@@ -451,7 +451,7 @@ function team() {
                     else {
                         $system->message("Error starting mission!");
                     }
-                }catch (Exception $e) {
+                }catch (RuntimeException $e) {
                     $system->message($e->getMessage());
                 }
             }
@@ -483,7 +483,7 @@ function team() {
 
                         $system->message("Mission cancelled!");
                     }
-                }catch (Exception $e){
+                }catch (RuntimeException $e){
                     $system->message($e->getMessage());
                 }
             }

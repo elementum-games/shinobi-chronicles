@@ -202,7 +202,7 @@ function missions(): bool {
                 missions();
                 return true;
             }
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 	}

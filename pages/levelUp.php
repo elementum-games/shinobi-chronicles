@@ -467,7 +467,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 
             $player->exam_stage = RankManager::CHUUNIN_STAGE_SURVIVAL_START;
             $system->message("You have passed stage 1!");
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message("Your answers were incorrect. You have failed the Chuunin exam. " . $e->getMessage() .
                 "<a href='{$system->router->links['profile']}'>Continue</a>");
             $system->printMessage();
