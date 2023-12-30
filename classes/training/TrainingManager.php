@@ -366,9 +366,9 @@ class TrainingManager {
             case NPC::DIFFICULTY_EASY:
                 return 1;
             case NPC::DIFFICULTY_NORMAL:
-                return 1 + $rank;
+                return 2;
             case NPC::DIFFICULTY_HARD:
-                return 2 * (1 + $rank);
+                return 4;
             default:
                 return 1;
         }

@@ -63,7 +63,7 @@ class NPC extends Fighter {
     const DIFFICULTY_HARD = 'hard';
 
     const AI_COOLDOWNS = [
-        self::DIFFICULTY_EASY => 15,
+        self::DIFFICULTY_EASY => 4,
         self::DIFFICULTY_NORMAL => 60,
         self::DIFFICULTY_HARD => 300
     ];
