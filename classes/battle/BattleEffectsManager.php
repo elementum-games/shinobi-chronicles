@@ -83,12 +83,6 @@ class BattleEffectsManager {
             case 'resist_boost':
             case 'vulnerability':
             case 'offense_nerf':
-            case 'substitution':
-            case 'counter':
-            case 'piercing':
-            case 'immolate':
-            case 'recoil':
-            case 'reflect':
             case 'fire_boost':
             case 'wind_boost':
             case 'lightning_boost':
@@ -99,6 +93,7 @@ class BattleEffectsManager {
             case 'lightning_vulnerability':
             case 'earth_vulnerability':
             case 'water_vulnerability':
+            case 'reflect_damage':
                 // No changes needed to base number, calculated in applyPassiveEffects
                 break;
             case 'intelligence_boost':
@@ -109,10 +104,14 @@ class BattleEffectsManager {
                 break;
             case Jutsu::USE_TYPE_BARRIER:
                 $effect->effect_amount = $raw_damage;
+                $apply_effect = false;
                 break;
-            case 'reflect_damage':
-                // No changes need to base number, calculated in jutsu collision
-                break;
+            case 'substitution':
+            case 'counter':
+            case 'piercing':
+            case 'immolate':
+            case 'recoil':
+            case 'reflect':
             default:
                 $apply_effect = false;
                 break;
@@ -120,7 +119,7 @@ class BattleEffectsManager {
 
         if ($apply_effect) {
             $effect_id = $jutsu->combat_id;
-            if ($jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
+            if ($effect->effect == Jutsu::USE_TYPE_BARRIER) {
                 $effect_id = self::barrierId($effect_user);
             } else if ($jutsu->is_weapon) {
                 $effect_id = $effect_user->combat_id . ':WE:' . $effect->effect;
