@@ -33,6 +33,19 @@ class System {
     const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
+    const HOLIDAYS = [
+		'Jan 1' => 'New Years Boost',
+	    'Jan 16' => 'Martin Luther King Day Boost',
+	    'Feb 14' => 'Valentines Day Boost',
+	    'May 27' => 'Memorial Day Boost',
+	    'Jun 19' => 'Juneteenth Boost',
+	    'Jul 4' => 'Independence Day Boost',
+	    'Sep 2' => 'Labor Day Boost',
+	    'Nov 11' => 'Veterans Day Boost',
+	    'Nov 28' => 'Thanksgiving Day Boost',
+	    'Dec 25' => 'Christmas Day Boost',
+	];
+
     // Temporary event data storage
     public ?Event $event;
 
@@ -707,10 +720,11 @@ class System {
             $this->event = new BonusExpWeekend($endTime);
         }
     	// Holiday training boosts, if no other event has been planned
-    	if (!isset($this->event) && in_array($current_datetime->format('M j'), ['Jan 1', 'Jan 16', 'Feb 14', 'May 27', 'Jun 19', 'Jul 4', 'Sep 2', 'Nov 11', 'Nov 28', 'Dec 25'])) {
-		$endTime = $current_datetime->modify("tomorrow");
-		$this->event = new BonusExpWeekend($endTime);
-  	}
+    	if (!isset($this->event) && in_array($current_datetime->format('M j'), array_keys(self::HOLIDAYS))) {
+			$boost_amount = 2;
+			$endTime = $current_datetime->modify("tomorrow");
+			$this->event = new BonusExpWeekend($endTime, self::HOLIDAYS[$current_datetime->format('M j')], $boost_amount);
+  		}
     }
 
     /**
