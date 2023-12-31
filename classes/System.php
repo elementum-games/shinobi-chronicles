@@ -706,6 +706,11 @@ class System {
             $endTime = new DateTimeImmutable('next Monday');
             $this->event = new BonusExpWeekend($endTime);
         }
+    	// Holiday training boosts, if no other event has been planned
+    	if (!isset($this->event) && in_array($current_datetime->format('M j'), ['Jan 1', 'Jan 16', 'Feb 14', 'May 27', 'Jun 19', 'Jul 4', 'Sep 2', 'Nov 11', 'Nov 28', 'Dec 25'])) {
+		$endTime = $current_datetime->modify("tomorrow");
+		$this->event = new BonusExpWeekend($endTime);
+  	}
     }
 
     /**
