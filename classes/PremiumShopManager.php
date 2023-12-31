@@ -29,7 +29,7 @@ class PremiumShopManager {
     public static int $free_stat_change_cooldown = 86400;
     public static int $free_stat_change_cooldown_hours = 24;
 
-    public int $max_free_stat_change_amount = 100;
+    public int $max_free_stat_change_amount = 250;
 
     public int $free_stat_change_cooldown_left;
 
