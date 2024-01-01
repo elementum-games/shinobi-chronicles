@@ -2118,7 +2118,7 @@ class VillageManager {
         switch ($proposal_type) {
             case self::PROPOSAL_TYPE_BREAK_ALLIANCE:
                 $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_END_ALLIANCE;
-                $message = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " has ended and Alliance with " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
+                $message = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " has ended an Alliance with " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
                 break;
             case self::PROPOSAL_TYPE_ACCEPT_PEACE:
                 $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_END_WAR;
