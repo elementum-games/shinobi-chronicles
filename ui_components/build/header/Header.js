@@ -125,7 +125,7 @@ function Header({
     className: "header_maint_label ft-default ft-s ft-c5"
   }, maintTime), !scOpen && /*#__PURE__*/React.createElement("div", {
     className: "header_maint_label ft-default ft-s ft-c5"
-  }, "SERVER IN MAINT MODE"), /*#__PURE__*/React.createElement("div", {
+  }, "SERVER CLOSED"), /*#__PURE__*/React.createElement("div", {
     className: "header_logout_wrapper t-center"
   }, /*#__PURE__*/React.createElement("a", {
     href: links.logout_link,

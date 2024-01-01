@@ -143,7 +143,7 @@ function Header({ links, navigationAPIData, timeZone, updateMaintenance, scOpen 
                         <div className="header_maint_label ft-default ft-s ft-c5">{maintTime}</div>
                     }
                     {!scOpen &&
-                        <div className="header_maint_label ft-default ft-s ft-c5">SERVER IN MAINT MODE</div>
+                        <div className="header_maint_label ft-default ft-s ft-c5">SERVER CLOSED</div>
                     }
                     <div className={"header_logout_wrapper t-center"}>
                         <a href={links.logout_link} className={"header_logout_label ft-default ft-s"}>LOGOUT</a>
