@@ -83,7 +83,7 @@ class System {
 
     //New server time
     const SERVER_TIME_ZONE = "America/New_York";
-    const REPUTATION_RESET_DAY = "next friday";
+    const REPUTATION_RESET_DAY = "Friday";
     const REPUTATION_RESET_HOUR = 20;
     const REPUTATION_RESET_MINUTE = 0;
     public DateTimeImmutable $SERVER_TIME;
@@ -237,8 +237,7 @@ class System {
 
         // New Server Time
         $this->SERVER_TIME = new DateTimeImmutable(datetime: "now", timezone: new DateTimeZone(self::SERVER_TIME_ZONE));
-        $this->REPUTATION_RESET = $this->SERVER_TIME->modify(self::REPUTATION_RESET_DAY);
-        $this->REPUTATION_RESET = $this->REPUTATION_RESET->setTime(hour: self::REPUTATION_RESET_HOUR, minute: self::REPUTATION_RESET_MINUTE);
+        $this->loadRepReset();
         // Old Server Time
         $this->timezoneOffset = date('Z');
 
@@ -764,6 +763,18 @@ class System {
         }
 
         return "30 minutes";
+    }
+
+    public function loadRepReset(): void {
+        if($this->SERVER_TIME->format('l') == self::REPUTATION_RESET_DAY &&
+            (int)$this->SERVER_TIME->format('H') >= self::REPUTATION_RESET_HOUR && (int) $this->SERVER_TIME->format('i') < self::REPUTATION_RESET_MINUTE)
+        {
+            $this->REPUTATION_RESET = $this->SERVER_TIME;
+        }
+        else {
+            $this->REPUTATION_RESET = $this->SERVER_TIME->modify('next ' . self::REPUTATION_RESET_DAY);
+        }
+        $this->REPUTATION_RESET = $this->REPUTATION_RESET->setTime(hour: self::REPUTATION_RESET_HOUR, minute: self::REPUTATION_RESET_MINUTE);
     }
 
     /**
