@@ -14,7 +14,8 @@ function Village({
   proposalData,
   strategicData,
   challengeData,
-  warLogData
+  warLogData,
+  kageRecords
 }) {
   const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
   const [policyDataState, setPolicyDataState] = React.useState(policyData);
@@ -160,6 +161,7 @@ function Village({
     challengeDataState: challengeDataState,
     setChallengeDataState: setChallengeDataState,
     clanData: clanData,
+    kageRecords: kageRecords,
     handleErrors: handleErrors,
     getKageKanji: getKageKanji,
     getVillageIcon: getVillageIcon,
@@ -220,11 +222,13 @@ function VillageHQ({
   challengeDataState,
   setChallengeDataState,
   clanData,
+  kageRecords,
   handleErrors,
   getKageKanji,
   getVillageIcon,
   getPolicyDisplayData
 }) {
+  console.log(kageRecords);
   const [modalState, setModalState] = React.useState("closed");
   const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
   const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
@@ -731,7 +735,40 @@ function VillageHQ({
     className: "resource_lost"
   }, resource.lost), /*#__PURE__*/React.createElement("div", {
     className: "resource_spent"
-  }, resource.spent)))))))));
+  }, resource.spent))))))), /*#__PURE__*/React.createElement("div", {
+    className: "row fourth"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "column first"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "hq_navigation_row"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "Kage Record"), /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_header_section"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_header"
+  }, /*#__PURE__*/React.createElement("span", null, "Whispers of the past"), /*#__PURE__*/React.createElement("span", null, "Echoes of a leader's might"), /*#__PURE__*/React.createElement("span", null, "Legacy in stone."))), /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_main_section"
+  }, kageRecords.map((kage, index) => /*#__PURE__*/React.createElement("div", {
+    key: kage.user_id,
+    className: "kage_record"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_item_row_first"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_item_title"
+  }, kage.seat_title), ": ", /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_item_name"
+  }, /*#__PURE__*/React.createElement("a", {
+    href: "/?id=6&user=" + kage.user_name
+  }, kage.user_name))), /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_item_row_second"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_item_start"
+  }, kage.seat_start), " - ", /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_item_length"
+  }, kage.time_held)))))))))));
 }
 function KageQuarters({
   playerID,

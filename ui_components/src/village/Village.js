@@ -16,6 +16,7 @@ function Village({
     strategicData,
     challengeData,
     warLogData,
+    kageRecords,
 }) {
     const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
     const [policyDataState, setPolicyDataState] = React.useState(policyData);
@@ -154,6 +155,7 @@ function Village({
                 challengeDataState={challengeDataState}
                 setChallengeDataState={setChallengeDataState}
                 clanData={clanData}
+                kageRecords={kageRecords}
                 handleErrors={handleErrors}
                 getKageKanji={getKageKanji}
                 getVillageIcon={getVillageIcon}
@@ -227,11 +229,13 @@ function VillageHQ({
     challengeDataState,
     setChallengeDataState,
     clanData,
+    kageRecords,
     handleErrors,
     getKageKanji,
     getVillageIcon,
     getPolicyDisplayData
 }) {
+    console.log(kageRecords);
     const [modalState, setModalState] = React.useState("closed");
     const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
     const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
@@ -709,6 +713,35 @@ function VillageHQ({
                                             <div className="resource_spent">{resource.spent}</div>
                                         </div>
                                     ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="row fourth">
+                    <div className="column first">
+                        <div className="hq_navigation_row">
+                            <div className="header">Kage Record</div>
+                            <div className="kage_record_container">
+                                <div className="kage_record_header_section">
+                                    <div className="kage_record_header">
+                                        <span>Whispers of the past</span>
+                                        <span>Echoes of a leader's might</span>
+                                        <span>Legacy in stone.</span>
+                                    </div>
+                                </div>
+                                <div className="kage_record_main_section">
+                                    {kageRecords
+                                        .map((kage, index) => (
+                                            <div key={kage.user_id} className="kage_record">
+                                                <div className="kage_record_item_row_first">
+                                                    <div className="kage_record_item_title">{kage.seat_title}</div>: <div className="kage_record_item_name"><a href={"/?id=6&user=" + kage.user_name}>{kage.user_name}</a></div>
+                                                </div>
+                                                <div className="kage_record_item_row_second">
+                                                    <div className="kage_record_item_start">{kage.seat_start}</div> - <div className="kage_record_item_length">{kage.time_held}</div>
+                                                </div>
+                                            </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
