@@ -68,6 +68,7 @@ class System {
     public bool $enable_dev_only_features;
 
     public bool $SC_OPEN;
+    public ?DateTimeImmutable $UPDATE_MAINTENANCE;
     public bool $register_open;
     public bool $USE_NEW_BATTLES = false;
 
@@ -226,6 +227,7 @@ class System {
         $this->enable_dev_only_features = $ENABLE_DEV_ONLY_FEATURES ?? self::ENABLE_DEV_ONLY_FEATURES; // Will only ever effect dev envs
         $this->register_open = $register_open ?? false;
         $this->SC_OPEN = $SC_OPEN ?? false;
+        $this->UPDATE_MAINTENANCE = $this->checkForMaintenance();
         $this->USE_NEW_BATTLES = $USE_NEW_BATTLES ?? false;
 
         $this->router = new Router($web_url ?? 'http://localhost/');
@@ -725,6 +727,24 @@ class System {
 		    $endTime = new DateTimeImmutable("tomorrow");
 		    $this->event = new HolidayBonusEvent($endTime, self::HOLIDAYS[$current_datetime->format('M j')]);
 	    }
+    }
+
+    public function checkForMaintenance(): ?DateTimeImmutable {
+        $time = new DateTimeImmutable();
+        $maintenanceBegin = new DateTimeImmutable("Jan 1 14:01", new DateTimeZone(self::SERVER_TIME_ZONE));
+        $maintenanceEnd = new DateTimeImmutable("Jan 1 14:08", new DateTimeZone(self::SERVER_TIME_ZONE));
+
+        // Display timer for maintenance window
+        if($time->getTimestamp() < $maintenanceBegin->getTimestamp()) {
+            return $maintenanceBegin;
+        }
+        // Close SC for maintenance window - NOTE: This can be overridden in vars.php if window can't be easily determined
+        if($time->getTimestamp() > $maintenanceBegin->getTimestamp() && $time->getTimestamp() < $maintenanceEnd->getTimestamp()) {
+            $this->SC_OPEN = false;
+        }
+
+
+        return null;
     }
 
     /**
