@@ -722,9 +722,9 @@ class System {
         }
     	// Holiday training boosts, if no other event has been planned
     	if (!isset($this->event) && in_array($current_datetime->format('M j'), array_keys(self::HOLIDAYS))) {
-		$endTime = new DateTimeImmutable("tomorrow");
-		$this->event = new HolidayBonusEvent($endTime, self::HOLIDAYS[$current_datetime->format('M j')]);
-	}
+		    $endTime = new DateTimeImmutable("tomorrow");
+		    $this->event = new HolidayBonusEvent($endTime, self::HOLIDAYS[$current_datetime->format('M j')]);
+	    }
     }
 
     /**
