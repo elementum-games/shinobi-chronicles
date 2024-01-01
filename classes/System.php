@@ -11,6 +11,7 @@ require_once __DIR__ . '/Route.php';
 require_once __DIR__ . '/../classes/event/DoubleExpEvent.php';
 require_once __DIR__ . '/../classes/event/DoubleReputationEvent.php';
 require_once __DIR__ . '/../classes/event/BonusExpWeekend.php';
+require_once __DIR__ . '/../classes/event/HolidayBonusEvent.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -721,9 +722,8 @@ class System {
         }
     	// Holiday training boosts, if no other event has been planned
     	if (!isset($this->event) && in_array($current_datetime->format('M j'), array_keys(self::HOLIDAYS))) {
-		$boost_amount = 2;
 		$endTime = new DateTimeImmutable("tomorrow");
-		$this->event = new BonusExpWeekend($endTime, self::HOLIDAYS[$current_datetime->format('M j')], $boost_amount);
+		$this->event = new HolidayBonusEvent($endTime, self::HOLIDAYS[$current_datetime->format('M j')]);
 	}
     }
 
