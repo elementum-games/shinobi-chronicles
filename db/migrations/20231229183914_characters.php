@@ -11,9 +11,11 @@ final class Characters extends AbstractMigration
             RENAME TABLE `users` TO `characters`;
             
             -- Add character data into table
-            ALTER TABLE `characters` 
+            ALTER TABLE `characters`
                 DROP PRIMARY KEY, 
-                CHANGE `user_id` `user_id` INT NOT NULL,
+                CHANGE `user_id` `user_id` INT NOT NULL;
+                -- Keep this as additional transaction
+            ALTER TABLE `characters`
                 ADD `character_id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT FIRST;
                 
             -- Add indexing to character_id
