@@ -235,7 +235,6 @@ function VillageHQ({
     getVillageIcon,
     getPolicyDisplayData
 }) {
-    console.log(kageRecords);
     const [modalState, setModalState] = React.useState("closed");
     const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
     const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
@@ -568,7 +567,9 @@ function VillageHQ({
                                 <div className="kage_nameplate_decoration se"></div>
                                 <div className="kage_nameplate_decoration sw"></div>
                                 <div className="kage_name">{kage.user_name ? kage.user_name : "---"}</div>
-                                <div className="kage_title">{kage.seat_title + " of " + villageName}</div>
+                                <div className="kage_title">
+                                    {kage.is_provisional ? kage.seat_title : kage.seat_title + " of " + villageName}
+                                </div>
                                 {kage.seat_id && kage.seat_id == playerSeatState.seat_id &&
                                     <div className="kage_resign_button" onClick={() => Resign()}>resign</div>
                                 }

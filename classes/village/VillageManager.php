@@ -44,7 +44,7 @@ class VillageManager {
 
     const VOTE_NO = 0;
     const VOTE_YES = 1;
-    const VOTE_BOOST_COST = 250;
+    const VOTE_BOOST_COST = 500;
 
     const PROPOSAL_TYPE_CHANGE_POLICY = "change_policy";
     const PROPOSAL_TYPE_DECLARE_WAR = "declare_war";
@@ -373,20 +373,24 @@ class VillageManager {
         $seat_result = $system->db->query("SELECT `village_seats`.*, `users`.`user_name`, `users`.`avatar_link` FROM `village_seats`
             INNER JOIN `users` on `village_seats`.`user_id` = `users`.`user_id`
             WHERE `seat_end` IS NULL AND `village_id` = {$village_id} ORDER BY `seat_start` ASC");
-		$seat_result = $system->db->fetch_all($seat_result);
+        $seat_result = $system->db->fetch_all($seat_result);
         $elder_count = 0;
         $has_kage = false;
         foreach ($seat_result as $seat) {
             switch ($seat['seat_type']) {
                 case 'kage':
                     $has_kage = true;
+                    $provisional_days_remaining = "";
+                    if ($seat['is_provisional']) {
+                        $provisional_days_remaining = ": " . System::timeRemaining(time() - $seat['seat_start'], format: 'days');
+                    }
                     $seats[] = new VillageSeatDto(
                         seat_key: 'kage',
                         seat_id: $seat['seat_id'],
                         user_id: $seat['user_id'],
                         village_id: $seat['village_id'],
                         seat_type: $seat['seat_type'],
-                        seat_title: $seat['seat_title'],
+                        seat_title: $seat['seat_title'] . $provisional_days_remaining,
                         seat_start: $seat['seat_start'],
                         user_name: $seat['user_name'],
                         avatar_link: $seat['avatar_link'],
