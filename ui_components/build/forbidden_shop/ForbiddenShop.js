@@ -476,13 +476,19 @@ function JutsuScroll({
     style: {
       fontWeight: "700"
     }
-  }, "EFFECT:"), " ", jutsu_data.effect, " (", jutsu_data.effectAmount, "%)"), /*#__PURE__*/React.createElement("div", {
+  }, "EFFECT:"), " ", jutsu_data.effect, " (", Math.round(jutsu_data.effectAmount * 1.2), "%)"), /*#__PURE__*/React.createElement("div", {
+    className: "jutsu_effect"
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontWeight: "700"
+    }
+  }, "EFFECT:"), " ", jutsu_data.effect2, " (", Math.round(jutsu_data.effectAmount2 * 1.2), "%)"), jutsu_data.effectDuration > 0 ? /*#__PURE__*/React.createElement("div", {
     className: "jutsu_duration"
   }, /*#__PURE__*/React.createElement("span", {
     style: {
       fontWeight: "700"
     }
-  }, "DURATION:"), " ", jutsu_data.effectDuration, " TURNS")), /*#__PURE__*/React.createElement("div", {
+  }, "DURATION:"), " ", jutsu_data.effectDuration, " TURNS") : ""), /*#__PURE__*/React.createElement("div", {
     className: "jutsu_scroll_divider_bottom"
   }, /*#__PURE__*/React.createElement("svg", {
     width: "100%",
