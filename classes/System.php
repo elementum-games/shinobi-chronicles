@@ -11,6 +11,7 @@ require_once __DIR__ . '/Route.php';
 require_once __DIR__ . '/../classes/event/DoubleExpEvent.php';
 require_once __DIR__ . '/../classes/event/DoubleReputationEvent.php';
 require_once __DIR__ . '/../classes/event/BonusExpWeekend.php';
+require_once __DIR__ . '/../classes/event/HolidayBonusEvent.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -32,6 +33,19 @@ class System {
     const SC_ADMIN_EMAIL = "admin@shinobichronicles.com";
     const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
+
+    const HOLIDAYS = [
+		'Jan 1' => 'New Years Boost',
+	    'Jan 16' => 'Martin Luther King Day Boost',
+	    'Feb 14' => 'Valentines Day Boost',
+	    'May 27' => 'Memorial Day Boost',
+	    'Jun 19' => 'Juneteenth Boost',
+	    'Jul 4' => 'Independence Day Boost',
+	    'Sep 2' => 'Labor Day Boost',
+	    'Nov 11' => 'Veterans Day Boost',
+	    'Nov 28' => 'Thanksgiving Day Boost',
+	    'Dec 25' => 'Christmas Day Boost',
+	];
 
     // Temporary event data storage
     public ?Event $event;
@@ -706,6 +720,11 @@ class System {
             $endTime = new DateTimeImmutable('next Monday');
             $this->event = new BonusExpWeekend($endTime);
         }
+    	// Holiday training boosts, if no other event has been planned
+    	if (!isset($this->event) && in_array($current_datetime->format('M j'), array_keys(self::HOLIDAYS))) {
+		$endTime = new DateTimeImmutable("tomorrow");
+		$this->event = new HolidayBonusEvent($endTime, self::HOLIDAYS[$current_datetime->format('M j')]);
+	}
     }
 
     /**
