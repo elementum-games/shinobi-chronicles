@@ -27,6 +27,7 @@ type Props = {|
         +gender: "Male" | "Female" | "Non-binary" | "None",
     },
     +initialNewsPosts: $ReadOnlyArray<NewsPostType>,
+    +scOpen: bool,
 |};
 function Home({
     homeLinks,
@@ -41,6 +42,7 @@ function Home({
     loginMessageText,
     registerPreFill,
     initialNewsPosts,
+    scOpen,
 }: Props) {
     const newsRef = React.useRef(null);
     const contactRef = React.useRef(null);
@@ -61,6 +63,7 @@ function Home({
                 newsRef={newsRef}
                 contactRef={contactRef}
                 AshBackground={AshBackground}
+                scOpen={scOpen}
             />
             <div ref={newsRef} id="news_container" className={"home_section news_section"}>
                 <div className="home_header">
@@ -105,7 +108,8 @@ function MainBannerSection({
     registerPreFill,
     newsRef,
     contactRef,
-    AshBackground
+    AshBackground,
+    scOpen
 }) {
     const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset" ? "reset" : "login");
     const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
@@ -173,6 +177,15 @@ function MainBannerSection({
                     <img src="/images/v2/decorations/homepagelogo.png" />
                     <div className="title_version">{version}</div>
                 </div>
+
+                {!scOpen &&
+                    <div className="sc_maintenance_container">
+                        <div className="sc_maintenance_message">
+                            Shinobi Chronicles is currently closed for maintenance.<br />
+                            Down time is usually less than 30 minutes.
+                        </div>
+                    </div>
+                }
 
                 {/*
                 <div className={"home_lantern lantern_1"}><img src="/images/v2/decorations/lanternbig.png" /></div>
