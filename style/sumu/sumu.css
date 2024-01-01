@@ -1246,3 +1246,22 @@ button {
 .warlog_rank_wrapper {
     background-color: var(--box-color-default) !important;
 }
+
+/* Abyss Overrides */
+.favor_exchange_header, .faction_mission_header, .forbidden_shop_container .section_title {
+    font-size: 16px !important;
+    font-family: var(--font-primary) !important;
+    font-variant: var(--font-primary-variant) !important;
+    color: var(--font-color-1) !important;
+}
+.currency_exchange_button.disabled {
+    cursor: default !important;
+    opacity: 0.5 !important;
+    color: white !important;
+}
+.favor_exchange_label {
+    color: #6e0e11 !important;
+    font-size: 12px !important;
+    font-family: 'Segoe UI' !important;
+    text-align: center !important;
+}
