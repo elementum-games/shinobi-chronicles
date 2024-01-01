@@ -636,8 +636,8 @@ function premiumShop(): void {
                     break;
             }
             $target_village = new Village($system, $village);
-            if ($target_village->policy->free_transfer) {
-                $ak_cost = 0;
+            if ($target_village->policy->transfer_cost_reduction > 0) {
+                $ak_cost = floor($ak_cost * (1 - ($target_village->policy->transfer_cost_reduction / 100)));
             }
 
             if ($player->team) {
@@ -660,11 +660,13 @@ function premiumShop(): void {
                 }
             }
 
+            $rep_loss_percent = round(20 * (1 - ($target_village->policy->transfer_cost_reduction / 100)));
+
             if (!isset($_POST['confirm_village_change'])) {
                 $confirmation_string = "Are you sure you want to move from the {$player->village->name} village to the $village
                 village?"
                     . (!$player->clan->bloodline_only ? " You will be kicked out of your clan and placed in a random clan in the new village." : "")
-                    . ((!$target_village->policy->free_transfer && $player->village_changes > 0) ? "<br />You will lose 20% of your Reputation for this village change (you can not fall below Shinobi)." : "")
+                    . (($player->village_changes > 0) ? "<br />You will lose {$rep_loss_percent}% of your Reputation for this village change (you can not fall below Shinobi)." : "")
                     . "<br><b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village you will have to pay a higher transfer fee)</b>";
 
                 renderPurchaseConfirmation(
@@ -704,8 +706,9 @@ function premiumShop(): void {
                 }
 
                 // Lose rep tier for subsequent village changes (5k minimum rep)
-                if ($player->village_changes > 0 && $player->reputation->rank >= 3 && !$target_village->policy->free_transfer) {
-                    $new_reputation = floor(max($player->village_rep * 0.8, UserReputation::$VillageRep[3]['min_rep']));
+                if ($player->village_changes > 0 && $player->reputation->rank >= 3) {
+                    $policy_reduction = $target_village->policy->transfer_cost_reduction / 100;
+                    $new_reputation = floor(max($player->village_rep * (1 - (0.2 * $policy_reduction)), UserReputation::$VillageRep[3]['min_rep']));
                     $player->village_rep = $new_reputation;
                 }
 
