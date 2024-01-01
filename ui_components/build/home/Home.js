@@ -15,7 +15,8 @@ function Home({
   loginMessageText,
   registerPreFill,
   initialNewsPosts,
-  scOpen
+  scOpen,
+  reopenTimeWindow
 }) {
   const newsRef = React.useRef(null);
   const contactRef = React.useRef(null);
@@ -33,7 +34,8 @@ function Home({
     newsRef: newsRef,
     contactRef: contactRef,
     AshBackground: AshBackground,
-    scOpen: scOpen
+    scOpen: scOpen,
+    reopenTimeWindow: reopenTimeWindow
   }), /*#__PURE__*/React.createElement("div", {
     ref: newsRef,
     id: "news_container",
@@ -78,7 +80,8 @@ function MainBannerSection({
   newsRef,
   contactRef,
   AshBackground,
-  scOpen
+  scOpen,
+  reopenTimeWindow
 }) {
   const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset" ? "reset" : "login");
   const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
@@ -143,7 +146,7 @@ function MainBannerSection({
     className: "sc_maintenance_container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "sc_maintenance_message"
-  }, "Shinobi Chronicles is currently closed for maintenance.", /*#__PURE__*/React.createElement("br", null), "Down time is usually less than 30 minutes.")), activeModal, /*#__PURE__*/React.createElement(AshBackground, null), /*#__PURE__*/React.createElement("div", {
+  }, "Shinobi Chronicles is currently closed for maintenance.", /*#__PURE__*/React.createElement("br", null), "Check back in ", reopenTimeWindow, ".")), activeModal, /*#__PURE__*/React.createElement(AshBackground, null), /*#__PURE__*/React.createElement("div", {
     className: "login_container",
     style: activeModal != null ? {
       visibility: "hidden"

@@ -43,6 +43,10 @@ function Header({
   function calcMaintWindow(timeStamp, timeZone) {
     const currentDate = new Date();
     let timeRemaining = Math.floor(timeStamp - currentDate.getTime() / 1000);
+    if (timeRemaining <= 0) {
+      setMaintTime("SERVER CLOSED");
+      return false;
+    }
     let returnString = "Server Maintenance ";
 
     // Calc time remaining
@@ -51,7 +55,7 @@ function Header({
       let hours = Math.floor(timeRemaining / 3600);
       timeRemaining -= hours * 3600;
       if (hours < 10) {
-        hours = "0" + hours;
+        hours = "0" + hours + ":";
       }
       returnString += hours;
     } else {

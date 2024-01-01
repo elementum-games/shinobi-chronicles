@@ -28,6 +28,7 @@ type Props = {|
     },
     +initialNewsPosts: $ReadOnlyArray<NewsPostType>,
     +scOpen: bool,
+    +reopenTimeWindow: string,
 |};
 function Home({
     homeLinks,
@@ -43,6 +44,7 @@ function Home({
     registerPreFill,
     initialNewsPosts,
     scOpen,
+    reopenTimeWindow,
 }: Props) {
     const newsRef = React.useRef(null);
     const contactRef = React.useRef(null);
@@ -64,6 +66,7 @@ function Home({
                 contactRef={contactRef}
                 AshBackground={AshBackground}
                 scOpen={scOpen}
+                reopenTimeWindow={reopenTimeWindow}
             />
             <div ref={newsRef} id="news_container" className={"home_section news_section"}>
                 <div className="home_header">
@@ -109,7 +112,8 @@ function MainBannerSection({
     newsRef,
     contactRef,
     AshBackground,
-    scOpen
+    scOpen,
+    reopenTimeWindow
 }) {
     const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset" ? "reset" : "login");
     const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
@@ -182,7 +186,7 @@ function MainBannerSection({
                     <div className="sc_maintenance_container">
                         <div className="sc_maintenance_message">
                             Shinobi Chronicles is currently closed for maintenance.<br />
-                            Down time is usually less than 30 minutes.
+                            Check back in {reopenTimeWindow}.
                         </div>
                     </div>
                 }

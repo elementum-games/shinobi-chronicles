@@ -22,6 +22,9 @@ class System {
     const ENVIRONMENT_PROD = 'prod';
     const LOCAL_HOST = true;
 
+    const MAINTENANCE_BEGIN = 'Jan 1 00:00 2024';
+    const MAINTENANCE_END = 'Jan 1 00:00 2024';
+
     const KUNAI_PER_DOLLAR = 2;
     const LOGOUT_LIMIT = 720;
     const BLOODLINE_ROLL_CHANCE = 50;
@@ -731,8 +734,13 @@ class System {
 
     public function checkForMaintenance(): ?DateTimeImmutable {
         $time = new DateTimeImmutable();
-        $maintenanceBegin = new DateTimeImmutable("Jan 1 14:01", new DateTimeZone(self::SERVER_TIME_ZONE));
-        $maintenanceEnd = new DateTimeImmutable("Jan 1 14:08", new DateTimeZone(self::SERVER_TIME_ZONE));
+        $maintenanceBegin = new DateTimeImmutable(self::MAINTENANCE_BEGIN, new DateTimeZone(self::SERVER_TIME_ZONE));
+        $maintenanceEnd = new DateTimeImmutable(self::MAINTENANCE_END, new DateTimeZone(self::SERVER_TIME_ZONE));
+
+        // Maintenance time-frame error
+        if($maintenanceBegin->getTimestamp() > $maintenanceEnd->getTimestamp()) {
+            return null;
+        }
 
         // Display timer for maintenance window
         if($time->getTimestamp() < $maintenanceBegin->getTimestamp()) {
@@ -741,10 +749,21 @@ class System {
         // Close SC for maintenance window - NOTE: This can be overridden in vars.php if window can't be easily determined
         if($time->getTimestamp() > $maintenanceBegin->getTimestamp() && $time->getTimestamp() < $maintenanceEnd->getTimestamp()) {
             $this->SC_OPEN = false;
+            return $maintenanceEnd;
         }
 
 
         return null;
+    }
+
+    public function checkForMaintenanceEnd(): string {
+        if(!$this->SC_OPEN && $this->UPDATE_MAINTENANCE) {
+            $mins = ceil(($this->UPDATE_MAINTENANCE->getTimestamp() - time()) / 60);
+            $mins += 5 - ($mins % 5);
+            return "$mins minutes";
+        }
+
+        return "30 minutes";
     }
 
     /**
