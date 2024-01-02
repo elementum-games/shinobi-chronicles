@@ -8,7 +8,7 @@ class SenseiManager {
         14 => ['boost_primary' => 12, 'boost_secondary' => 6],
     ];
 
-    public static array $exam_answers = ['1a', '2c', '3c', '4c', '5b', '6b'];
+    public static array $exam_answers = ['1a', '2c', '3c', '4b', '5a', '6c'];
 
     const LESSON_COST_PER_MINUTE = 60;
 

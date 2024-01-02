@@ -329,7 +329,7 @@
                     <div>
                         <p class="label_bold">Requirements:</p>
                         <div><span>Jonin Rank - Level 75</span></div>
-                        <div><span>5 Jutsu Mastered</span></div>
+                        <div><span>5 Jutsu Mastered (Bloodline Excluded)</span></div>
                         <div><span>Pass Aptitude Exam</span></div>
                     </div>
                     <p>As a sensei you can have up to three students at a time.</p>
