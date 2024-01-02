@@ -41,7 +41,7 @@ class ForbiddenShopApiPresenter {
                     'description' => html_entity_decode($jutsu->description, ENT_QUOTES),
                     'power' => $jutsu->base_power,
                     'cooldown' => $jutsu->cooldown,
-                    'effect' => System::UnSlug($jutsu->effects[0]->effect),
+                    'effect' => System::unSlug($jutsu->effects[0]->effect),
                     'effectAmount' => $jutsu->effects[0]->effect_amount,
                     'effectDuration' => $jutsu->effects[0]->effect_length,
                     'effect2' => System::UnSlug($jutsu->effects[1]->effect),
