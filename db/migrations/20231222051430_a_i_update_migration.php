@@ -33,6 +33,9 @@ final class AIUpdateMigration extends AbstractMigration
             -- Alter table maps_locations
             ALTER TABLE `maps_locations` ADD `battle_background_link` VARCHAR(100) NOT NULL;
 
+            -- Update table maps_locations
+            UPDATE `maps_locations` SET `battle_background_link` = '/images/battle_backgrounds/Underground.jpg' WHERE `maps_locations`.`name` = 'Underground Colosseum';
+
             -- Update table regions
             UPDATE `regions` SET `battle_background_link` = '/images/battle_backgrounds/LowMountainpath.jpg' WHERE `regions`.`region_id` = 1;
             UPDATE `regions` SET `battle_background_link` = '/images/battle_backgrounds/HighMountainpath.jpg' WHERE `regions`.`region_id` = 2;
