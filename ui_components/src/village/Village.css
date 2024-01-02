@@ -95,6 +95,9 @@
             flex-basis: 50%;
             width: 100%;
         }
+    .hq_container .row.fourth .column.first {
+        width: 100%;
+    }
 
 .boost_container .content {
     height: 100px;
@@ -295,13 +298,13 @@
         min-width: 62px;
     }
         .resources_inner_header .first a {
-            color: #bfb7e0 !important;
+            color: #bfb7e0;
             text-decoration: underline;
             cursor: pointer;
             user-select: none;
         }
         .resources_inner_header .first a:hover {
-            color: var(--font-color-2) !important;
+            color: var(--font-color-2);
         }
     .resources_inner_header .second {
         min-width: 100px;
@@ -659,6 +662,59 @@
     background-color: var(--hq-number-background-color);
     text-align: center;
     padding-bottom: 1px !important;
+}
+
+.kage_record_container {
+    padding: 16px 20px 20px;
+    background: url(/images/v2/decorations/nwbigcorner.png) no-repeat top left, url(/images/v2/decorations/sebigcorner.png) no-repeat bottom right, url(/images/v2/decorations/swbigcorner.png) no-repeat bottom left, url(/images/v2/decorations/nebigcorner.png) no-repeat top right;
+    display: flex;
+    justify-content: space-between;
+    gap: 19px;
+    background-color: var(--box-color-default);
+    flex-direction: column;
+}
+.kage_record_header {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    font-style: italic;
+    color: #b6bdd0;
+}
+.kage_record_main_section {
+    height: 100%;
+    border-top: 1px solid #1e1d23;
+    padding-top: 25px;
+    text-align: center;
+    color: var(--village-text-color-1);
+    white-space: pre-wrap;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+.kage_record_item_row_first {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+.kage_record_item_title {
+    font-size: 14px;
+    font-weight: bold;
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+    color: var(--font-color-1);
+    text-transform: lowercase;
+}
+.kage_record_item_name {
+    font-size: 13px;
+    color: #d0c5ff;
+    font-weight: bold;
+}
+.kage_record_item_row_second {
+    color: #b6bdd0;
+    text-transform: uppercase;
+    display: flex;
+    font-size: 12px;
+    justify-content: center;
 }
 
 .modal {

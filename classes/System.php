@@ -778,7 +778,7 @@ class System {
             if($days && $include_days) {
                 $string = "$days day(s), $hours hour(s), $minutes minute(s)";
             }
-            else if($hours && $hours != '00') {
+            else if ($hours && $hours != '00') {
                 $string = "$hours hour(s), $minutes minute(s)";
             }
             else {
@@ -802,6 +802,13 @@ class System {
 
             if($include_seconds) {
                 $string .= ":$seconds";
+            }
+        }
+        else if($format == 'days') {
+            if ($days) {
+                $string = "$days day(s)";
+            } else {
+                $string = "0 days";
             }
         }
         return $string;
