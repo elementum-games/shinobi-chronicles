@@ -132,10 +132,11 @@ class TravelApiPresenter {
         );
     }
 
-    public static function attackPlayerResponse(bool $success, System $system): array
+    public static function attackPlayerResponse(bool $success, TravelManager $travelManager, System $system): array
     {
         return [
             'success' => $success,
+            'travel_message' => $travelManager->travel_message,
             'redirect' => $system->router->getUrl('battle'),
         ];
     }
