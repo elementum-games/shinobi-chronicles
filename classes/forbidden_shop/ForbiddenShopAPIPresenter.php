@@ -44,7 +44,7 @@ class ForbiddenShopApiPresenter {
                     'effect' => System::unSlug($jutsu->effects[0]->effect),
                     'effectAmount' => $jutsu->effects[0]->effect_amount,
                     'effectDuration' => $jutsu->effects[0]->effect_length,
-                    'effect2' => System::UnSlug($jutsu->effects[1]->effect),
+                    'effect2' => System::unSlug($jutsu->effects[1]->effect),
                     'effectAmount2' => $jutsu->effects[1]->effect_amount,
                     'effectDuration2' => $jutsu->effects[1]->effect_length,
                 ];
