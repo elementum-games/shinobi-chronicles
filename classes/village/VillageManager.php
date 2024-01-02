@@ -647,8 +647,8 @@ class VillageManager {
 
         // check challenge cooldown, ignoring cancelled challenges (complete, but winner is not null)
         $last_challenge = $system->db->query(
-            "SELECT * FROM `challenge_requests` 
-                WHERE `challenger_id` = {$player->user_id} 
+            "SELECT * FROM `challenge_requests`
+                WHERE `challenger_id` = {$player->user_id}
                 AND `winner` IS NOT NULL
                 ORDER BY `start_time` DESC LIMIT 1");
         $last_challenge = $system->db->fetch($last_challenge);
@@ -699,7 +699,7 @@ class VillageManager {
         // create challenge
         $time = time();
         $selected_times = json_encode($selected_times);
-        $system->db->query("INSERT INTO `challenge_requests` (`challenger_id`, `seat_holder_id`, `seat_id`, `created_time`, `selected_times`) 
+        $system->db->query("INSERT INTO `challenge_requests` (`challenger_id`, `seat_holder_id`, `seat_id`, `created_time`, `selected_times`)
             VALUES ({$player->user_id}, {$seat_result['user_id']}, {$seat_id}, {$time}, '{$selected_times}')");
         // create notification
         $new_notification = new NotificationDto(
@@ -709,7 +709,7 @@ class VillageManager {
             created: time(),
             alert: false,
         );
-        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_MULTIPLE);
+        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
         return "Challenge submitted!";
     }
 
@@ -830,12 +830,30 @@ class VillageManager {
      * @param int    $user_id
      * @return void
      */
-    public static function cancelUserChallenges(System $system, int $user_id): void {
+    public static function cancelUserChallenges(System $system, int $user_id): void
+    {
         $time = time();
         $system->db->query("
-            UPDATE `challenge_requests` SET `end_time` = {$time} 
+            UPDATE `challenge_requests` SET `end_time` = {$time}
             WHERE `end_time` IS NULL AND (`seat_holder_id` = {$user_id} OR `challenger_id` = {$user_id})
         ");
+    }
+
+    /**
+     * Cancels active challenges created by the user. Note that winner is not set, in order to represent that this challenge was not completed
+     * and not trigger the new challenge cooldown.
+     *
+     * @param System $system
+     * @param int    $user_id
+     * @return void
+     */
+    public static function cancelUserCreatedChallenges(System $system, int $user_id): string {
+        $time = time();
+        $system->db->query("
+            DELETE FROM `challenge_requests`
+            WHERE `end_time` IS NULL AND `challenger_id` = {$user_id}
+        ");
+        return "Pending challenges cancelled!";
     }
 
     public static function checkChallengeLock(System $system, User $player) {
