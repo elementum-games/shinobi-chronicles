@@ -32,6 +32,11 @@ if($battle->battle_text) {
         $("#battle_details").toggle();
         $("#last_turn_label").toggle();
         $("#last_turn_details").toggle();
+        if ($("#battle_details").is(":visible")) {
+            $("#battle_details_toggle").text("Hide Battle Details");
+        } else {
+            $("#battle_details_toggle").text("Show Battle Details");
+        }
     }   
 </script>
 
@@ -228,7 +233,7 @@ if($battle->battle_text) {
             <li style='width:100%;'><a href='<?= $refresh_link ?>'>Refresh Battle</a></li>
         <?php else: ?>
             <li style='width:49%;'><a href='<?= $refresh_link ?>'>Refresh Battle</a></li>
-            <li style='width:49%;'><a style="cursor: pointer" onclick="toggleBattleDetails()">Toggle Battle Details</a></li>
+            <li style='width:49%;'><a id="battle_details_toggle" style="cursor: pointer; user-select: none" onclick="toggleBattleDetails()">Hide Battle Details</a></li>
         <?php endif; ?>
     </ul>
 </div>
