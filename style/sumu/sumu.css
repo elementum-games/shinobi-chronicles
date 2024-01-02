@@ -1179,16 +1179,10 @@ button {
 .kage_title {
     color: black !important;
 }
-.resource_produced {
+.resource_produced, .resource_claimed, .warlog_green {
     color: #2A8A48 !important;
 }
-.resource_claimed {
-    color: #2A8A48 !important;
-}
-.resource_lost {
-    color: #B03232 !important;
-}
-.resource_spent {
+.resource_lost, .resource_spent, .warlog_red {
     color: #B03232 !important;
 }
 .kage_nameplate_decoration {
@@ -1216,4 +1210,58 @@ button {
 }
 .kage_kanji {
     color: #536184 !important;
+}
+.kage_record_header {
+    color: var(--village-text-color-1) !important;
+}
+.kage_record_item_row_second {
+    color: var(--village-text-color-1) !important;
+}
+.kage_record_container, .strategic_info_container {
+    background: url(../../../images/v2/sumu/nwbigcorner.png) no-repeat top left, url(../../../images/v2/sumu/sebigcorner.png) no-repeat bottom right, url(../../../images/v2/sumu/swbigcorner.png) no-repeat bottom left, url(../../../images/v2/sumu/nebigcorner.png) no-repeat top right !important;
+}
+.kage_record_container, .strategic_info_item, .proposal_container .content,
+.village_policy_bonus_container, .village_policy_penalty_container, .village_policy_main_inner,
+.village_policy_name, .active_proposal_name_container {
+    background-color: var(--box-color-default) !important;
+}
+.village_policy_bonus_container, .village_policy_penalty_container, .village_policy_description,
+.strategic_info_seat, .previous_proposal_button_label, .next_proposal_button_label {
+    color: var(--village-text-color-1) !important;
+}
+.village_policy_phrase, .strategic_info_name, .strategic_info_label,
+.resources_inner_header .first a, .proposal_count, .warlog_war_score {
+    color: var(--village-text-color-2) !important;
+}
+.strategic_info_item {
+    border-top: 4px solid #383838 !important;
+    border-bottom: 4px solid #383838 !important;
+}
+.warlog_data_row {
+    background-color: var(--box-color-default) !important;
+}
+.global_leaderboard_container > :nth-child(2n) .warlog_data_row {
+    background-color: var(--box-color-default) !important;
+}
+.warlog_rank_wrapper {
+    background-color: var(--box-color-default) !important;
+}
+
+/* Abyss Overrides */
+.favor_exchange_header, .faction_mission_header, .forbidden_shop_container .section_title {
+    font-size: 16px !important;
+    font-family: var(--font-primary) !important;
+    font-variant: var(--font-primary-variant) !important;
+    color: var(--font-color-1) !important;
+}
+.currency_exchange_button.disabled {
+    cursor: default !important;
+    opacity: 0.5 !important;
+    color: white !important;
+}
+.favor_exchange_label {
+    color: #6e0e11 !important;
+    font-size: 12px !important;
+    font-family: 'Segoe UI' !important;
+    text-align: center !important;
 }

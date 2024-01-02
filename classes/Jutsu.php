@@ -2,6 +2,8 @@
 
 use JetBrains\PhpStorm\Pure;
 
+require_once __DIR__ . "/Effect.php";
+
 class Jutsu {
     const ELEMENT_NONE = 'None';
     const ELEMENT_FIRE = 'Fire';

@@ -14,7 +14,8 @@ function Village({
   proposalData,
   strategicData,
   challengeData,
-  warLogData
+  warLogData,
+  kageRecords
 }) {
   const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
   const [policyDataState, setPolicyDataState] = React.useState(policyData);
@@ -84,7 +85,7 @@ function Village({
         data.name = "From the Ashes";
         data.phrase = "bonds forged, courage shared.";
         data.description = "In unity, find the strength to overcome.\nOne village, one heart, one fight.";
-        data.bonuses = ["25% increased Caravan speed", "+25 base resource production", "+5% training speed", "Free incoming village transfer"];
+        data.bonuses = ["25% increased Caravan speed", "+25 base resource production", "+5% training speed", "50% reduced cost for village transfers"];
         data.penalties = ["-30 Materials/hour", "-50 Food/hour", "-20 Wealth/hour", "Cannot declare War"];
         data.glowClass = "growth_glow";
         break;
@@ -160,6 +161,7 @@ function Village({
     challengeDataState: challengeDataState,
     setChallengeDataState: setChallengeDataState,
     clanData: clanData,
+    kageRecords: kageRecords,
     handleErrors: handleErrors,
     getKageKanji: getKageKanji,
     getVillageIcon: getVillageIcon,
@@ -220,6 +222,7 @@ function VillageHQ({
   challengeDataState,
   setChallengeDataState,
   clanData,
+  kageRecords,
   handleErrors,
   getKageKanji,
   getVillageIcon,
@@ -553,7 +556,7 @@ function VillageHQ({
     className: "kage_name"
   }, kage.user_name ? kage.user_name : "---"), /*#__PURE__*/React.createElement("div", {
     className: "kage_title"
-  }, kage.seat_title + " of " + villageName), kage.seat_id && kage.seat_id == playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
+  }, kage.is_provisional ? kage.seat_title + ": " + kage.provisional_days_label : kage.seat_title + " of " + villageName), kage.seat_id && kage.seat_id == playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
     className: "kage_resign_button",
     onClick: () => Resign()
   }, "resign"), !kage.seat_id && /*#__PURE__*/React.createElement("div", {
@@ -731,7 +734,40 @@ function VillageHQ({
     className: "resource_lost"
   }, resource.lost), /*#__PURE__*/React.createElement("div", {
     className: "resource_spent"
-  }, resource.spent)))))))));
+  }, resource.spent))))))), /*#__PURE__*/React.createElement("div", {
+    className: "row fourth"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "column first"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "hq_navigation_row"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "Kage Record"), /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_header_section"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_header"
+  }, /*#__PURE__*/React.createElement("span", null, "Whispers of the past"), /*#__PURE__*/React.createElement("span", null, "Echoes of a leader's might"), /*#__PURE__*/React.createElement("span", null, "Legacy in stone."))), /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_main_section"
+  }, kageRecords.map((kage, index) => /*#__PURE__*/React.createElement("div", {
+    key: kage.user_id,
+    className: "kage_record"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_item_row_first"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_item_title"
+  }, kage.seat_title), ": ", /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_item_name"
+  }, /*#__PURE__*/React.createElement("a", {
+    href: "/?id=6&user=" + kage.user_name
+  }, kage.user_name))), /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_item_row_second"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_item_start"
+  }, kage.seat_start), " - ", /*#__PURE__*/React.createElement("div", {
+    className: "kage_record_item_length"
+  }, kage.time_held)))))))))));
 }
 function KageQuarters({
   playerID,

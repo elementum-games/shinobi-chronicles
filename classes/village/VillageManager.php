@@ -44,7 +44,7 @@ class VillageManager {
 
     const VOTE_NO = 0;
     const VOTE_YES = 1;
-    const VOTE_BOOST_COST = 250;
+    const VOTE_BOOST_COST = 500;
 
     const PROPOSAL_TYPE_CHANGE_POLICY = "change_policy";
     const PROPOSAL_TYPE_DECLARE_WAR = "declare_war";
@@ -373,25 +373,43 @@ class VillageManager {
         $seat_result = $system->db->query("SELECT `village_seats`.*, `users`.`user_name`, `users`.`avatar_link` FROM `village_seats`
             INNER JOIN `users` on `village_seats`.`user_id` = `users`.`user_id`
             WHERE `seat_end` IS NULL AND `village_id` = {$village_id} ORDER BY `seat_start` ASC");
-		$seat_result = $system->db->fetch_all($seat_result);
+        $seat_result = $system->db->fetch_all($seat_result);
         $elder_count = 0;
         $has_kage = false;
         foreach ($seat_result as $seat) {
             switch ($seat['seat_type']) {
                 case 'kage':
                     $has_kage = true;
-                    $seats[] = new VillageSeatDto(
-                        seat_key: 'kage',
-                        seat_id: $seat['seat_id'],
-                        user_id: $seat['user_id'],
-                        village_id: $seat['village_id'],
-                        seat_type: $seat['seat_type'],
-                        seat_title: $seat['seat_title'],
-                        seat_start: $seat['seat_start'],
-                        user_name: $seat['user_name'],
-                        avatar_link: $seat['avatar_link'],
-                        is_provisional: $seat['is_provisional']
-                    );
+                    $provisional_days_remaining = "";
+                    if ($seat['is_provisional']) {
+                        $provisional_days_remaining = System::timeRemaining(time() - $seat['seat_start'], format: 'days');
+                        $seats[] = new VillageSeatDto(
+                            seat_key: 'kage',
+                            seat_id: $seat['seat_id'],
+                            user_id: $seat['user_id'],
+                            village_id: $seat['village_id'],
+                            seat_type: $seat['seat_type'],
+                            seat_title: $seat['seat_title'],
+                            seat_start: $seat['seat_start'],
+                            user_name: $seat['user_name'],
+                            avatar_link: $seat['avatar_link'],
+                            is_provisional: $seat['is_provisional'],
+                            provisional_days_label: $provisional_days_remaining,
+                        );
+                    } else {
+                        $seats[] = new VillageSeatDto(
+                            seat_key: 'kage',
+                            seat_id: $seat['seat_id'],
+                            user_id: $seat['user_id'],
+                            village_id: $seat['village_id'],
+                            seat_type: $seat['seat_type'],
+                            seat_title: $seat['seat_title'],
+                            seat_start: $seat['seat_start'],
+                            user_name: $seat['user_name'],
+                            avatar_link: $seat['avatar_link'],
+                            is_provisional: $seat['is_provisional'],
+                        );
+                    }
                     break;
                 case 'elder':
                     $elder_count++;
@@ -647,8 +665,8 @@ class VillageManager {
 
         // check challenge cooldown, ignoring cancelled challenges (complete, but winner is not null)
         $last_challenge = $system->db->query(
-            "SELECT * FROM `challenge_requests` 
-                WHERE `challenger_id` = {$player->user_id} 
+            "SELECT * FROM `challenge_requests`
+                WHERE `challenger_id` = {$player->user_id}
                 AND `winner` IS NOT NULL
                 ORDER BY `start_time` DESC LIMIT 1");
         $last_challenge = $system->db->fetch($last_challenge);
@@ -699,7 +717,7 @@ class VillageManager {
         // create challenge
         $time = time();
         $selected_times = json_encode($selected_times);
-        $system->db->query("INSERT INTO `challenge_requests` (`challenger_id`, `seat_holder_id`, `seat_id`, `created_time`, `selected_times`) 
+        $system->db->query("INSERT INTO `challenge_requests` (`challenger_id`, `seat_holder_id`, `seat_id`, `created_time`, `selected_times`)
             VALUES ({$player->user_id}, {$seat_result['user_id']}, {$seat_id}, {$time}, '{$selected_times}')");
         // create notification
         $new_notification = new NotificationDto(
@@ -709,7 +727,7 @@ class VillageManager {
             created: time(),
             alert: false,
         );
-        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_MULTIPLE);
+        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
         return "Challenge submitted!";
     }
 
@@ -830,12 +848,30 @@ class VillageManager {
      * @param int    $user_id
      * @return void
      */
-    public static function cancelUserChallenges(System $system, int $user_id): void {
+    public static function cancelUserChallenges(System $system, int $user_id): void
+    {
         $time = time();
         $system->db->query("
-            UPDATE `challenge_requests` SET `end_time` = {$time} 
+            UPDATE `challenge_requests` SET `end_time` = {$time}
             WHERE `end_time` IS NULL AND (`seat_holder_id` = {$user_id} OR `challenger_id` = {$user_id})
         ");
+    }
+
+    /**
+     * Cancels active challenges created by the user. Note that winner is not set, in order to represent that this challenge was not completed
+     * and not trigger the new challenge cooldown.
+     *
+     * @param System $system
+     * @param int    $user_id
+     * @return void
+     */
+    public static function cancelUserCreatedChallenges(System $system, int $user_id): string {
+        $time = time();
+        $system->db->query("
+            DELETE FROM `challenge_requests`
+            WHERE `end_time` IS NULL AND `challenger_id` = {$user_id}
+        ");
+        return "Pending challenges cancelled!";
     }
 
     public static function checkChallengeLock(System $system, User $player) {
@@ -2114,7 +2150,7 @@ class VillageManager {
         switch ($proposal_type) {
             case self::PROPOSAL_TYPE_BREAK_ALLIANCE:
                 $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_END_ALLIANCE;
-                $message = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " has ended and Alliance with " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
+                $message = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " has ended an Alliance with " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
                 break;
             case self::PROPOSAL_TYPE_ACCEPT_PEACE:
                 $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_END_WAR;
@@ -2227,5 +2263,65 @@ class VillageManager {
                 return false;
                 break;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public static function getKageRecord(System $system, int $village_id): array
+    {
+        $timePerUser = [];
+        $kageRecords = [];
+        $result = $system->db->query("SELECT `village_seats`.*, `users`.`user_name`
+            FROM `village_seats`
+            INNER JOIN `users` ON `users`.`user_id` = `village_seats`.`user_id`
+            WHERE `village_id` = {$village_id}
+            AND `seat_type` = 'kage'
+            AND `is_provisional` = 0
+            ORDER BY `seat_start` ASC
+        ");
+        $result = $system->db->fetch_all($result);
+        if (count($result) > 0) {
+            foreach ($result as $row) {
+                $user_id = $row['user_id'];
+                $start = $row['seat_start'];
+                $end = !empty($row['seat_end']) ? $row['seat_end'] : time();
+
+                $time_held = $end - $start;
+
+                // Add to running total
+                if (isset($timePerUser[$user_id])) {
+                    $timePerUser[$user_id] += $time_held;
+                }
+                // Start running total
+                else {
+                    $timePerUser[$user_id] = $time_held;
+                }
+
+                // If not set, add to records
+                if (!isset($kageRecords[$user_id])) {
+                    $kageRecords[$user_id] = $row;
+                }
+                // Otherwise get newest end time
+                else {
+                    $kageRecords[$user_id]['seat_end'] = $end;
+                }
+            }
+
+            // Add total time to records
+            foreach ($timePerUser as $key => $value) {
+                $kageRecords[$key]['time_held'] = $value;
+            }
+        }
+
+        // Format
+        foreach ($kageRecords as &$record) {
+            $time_held = System::timeRemaining($record['time_held'], format: 'days', include_seconds: false);
+            $seat_start = date("M jS Y", $record['seat_start']);
+            $record['time_held'] = $time_held;
+            $record['seat_start'] = $seat_start;
+        }
+
+        return $kageRecords;
     }
 }
