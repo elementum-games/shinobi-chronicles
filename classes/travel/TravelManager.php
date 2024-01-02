@@ -124,7 +124,9 @@ class TravelManager {
 
         // check if the user is in an active operation
         if ($this->user->operation) {
-            throw new InvalidMovementException('You are currently in an active Operation and cannot travel!');
+            $operation = $this->warManager->getOperationById($this->user->operation);
+            $message = "You are currently " . Operation::OPERATION_TYPE_DESCRIPTOR[$operation->type] . " and cannot travel!";
+            throw new InvalidMovementException($message);
         }
 
         // check if the user is in a combat mission fail it
@@ -676,7 +678,9 @@ class TravelManager {
                         ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
                 }*/
             if ($this->user->operation > 0) {
-                throw new RuntimeException("You are currently in an operation!");
+                $operation = $this->warManager->getOperationById($this->user->operation);
+                $message = "You cannot attack while " . Operation::OPERATION_TYPE_DESCRIPTOR[$operation->type] . "!";
+                throw new RuntimeException($message);
             }
             if ($this->dbFetchIsProtectedByAlly($user) && $this->user->rank_num >= 4) {
                 throw new RuntimeException("Target is protected by a higher rank ally! Attack them first.");
@@ -1223,7 +1227,7 @@ class TravelManager {
                 LIMIT 1
             ");
             if ($this->system->db->last_num_rows == 0) {
-                throw new RuntimeException("No operation target found!");
+                throw new RuntimeException("No valid target found!");
             }
             $target = $this->system->db->fetch($target);
             $this->warManager->beginOperation($operation_type, $target['id']);
@@ -1254,7 +1258,7 @@ class TravelManager {
             try {
                 $message = $this->warManager->processOperation($this->user->operation);
             } catch (RuntimeException $e) {
-                $message = "Operation cancelled";
+                //$message = "Operation cancelled";
                 if ($this->system->isDevEnvironment()) {
                     $message .= ": " . $e->getMessage();
                 }
