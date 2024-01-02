@@ -27,6 +27,7 @@ class VillageApiPresenter {
                     "user_name" => $seat->user_name,
                     "avatar_link" => $seat->avatar_link,
                     "is_provisional" => $seat->is_provisional,
+                    "provisional_days_label" => $seat->provisional_days_label,
                 ];
             },
             VillageManager::getVillageSeats($system, $player->village->village_id)

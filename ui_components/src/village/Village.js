@@ -568,7 +568,7 @@ function VillageHQ({
                                 <div className="kage_nameplate_decoration sw"></div>
                                 <div className="kage_name">{kage.user_name ? kage.user_name : "---"}</div>
                                 <div className="kage_title">
-                                    {kage.is_provisional ? kage.seat_title : kage.seat_title + " of " + villageName}
+                                    {kage.is_provisional ? kage.seat_title + ": " + kage.provisional_days_label : kage.seat_title + " of " + villageName}
                                 </div>
                                 {kage.seat_id && kage.seat_id == playerSeatState.seat_id &&
                                     <div className="kage_resign_button" onClick={() => Resign()}>resign</div>

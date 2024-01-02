@@ -382,20 +382,34 @@ class VillageManager {
                     $has_kage = true;
                     $provisional_days_remaining = "";
                     if ($seat['is_provisional']) {
-                        $provisional_days_remaining = ": " . System::timeRemaining(time() - $seat['seat_start'], format: 'days');
+                        $provisional_days_remaining = System::timeRemaining(time() - $seat['seat_start'], format: 'days');
+                        $seats[] = new VillageSeatDto(
+                            seat_key: 'kage',
+                            seat_id: $seat['seat_id'],
+                            user_id: $seat['user_id'],
+                            village_id: $seat['village_id'],
+                            seat_type: $seat['seat_type'],
+                            seat_title: $seat['seat_title'],
+                            seat_start: $seat['seat_start'],
+                            user_name: $seat['user_name'],
+                            avatar_link: $seat['avatar_link'],
+                            is_provisional: $seat['is_provisional'],
+                            provisional_days_label: $provisional_days_remaining,
+                        );
+                    } else {
+                        $seats[] = new VillageSeatDto(
+                            seat_key: 'kage',
+                            seat_id: $seat['seat_id'],
+                            user_id: $seat['user_id'],
+                            village_id: $seat['village_id'],
+                            seat_type: $seat['seat_type'],
+                            seat_title: $seat['seat_title'],
+                            seat_start: $seat['seat_start'],
+                            user_name: $seat['user_name'],
+                            avatar_link: $seat['avatar_link'],
+                            is_provisional: $seat['is_provisional'],
+                        );
                     }
-                    $seats[] = new VillageSeatDto(
-                        seat_key: 'kage',
-                        seat_id: $seat['seat_id'],
-                        user_id: $seat['user_id'],
-                        village_id: $seat['village_id'],
-                        seat_type: $seat['seat_type'],
-                        seat_title: $seat['seat_title'] . $provisional_days_remaining,
-                        seat_start: $seat['seat_start'],
-                        user_name: $seat['user_name'],
-                        avatar_link: $seat['avatar_link'],
-                        is_provisional: $seat['is_provisional']
-                    );
                     break;
                 case 'elder':
                     $elder_count++;

@@ -556,7 +556,7 @@ function VillageHQ({
     className: "kage_name"
   }, kage.user_name ? kage.user_name : "---"), /*#__PURE__*/React.createElement("div", {
     className: "kage_title"
-  }, kage.is_provisional ? kage.seat_title : kage.seat_title + " of " + villageName), kage.seat_id && kage.seat_id == playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
+  }, kage.is_provisional ? kage.seat_title + ": " + kage.provisional_days_label : kage.seat_title + " of " + villageName), kage.seat_id && kage.seat_id == playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
     className: "kage_resign_button",
     onClick: () => Resign()
   }, "resign"), !kage.seat_id && /*#__PURE__*/React.createElement("div", {
