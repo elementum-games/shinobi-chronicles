@@ -19,6 +19,13 @@ class PremiumShopManager {
     const SALE_REFUND_RATE = 50;
     const EDS_90_DAY_DISCOUNT = 0.17;
 
+    const FREE_TRANSFER_BASE_AMOUNT = [
+        1 => 100,
+        2 => 250,
+        3 => 500,
+        4 => 2500,
+    ];
+
     public System $system;
     public User $player;
 
@@ -140,11 +147,8 @@ class PremiumShopManager {
         $this->expedited_stat_transfer_points_per_yen = round($this->stat_transfer_points_per_ak / 10000, 5);
 
         // Free stat transfers
-        $base_free_stat_change = $this->max_free_stat_change_amount;
-        if ($this->player->rank_num >= 3) {
-            $this->max_free_stat_change_amount = floor($this->player->rank->stat_cap / 100);
-            $base_free_stat_change = $this->max_free_stat_change_amount;
-        }
+        $base_free_stat_change = self::FREE_TRANSFER_BASE_AMOUNT[$this->player->rank_num];
+        $this->max_free_stat_change_amount = $base_free_stat_change;
         if ($this->player->reputation->benefits[UserReputation::BENEFIT_FREE_TRANSFER_BONUS]) {
             $this->max_free_stat_change_amount += floor($base_free_stat_change * UserReputation::FREE_TRANSFER_BONUS / 100);
         }

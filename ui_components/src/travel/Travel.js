@@ -148,6 +148,9 @@ function Travel({
                 setFeedback(null);
                 setFeedback([response.data.travel_message, 'info']);
             }
+            if (!response.data.success) {
+                return;
+            }
             setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
             setStrategicView(response.data.mapData.player_filters.strategic_view === "true");
             setDisplayGrid(response.data.mapData.player_filters.display_grid === "true");
@@ -181,7 +184,10 @@ function Travel({
                 handleErrors(response.errors);
                 return;
             }
-
+            if (response.data.travel_message) {
+                setFeedback(null);
+                setFeedback([response.data.travel_message, 'info']);
+            }
             if (response.data.success) {
                 //console.log("Response Time: " + response.data.time);
                 debug(`Move completed ${requestEnd - lastTravelSuccessTime.current} ms after last move`);
@@ -215,7 +221,10 @@ function Travel({
                 handleErrors(response.errors);
                 return;
             }
-
+            if (response.data.travel_message) {
+                setFeedback(null);
+                setFeedback([response.data.travel_message, 'info']);
+            }
             if (response.data.success) {
                 setFeedback(null);
                 debug('Player moved through portal.');
@@ -241,6 +250,13 @@ function Travel({
         ).then((response) => {
             if (response.errors.length) {
                 handleErrors(response.errors);
+                return;
+            }
+            if (response.data.travel_message) {
+                setFeedback(null);
+                setFeedback([response.data.travel_message, 'info']);
+            }
+            if (!response.data.success) {
                 return;
             }
 
@@ -272,6 +288,13 @@ function Travel({
                 handleErrors(response.errors);
                 return;
             }
+            if (response.data.travel_message) {
+                setFeedback(null);
+                setFeedback([response.data.travel_message, 'info']);
+            }
+            if (!response.data.success) {
+                return;
+            }
 
             window.location.href = response.data.redirect;
         });
@@ -293,6 +316,9 @@ function Travel({
                 setFeedback(null);
                 setFeedback([response.data.travel_message, 'info']);
             }
+            if (!response.data.success) {
+                return;
+            }
             setMapData(response.data.mapData);
         });
     }
@@ -312,6 +338,9 @@ function Travel({
                 setFeedback(null);
                 setFeedback([response.data.travel_message, 'info']);
             }
+            if (!response.data.success) {
+                return;
+            }
             setMapData(response.data.mapData);
         });
     }
@@ -330,6 +359,9 @@ function Travel({
             if (response.data.travel_message) {
                 setFeedback(null);
                 setFeedback([response.data.travel_message, 'info']);
+            }
+            if (!response.data.success) {
+                return;
             }
             setMapData(response.data.mapData);
         });

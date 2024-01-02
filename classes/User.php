@@ -19,7 +19,8 @@ require_once __DIR__ . "/event/LanternEvent.php";
 require_once __DIR__ . "/Bloodline.php";
 require_once __DIR__ . "/travel/TravelManager.php";
 require_once __DIR__ . "/travel/Region.php";
-require_once __DIR__ . '/notification/BlockedNotificationManager.php';
+require_once __DIR__ . "/notification/BlockedNotificationManager.php";
+require_once __DIR__ . "/user/Blacklist.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.

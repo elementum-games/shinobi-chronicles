@@ -26,6 +26,8 @@ class VillageApiPresenter {
                     "seat_start" => $seat->seat_start,
                     "user_name" => $seat->user_name,
                     "avatar_link" => $seat->avatar_link,
+                    "is_provisional" => $seat->is_provisional,
+                    "provisional_days_label" => $seat->provisional_days_label,
                 ];
             },
             VillageManager::getVillageSeats($system, $player->village->village_id)
@@ -156,5 +158,21 @@ class VillageApiPresenter {
             "global_leaderboard_war_logs" => $global_leaderboard_war_logs,
             "player_war_log" => $player_war_log
         ];
+    }
+    public static function kageRecordResponse(System $system, User $player): array
+    {
+        return array_map(
+            function ($row) {
+                return [
+                    "user_id" => $row['user_id'],
+                    "user_name" => $row['user_name'],
+                    "seat_title" => $row['seat_title'],
+                    "seat_start" => $row['seat_start'],
+                    "seat_end" => $row['seat_end'],
+                    "time_held" => $row['time_held'],
+                ];
+            },
+            array_values(VillageManager::getKageRecord($system, $player->village->village_id))
+        );
     }
 }

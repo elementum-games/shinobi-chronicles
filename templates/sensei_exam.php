@@ -42,7 +42,7 @@
                 <div><input type="radio" name="question1" value="1c" /> <label>Jutsu Levels</label></div>
                 <div><input type="radio" name="question1" value="1d" /> <label>All of the above</label></div>
                 <div><input type="radio" name="question1" value="1e" /> <label>None of the above (pure chance)</label></div>
-                <p class="question_label">Which of these Forbidden Seal benefits is exclusive to Four Dragon Seal?</p>
+                <p class="question_label">Which of these Forbidden Seal benefits is not granted by Twin Dragon Seal?</p>
                 <div><input type="radio" name="question2" value="2a" checked/> <label>Increased Regen</label></div>
                 <div><input type="radio" name="question2" value="2b" /> <label>Larger Avatar</label></div>
                 <div><input type="radio" name="question2" value="2c" /> <label>Enhanced Training</label></div>
@@ -53,22 +53,22 @@
                 <div><input type="radio" name="question3" value="3b" /> <label>Equal Offense/Speed Stats</label></div>
                 <div><input type="radio" name="question3" value="3c" /> <label>Equal Bloodline/Offense/Speed Stats</label></div>
                 <div><input type="radio" name="question3" value="3d" /> <label>None of the above</label></div>
-                <p class="question_label">How much speed is required to reach maximum evasion (35%)?</p>
-                <div><input type="radio" name="question4" value="4a" checked/> <label>+50%</label></div>
-                <div><input type="radio" name="question4" value="4b" /> <label>+66.6%</label></div>
-                <div><input type="radio" name="question4" value="4c" /> <label>+75%</label></div>
-                <div><input type="radio" name="question4" value="4d" /> <label>+100%</label></div>
-                <p class="question_label">Which of the following jutsu has the greatest total power?</p>
-                <div><input type="radio" name="question5" value="5a" checked/> <label>3.5 Base Power, lv100 - Shop Jutsu</label></div>
-                <div><input type="radio" name="question5" value="5b" /> <label>3.5 Base Power, lv100 - Bloodline Jutsu</label></div>
-                <div><input type="radio" name="question5" value="5c" /> <label>4.5 Base Power, lv1 - Shop Jutsu</label></div>
-                <div><input type="radio" name="question5" value="5d" /> <label>All of the above (equal)</label></div>
-                <p class="question_label">Which of the following is true about debuffs?</p>
-                <div><input type="radio" name="question6" value="6a" checked/> <label>Offense debuffs are based on the target's stats</label></div>
-                <div><input type="radio" name="question6" value="6b" /> <label>Offense debuffs are based on the Jutsu's damage</label></div>
-                <div><input type="radio" name="question6" value="6c" /> <label>Speed debuffs are based on the Jutsu's damage</label></div>
-                <div><input type="radio" name="question6" value="6d" /> <label>Speed debuffs are based on the user's stats</label></div>
-                <div><input type="radio" name="question6" value="6e" /> <label>None of the above</label></div>
+                <p class="question_label">What are the soft and hard caps for Evasion, Resist, and Offense Nerf?</p>
+                <div><input type="radio" name="question4" value="4a" checked/> <label>25% and 50%</label></div>
+                <div><input type="radio" name="question4" value="4b" /> <label>35% and 65%</label></div>
+                <div><input type="radio" name="question4" value="4c" /> <label>50% and 75%</label></div>
+                <div><input type="radio" name="question4" value="4d" /> <label>65% and 100%</label></div>
+                <p class="question_label">How much of an increase to a jutsu's power and effect does it gain by level 100?</p>
+                <div><input type="radio" name="question5" value="5a" checked/> <label>30% Power, 20% Effect Strength</label></div>
+                <div><input type="radio" name="question5" value="5b" /> <label>50% Power, 30% Effect Strength</label></div>
+                <div><input type="radio" name="question5" value="5c" /> <label>50% Power, 50% Effect Strength</label></div>
+                <p class="question_label">Which of the following effects is not reduced by a Piercing jutsu?</p>
+                <div><input type="radio" name="question6" value="6a" checked/> <label>Counter</label></div>
+                <div><input type="radio" name="question6" value="6b" /> <label>Reflect</label></div>
+                <div><input type="radio" name="question6" value="6c" /> <label>Substitution</label></div>
+                <div><input type="radio" name="question6" value="6d" /> <label>Barrier</label></div>
+                <div><input type="radio" name="question6" value="6e" /> <label>Resists</label></div>
+                <div><input type="radio" name="question6" value="6f" /> <label>None of the above</label></div>
                 <div class="submit_container">
                     <b>
                         Choose your Specialization

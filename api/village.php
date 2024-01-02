@@ -165,7 +165,7 @@ try {
             ];
             break;
         case 'CancelChallenge':
-            $message = VillageManager::forfeitChallenge($system, $player);
+            $message = VillageManager::cancelUserCreatedChallenges($system, $player->user_id);
             $VillageAPIResponse->response = [
                 'response_message' => $message,
                 'challengeData' => VillageManager::getChallengeData($system, $player),
