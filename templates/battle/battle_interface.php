@@ -28,6 +28,14 @@ if($battle->battle_text) {
 ?>
 
 <script type='text/javascript'>
+    function toggleBattleDetails() {
+        $("#battle_details").toggle();
+        $("#last_turn_label").toggle();
+        $("#last_turn_details").toggle();
+    }   
+</script>
+
+<script type='text/javascript'>
     let battle_id = <?= $battle->battle_id ?>;
     var apiUrl = `api/battle.php?check_turn=` + battle_id;
     let turn_count = <?= $battle->turn_count ?>;
@@ -220,14 +228,14 @@ if($battle->battle_text) {
             <li style='width:100%;'><a href='<?= $refresh_link ?>'>Refresh Battle</a></li>
         <?php else: ?>
             <li style='width:49%;'><a href='<?= $refresh_link ?>'>Refresh Battle</a></li>
-            <li style='width:49%;'><a href='#actionSelect'>Action Select</a></li>
+            <li style='width:49%;'><a style="cursor: pointer" onclick="toggleBattleDetails()">Toggle Battle Details</a></li>
         <?php endif; ?>
     </ul>
 </div>
 <div class='submenuMargin'></div>
 
 <?php $system->printMessage(); ?>
-<table class='table'>
+<table id="battle_details" class='table'>
     <tr><th colspan="2">Turn <?= $battle->winner ? $battle->turn_count : $battle->turn_count + 1 ?></th></tr>
     <tr>
         <th id='bi_th_user' style='width:50%;'>
@@ -331,8 +339,8 @@ if($battle->battle_text) {
 <table class='table'>
     <!--// Battle text display-->
     <?php if($battle_text): ?>
-        <tr><th colspan='2'>Last turn</th></tr>
-        <tr><td style='text-align:center;' colspan='2'><?= $battle_text ?></td></tr>
+        <tr id="last_turn_label"><th colspan='2'>Last turn</th></tr>
+        <tr id="last_turn_details"><td style='text-align:center;' colspan='2'><?= $battle_text ?></td></tr>
     <?php endif; ?>
 
     <!--// Trigger win action or display action prompt-->
