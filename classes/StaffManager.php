@@ -672,23 +672,23 @@ class StaffManager {
     }
 
     /** ADMIN PANEL METHODS **/
-    public function getAdminPanelPerms($type): array {
+    public function getAdminPanelPerms(string $type, bool $permission_check = false): array {
         switch($type) {
             // Keep create content and edit content in line with each other
             case 'create_content':
-                if($this->isContentAdmin()) {
+                if($this->isContentAdmin() || $permission_check) {
                     $tools = ['create_ai', 'create_jutsu', 'create_item', 'create_bloodline', 'create_mission', 'create_clan'];
                 }
                 return $tools ?? array();
             case 'edit_content':
-                if($this->isContentAdmin()) {
+                if($this->isContentAdmin() || $permission_check) {
                     $tools = ['edit_ai', 'edit_jutsu', 'edit_item', 'edit_bloodline', 'edit_mission', 'edit_clan'];
                 }
                 return $tools ?? array();
             case 'misc_tools':
-                if($this->isUserAdmin()) {
+                if($this->isUserAdmin() || $permission_check) {
                     $tools = ['create_rank', 'edit_user', 'activate_user', 'stat_cut', 'staff_payments', 'give_bloodline',
-                        'edit_rank', 'edit_team', 'delete_user', 'dev_tools', 'manual_transaction', 'logs'];
+                        'edit_rank', 'edit_team', 'delete_user', 'dev_tools', 'manual_transaction', 'logs', 'reset_password'];
                 }
                 return $tools ?? array();
             default:

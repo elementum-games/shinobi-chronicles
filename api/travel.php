@@ -53,6 +53,7 @@ function handleTravelRequest(System $system, User $player, string $request) {
     switch($request) {
         case 'LoadTravelData':
             $TravelAPIResponse->response = [
+                'success' => true,
                 'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $TravelManager, system: $system),
                 'nearbyPlayers' => TravelApiPresenter::nearbyPlayersResponse(travelManager: $TravelManager),
                 'nearbyPatrols' => TravelApiPresenter::nearbyPatrolsResponse(travelManager: $TravelManager),
@@ -86,7 +87,7 @@ function handleTravelRequest(System $system, User $player, string $request) {
             $target_attack_id = $system->db->clean($_POST['target']);
 
             $success = $TravelManager->attackPlayer($target_attack_id);
-            $TravelAPIResponse->response = TravelApiPresenter::attackPlayerResponse($success, $system);
+            $TravelAPIResponse->response = TravelApiPresenter::attackPlayerResponse($success, $TravelManager, $system);
             break;
 
         case 'BeginOperation':

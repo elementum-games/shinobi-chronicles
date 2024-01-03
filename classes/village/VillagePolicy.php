@@ -11,7 +11,7 @@ class VillagePolicy {
     const POLICY_BONUS_PATROL_RESPAWN = "PATROL_RESPAWN";
     const POLICY_BONUS_PATROL_TIER = "PATROL_TIER";
     const POLICY_BONUS_TRAINING_SPEED = "TRAINING_SPEED";
-    const POLICY_BONUS_FREE_TRANSFER = "FREE_TRANSFER";
+    const POLICY_BONUS_TRANSFER_COST_REDUCTION = "TRANSFER_COST_REDUCTION";
     const POLICY_BONUS_HOME_PRODUCTION_BOOST = "HOME_PRODUCTION_BOOST";
     const POLICY_BONUS_SCOUTING = "SCOUTING";
     const POLICY_BONUS_STEALTH = "STEALTH";
@@ -50,7 +50,7 @@ class VillagePolicy {
     public int $patrol_respawn;
     public int $patrol_tier;
     public int $training_speed;
-    public bool $free_transfer;
+    public int $transfer_cost_reduction;
     public int $home_production_boost;
     public int $scouting;
     public int $stealth;
@@ -77,7 +77,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_PATROL_RESPAWN => 0,
                 self::POLICY_BONUS_PATROL_TIER => 0,
                 self::POLICY_BONUS_TRAINING_SPEED => 0,
-                self::POLICY_BONUS_FREE_TRANSFER => false,
+                self::POLICY_BONUS_TRANSFER_COST_REDUCTION => 0,
                 self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 0,
                 self::POLICY_BONUS_SCOUTING => 0,
                 self::POLICY_BONUS_STEALTH => 0,
@@ -100,7 +100,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_PATROL_RESPAWN => 0,
                 self::POLICY_BONUS_PATROL_TIER => 0,
                 self::POLICY_BONUS_TRAINING_SPEED => 5,
-                self::POLICY_BONUS_FREE_TRANSFER => true,
+                self::POLICY_BONUS_TRANSFER_COST_REDUCTION => 50,
                 self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 25,
                 self::POLICY_BONUS_SCOUTING => 0,
                 self::POLICY_BONUS_STEALTH => 0,
@@ -123,7 +123,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_PATROL_RESPAWN => 0,
                 self::POLICY_BONUS_PATROL_TIER => 0,
                 self::POLICY_BONUS_TRAINING_SPEED => 0,
-                self::POLICY_BONUS_FREE_TRANSFER => false,
+                self::POLICY_BONUS_TRANSFER_COST_REDUCTION => 0,
                 self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 0,
                 self::POLICY_BONUS_SCOUTING => 0,
                 self::POLICY_BONUS_STEALTH => 1,
@@ -146,7 +146,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_PATROL_RESPAWN => 0,
                 self::POLICY_BONUS_PATROL_TIER => 1,
                 self::POLICY_BONUS_TRAINING_SPEED => 0,
-                self::POLICY_BONUS_FREE_TRANSFER => false,
+                self::POLICY_BONUS_TRANSFER_COST_REDUCTION => 0,
                 self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 0,
                 self::POLICY_BONUS_SCOUTING => 1,
                 self::POLICY_BONUS_STEALTH => 0,
@@ -169,7 +169,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_PATROL_RESPAWN => 25,
                 self::POLICY_BONUS_PATROL_TIER => 0,
                 self::POLICY_BONUS_TRAINING_SPEED => 0,
-                self::POLICY_BONUS_FREE_TRANSFER => false,
+                self::POLICY_BONUS_TRANSFER_COST_REDUCTION => 0,
                 self::POLICY_BONUS_HOME_PRODUCTION_BOOST => 0,
                 self::POLICY_BONUS_SCOUTING => 0,
                 self::POLICY_BONUS_STEALTH => 0,
@@ -201,7 +201,7 @@ class VillagePolicy {
         $this->patrol_respawn = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_PATROL_RESPAWN];
         $this->patrol_tier = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_PATROL_TIER];
         $this->training_speed = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_TRAINING_SPEED];
-        $this->free_transfer = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_FREE_TRANSFER];
+        $this->transfer_cost_reduction = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_TRANSFER_COST_REDUCTION];
         $this->home_production_boost = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_HOME_PRODUCTION_BOOST];
         $this->scouting = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_SCOUTING];
         $this->stealth = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_STEALTH];
