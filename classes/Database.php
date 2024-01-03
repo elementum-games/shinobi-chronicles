@@ -108,6 +108,9 @@ class Database {
             if ($e->getCode() == Database::MYSQL_DEADLOCK_ERROR_CODE) {
                 $this->handleQueryError($query, $e->getMessage(), $e->getCode());
             }
+            else {
+                throw $e;
+            }
         }
 
         if($this->last_query_type == 'select') {

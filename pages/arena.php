@@ -76,7 +76,7 @@ function arena(): bool {
                     $player->log(User::LOG_ARENA, "Opponent {$ai->id} ({$ai->getName()})");
                     return true;
                 } catch(RuntimeException $e) {
-                    $system->message("Invalid opponent!");
+                    $system->message($e->getMessage());
                     $system->printMessage();
                 }
 			}

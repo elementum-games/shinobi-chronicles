@@ -82,7 +82,7 @@ class BattleV2 {
      * @param Fighter $player2
      * @param int     $battle_type
      * @return int
-     * @throws RuntimeException
+     * @throws RuntimeException|DatabaseDeadlockException
      */
     public static function start(
         System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null
@@ -112,26 +112,25 @@ class BattleV2 {
 
         $initial_field = BattleField::getInitialFieldExport($player1, $player2, $battle_type);
 
-        $system->db->query(
-            "INSERT INTO `battles` SET
-                `battle_type` = '" . $battle_type . "',
-                `start_time` = '" . time() . "',
-                `turn_time` = '" . (time() + self::PREP_LENGTH - 5) . "',
-                `turn_count` = '" . 0 . "',
-                `turn_type` = '" . BattleV2::TURN_TYPE_MOVEMENT . "',
-                `winner` = '',
-                `player1` = '" . $player1->id . "',
-                `player2` = '" . $player2->id . "',
-                `fighter_health` = '" . json_encode($fighter_health) . "',
-                `fighter_actions` = '" . $json_empty_array . "',
-                `field` = '" . json_encode($initial_field) . "',
-                `active_effects` = '" . $json_empty_array . "',
-                `active_genjutsu` = '" . $json_empty_array . "',
-                `jutsu_cooldowns` = '" . $json_empty_array . "',
-                `fighter_jutsu_used` = '" . $json_empty_array . "',
-                `patrol_id` = '" . $patrol_id . "',
-                "
-        );
+        $system->db->query("
+            INSERT INTO `battles` SET
+            `battle_type` = '" . $battle_type . "',
+            `start_time` = '" . time() . "',
+            `turn_time` = '" . (time() + self::PREP_LENGTH - 5) . "',
+            `turn_count` = '" . 0 . "',
+            `turn_type` = '" . BattleV2::TURN_TYPE_MOVEMENT . "',
+            `winner` = '',
+            `player1` = '" . $player1->id . "',
+            `player2` = '" . $player2->id . "',
+            `fighter_health` = '" . json_encode($fighter_health) . "',
+            `fighter_actions` = '" . $json_empty_array . "',
+            `field` = '" . json_encode($initial_field) . "',
+            `active_effects` = '" . $json_empty_array . "',
+            `active_genjutsu` = '" . $json_empty_array . "',
+            `jutsu_cooldowns` = '" . $json_empty_array . "',
+            `fighter_jutsu_used` = '" . $json_empty_array . "',
+            `patrol_id` = '" . $patrol_id . "'
+        ");
         $battle_id = $system->db->last_insert_id;
 
         if($player1 instanceof User) {
