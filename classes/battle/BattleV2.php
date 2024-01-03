@@ -77,12 +77,13 @@ class BattleV2 {
     public ?int $patrol_id;
 
     /**
-     * @param System  $system
-     * @param Fighter $player1
-     * @param Fighter $player2
-     * @param int     $battle_type
+     * @param System   $system
+     * @param Fighter  $player1
+     * @param Fighter  $player2
+     * @param int      $battle_type
+     * @param int|null $patrol_id
      * @return int
-     * @throws RuntimeException|DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
      */
     public static function start(
         System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null
@@ -129,7 +130,7 @@ class BattleV2 {
             `active_genjutsu` = '" . $json_empty_array . "',
             `jutsu_cooldowns` = '" . $json_empty_array . "',
             `fighter_jutsu_used` = '" . $json_empty_array . "',
-            `patrol_id` = '" . $patrol_id . "'
+            `patrol_id` = " . ($patrol_id ?? "NULL") . "
         ");
         $battle_id = $system->db->last_insert_id;
 
