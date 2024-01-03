@@ -838,9 +838,6 @@
 .kq_container .row.second .column.first {
     width: 100%;
 }
-.proposal_container {
-    width: 640px;
-}
 .proposal_container .elder_list {
     justify-content: space-evenly;
     margin-top: -15px;
