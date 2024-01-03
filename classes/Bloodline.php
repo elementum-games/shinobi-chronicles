@@ -141,6 +141,8 @@ class Bloodline {
                         $bloodline->jutsu[$id]->setLevel($uj['level'], $uj['exp']);
                     }
                 }
+
+                ksort($bloodline->jutsu);
             }
             else {
                 $bloodline->jutsu = array();
