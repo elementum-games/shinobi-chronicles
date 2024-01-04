@@ -1,3 +1,182 @@
+/* Helper Classes */
+.ft-b {
+    font-weight: bold;
+}
+
+.ft-i {
+    font-style: italic;
+}
+
+.ft-p {
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+}
+
+.ft-s {
+    font-family: var(--font-secondary);
+    font-variant: var(--font-secondary-variant);
+}
+
+.ft-c1 {
+    color: var(--font-color-1);
+}
+
+.ft-c2 {
+    color: var(--font-color-2);
+}
+
+.ft-c3 {
+    color: var(--font-color-3);
+}
+
+.ft-c4 {
+    color: var(--font-color-4);
+}
+
+.ft-c5 {
+    color: var(--font-color-5);
+}
+
+.ft-min {
+    font-size: 12px;
+}
+
+.ft-small {
+    font-size: 13px;
+}
+
+.ft-default {
+    font-size: 14px;
+}
+
+.ft-medium {
+    font-size: 15px;
+}
+
+.ft-large {
+    font-size: 17px;
+}
+
+.ft-xlarge {
+    font-size: 18px;
+}
+
+.ft-max {
+    font-size: 21px;
+}
+
+.t-center {
+    text-align: center;
+}
+
+.t-left {
+    text-align: left;
+}
+
+.t-hover:hover {
+    color: var(--text-hover);
+    cursor: pointer;
+}
+
+.d-none {
+    display: none;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.d-in_flex {
+    display: inline-flex;
+}
+
+.d-in_block {
+    display: inline-block;
+}
+
+.jc-center {
+    justify-content: center;
+}
+
+.button-bar_small {
+    height: 22px;
+    width: 67px;
+    border: none;
+    background: url("/images/v2/decorations/barbutton.png") no-repeat;
+    background-position: center;
+}
+
+.button-bar_large {
+    height: 22px;
+    width: 108px;
+    border: none;
+    background: url("/images/v2/decorations/barbigbutton.png") no-repeat;
+    background-position: center;
+}
+
+.nwbigcorner {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.nebigcorner {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.sebigcorner {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.swbigcorner {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.nwcorner {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.necorner {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.secorner {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.swcorner {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.box-primary {
+    box-sizing: border-box;
+    background-color: var(--box-color-default);
+    /* Corners in clockwise direction */
+    background-image: url(/images/v2/decorations/necorner.png), url(/images/v2/decorations/secorner.png), url(/images/v2/decorations/swcorner.png), url(/images/v2/decorations/nwcorner.png);
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+    background-position: top right, bottom right, bottom left, top left;
+}
+
+.box-secondary {
+    box-sizing: border-box;
+    background-color: var(--box-color-default);
+    border: 1px solid var(--border-color-default);
+}
+
 /* Geisha Overrides */
 .contentDivHeader {
     color: var(--font-color-2) !important;
