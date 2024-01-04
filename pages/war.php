@@ -86,7 +86,8 @@ function processWarBattleEnd($battle, User $player): string {
 
             $stat_gain_display = '<br />During the fight you realized a way to use your ' . System::unSlug($stat_to_gain) . ' a little
             more effectively.';
-            $stat_gain_display .= $player->addStatGain($stat_to_gain, 1) . '.';
+            $stat_gain = TrainingManager::getAIStatGain($opponent->difficulty_level, $player->rank_num);
+            $stat_gain_display .= $player->addStatGain($stat_to_gain, $stat_gain) . '.';
         }
 
         // Village Rep Gains - PLACEHOLDER FOR WAR GAINS
