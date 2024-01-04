@@ -11,7 +11,7 @@ final class AIUpdateMigration extends AbstractMigration
     public function up(): void
     {
         $this->execute("
-                        -- Alter table ai_opponents
+            -- Alter table ai_opponents
             ALTER TABLE `ai_opponents` ADD `shop_jutsu` VARCHAR(100) NOT NULL DEFAULT '0';
             ALTER TABLE `ai_opponents` ADD `shop_jutsu_priority` VARCHAR(100) NOT NULL DEFAULT '0';
             ALTER TABLE `ai_opponents` ADD `battle_iq` INT(11) NOT NULL DEFAULT '0';
