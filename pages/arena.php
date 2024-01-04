@@ -222,7 +222,9 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         if($rep_gain_string != "") {
             $battle_result .= $rep_gain_string;
         }
-		$battle_result .= "You have claimed your prize of &yen;$money_gain.<br />";
+        if ($money_gain > 0) {
+            $battle_result .= "You have claimed your prize of &yen;$money_gain.<br />";
+        }
         if($append_message != "") {
             $battle_result .= $append_message;
         }
