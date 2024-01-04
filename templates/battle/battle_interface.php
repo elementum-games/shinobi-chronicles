@@ -89,13 +89,17 @@ if($battle->battle_text) {
 <style type='text/css'>
     .playerAvatar {
         display:block;
-        margin: auto;
+        margin-top:auto;
+        margin-left:auto;
+        margin-right:auto;
         max-width:<?= $player_avatar_size ?> !important;
         max-height:<?= $player_avatar_size ?> !important;
     }
     .opponentAvatar {
         display:block;
-        margin:auto;
+        margin-top:auto;
+        margin-left:auto;
+        margin-right:auto;
         max-width:<?= $opponent_avatar_size ?> !important;
         max-height:<?= $opponent_avatar_size ?> !important;
     }
@@ -234,53 +238,65 @@ if($battle->battle_text) {
             <a href='<?= $system->router->links['members'] ?>&user=<?= $player->getName() ?>' style='text-decoration:none'><?= $player->getName() ?></a>
         </th>
         <th id='bi_th_opponent' style='width:50%;'>
-            <?php if($opponent instanceof AI): ?>
+            <?php if($opponent instanceof NPC): ?>
                 <?= $opponent->getName() ?>
             <?php else: ?>
                 <a href='<?= $system->router->links['members'] ?>&user=<?= $opponent->getName() ?>' style='text-decoration:none'><?= $opponent->getName() ?></a>
             <?php endif; ?>
         </th>
     </tr>
-    <tr>
-        <td style='text-align: center;' id='bi_td_player'>
-            <img src='<?= $player->avatar_link ?>' class='playerAvatar' alt='player_profile_img' />
-            <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
+    <tr style="background: linear-gradient(to right, var(--main-background-color) 0%, transparent 10%, transparent 90%, var(--main-background-color) 100%), url('<?= $battle->battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
+        <td id='bi_td_player' style="border-right: none">
+            <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
+                <img src='<?= $player->avatar_link ?>' class='playerAvatar' alt='player_profile_img' />
+                <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 8px;'>
 
-                <!-- Health -->
-                <div class='resourceBarOuter healthPreview'>
-                    <label class='innerResourceBarLabel' ><?= sprintf("%.0f", $player->health) ?> / <?= sprintf("%.0f", $player->max_health) ?></label>
-                    <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
-                </div>
+                    <!-- Health -->
+                    <div class='resourceBarOuter healthPreview'>
+                        <label class='innerResourceBarLabel'><?= sprintf("%.0f", $player->health) ?> / <?= sprintf("%.0f", $player->max_health) ?></label>
+                        <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
+                    </div>
 
-                <?php if(!$battleManager->spectate): ?>
+                    <?php if(!$battleManager->spectate): ?>
 
                     <!-- Chakra -->
-                <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
-                    <label class='innerResourceBarLabel'>
-                        <?= sprintf("%.0f", $player->chakra) ?> / <?= sprintf("%.0f", $player->max_chakra) ?>
-                    </label>
-                    <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
-                </div>
+                    <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
+                        <label class='innerResourceBarLabel'>
+                            <?= sprintf("%.0f", $player->chakra) ?> / <?= sprintf("%.0f", $player->max_chakra) ?>
+                        </label>
+                        <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
+                    </div>
 
                     <!-- Stamina -->
-                <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
-                    <label class='innerResourceBarLabel'>
-                        <?= sprintf("%.0f", $player->stamina) ?> / <?= sprintf("%.0f", $player->max_stamina) ?>
-                    </label>
-                    <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
-                </div>
+                    <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
+                        <label class='innerResourceBarLabel'>
+                            <?= sprintf("%.0f", $player->stamina) ?> / <?= sprintf("%.0f", $player->max_stamina) ?>
+                        </label>
+                        <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
+                    </div>
 
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </td>
-        <td style='text-align: center;' id='bi_td_opponent'>
-            <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
-            <div id='ai_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
-                <div class='resourceBarOuter healthPreview' style='margin-top:8px;'>
-                    <div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
-                        <label class='innerResourceBarLabel'>
-                            <?= sprintf("%.0f", $opponent->health) ?> / <?= sprintf("%.0f", $opponent->max_health) ?>
-                        </label>
+        <td style='text-align: center; border-left: none' id='bi_td_opponent'>
+            <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
+                <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
+                <div id='ai_battle_stats_container' style='display: inline-block; text-align: center'>
+                    <div class='resourceBarOuter healthPreview' style='margin-top:8px;'>
+                        <div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
+                            <label class='innerResourceBarLabel'>
+                                <?= sprintf("%.0f", $opponent->health) ?> / <?= sprintf("%.0f", $opponent->max_health) ?>
+                            </label>
+                        </div>
+                    </div>
+                    <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
+                        <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                        <div class='chakraFill' style='width:100%'></div>
+                    </div>
+                    <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
+                        <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                        <div class='staminaFill' style='width:100%;'></div>
                     </div>
                 </div>
             </div>

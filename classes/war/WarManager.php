@@ -46,9 +46,9 @@ class WarManager {
         4 => 17,
     ];
     const PATROL_CHANCE = [
-        1 => 50,
-        2 => 35,
-        3 => 15,
+        1 => 65,
+        2 => 25,
+        3 => 10,
         4 => 0,
     ];
     const PATROL_RESPAWN_TIME = 600;
@@ -344,6 +344,10 @@ class WarManager {
 
     function tryBeginPatrolBattle(Patrol $patrol) {
         $patrol_location = new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id);
+        // if rank below chuunin
+        if ($this->user->rank_num < 3) {
+            return;
+        }
         // if already in battle
         if ($this->user->battle_id) {
             return;
@@ -364,20 +368,21 @@ class WarManager {
         if ($this->user->special_mission > 0) {
             return;
         }
-        $ai = $this->system->db->query("SELECT `ai_id` FROM `ai_opponents` WHERE `ai_id` = {$patrol->ai_id} LIMIT 1");
-        if ($this->system->db->last_num_rows == 0) {
-            return;
-        }
         if ($this->user->operation > 0) {
             $this->cancelOperation();
         }
-        $ai = new NPC($this->system, $patrol->ai_id);
+        $ai = $this->getRandomPatrolAI($patrol->tier, $patrol->ai_id);
+        $ai = new NPC($this->system, $ai);
         $ai->loadData();
         $ai->health = $ai->max_health;
+        $battle_background = TravelManager::getLocationBattleBackgroundLink($this->system, $this->user->location);
+        if (empty($battle_background)) {
+            $battle_background = $this->user->region->battle_background_link;
+        }
         if ($this->system->USE_NEW_BATTLES) {
-            BattleV2::start($this->system, $this->user, $ai, BattleV2::TYPE_AI_WAR, $patrol->id);
+            BattleV2::start($this->system, $this->user, $ai, BattleV2::TYPE_AI_WAR, $patrol->id, $battle_background);
         } else {
-            Battle::start($this->system, $this->user, $ai, Battle::TYPE_AI_WAR, $patrol->id);
+            Battle::start($this->system, $this->user, $ai, Battle::TYPE_AI_WAR, $patrol->id, $battle_background);
         }
     }
 
@@ -462,21 +467,16 @@ class WarManager {
         WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_PATROLS_DEFEATED, $patrol_result['village_id']);
         $x = mt_rand(1, 100);
         if ($x <= self::PATROL_CHANCE[3]) {
-            $name = self::PATROL_NAMES[min(3 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
-            $ai_id = self::PATROL_AI[min(3 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
-            $tier = min(3 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER);
+            $tier = 3;
         } else if ($x <= self::PATROL_CHANCE[3] + self::PATROL_CHANCE[2]) {
-            $name = self::PATROL_NAMES[min(2 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
-            $ai_id = self::PATROL_AI[min(2 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
-            $tier = min(2 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER);
+            $tier = 2;
         } else {
-            $name = self::PATROL_NAMES[min(1 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
-            $ai_id = self::PATROL_AI[min(1 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER)];
-            $tier = min(1 + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER);
+            $tier = 1;
         }
-        if ($this->system->isDevEnvironment()) {
-            $ai_id = 17;
-        }
+        $tier = min($tier + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER);
+        $name = self::PATROL_NAMES[$tier];
+        // AI is now set dynamically on battle start but we maintain this field for forward/backward compatability as mechanics change
+        $ai_id = $this->getRandomPatrolAI($tier, $patrol_result['ai_id']);
         $respawn_time = time() + round(self::PATROL_RESPAWN_TIME * (100 / (100 + $this->user->village->policy->patrol_respawn)), 1);
         $this->system->db->query("UPDATE `patrols` SET `start_time` = {$respawn_time}, `name` = '{$name}', `ai_id` = {$ai_id}, `tier` = {$tier} WHERE `id` = {$patrol_id}");
         // decrease region location defense in region that matches patrol's village
@@ -527,6 +527,41 @@ class WarManager {
         $time = time();
         $this->system->db->query("UPDATE `loot` SET `claimed_village_id` = {$village->village_id}, `claimed_time` = {$time}, `battle_id` = NULL, `user_id` = 0 WHERE `user_id` = {$this->user->user_id} AND `claimed_village_id` IS NULL");
         return $message;
+    }
+
+    /**
+     * Gets random patrol AI based on params, using previously set AI as fallback
+     * @param System $system
+     * @param int $patrol_tier
+     * @param int $previous_ai
+     * @return int
+     */
+    public function getRandomPatrolAI(int $patrol_tier, int $previous_ai): int {
+        switch ($patrol_tier) {
+            case 1:
+                $ai_difficulty = NPC::DIFFICULTY_EASY;
+                break;
+            case 2:
+                $ai_difficulty = NPC::DIFFICULTY_NORMAL;
+                break;
+            case 3:
+                $ai_difficulty = NPC::DIFFICULTY_HARD;
+                break;
+            default:
+                return $previous_ai;
+        }
+        $ai_result = $this->system->db->query("SELECT `ai_id` FROM `ai_opponents`
+            WHERE `is_patrol` = 1
+            AND `difficulty_level` = '{$ai_difficulty}'
+            AND `rank` = {$this->user->rank_num}
+            ORDER BY RAND() LIMIT 1
+        ");
+        $ai_result = $this->system->db->fetch($ai_result);
+        if (empty($ai_result['ai_id'])) {
+            return $previous_ai;
+        } else {
+            return $ai_result['ai_id'];
+        }
     }
 
     /**

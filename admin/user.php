@@ -342,7 +342,7 @@ function statCutPage(System $system, User $player): void {
                 $system->message("{$user['user_name']} has had stats cut!");
                 $player->staff_manager->staffLog(StaffManager::STAFF_LOG_ADMIN, "{$player->user_name}({$player->user_id})"
                     . " cut {$user['user_name']}\'s({$user['user_id']}) by " . 100 - ($cut_amount * 100) . "%.
-                        
+
                         " . $log_data);
                 $user = false;
             }
@@ -500,6 +500,11 @@ function devToolsPage(System $system, User $player): void {
 
     if (!empty($_POST['cap_jutsu'])) {
         $name = $system->db->clean($_POST['cap_jutsu']);
+        if (isset($_POST['jutsu_level'])) {
+            $jutsu_level = $system->db->clean($_POST['jutsu_level']);
+        } else {
+            $jutsu_level = 100;
+        }
 
         try {
             $user = User::findByName($system, $name);
@@ -516,14 +521,14 @@ function devToolsPage(System $system, User $player): void {
             }
 
             foreach($user->jutsu as &$jutsu) {
-                $jutsu->level = 100;
+                $jutsu->level = $jutsu_level;
                 $jutsu->exp = 0;
             }
             unset($jutsu);
 
             if($user->bloodline != null && count($user->bloodline->jutsu) > 0) {
                 foreach($user->bloodline->jutsu as &$jutsu) {
-                    $jutsu->level = 100;
+                    $jutsu->level = $jutsu_level;
                     $jutsu->exp = 0;
                 }
                 unset($jutsu);
@@ -536,7 +541,8 @@ function devToolsPage(System $system, User $player): void {
             );
             $user->updateInventory();
 
-            $system->message("Jutsu capped for {$user->user_name}.");
+
+            $system->message("Jutsu level set to {$jutsu_level} for {$user->user_name}.");
         } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
@@ -569,7 +575,7 @@ function devToolsPage(System $system, User $player): void {
             $total_stats = $rank->stat_cap;
 
             foreach($stats as $stat) {
-                if(!empty($_POST[$stat . '_percent'])) {
+                if(isset($_POST[$stat . '_percent']) && is_numeric($_POST[$stat . '_percent'])) {
                     $percent = $_POST[$stat . '_percent'];
                     $amount = $percent * $total_stats;
 

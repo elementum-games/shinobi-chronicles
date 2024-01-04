@@ -269,6 +269,7 @@ class User extends Fighter {
     public int $exam_stage;
 
     public int $last_ai_ms;
+    public array $ai_cooldowns = [];
 
     public int $last_free_stat_change;
 
@@ -552,6 +553,7 @@ class User extends Fighter {
         $this->exam_stage = $user_data['exam_stage'];
 
         $this->last_ai_ms = $user_data['last_ai_ms'];
+        $this->ai_cooldowns = json_decode($user_data['ai_cooldowns'], true);
         $this->last_free_stat_change = $user_data['last_free_stat_change'];
         $this->last_pvp_ms = $user_data['last_pvp_ms'];
         $this->last_death_ms = $user_data['last_death_ms'];
@@ -1851,6 +1853,7 @@ class User extends Fighter {
 
         $query .= "`exam_stage` = '{$this->exam_stage}',
 		`last_ai_ms` = '$this->last_ai_ms',
+        `ai_cooldowns` = '" . json_encode($this->ai_cooldowns) . "',
 		`last_free_stat_change` = '{$this->last_free_stat_change}',
 		`last_pvp_ms` = '$this->last_pvp_ms',
 		`last_death_ms` = '$this->last_death_ms',
@@ -2576,12 +2579,14 @@ class User extends Fighter {
         foreach ($this->system->db->fetch_all($result) as $region) {
             //return Region::fromDb($region, get_coordinates: false);
             $region_vertices = json_decode($region['vertices']);
-            foreach ($region_vertices as $vertex) {
-                $coord = new RegionCoords($this->location->x, $this->location->y, $this->location->map_id);
-                if (Region::coordInRegion($coord, $region_vertices)) {
-                    return Region::fromDb($region, get_coordinates: false);
-                }
+            $coord = new RegionCoords($this->location->x, $this->location->y, $this->location->map_id);
+            if (Region::coordInRegion($coord, $region_vertices)) {
+                return Region::fromDb($region, get_coordinates: false);
             }
         }
+    }
+
+    public function getBaseStatTotal(): int {
+        return max(1, $this->total_stats);
     }
 }
