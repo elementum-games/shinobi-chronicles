@@ -82,12 +82,13 @@ class BattleV2 {
     public string $battle_background_link;
 
     /**
-     * @param System  $system
-     * @param Fighter $player1
-     * @param Fighter $player2
-     * @param int     $battle_type
+     * @param System   $system
+     * @param Fighter  $player1
+     * @param Fighter  $player2
+     * @param int      $battle_type
+     * @param int|null $patrol_id
      * @return int
-     * @throws RuntimeException
+     * @throws DatabaseDeadlockException
      */
     public static function start(
         System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null, string $battle_background_link = ''
