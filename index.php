@@ -452,7 +452,7 @@ else {
 }
 
 // Done checking login, close the session here
-session_write_close();
+// session_write_close();
 
 // Load page or news
 if($LOGGED_IN) {
