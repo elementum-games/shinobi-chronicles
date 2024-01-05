@@ -50,31 +50,30 @@ function arena(): bool {
             // check if the current location disallows ai fights
             if ($player->rank_num > 2 && $player->current_location->location_id && $player->current_location->ai_allowed == 0) {
                 $system->message('You cannot fight at this location');
-            }
-            else if ($player->last_ai_ms > $max_last_ai_ms) {
-				$system->message("Please wait " . ceil(($player->last_ai_ms - $max_last_ai_ms) / 1000) . " more seconds!");
-			}
-            try {
-                $ai_difficulty = $_GET['difficulty'];
-                $ai = getArenaOpponent($ai_difficulty, $player, $system);
-                $ai->loadData($player);
-                $ai->health = $ai->max_health;
+            } else if ($player->last_ai_ms > $max_last_ai_ms) {
+                $system->message("Please wait " . ceil(($player->last_ai_ms - $max_last_ai_ms) / 1000) . " more seconds!");
+            } else {
+                try {
+                    $ai_difficulty = $_GET['difficulty'];
+                    $ai = getArenaOpponent($ai_difficulty, $player, $system);
+                    $ai->loadData($player);
+                    $ai->health = $ai->max_health;
 
-                $player->last_ai_ms = System::currentTimeMs();
-                if($system->USE_NEW_BATTLES) {
-                    BattleV2::start($system, $player, $ai, BattleV2::TYPE_AI_ARENA, battle_background_link: $arena_background);
-                }
-                else {
-                    Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA, battle_background_link: $arena_background);
-                }
-                $player->ai_cooldowns[$ai_difficulty] = NPC::AI_COOLDOWNS[$ai_difficulty] + time();
+                    $player->last_ai_ms = System::currentTimeMs();
+                    if ($system->USE_NEW_BATTLES) {
+                        BattleV2::start($system, $player, $ai, BattleV2::TYPE_AI_ARENA, battle_background_link: $arena_background);
+                    } else {
+                        Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA, battle_background_link: $arena_background);
+                    }
+                    $player->ai_cooldowns[$ai_difficulty] = NPC::AI_COOLDOWNS[$ai_difficulty] + time();
 
-                arena();
-                $player->log(User::LOG_ARENA, "Opponent {$ai->id} ({$ai->getName()})");
-                return true;
-            } catch(RuntimeException $e) {
-                $system->message($e->getMessage());
-                $system->printMessage();
+                    arena();
+                    $player->log(User::LOG_ARENA, "Opponent {$ai->id} ({$ai->getName()})");
+                    return true;
+                } catch (RuntimeException $e) {
+                    $system->message($e->getMessage());
+                    $system->printMessage();
+                }
             }
 		}
 
@@ -223,7 +222,9 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         if($rep_gain_string != "") {
             $battle_result .= $rep_gain_string;
         }
-		$battle_result .= "You have claimed your prize of &yen;$money_gain.<br />";
+        if ($money_gain > 0) {
+            $battle_result .= "You have claimed your prize of &yen;$money_gain.<br />";
+        }
         if($append_message != "") {
             $battle_result .= $append_message;
         }
