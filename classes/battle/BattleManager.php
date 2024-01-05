@@ -409,10 +409,6 @@ class BattleManager {
 
     public function isComplete(): bool {
         $complete = $this->battle->isComplete();
-        // TEMP FIX
-        if ($complete) {
-            $_SESSION['ai_logic']['special_move_used'] = false;
-        }
         return $complete;
     }
 

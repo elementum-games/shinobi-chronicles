@@ -12,6 +12,7 @@ class Auth {
      */
     public static function getUserFromSession(System $system): User {
         session_start();
+        session_write_close();
         
         if(!isset($_SESSION['user_id'])) {
             throw new LoggedOutException("User is not logged in!");

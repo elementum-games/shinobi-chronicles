@@ -126,13 +126,6 @@ class Router {
             }
         }
 
-        //Check for survival mission restricted
-        if(isset($route->survival_ok) && $route->survival_ok === false) {
-            if(isset($_SESSION['ai_defeated']) && $player->mission_stage['action_type'] == 'combat') {
-                throw new RuntimeException("You cannot move while under attack!");
-            }
-        }
-
         // Check for spar/fight PvP type, stop page if trying to load spar/battle while in NPC battle
         if(isset($route->battle_type)) {
             $result = $system->db->query(

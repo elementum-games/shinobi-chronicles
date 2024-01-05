@@ -91,11 +91,6 @@ class NPC extends Fighter {
 
         $this->name = $result['name'];
 
-        if(!isset($_SESSION['ai_logic'])) {
-            $_SESSION['ai_logic'] = array();
-            $_SESSION['ai_logic']['special_move_used'] = false;
-        }
-
         return true;
     }
 
@@ -426,7 +421,7 @@ class NPC extends Fighter {
     }
 
     public function updateData() {
-        $_SESSION['ai_health'] = $this->health;
+        // no-op
     }
 
     public function getName(): string {

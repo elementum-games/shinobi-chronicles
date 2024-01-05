@@ -318,7 +318,7 @@ class Bloodline {
      * @return bool
      * @throws RuntimeException
      */
-    public static function giveBloodline(System $system, int $bloodline_id, int $user_id, bool $display = true): bool {
+    public static function giveBloodline(System $system, int $bloodline_id, int $user_id, ?User $player = null, bool $display = true): bool {
         $result = $system->db->query("SELECT * FROM `bloodlines` WHERE `bloodline_id` = '$bloodline_id' LIMIT 1");
         if($system->db->last_num_rows == 0) {
             throw new RuntimeException("Invalid bloodline!");
@@ -449,8 +449,7 @@ class Bloodline {
 			WHERE `user_id`='$user_id' LIMIT 1";
 
             $system->db->query($query);
-            if($user_id == $_SESSION['user_id']) {
-                global $player;
+            if($player != null) {
                 $player->bloodline_id = $bloodline_id;
                 $player->bloodline_name = $bloodline['name'];
                 $player->exp = $new_exp;

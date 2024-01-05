@@ -451,6 +451,9 @@ else {
 	$player->loadData();
 }
 
+// Done checking login, close the session here
+session_write_close();
+
 // Load page or news
 if($LOGGED_IN) {
     $layout = $system->setLayoutByName($player->layout);

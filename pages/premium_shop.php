@@ -320,6 +320,7 @@ function premiumShop(): void {
                     system: $system,
                     bloodline_id: $bloodline_id,
                     user_id: $player->user_id,
+                    player: $player,
                     display: false
                 );
 
@@ -411,6 +412,7 @@ function premiumShop(): void {
                     system: $system,
                     bloodline_id: $bloodline_id,
                     user_id: $player->user_id,
+                    player: $player,
                     display: false
                 );
 
