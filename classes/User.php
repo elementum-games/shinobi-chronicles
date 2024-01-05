@@ -430,15 +430,14 @@ class User extends Fighter {
      * @return User|null
      * @throws RuntimeException
      */
-    public static function findByName(System $system, string $name, bool $remote_view = true): ?User
-    {
+    public static function findByName(System $system, string $name, bool $remote_view = true): ?User {
         $result = $system->db->query(
             "SELECT
                    `user_id` FROM `users` WHERE `user_name`='{$name}'"
         );
         $user_id = $system->db->fetch($result)['user_id'] ?? null;
 
-        if ($user_id) {
+        if($user_id) {
             return User::loadFromId(system: $system, user_id: $user_id, remote_view: $remote_view);
         }
 
