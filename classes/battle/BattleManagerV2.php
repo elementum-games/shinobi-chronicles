@@ -756,7 +756,7 @@ class BattleManagerV2 {
      */
     #[Trace]
     protected function chooseNPCAttackAction(NPC $npc, Fighter $target): FighterAttackAction {
-        $jutsu = $npc->chooseAttack();
+        $jutsu = $npc->chooseAttack($this);
         $jutsu->setCombatId($npc->combat_id);
 
         // $fighter_id_target = new AttackFighterIdTarget($this->player->combat_id);

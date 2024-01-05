@@ -19,6 +19,8 @@ require_once __DIR__ . "/event/LanternEvent.php";
 require_once __DIR__ . "/Bloodline.php";
 require_once __DIR__ . "/travel/TravelManager.php";
 require_once __DIR__ . "/travel/Region.php";
+require_once __DIR__ . "/notification/BlockedNotificationManager.php";
+require_once __DIR__ . "/user/Blacklist.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -198,6 +200,7 @@ class User extends Fighter {
     /** @var Item[] */
     public array $items;
     public array $equipped_weapon_ids;
+    public array $equipped_armor_ids;
 
     public ?Bloodline $bloodline = null;
     public float $bloodline_skill;
@@ -266,6 +269,7 @@ class User extends Fighter {
     public int $exam_stage;
 
     public int $last_ai_ms;
+    public array $ai_cooldowns = [];
 
     public int $last_free_stat_change;
 
@@ -287,7 +291,6 @@ class User extends Fighter {
 
     public int $clan_office;
 
-    public array $equipped_armor;
     public array $bloodline_offense_boosts;
     public array $bloodline_defense_boosts;
 
@@ -550,6 +553,7 @@ class User extends Fighter {
         $this->exam_stage = $user_data['exam_stage'];
 
         $this->last_ai_ms = $user_data['last_ai_ms'];
+        $this->ai_cooldowns = json_decode($user_data['ai_cooldowns'], true);
         $this->last_free_stat_change = $user_data['last_free_stat_change'];
         $this->last_pvp_ms = $user_data['last_pvp_ms'];
         $this->last_death_ms = $user_data['last_death_ms'];
@@ -636,8 +640,6 @@ class User extends Fighter {
         $this->intelligence_boost = 0;
         $this->willpower_boost = 0;
 
-        $this->defense_boost = 0;
-
         $this->ninjutsu_resist = 0;
         $this->taijutsu_resist = 0;
         $this->genjutsu_resist = 0;
@@ -723,9 +725,6 @@ class User extends Fighter {
             // Player team stuff
             else {
                 $this->team = Team::findById($this->system, $team_id);
-                if($this->team != null) {
-                    $this->defense_boost += $this->team->getDefenseBoost($this);
-                }
             }
         }
 
@@ -1158,6 +1157,13 @@ class User extends Fighter {
             $count = 0;
             foreach($equipped_jutsu as $jutsu_data) {
                 if($this->hasJutsu($jutsu_data->id)) {
+                    // We double-check this in useJutsu() as well, but removing from equipped helps users understand
+                    // before getting into a fight they cannot use a jutsu they don't have the element for
+                    $jutsu = $this->jutsu[$jutsu_data->id];
+                    if(!$this->hasElement($jutsu->element)) {
+                        continue;
+                    }
+
                     $this->equipped_jutsu[$count]['id'] = $jutsu_data->id;
                     $this->equipped_jutsu[$count]['type'] = $jutsu_data->type;
                     $count++;
@@ -1204,16 +1210,16 @@ class User extends Fighter {
 
         $this->equipped_items = [];
         $this->equipped_weapon_ids = [];
-        $this->equipped_armor = [];
+        $this->equipped_armor_ids = [];
         if($equipped_items) {
             foreach($equipped_items as $item_id) {
                 if($this->hasItem($item_id)) {
                     $this->equipped_items[] = $item_id;
-                    if($this->items[$item_id]->use_type == 1) {
+                    if($this->items[$item_id]->use_type == Item::USE_TYPE_WEAPON) {
                         $this->equipped_weapon_ids[] = $item_id;
                     }
-                    else if($this->items[$item_id]->use_type == 2) {
-                        $this->equipped_armor[] = $item_id;
+                    else if($this->items[$item_id]->use_type == Item::USE_TYPE_ARMOR) {
+                        $this->equipped_armor_ids[] = $item_id;
                     }
                 }
             }
@@ -1239,9 +1245,14 @@ class User extends Fighter {
                 $this->getInventory();
 
                 $gain = User::$jutsu_train_gain;
-                if ($this->system->TRAIN_BOOST) {
-                    $gain += $this->system->TRAIN_BOOST;
+                // check event bonus
+                if ($this->system->event != null && $this->system->event->exp_gain_multiplier > 1) {
+                    $gain = floor($gain * $this->system->event->exp_gain_multiplier);
                 }
+                // commenting this out, I'm not sure of the purpose but it doesn't seem like a flat training bonus is supposed to add to jutsu levels
+                /*if ($this->system->TRAIN_BOOST) {
+                    $gain += $this->system->TRAIN_BOOST;
+                }*/
                 if ($this->bloodline->jutsu[$jutsu_id]->level + $gain > 100) {
                     $gain = 100 - $this->bloodline->jutsu[$jutsu_id]->level;
                 }
@@ -1295,9 +1306,14 @@ class User extends Fighter {
                 $this->getInventory();
 
                 $gain = User::$jutsu_train_gain;
-                if ($this->system->TRAIN_BOOST) {
-                    $gain += $this->system->TRAIN_BOOST;
+                // check event bonus
+                if ($this->system->event != null && $this->system->event->exp_gain_multiplier > 1) {
+                    $gain = floor($gain * $this->system->event->exp_gain_multiplier);
                 }
+                // commenting this out, I'm not sure of the purpose but it doesn't seem like a flat training bonus is supposed to add to jutsu levels
+                /*if ($this->system->TRAIN_BOOST) {
+                    $gain += $this->system->TRAIN_BOOST;
+                }*/
                 if ($this->jutsu[$jutsu_id]->level + $gain > 100) {
                     $gain = 100 - $this->jutsu[$jutsu_id]->level;
                 }
@@ -1447,8 +1463,8 @@ class User extends Fighter {
             throw new RuntimeException("Invalid stat!");
         }
 
-        if ($event_boost && !empty($this->system->event) && $this->system->event instanceof DoubleExpEvent) {
-            $stat_gain *= DoubleExpEvent::exp_modifier;
+        if ($event_boost && !empty($this->system->event) && $this->system->event->exp_gain_multiplier > 1) {
+            $stat_gain *= $this->system->event->exp_gain_multiplier;
         }
 
         $new_total_stats = $this->total_stats + $stat_gain;
@@ -1519,6 +1535,14 @@ class User extends Fighter {
     }
     public function itemQuantity(int $item_id): int {
         return isset($this->items[$item_id]) ? $this->items[$item_id]->quantity : 0;
+    }
+
+    public function hasElement(string $element): bool {
+        if($element == Jutsu::ELEMENT_NONE) {
+            return true;
+        }
+
+        return in_array($element, $this->elements);
     }
 
     public function giveItem(Item $item, int $quantity = 1): void {
@@ -1595,15 +1619,8 @@ class User extends Fighter {
             case Jutsu::PURCHASE_TYPE_PURCHASABLE:
             case Jutsu::PURCHASE_TYPE_EVENT_SHOP:
                 // Element check
-                if($jutsu->element && $jutsu->element != Jutsu::ELEMENT_NONE) {
-                    if($this->elements) {
-                        if(!in_array($jutsu->element, $this->elements)) {
-                            return ActionResult::failed("You do not possess the elemental chakra for this jutsu!");
-                        }
-                    }
-                    else {
-                        return ActionResult::failed("You do not possess the elemental chakra for this jutsu!");
-                    }
+                if($jutsu->element && !$this->hasElement($jutsu->element)) {
+                    return ActionResult::failed("You do not possess the elemental chakra for this jutsu!");
                 }
 
                 if($this->jutsu[$jutsu->id]->level < 100) {
@@ -1716,7 +1733,6 @@ class User extends Fighter {
     public function addPremiumCredits(int $amount, string $description) {
         $this->setPremiumCredits($this->premium_credits + $amount, $description);
     }
-
 
     /**
      * @throws RuntimeException
@@ -1837,6 +1853,7 @@ class User extends Fighter {
 
         $query .= "`exam_stage` = '{$this->exam_stage}',
 		`last_ai_ms` = '$this->last_ai_ms',
+        `ai_cooldowns` = '" . json_encode($this->ai_cooldowns) . "',
 		`last_free_stat_change` = '{$this->last_free_stat_change}',
 		`last_pvp_ms` = '$this->last_pvp_ms',
 		`last_death_ms` = '$this->last_death_ms',
@@ -2562,12 +2579,14 @@ class User extends Fighter {
         foreach ($this->system->db->fetch_all($result) as $region) {
             //return Region::fromDb($region, get_coordinates: false);
             $region_vertices = json_decode($region['vertices']);
-            foreach ($region_vertices as $vertex) {
-                $coord = new RegionCoords($this->location->x, $this->location->y, $this->location->map_id);
-                if (Region::coordInRegion($coord, $region_vertices)) {
-                    return Region::fromDb($region, get_coordinates: false);
-                }
+            $coord = new RegionCoords($this->location->x, $this->location->y, $this->location->map_id);
+            if (Region::coordInRegion($coord, $region_vertices)) {
+                return Region::fromDb($region, get_coordinates: false);
             }
         }
+    }
+
+    public function getBaseStatTotal(): int {
+        return max(1, $this->total_stats);
     }
 }

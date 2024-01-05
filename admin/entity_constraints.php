@@ -160,6 +160,8 @@ $constraints['edit_user'] = [
 ];
 
 /* NPC */
+$jutsu_effects = require 'admin/constraints/jutsu_effects.php';
+
 $constraints['ai'] = [
     'rank' => [
         'data_type' => 'int',
@@ -210,16 +212,26 @@ $constraints['ai'] = [
         'input_type' => 'text',
     ],
     'moves' => [
-        'count' => 4,
-        'num_required' => 1,
+        'count' => 5,
+        'num_required' => 0,
         'variables' => [
-            'battle_text' => [
+            'name' => [
                 'data_type' => 'string',
                 'input_type' => 'text',
+                'max_length' => 35,
+                'field_required' => false,
+            ],
+            'battle_text' => [
+                'data_type' => 'string',
+                'input_type' => 'text_area',
                 'max_length' => 375,
             ],
             'power' => [
                 'data_type' => 'float',
+                'input_type' => 'text',
+            ],
+            'cooldown' => [
+                'data_type' => 'int',
                 'input_type' => 'text',
             ],
             'jutsu_type' => [
@@ -232,54 +244,22 @@ $constraints['ai'] = [
                 'input_type' => 'text',
                 'options' => [Jutsu::USE_TYPE_MELEE, Jutsu::USE_TYPE_PROJECTILE, Jutsu::USE_TYPE_BUFF, Jutsu::USE_TYPE_BARRIER, Jutsu::USE_TYPE_INDIRECT],
             ],
+            'element' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
+                'options' => [
+                    Jutsu::ELEMENT_NONE,
+                    Jutsu::ELEMENT_FIRE,
+                    Jutsu::ELEMENT_EARTH,
+                    Jutsu::ELEMENT_WIND,
+                    Jutsu::ELEMENT_WATER,
+                    Jutsu::ELEMENT_LIGHTNING,
+                ],
+            ],
             'effect' => [
-                    'data_type' => 'string',
-                    'input_type' => 'text',
-                    'options' => [
-                        'none',
-                        'release_genjutsu',
-                        'residual_damage',
-                        'ninjutsu_boost',
-                        'taijutsu_boost',
-                        'genjutsu_boost',
-                        'ninjutsu_resist',
-                        'taijutsu_resist',
-                        'genjutsu_resist',
-                        'speed_boost',
-                        'cast_speed_boost',
-                        'intelligence_boost',
-                        'willpower_boost',
-                        'ninjutsu_nerf',
-                        'taijutsu_nerf',
-                        'genjutsu_nerf',
-                        'cast_speed_nerf',
-                        'speed_nerf',
-                        'endurance_nerf',
-                        'intelligence_nerf',
-                        'willpower_nerf',
-                        'vulnerability',
-                        'fire_vulnerability',
-                        'wind_vulnerability',
-                        'lightning_vulnerability',
-                        'earth_vulnerability',
-                        'water_vulnerability',
-                        'fire_boost',
-                        'wind_boost',
-                        'lightning_boost',
-                        'earth_boost',
-                        'water_boost',
-                        'evasion_boost',
-                        'evasion_nerf',
-                        'offense_nerf',
-                        'resist_boost',
-                        'piercing',
-                        'substitution',
-                        'counter',
-                        'immolate',
-                        'recoil',
-                        'delayed_residual',
-                        'reflect',
-                    ],
+                'data_type' => 'string',
+                'input_type' => 'text',
+                'options' => $jutsu_effects,
             ],
             'effect_amount' => [
                 'data_type' => 'string',
@@ -289,7 +269,67 @@ $constraints['ai'] = [
                 'data_type' => 'string',
                 'input_type' => 'text',
             ],
+            'effect2' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
+                'options' => $jutsu_effects,
+            ],
+            'effect2_amount' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
+            ],
+            'effect2_length' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
+            ],
         ],
+    ],
+    'shop_jutsu' => [
+        'data_type' => 'string',
+        'input_type' => 'text',
+        'max_length' => 200,
+        'field_required' => false,
+    ],
+    'shop_jutsu_priority' => [
+        'data_type' => 'string',
+        'input_type' => 'text',
+        'max_length' => 200,
+        'field_required' => false,
+    ],
+    'battle_iq' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
+        'field_required' => false,
+    ],
+    'scaling' => [
+        'data_type' => 'int',
+        'input_type' => 'radio',
+        'options' => [0 => 'No', 1 => 'Yes'],
+        'field_required' => false,
+    ],
+    'difficulty_level' => [
+        'data_type' => 'string',
+        'input_type' => 'text',
+        'options' => [NPC::DIFFICULTY_NONE, NPC::DIFFICULTY_EASY, NPC::DIFFICULTY_NORMAL, NPC::DIFFICULTY_HARD],
+        'field_required' => false,
+    ],
+    'arena_enabled' => [
+        'data_type' => 'int',
+        'input_type' => 'radio',
+        'options' => [0 => 'No', 1 => 'Yes'],
+        'field_required' => false,
+    ],
+    'is_patrol' => [
+        'data_type' => 'int',
+        'input_type' => 'radio',
+        'options' => [0 => 'No', 1 => 'Yes'],
+        'field_required' => false,
+    ],
+    'avatar_link' => [
+        'data_type' => 'string',
+        'input_type' => 'text',
+        'max_length' => 100,
+        'field_required' => false,
     ],
 ];
 

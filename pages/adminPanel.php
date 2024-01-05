@@ -34,13 +34,13 @@ function adminPanel() {
 
     $page = $_GET['page'] ?? '';
 
-    if(in_array($page, $player->staff_manager->getAdminPanelPerms('misc_tools')) && !$player->isUserAdmin()) {
+    if(in_array($page, $player->staff_manager->getAdminPanelPerms(type: 'misc_tools', permission_check: true)) && !$player->isUserAdmin()) {
         $page = '';
     }
-    else if(in_array($page, $player->staff_manager->getAdminPanelPerms('create_content')) && !$player->isContentAdmin()) {
+    else if(in_array($page, $player->staff_manager->getAdminPanelPerms(type: 'create_content', permission_check: true)) && !$player->isContentAdmin()) {
         $page = '';
     }
-    else if(in_array($page, $player->staff_manager->getAdminPanelPerms('edit_content')) && !$player->isContentAdmin()) {
+    else if(in_array($page, $player->staff_manager->getAdminPanelPerms(type: 'edit_content', permission_check: true)) && !$player->isContentAdmin()) {
         $page = '';
     }
 
@@ -940,10 +940,15 @@ function adminPanel() {
         require 'admin/user.php';
         deleteUserPage($system, $player);
     }
+    // Reset password
+    else if($page == 'reset_password') {
+        require 'admin/user.php';
+        resetPasswordPage($system, $player);
+    }
     // Give bloodline
     else if($page == 'give_bloodline') {
         require 'admin/user.php';
-        giveBloodlinePage($system);
+        giveBloodlinePage($system, $player);
     }
     // Stat cut
     else if($page == 'stat_cut') {

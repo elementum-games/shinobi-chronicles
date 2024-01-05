@@ -451,12 +451,15 @@ else {
 	$player->loadData();
 }
 
+// Done checking login, close the session here
+session_write_close();
+
 // Load page or news
 if($LOGGED_IN) {
     $layout = $system->setLayoutByName($player->layout);
 
     // Master close
-    if(!$system->SC_OPEN && !$player->isUserAdmin()) {
+    if(!$system->SC_OPEN && !$player->isContentAdmin()) {
         $layout->renderBeforeContentHTML($system, $player, "Profile");
 
         echo "<table class='table'><tr><th>Game Maintenance</th></tr>
@@ -604,9 +607,9 @@ if($LOGGED_IN) {
             try {
                 ($route->function_name)();
             } catch (DatabaseDeadlockException $e) {
-                // Wait 1ms, then retry deadlocked transaction
+                // Wait random time between 100-500ms, then retry deadlocked transaction
                 $system->db->rollbackTransaction();
-                usleep(1000);
+                usleep(mt_rand(100000, 500000));
 
                 $system->db->startTransaction();
                 $player->loadData();

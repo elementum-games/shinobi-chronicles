@@ -124,7 +124,7 @@ function members(): void {
 			}
 			echo "</table>";
 		}
-		catch (Exception $e) {
+		catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();
@@ -183,7 +183,7 @@ function members(): void {
             require 'templates/view_user_profile.php';
 
 			$display_list = false;
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();

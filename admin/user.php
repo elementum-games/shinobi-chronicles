@@ -90,23 +90,23 @@ function editUserPage(System $system, User $player): void {
             $FORM_DATA = $_POST;
 
             // Additional data checking for Elements
-            if($user_data['rank'] >= 3 && $player->isHeadAdmin()) {
+            if($FORM_DATA['rank'] >= 3 && $player->isHeadAdmin()) {
                 $new_elements = array();
 
                 if($user_data['staff_level'] != StaffManager::STAFF_HEAD_ADMINISTRATOR) {
-                    $required_elements = (int)$_POST['rank'] - 2;
-                    if(count($_POST['elements']) > $required_elements) {
+                    $required_elements = (int)$FORM_DATA['rank'] - 2;
+                    if(count($FORM_DATA['elements']) > $required_elements) {
                         throw new RuntimeException("Only $required_elements element(s) allowed!");
                     }
-                    if(count($_POST['elements']) < $required_elements) {
+                    if(count($FORM_DATA['elements']) < $required_elements) {
                         throw new RuntimeException("There must be at least $required_elements element(s)!");
                     }
                 }
 
-                if(!is_array($_POST['elements'])) {
+                if(!is_array($FORM_DATA['elements'])) {
                     throw new RuntimeException("Elements form data must be of type array!");
                 }
-                foreach($_POST['elements'] as $element) {
+                foreach($FORM_DATA['elements'] as $element) {
                     if(!in_array($element, User::$ELEMENTS)) {
                         throw new RuntimeException("Invalid element ($element).");
                     }
@@ -119,7 +119,7 @@ function editUserPage(System $system, User $player): void {
             else {
                 //Remove elements in case rank has been reduced
                 if($player->isHeadAdmin()) {
-                    unset($_POST['elements']);
+                    unset($FORM_DATA['elements']);
                     unset($variables['elements']);
                 }
             }
@@ -222,7 +222,7 @@ function statCutPage(System $system, User $player): void {
             if(!$user) {
                 throw new RuntimeException("Invalid user!");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -342,14 +342,14 @@ function statCutPage(System $system, User $player): void {
                 $system->message("{$user['user_name']} has had stats cut!");
                 $player->staff_manager->staffLog(StaffManager::STAFF_LOG_ADMIN, "{$player->user_name}({$player->user_id})"
                     . " cut {$user['user_name']}\'s({$user['user_id']}) by " . 100 - ($cut_amount * 100) . "%.
-                        
+
                         " . $log_data);
                 $user = false;
             }
             else {
                 $system->message("Error cutting stats.");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -416,6 +416,78 @@ function deleteUserPage(System $system, User $player): void {
     }
 }
 
+/**
+ * Used only in the function below to generate a random string as a password.
+ * It is STRONGLY recommended that users reset their password after regaining access to their account.
+ * This method by NO MEANS generates a totally secure password!!!!
+ * @param $length
+ * @return string
+ * @throws Exception
+ */
+function generateRandPassword($length): string {
+    $keyspace = str_shuffle(string: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+
+    $str = '';
+    $max = mb_strlen($keyspace, '8bit') - 1;
+    for ($i = 0; $i < $length; ++$i) {
+        $str .= $keyspace[random_int(0, $max)];
+    }
+
+    if (!preg_match('/[!@#$%&*]/', $str)) {
+        $special_chars = str_shuffle(string: '!@#$%&*');
+        $insert_char = substr($special_chars, offset: mt_rand(0, strlen($special_chars)-1), length: 1);
+        $insert_location = mt_rand(ceil(strlen($str) * 0.25), floor(strlen($str)-1 * 0.75));
+        $first_half = substr($str, offset: 0, length: $insert_location);
+        $second_half = substr($str, offset: $insert_location, length: strlen($str));
+
+        $str = $first_half . str_shuffle(string: $insert_char . $second_half);
+    }
+    return $str;
+}
+
+/**
+ * Temporary method to reset user passwords until system emails are restored.
+ * Note: This reset doesn't generate a truly secure password, users should reset password after recovery
+ * @param System $system
+ * @param User $player
+ * @return void
+ * @throws Exception
+ */
+function resetPasswordPage(System $system, User $player): void {
+    $self_link = $system->router->getUrl('admin', ['page' => 'reset_password']);
+    if(isset($_POST['user_name'])) {
+        try {
+            $user_name = $system->db->clean($_POST['user_name']);
+
+            $result = $system->db->query("SELECT `user_id`, `staff_level` FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
+            // User not found
+            if(!$system->db->last_num_rows) {
+                throw new RuntimeException("$user_name was not found!");
+            }
+            $result = $system->db->fetch($result);
+
+            // Disable for user admins and head admins
+            if(in_array($result['staff_level'], [StaffManager::STAFF_ADMINISTRATOR, StaffManager::STAFF_HEAD_ADMINISTRATOR]) && !$system->isDevEnvironment()) {
+                throw new RuntimeException("Password resets are disabled for User and Head Administrators.");
+            }
+
+            $password = generateRandPassword(mt_rand(7, 12));
+            $password_hash = $system->hash_password($password);
+
+            $system->db->query("UPDATE `users` SET `password`='$password_hash' WHERE `user_id`='{$result['user_id']}' LIMIT 1");
+            if($system->db->last_affected_rows) {
+                $system->message("Password set to: $password");
+                $system->printMessage();
+            }
+
+        } catch (RuntimeException $e) {
+            $system->message($e->getMessage());
+            $system->printMessage();
+        }
+    }
+    require 'templates/admin/reset_password.php';
+}
+
 function devToolsPage(System $system, User $player): void {
     $stats = [
         'ninjutsu_skill',
@@ -428,6 +500,11 @@ function devToolsPage(System $system, User $player): void {
 
     if (!empty($_POST['cap_jutsu'])) {
         $name = $system->db->clean($_POST['cap_jutsu']);
+        if (isset($_POST['jutsu_level'])) {
+            $jutsu_level = $system->db->clean($_POST['jutsu_level']);
+        } else {
+            $jutsu_level = 100;
+        }
 
         try {
             $user = User::findByName($system, $name);
@@ -444,14 +521,14 @@ function devToolsPage(System $system, User $player): void {
             }
 
             foreach($user->jutsu as &$jutsu) {
-                $jutsu->level = 100;
+                $jutsu->level = $jutsu_level;
                 $jutsu->exp = 0;
             }
             unset($jutsu);
 
             if($user->bloodline != null && count($user->bloodline->jutsu) > 0) {
                 foreach($user->bloodline->jutsu as &$jutsu) {
-                    $jutsu->level = 100;
+                    $jutsu->level = $jutsu_level;
                     $jutsu->exp = 0;
                 }
                 unset($jutsu);
@@ -464,8 +541,9 @@ function devToolsPage(System $system, User $player): void {
             );
             $user->updateInventory();
 
-            $system->message("Jutsu capped for {$user->user_name}.");
-        } catch (Exception $e) {
+
+            $system->message("Jutsu level set to {$jutsu_level} for {$user->user_name}.");
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -497,7 +575,7 @@ function devToolsPage(System $system, User $player): void {
             $total_stats = $rank->stat_cap;
 
             foreach($stats as $stat) {
-                if(!empty($_POST[$stat . '_percent'])) {
+                if(isset($_POST[$stat . '_percent']) && is_numeric($_POST[$stat . '_percent'])) {
                     $percent = $_POST[$stat . '_percent'];
                     $amount = $percent * $total_stats;
 
@@ -523,7 +601,7 @@ function devToolsPage(System $system, User $player): void {
                 "Admin {$user->user_name} (#{$user->user_id}) capped stats for player {$user->user_name} (#{$user->user_id})"
             );
             $system->message("Stats capped for $name.");
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -534,7 +612,7 @@ function devToolsPage(System $system, User $player): void {
 /**
  * @throws RuntimeException
  */
-function giveBloodlinePage(System $system): void {
+function giveBloodlinePage(System $system, User $player): void {
     // Fetch BL list
     $result = $system->db->query("SELECT `bloodline_id`, `name` FROM `bloodlines`");
     if($system->db->last_num_rows == 0) {
@@ -564,7 +642,8 @@ function giveBloodlinePage(System $system): void {
             $status = Bloodline::giveBloodline(
                 system: $system,
                 bloodline_id: $editing_bloodline_id,
-                user_id: $user_id
+                user_id: $user_id,
+                player: $user_id == $player->user_id ? $player : null,
             );
         } catch(RuntimeException $e) {
             $system->message($e->getMessage());

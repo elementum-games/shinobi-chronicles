@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../ReportManager.php';
 require_once __DIR__ . '/ChatPostDto.php';
+require_once __DIR__ . '/../notification/BlockedNotificationManager.php';
 
 class ChatManager {
     const MAX_POST_LENGTH = 350;
@@ -16,9 +17,14 @@ class ChatManager {
      * @throws RuntimeException
      */
     public function loadPosts(?int $current_page_post_id = null): array {
-        $result = $this->system->db->query(
-            "SELECT MAX(`post_id`) as `latest_post_id`, MIN(`post_id`) as `first_post_id` FROM `chat`"
-        );
+        $blocked_user_ids = $this->player->blacklist->blockedUserIds(exclude_staff: true);
+
+        $query = "SELECT MAX(`post_id`) as `latest_post_id`, MIN(`post_id`) as `first_post_id` FROM `chat`";
+        if(count($blocked_user_ids) > 0) {
+            $query .= " WHERE `user_id` NOT IN (" . implode(",", $blocked_user_ids) . ")";
+        }
+
+        $result = $this->system->db->query($query);
         if($this->system->db->last_num_rows) {
             $bookend_posts = $this->system->db->fetch($result);
             $latest_post_id = $bookend_posts['latest_post_id'];
@@ -63,30 +69,24 @@ class ChatManager {
      */
     private function fetchPosts(?int $starting_post_id = null, int $max_posts = self::MAX_POSTS_PER_PAGE, bool $is_quote = false): array {
         if($starting_post_id != null) {
-            $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id  AND `deleted` = 0 ORDER BY `post_id` DESC LIMIT $max_posts";
+            $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id AND `deleted`=0";
         }
         else {
-            $query = "SELECT * FROM `chat` WHERE `deleted` = 0 ORDER BY `post_id` DESC LIMIT $max_posts";
+            $query = "SELECT * FROM `chat` WHERE `deleted` = 0";
         }
+
+        $blocked_user_ids = $this->player->blacklist->blockedUserIds(exclude_staff: true);
+        if(count($blocked_user_ids) > 0) {
+            $query .= " AND `user_id` NOT IN (" . implode(",", $blocked_user_ids) . ")";
+        }
+
+        $query .= " ORDER BY `post_id` DESC LIMIT $max_posts";
+
         $result = $this->system->db->query($query);
 
         $posts = [];
         while($row = $this->system->db->fetch($result)) {
             $post = ChatPostDto::fromDb($row);
-
-            //Skip post if user blacklisted
-            $blacklisted = false;
-            // Legacy posts blocking
-            if($post->user_id == 0) {
-                if($this->player->blacklist->userBlockedByName($post->user_name)) {
-                    $blacklisted = true;
-                }
-            }
-            else {
-                if($this->player->blacklist->userBlocked($post->user_id)) {
-                    $blacklisted = true;
-                }
-            }
 
             //Base data
             $post->avatar = './images/default_avatar.png';
@@ -109,15 +109,6 @@ class ChatManager {
                 } else {
                     $user_data['avatar_style'] = "avy_round";
                     $user_data['avatar_frame'] = "avy_frame_default";
-                }
-                //If blacklisted block content, only if blacklisted user is not currently a staff member
-                if($blacklisted && $user_data['staff_level'] == StaffManager::STAFF_NONE) {
-                    continue;
-                }
-            }
-            else {
-                if($blacklisted) {
-                    continue;
                 }
             }
 
@@ -216,7 +207,8 @@ class ChatManager {
                                 $post->message = preg_replace("/" . preg_quote($match, '/') . '/', $formatted_quote, $post->message, 1);
                             }
                             else {
-                                $post->message = str_replace($matches[0], "<i>(removed)</i>", $post->message);
+                                // Just remove quote tags for deleted posts/blacklisted users
+                                $post->message = str_replace($matches[0], "", $post->message);
                             }
                         }
                     }
@@ -241,7 +233,7 @@ class ChatManager {
         try {
             $result = $this->system->db->query(
                 "SELECT `message` FROM `chat`
-                     WHERE `user_name` = '{$this->player->user_name}' ORDER BY  `post_id` DESC LIMIT 1"
+                     WHERE `user_id` = '{$this->player->user_id}' ORDER BY  `post_id` DESC LIMIT 1"
             );
             if($this->system->db->last_num_rows) {
                 $post = $this->system->db->fetch($result);
@@ -279,11 +271,11 @@ class ChatManager {
             }
 
             $sql = "INSERT INTO `chat`
-                    (`user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES
-                           ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
+                    (`user_id`, `user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES
+                           (%s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
             $this->system->db->query(
                 sprintf(
-                    $sql, $this->player->user_name, $message, $title, $this->player->village->name, $staff_level, $user_color, time(), 0
+                    $sql, $this->player->user_id, $this->player->user_name, $message, $title, $this->player->village->name, $staff_level, $user_color, time(), 0
                 )
             );
             $new_post_id = $this->system->db->last_insert_id;
@@ -293,6 +285,9 @@ class ChatManager {
 
             // Master notification array
             $notification_blocks = [];
+            // Master bl array
+            $master_bl = [];
+
             // Handle Quotes
             $pattern = "/\[quote:\d+\]/";
             $has_quote = preg_match_all($pattern, $message, $matches);
@@ -328,6 +323,14 @@ class ChatManager {
                         }
                         // Notification blocked
                         if($notification_blocks[$result['user_id']]->notificationBlocked(NotificationManager::NOTIFICATION_CHAT)) {
+                            continue;
+                        }
+
+                        // Blacklist user
+                        if(!isset($master_bl[$result['user_id']])) {
+                            $master_bl[$result['user_id']] = Blacklist::fromDb(system: $this->system, user_id: $result['user_id']);
+                        }
+                        if($master_bl[$result['user_id']]->userBlocked($this->player->user_id)) {
                             continue;
                         }
 
@@ -386,6 +389,14 @@ class ChatManager {
                     }
 
                     if($notification_blocks[$result['user_id']]->notificationBlocked(NotificationManager::NOTIFICATION_CHAT)) {
+                        continue;
+                    }
+
+                    // Blacklist user
+                    if(!isset($master_bl[$result['user_id']])) {
+                        $master_bl[$result['user_id']] = Blacklist::fromDb(system: $this->system, user_id: $result['user_id']);
+                    }
+                    if($master_bl[$result['user_id']]->userBlocked($this->player->user_id)) {
                         continue;
                     }
 

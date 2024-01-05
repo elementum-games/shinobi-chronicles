@@ -17,7 +17,7 @@ else if($exp_percent > 100) {
 $exp_width = round($exp_percent * 2);
 
 $regen_cut = 0;
-if($player->battle_id or isset($_SESSION['ai_id'])) {
+if($player->battle_id) {
     $regen_cut = round(($player->regen_rate + $player->regen_boost) * 0.7, 1);
 }
 

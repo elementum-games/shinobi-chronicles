@@ -27,8 +27,6 @@ $number_name = [
             <br />
             <?php endif ?>
             Your <?=$number_name[$player->exam_stage]?> assigned task is to perform the <?=$jutsu_data[$player->exam_stage]['name']?> jutsu.<br />
-            Exam time remaining: <div style="display:inline-block;" id="exam_limit"><?=$system->time_remaining($time_remaining)?></div>
-            <script type='text/javascript'>countdownTimer(<?=$time_remaining?>, 'exam_limit', false);</script>
         </td>
     </tr>
     <tr>

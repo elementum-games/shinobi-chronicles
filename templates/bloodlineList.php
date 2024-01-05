@@ -172,12 +172,26 @@
                                     <label style="width:7.5em; font-weight:bold;">Element:</label> <?=ucwords($ability->element)?><br />
                                     <label style="width:7.5em; font-weight:bold;">Use Cost:</label>
                                         <?=$ability->use_cost?> <?= $ability->jutsu_type == 'Taijutsu' ? 'Stamina' : 'Chakra' ?><br />
-                                    <label style="width:7.5em; font-weight:bold;">Effect:</label> <?=ucwords(str_replace('_', ' ', $ability->effect))?>
-                                        <?php if($ability->effect != 'none'): ?>
-                                            - <?=$ability->effect_length?> turn(s)<br />
+                                    <?php if ($ability->use_type == Jutsu::USE_TYPE_BARRIER || isset($ability->effect) && $ability->effect != "none"): ?>
+                                        <?php if ($ability->use_type == Jutsu::USE_TYPE_BARRIER): ?>
+                                            <label style="width:7.5em; font-weight:bold;">Effect:</label> Barrier
                                         <?php else: ?>
-                                            <br />
-                                        <?php endif ?>
+                                            <label style="width:7.5em; font-weight:bold;">Effect:</label> <?= ucwords(str_replace('_', ' ', $ability->effect)) ?>
+                                        <?php endif; ?>
+                                            <?php if ($ability->effect != 'none'): ?>
+                                                - <?= $ability->effect_length ?> turn(s)<br />
+                                            <?php else: ?>
+                                                <br />
+                                            <?php endif ?>
+                                    <?php endif ?>
+                                    <?php if (isset($ability->effect2) && $ability->effect2 != "none"): ?>
+                                        <label style="width:7.5em; font-weight:bold;">Effect:</label> <?= ucwords(str_replace('_', ' ', $ability->effect2)) ?>
+                                            <?php if ($ability->effect2 != 'none'): ?>
+                                                - <?= $ability->effect2_length ?> turn(s)<br />
+                                            <?php else: ?>
+                                                <br />
+                                            <?php endif ?>
+                                    <?php endif ?>
                                     <label style="width:7.5em; font-weight:bold;">Jutsu Type:</label> <?=ucwords($ability->jutsu_type)?><br />
                                     <label style="width:7.5em; font-weight:bold;">Description:</label> <?=$ability->description?><br />
                                     <br />

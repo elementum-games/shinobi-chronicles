@@ -23,7 +23,8 @@
         <td style='text-align: center;'>
             <form action='' method='post'>
                 <input type='text' name='cap_jutsu' placeholder='Username' style='margin-bottom: 8px;' /><br />
-                <input type='submit' value='Cap Jutsu' />
+                <input type='number' name='jutsu_level' min='1' max='100' placeholder='100' style='margin-bottom: 8px' value='100'/><br />
+                <input type='submit' value='Set Jutsu Level' />
             </form>
         </td>
         <td>
@@ -44,8 +45,8 @@
                 <?php foreach($stats as $stat): ?>
                     <label style='display: inline-block;width:105px;'><?= $stat ?></label>
                     <select name='<?= $stat ?>_percent'>
-                        <option value='0'>-</option>
-                        <?php for($i = 10; $i >= 1; $i--): ?>
+                        <option value='N/A'>-</option>
+                        <?php for($i = 10; $i >= 0; $i--): ?>
                             <?php $percent = $i / 10; ?>
                             <option value='<?= $percent ?>'><?= ($percent * 100) ?>%</option>
                         <?php endfor; ?>

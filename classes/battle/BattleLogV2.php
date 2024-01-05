@@ -141,7 +141,7 @@ class BattleLogV2 {
      * @throws RuntimeException
      */
     public static function fromDbArray(System $system, array $raw_data): BattleLogV2 {
-        $fighter_action_logs = json_decode($raw_data['fighter_action_logs'], true);
+        $fighter_action_logs = json_decode($raw_data['fighter_action_logs'], true) ?? [];
 
         return new BattleLogV2(
             system: $system,

@@ -76,16 +76,22 @@ class BattleV2 {
 
     public ?int $patrol_id;
 
+    public int $player1_last_damage_taken;
+    public int $player2_last_damage_taken;
+
+    public string $battle_background_link;
+
     /**
-     * @param System  $system
-     * @param Fighter $player1
-     * @param Fighter $player2
-     * @param int     $battle_type
+     * @param System   $system
+     * @param Fighter  $player1
+     * @param Fighter  $player2
+     * @param int      $battle_type
+     * @param int|null $patrol_id
      * @return int
-     * @throws RuntimeException
+     * @throws DatabaseDeadlockException
      */
     public static function start(
-        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null
+        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null, string $battle_background_link = ''
     ): int {
         $json_empty_array = '[]';
 
@@ -129,9 +135,10 @@ class BattleV2 {
                 `active_genjutsu` = '" . $json_empty_array . "',
                 `jutsu_cooldowns` = '" . $json_empty_array . "',
                 `fighter_jutsu_used` = '" . $json_empty_array . "',
-                `patrol_id` = '" . $patrol_id . "',
-                "
-        );
+                `is_retreat` = '" . (int) false . "',
+                `patrol_id` = " . (!empty($patrol_id) ? $patrol_id : "NULL") . ",
+                `battle_background_link` = '{$battle_background_link}'
+        ");
         $battle_id = $system->db->last_insert_id;
 
         if($player1 instanceof User) {

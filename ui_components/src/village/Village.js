@@ -16,6 +16,7 @@ function Village({
     strategicData,
     challengeData,
     warLogData,
+    kageRecords,
 }) {
     const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
     const [policyDataState, setPolicyDataState] = React.useState(policyData);
@@ -82,7 +83,7 @@ function Village({
                 data.name = "From the Ashes";
                 data.phrase = "bonds forged, courage shared.";
                 data.description = "In unity, find the strength to overcome.\nOne village, one heart, one fight.";
-                data.bonuses = ["25% increased Caravan speed", "+25 base resource production", "+5% training speed", "Free incoming village transfer"];
+                data.bonuses = ["25% increased Caravan speed", "+25 base resource production", "+5% training speed", "50% reduced cost for village transfers"];
                 data.penalties = ["-30 Materials/hour", "-50 Food/hour", "-20 Wealth/hour", "Cannot declare War"];
                 data.glowClass = "growth_glow";
                 break;
@@ -154,6 +155,7 @@ function Village({
                 challengeDataState={challengeDataState}
                 setChallengeDataState={setChallengeDataState}
                 clanData={clanData}
+                kageRecords={kageRecords}
                 handleErrors={handleErrors}
                 getKageKanji={getKageKanji}
                 getVillageIcon={getVillageIcon}
@@ -227,6 +229,7 @@ function VillageHQ({
     challengeDataState,
     setChallengeDataState,
     clanData,
+    kageRecords,
     handleErrors,
     getKageKanji,
     getVillageIcon,
@@ -564,7 +567,9 @@ function VillageHQ({
                                 <div className="kage_nameplate_decoration se"></div>
                                 <div className="kage_nameplate_decoration sw"></div>
                                 <div className="kage_name">{kage.user_name ? kage.user_name : "---"}</div>
-                                <div className="kage_title">{kage.seat_title + " of " + villageName}</div>
+                                <div className="kage_title">
+                                    {kage.is_provisional ? kage.seat_title + ": " + kage.provisional_days_label : kage.seat_title + " of " + villageName}
+                                </div>
                                 {kage.seat_id && kage.seat_id == playerSeatState.seat_id &&
                                     <div className="kage_resign_button" onClick={() => Resign()}>resign</div>
                                 }
@@ -709,6 +714,35 @@ function VillageHQ({
                                             <div className="resource_spent">{resource.spent}</div>
                                         </div>
                                     ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="row fourth">
+                    <div className="column first">
+                        <div className="hq_navigation_row">
+                            <div className="header">Kage Record</div>
+                            <div className="kage_record_container">
+                                <div className="kage_record_header_section">
+                                    <div className="kage_record_header">
+                                        <span>Whispers of the past</span>
+                                        <span>Echoes of a leader's might</span>
+                                        <span>Legacy in stone.</span>
+                                    </div>
+                                </div>
+                                <div className="kage_record_main_section">
+                                    {kageRecords
+                                        .map((kage, index) => (
+                                            <div key={kage.user_id} className="kage_record">
+                                                <div className="kage_record_item_row_first">
+                                                    <div className="kage_record_item_title">{kage.seat_title}</div>: <div className="kage_record_item_name"><a href={"/?id=6&user=" + kage.user_name}>{kage.user_name}</a></div>
+                                                </div>
+                                                <div className="kage_record_item_row_second">
+                                                    <div className="kage_record_item_start">{kage.seat_start}</div> - <div className="kage_record_item_length">{kage.time_held}</div>
+                                                </div>
+                                            </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>

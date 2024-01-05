@@ -7,10 +7,10 @@ class PremiumShopManager {
     const STAT_TRANSFER_EXPEDITED = 'expedited';
     const STAT_TRANSFER_SUPER_EXPEDITED = 'super_expedited';
 
-    const EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 2;
-    const SUPER_EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 10;
-    const SUPER_EXPEDITED_AK_COST_MULTIPLIER = 2;
-    const SUPER_EXPEDITED_YEN_COST_MULTIPLIER = 2;
+    const EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 10;
+    const SUPER_EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 150;
+    const SUPER_EXPEDITED_AK_COST_MULTIPLIER = 4;
+    const SUPER_EXPEDITED_YEN_COST_MULTIPLIER = 0.5;
 
     const EXCHANGE_MIN_YEN_PER_AK = 10.0;
     const EXCHANGE_MAX_YEN_PER_AK = 100.0;
@@ -18,6 +18,13 @@ class PremiumShopManager {
     const TIER_THREE_SALE_END = '2023-11-30';
     const SALE_REFUND_RATE = 50;
     const EDS_90_DAY_DISCOUNT = 0.17;
+
+    const FREE_TRANSFER_BASE_AMOUNT = [
+        1 => 100,
+        2 => 250,
+        3 => 500,
+        4 => 2500,
+    ];
 
     public System $system;
     public User $player;
@@ -121,30 +128,27 @@ class PremiumShopManager {
 
     private function initStatTransferVars(): void {
         $this->stat_transfer_points_per_min = 10;
-        $this->stat_transfer_points_per_ak = 300;
+        $this->stat_transfer_points_per_ak = 600;
 
         if ($this->player->rank_num >= 3) {
-            $this->stat_transfer_points_per_min += 5;
-
-            $this->stat_transfer_points_per_ak = 600;
-        }
-        if ($this->player->rank_num >= 4) {
-            $this->stat_transfer_points_per_min += 5;
+            $this->stat_transfer_points_per_min += 10;
 
             $this->stat_transfer_points_per_ak = 1200;
+        }
+        if ($this->player->rank_num >= 4) {
+            $this->stat_transfer_points_per_min += 10;
+
+            $this->stat_transfer_points_per_ak = 2400;
         }
 
         $this->stat_transfer_points_per_min += $this->player->forbidden_seal->stat_transfer_boost;
         $this->stat_transfer_points_per_ak += $this->player->forbidden_seal->extra_stat_transfer_points_per_ak;
 
-        $this->expedited_stat_transfer_points_per_yen = round($this->stat_transfer_points_per_ak / 1000, 5);
+        $this->expedited_stat_transfer_points_per_yen = round($this->stat_transfer_points_per_ak / 10000, 5);
 
         // Free stat transfers
-        $base_free_stat_change = $this->max_free_stat_change_amount;
-        if ($this->player->rank_num >= 3) {
-            $this->max_free_stat_change_amount = floor($this->player->rank->stat_cap / 100);
-            $base_free_stat_change = $this->max_free_stat_change_amount;
-        }
+        $base_free_stat_change = self::FREE_TRANSFER_BASE_AMOUNT[$this->player->rank_num];
+        $this->max_free_stat_change_amount = $base_free_stat_change;
         if ($this->player->reputation->benefits[UserReputation::BENEFIT_FREE_TRANSFER_BONUS]) {
             $this->max_free_stat_change_amount += floor($base_free_stat_change * UserReputation::FREE_TRANSFER_BONUS / 100);
         }
@@ -368,6 +372,10 @@ class PremiumShopManager {
             throw new RuntimeException("Invalid target stat!");
         }
 
+        if($this->player->battle_id > 0) {
+            throw new RuntimeException("Cannot transfer stats mid fight!");
+        }
+
         // Check for same stat
         if ($original_stat == $target_stat) {
             throw new RuntimeException("You cannot transfer points to the same stat!");
@@ -510,19 +518,11 @@ class PremiumShopManager {
             "Changed element #{$editing_element_index} from {$this->player->elements[$editing_element_index]} to $new_element"
         );
 
-        $this->player->getInventory();
-
         if (isset($this->player->elements[$editing_element_index])) {
-            foreach ($this->player->jutsu as $jutsu) {
-                if ($jutsu->element == $this->player->elements[$editing_element_index]) {
-                    $this->player->removeJutsu($jutsu->id);
-                }
-            }
             $this->player->elements[$editing_element_index] = $new_element;
         }
 
         $this->player->updateData();
-        $this->player->updateInventory();
 
         $message = '';
         switch ($new_element) {
@@ -577,8 +577,7 @@ class PremiumShopManager {
                 break;
         }
 
-        $message .=  "<b style='color:green'>You have forgotten the {$previous_element} nature and all its
-                jutsu and are now attuned to the {$new_element} nature.</b>";
+        $message .=  "<b style='color:green'>You have forgotten the {$previous_element} nature and are now attuned to the {$new_element} nature.</b>";
 
         return ActionResult::succeeded($message);
     }

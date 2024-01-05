@@ -10,8 +10,10 @@ class Router {
         'profile' => 1,
         'inbox' => 2,
         'settings' => 3,
+        'gear' => 5,
         'members' => 6,
         'chat' => 7,
+        'store' => 8,
         'villageHQ' => 9,
         'bloodline' => 10,
         'travel' => 11,
@@ -121,13 +123,6 @@ class Router {
                 }
                 $player->log(User::LOG_IN_BATTLE, implode(',', $contents_arr));
                 throw new RuntimeException("You cannot visit this page while in battle!");
-            }
-        }
-
-        //Check for survival mission restricted
-        if(isset($route->survival_ok) && $route->survival_ok === false) {
-            if(isset($_SESSION['ai_defeated']) && $player->mission_stage['action_type'] == 'combat') {
-                throw new RuntimeException("You cannot move while under attack!");
             }
         }
 

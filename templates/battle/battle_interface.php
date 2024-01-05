@@ -46,10 +46,6 @@ if($battle->battle_text) {
                 return;
             }
         }
-        player1_time--;
-        $("#player1_time").text(player1_time);
-        player2_time--;
-        $("#player2_time").text(player2_time);
         if ((player1_time <= 0 || player1_submitted) && (player2_time <= 0 || player2_submitted)) {
             updateContent();
             return;
@@ -60,6 +56,10 @@ if($battle->battle_text) {
                 if (data.data != undefined && data.data.turn_count > turn_count) {
                     updateContent();
                 } else {
+                    player1_time = data.data.player1_time;
+                    player2_time = data.data.player2_time;
+                    $("#player1_time").text(player1_time);
+                    $("#player2_time").text(player2_time);
                     setTimeout(checkTurn, 1000);
                 }
             })
@@ -89,13 +89,17 @@ if($battle->battle_text) {
 <style type='text/css'>
     .playerAvatar {
         display:block;
-        margin: auto;
+        margin-top:auto;
+        margin-left:auto;
+        margin-right:auto;
         max-width:<?= $player_avatar_size ?> !important;
         max-height:<?= $player_avatar_size ?> !important;
     }
     .opponentAvatar {
         display:block;
-        margin:auto;
+        margin-top:auto;
+        margin-left:auto;
+        margin-right:auto;
         max-width:<?= $opponent_avatar_size ?> !important;
         max-height:<?= $opponent_avatar_size ?> !important;
     }
@@ -169,11 +173,59 @@ if($battle->battle_text) {
     #forfeitDialog, #retreatDialog {
         display: none;
     }
+
+    .active_effects_container {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+    .active_effect {
+        display: inline-flex;
+        gap: 10px;
+        color: white;
+        font-family: var(--font-secondary);
+        font-weight: bold;
+        height: 26px;
+        align-items: center;
+        justify-content: center;
+    }
+        .active_effect.buff .effect_name {
+            background-color: #2a5e3c;
+        }
+        .active_effect.nerf .effect_name {
+            background-color: #7c2d2d;
+        }
+        .active_effect .effect_duration {
+            margin-left: -27px;
+            height: 21px;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            margin-top: 2px;
+        }
+        .active_effect .effect_duration_decoration {
+            margin-left: -22px;
+            margin-top: 1px;
+        }
+        .active_effect .effect_name {
+            line-height: 20px;
+            font-size: 12px;
+            height: 21px;
+            padding-left: 10px;
+            padding-right: 18px;
+            border-radius: 4px;
+            box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+        }
 </style>
 
 <div class='submenu'>
     <ul class='submenu'>
-        <li style='width:100%;'><a href='<?= $refresh_link ?>'>Refresh Battle</a></li>
+        <?php if ($battleManager->spectate): ?>
+            <li style='width:100%;'><a href='<?= $refresh_link ?>'>Refresh Battle</a></li>
+        <?php else: ?>
+            <li style='width:49%;'><a href='<?= $refresh_link ?>'>Refresh Battle</a></li>
+            <li style='width:49%;'><a href='#actionSelect'>Action Select</a></li>
+        <?php endif; ?>
     </ul>
 </div>
 <div class='submenuMargin'></div>
@@ -186,55 +238,107 @@ if($battle->battle_text) {
             <a href='<?= $system->router->links['members'] ?>&user=<?= $player->getName() ?>' style='text-decoration:none'><?= $player->getName() ?></a>
         </th>
         <th id='bi_th_opponent' style='width:50%;'>
-            <?php if($opponent instanceof AI): ?>
+            <?php if($opponent instanceof NPC): ?>
                 <?= $opponent->getName() ?>
             <?php else: ?>
                 <a href='<?= $system->router->links['members'] ?>&user=<?= $opponent->getName() ?>' style='text-decoration:none'><?= $opponent->getName() ?></a>
             <?php endif; ?>
         </th>
     </tr>
-    <tr>
-        <td style='text-align: center;' id='bi_td_player'>
-            <img src='<?= $player->avatar_link ?>' class='playerAvatar' alt='player_profile_img' />
-            <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
+    <tr style="background: linear-gradient(to right, var(--main-background-color) 0%, transparent 10%, transparent 90%, var(--main-background-color) 100%), url('<?= $battle->battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
+        <td id='bi_td_player' style="border-right: none">
+            <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
+                <img src='<?= $player->avatar_link ?>' class='playerAvatar' alt='player_profile_img' />
+                <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 8px;'>
 
-                <!-- Health -->
-                <div class='resourceBarOuter healthPreview'>
-                    <label class='innerResourceBarLabel' ><?= sprintf("%.0f", $player->health) ?> / <?= sprintf("%.0f", $player->max_health) ?></label>
-                    <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
-                </div>
+                    <!-- Health -->
+                    <div class='resourceBarOuter healthPreview'>
+                        <label class='innerResourceBarLabel'><?= sprintf("%.0f", $player->health) ?> / <?= sprintf("%.0f", $player->max_health) ?></label>
+                        <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
+                    </div>
 
-                <?php if(!$battleManager->spectate): ?>
+                    <?php if(!$battleManager->spectate): ?>
 
                     <!-- Chakra -->
-                <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
-                    <label class='innerResourceBarLabel'>
-                        <?= sprintf("%.0f", $player->chakra) ?> / <?= sprintf("%.0f", $player->max_chakra) ?>
-                    </label>
-                    <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
-                </div>
+                    <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
+                        <label class='innerResourceBarLabel'>
+                            <?= sprintf("%.0f", $player->chakra) ?> / <?= sprintf("%.0f", $player->max_chakra) ?>
+                        </label>
+                        <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
+                    </div>
 
                     <!-- Stamina -->
-                <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
-                    <label class='innerResourceBarLabel'>
-                        <?= sprintf("%.0f", $player->stamina) ?> / <?= sprintf("%.0f", $player->max_stamina) ?>
-                    </label>
-                    <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
-                </div>
+                    <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
+                        <label class='innerResourceBarLabel'>
+                            <?= sprintf("%.0f", $player->stamina) ?> / <?= sprintf("%.0f", $player->max_stamina) ?>
+                        </label>
+                        <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
+                    </div>
 
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </td>
-        <td style='text-align: center;' id='bi_td_opponent'>
-            <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
-            <div id='ai_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
-                <div class='resourceBarOuter healthPreview' style='margin-top:8px;'>
-                    <div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
-                        <label class='innerResourceBarLabel'>
-                            <?= sprintf("%.0f", $opponent->health) ?> / <?= sprintf("%.0f", $opponent->max_health) ?>
-                        </label>
+        <td style='text-align: center; border-left: none' id='bi_td_opponent'>
+            <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
+                <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
+                <div id='ai_battle_stats_container' style='display: inline-block; text-align: center'>
+                    <div class='resourceBarOuter healthPreview' style='margin-top:8px;'>
+                        <div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
+                            <label class='innerResourceBarLabel'>
+                                <?= sprintf("%.0f", $opponent->health) ?> / <?= sprintf("%.0f", $opponent->max_health) ?>
+                            </label>
+                        </div>
+                    </div>
+                    <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
+                        <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                        <div class='chakraFill' style='width:100%'></div>
+                    </div>
+                    <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
+                        <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                        <div class='staminaFill' style='width:100%;'></div>
                     </div>
                 </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div class="active_effects_container">
+                <?php foreach ($battleManager->getEffects() as $effect): ?>
+                <?php if ($effect->target == $player->combat_id && $effect->turns > 0): ?>
+                <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
+                    <div class="effect_name">
+                        <?= System::unSlug($effect->effect) ?>
+                    </div>
+                    <svg class="effect_duration_decoration" width="26" height="26">
+                        <polygon points="0,13 13,0 26,13 13,26" fill="#ad9357" stroke="black" stroke-width="1"></polygon>
+                    </svg>
+                    <div class="effect_duration">
+                        <?= System::unSlug($effect->turns) ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        </td>
+        <td>
+            <div class="active_effects_container">
+                <?php foreach ($battleManager->getEffects() as $effect): ?>
+                    <?php if ($effect->target == $opponent->combat_id && $effect->turns > 0): ?>
+                        <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
+                            <div class="effect_name">
+                                <?= System::unSlug($effect->effect) ?>
+                            </div>
+                            <svg class="effect_duration_decoration" width="26" height="26">
+                                <polygon points="0,13 13,0 26,13 13,26" fill="#ad9357" stroke="black" stroke-width="1"></polygon>
+                            </svg>
+                            <div class="effect_duration">
+                                <?= System::unSlug($effect->turns) ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
             </div>
         </td>
     </tr>
@@ -249,7 +353,7 @@ if($battle->battle_text) {
 
     <!--// Trigger win action or display action prompt-->
     <?php if(!$battle->isComplete() && !$battleManager->spectate): ?>
-        <tr><th colspan='2'>Select Action</th></tr>
+        <tr><th id="actionSelect" colspan='2'>Select Action</th></tr>
 
         <?php if(!$battleManager->playerActionSubmitted()): ?>
             <?php require 'templates/battle/action_prompt.php'; ?>

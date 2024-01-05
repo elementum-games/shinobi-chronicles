@@ -13,8 +13,9 @@ class Battle {
     const TYPE_AI_RANKUP = 6;
     const TYPE_AI_WAR = 7;
 
-    const TURN_LENGTH = 15;
+    const TURN_LENGTH = 20;
     const INITIAL_TURN_LENGTH = 40;
+    const MAX_TURN_LENGTH = 40;
     const PREP_LENGTH = 20;
 
     const MAX_PRE_FIGHT_HEAL_PERCENT = 85;
@@ -78,6 +79,8 @@ class Battle {
     public int $player1_last_damage_taken;
     public int $player2_last_damage_taken;
 
+    public string $battle_background_link;
+
     /**
      * @param System  $system
      * @param Fighter $player1
@@ -87,7 +90,7 @@ class Battle {
      * @throws RuntimeException
      */
     public static function start(
-        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null
+        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null, string $battle_background_link = ''
     ) {
         $json_empty_array = '[]';
 
@@ -131,7 +134,8 @@ class Battle {
                 `jutsu_cooldowns` = '" . $json_empty_array . "',
                 `fighter_jutsu_used` = '" . $json_empty_array . "',
                 `is_retreat` = '" . (int)false . "',
-                `patrol_id` = " . (!empty($patrol_id) ? $patrol_id : "NULL") . "
+                `patrol_id` = " . (!empty($patrol_id) ? $patrol_id : "NULL") . ",
+                `battle_background_link` = '{$battle_background_link}'
         ");
         $battle_id = $system->db->last_insert_id;
 
@@ -255,6 +259,8 @@ class Battle {
 
         $this->player1_last_damage_taken = $battle['player1_last_damage_taken'];
         $this->player2_last_damage_taken = $battle['player2_last_damage_taken'];
+
+        $this->battle_background_link = empty($battle['battle_background_link']) ? '' : $battle['battle_background_link'];
     }
 
     /**
@@ -272,11 +278,23 @@ class Battle {
         $this->player2->combat_id = Battle::combatId(Battle::TEAM2, $this->player2);
 
         if($this->player1 instanceof NPC) {
-            $this->player1->loadData();
+            // if opponent is player, pass to constructor for AI scaling
+            if ($this->player2 instanceof User) {
+                $this->player1->loadData($this->player2);
+            }
+            else {
+                $this->player1->loadData();
+            }
             $this->player1->health = $this->fighter_health[$this->player1->combat_id];
         }
         if($this->player2 instanceof NPC) {
-            $this->player2->loadData();
+            // if opponent is player, pass to constructor for AI scaling
+            if ($this->player1 instanceof User) {
+                $this->player2->loadData($this->player1);
+            }
+            else {
+                $this->player2->loadData();
+            }
             $this->player2->health = $this->fighter_health[$this->player2->combat_id];
         }
 
@@ -322,6 +340,73 @@ class Battle {
                     continue;
                 }
                 $this->player2->resist_boost += $boost['effect_amount'] / $this->player1->getBaseStatTotal();
+            }
+        }
+
+        // Weaken jutsu that do not match player's primary jutsu type, or are not equipped
+        $player1_primary_jutsu_type = $this->player1->getPrimaryJutsuType();
+        $player2_primary_jutsu_type = $this->player2->getPrimaryJutsuType();
+
+        $player1_equipped_jutsu_ids = array_flip(
+            array_map(function($equipped_jutsu) {
+                return $equipped_jutsu['id'];
+            }, $this->player1->equipped_jutsu)
+        );
+        $player2_equipped_jutsu_ids = array_flip(
+            array_map(function ($equipped_jutsu) {
+                return $equipped_jutsu['id'];
+            }, $this->player2->equipped_jutsu)
+        );
+
+        foreach ($this->player1->jutsu as $jutsu) {
+            if ($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player1_equipped_jutsu_ids[$jutsu->id])) {
+                $jutsu->power *= 0.75;
+                foreach($jutsu->effects as $effect) {
+                    $effect->display_effect_amount *= 0.75;
+                    $effect->effect_amount *= 0.75;
+                }
+            }
+
+            if($jutsu->rank == 1) continue;
+
+            if($jutsu->jutsu_type != $player1_primary_jutsu_type) {
+                $jutsu->power *= 0.5;
+                foreach($jutsu->effects as $effect) {
+                    $effect->display_effect_amount *= 0.5;
+                    $effect->effect_amount *= 0.5;
+                }
+            }
+        }
+        foreach($this->player2->jutsu as $jutsu) {
+            if ($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player2_equipped_jutsu_ids[$jutsu->id])) {
+                $jutsu->power *= 0.75;
+                foreach ($jutsu->effects as $effect) {
+                    $effect->display_effect_amount *= 0.75;
+                    $effect->effect_amount *= 0.75;
+                }
+            }
+        }
+      
+        if (!$this->player2 instanceof NPC) {
+            foreach ($this->player2->jutsu as $jutsu) {
+                if ($jutsu->rank == 1)
+                    continue;
+
+                if ($jutsu->jutsu_type != $player2_primary_jutsu_type) {
+                    $jutsu->power *= 0.5;
+                    foreach ($jutsu->effects as $effect) {
+                        $effect->display_effect_amount *= 0.5;
+                        $effect->effect_amount *= 0.5;
+                    }
+                }
+
+                if($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player2_equipped_jutsu_ids[$jutsu->id])) {
+                    $jutsu->power *= 0.75;
+                    foreach($jutsu->effects as $effect) {
+                        $effect->display_effect_amount *= 0.75;
+                        $effect->effect_amount *= 0.75;
+                    }
+                }
             }
         }
     }
@@ -386,6 +471,10 @@ class Battle {
         }
     }
 
+    public static function calcTimeRemaining($turn_time, $player_time): int {
+        return $player_time - (time() - $turn_time);
+    }
+
     public function prepTimeRemaining(): int {
         return Battle::PREP_LENGTH - (time() - $this->start_time);
     }
@@ -397,14 +486,14 @@ class Battle {
                 if ($min) {
                     $this->player1_time = self::TURN_LENGTH;
                 } else {
-                    $this->player1_time = min(max(($this->player1_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::INITIAL_TURN_LENGTH);
+                    $this->player1_time = min(max(($this->player1_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::MAX_TURN_LENGTH);
                 }
                 break;
             case $this->player2_id:
                 if ($min) {
                     $this->player2_time = self::TURN_LENGTH;
                 } else {
-                    $this->player2_time = min(max(($this->player2_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::INITIAL_TURN_LENGTH);
+                    $this->player2_time = min(max(($this->player2_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::MAX_TURN_LENGTH);
                 }
                 break;
             default:
@@ -476,7 +565,7 @@ class Battle {
             }
         }
         foreach ($this->player2->jutsu as $jutsu) {
-            if ($jutsu->linked_jutsu_id > 0) {
+            if ($jutsu->linked_jutsu_id > 0 && $this->player2 instanceof User) {
                 $id = "J" . $jutsu->id . ":T2:U:" . $this->player2->user_id;
                 if (isset($this->jutsu_cooldowns[$id]) && $this->jutsu_cooldowns[$id] > 0) {
                     if (!isset($this->player1->jutsu[$jutsu->linked_jutsu_id])) {

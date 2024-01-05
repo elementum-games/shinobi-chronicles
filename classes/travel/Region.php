@@ -9,6 +9,7 @@ class Region {
     public array $vertices = [];
     public int $village;
     public string $color;
+    public string $battle_background_link;
 
     const VILLAGE_COLORS = [
         0 => "rgba(0, 0, 0, 0)",
@@ -27,6 +28,7 @@ class Region {
         $new_region->village = $region_data['village'];
         $new_region->color = self::VILLAGE_COLORS[$new_region->village];
         $new_region->vertices = json_decode($region_data['vertices']);
+        $new_region->battle_background_link = empty($region_data['battle_background_link']) ? '' : $region_data['battle_background_link'];
         // generate coordinate list
         if ($get_coordinates) {
             for ($i = $min_x; $i < $max_x; $i++) {

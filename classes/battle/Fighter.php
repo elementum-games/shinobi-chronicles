@@ -63,10 +63,10 @@ abstract class Fighter {
 
     public array $equipped_jutsu;
     public array $equipped_weapon_ids;
-    public array $equipped_armor;
+    public array $equipped_armor_ids;
 
     public int $bloodline_id;
-    public ?Bloodline $bloodline;
+    public ?Bloodline $bloodline = null;
 
     public array $bloodline_offense_boosts;
     public array $bloodline_defense_boosts;
@@ -93,8 +93,6 @@ abstract class Fighter {
     public $ninjutsu_resist = 0;
     public $taijutsu_resist = 0;
     public $genjutsu_resist = 0;
-
-    public $defense_boost = 0;
 
     public $barrier;
 
@@ -248,6 +246,49 @@ abstract class Fighter {
         return $final_amount * (self::SKILL_OFFENSE_RATIO * 2) * $avg_rand;
     }
 
+    public function getPrimaryJutsuType(): string {
+        // Get total offense value
+        $ninjutsu_skill = $this->ninjutsu_skill;
+        $taijutsu_skill = $this->taijutsu_skill;
+        $genjutsu_skill = $this->genjutsu_skill;
+        if ($this->bloodline != null) {
+            foreach ($this->bloodline->combat_boosts as $combat_boost) {
+                switch ($combat_boost['effect']) {
+                    case 'ninjutsu_boost':
+                        $ninjutsu_skill += $combat_boost['effect_amount'];
+                        break;
+                    case 'taijutsu_boost':
+                        $taijutsu_skill += $combat_boost['effect_amount'];
+                        break;
+                    case 'genjutsu_boost':
+                        $genjutsu_skill += $combat_boost['effect_amount'];
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        // First, is one of the offenses higher than the others
+        if($ninjutsu_skill > max($taijutsu_skill, $genjutsu_skill)) {
+            return 'ninjutsu';
+        }
+        if($taijutsu_skill > max($ninjutsu_skill, $genjutsu_skill)) {
+            return 'taijutsu';
+        }
+        if($genjutsu_skill > max($ninjutsu_skill, $taijutsu_skill)) {
+            return 'genjutsu';
+        }
+
+        // What's the offense boost on bloodline, if any
+        if($this->bloodline != null) {
+            return $this->bloodline->getPrimaryJutsuType();
+        }
+
+        // Fuck it, you're a ninja, you use ninjutsu - lmfao
+        return 'ninjutsu';
+    }
+
     /**
      * function calcDamage() CONTAINS TEMP NUMBER FIX
      *    Calculates raw damage based on player stats and jutsu or item strength
@@ -257,7 +298,7 @@ abstract class Fighter {
      * @return float|int
      * @throws RuntimeException
      */
-    public function calcDamage(Jutsu $attack, bool $disable_randomness = false, float $immolate_raw_damage = 0): float|int {
+    public function calcDamage(Jutsu $attack, bool $disable_randomness = false): float|int {
         if($this->system->debug['damage'])  {
             echo "Debugging damage for {$this->getName()}<br />";
         }
@@ -371,8 +412,6 @@ abstract class Fighter {
 
         $damage = $offense * $attack->power * $rand;
 
-        $damage += $immolate_raw_damage;
-
         // Add non-BL damage boosts
         if($this->system->debug['damage']) {
             echo "Damage/boost/nerf: $damage / {$off_boost} / {$off_nerf}} <br />";
@@ -407,14 +446,13 @@ abstract class Fighter {
      * @param bool   $residual_damage
      * @return float|int
      */
-    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false, bool $apply_resists = true, string $element = Jutsu::ELEMENT_NONE): float|int {
+    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false, bool $apply_resists = true, string $element = Jutsu::ELEMENT_NONE, bool $is_raw_damage = true): float|int {
         $defense = self::BASE_DEFENSE;
 
         if($defense <= 0) {
             $defense = 1;
         }
         if($apply_resists) {
-            $defense *= (1 + $this->defense_boost);
             if (!empty($this->bloodline_defense_boosts)) {
                 foreach ($this->bloodline_defense_boosts as $id => $boost) {
                     $boost_type = explode('_', $boost['effect'])[0];
@@ -438,20 +476,20 @@ abstract class Fighter {
         switch($defense_type) {
             case 'ninjutsu':
                 // Resist unfairly applies to nin/tai residuals which only have a 25% or so effect amount, so we lower its effectiveness compared to a regular hit
-                if ($apply_resists) {
+                if ($apply_resists && $is_raw_damage) {
                     $raw_damage -= $residual_damage ? $this->ninjutsu_resist * 0.5 : $this->ninjutsu_resist;
                 }
                 $weakness_modifier += $this->ninjutsu_weakness;
                 break;
             case 'genjutsu':
-                if ($apply_resists) {
+                if ($apply_resists && $is_raw_damage) {
                     $raw_damage -= $this->genjutsu_resist;
                 }
                 $weakness_modifier += $this->genjutsu_weakness;
                 break;
             case 'taijutsu':
                 // Resist unfairly applies to residuals, so we lower its effectiveness compared to a regular hit
-                if ($apply_resists) {
+                if ($apply_resists && $is_raw_damage) {
                     $raw_damage -= $residual_damage ? $this->taijutsu_resist * 0.5 : $this->taijutsu_resist;
                 }
                 $weakness_modifier += $this->taijutsu_weakness;
@@ -484,21 +522,25 @@ abstract class Fighter {
             $raw_damage *= (100 - $this->reputation_defense_boost) / 100;
         }
 
-        $damage = round($raw_damage / $defense, 2);
-        if($damage < 0.0) {
+        if ($is_raw_damage) {
+            $damage = round($raw_damage / $defense, 2);
+        } else {
+            $damage = $raw_damage;
+        }
+        if ($damage < 0.0) {
             $damage = 0;
         }
-
         if ($apply_resists) {
+            $resist_boost = $this->resist_boost;
             // if higher than soft cap, apply penalty
-            if ($this->resist_boost > BattleManager::RESIST_SOFT_CAP) {
-                $this->resist_boost = (($this->resist_boost - BattleManager::RESIST_SOFT_CAP) * BattleManager::RESIST_SOFT_CAP_RATIO) + BattleManager::RESIST_SOFT_CAP;
+            if ($resist_boost > BattleManager::RESIST_SOFT_CAP) {
+                $resist_boost = (($resist_boost - BattleManager::RESIST_SOFT_CAP) * BattleManager::RESIST_SOFT_CAP_RATIO) + BattleManager::RESIST_SOFT_CAP;
             }
             // if still higher than cap cap, set to hard cap
-            if ($this->resist_boost > BattleManager::RESIST_HARD_CAP) {
-                $this->resist_boost = BattleManager::RESIST_HARD_CAP;
+            if ($resist_boost > BattleManager::RESIST_HARD_CAP) {
+                $resist_boost = BattleManager::RESIST_HARD_CAP;
             }
-            $damage *= 1 - $this->resist_boost;
+            $damage *= 1 - $resist_boost;
         }
         return $damage;
     }
@@ -511,24 +553,7 @@ abstract class Fighter {
         return $include_bloodline ? $this->speed + $this->bloodline_speed_boost : $this->speed;
     }
 
-    public function getBaseStatTotal(): int {
-        if ($this instanceof NPC) {
-            $rankManager = new RankManager($this->system);
-            $rankManager->loadRanks();
-            return $rankManager->statsForRankAndLevel($this->rank, $this->level);
-        } else if ($this instanceof User) {
-            return $this->total_stats;
-        }
-        $stat_total = $this->taijutsu_skill
-            + $this->ninjutsu_skill
-            + $this->genjutsu_skill
-            + (!empty($this->bloodline_skill) ? $this->bloodline_skill : 0)
-            + $this->willpower
-            + $this->intelligence
-            + $this->speed
-            + $this->cast_speed;
-        return max(1, $stat_total);
-    }
+    abstract function getBaseStatTotal(): int;
 
     // Actions
     abstract public function useJutsu(Jutsu $jutsu);

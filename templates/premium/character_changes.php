@@ -305,9 +305,8 @@
                 A gift offering of <?= $premiumShopManager->costs['element_change'] ?> Ancient Kunai is required.
                 <br/>
                 <br/>
-                <b>(IMPORTANT: This is non-reversable once completed<br />If you want to return to your original element you
-                    will have to pay another fee.<br />You will forget any elemental jutsu you currently have of this
-                    nature.)</b><br />
+                <b>(IMPORTANT: This is non-reversible once completed<br />If you want to return to your original element you
+                    will have to pay another fee.)</b><br />
 
                 <br/>Choose your element to reattune:
                 <br/>
@@ -382,7 +381,7 @@
                 However to get the other village to accept you, you must offer them <?= $premiumShopManager->costs['village_change'] ?>
                 Ancient Kunai.<br/>
                 <p>You will lose 20% of your Reputation for all village changes after the first (you can not fall below Shinobi).</p>
-                <p>Villages with "From the Ashes" policy may be transferred to at no cost.</p>
+                <p>Villages with "From the Ashes" policy reduce the Reputation and Ancient Kunai cost to transfer by 50%.</p>
                 <br/>
                 <b>(IMPORTANT: This is non-reversable once completed<br />If you want to return to your original village you
                     will have to pay

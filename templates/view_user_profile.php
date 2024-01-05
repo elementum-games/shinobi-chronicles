@@ -216,7 +216,7 @@ $clan_positions = array(
                     <!--// Last chat post-->
                     <?php
                     $result = $system->db->query(
-                        "SELECT `time` FROM `chat` WHERE `user_name`='{$viewUser->user_name}' ORDER BY `post_id` DESC LIMIT 1"
+                        "SELECT `time` FROM `chat` WHERE `user_id`='{$viewUser->user_id}' ORDER BY `post_id` DESC LIMIT 1"
                     );
                     ?>
                     <?php if($system->db->last_num_rows > 0): ?>

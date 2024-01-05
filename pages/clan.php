@@ -52,7 +52,7 @@ function clan() {
                 }
                 return true;
             }
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 	}
@@ -67,7 +67,7 @@ function clan() {
                 if($challenge_succeeded) {
                     $page = 'controls';
                 }
-			} catch (Exception $e) {
+			} catch (RuntimeException $e) {
 				$system->message($e->getMessage());
 				$page = 'HQ';
 			}
@@ -102,7 +102,7 @@ function clan() {
 			$motto = $system->db->clean($_POST['motto']);
 			try {
 				$player->clan->setMotto($motto);
-			} catch (Exception $e) {
+			} catch (RuntimeException $e) {
 				$system->message($e->getMessage());
 			}
 		}
@@ -110,7 +110,7 @@ function clan() {
 			$logo_url = $system->db->clean($_POST['logo']);
 			try {
                 $player->clan->setLogoUrl($logo_url);
-			} catch (Exception $e) {
+			} catch (RuntimeException $e) {
 				$system->message($e->getMessage());
 			}
 		}
@@ -118,7 +118,7 @@ function clan() {
 			$new_boost = $system->db->clean($_POST['boost']);
 			try {
                 $player->clan->setBoost($new_boost);
-			} catch (Exception $e) {
+			} catch (RuntimeException $e) {
 				$system->message($e->getMessage());
 			}
 		}
@@ -126,7 +126,7 @@ function clan() {
 			$info = $system->db->clean($_POST['info']);
 			try {
                 $player->clan->setInfo($info);
-			} catch (Exception $e) {
+			} catch (RuntimeException $e) {
 				$system->message($e->getMessage());
 			}
 		}

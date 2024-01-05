@@ -66,7 +66,7 @@ function healingShop() {
 			if($player->health > $player->max_health) {
 				$player->health = $player->max_health;
 			}
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 			$system->printMessage();
 		}

@@ -10,6 +10,8 @@ require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/Route.php';
 require_once __DIR__ . '/../classes/event/DoubleExpEvent.php';
 require_once __DIR__ . '/../classes/event/DoubleReputationEvent.php';
+require_once __DIR__ . '/../classes/event/BonusExpWeekend.php';
+require_once __DIR__ . '/../classes/event/HolidayBonusEvent.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -31,6 +33,19 @@ class System {
     const SC_ADMIN_EMAIL = "admin@shinobichronicles.com";
     const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
+
+    const HOLIDAYS = [
+		'Jan 1' => 'New Years Boost',
+	    'Jan 16' => 'Martin Luther King Day Boost',
+	    'Feb 14' => 'Valentines Day Boost',
+	    'May 27' => 'Memorial Day Boost',
+	    'Jun 19' => 'Juneteenth Boost',
+	    'Jul 4' => 'Independence Day Boost',
+	    'Sep 2' => 'Labor Day Boost',
+	    'Nov 11' => 'Veterans Day Boost',
+	    'Nov 28' => 'Thanksgiving Day Boost',
+	    'Dec 25' => 'Christmas Day Boost',
+	];
 
     // Temporary event data storage
     public ?Event $event;
@@ -65,7 +80,7 @@ class System {
     //New server time
     const SERVER_TIME_ZONE = "America/New_York";
     const REPUTATION_RESET_DAY = "next friday";
-    const REPUTATION_RESET_HOUR = 17;
+    const REPUTATION_RESET_HOUR = 20;
     const REPUTATION_RESET_MINUTE = 0;
     public DateTimeImmutable $SERVER_TIME;
     public DateTimeImmutable $REPUTATION_RESET;
@@ -107,8 +122,8 @@ class System {
 
     // Default layout
     const DEFAULT_LAYOUT = 'new_geisha';
-    const VERSION_NUMBER = '0.10.0';
-    const VERSION_NAME = '0.10 Warring Shadows';
+    const VERSION_NUMBER = '0.11';
+    const VERSION_NAME = '0.11 Warring Shadows';
 
     // Misc stuff
     const SC_MAX_RANK = 4;
@@ -666,20 +681,20 @@ class System {
         // Dev Environment Event start times
         if($this->isDevEnvironment()) {
             $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-15');
-            $double_exp_start_time = new DateTimeImmutable('2023-09-13');
+            $double_exp_start_time = new DateTimeImmutable('2023-12-25');
             $double_reputation_start_time = new DateTimeImmutable('2023-10-16');
         }
         // Production Event start times
         else {
             $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
-            $double_exp_start_time = new DateTimeImmutable('2023-09-19');
+            $double_exp_start_time = new DateTimeImmutable('2023-12-25');
             $double_reputation_start_time = new DateTimeImmutable('2023-10-18');
         }
 
         /*****CORE EVENTS*****/
         // TODO: Make core events more manageable
         // Double exp gains
-        $double_exp_end_time = new DateTimeImmutable('2023-11-28');
+        $double_exp_end_time = new DateTimeImmutable('2023-12-27');
         if($current_datetime > $double_exp_start_time && $current_datetime < $double_exp_end_time) {
             $this->event = new DoubleExpEvent($double_exp_end_time);
         }
@@ -699,6 +714,17 @@ class System {
         if($this->testNotifications['event'] && is_null($this->event) && $this->isDevEnvironment()) {
             $this->event = new DoubleExpEvent($current_datetime->modify("+2 weeks"));
         }
+
+        // If no other event active on weekend, activate bonus XP
+        if (!isset($this->event) && (System::currentDayOfWeek() == 0 || System::currentDayOfWeek() == 6)) {
+            $endTime = new DateTimeImmutable('next Monday');
+            $this->event = new BonusExpWeekend($endTime);
+        }
+    	// Holiday training boosts, if no other event has been planned
+    	if (!isset($this->event) && in_array($current_datetime->format('M j'), array_keys(self::HOLIDAYS))) {
+		    $endTime = new DateTimeImmutable("tomorrow");
+		    $this->event = new HolidayBonusEvent($endTime, self::HOLIDAYS[$current_datetime->format('M j')]);
+	    }
     }
 
     /**
@@ -752,7 +778,7 @@ class System {
             if($days && $include_days) {
                 $string = "$days day(s), $hours hour(s), $minutes minute(s)";
             }
-            else if($hours && $hours != '00') {
+            else if ($hours && $hours != '00') {
                 $string = "$hours hour(s), $minutes minute(s)";
             }
             else {
@@ -776,6 +802,13 @@ class System {
 
             if($include_seconds) {
                 $string .= ":$seconds";
+            }
+        }
+        else if($format == 'days') {
+            if ($days) {
+                $string = "$days day(s)";
+            } else {
+                $string = "0 days";
             }
         }
         return $string;
@@ -807,7 +840,8 @@ class System {
         };
     }
 
-    public static function currentYear(): int {
+    public static function currentYear(): int
+    {
         return (int) date('Y', time());
     }
 
@@ -837,6 +871,13 @@ class System {
      */
     public static function currentMinute(): int {
         return (int)date('i');
+    }
+
+    /**
+     * @return int day of the week: 0 (Sunday) - 6 (Saturday)
+     */
+    public static function currentDayOfWeek(): int {
+        return (int) date('w');
     }
 
     public static function getKunaiPacks(): array {

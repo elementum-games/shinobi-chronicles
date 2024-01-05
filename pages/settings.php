@@ -62,7 +62,7 @@ function userSettings() {
 
             $player->avatar_link = $avatar_link;
             $system->message("Avatar updated!");
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -113,7 +113,7 @@ function userSettings() {
             if ($system->db->last_affected_rows >= 1) {
                 $system->message("Password updated!");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -137,7 +137,7 @@ function userSettings() {
             if ($system->db->last_affected_rows == 1) {
                 $system->message("Journal updated!");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -153,12 +153,14 @@ function userSettings() {
             } else {
                 $blacklist_user = $system->db->fetch($result);
             }
-            if ($blacklist_user['staff_level'] >= User::STAFF_MODERATOR) {
-                throw new RuntimeException("You are unable to blacklist staff members!");
+
+            if (!in_array($blacklist_user['staff_level'], Blacklist::$blockable_staff_levels)) {
+                throw new RuntimeException("You are unable to blacklist moderators or staff admins!");
             }
             if ($player->user_id == $blacklist_user['user_id']) {
                 throw new RuntimeException("You cannot blacklist yourself!");
             }
+
             // Add user
             if (isset($_POST['blacklist_add'])) {
                 if($player->blacklist->userBlocked($blacklist_user['user_id'])) {
@@ -182,7 +184,7 @@ function userSettings() {
                 }
             }
 
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();

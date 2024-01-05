@@ -57,7 +57,7 @@
     </td></tr>
     <tr><td style='text-align:center;'>
         <div class='choicesContainer'>
-            <img src="images/pages/ramen_300px.png" class='ramenImage' />
+            <img src="images/ramen150.png" class='ramenImage' />
             <div class='choices'>
                 <?php foreach($ramen_choices as $key => $ramen): ?>
                     <a href='<?= $self_link ?>&heal=<?= $key ?>'><span class='button' style='width:10em;'><?= $ramen['label'] ?> ramen</span></a>

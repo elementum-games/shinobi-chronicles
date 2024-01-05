@@ -1,5 +1,10 @@
 <?php
 class Blacklist {
+    public static array $blockable_staff_levels = [
+        User::STAFF_NONE,
+        User::STAFF_CONTENT_ADMIN
+    ];
+
     public function __construct(
         public System $system,
         public int $user_id,
@@ -28,13 +33,36 @@ class Blacklist {
         }
         else {
             $this->blacklist = array();
-            $this->setEncodedBlacklist();
+            $this->createBlacklist();
         }
     }
 
     // Check if player has anybody blocked
-    public function hasUsersBlocked(): bool {
+    public function hasAnyUsersBlocked(): bool {
         return !empty($this->blacklist);
+    }
+
+    /**
+     * @return int[] user IDs of accounts the player has blocked
+     */
+    public function blockedUserIds(bool $exclude_staff = false): array {
+        $blocked_user_ids = array_keys($this->blacklist);
+
+        if(!$exclude_staff) {
+            return $blocked_user_ids;
+        }
+        if(count($blocked_user_ids) <= 0) {
+            return $blocked_user_ids;
+        }
+
+        $result = $this->system->db->query("
+            SELECT `user_id` FROM `users` 
+            WHERE `user_id` IN (" . implode(",", $blocked_user_ids) . ")
+            AND `staff_level` IN (" . implode(",", self::$blockable_staff_levels) . ")
+        ");
+        return array_map(function($user_record) {
+            return $user_record['user_id'];
+        }, $this->system->db->fetch_all($result));
     }
 
     // Check if user is blocked by id
@@ -109,7 +137,24 @@ class Blacklist {
     }
 
     // Update blacklist
-    public function updateData() {
+    public function updateData(): void {
         $this->system->db->query("UPDATE `blacklist` SET `blocked_ids`='$this->encodedBlacklist' WHERE `user_id` = $this->user_id LIMIT 1");
+    }
+
+    // Create blacklist
+    public function createBlacklist(): void {
+        // Redundancy check
+        $this->system->db->query("SELECT * FROM `blacklist` WHERE `user_id` = $this->user_id LIMIT 1");
+        if(!$this->system->db->last_num_rows) {
+            $this->encodedBlacklist = json_encode(array());
+            $this->system->db->query("INSERT INTO `blacklist` (`user_id`, `blocked_ids`) VALUES ('$this->user_id', '$this->encodedBlacklist')");
+        }
+    }
+
+    public static function fromDb(System $system, int $user_id): Blacklist {
+        return new Blacklist(
+            system: $system,
+            user_id: $user_id
+        );
     }
 }

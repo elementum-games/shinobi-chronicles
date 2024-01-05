@@ -44,7 +44,7 @@ function LoadConvoList(System $system, User $player): InboxAPIResponse {
 		}
 		
 		$response->response_data = Inbox::allConvosForUser($system, $player->user_id);
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -103,7 +103,7 @@ function ViewConvo(System $system, User $player, int|string $convo_id): InboxAPI
 		// get convo data
 		$response->response_data = $inbox->getConversation($convo_id);
 	
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -183,7 +183,7 @@ function SendMessage(System $system, User $player, int|string $convo_id, string 
 			return $response;
 		}
 		
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -230,7 +230,7 @@ function ChangeTitle(System $system, User $player, int|string $convo_id, string 
 		// change title
 		$response->response_data[] = Inbox::updateTitle($system, $convo_id, $new_title);
 
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -309,7 +309,7 @@ function AddPlayer(System $system, User $player, int|string $convo_id, string $n
 			$response->errors[] = 'Fatal error adding player';
 		}
 
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -390,7 +390,7 @@ function RemovePlayer(System $system, User $player, int|string $convo_id, $remov
 			return $response;
 		}
 
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -440,7 +440,7 @@ function LeaveConversation(System $system, User $player, int|string $convo_id): 
 			$response->errors[] = 'Fatal error leaving the conversation';
 		}
 
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -538,7 +538,7 @@ function CreateNewConvo(System $system, User $player, string $members, ?string $
 			return $response;
 		}		
 		
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -596,7 +596,7 @@ function CheckForNewMessages(System $system, User $player, int|string $convo_id,
 			Inbox::updateLastViewedForUser($system, $convo_id, $player->user_id);
 		}
 
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -641,7 +641,7 @@ function LoadNextPage(System $system, User $player, int|string $convo_id, int $o
             message_id: $oldest_message_id
         );
 		
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -684,7 +684,7 @@ function ToggleMute(System $system, User $player, int|string $convo_id): InboxAP
 			$response->errors[] = 'Error toggling mute status.';
 		}
 
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 

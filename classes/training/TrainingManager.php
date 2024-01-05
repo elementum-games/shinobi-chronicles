@@ -330,8 +330,8 @@ class TrainingManager {
 
     public function trainingDisplay() {
         $train_gain = $this->train_gain;
-        if (!empty($this->system->event) && $this->system->event instanceof DoubleExpEvent) {
-            $train_gain *= DoubleExpEvent::exp_modifier;
+        if (!empty($this->system->event) && $this->system->event->exp_gain_multiplier > 1) {
+            $train_gain *= $this->system->event->exp_gain_multiplier;
         }
         if(str_contains($this->train_type, 'jutsu:')) {
             return "You will gain " . User::$jutsu_train_gain . " jutsu levels once training is complete!";
@@ -352,5 +352,25 @@ class TrainingManager {
         $this->train_time = time() + $length;
         $this->train_time_remaining = $length;
         $this->train_gain = $amount;
+    }
+
+    /**
+     * @param string $difficulty_level
+     * @param int $rank
+     * @return int
+     */
+    public static function getAIStatGain(string $difficulty_level, int $rank): int {
+        switch ($difficulty_level) {
+            case NPC::DIFFICULTY_NONE:
+                return 1;
+            case NPC::DIFFICULTY_EASY:
+                return 1;
+            case NPC::DIFFICULTY_NORMAL:
+                return 2;
+            case NPC::DIFFICULTY_HARD:
+                return 4;
+            default:
+                return 1;
+        }
     }
 }

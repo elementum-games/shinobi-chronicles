@@ -235,7 +235,7 @@ function viewBattles() {
                 } else {
                     throw new RuntimeException("Invalid battle!");
                 }
-            } catch (Exception $e) {
+            } catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }

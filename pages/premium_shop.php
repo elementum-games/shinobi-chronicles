@@ -47,7 +47,7 @@ function premiumShop(): void {
                 );
                 return;
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     } else if (isset($_POST['name_change'])) {
@@ -74,7 +74,7 @@ function premiumShop(): void {
             } else {
                 $result = $premiumShopManager->changeUserName($new_name);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     } else if (isset($_POST['change_gender'])) {
@@ -99,7 +99,7 @@ function premiumShop(): void {
                 $result = $premiumShopManager->changeGender($new_gender);
                 $system->message($result->success_message);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     } else if (isset($_POST['stat_reset'])) {
@@ -129,7 +129,7 @@ function premiumShop(): void {
                 $player->exp -= $exp;
                 $system->message("You have reset your " . System::unSlug($stat) . " to $reset_amount.");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -196,7 +196,7 @@ function premiumShop(): void {
 
                 );
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -222,7 +222,7 @@ function premiumShop(): void {
 
                 $system->message("You have reset your AI wins and losses to 0.");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -248,7 +248,7 @@ function premiumShop(): void {
 
                 $system->message("You have reset your PvP wins and losses to 0.");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -320,6 +320,7 @@ function premiumShop(): void {
                     system: $system,
                     bloodline_id: $bloodline_id,
                     user_id: $player->user_id,
+                    player: $player,
                     display: false
                 );
 
@@ -339,7 +340,7 @@ function premiumShop(): void {
 
                 renderPurchaseComplete('New Bloodline!', $message);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     } else if (isset($_POST['purchase_bloodline_random'])) {
@@ -411,6 +412,7 @@ function premiumShop(): void {
                     system: $system,
                     bloodline_id: $bloodline_id,
                     user_id: $player->user_id,
+                    player: $player,
                     display: false
                 );
 
@@ -430,7 +432,7 @@ function premiumShop(): void {
 
                 renderPurchaseComplete('New Bloodline!', $message);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -554,7 +556,7 @@ function premiumShop(): void {
 
                 $system->message("Seal infused!");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
             $system->printMessage();
         }
@@ -588,10 +590,10 @@ function premiumShop(): void {
             //Confirm purchase
             if (!isset($_POST['confirm_chakra_element_change'])) {
                 $confirmation_string = "Are you sure you want to <b>forget the {$player->elements[$editing_element_index]} nature</b>
-                and any jutsus you have to <b>attune to the $new_element nature</b>?<br />
+                and <b>attune to the $new_element nature</b>?<br />
                 <br />
                 <b>(IMPORTANT: This is non-reversable once completed! If you want to return to your original element you
-                will have to pay another fee. You will forget any elemental jutsu you currently have of this nature.)</b>";
+                will have to pay another fee.)</b>";
 
                 renderPurchaseConfirmation(
                     purchase_type: 'change_element',
@@ -636,8 +638,8 @@ function premiumShop(): void {
                     break;
             }
             $target_village = new Village($system, $village);
-            if ($target_village->policy->free_transfer) {
-                $ak_cost = 0;
+            if ($target_village->policy->transfer_cost_reduction > 0) {
+                $ak_cost = floor($ak_cost * (1 - ($target_village->policy->transfer_cost_reduction / 100)));
             }
 
             if ($player->team) {
@@ -660,11 +662,13 @@ function premiumShop(): void {
                 }
             }
 
+            $rep_loss_percent = round(20 * (1 - ($target_village->policy->transfer_cost_reduction / 100)));
+
             if (!isset($_POST['confirm_village_change'])) {
                 $confirmation_string = "Are you sure you want to move from the {$player->village->name} village to the $village
                 village?"
                     . (!$player->clan->bloodline_only ? " You will be kicked out of your clan and placed in a random clan in the new village." : "")
-                    . ((!$target_village->policy->free_transfer && $player->village_changes > 0) ? "<br />You will lose 20% of your Reputation for this village change (you can not fall below Shinobi)." : "")
+                    . (($player->village_changes > 0) ? "<br />You will lose {$rep_loss_percent}% of your Reputation for this village change (you can not fall below Shinobi)." : "")
                     . "<br><b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village you will have to pay a higher transfer fee)</b>";
 
                 renderPurchaseConfirmation(
@@ -704,8 +708,9 @@ function premiumShop(): void {
                 }
 
                 // Lose rep tier for subsequent village changes (5k minimum rep)
-                if ($player->village_changes > 0 && $player->reputation->rank >= 3 && !$target_village->policy->free_transfer) {
-                    $new_reputation = floor(max($player->village_rep * 0.8, UserReputation::$VillageRep[3]['min_rep']));
+                if ($player->village_changes > 0 && $player->reputation->rank >= 3) {
+                    $policy_reduction = $target_village->policy->transfer_cost_reduction / 100;
+                    $new_reputation = floor(max($player->village_rep * (1 - (0.2 * $policy_reduction)), UserReputation::$VillageRep[3]['min_rep']));
                     $player->village_rep = $new_reputation;
                 }
 

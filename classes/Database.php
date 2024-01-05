@@ -72,6 +72,7 @@ class Database {
 
     /**
      * @throws RuntimeException
+     * @throws DatabaseDeadlockException
      */
     public function query($query): mysqli_result|bool {
         $query = trim($query);
@@ -98,9 +99,18 @@ class Database {
             $this->connect();
         }
 
-        $result = mysqli_query($this->con, $query);
-        if(!$result) {
-            $this->handleQueryError($query);
+        try {
+            $result = mysqli_query($this->con, $query);
+            if(!$result) {
+                $this->handleQueryError($query, mysqli_error($this->con), mysqli_errno($this->con));
+            }
+        } catch (Exception $e) {
+            if ($e->getCode() == Database::MYSQL_DEADLOCK_ERROR_CODE) {
+                $this->handleQueryError($query, $e->getMessage(), $e->getCode());
+            }
+            else {
+                throw $e;
+            }
         }
 
         if($this->last_query_type == 'select') {
@@ -120,13 +130,11 @@ class Database {
     /**
      * @throws DatabaseDeadlockException|Exception
      */
-    protected function handleQueryError(string $query) {
-        $error_code = mysqli_errno($this->con);
+    protected function handleQueryError(string $query, string $error_message, int $error_code) {
         if($error_code == self::MYSQL_DEADLOCK_ERROR_CODE) {
             throw new DatabaseDeadlockException();
         }
 
-        $error_message = mysqli_error($this->con);
         error_log($error_message . ' in query ' . $query . ' at ' . System::simpleStackTrace());
 
         throw new RuntimeException($error_message);

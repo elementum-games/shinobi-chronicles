@@ -21,6 +21,29 @@ try {
         throw new RuntimeException('No request was made!');
     }
 
+    try {
+        handleTravelRequest($system, $player, $request);
+    } catch(DatabaseDeadlockException $e) {
+        $system->db->rollbackTransaction();
+        // sleep for 100-200ms then retry
+        usleep(mt_rand(100000, 200000));
+
+        $system->db->startTransaction();
+        $player->loadData();
+        handleTravelRequest($system, $player, $request);
+    }
+} catch (Throwable $e) {
+    if($e instanceof DatabaseDeadlockException) {
+        error_log("DEADLOCK - retry did not solve");
+    }
+
+    API::exitWithException($e, system: $system);
+}
+
+/**
+ * @throws DatabaseDeadlockException
+ */
+function handleTravelRequest(System $system, User $player, string $request) {
     $TravelAPIResponse = new TravelAPIResponse();
     $TravelManager = new TravelManager($system, $player);
 
@@ -30,6 +53,7 @@ try {
     switch($request) {
         case 'LoadTravelData':
             $TravelAPIResponse->response = [
+                'success' => true,
                 'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $TravelManager, system: $system),
                 'nearbyPlayers' => TravelApiPresenter::nearbyPlayersResponse(travelManager: $TravelManager),
                 'nearbyPatrols' => TravelApiPresenter::nearbyPatrolsResponse(travelManager: $TravelManager),
@@ -63,7 +87,7 @@ try {
             $target_attack_id = $system->db->clean($_POST['target']);
 
             $success = $TravelManager->attackPlayer($target_attack_id);
-            $TravelAPIResponse->response = TravelApiPresenter::attackPlayerResponse($success, $system);
+            $TravelAPIResponse->response = TravelApiPresenter::attackPlayerResponse($success, $TravelManager, $system);
             break;
 
         case 'BeginOperation':
@@ -96,7 +120,4 @@ try {
         debug_messages: $system->debug_messages,
         system: $system,
     );
-} catch (Throwable $e) {
-    API::exitWithException($e, system: $system);
 }
-

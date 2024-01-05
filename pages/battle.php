@@ -103,17 +103,21 @@ function battle(): bool {
 					ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}*/
 
+            $battle_background = TravelManager::getLocationBattleBackgroundLink($system, $player->location);
+            if (empty($battle_background)) {
+                $battle_background = $player->region->battle_background_link;
+            }
             if($system->USE_NEW_BATTLES) {
-                BattleV2::start($system, $player, $user, Battle::TYPE_FIGHT);
+                BattleV2::start($system, $player, $user, Battle::TYPE_FIGHT, battle_background_link: $battle_background);
             }
             else {
-                Battle::start($system, $player, $user, Battle::TYPE_FIGHT);
+                Battle::start($system, $player, $user, Battle::TYPE_FIGHT, battle_background_link: $battle_background);
             }
 
             $system->message("You have attacked!<br />
 				<a class='link' href='$self_link'>To Battle</a>");
 			$system->printMessage();
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 			$system->printMessage();
 
@@ -225,7 +229,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                 $system->db->query("UPDATE `region_locations` SET `defense` = {$region_objective['defense']} WHERE `id` = {$region_objective['id']}");
                 WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_DEFENSE_GAINED, $region_objective['village']);
                 $result .= "Increased objective defense by 1.[br]";
-            } 
+            }
         }
         // if opponent is allied with location owner
         else if ($opponent_alignment == VillageRelation::RELATION_ALLIANCE) {
@@ -234,7 +238,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                 $system->db->query("UPDATE `region_locations` SET `defense` = {$region_objective['defense']} WHERE `id` = {$region_objective['id']}");
                 WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_DEFENSE_REDUCED, $region_objective['village']);
                 $result .= "Decreased objective defense by 1.[br]";
-            } 
+            }
         }
 
         // War Log
@@ -295,7 +299,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $result .= "You both knocked each other out. You were taken back to your village by some allied ninja.[br]";
         $player->health = 5;
         $player->moveToVillage();
-        $player->last_pvp_ms = System::currentTimeMs(); 
+        $player->last_pvp_ms = System::currentTimeMs();
 
         // If player is killed during a survival mission as a result of PVP, clear the survival mission
         if ($player->mission_id != null) {
@@ -344,7 +348,7 @@ function battleFightAPI(System $system, User $player): BattlePageAPIResponse {
             $response->battle_result = processBattleFightEnd($battle, $player, $system);
         }
     }
-    catch (Exception $e) {
+    catch (RuntimeException $e) {
         $response->errors[] = $e->getMessage();
     }
 

@@ -40,12 +40,6 @@ function rankUp(): bool {
         if($player->rank_num == 3) {
             $player->clearMission();
         }
-        if(isset($_SESSION['exam_begin'])) {
-            unset($_SESSION['exam_begin']);
-        }
-        if(isset($_SESSION['genin_jutsu_fails'])) {
-            unset($_SESSION['genin_jutsu_fails']);
-        }
 
         $system->message("Understanding that this is not your time, you bow out of the exam. Maybe next time
             will be your chance!<br />
@@ -116,26 +110,6 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
         $jutsu_data[$count++] = $row;
     }
 
-    // Resume exam from afk, logout, etc.
-    if($player->exam_stage > 0 && !isset($_SESSION['exam_begin'])) {
-        //Allow continuance of exam due to exiting browser/logging out but with reduced time limit based on stage
-        $_SESSION['exam_begin'] = time() - ($player->exam_stage * 60);
-        // Allow 2 fails beginning on stage 1, 1 fail beginning on stage 2, stage 3 must not have fails
-        $_SESSION['genin_jutsu_fails'] = $player->exam_stage - 1;
-    }
-
-    // Exam timeout
-    if($player->exam_stage && isset($_SESSION['exam_begin']) && $player->exam_stage < 4) {
-        $time_remaining = ($_SESSION['exam_begin'] + $exam_time_limit) - time();
-        if($time_remaining < 1) {
-            $system->message("You have run out of time and failed the $exam_name!");
-            $system->printMessage();
-            unset($_SESSION['exam_begin']);
-            unset($_SESSION['genin_jutsu_fails']);
-            $player->exam_stage = 0;
-        }
-    }
-
     // Input
     if(!empty($_POST['hand_seals']) && $player->exam_stage > 0) {
         $hand_seals = $_POST['hand_seals'];
@@ -145,24 +119,12 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
         }
         // Jutsu fail
         else {
-            $_SESSION['genin_jutsu_fails'] += 1;
-            if($_SESSION['genin_jutsu_fails'] < 3) {
-                $system->message("You attempted to perform " . $jutsu_data[$player->exam_stage]['name'] . " but failed.");
-            }
-            // Three jutsu fails, end exam
-            else {
-                $system->message("Having failed to perform a jutsu 3 times, you have failed the $exam_name!");
-                $player->exam_stage = 0;
-                unset($_SESSION['genin_jutsu_fails']);
-                unset($_SESSION['exam_begin']);
-            }
+            $system->message("You attempted to perform " . $jutsu_data[$player->exam_stage]['name'] . " but failed.");
         }
     }
 
     // Begin exam request
     if(!empty($_POST['begin_exam']) && $player->exam_stage == 0) {
-        $_SESSION['exam_begin'] = time();
-        $_SESSION['genin_jutsu_fails'] = 0;
         $player->exam_stage = 1;
     }
 
@@ -187,8 +149,6 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
         require 'templates/level_rank_up/exam_assignment.php';
     }
     else if($player->exam_stage >= 1 && $player->exam_stage <= 3) {
-        //Check time limit
-        $time_remaining = ($_SESSION['exam_begin'] + $exam_time_limit) - time();
         //Abandon Exam
         require 'templates/level_rank_up/abandon_exam.php';
         $submitted_hand_seals = $_POST['hand_seals'] ?? '';
@@ -206,12 +166,12 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 
             // Bloodline roll
             if($bloodline_rolled) {
-                // Chances: 10% legendary, 20% elite, 70% common
+                // Chances: 10% (5%) legendary, 40% (20%) elite, 50% (25%) common
                 $x = mt_rand(1, 100);
-                if($x < 10) {
+                if ($x < 10) {
                     $bloodline_rank = 1;
                 }
-                else if($x < 30) {
+                else if ($x < 50) {
                     $bloodline_rank = 2;
                 }
                 else {
@@ -303,7 +263,8 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                     Bloodline::giveBloodline(
                         system: $system,
                         bloodline_id: $bloodline_id,
-                        user_id: $player->user_id
+                        user_id: $player->user_id,
+                        player: $player
                     );
                 }
             }
@@ -380,18 +341,20 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
             $rankManager->increasePlayerRank($player);
 
             if($bloodline_rolled) {
-                $bloodline_display = "Suddenly the elder senses something as a strange force wells up inside you, 
+                $bloodline_display = "Suddenly the elder senses something as a strange force wells up inside you,
                     answering the call of the elder's chakra. The elder withdraws $gender hand
 					and smiles, 'You have awakened <b>$bloodline_name</b>. This is the
 					bloodline of the <b>$clan_name</b> clan. From this day forward you shall join them and train
 					your bloodline to its fullest potential.'<br />
-					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p>";
+					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p><br />
+                    <p style='text-align:center;'>Visit the <a href='{$system->router->links['premium']}'>Ancient Market</a> to reset your character and try again, or purchase a bloodline.</p>";
             }
             else {
-                $bloodline_display = "After focusing deeply for several minutes, the elder withdraws $gender hand and says 'The power within your lineage remains dormant. 
+                $bloodline_display = "After focusing deeply for several minutes, the elder withdraws $gender hand and says 'The power within your lineage remains dormant.
                     You are free to train as you wish in the <b>$clan_name</b> clan. Train
 					hard with them and become a strong ninja for your clan and village.'<br />
-					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p>";
+					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p><br />
+                    <p style='text-align:center;'>Visit the <a href='{$system->router->links['premium']}'>Ancient Market</a> to reset your character and try again, or purchase a bloodline.</p>";
             }
         } catch(RuntimeException $e) {
             $system->message($e->getMessage());
@@ -465,7 +428,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 
             $player->exam_stage = RankManager::CHUUNIN_STAGE_SURVIVAL_START;
             $system->message("You have passed stage 1!");
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message("Your answers were incorrect. You have failed the Chuunin exam. " . $e->getMessage() .
                 "<a href='{$system->router->links['profile']}'>Continue</a>");
             $system->printMessage();

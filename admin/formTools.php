@@ -285,7 +285,7 @@ function displayVariable($var_name, $variable, $current_value, $input_name_prefi
                     echo "<option value='$option'" . ($current_value == $option ? "selected='selected'" : '') . ">"
                         . System::unSlug($option) . "</option>";
                 }
-            echo "</select>";
+            echo "</select><br />";
         }
         else {
 		    echo "<input type='text' name='$name' value='" . stripslashes($current_value) . "' /><br />";

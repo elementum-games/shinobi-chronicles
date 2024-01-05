@@ -53,6 +53,13 @@ function jutsu(): void {
                     throw new RuntimeException("Invalid jutsu type!");
                 }
                 if($player->hasJutsu($jutsu_array[1])) {
+                    $jutsu = $player->jutsu[$jutsu_array[1]];
+                    // We double-check this in User::useJutsu as well, but this helps players to get setup correctly
+                    // before they get into a battle
+                    if($jutsu->element && !$player->hasElement($jutsu->element)) {
+                        throw new RuntimeException("You do not have the elemental chakra to equip {$jutsu->name}!");
+                    }
+
                     $equipped_jutsu[$count]['id'] = $system->db->clean($jutsu_array[1]);
                     $equipped_jutsu[$count]['type'] = $system->db->clean($jutsu_array[0]);
                     $count++;
@@ -208,7 +215,7 @@ function jutsu(): void {
     $child_jutsu_result = $system->db->query("SELECT `name`, `parent_jutsu` FROM `jutsu` WHERE `parent_jutsu` != '0'");
     while($row = $system->db->fetch($child_jutsu_result)) {
         if (array_key_exists($row['parent_jutsu'], $child_jutsu)) {
-            array_push($child_jutsu[$row['parent_jutsu']], $row['name']);
+            $child_jutsu[$row['parent_jutsu']][] = $row['name'];
         }
         else {
             $child_jutsu[$row['parent_jutsu']] = [array($row['name'])];
