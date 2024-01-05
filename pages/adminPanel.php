@@ -948,7 +948,7 @@ function adminPanel() {
     // Give bloodline
     else if($page == 'give_bloodline') {
         require 'admin/user.php';
-        giveBloodlinePage($system);
+        giveBloodlinePage($system, $player);
     }
     // Stat cut
     else if($page == 'stat_cut') {

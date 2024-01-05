@@ -612,7 +612,7 @@ function devToolsPage(System $system, User $player): void {
 /**
  * @throws RuntimeException
  */
-function giveBloodlinePage(System $system): void {
+function giveBloodlinePage(System $system, User $player): void {
     // Fetch BL list
     $result = $system->db->query("SELECT `bloodline_id`, `name` FROM `bloodlines`");
     if($system->db->last_num_rows == 0) {
@@ -642,7 +642,8 @@ function giveBloodlinePage(System $system): void {
             $status = Bloodline::giveBloodline(
                 system: $system,
                 bloodline_id: $editing_bloodline_id,
-                user_id: $user_id
+                user_id: $user_id,
+                player: $user_id == $player->user_id ? $player : null,
             );
         } catch(RuntimeException $e) {
             $system->message($e->getMessage());
