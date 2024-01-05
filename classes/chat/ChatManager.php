@@ -19,9 +19,7 @@ class ChatManager {
     public function loadPosts(?int $current_page_post_id = null): array {
         $blocked_user_ids = $this->player->blacklist->blockedUserIds(exclude_staff: true);
 
-        $query = $this->system->db->query(
-            "SELECT MAX(`post_id`) as `latest_post_id`, MIN(`post_id`) as `first_post_id` FROM `chat`"
-        );
+        $query = "SELECT MAX(`post_id`) as `latest_post_id`, MIN(`post_id`) as `first_post_id` FROM `chat`";
 
         $result = $this->system->db->query($query);
         if($this->system->db->last_num_rows) {
