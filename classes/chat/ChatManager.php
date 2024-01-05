@@ -165,7 +165,7 @@ class ChatManager {
                             break;
                         }
                         // only display formatted mention if user exists
-                        if(!User::findByName($this->system, str_replace("\\", "", $match), true)) {
+                        if(!User::userExists($this->system, str_replace("\\", "", $match))) {
                             continue;
                         }
                         // format each mention
