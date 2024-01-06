@@ -595,7 +595,8 @@ class WarManager {
             AND `last_update_ms` > {$oldest_active_raid_time}
             AND `status` = " . Operation::OPERATION_ACTIVE . "
             AND `operations`.`type` = " . Operation::OPERATION_RAID . "
-            GROUP BY `operations`.`target_id`, `operations`.`target_village`, `attacking_user_village`");
+            GROUP BY `operations`.`target_id`, `operations`.`target_village`, `attacking_user_village`
+            FOR SHARE");
         $raw_raid_targets = $system->db->fetch_all($result);
 
         $raid_targets = [];
