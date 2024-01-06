@@ -1067,8 +1067,7 @@ class TravelManager {
             `villages`.`name` as `village_name`, `villages`.`village_id`
             FROM `region_locations`
             INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
-            INNER JOIN `villages` ON COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) = `villages`.`village_id`
-            FOR SHARE");
+            INNER JOIN `villages` ON COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) = `villages`.`village_id`");
         $region_objectives = $this->system->db->fetch_all($region_result);
         foreach ($region_objectives as $obj) {
             $distance = $this->user->location->distanceDifference(
