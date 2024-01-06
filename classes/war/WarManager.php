@@ -197,7 +197,8 @@ class WarManager {
             $target = $this->system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`, `regions`.`village` as `original_village`
             FROM `region_locations`
             INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
-            WHERE `id` = {$operation->target_id} LIMIT 1");
+            WHERE `id` = {$operation->target_id} LIMIT 1
+            FOR SHARE");
             if ($this->system->db->last_num_rows == 0) {
                 return false;
             }
@@ -270,7 +271,8 @@ class WarManager {
             INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
             WHERE `x` = {$this->user->location->x}
             AND `y` = {$this->user->location->y}
-            AND `map_id` = {$this->user->location->map_id} LIMIT 1");
+            AND `map_id` = {$this->user->location->map_id} LIMIT 1
+            FOR SHARE");
         if ($this->system->db->last_num_rows > 0) {
             $target_location = $this->system->db->fetch($target_location);
             // check each operation type, return array
