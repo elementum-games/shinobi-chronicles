@@ -270,8 +270,7 @@ class WarManager {
             INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
             WHERE `x` = {$this->user->location->x}
             AND `y` = {$this->user->location->y}
-            AND `map_id` = {$this->user->location->map_id} LIMIT 1
-            FOR SHARE");
+            AND `map_id` = {$this->user->location->map_id} LIMIT 1");
         if ($this->system->db->last_num_rows > 0) {
             $target_location = $this->system->db->fetch($target_location);
             // check each operation type, return array
@@ -580,7 +579,6 @@ class WarManager {
         $max_raid_duration_ms = $num_raid_cycles * Operation::BASE_OPERATION_INTERVAL_SECONDS * 1000;
         $oldest_active_raid_time = (microtime(true) * 1000) - $max_raid_duration_ms;
 
-        $system->db->query("SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED");
         $result = $system->db->query("SELECT
             `operations`.`user_village` as `attacking_user_village`,
             `operations`.`target_id`,
@@ -597,7 +595,6 @@ class WarManager {
             AND `operations`.`type` = " . Operation::OPERATION_RAID . "
             GROUP BY `operations`.`target_id`, `operations`.`target_village`, `attacking_user_village`");
         $raw_raid_targets = $system->db->fetch_all($result);
-        $system->db->query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ");
 
         $raid_targets = [];
         foreach($raw_raid_targets as $target) {
