@@ -17,6 +17,14 @@ final class NotificationAPIOptimizationMigration extends AbstractMigration
             CREATE INDEX `status` ON operations (status);
             CREATE INDEX `type` ON operations (type);
             CREATE INDEX `target_id` ON operations (target_id);
+
+            -- Alter table loot
+            CREATE INDEX `user_id` ON loot (user_id);
+            CREATE INDEX `battle_id` ON loot (battle_id);
+            CREATE INDEX `resource_id` ON loot (resource_id);
+            CREATE INDEX `target_village_id` ON loot (target_village_id);
+            CREATE INDEX `claimed_village_id` ON loot (claimed_village_id);
+            CREATE INDEX `claimed_time` ON loot (claimed_time);
         ");
     }
 
@@ -32,6 +40,14 @@ final class NotificationAPIOptimizationMigration extends AbstractMigration
             DROP INDEX `status` ON operations;
             DROP INDEX `type` ON operations;
             DROP INDEX `target_id` ON operations;
+
+            -- Alter table loot
+            DROP INDEX `user_id` ON loot (user_id);
+            DROP INDEX `battle_id` ON loot (battle_id);
+            DROP INDEX `resource_id` ON loot (resource_id);
+            DROP INDEX `target_village_id` ON loot (target_village_id);
+            DROP INDEX `claimed_village_id` ON loot (claimed_village_id);
+            DROP INDEX `claimed_time` ON loot (claimed_time);
         ");
     }
 }
