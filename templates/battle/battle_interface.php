@@ -274,7 +274,15 @@ if($battle->battle_text) {
                         </label>
                         <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
                     </div>
-
+                    <?php else: ?>
+                    <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
+                        <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                        <div class='chakraFill' style='width:100%'></div>
+                    </div>
+                    <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
+                        <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                        <div class='staminaFill' style='width:100%;'></div>
+                    </div>
                     <?php endif; ?>
                 </div>
             </div>
