@@ -151,7 +151,7 @@ class ChatManager {
 
             //Format posts
             $post->user_link_class_names = ["userLink"];
-            if($user_data) {
+            if(!empty($user_data)) {
                 if($user_data['premium_credits_purchased'] && $user_data['chat_effect'] == 'sparkles') {
                     $post->user_link_class_names[] = "premiumUser";
                 }
