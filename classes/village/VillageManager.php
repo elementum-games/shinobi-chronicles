@@ -2105,21 +2105,21 @@ class VillageManager {
             $system->db->query("UPDATE `regions` SET `village` = {$village2_id} WHERE `region_id` = {$region}");
             // update patrols, move back 5 minutes
             $patrol_spawn = time() + (60 * 5);
-            $this->system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$village2_id} WHERE `region_id` = {$region}");
+            $system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$village2_id} WHERE `region_id` = {$region}");
             // update caravans, change only caravans that haven't spawned
             $name = VillageManager::VILLAGE_NAMES[$village2_id] . " Caravan";
             $time = time();
-            $this->system->db->query("UPDATE `caravans` SET `village_id` = {$village2_id}, `name` = '{$name}' WHERE `region_id` = {$region} AND `start_time` > {$time}");
+            $system->db->query("UPDATE `caravans` SET `village_id` = {$village2_id}, `name` = '{$name}' WHERE `region_id` = {$region} AND `start_time` > {$time}");
         }
         foreach ($requested_regions as $region) {
             $system->db->query("UPDATE `regions` SET `village` = {$village1_id} WHERE `region_id` = {$region}");
             // update patrols, move back 5 minutes
             $patrol_spawn = time() + (60 * 5);
-            $this->system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$village1_id} WHERE `region_id` = {$region}");
+            $system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$village1_id} WHERE `region_id` = {$region}");
             // update caravans, change only caravans that haven't spawned
             $name = VillageManager::VILLAGE_NAMES[$village1_id] . " Caravan";
             $time = time();
-            $this->system->db->query("UPDATE `caravans` SET `village_id` = {$village1_id}, `name` = '{$name}' WHERE `region_id` = {$region} AND `start_time` > {$time}");
+            $system->db->query("UPDATE `caravans` SET `village_id` = {$village1_id}, `name` = '{$name}' WHERE `region_id` = {$region} AND `start_time` > {$time}");
         }
         // update resources
         $villages_result = $system->db->query("SELECT * FROM `villages` WHERE `village_id` = {$village1_id} OR `village_id`={$village2_id} LIMIT 2");
