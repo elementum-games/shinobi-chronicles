@@ -17,12 +17,7 @@ class ChatManager {
      * @throws RuntimeException
      */
     public function loadPosts(?int $current_page_post_id = null): array {
-        $blocked_user_ids = $this->player->blacklist->blockedUserIds(exclude_staff: true);
-
         $query = "SELECT MAX(`post_id`) as `latest_post_id`, MIN(`post_id`) as `first_post_id` FROM `chat`";
-        if(count($blocked_user_ids) > 0) {
-            $query .= " WHERE `user_id` NOT IN (" . implode(",", $blocked_user_ids) . ")";
-        }
 
         $result = $this->system->db->query($query);
         if($this->system->db->last_num_rows) {
@@ -170,7 +165,7 @@ class ChatManager {
                             break;
                         }
                         // only display formatted mention if user exists
-                        if(!User::findByName($this->system, str_replace("\\", "", $match), true)) {
+                        if(!User::userExists($this->system, str_replace("\\", "", $match))) {
                             continue;
                         }
                         // format each mention

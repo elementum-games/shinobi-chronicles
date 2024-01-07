@@ -444,6 +444,20 @@ class User extends Fighter {
         return null;
     }
 
+    /**
+     * @param System $system
+     * @param string $name
+     * @return bool
+     */
+    public static function userExists(System $system, string $name): bool {
+        $result = $system->db->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$name}'");
+        $user_id = $system->db->fetch($result)['user_id'] ?? null;
+        if ($user_id) {
+            return true;
+        }
+        return false;
+    }
+
     /* function loadData()
         Loads user data from the database into class members
         -Parameters-
