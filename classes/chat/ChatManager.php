@@ -82,7 +82,8 @@ class ChatManager {
 
         // Get user IDs from posts
         $user_ids = [];
-        $user_data = [];
+        $user_data_by_id = [];
+        $user_data_by_name = [];
         foreach ($result as $row) {
             // If user_id is set (newer post) add to list for batch
             if ($row['user_id'] > 0 && !in_array($row['user_id'], $user_ids)) {
@@ -108,7 +109,7 @@ class ChatManager {
                     if (!isset($user_data_result['avatar_frame'])) {
                         $user_data_result['avatar_frame'] = "avy_frame_default";
                     }
-                    $user_data[$row['user_name']] = $user_data_result;
+                    $user_data_by_name[$row['user_name']] = $user_data_result;
                 }
             }
         }
@@ -118,7 +119,7 @@ class ChatManager {
             `user_settings`.`avatar_style`, `user_settings`.`avatar_frame`
             FROM `users`
             LEFT JOIN `user_settings` ON `users`.`user_id` = `user_settings`.`user_id`
-            WHERE `users`.`user_name` IN ('" . implode(', ', $user_ids) . "')
+            WHERE `users`.`user_id` IN ('" . implode(', ', $user_ids) . "')
         ");
         $user_data_result = $this->system->db->fetch_all($user_data_result);
         foreach ($user_data_result as $row) {
@@ -130,7 +131,7 @@ class ChatManager {
             if (!isset($row['avatar_frame'])) {
                 $row['avatar_frame'] = "avy_frame_default";
             }
-            $user_data[$row['user_name']] = $row;
+            $user_data_by_id[$row['user_id']] = $row;
         }
         $posts = [];
         foreach ($result as $row) {
@@ -140,7 +141,13 @@ class ChatManager {
             $post->avatar = './images/default_avatar.png';
 
             //Fetch user data
-            $user_data = isset($user_data[$post->user_name]) ? $user_data[$post->user_name] : false;
+            $user_data = null;
+            if (isset($user_data_by_id[$post->user_id])) {
+                $user_data = $user_data_by_id[$post->user_id];
+            }
+            else if (isset($user_data_by_name[$post->user_name])) {
+                $user_data = $user_data_by_name[$post->user_name];
+            }
 
             //Format posts
             $post->user_link_class_names = ["userLink"];
