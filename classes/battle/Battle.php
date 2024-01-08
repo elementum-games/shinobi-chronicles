@@ -29,7 +29,7 @@ class Battle {
     const MIN_DEBUFF_RATIO = 0.1;
     const MAX_DIFFUSE_PERCENT = 0.75;
 
-    const REPUTATION_DAMAGE_RESISTANCE_BOOST = 15;
+    const REPUTATION_DAMAGE_RESISTANCE_BOOST = 5;
 
     private System $system;
 
@@ -82,7 +82,7 @@ class Battle {
     public string $battle_background_link;
 
     public int $rounds = 1;
-    public int $current_round = 1;
+    public int $round_count = 0;
     public int $team1_wins;
     public int $team2_wins;
 
@@ -269,7 +269,7 @@ class Battle {
         $this->battle_background_link = empty($battle['battle_background_link']) ? '' : $battle['battle_background_link'];
 
         $this->rounds = $battle['rounds'];
-        $this->current_round = $battle['current_round'];
+        $this->round_count = $battle['round_count'];
         $this->team1_wins = $battle['team1_wins'];
         $this->team2_wins = $battle['team2_wins'];
     }
@@ -539,7 +539,7 @@ class Battle {
             `player1_last_damage_taken` = {$this->player1->last_damage_taken},
             `player2_last_damage_taken` = {$this->player2->last_damage_taken},
 
-            `current_round` = {$this->current_round},
+            `round_count` = {$this->round_count},
             `team1_wins` = {$this->team1_wins},
             `team2_wins` = {$this->team2_wins}
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"

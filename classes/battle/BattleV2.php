@@ -82,7 +82,7 @@ class BattleV2 {
     public string $battle_background_link;
 
     public int $rounds = 1;
-    public int $current_round = 1;
+    public int $round_count = 1;
     public int $team1_wins;
     public int $team2_wins;
 
@@ -241,7 +241,7 @@ class BattleV2 {
         $battle->battle_background_link = empty($battle_data['battle_background_link']) ? '' : $battle_data['battle_background_link'];
 
         $battle->rounds = $battle_data['rounds'];
-        $battle->current_round = $battle_data['current_round'];
+        $battle->round_count = $battle_data['round_count'];
         $battle->team1_wins = $battle_data['team1_wins'];
         $battle->team2_wins = $battle_data['team2_wins'];
 
@@ -382,7 +382,7 @@ class BattleV2 {
                 `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
                 `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
 
-                `current_round` = {$this->current_round},
+                `round_count` = {$this->round_count},
                 `team1_wins` = {$this->team1_wins},
                 `team2_wins` = {$this->team2_wins}
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"

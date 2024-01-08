@@ -666,23 +666,25 @@ class BattleManager {
             return Battle::DRAW;
         }
         // if team1 majority of wins (total rounds)
-        if ($this->battle->team1_wins > floor($this->battle->rounds / 2) || ($this->battle->current_round > $this->battle->rounds && $this->battle->team1_wins > $this->battle->team2_wins)) {
-             return Battle::TEAM1;
+        if ($this->battle->team1_wins > floor($this->battle->rounds / 2) || ($this->battle->round_count >= $this->battle->rounds && $this->battle->team1_wins > $this->battle->team2_wins)) {
+            return Battle::TEAM1;
         }
         // if team2 majority of wins (total rounds)
-        if ($this->battle->team2_wins > floor($this->battle->rounds / 2) || ($this->battle->current_round > $this->battle->rounds && $this->battle->team2_wins > $this->battle->team1_wins)) {
+        if ($this->battle->team2_wins > floor($this->battle->rounds / 2) || ($this->battle->round_count >= $this->battle->rounds && $this->battle->team2_wins > $this->battle->team1_wins)) {
             return Battle::TEAM2;
         }
         // if more rounds to go
-        if ($this->battle->current_round < $this->battle->rounds) {
-            $this->battle->current_round++;
+        if ($this->battle->round_count < $this->battle->rounds) {
+            $this->battle->round_count++;
             $this->battle->player1->health = $this->battle->player1->max_health;
+            $this->battle->fighter_health[$this->battle->player1->combat_id] = $this->battle->player1->health;
             $this->battle->player1_last_damage_taken = 0;
             $this->battle->player2->health = $this->battle->player2->max_health;
+            $this->battle->fighter_health[$this->battle->player2->combat_id] = $this->battle->player2->health;
             $this->battle->player2_last_damage_taken = 0;
             $this->effects->active_effects = [];
             $this->battle->jutsu_cooldowns = [];
-            $this->battle->turn_count = 1;
+            $this->battle->turn_count = 0;
             $this->battle->turn_time = time();
             $this->battle->player1_time = Battle::MAX_TURN_LENGTH;
             $this->battle->player2_time = Battle::MAX_TURN_LENGTH;
@@ -690,14 +692,16 @@ class BattleManager {
         }
         // if rounds completed but no winner
         if ($this->battle->team1_wins == $this->battle->team2_wins) {
-            $this->battle->current_round++;
+            $this->battle->round_count++;
             $this->battle->player1->health = $this->battle->player1->max_health;
+            $this->battle->fighter_health[$this->battle->player1->combat_id] = $this->battle->player1->health;
             $this->battle->player1_last_damage_taken = 0;
             $this->battle->player2->health = $this->battle->player2->max_health;
+            $this->battle->fighter_health[$this->battle->player2->combat_id] = $this->battle->player2->health;
             $this->battle->player2_last_damage_taken = 0;
             $this->effects->active_effects = [];
             $this->battle->jutsu_cooldowns = [];
-            $this->battle->turn_count = 1;
+            $this->battle->turn_count = 0;
             $this->battle->turn_time = time();
             $this->battle->player1_time = Battle::MAX_TURN_LENGTH;
             $this->battle->player2_time = Battle::MAX_TURN_LENGTH;
