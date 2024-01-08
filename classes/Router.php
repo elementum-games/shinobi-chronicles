@@ -174,36 +174,67 @@ class Router {
                 throw new RuntimeException("You cannot access this page while in a village!");
             }
 
-            if($route->village_ok === Route::ONLY_IN_VILLAGE && !$player->location->equals($player->village_location)) {
-                $contents_arr = [];
-                foreach($_GET as $key => $val) {
-                    $contents_arr[] = "GET[{$key}]=$val";
-                }
-                foreach($_POST as $key => $val) {
-                    $contents_arr[] = "POST[{$key}]=$val";
-                }
-                $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
+            if ($route->village_ok === Route::ONLY_IN_VILLAGE) {
+                if (!$player->location->equals($player->village_location)) {
+                    $location_allowed = false;
+                    if (isset($route->village_restriction_overrides[Route::COLOSSEUM_OVERRIDE])) {
+                        $result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
+                        $location_result = $system->db->fetch($result);
+                        $arena_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
+                        if ($player->location->equals($arena_coords)) {
+                            $location_allowed = true;
+                        }
+                    }
+                    if (isset($route->village_restriction_overrides[Route::TOWN_OVERRIDE])) {
+                        $town = $system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`, `regions`.`village` as `original_village`
+                            FROM `region_locations`
+                            INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+                            WHERE `x` = {$player->location->x}
+                            AND `y` = {$player->location->y}
+                            AND `map_id` = {$player->location->map_id}
+                            AND `type` = 'village'
+                        ");
+                        $town = $system->db->fetch($town);
+                        if ($system->db->last_num_rows > 0) {
+                            // must be owned or ally
+                            if ($town['village'] == $player->village->village_id || $player->village->relations[$town['village']]->relation_type == VillageRelation::RELATION_ALLIANCE) {
+                                $location_allowed = true;
+                            }
+                        }
+                    }
+                    if (isset($route->village_restriction_overrides[Route::CASTLE_OVERRIDE])) {
+                        $castle = $system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`, `regions`.`village` as `original_village`
+                            FROM `region_locations`
+                            INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+                            WHERE `x` = {$player->location->x}
+                            AND `y` = {$player->location->y}
+                            AND `map_id` = {$player->location->map_id}
+                            AND `type` = 'castle'
+                        ");
+                        $castle = $system->db->fetch($castle);
+                        if ($system->db->last_num_rows > 0) {
+                            // must be owned or ally
+                            if ($castle['village'] == $player->village->village_id || $player->village->relations[$castle['village']]->relation_type == VillageRelation::RELATION_ALLIANCE) {
+                                $location_allowed = true;
+                            }
+                        }
+                    }
+                    if (!$location_allowed) {
+                        $contents_arr = [];
+                        foreach ($_GET as $key => $val) {
+                            $contents_arr[] = "GET[{$key}]=$val";
+                        }
+                        foreach ($_POST as $key => $val) {
+                            $contents_arr[] = "POST[{$key}]=$val";
+                        }
+                        $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
 
-                throw new RuntimeException("You must be in your village to access this page!");
+                        throw new RuntimeException("You must be in your village to access this page!");
+                    }
+
+                }
             }
 
-            if ($route->village_ok === Route::VILLAGE_OR_COLOSSEUM && !$player->location->equals($player->village_location)) {
-                $result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
-                $location_result = $system->db->fetch($result);
-                $arena_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
-                if (!$player->location->equals($arena_coords)) {
-                    $contents_arr = [];
-                    foreach($_GET as $key => $val) {
-                        $contents_arr[] = "GET[{$key}]=$val";
-                    }
-                    foreach($_POST as $key => $val) {
-                        $contents_arr[] = "POST[{$key}]=$val";
-                    }
-                    $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
-
-                    throw new RuntimeException("You must be in your village or Underground Colosseum to access this page!");
-                }
-            }
         }
         if(isset($route->min_rank)) {
             if($player->rank_num < $route->min_rank) {

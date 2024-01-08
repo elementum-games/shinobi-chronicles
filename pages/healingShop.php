@@ -27,20 +27,21 @@ function healingShop() {
     $arena_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
 
     $ramen_choices['vegetable'] = [
-        'cost' => $player->location->equals($arena_coords) ? $player->rank_num * 5 * 5 : $player->rank_num * 5,
+        'cost' => !$player->location->equals($player->village_location) ? $player->rank_num * 5 * 5 : $player->rank_num * 5,
         'health_amount' => $health[$player->rank_num] * 0.1,
         'label' => 'Vegetable'
     ];
     $ramen_choices['pork'] = [
-        'cost' => $player->location->equals($arena_coords) ? $player->rank_num * 25 * 5 : $player->rank_num * 25,
+        'cost' => !$player->location->equals($player->village_location) ? $player->rank_num * 25 * 5 : $player->rank_num * 25,
         'health_amount' => $health[$player->rank_num] * 0.5,
         'label' => 'Pork'
     ];
     $ramen_choices['deluxe'] = [
-        'cost' => $player->location->equals($arena_coords) ? $player->rank_num * 50 * 5 : $player->rank_num * 50,
+        'cost' => !$player->location->equals($player->village_location) ? $player->rank_num * 50 * 5 : $player->rank_num * 50,
         'health_amount' => $health[$player->rank_num] * 1,
         'label' => 'Deluxe'
     ];
+
     if ($system->isDevEnvironment()) {
         $ramen_choices['vegetable']['cost'] = 0;
         $ramen_choices['pork']['cost'] = 0;
