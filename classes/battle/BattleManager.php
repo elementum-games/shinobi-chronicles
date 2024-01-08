@@ -308,7 +308,7 @@ class BattleManager {
                         throw new RuntimeException($result->error_message);
                     }
 
-                    // Check for weapon if non-BL taijutsu
+                    /* Check for weapon if non-BL taijutsu
                     $weapon_id = 0;
                     $weapon_element = Jutsu::ELEMENT_NONE;
                     if($jutsu_type == Jutsu::TYPE_TAIJUTSU && !empty($_POST['weapon_id'])) {
@@ -326,7 +326,7 @@ class BattleManager {
                         if(!in_array($weapon_element, $this->player->elements)) {
                             $weapon_element = Jutsu::ELEMENT_NONE;
                         }
-                    }
+                    }*/
 
                     // Log jutsu used
                     $this->setPlayerAction($this->player, $player_jutsu, $weapon_id, $weapon_element);
