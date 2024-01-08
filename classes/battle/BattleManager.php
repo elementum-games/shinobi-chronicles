@@ -329,7 +329,7 @@ class BattleManager {
                     }*/
 
                     // Log jutsu used
-                    $this->setPlayerAction($this->player, $player_jutsu, $weapon_id, $weapon_element);
+                    $this->setPlayerAction($this->player, $player_jutsu, 0, Jutsu::ELEMENT_NONE);
 
                     //update player turn time
                     $this->battle->updatePlayerTime($this->player->id);
