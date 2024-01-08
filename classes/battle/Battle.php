@@ -81,6 +81,11 @@ class Battle {
 
     public string $battle_background_link;
 
+    public int $rounds = 1;
+    public int $current_round = 1;
+    public int $team1_wins;
+    public int $team2_wins;
+
     /**
      * @param System  $system
      * @param Fighter $player1
@@ -90,7 +95,7 @@ class Battle {
      * @throws RuntimeException
      */
     public static function start(
-        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null, string $battle_background_link = ''
+        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null, string $battle_background_link = '', int $rounds = 1
     ) {
         $json_empty_array = '[]';
 
@@ -135,7 +140,8 @@ class Battle {
                 `fighter_jutsu_used` = '" . $json_empty_array . "',
                 `is_retreat` = '" . (int)false . "',
                 `patrol_id` = " . (!empty($patrol_id) ? $patrol_id : "NULL") . ",
-                `battle_background_link` = '{$battle_background_link}'
+                `battle_background_link` = '{$battle_background_link}',
+                `rounds` = {$rounds}
         ");
         $battle_id = $system->db->last_insert_id;
 
@@ -261,6 +267,11 @@ class Battle {
         $this->player2_last_damage_taken = $battle['player2_last_damage_taken'];
 
         $this->battle_background_link = empty($battle['battle_background_link']) ? '' : $battle['battle_background_link'];
+
+        $this->rounds = $battle['rounds'];
+        $this->current_round = $battle['current_round'];
+        $this->team1_wins = $battle['team1_wins'];
+        $this->team2_wins = $battle['team2_wins'];
     }
 
     /**
@@ -386,7 +397,7 @@ class Battle {
                 }
             }
         }
-      
+
         if (!$this->player2 instanceof NPC) {
             foreach ($this->player2->jutsu as $jutsu) {
                 if ($jutsu->rank == 1)
@@ -526,7 +537,11 @@ class Battle {
             `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "',
 
             `player1_last_damage_taken` = {$this->player1->last_damage_taken},
-            `player2_last_damage_taken` = {$this->player2->last_damage_taken}
+            `player2_last_damage_taken` = {$this->player2->last_damage_taken},
+
+            `current_round` = {$this->current_round},
+            `team1_wins` = {$this->team1_wins},
+            `team2_wins` = {$this->team2_wins}
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
         );
 
