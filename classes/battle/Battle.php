@@ -386,7 +386,7 @@ class Battle {
                 }
             }
         }
-      
+
         if (!$this->player2 instanceof NPC) {
             foreach ($this->player2->jutsu as $jutsu) {
                 if ($jutsu->rank == 1)
@@ -530,7 +530,7 @@ class Battle {
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
         );
 
-        BattleLog::addOrUpdateTurnLog($this->system, $this->battle_id, $this->turn_count, $this->battle_text);
+        BattleLog::addOrUpdateTurnLog($this->system, $this->battle_id, $this->turn_count, $this->battle_text, $this->fighter_health);
 
         $this->system->db->query("COMMIT;");
     }
