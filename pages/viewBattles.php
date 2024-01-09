@@ -13,6 +13,11 @@ function viewBattles() {
         $limit = 25;
     }
 
+    $view = "view_battles";
+    if (!empty($_GET['view'])) {
+        $view = $_GET['view'];
+    }
+
     if(!empty($_GET['battle_id'])) {
         $battle_id = (int)$_GET['battle_id'];
         try {
@@ -129,10 +134,15 @@ function viewBattles() {
         ];
     }
 
-    require 'templates/viewBattles.php';
-
     /* Begin User Battle History */
+    if ($view == "battle_history" && !($player->forbidden_seal->max_battle_history_view > 0)) {
+        $system->message("Visit the Ancient Market and imbue a Forbidden Seal to view past battles.");
+        $system->printMessage();
+    }
+
     if ($player->rank_num > 1 && $player->forbidden_seal->max_battle_history_view > 0) {
+
+        /* PvP Battles */
         $battle_types = [Battle::TYPE_SPAR, Battle::TYPE_FIGHT, Battle::TYPE_CHALLENGE];
         $limit = $player->forbidden_seal->max_battle_history_view;
 
@@ -211,19 +221,115 @@ function viewBattles() {
             ];
         }
 
+        /* PvE Battles */
+        $battle_types = [Battle::TYPE_AI_ARENA, Battle::TYPE_AI_MISSION, Battle::TYPE_AI_RANKUP, Battle::TYPE_AI_WAR];
+        $limit = $player->forbidden_seal->max_battle_history_view;
+
+        $battles_result = $system->db->query(
+            "SELECT `battle_id`, `player1`, `player2`, `winner` FROM `battles`
+            WHERE `battle_type` IN (" . implode(",", $battle_types) . ")
+            AND player1 = '{$player->id}'
+            ORDER BY `battle_id` DESC LIMIT {$limit}"
+        );
+
+        $ai_ids = [];
+        $raw_battles = [];;
+        while ($row = $system->db->fetch($battles_result)) {
+            $p1 = EntityId::fromString($row['player1']);
+            $p2 = EntityId::fromString($row['player2']);
+            $ai_ids[] = $p2->id;
+
+            $raw_battles[] = [
+                'id' => $row['battle_id'],
+                'player1' => $p1,
+                'player2' => $p2,
+                'winner' => $row['winner'],
+            ];
+        }
+
+        $ai_names = [];
+        $ai_names_result = $system->db->query(
+            "SELECT `ai_id`, `name` FROM `ai_opponents`
+            WHERE `ai_id` IN(" . implode(',', $ai_ids) . ")
+        ");
+        $ai_names_result = $system->db->fetch_all($ai_names_result);
+        foreach ($ai_names_result as $ai) {
+            $ai_names[$ai['ai_id']] = $ai['name'];
+        }
+
+        $ai_battles = [];
+        $battleIds = [];
+        foreach ($raw_battles as $battle) {
+            /** @var EntityId $p1 */
+            $p1 = $battle['player1'];
+            /** @var EntityId $p2 */
+            $p2 = $battle['player2'];
+
+            $p1_name = $player->user_name;
+            $p2_name = $ai_names[$p2->id];
+
+            $winner = '';
+            switch ($battle['winner']) {
+                case Battle::DRAW:
+                    $winner = 'Draw';
+                    break;
+                case Battle::STOP:
+                    $winner = 'Stopped';
+                    break;
+                case Battle::TEAM1:
+                    $winner = $p1_name;
+                    break;
+                case Battle::TEAM2:
+                    $winner = $p2_name;
+                    break;
+            }
+
+            $battleIds[] = $battle['id'];
+            $ai_battles[] = [
+                'id' => $battle['id'],
+                'player1' => $p1_name,
+                'player2' => $p2_name,
+                'winner' => $winner
+            ];
+        }
+
+
+        /* View Log */
         $logs_result;
         $battle_logs = [];
         if (isset($_GET['view_log'])) {
+            $view = "battle_history";
             try {
                 $battle_id = (int) $_GET['view_log'];
-                if (in_array($battle_id, $battleIds)) {
-                    $logs_result = $system->db->query(
-                        "SELECT `turn_number`, `content` FROM `battle_logs`
+                if (!($player->forbidden_seal->max_battle_history_view > 0)) {
+                    throw new RuntimeException("Visit the Ancient Market and imbue a Forbidden Seal to view past battles.");
+                }
+                // get battle
+                $battle_result = $system->db->query("
+                    SELECT * FROM `battles` WHERE `battle_id` = {$battle_id}
+                ");
+                $battle_result = $system->db->fetch($battle_result);
+                if ($system->db->last_num_rows > 0) {
+                    // only allow viewing own AI battles
+                    if (strpos($battle_result['player2'], "NPC") !== false) {
+                        $own_battle = false;
+                        if ($battle_result['player1'] == $player->id || $battle_result['player2'] == $player->id) {
+                            $own_battle = true;
+                        }
+                        if (!$own_battle) {
+                            throw new RuntimeException("Battle not found!");
+                        }
+                    }
+                } else {
+                    throw new RuntimeException("Battle not found!");
+                }
+                $logs_result = $system->db->query(
+                    "SELECT `turn_number`, `content` FROM `battle_logs`
                     WHERE `battle_id` = '{$battle_id}'
                     AND `turn_number` != '0'
                     ORDER BY `turn_number` ASC"
-                    );
-
+                );
+                if ($system->db->last_num_rows > 0) {
                     while ($row = $system->db->fetch($logs_result)) {
                         $battle_text = $system->html_parse(stripslashes($row['content']));
                         $battle_text = str_replace(array('[br]', '[hr]'), array('', '<hr />'), $battle_text);
@@ -233,7 +339,7 @@ function viewBattles() {
                         ];
                     }
                 } else {
-                    throw new RuntimeException("Invalid battle!");
+                    throw new RuntimeException("No logs available for this battle.");
                 }
             } catch (RuntimeException $e) {
                 $system->message($e->getMessage());
@@ -241,7 +347,7 @@ function viewBattles() {
         }
         $system->printMessage();
 
-        require_once('templates/battleHistory.php');
     }
+    require_once('templates/view_battles/view_battles_header.php');
     return true;
 }
