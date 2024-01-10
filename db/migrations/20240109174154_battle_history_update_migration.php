@@ -25,7 +25,7 @@ final class BattleHistoryUpdateMigration extends AbstractMigration
         $this->execute("
             -- Alter table battle_logs
             ALTER TABLE `battle_logs` DROP `fighter_health`;
-            ALTER TABLE `battle_logs` DROP `active_effects`
+            ALTER TABLE `battle_logs` DROP `active_effects`;
         ");
     }
 }
