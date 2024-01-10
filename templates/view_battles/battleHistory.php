@@ -38,6 +38,7 @@
         background-color: rgba(0, 0, 0, 0.6);
         margin-left: auto;
         margin-right: auto;
+        margin-top: 10px;
     }
 
     /* Parent must be Position: relative */
@@ -134,7 +135,7 @@
             </tr>
         <?php if (isset($log['player1_health'])): ?>
             <tr>
-                <td style="border:none">
+                <td style="border-bottom:none">
                     <div class='resourceBarOuter healthPreview'>
                         <label class='innerResourceBarLabel'><?= sprintf("%.0f", $log['player1_health']) ?> / <?= sprintf("%.0f", $p1_max_health) ?></label>
                         <div class='healthFill' style='width:<?= round(($log['player1_health'] / $p1_max_health) * 100) ?>%;'></div>
@@ -150,7 +151,7 @@
         <?php endif; ?>
         <?php if (count($log['active_effects']) > 0): ?>
             <tr>
-                <td style="border:none">
+                <td style="border-top:none">
                     <div class="active_effects_container">
                         <?php foreach ($log['active_effects'] as $effect): ?>
                         <?php if ($effect->target == $p1_key && $effect->turns > 0): ?>
@@ -169,7 +170,7 @@
                         <?php endforeach; ?>
                     </div>
                 </td>
-                <td style="border:none">
+                <td style="border-top:none">
                     <div class="active_effects_container">
                         <?php foreach ($log['active_effects'] as $effect): ?>
                         <?php if ($effect->target == $p2_key && $effect->turns > 0): ?>
@@ -190,6 +191,9 @@
                 </td>
             </tr>
         <?php endif; ?>
+            <tr>
+                <th colspan="2">Battle Log</th>
+            </tr>
             <tr>
                 <td colspan="2">
                     <?= $system->html_parse($log['content']) ?>
