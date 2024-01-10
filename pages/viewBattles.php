@@ -243,7 +243,7 @@ function viewBattles() {
                 'id' => $row['battle_id'],
                 'player1' => $p1,
                 'player2' => $p2,
-                'winner' => $row['winner'],
+                'winner' => $row['winner']
             ];
         }
 
@@ -306,36 +306,62 @@ function viewBattles() {
                 }
                 // get battle
                 $battle_result = $system->db->query("
-                    SELECT * FROM `battles` WHERE `battle_id` = {$battle_id}
+                    SELECT `player1`, `player2`, `battle_background_link` FROM `battles` WHERE `battle_id` = {$battle_id}
                 ");
                 $battle_result = $system->db->fetch($battle_result);
                 if ($system->db->last_num_rows > 0) {
                     // only allow viewing own AI battles
                     if (strpos($battle_result['player2'], "NPC") !== false) {
-                        $own_battle = false;
-                        if ($battle_result['player1'] == $player->id || $battle_result['player2'] == $player->id) {
-                            $own_battle = true;
-                        }
-                        if (!$own_battle) {
+                        if ($battle_result['player1'] != $player->id && $battle_result['player2'] != $player->id) {
                             throw new RuntimeException("Battle not found!");
+                        }
+                        else {
+                            $p1 = EntityId::fromString($battle_result['player1']);
+                            $p2 = EntityId::fromString($battle_result['player2']);
+                            $battle_background_link = null;
+                            if (isset($battle_result['battle_background_link'])) {
+                                $battle_background_link = $battle_result['battle_background_link'];
+                            }
                         }
                     }
                 } else {
                     throw new RuntimeException("Battle not found!");
                 }
                 $logs_result = $system->db->query(
-                    "SELECT `turn_number`, `content` FROM `battle_logs`
+                    "SELECT `turn_number`, `content`, `fighter_health`, `active_effects` FROM `battle_logs`
                     WHERE `battle_id` = '{$battle_id}'
                     AND `turn_number` != '0'
                     ORDER BY `turn_number` ASC"
                 );
                 if ($system->db->last_num_rows > 0) {
-                    while ($row = $system->db->fetch($logs_result)) {
-                        $battle_text = $system->html_parse(stripslashes($row['content']));
-                        $battle_text = str_replace(array('[br]', '[hr]'), array('', '<hr />'), $battle_text);
+                    while ($turn = $system->db->fetch($logs_result)) {
+                        $battle_text = $system->html_parse(stripslashes($turn['content']));
+                        $battle_text = str_replace(array('[br]', '[hr]'), array('<br />', '<hr />'), $battle_text);
+                        $p1_health = null;
+                        $p1_key = "T1:U:" . $p1->id;
+                        $p2_health = null;
+                        $p2_key = "T2:NPC:" . $p2->id;
+                        $effects = [];
+                        $p1_max_health = null;
+                        $p2_max_health = null;
+                        if (isset($turn['fighter_health'])) {
+                            isset($turn['fighter_health'][$p1_key]) ?? $p1_health = $turn['fighter_health'][$p1_key];
+                            isset($turn['fighter_health'][$p1_key . ":MAX"]) ?? $p1_max_health = $turn['fighter_health'][$p1_key . ":MAX"];
+                            isset($turn['fighter_health'][$p2_key]) ?? $p2_health = $turn['fighter_health'][$p2_key];
+                            isset($turn['fighter_health'][$p2_key . ":MAX"]) ?? $p2_max_health = $turn['fighter_health'][$p2_key . ":MAX"];
+                        }
+                        $active_effects = json_decode($turn['active_effects'], true);
+                        if (isset($active_effects)) {
+                            $effects = array_map(function ($effect) {
+                                return BattleEffect::fromArray($effect);
+                            }, $active_effects);
+                        }
                         $battle_logs[] = [
-                            'turn' => $row['turn_number'],
-                            'content' => $battle_text
+                            'turn' => $turn['turn_number'],
+                            'content' => $battle_text,
+                            'player1_health' => $p1_health,
+                            'player2_health' => $p2_health,
+                            'active_effects' => $effects,
                         ];
                     }
                 } else {
