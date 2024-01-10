@@ -77,8 +77,10 @@
         .active_effects_container {
         display: flex;
         justify-content: center;
-        gap: 14px;
+        column-gap: 14px;
+        row-gap: 7px;
         flex-wrap: wrap;
+        margin-bottom: 5px;
     }
 
     .active_effect {
@@ -192,7 +194,7 @@
             </tr>
         <?php endif; ?>
             <tr>
-                <th colspan="2">Battle Log</th>
+                <th colspan="2">Turn Details</th>
             </tr>
             <tr>
                 <td colspan="2">
