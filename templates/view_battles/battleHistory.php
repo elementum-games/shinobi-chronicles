@@ -10,6 +10,11 @@
 
 ?>
 
+<script>
+    var log_count = <?= count($battle_logs) ?>;
+    var log_number = 0;
+</script>
+
 <style type='text/css'>
         .playerAvatar {
         display: block;
@@ -80,6 +85,7 @@
         row-gap: 7px;
         flex-wrap: wrap;
         margin-bottom: 5px;
+        margin-top: 5px;
     }
 
     .active_effect {
@@ -131,118 +137,107 @@
             <th colspan="2">Battle Log</th>
         </tr>
         <?php foreach ($battle_logs as $log): ?>
-        <?php if ($log['turn'] == 0 && isset($log['player1_health'])): ?>
-        <tr>
-            <th><?= $p1_name ?></th>
-            <th><?= $p2_name ?></th>
-        </tr>
-        <tr style="background: linear-gradient(to right, var(--main-background-color) 0%, transparent 10%, transparent 90%, var(--main-background-color) 100%), url('<?= $battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
-            <td id='bi_td_player' style="border-right: none">
-                <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
-                    <img src='<?= $p1_avatar ?>' class='playerAvatar' alt='player_profile_img' />
-                    <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 8px;'>
-                        <div class='resourceBarOuter healthPreview'>
-                            <label class='innerResourceBarLabel'><?= sprintf("%.0f", $log['player1_health']) ?> / <?= sprintf("%.0f", $p1_max_health) ?></label>
-                            <div class='healthFill' style='width:<?= round(($log['player1_health'] / $p1_max_health) * 100) ?>%;'></div>
-                        </div>
-                        <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
-                            <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
-                            <div class='chakraFill' style='width:100%'></div>
-                        </div>
-                        <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
-                            <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
-                            <div class='staminaFill' style='width:100%;'></div>
-                        </div>
-                    </div>
-                </div>
-            </td>
-            <td style='text-align: center; border-left: none' id='bi_td_opponent'>
-                <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
-                    <img src='<?= $p2_avatar ?>' class='opponentAvatar' />
-                    <div id='ai_battle_stats_container' style='display: inline-block; text-align: center'>
-                        <div class='resourceBarOuter healthPreview'>
-                            <label class='innerResourceBarLabel'><?= sprintf("%.0f", $log['player2_health']) ?> / <?= sprintf("%.0f", $p2_max_health) ?></label>
-                            <div class='healthFill' style='width:<?= round(($log['player2_health'] / $p2_max_health) * 100) ?>%;'></div>
-                        </div>
-                        <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
-                            <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
-                            <div class='chakraFill' style='width:100%'></div>
-                        </div>
-                        <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
-                            <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
-                            <div class='staminaFill' style='width:100%;'></div>
-                        </div>
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <?php elseif ($log['turn'] > 0): ?>
+            <?php if ($log['turn'] == 0): ?>
+                <?php continue; ?>
+            <?php endif; ?>
             <tr>
                 <th colspan="2">Turn <?= $log['turn'] ?></th>
             </tr>
-        <?php endif; ?>
-        <?php if (isset($log['player1_health']) && $log['turn'] > 0): ?>
-            <tr>
-                <th><?= $p1_name ?></th>
-                <th><?= $p2_name ?></th>
-            </tr>
-            <tr>
-                <td style="border-bottom:none">
-                    <div class='resourceBarOuter healthPreview'>
-                        <label class='innerResourceBarLabel'><?= sprintf("%.0f", $log['player1_health']) ?> / <?= sprintf("%.0f", $p1_max_health) ?></label>
-                        <div class='healthFill' style='width:<?= round(($log['player1_health'] / $p1_max_health) * 100) ?>%;'></div>
-                    </div>
-                </td>
-                <td style="border:none">
-                    <div class='resourceBarOuter healthPreview'>
-                        <label class='innerResourceBarLabel'><?= sprintf("%.0f", $log['player2_health']) ?> / <?= sprintf("%.0f", $p2_max_health) ?></label>
-                        <div class='healthFill' style='width:<?= round(($log['player2_health'] / $p2_max_health) * 100) ?>%;'></div>
-                    </div>
-                </td>
-            </tr>
-        <?php endif; ?>
-        <?php if (count($log['active_effects']) > 0 && $log['turn'] > 0): ?>
-            <tr>
-                <td style="border-top:none">
-                    <div class="active_effects_container">
-                        <?php foreach ($log['active_effects'] as $effect): ?>
-                        <?php if ($effect->target == $p1_key && $effect->turns > 0): ?>
-                        <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
-                            <div class="effect_name">
-                                <?= System::unSlug($effect->effect) ?>
-                            </div>
-                            <svg class="effect_duration_decoration" width="26" height="26">
-                                <polygon points="0,13 13,0 26,13 13,26" fill="#ad9357" stroke="black" stroke-width="1"></polygon>
-                            </svg>
-                            <div class="effect_duration">
-                                <?= System::unSlug($effect->turns) ?>
+            <?php if (isset($log['player1_health'])): ?>
+                <tr>
+                    <th><?= $p1_name ?></th>
+                    <th><?= $p2_name ?></th>
+                </tr>
+                <tr style="background: linear-gradient(to right, var(--main-background-color) 0%, transparent 10%, transparent 90%, var(--main-background-color) 100%), url('<?= $battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
+                    <td id='bi_td_player' style="border-right: none">
+                        <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
+                            <img src='<?= $p1_avatar ?>' class='playerAvatar' alt='player_profile_img' />
+                            <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 8px;'>
+                                <div class='resourceBarOuter healthPreview'>
+                                    <label class='innerResourceBarLabel'><?= sprintf("%.0f", $log['player1_health']) ?> / <?= sprintf("%.0f", $p1_max_health) ?></label>
+                                    <div class='healthFill' style='width:<?= round(($log['player1_health'] / $p1_max_health) * 100) ?>%;'></div>
+                                </div>
+                                <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
+                                    <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                                    <div class='chakraFill' style='width:100%'></div>
+                                </div>
+                                <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
+                                    <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                                    <div class='staminaFill' style='width:100%;'></div>
+                                </div>
                             </div>
                         </div>
-                        <?php endif; ?>
-                        <?php endforeach; ?>
-                    </div>
-                </td>
-                <td style="border-top:none">
-                    <div class="active_effects_container">
-                        <?php foreach ($log['active_effects'] as $effect): ?>
-                        <?php if ($effect->target == $p2_key && $effect->turns > 0): ?>
-                        <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
-                            <div class="effect_name">
-                                <?= System::unSlug($effect->effect) ?>
-                            </div>
-                            <svg class="effect_duration_decoration" width="26" height="26">
-                                <polygon points="0,13 13,0 26,13 13,26" fill="#ad9357" stroke="black" stroke-width="1"></polygon>
-                            </svg>
-                            <div class="effect_duration">
-                                <?= System::unSlug($effect->turns) ?>
+                    </td>
+                    <td style='text-align: center; border-left: none' id='bi_td_opponent'>
+                        <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
+                            <img src='<?= $p2_avatar ?>' class='opponentAvatar' />
+                            <div id='ai_battle_stats_container' style='display: inline-block; text-align: center'>
+                                <div class='resourceBarOuter healthPreview' style='margin-top: 8px';>
+                                    <label class='innerResourceBarLabel'><?= sprintf("%.0f", $log['player2_health']) ?> / <?= sprintf("%.0f", $p2_max_health) ?></label>
+                                    <div class='healthFill' style='width:<?= round(($log['player2_health'] / $p2_max_health) * 100) ?>%;'></div>
+                                </div>
+                                <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
+                                    <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                                    <div class='chakraFill' style='width:100%'></div>
+                                </div>
+                                <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
+                                    <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                                    <div class='staminaFill' style='width:100%;'></div>
+                                </div>
                             </div>
                         </div>
-                        <?php endif; ?>
-                        <?php endforeach; ?>
-                    </div>
-                </td>
-            </tr>
-        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+            <?php if (count($log['active_effects']) > 0): ?>
+                <tr>
+                    <td style="border-top:none">
+                        <div class="active_effects_container">
+                            <?php foreach ($log['active_effects'] as $effect): ?>
+                            <?php if ($effect->target == $p1_key && $effect->turns > 0): ?>
+                            <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
+                                <div class="effect_name">
+                                    <?= System::unSlug($effect->effect) ?>
+                                </div>
+                                <svg class="effect_duration_decoration" width="26" height="26">
+                                    <polygon points="0,13 13,0 26,13 13,26" fill="#ad9357" stroke="black" stroke-width="1"></polygon>
+                                </svg>
+                                <div class="effect_duration">
+                                    <?= System::unSlug($effect->turns) ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                            <?php endforeach; ?>
+                        </div>
+                    </td>
+                    <td style="border-top:none">
+                        <div class="active_effects_container">
+                            <?php foreach ($log['active_effects'] as $effect): ?>
+                            <?php if ($effect->target == $p2_key && $effect->turns > 0): ?>
+                            <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
+                                <div class="effect_name">
+                                    <?= System::unSlug($effect->effect) ?>
+                                </div>
+                                <svg class="effect_duration_decoration" width="26" height="26">
+                                    <polygon points="0,13 13,0 26,13 13,26" fill="#ad9357" stroke="black" stroke-width="1"></polygon>
+                                </svg>
+                                <div class="effect_duration">
+                                    <?= System::unSlug($effect->turns) ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                            <?php endforeach; ?>
+                        </div>
+                    </td>
+                </tr>
+            <?php endif; ?>
+            <?php if (isset($log['player1_health'])): ?>
+                <tr>
+                    <th colspan="2">
+                        Battle Log
+                    </th>
+                </tr>
+            <?php endif; ?>
             <tr>
                 <td colspan="2">
                     <?= $system->html_parse($log['content']) ?>
