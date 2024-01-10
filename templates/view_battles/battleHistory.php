@@ -16,8 +16,8 @@
         margin-top: auto;
         margin-left: auto;
         margin-right: auto;
-        max-width: <?= $player_avatar_size ?> !important;
-        max-height: <?= $player_avatar_size ?> !important;
+        max-width: <?= $p1_avatar_size ?>px !important;
+        max-height: <?= $p1_avatar_size ?>px !important;
     }
 
     .opponentAvatar {
@@ -25,8 +25,8 @@
         margin-top: auto;
         margin-left: auto;
         margin-right: auto;
-        max-width: <?= $opponent_avatar_size ?> !important;
-        max-height: <?= $opponent_avatar_size ?> !important;
+        max-width: <?= $p2_avatar_size ?>px !important;
+        max-height: <?= $p2_avatar_size ?>px !important;
     }
 
     .resourceBarOuter {
@@ -38,7 +38,6 @@
         background-color: rgba(0, 0, 0, 0.6);
         margin-left: auto;
         margin-right: auto;
-        margin-top: 10px;
     }
 
     /* Parent must be Position: relative */
@@ -126,16 +125,67 @@
         }
 </style>
 
-<?php if (isset($battle_logs) && count($battle_logs) > 0): ?>
+<?php if (isset($battle_logs) && count($battle_logs) > 1): ?>
     <table class='table' style="text-align:center;">
         <tr>
             <th colspan="2">Battle Log</th>
         </tr>
         <?php foreach ($battle_logs as $log): ?>
+        <?php if ($log['turn'] == 0 && isset($log['player1_health'])): ?>
+        <tr>
+            <th><?= $p1_name ?></th>
+            <th><?= $p2_name ?></th>
+        </tr>
+        <tr style="background: linear-gradient(to right, var(--main-background-color) 0%, transparent 10%, transparent 90%, var(--main-background-color) 100%), url('<?= $battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
+            <td id='bi_td_player' style="border-right: none">
+                <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
+                    <img src='<?= $p1_avatar ?>' class='playerAvatar' alt='player_profile_img' />
+                    <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 8px;'>
+                        <div class='resourceBarOuter healthPreview'>
+                            <label class='innerResourceBarLabel'><?= sprintf("%.0f", $log['player1_health']) ?> / <?= sprintf("%.0f", $p1_max_health) ?></label>
+                            <div class='healthFill' style='width:<?= round(($log['player1_health'] / $p1_max_health) * 100) ?>%;'></div>
+                        </div>
+                        <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
+                            <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                            <div class='chakraFill' style='width:100%'></div>
+                        </div>
+                        <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
+                            <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                            <div class='staminaFill' style='width:100%;'></div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td style='text-align: center; border-left: none' id='bi_td_opponent'>
+                <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
+                    <img src='<?= $p2_avatar ?>' class='opponentAvatar' />
+                    <div id='ai_battle_stats_container' style='display: inline-block; text-align: center'>
+                        <div class='resourceBarOuter healthPreview'>
+                            <label class='innerResourceBarLabel'><?= sprintf("%.0f", $log['player2_health']) ?> / <?= sprintf("%.0f", $p2_max_health) ?></label>
+                            <div class='healthFill' style='width:<?= round(($log['player2_health'] / $p2_max_health) * 100) ?>%;'></div>
+                        </div>
+                        <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
+                            <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                            <div class='chakraFill' style='width:100%'></div>
+                        </div>
+                        <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
+                            <label style="opacity: 75%" class='innerResourceBarLabel'>??? / ???</label>
+                            <div class='staminaFill' style='width:100%;'></div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <?php elseif ($log['turn'] > 0): ?>
             <tr>
                 <th colspan="2">Turn <?= $log['turn'] ?></th>
             </tr>
-        <?php if (isset($log['player1_health'])): ?>
+        <?php endif; ?>
+        <?php if (isset($log['player1_health']) && $log['turn'] > 0): ?>
+            <tr>
+                <th><?= $p1_name ?></th>
+                <th><?= $p2_name ?></th>
+            </tr>
             <tr>
                 <td style="border-bottom:none">
                     <div class='resourceBarOuter healthPreview'>
@@ -151,7 +201,7 @@
                 </td>
             </tr>
         <?php endif; ?>
-        <?php if (count($log['active_effects']) > 0): ?>
+        <?php if (count($log['active_effects']) > 0 && $log['turn'] > 0): ?>
             <tr>
                 <td style="border-top:none">
                     <div class="active_effects_container">
@@ -193,9 +243,6 @@
                 </td>
             </tr>
         <?php endif; ?>
-            <tr>
-                <th colspan="2">Turn Details</th>
-            </tr>
             <tr>
                 <td colspan="2">
                     <?= $system->html_parse($log['content']) ?>

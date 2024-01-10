@@ -310,27 +310,48 @@ function viewBattles() {
                 ");
                 $battle_result = $system->db->fetch($battle_result);
                 if ($system->db->last_num_rows > 0) {
+                    $is_ai_battle = false;
+                    $p1 = EntityId::fromString($battle_result['player1']);
+                    $p2 = EntityId::fromString($battle_result['player2']);
+                    $battle_background_link = null;
+                    if (isset($battle_result['battle_background_link'])) {
+                        $battle_background_link = $battle_result['battle_background_link'];
+                    }
                     // only allow viewing own AI battles
                     if (strpos($battle_result['player2'], "NPC") !== false) {
+                        $is_ai_battle = true;
                         if ($battle_result['player1'] != $player->id && $battle_result['player2'] != $player->id) {
                             throw new RuntimeException("Battle not found!");
-                        }
-                        else {
-                            $p1 = EntityId::fromString($battle_result['player1']);
-                            $p2 = EntityId::fromString($battle_result['player2']);
-                            $battle_background_link = null;
-                            if (isset($battle_result['battle_background_link'])) {
-                                $battle_background_link = $battle_result['battle_background_link'];
-                            }
                         }
                     }
                 } else {
                     throw new RuntimeException("Battle not found!");
                 }
+                $p1_name = null;
+                $p1_avatar = null;
+                $p2_name = null;
+                $p2_avatar = null;
+                $player1 = User::loadFromId($system, $p1->id, read_only: true);
+                $player1->loadData(UPDATE: User::UPDATE_NOTHING);
+                $p1_name = $player1->user_name;
+                $p1_avatar = $player1->avatar_link;
+                $p1_avatar_size = $player1->getAvatarSize();
+                if ($is_ai_battle) {
+                    $player2 = new NPC($system, $p2->id);
+                    $player2->loadData();
+                    $p2_name = $player2->name;
+                    $p2_avatar = $player2->avatar_link;
+                    $p2_avatar_size = $player2->getAvatarSize();
+                } else {
+                    $player2 = User::loadFromId($system, $p2->id, read_only: true);
+                    $player2->loadData(UPDATE: User::UPDATE_NOTHING);
+                    $p2_name = $player2->user_name;
+                    $p2_avatar = $player2->avatar_link;
+                    $p2_avatar_size = $player2->getAvatarSize();
+                }
                 $logs_result = $system->db->query(
                     "SELECT `turn_number`, `content`, `fighter_health`, `active_effects` FROM `battle_logs`
                     WHERE `battle_id` = '{$battle_id}'
-                    AND `turn_number` != '0'
                     ORDER BY `turn_number` ASC"
                 );
                 $p1_max_health = null;
@@ -342,7 +363,7 @@ function viewBattles() {
                         $p1_health = null;
                         $p1_key = "T1:U:" . $p1->id;
                         $p2_health = null;
-                        $p2_key = "T2:NPC:" . $p2->id;
+                        $p2_key = $is_ai_battle ? "T2:NPC:" . $p2->id : "T2:U:" . $p2->id;
                         $effects = [];
                         $fighter_health = json_decode($turn['fighter_health'], true);
                         if (isset($fighter_health)) {
