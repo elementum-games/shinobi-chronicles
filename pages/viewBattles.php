@@ -333,6 +333,8 @@ function viewBattles() {
                     AND `turn_number` != '0'
                     ORDER BY `turn_number` ASC"
                 );
+                $p1_max_health = null;
+                $p2_max_health = null;
                 if ($system->db->last_num_rows > 0) {
                     while ($turn = $system->db->fetch($logs_result)) {
                         $battle_text = $system->html_parse(stripslashes($turn['content']));
@@ -342,13 +344,12 @@ function viewBattles() {
                         $p2_health = null;
                         $p2_key = "T2:NPC:" . $p2->id;
                         $effects = [];
-                        $p1_max_health = null;
-                        $p2_max_health = null;
-                        if (isset($turn['fighter_health'])) {
-                            isset($turn['fighter_health'][$p1_key]) ?? $p1_health = $turn['fighter_health'][$p1_key];
-                            isset($turn['fighter_health'][$p1_key . ":MAX"]) ?? $p1_max_health = $turn['fighter_health'][$p1_key . ":MAX"];
-                            isset($turn['fighter_health'][$p2_key]) ?? $p2_health = $turn['fighter_health'][$p2_key];
-                            isset($turn['fighter_health'][$p2_key . ":MAX"]) ?? $p2_max_health = $turn['fighter_health'][$p2_key . ":MAX"];
+                        $fighter_health = json_decode($turn['fighter_health'], true);
+                        if (isset($fighter_health)) {
+                            $p1_health = $fighter_health[$p1_key] ?? null;
+                            $p1_max_health = $fighter_health[$p1_key . ":MAX"] ?? $p1_max_health;
+                            $p2_health = $fighter_health[$p2_key] ?? null;
+                            $p2_max_health = $fighter_health[$p2_key . ":MAX"] ?? $p2_max_health;
                         }
                         $active_effects = json_decode($turn['active_effects'], true);
                         if (isset($active_effects)) {
