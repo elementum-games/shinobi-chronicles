@@ -381,6 +381,10 @@ $constraints['item'] = [
             Item::USE_TYPE_CURRENCY => 'Currency'
         ],
     ],
+    'max_quantity' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
+    ],
     'effect' => [
         'data_type' => 'string',
         'input_type' => 'radio',

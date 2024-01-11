@@ -39,6 +39,8 @@ class Item {
 
     public int $quantity;
 
+    public int $max_quantity = 1;
+
     public function __construct(
         int $id,
         string $name = '',
@@ -52,7 +54,9 @@ class Item {
 
         string $effect = '',
         float $effect_amount = 0.0,
-        int $quantity = 0
+        int $quantity = 0,
+
+        int $max_quantity = 1
     ) {
         $this->id = $id;
         $this->name = $name;
@@ -67,6 +71,8 @@ class Item {
         $this->effect = $effect;
         $this->effect_amount = $effect_amount;
         $this->quantity = $quantity;
+
+        $this->max_quantity = $max_quantity;
     }
 
     public function effectDisplayUnit(): string {
@@ -101,7 +107,8 @@ class Item {
             use_type: $db_data['use_type'],
             effect: $db_data['effect'],
             effect_amount: $db_data['effect_amount'],
-            quantity: $quantity
+            quantity: $quantity,
+            max_quantity: $db_data['max_quantity']
         );
     }
 

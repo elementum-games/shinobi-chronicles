@@ -83,7 +83,7 @@ function gear(): void {
                     if($player->health > $player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100)) {
                         $player->health = $player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100);
                     }
-                    $system->message("Restored " . $player->items[$item_id]->effect_amount . " HP.");
+                    $system->message("Restored " . $player->items[$item_id]->effect_amount . "% HP.");
                     break;
                 default:
                     break;
