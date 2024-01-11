@@ -11,8 +11,9 @@
 ?>
 
 <script>
-    var log_count = <?= count($battle_logs) ?>;
-    var log_number = 0;
+    function toggleLog(turn) {
+        $(".turn_" + turn).toggle();
+    }
 </script>
 
 <style type='text/css'>
@@ -141,14 +142,14 @@
                 <?php continue; ?>
             <?php endif; ?>
             <tr>
-                <th colspan="2">Turn <?= $log['turn'] ?></th>
+                <th style="cursor: pointer" onclick="toggleLog(<?= $log['turn'] ?>)" colspan="2">Turn <?= $log['turn'] ?></th>
             </tr>
             <?php if (isset($log['player1_health'])): ?>
-                <tr>
+                <tr class="turn_<?= $log['turn'] ?>">
                     <th><?= $p1_name ?></th>
                     <th><?= $p2_name ?></th>
                 </tr>
-                <tr style="background: linear-gradient(to right, var(--main-background-color) 0%, transparent 10%, transparent 90%, var(--main-background-color) 100%), url('<?= $battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
+                <tr class="turn_<?= $log['turn'] ?>" style="background: linear-gradient(to right, var(--main-background-color) 0%, transparent 10%, transparent 90%, var(--main-background-color) 100%), url('<?= $battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
                     <td id='bi_td_player' style="border-right: none">
                         <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
                             <img src='<?= $p1_avatar ?>' class='playerAvatar' alt='player_profile_img' />
@@ -190,7 +191,7 @@
                 </tr>
             <?php endif; ?>
             <?php if (count($log['active_effects']) > 0): ?>
-                <tr>
+                <tr class="turn_<?= $log['turn'] ?>">
                     <td style="border-top:none">
                         <div class="active_effects_container">
                             <?php foreach ($log['active_effects'] as $effect): ?>
@@ -232,13 +233,13 @@
                 </tr>
             <?php endif; ?>
             <?php if (isset($log['player1_health'])): ?>
-                <tr>
+                <tr class="turn_<?= $log['turn'] ?>">
                     <th colspan="2">
                         Battle Log
                     </th>
                 </tr>
             <?php endif; ?>
-            <tr>
+            <tr class="turn_<?= $log['turn'] ?>">
                 <td colspan="2">
                     <?= $system->html_parse($log['content']) ?>
                 </td>
