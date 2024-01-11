@@ -181,9 +181,6 @@
 </table>
     <?php if ($display == "simple"): ?>
         <table class='table' style="text-align:center;">
-            <tr>
-                <th colspan="2">Battle Log</th>
-            </tr>
             <?php foreach ($battle_logs as $log): ?>
             <?php if ($log['turn'] == 0): ?>
             <?php continue; ?>
@@ -200,9 +197,6 @@
         </table>
         <?php else: ?>
         <table class='table' style="text-align:center;">
-            <tr>
-                <th colspan="2">Battle Log</th>
-            </tr>
             <?php foreach ($battle_logs as $log): ?>
                     <?php if ($log['turn'] == 0): ?>
                             <?php continue; ?>
