@@ -705,6 +705,7 @@ class BattleManager {
         $this->battle->player2_time = Battle::MAX_TURN_LENGTH;
         $this->battle->player1->updateData();
         $this->battle->player2->updateData();
+        $this->battle->start_time = time();
     }
 
     /**
