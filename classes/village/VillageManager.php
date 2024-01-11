@@ -902,9 +902,9 @@ class VillageManager {
                 $challenger->loadData(User::UPDATE_NOTHING);
             }
             if ($system->USE_NEW_BATTLES) {
-                $battle_id = BattleV2::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE);
+                $battle_id = BattleV2::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE, rounds: 3);
             } else {
-                $battle_id = Battle::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE);
+                $battle_id = Battle::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE, rounds: 3);
             }
             $system->db->query("UPDATE `challenge_requests` SET `battle_id` = {$battle_id} WHERE `request_id` = {$player->locked_challenge}");
             return;

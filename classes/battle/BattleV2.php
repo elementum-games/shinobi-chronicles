@@ -81,6 +81,11 @@ class BattleV2 {
 
     public string $battle_background_link;
 
+    public int $rounds = 1;
+    public int $round_count = 1;
+    public int $team1_wins;
+    public int $team2_wins;
+
     /**
      * @param System   $system
      * @param Fighter  $player1
@@ -91,7 +96,7 @@ class BattleV2 {
      * @throws DatabaseDeadlockException
      */
     public static function start(
-        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null, string $battle_background_link = ''
+        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null, string $battle_background_link = '', int $rounds = 1
     ): int {
         $json_empty_array = '[]';
 
@@ -137,7 +142,8 @@ class BattleV2 {
                 `fighter_jutsu_used` = '" . $json_empty_array . "',
                 `is_retreat` = '" . (int) false . "',
                 `patrol_id` = " . (!empty($patrol_id) ? $patrol_id : "NULL") . ",
-                `battle_background_link` = '{$battle_background_link}'
+                `battle_background_link` = '{$battle_background_link}',
+                `rounds` = '{$rounds}'
         ");
         $battle_id = $system->db->last_insert_id;
 
@@ -231,6 +237,13 @@ class BattleV2 {
 
         $battle->current_turn_log = $current_turn_log;
         $battle->log[$battle->turn_count] = $battle->current_turn_log;
+
+        $battle->battle_background_link = empty($battle_data['battle_background_link']) ? '' : $battle_data['battle_background_link'];
+
+        $battle->rounds = $battle_data['rounds'];
+        $battle->round_count = $battle_data['round_count'];
+        $battle->team1_wins = $battle_data['team1_wins'];
+        $battle->team2_wins = $battle_data['team2_wins'];
 
         return $battle;
     }
@@ -368,6 +381,10 @@ class BattleV2 {
 
                 `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
                 `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
+
+                `round_count` = {$this->round_count},
+                `team1_wins` = {$this->team1_wins},
+                `team2_wins` = {$this->team2_wins}
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
         );
 
