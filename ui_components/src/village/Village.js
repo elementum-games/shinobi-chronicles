@@ -821,7 +821,7 @@ function KageQuarters({
         else {
             setModalState("confirm_policy");
             setModalHeader("Confirmation");
-            setModalText("Are you sure you want to change policies? You will be unable to select a new policy for 14 days.");
+            setModalText("Are you sure you want to change policies? You will be unable to select a new policy for 3 days.");
         }
     }
     const DeclareWar = () => {
@@ -1162,7 +1162,11 @@ function KageQuarters({
                             </>
                         }
                         {modalState == "confirm_offer_trade" &&
-                            <>
+                        <>
+                                <div class="schedule_challenge_subtext_wrapper" style={{ marginBottom: "20px", marginTop: "-10px" }}>
+                                    <span class="schedule_challenge_subtext">Each village can offer up to 25000 resources of each resource type per trade.</span>
+                                    <span class="schedule_challenge_subtext">Trades have a cooldown of 24 hours.</span>
+                                </div>
                                 {TradeDisplay({
                                     viewOnly:false,
                                     offeringVillageResources:resourceDataState,
@@ -1695,8 +1699,10 @@ function KageQuarters({
                                                 readOnly
                                             />
                                             <div className="trade_display_resource_name">{resource.resource_name}</div>
-                                            {total &&
+                                            {total ?
                                                 <div className="trade_display_resource_total">{total}</div>
+                                                :
+                                                <div className="trade_display_resource_total">???</div>
                                             }
                                         </div>
                                     );
@@ -1734,8 +1740,10 @@ function KageQuarters({
                                                 readOnly
                                             />
                                             <div className="trade_display_resource_name">{resource.resource_name}</div>
-                                            {total &&
+                                            {total ?
                                                 <div className="trade_display_resource_total">{total}</div>
+                                                :
+                                                <div className="trade_display_resource_total">???</div>
                                             }
                                         </div>
                                     );
@@ -1766,7 +1774,7 @@ function KageQuarters({
                                             <input
                                                 type="number"
                                                 min="0"
-                                                max={total ? total : null}
+                                                max={total ? total : 25000}
                                                 step="100"
                                                 placeholder="0"
                                                 className="trade_display_resource_input"
@@ -1774,8 +1782,10 @@ function KageQuarters({
                                                 onChange={(e) => handleOfferedResourcesChange(resource.resource_name, parseInt(e.target.value))}
                                             />
                                             <div className="trade_display_resource_name">{resource.resource_name}</div>
-                                            {total &&
+                                            {total ?
                                                 <div className="trade_display_resource_total">{total}</div>
+                                                :
+                                                <div className="trade_display_resource_total">???</div>
                                             }
                                         </div>
                                     );
@@ -1808,7 +1818,7 @@ function KageQuarters({
                                             <input
                                                 type="number"
                                                 min="0"
-                                                max={total ? total : null}
+                                                max={total ? total : 25000}
                                                 step="100"
                                                 placeholder="0"
                                                 className="trade_display_resource_input"
@@ -1816,8 +1826,10 @@ function KageQuarters({
                                                 onChange={(e) => handleRequestedResourcesChange(resource.resource_name, parseInt(e.target.value))}
                                             />
                                             <div className="trade_display_resource_name">{resource.resource_name}</div>
-                                            {total &&
+                                            {total ?
                                                 <div className="trade_display_resource_total">{total}</div>
+                                                :
+                                                <div className="trade_display_resource_total">???</div>
                                             }
                                         </div>
                                     );
