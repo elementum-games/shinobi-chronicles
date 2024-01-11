@@ -421,7 +421,7 @@ if($battle->battle_text) {
                         <?php endif; ?>
                     <?php endif; ?>
                 </p>
-                <?php if ($battle->isPreparationPhase()): ?>
+                <?php if ($battle->isPreparationPhase() && $battle->battle_type == Battle::TYPE_FIGHT): ?>
                     <a id='retreatButton'>Retreat</a>
                     <div id="retreatDialog">
                         <form method="post">
@@ -445,7 +445,7 @@ if($battle->battle_text) {
                             $(retreatDialog).hide();
                         });
                     </script>
-                <?php else: ?>
+                <?php elseif (!$battle->isPreparationPhase()): ?>
                     <a id='forfeitButton'>Forfeit</a>
                     <div id="forfeitDialog">
                         <form method="post">
