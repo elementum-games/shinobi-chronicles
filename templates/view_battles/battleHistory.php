@@ -5,6 +5,7 @@
 /** @var string $battle_background_link */
 /** @var int $p1_max_health */
 /** @var int $p2_max_health */
+/** @var string $display */
 
 /** @var System $system */
 
@@ -13,6 +14,29 @@
 <script>
     function toggleLog(turn) {
         $(".turn_" + turn).toggle();
+    }
+    function copyUrl() {
+        navigator.clipboard.writeText(window.location.href)
+            .then(() => {
+                console.log('URL copied to clipboard');
+            })
+            .catch(err => {
+                console.error('Error in copying URL: ', err);
+            });
+        $("#share_btn").text("Link Copied!");
+    }
+    function showLogs() {
+        $(".turn").show();
+    }
+    function hideLogs() {
+        $(".turn").hide();
+    }
+    function updateDisplay(display) {
+        let url = new URL(window.location.href);
+        let params = url.searchParams;
+        params.set('display', display);
+        url.search = params.toString();
+        window.location.href = url.toString();
     }
 </script>
 
@@ -132,24 +156,66 @@
         }
 </style>
 
+<!-- Battle Log Display -->
 <?php if (isset($battle_logs) && count($battle_logs) > 1): ?>
-    <table class='table' style="text-align:center;">
+    <table class="table" style="width: 90%; margin-left: auto; margin-right: auto; margin-bottom: -5px; margin-top: -5px;">
+    <tbody>
         <tr>
-            <th colspan="2">Battle Log</th>
+            <td style="text-align: center">
+                <a href="#" onclick="updateDisplay('full')">Full View</a>
+            </td>
+            <td style="text-align: center">
+                <a href="#" onclick="updateDisplay('simple')">Simple View</a>
+            </td>
+            <td style="text-align: center">
+                <a href="#" onclick="hideLogs()">Collapse All</a>
+            </td>
+            <td style="text-align: center">
+                <a href="#" onclick="showLogs()">Expand All</a>
+            </td>
+            <td style="text-align: center">
+                <a id="share_btn" href="#" onclick="copyUrl()">Share</a>
+            </td>
         </tr>
-        <?php foreach ($battle_logs as $log): ?>
+    </tbody>
+</table>
+    <?php if ($display == "simple"): ?>
+        <table class='table' style="text-align:center;">
+            <tr>
+                <th colspan="2">Battle Log</th>
+            </tr>
+            <?php foreach ($battle_logs as $log): ?>
             <?php if ($log['turn'] == 0): ?>
-                <?php continue; ?>
+            <?php continue; ?>
             <?php endif; ?>
             <tr>
                 <th style="cursor: pointer" onclick="toggleLog(<?= $log['turn'] ?>)" colspan="2">Turn <?= $log['turn'] ?></th>
             </tr>
-            <?php if (isset($log['player1_health'])): ?>
-                <tr class="turn_<?= $log['turn'] ?>">
-                    <th><?= $p1_name ?></th>
-                    <th><?= $p2_name ?></th>
-                </tr>
-                <tr class="turn_<?= $log['turn'] ?>" style="background: linear-gradient(to right, var(--main-background-color) 0%, transparent 10%, transparent 90%, var(--main-background-color) 100%), url('<?= $battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
+            <tr class="turn turn_<?= $log['turn'] ?>">
+                <td colspan="2">
+                    <?= $system->html_parse($log['content']) ?>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
+        <?php else: ?>
+        <table class='table' style="text-align:center;">
+            <tr>
+                <th colspan="2">Battle Log</th>
+            </tr>
+            <?php foreach ($battle_logs as $log): ?>
+                    <?php if ($log['turn'] == 0): ?>
+                            <?php continue; ?>
+                    <?php endif; ?>
+                    <tr>
+                        <th style="cursor: pointer" onclick="toggleLog(<?= $log['turn'] ?>)" colspan="2">Turn <?= $log['turn'] ?></th>
+                    </tr>
+                    <?php if (isset($p1_max_health)): ?>
+                            <tr class="turn turn_<?= $log['turn'] ?>">
+                                <th><?= $p1_name ?></th>
+                                <th><?= $p2_name ?></th>
+                            </tr>
+                            <tr class="turn turn_<?= $log['turn'] ?>" style="background: linear-gradient(to right, var(--main-background-color) 0%, transparent 10%, transparent 90%, var(--main-background-color) 100%), url('<?= $battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
                     <td id='bi_td_player' style="border-right: none">
                         <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
                             <img src='<?= $p1_avatar ?>' class='playerAvatar' alt='player_profile_img' />
@@ -191,7 +257,7 @@
                 </tr>
             <?php endif; ?>
             <?php if (count($log['active_effects']) > 0): ?>
-                <tr class="turn_<?= $log['turn'] ?>">
+                <tr class="turn turn_<?= $log['turn'] ?>">
                     <td style="border-top:none">
                         <div class="active_effects_container">
                             <?php foreach ($log['active_effects'] as $effect): ?>
@@ -232,21 +298,24 @@
                     </td>
                 </tr>
             <?php endif; ?>
-            <?php if (isset($log['player1_health'])): ?>
-                <tr class="turn_<?= $log['turn'] ?>">
+            <?php if (isset($p1_max_health)): ?>
+                <tr class="turn turn_<?= $log['turn'] ?>">
                     <th colspan="2">
                         Battle Log
                     </th>
                 </tr>
             <?php endif; ?>
-            <tr class="turn_<?= $log['turn'] ?>">
+            <tr class="turn turn_<?= $log['turn'] ?>">
                 <td colspan="2">
                     <?= $system->html_parse($log['content']) ?>
                 </td>
             </tr>
         <?php endforeach; ?>
     </table>
+    <?php endif; ?>
 <?php endif; ?>
+
+<!-- PvP Battle Listing -->
 <?php if (isset($user_battles)): ?>
 <table class='table' style="text-align:center;">
     <tr>
@@ -280,6 +349,8 @@
     <?php endforeach; ?>
 </table>
 <?php endif; ?>
+
+<!-- AI Battle Listing -->
 <?php if (isset($ai_battles)): ?>
 <table class='table' style="text-align:center;">
     <tr>

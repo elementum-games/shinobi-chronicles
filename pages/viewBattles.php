@@ -299,6 +299,10 @@ function viewBattles() {
         $battle_logs = [];
         if (isset($_GET['view_log'])) {
             $view = "battle_history";
+            $display = "full";
+            if(isset($_GET['display'])) {
+                $display = $_GET['display'];
+            }
             try {
                 $battle_id = (int) $_GET['view_log'];
                 if (!($player->forbidden_seal->max_battle_history_view > 0)) {
