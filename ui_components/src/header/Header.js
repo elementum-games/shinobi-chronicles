@@ -66,9 +66,9 @@ function Header({ links, navigationAPIData, timeZone, updateMaintenance, scOpen 
             let hours = Math.floor(timeRemaining / 3600);
             timeRemaining -= hours * 3600;
             if(hours < 10) {
-                hours = "0" + hours + ":";
+                hours = "0" + hours;
             }
-            returnString += hours;
+            returnString += hours + ":";
         }
         else {
             returnString += "00:";
@@ -78,7 +78,7 @@ function Header({ links, navigationAPIData, timeZone, updateMaintenance, scOpen 
             let minutes = Math.floor(timeRemaining / 60);
             timeRemaining -= minutes * 60;
             if(minutes < 10) {
-                minutes = "0" + minutes;
+                minutes = "0" + minutes + ":";
             }
             returnString += minutes + ":";
         }
@@ -145,7 +145,7 @@ function Header({ links, navigationAPIData, timeZone, updateMaintenance, scOpen 
                     {!updateMaintenance && scOpen &&
                         <div className="header_time_label ft-default ft-s ft-c5">{serverTime}</div>
                     }
-                    {updateMaintenance && scOpen &&
+                    {updateMaintenance > 0 && scOpen &&
                         <div className="header_maint_label ft-default ft-s ft-c5">{maintTime}</div>
                     }
                     {!scOpen &&
