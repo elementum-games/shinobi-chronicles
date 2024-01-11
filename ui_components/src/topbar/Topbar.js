@@ -94,6 +94,16 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
         return () => clearInterval(notificationIntervalId);
     }, []);
 
+    notificationData
+        .sort((a, b) => {
+            if (a.type === 'training' && b.type !== 'training') {
+                return 1; // Move 'training' type to the start
+            } else if (a.type !== 'training' && b.type === 'training') {
+                return -1; // Move non-'training' types after
+            }
+            return 0; // No change in order for types other than 'training'
+        });
+
     // Display
     const leftNotificationTypes = [
         "training",
