@@ -321,12 +321,11 @@ function viewBattles() {
                     if (isset($battle_result['battle_background_link'])) {
                         $battle_background_link = $battle_result['battle_background_link'];
                     }
-                    // only allow viewing own AI battles
                     if (strpos($battle_result['player2'], "NPC") !== false) {
                         $is_ai_battle = true;
-                        if ($battle_result['player1'] != $player->id && $battle_result['player2'] != $player->id) {
+                        /*if ($battle_result['player1'] != $player->id && $battle_result['player2'] != $player->id) {
                             throw new RuntimeException("Battle not found!");
-                        }
+                        }*/
                     }
                 } else {
                     throw new RuntimeException("Battle not found!");
