@@ -2014,9 +2014,7 @@ class VillageManager {
         if ($system->db->last_num_rows > 0) {
             if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
                 $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
+                $time_remaining = $system->timeRemaining($seconds_remaining, 'long');
                 return "Cannot submit another proposal for " . $time_remaining . ".";
             }
         }
