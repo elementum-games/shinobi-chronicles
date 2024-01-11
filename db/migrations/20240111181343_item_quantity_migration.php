@@ -8,7 +8,7 @@ final class ItemQuantityMigration extends AbstractMigration
     public function up() {
         $this->execute("
             -- Alter table items
-            ALTER TABLE `items` ADD `max_quantity` INT(11) NOT NULL DEFAULT '1' AFTER `effect_amount`;
+            ALTER TABLE `items` ADD `max_quantity` INT(11) NOT NULL DEFAULT '1';
         ");
     }
 
