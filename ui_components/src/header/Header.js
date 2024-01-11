@@ -66,7 +66,7 @@ function Header({ links, navigationAPIData, timeZone, updateMaintenance, scOpen 
             let hours = Math.floor(timeRemaining / 3600);
             timeRemaining -= hours * 3600;
             if(hours < 10) {
-                hours = "0" + hours + ":";
+                hours = "0" + hours;
             }
             returnString += hours + ":";
         }
