@@ -528,7 +528,39 @@ function modPanel() {
 				if(strlen($message) > 1000) {
 					throw new RuntimeException("Message is too long! (" . strlen($message) . "/1000 chars)");
 				}
-				$system->db->query("UPDATE `system_storage` SET `global_message`='$message', `time`='".time()."'");
+
+                // Allow maintenance for head admins
+                $close_time = false;
+                $downtime = false;
+                if($player->staff_manager->isHeadAdmin()) {
+                    if(isset($_POST['close_sc'])) {
+                        $close_in = (int) $_POST['sc_close_time'];
+                        $downtime = (int) $_POST['sc_downtime'];
+
+                        if($close_in < 5) {
+                            throw new RuntimeException("You must allow at least 5 minutes prior to SC closure!");
+                        }
+                        if($close_in > 60) {
+                            throw new RuntimeException("Maintenance must start within an hour!");
+                        }
+                        if($downtime < 5) {
+                            throw new RuntimeException("Maintenance must be at least 5 minutes!");
+                        }
+                        if($downtime > 60) {
+                            throw new RuntimeException("Downtime may only be an hour, use manual closure for this maintenance period!");
+                        }
+
+                        $time = new DateTimeImmutable("now", new DateTimeZone(System::SERVER_TIME_ZONE));
+                        $close_time = $time->modify("+" . $close_in . " minutes");
+                        $downtime = $close_time->modify("+" . $downtime . " minutes");
+                    }
+                }
+
+                $storage_query = "UPDATE `system_storage` SET `global_message`='$message', `time`='" . time() . "'";
+                if($player->staff_manager->isHeadAdmin() && ($close_time && $downtime)) {
+                    $storage_query .= ", `maintenance_begin_time`='{$close_time->getTimestamp()}', `maintenance_end_time`='{$downtime->getTimestamp()}'";
+                }
+				$system->db->query($storage_query);
 				$system->db->query("UPDATE `users` SET `global_message_viewed`=0");
 				$player->global_message_viewed = 0;
                 $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD, "$player->user_name($player->user_id) posted global: <br />"

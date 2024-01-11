@@ -230,14 +230,13 @@ class System {
         $this->enable_dev_only_features = $ENABLE_DEV_ONLY_FEATURES ?? self::ENABLE_DEV_ONLY_FEATURES; // Will only ever effect dev envs
         $this->register_open = $register_open ?? false;
         $this->SC_OPEN = $SC_OPEN ?? false;
+        $this->SERVER_TIME = new DateTimeImmutable(datetime: "now", timezone: new DateTimeZone(self::SERVER_TIME_ZONE));
+        $this->loadRepReset();
         $this->UPDATE_MAINTENANCE = $this->checkForMaintenance();
         $this->USE_NEW_BATTLES = $USE_NEW_BATTLES ?? false;
 
         $this->router = new Router($web_url ?? 'http://localhost/');
 
-        // New Server Time
-        $this->SERVER_TIME = new DateTimeImmutable(datetime: "now", timezone: new DateTimeZone(self::SERVER_TIME_ZONE));
-        $this->loadRepReset();
         // Old Server Time
         $this->timezoneOffset = date('Z');
 
@@ -732,9 +731,19 @@ class System {
     }
 
     public function checkForMaintenance(): ?DateTimeImmutable {
-        $time = new DateTimeImmutable();
-        $maintenanceBegin = new DateTimeImmutable(self::MAINTENANCE_BEGIN, new DateTimeZone(self::SERVER_TIME_ZONE));
-        $maintenanceEnd = new DateTimeImmutable(self::MAINTENANCE_END, new DateTimeZone(self::SERVER_TIME_ZONE));
+        // Check for db-based maintenance
+        $db_maint = $this->db->query("SELECT `maintenance_begin_time`, `maintenance_end_time` FROM `system_storage`");
+        $db_maint = $this->db->fetch($db_maint);
+
+        if($db_maint['maintenance_begin_time'] > $this->SERVER_TIME->getTimestamp() || $db_maint['maintenance_end_time'] > $this->SERVER_TIME->getTimestamp()) {
+            $maintenanceBegin = $this->SERVER_TIME->setTimestamp($db_maint['maintenance_begin_time']);
+            $maintenanceEnd = $this->SERVER_TIME->setTimestamp($db_maint['maintenance_end_time']);
+        }
+        // Check for manual code maintenance
+        else {
+            $maintenanceBegin = new DateTimeImmutable(self::MAINTENANCE_BEGIN, new DateTimeZone(self::SERVER_TIME_ZONE));
+            $maintenanceEnd = new DateTimeImmutable(self::MAINTENANCE_END, new DateTimeZone(self::SERVER_TIME_ZONE));
+        }
 
         // Maintenance time-frame error
         if($maintenanceBegin->getTimestamp() > $maintenanceEnd->getTimestamp()) {
@@ -742,11 +751,11 @@ class System {
         }
 
         // Display timer for maintenance window
-        if($time->getTimestamp() < $maintenanceBegin->getTimestamp()) {
+        if($this->SERVER_TIME->getTimestamp() < $maintenanceBegin->getTimestamp()) {
             return $maintenanceBegin;
         }
         // Close SC for maintenance window - NOTE: This can be overridden in vars.php if window can't be easily determined
-        if($time->getTimestamp() > $maintenanceBegin->getTimestamp() && $time->getTimestamp() < $maintenanceEnd->getTimestamp()) {
+        if($this->SERVER_TIME->getTimestamp() > $maintenanceBegin->getTimestamp() && $this->SERVER_TIME->getTimestamp() < $maintenanceEnd->getTimestamp()) {
             $this->SC_OPEN = false;
             return $maintenanceEnd;
         }

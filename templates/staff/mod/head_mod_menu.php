@@ -1,5 +1,6 @@
 <?php
 /**
+ * @var User $player
  * @var string $self_link
  */
 ?>
@@ -98,6 +99,20 @@
         <td colspan='2' style='text-align:center;'>
             <form action='<?=$self_link?>' method='post'>
                 <textarea name='global_message' style='width:475px;height:175px;'></textarea><br />
+                <?php if($player->staff_manager->isHeadAdmin()): ?>
+                    <input type="checkbox" name="close_sc" /> Close SC for maintenance<br />
+                    Close in: <select name="sc_close_time">
+                        <?php for($i=5; $i <= 60; $i += 5): ?>
+                            <option value="<?=$i?>"><?=$i?> mins</option>
+                        <?php endfor ?>
+                    </select><br />
+                    Close for: <select name="sc_downtime">
+                        <?php for($i=5; $i <= 60; $i += 5): ?>
+                            <option value="<?=$i?>"><?=$i?> mins</option>
+                        <?php endfor ?>
+
+                    </select><br />
+                <?php endif ?>
                 <input style='margin-top: 5px;' type='submit' value='Post' />
             </form>
         </td>
