@@ -78,38 +78,80 @@ class ChatManager {
         $query .= " ORDER BY `post_id` DESC LIMIT $max_posts";
 
         $result = $this->system->db->query($query);
+        $result = $this->system->db->fetch_all($result);
 
+        // Get user IDs from posts
+        $user_ids = [];
+        $user_data_by_id = [];
+        $user_data_by_name = [];
+        foreach ($result as $row) {
+            // If user_id is set (newer post) add to list for batch
+            if ($row['user_id'] > 0 && !in_array($row['user_id'], $user_ids)) {
+                $user_ids[] = $row['user_id'];
+            }
+            // If user_id is not set (older post) get data for that user based on user_name
+            else {
+                $user_data_result = $this->system->db->query("
+                    SELECT `users`.`user_id`, `users`.`staff_level`, `users`.`premium_credits_purchased`, `users`.`chat_effect`, `users`.`avatar_link`,
+                    `user_settings`.`avatar_style`, `user_settings`.`avatar_frame`
+                    FROM `users`
+                    LEFT JOIN `user_settings` ON `users`.`user_id` = `user_settings`.`user_id`
+                    WHERE `users`.`user_name` = '{$this->system->db->clean($row['user_name'])}'
+                ");
+                $user_data_result = $this->system->db->fetch($user_data_result);
+                // only add data to array if user match found
+                if ($this->system->db->last_num_rows > 0) {
+                    // if custom setting is not set
+                    if (!isset($user_data_result['avatar_style'])) {
+                        $user_data_result['avatar_style'] = "avy_round";
+                    }
+                    // if custom setting is not set
+                    if (!isset($user_data_result['avatar_frame'])) {
+                        $user_data_result['avatar_frame'] = "avy_frame_default";
+                    }
+                    $user_data_by_name[$row['user_name']] = $user_data_result;
+                }
+            }
+        }
+        // Get batch user data
+        $user_data_result = $this->system->db->query("
+            SELECT `users`.`user_id`, `users`.`staff_level`, `users`.`premium_credits_purchased`, `users`.`chat_effect`, `users`.`avatar_link`,
+            `user_settings`.`avatar_style`, `user_settings`.`avatar_frame`
+            FROM `users`
+            LEFT JOIN `user_settings` ON `users`.`user_id` = `user_settings`.`user_id`
+            WHERE `users`.`user_id` IN ('" . implode(', ', $user_ids) . "')
+        ");
+        $user_data_result = $this->system->db->fetch_all($user_data_result);
+        foreach ($user_data_result as $row) {
+            // if custom setting is not set
+            if (!isset($row['avatar_style'])) {
+                $row['avatar_style'] = "avy_round";
+            }
+            // if custom setting is not set
+            if (!isset($row['avatar_frame'])) {
+                $row['avatar_frame'] = "avy_frame_default";
+            }
+            $user_data_by_id[$row['user_id']] = $row;
+        }
         $posts = [];
-        while($row = $this->system->db->fetch($result)) {
+        foreach ($result as $row) {
             $post = ChatPostDto::fromDb($row);
 
             //Base data
             $post->avatar = './images/default_avatar.png';
 
             //Fetch user data
-            $user_data = false;
-            $user_result = $this->system->db->query(
-                "SELECT `user_id`, `staff_level`, `premium_credits_purchased`, `chat_effect`, `avatar_link` FROM `users`
-                WHERE `user_name` = '{$this->system->db->clean($post->user_name)}'"
-            );
-            if($this->system->db->last_num_rows) {
-                $user_data = $this->system->db->fetch($user_result);
-                $settings_result = $this->system->db->query(
-                    "SELECT `avatar_style`, `avatar_frame` from `user_settings` where `user_id` = '{$user_data['user_id']}'"
-                );
-                if ($this->system->db->last_num_rows) {
-                    $settings_data = $this->system->db->fetch($settings_result);
-                    $user_data['avatar_style'] = $settings_data['avatar_style'];
-                    $user_data['avatar_frame'] = $settings_data['avatar_frame'];
-                } else {
-                    $user_data['avatar_style'] = "avy_round";
-                    $user_data['avatar_frame'] = "avy_frame_default";
-                }
+            $user_data = null;
+            if (isset($user_data_by_id[$post->user_id])) {
+                $user_data = $user_data_by_id[$post->user_id];
+            }
+            else if (isset($user_data_by_name[$post->user_name])) {
+                $user_data = $user_data_by_name[$post->user_name];
             }
 
             //Format posts
             $post->user_link_class_names = ["userLink"];
-            if($user_data) {
+            if(!empty($user_data)) {
                 if($user_data['premium_credits_purchased'] && $user_data['chat_effect'] == 'sparkles') {
                     $post->user_link_class_names[] = "premiumUser";
                 }
@@ -175,7 +217,6 @@ class ChatManager {
                     }
                 }
             }
-
             // Handle Quotes
             $pattern = "/\[quote:\d+\]/";
             $has_quote = preg_match_all($pattern, $post->message, $matches);
@@ -212,7 +253,6 @@ class ChatManager {
                     $post->message = str_replace($matches[0], "(...)", $post->message);
                 }
             }
-
 
             $posts[] = $post;
         }
