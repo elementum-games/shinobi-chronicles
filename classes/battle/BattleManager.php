@@ -676,39 +676,33 @@ class BattleManager {
         // if more rounds to go
         if ($this->battle->round_count < $this->battle->rounds) {
             $this->battle->round_count++;
-            $this->battle->player1->health = $this->battle->player1->max_health;
-            $this->battle->fighter_health[$this->battle->player1->combat_id] = $this->battle->player1->health;
-            $this->battle->player1_last_damage_taken = 0;
-            $this->battle->player2->health = $this->battle->player2->max_health;
-            $this->battle->fighter_health[$this->battle->player2->combat_id] = $this->battle->player2->health;
-            $this->battle->player2_last_damage_taken = 0;
-            $this->effects->active_effects = [];
-            $this->battle->jutsu_cooldowns = [];
-            $this->battle->turn_count = 0;
-            $this->battle->turn_time = time();
-            $this->battle->player1_time = Battle::MAX_TURN_LENGTH;
-            $this->battle->player2_time = Battle::MAX_TURN_LENGTH;
+            $this->resetBattle();
             return '';
         }
         // if rounds completed but no winner
         if ($this->battle->team1_wins == $this->battle->team2_wins) {
             $this->battle->round_count++;
-            $this->battle->player1->health = $this->battle->player1->max_health;
-            $this->battle->fighter_health[$this->battle->player1->combat_id] = $this->battle->player1->health;
-            $this->battle->player1_last_damage_taken = 0;
-            $this->battle->player2->health = $this->battle->player2->max_health;
-            $this->battle->fighter_health[$this->battle->player2->combat_id] = $this->battle->player2->health;
-            $this->battle->player2_last_damage_taken = 0;
-            $this->effects->active_effects = [];
-            $this->battle->jutsu_cooldowns = [];
-            $this->battle->turn_count = 0;
-            $this->battle->turn_time = time();
-            $this->battle->player1_time = Battle::MAX_TURN_LENGTH;
-            $this->battle->player2_time = Battle::MAX_TURN_LENGTH;
+            $this->resetBattle();
             return '';
         }
         // return no winner as failsafe
         return '';
+    }
+
+    #[Trace]
+    private function resetBattle() {
+        $this->battle->player1->health = $this->battle->player1->max_health;
+        $this->battle->fighter_health[$this->battle->player1->combat_id] = $this->battle->player1->health;
+        $this->battle->player1_last_damage_taken = 0;
+        $this->battle->player2->health = $this->battle->player2->max_health;
+        $this->battle->fighter_health[$this->battle->player2->combat_id] = $this->battle->player2->health;
+        $this->battle->player2_last_damage_taken = 0;
+        $this->effects->active_effects = [];
+        $this->battle->jutsu_cooldowns = [];
+        $this->battle->turn_count = 0;
+        $this->battle->turn_time = time();
+        $this->battle->player1_time = Battle::MAX_TURN_LENGTH;
+        $this->battle->player2_time = Battle::MAX_TURN_LENGTH;
     }
 
     /**
