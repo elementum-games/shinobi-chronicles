@@ -255,7 +255,11 @@ if($battle->battle_text) {
         <th id='bi_th_user' style='width:50%;'>
             <a href='<?= $system->router->links['members'] ?>&user=<?= $player->getName() ?>' style='text-decoration:none'><?= $player->getName() ?></a>
             <?php if ($battle->rounds > 1): ?>
+                <?php if ($battleManager->player_side == Battle::TEAM1): ?>
                 - <?= $battle->team1_wins ?> wins
+                <?php else: ?>
+                - <?= $battle->team2_wins ?> wins
+                <?php endif; ?>
             <?php endif; ?>
         </th>
         <th id='bi_th_opponent' style='width:50%;'>
@@ -265,7 +269,11 @@ if($battle->battle_text) {
                 <a href='<?= $system->router->links['members'] ?>&user=<?= $opponent->getName() ?>' style='text-decoration:none'><?= $opponent->getName() ?></a>
             <?php endif; ?>
             <?php if ($battle->rounds > 1): ?>
-            - <?= $battle->team2_wins ?> wins
+                <?php if ($battleManager->player_side == Battle::TEAM1): ?>
+                        - <?= $battle->team2_wins ?> wins
+                <?php else: ?>
+                        - <?= $battle->team1_wins ?> wins
+                <?php endif; ?>
             <?php endif; ?>
         </th>
     </tr>
