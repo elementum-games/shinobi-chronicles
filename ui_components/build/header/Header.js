@@ -55,9 +55,9 @@ function Header({
       let hours = Math.floor(timeRemaining / 3600);
       timeRemaining -= hours * 3600;
       if (hours < 10) {
-        hours = "0" + hours + ":";
+        hours = "0" + hours;
       }
-      returnString += hours;
+      returnString += hours + ":";
     } else {
       returnString += "00:";
     }
@@ -125,7 +125,7 @@ function Header({
     }, link.title));
   }), !updateMaintenance && scOpen && /*#__PURE__*/React.createElement("div", {
     className: "header_time_label ft-default ft-s ft-c5"
-  }, serverTime), updateMaintenance && scOpen && /*#__PURE__*/React.createElement("div", {
+  }, serverTime), updateMaintenance > 0 && scOpen && /*#__PURE__*/React.createElement("div", {
     className: "header_maint_label ft-default ft-s ft-c5"
   }, maintTime), !scOpen && /*#__PURE__*/React.createElement("div", {
     className: "header_maint_label ft-default ft-s ft-c5"
