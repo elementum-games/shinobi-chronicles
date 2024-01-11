@@ -692,10 +692,10 @@ class BattleManager {
     #[Trace]
     private function resetBattle() {
         $this->battle->player1->health = $this->battle->player1->max_health;
-        $this->battle->fighter_health[$this->battle->player1->combat_id] = $this->battle->player1->health;
+        $this->battle->fighter_health[$this->battle->player1->combat_id] = $this->battle->player1->max_health;
         $this->battle->player1_last_damage_taken = 0;
         $this->battle->player2->health = $this->battle->player2->max_health;
-        $this->battle->fighter_health[$this->battle->player2->combat_id] = $this->battle->player2->health;
+        $this->battle->fighter_health[$this->battle->player2->combat_id] = $this->battle->player2->max_health;
         $this->battle->player2_last_damage_taken = 0;
         $this->effects->active_effects = [];
         $this->battle->jutsu_cooldowns = [];
@@ -703,6 +703,8 @@ class BattleManager {
         $this->battle->turn_time = time();
         $this->battle->player1_time = Battle::MAX_TURN_LENGTH;
         $this->battle->player2_time = Battle::MAX_TURN_LENGTH;
+        $this->battle->player1->updateData();
+        $this->battle->player2->updateData();
     }
 
     /**

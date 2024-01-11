@@ -44,6 +44,7 @@ if($battle->battle_text) {
     let battle_id = <?= $battle->battle_id ?>;
     var apiUrl = `api/battle.php?check_turn=` + battle_id;
     let turn_count = <?= $battle->turn_count ?>;
+    let round_count = <?= $battle->round_count ?>;
     let prep_time_remaining = <?= $battle->prepTimeRemaining() ?>;
     let player1_submitted = <?= (int)isset($battle->fighter_actions[$battle->player1->combat_id]) ?>;
     let player2_submitted = <?= (int)isset($battle->fighter_actions[$battle->player2->combat_id]) ?>;
@@ -66,7 +67,7 @@ if($battle->battle_text) {
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
-                if (data.data != undefined && data.data.turn_count > turn_count) {
+                if (data.data != undefined && (data.data.turn_count > turn_count || data.data.round_count > round_count)) {
                     updateContent();
                 } else {
                     player1_time = data.data.player1_time;
