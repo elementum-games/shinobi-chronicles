@@ -755,10 +755,13 @@ class System {
         return null;
     }
 
-    public function checkForMaintenanceEnd(): string {
+	// This will return the estimated time the server will come back online, rounded up to the nearst 5 minutes
+	// e.g. 7 minutes => 10 minutes // 3 minutes => 5 minutes
+	// Default return for closing server in secure/vars is 30 minutes
+    public function getMaintenenceEndTime(): string {
         if(!$this->SC_OPEN && $this->UPDATE_MAINTENANCE) {
-            $mins = ceil(($this->UPDATE_MAINTENANCE->getTimestamp() - time()) / 60);
-            $mins += 5 - ($mins % 5);
+            $mins = ceil(($this->UPDATE_MAINTENANCE->getTimestamp() - time()) / 60); // Round up to nearest minute
+            $mins += 5 - ($mins % 5); // Add remainder to bring to nearst 5 minutes
             return "$mins minutes";
         }
 
