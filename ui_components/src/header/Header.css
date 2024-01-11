@@ -52,6 +52,12 @@
     text-transform: uppercase;
 }
 
+.header_maint_label {
+    margin-left: auto;
+    text-transform: uppercase;
+    color: var(--header-server-maint-color);
+}
+
 .header_logout_wrapper {
     margin-left: auto;
 }

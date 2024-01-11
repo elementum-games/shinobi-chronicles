@@ -87,6 +87,7 @@
     --header-border-color: #0c0d0e;
     --header-border-height: 3px;
     --header-logout-color: #e6a0a0;
+    --header-server-maint-color: #ff7973;
     /* Chat Config */
     --chat-secondary-background-color: #c8c4d2;
     /* Style helpers */

@@ -22,6 +22,9 @@ class System {
     const ENVIRONMENT_PROD = 'prod';
     const LOCAL_HOST = true;
 
+    const MAINTENANCE_BEGIN = 'Jan 1 00:00 2024';
+    const MAINTENANCE_END = 'Jan 1 00:00 2024';
+
     const KUNAI_PER_DOLLAR = 2;
     const LOGOUT_LIMIT = 720;
     const BLOODLINE_ROLL_CHANCE = 50;
@@ -68,6 +71,7 @@ class System {
     public bool $enable_dev_only_features;
 
     public bool $SC_OPEN;
+    public ?DateTimeImmutable $UPDATE_MAINTENANCE;
     public bool $register_open;
     public bool $USE_NEW_BATTLES = false;
 
@@ -79,7 +83,7 @@ class System {
 
     //New server time
     const SERVER_TIME_ZONE = "America/New_York";
-    const REPUTATION_RESET_DAY = "next friday";
+    const REPUTATION_RESET_DAY = "Friday";
     const REPUTATION_RESET_HOUR = 20;
     const REPUTATION_RESET_MINUTE = 0;
     public DateTimeImmutable $SERVER_TIME;
@@ -226,14 +230,14 @@ class System {
         $this->enable_dev_only_features = $ENABLE_DEV_ONLY_FEATURES ?? self::ENABLE_DEV_ONLY_FEATURES; // Will only ever effect dev envs
         $this->register_open = $register_open ?? false;
         $this->SC_OPEN = $SC_OPEN ?? false;
+        $this->UPDATE_MAINTENANCE = $this->checkForMaintenance();
         $this->USE_NEW_BATTLES = $USE_NEW_BATTLES ?? false;
 
         $this->router = new Router($web_url ?? 'http://localhost/');
 
         // New Server Time
         $this->SERVER_TIME = new DateTimeImmutable(datetime: "now", timezone: new DateTimeZone(self::SERVER_TIME_ZONE));
-        $this->REPUTATION_RESET = $this->SERVER_TIME->modify(self::REPUTATION_RESET_DAY);
-        $this->REPUTATION_RESET = $this->REPUTATION_RESET->setTime(hour: self::REPUTATION_RESET_HOUR, minute: self::REPUTATION_RESET_MINUTE);
+        $this->loadRepReset();
         // Old Server Time
         $this->timezoneOffset = date('Z');
 
@@ -725,6 +729,55 @@ class System {
 		    $endTime = new DateTimeImmutable("tomorrow");
 		    $this->event = new HolidayBonusEvent($endTime, self::HOLIDAYS[$current_datetime->format('M j')]);
 	    }
+    }
+
+    public function checkForMaintenance(): ?DateTimeImmutable {
+        $time = new DateTimeImmutable();
+        $maintenanceBegin = new DateTimeImmutable(self::MAINTENANCE_BEGIN, new DateTimeZone(self::SERVER_TIME_ZONE));
+        $maintenanceEnd = new DateTimeImmutable(self::MAINTENANCE_END, new DateTimeZone(self::SERVER_TIME_ZONE));
+
+        // Maintenance time-frame error
+        if($maintenanceBegin->getTimestamp() > $maintenanceEnd->getTimestamp()) {
+            return null;
+        }
+
+        // Display timer for maintenance window
+        if($time->getTimestamp() < $maintenanceBegin->getTimestamp()) {
+            return $maintenanceBegin;
+        }
+        // Close SC for maintenance window - NOTE: This can be overridden in vars.php if window can't be easily determined
+        if($time->getTimestamp() > $maintenanceBegin->getTimestamp() && $time->getTimestamp() < $maintenanceEnd->getTimestamp()) {
+            $this->SC_OPEN = false;
+            return $maintenanceEnd;
+        }
+
+
+        return null;
+    }
+
+	// This will return the estimated time the server will come back online, rounded up to the nearst 5 minutes
+	// e.g. 7 minutes => 10 minutes // 3 minutes => 5 minutes
+	// Default return for closing server in secure/vars is 30 minutes
+    public function getMaintenenceEndTime(): string {
+        if(!$this->SC_OPEN && $this->UPDATE_MAINTENANCE) {
+            $mins = ceil(($this->UPDATE_MAINTENANCE->getTimestamp() - time()) / 60); // Round up to nearest minute
+            $mins += 5 - ($mins % 5); // Add remainder to bring to nearst 5 minutes
+            return "$mins minutes";
+        }
+
+        return "30 minutes";
+    }
+
+    public function loadRepReset(): void {
+        if($this->SERVER_TIME->format('l') == self::REPUTATION_RESET_DAY &&
+            (int)$this->SERVER_TIME->format('H') >= self::REPUTATION_RESET_HOUR && (int) $this->SERVER_TIME->format('i') < self::REPUTATION_RESET_MINUTE)
+        {
+            $this->REPUTATION_RESET = $this->SERVER_TIME;
+        }
+        else {
+            $this->REPUTATION_RESET = $this->SERVER_TIME->modify('next ' . self::REPUTATION_RESET_DAY);
+        }
+        $this->REPUTATION_RESET = $this->REPUTATION_RESET->setTime(hour: self::REPUTATION_RESET_HOUR, minute: self::REPUTATION_RESET_MINUTE);
     }
 
     /**
