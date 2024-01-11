@@ -22,8 +22,8 @@ function healingShop() {
 	$health[4] = $rankManager->healthForRankAndLevel(4, $rankManager->ranks[4]->max_level);
 	// $health[5] = $rankManager->healthForRankAndLevel(5, $rankManager->ranks[5]->max_level);
 
-	// if not in village or colosseum, make sure no active enemy player at location
-	if (!$player->location->equals($player->village_location)) {
+	// Code for checking if at colosseum, if enemies at location
+	/*if (!$player->location->equals($player->village_location)) {
 		$result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
 		$location_result = $system->db->fetch($result);
 		$colosseum_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
@@ -49,8 +49,7 @@ function healingShop() {
                 }
             }
 		}
-    }
-
+    }*/
 
     $ramen_choices['vegetable'] = [
         'cost' => !$player->location->equals($player->village_location) ? $player->rank_num * 5 * 5 : $player->rank_num * 5,

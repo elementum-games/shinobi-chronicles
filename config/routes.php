@@ -135,7 +135,7 @@ return $routes = [
         menu: Route::MENU_ACTIVITY,
         battle_ok: false,
         village_ok: Route::ONLY_IN_VILLAGE,
-        village_restriction_overrides: [Route::COLOSSEUM_OVERRIDE => "true", Route::TOWN_OVERRIDE => "true", Route::CASTLE_OVERRIDE => "true"],
+        village_restriction_overrides: [Route::COLOSSEUM_OVERRIDE => "true"],
     ),
     26 => new Route(
         file_name: 'viewBattles.php',
