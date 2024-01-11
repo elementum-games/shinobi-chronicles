@@ -769,15 +769,21 @@ class System {
     }
 
     public function loadRepReset(): void {
-        if($this->SERVER_TIME->format('l') == self::REPUTATION_RESET_DAY &&
-            (int)$this->SERVER_TIME->format('H') >= self::REPUTATION_RESET_HOUR && (int) $this->SERVER_TIME->format('i') < self::REPUTATION_RESET_MINUTE)
-        {
-            $this->REPUTATION_RESET = $this->SERVER_TIME;
-        }
-        else {
-            $this->REPUTATION_RESET = $this->SERVER_TIME->modify('next ' . self::REPUTATION_RESET_DAY);
-        }
-        $this->REPUTATION_RESET = $this->REPUTATION_RESET->setTime(hour: self::REPUTATION_RESET_HOUR, minute: self::REPUTATION_RESET_MINUTE);
+		// Reset is today
+		if(strtolower($this->SERVER_TIME->format('l')) == strtolower(self::REPUTATION_RESET_DAY)) {
+			// Set time to today at proper hour and minute
+			$this->REPUTATION_RESET = $this->SERVER_TIME->setTime(hour: self::REPUTATION_RESET_HOUR, minute: self::REPUTATION_RESET_MINUTE);
+			// Reset has passed for today, move to next week and set to proper hour & minute
+			if($this->REPUTATION_RESET->getTimestamp() <= $this->SERVER_TIME->getTimestamp()) {
+				$this->REPUTATION_RESET = $this->SERVER_TIME->modify('next ' . self::REPUTATION_RESET_DAY);
+				$this->REPUTATION_RESET = $this->REPUTATION_RESET->setTime(hour: self::REPUTATION_RESET_HOUR, minute: self::REPUTATION_RESET_MINUTE);
+			}
+		}
+		// Reset is later in the week
+		else {
+			$this->REPUTATION_RESET = $this->SERVER_TIME->modify('next ' . self::REPUTATION_RESET_DAY);
+			$this->REPUTATION_RESET = $this->REPUTATION_RESET->setTime(hour: self::REPUTATION_RESET_HOUR, minute: self::REPUTATION_RESET_MINUTE);
+		}
     }
 
     /**
