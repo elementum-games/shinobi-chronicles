@@ -5,7 +5,8 @@ require_once __DIR__ . '/ChatPostDto.php';
 require_once __DIR__ . '/../notification/BlockedNotificationManager.php';
 
 class ChatManager {
-    const MAX_POST_LENGTH = 350;
+    const MAX_POST_LENGTH = 300;
+    const POST_LENGTH_BUFFER = 50;
     const MAX_POSTS_PER_PAGE = 15;
 
     public function __construct(
@@ -279,7 +280,8 @@ class ChatManager {
             if($message_length < 3) {
                 throw new RuntimeException("Message is too short!");
             }
-            if($message_length > $chat_max_post_length) {
+            // 50 character buffer
+            if($message_length > $chat_max_post_length + self::POST_LENGTH_BUFFER) {
                 throw new RuntimeException("Message is too long!");
             }
             //Failsafe, prevent posting if ban
