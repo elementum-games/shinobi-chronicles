@@ -42,7 +42,7 @@
                 <div><input type="radio" name="question1" value="1c" /> <label>Jutsu Levels</label></div>
                 <div><input type="radio" name="question1" value="1d" /> <label>All of the above</label></div>
                 <div><input type="radio" name="question1" value="1e" /> <label>None of the above (pure chance)</label></div>
-                <p class="question_label">Which of these Forbidden Seal benefits is not granted by Twin Dragon Seal?</p>
+                <p class="question_label">Which of these Forbidden Seal benefits is not granted by Twin Sparrow Seal?</p>
                 <div><input type="radio" name="question2" value="2a" checked/> <label>Increased Regen</label></div>
                 <div><input type="radio" name="question2" value="2b" /> <label>Larger Avatar</label></div>
                 <div><input type="radio" name="question2" value="2c" /> <label>Enhanced Training</label></div>
