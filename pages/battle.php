@@ -179,7 +179,10 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $result .= "You win the fight and earn ¥$pvp_yen![br]";
 
         $system->db->query(
-            "UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='{$player->village->name}' LIMIT 1"
+            "UPDATE `villages` SET 
+            `points` = `points` + '{$village_point_gain}',
+            `monthly_points` = `monthly_points` + '{$village_point_gain}'
+            WHERE `name`= '{$player->village->name}' LIMIT 1"
         );
         $result .= "You have earned $village_point_gain point for your village.[br]";
 

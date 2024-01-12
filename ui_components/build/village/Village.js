@@ -616,7 +616,7 @@ function VillageHQ({
     className: "points_label"
   }, "monthly"), /*#__PURE__*/React.createElement("div", {
     className: "points_total"
-  }, pointsDataState.points)))))), /*#__PURE__*/React.createElement("div", {
+  }, pointsDataState.monthly_points)))))), /*#__PURE__*/React.createElement("div", {
     className: "row second"
   }, /*#__PURE__*/React.createElement("div", {
     className: "column first"
