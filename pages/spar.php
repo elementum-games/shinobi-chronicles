@@ -224,9 +224,13 @@ function processSparFightEnd(BattleManager $battle, User $player, System $system
     if($battle->isPlayerWinner()) {
 		$result = "You win!";
         if ($reputation_eligible) {
-            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_WIN, UserReputation::ACTIVITY_TYPE_PVE);
+            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_WIN, UserReputation::ACTIVITY_TYPE_PVP);
             $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
             $result .= "<br>You have gained $rep_gain village reputation!";
+        }
+        // Daily Task
+        if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVP)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, UserReputation::SPAR_REP_WIN);
         }
         return $result;
     }
@@ -234,7 +238,7 @@ function processSparFightEnd(BattleManager $battle, User $player, System $system
         $player->health = 5;
         $result = "You lose.";
         if ($reputation_eligible) {
-            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_LOSS, UserReputation::ACTIVITY_TYPE_PVE);
+            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_LOSS, UserReputation::ACTIVITY_TYPE_PVP);
             $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
             $result .= "<br>You have gained $rep_gain village reputation!";
         }
@@ -244,9 +248,13 @@ function processSparFightEnd(BattleManager $battle, User $player, System $system
         $player->health = 5;
         $result = "You both knocked each other out.";
         if ($reputation_eligible) {
-            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_DRAW, UserReputation::ACTIVITY_TYPE_PVE);
+            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_DRAW, UserReputation::ACTIVITY_TYPE_PVP);
             $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
             $result .= "<br>You have gained $rep_gain village reputation!";
+        }
+        // Daily Task
+        if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVP)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, UserReputation::SPAR_REP_DRAW);
         }
         return $result;
     }

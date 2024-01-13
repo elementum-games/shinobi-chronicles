@@ -456,6 +456,9 @@ function runActiveMission(): bool {
                 if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_MISSIONS)) {
                     $player->daily_tasks->progressTask(DailyTask::ACTIVITY_MISSIONS, 1, $mission_rank);
                 }
+                if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVE)) {
+                    $player->daily_tasks->progressTask(DailyTask::ACTIVITY_MISSIONS, UserReputation::MISSION_GAINS[$mission_rank], $mission_rank);
+                }
 
                 if (isset($player->missions_completed[$mission->rank])) {
                     $player->missions_completed[$mission->rank] += 1;

@@ -190,6 +190,10 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                 if ($rep_gained > 0) {
                     $result .= "You have earned $rep_gained village reputation.[br]";
                 }
+                // Daily Task
+                if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVP)) {
+                    $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, $rep_gained);
+                }
             }
             // Loot - winner takes half loser's if retreat, which is all remaining since loser has left battle in order to flag as retreat
             $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}");
@@ -202,6 +206,10 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                 $rep_gained = $player->reputation->handlePvPWin($player, $battle->opponent);
                 if ($rep_gained > 0) {
                     $result .= "You have earned $rep_gained village reputation.[br]";
+                }
+                // Daily Task
+                if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVP)) {
+                    $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, $rep_gained);
                 }
             }
             // Loot

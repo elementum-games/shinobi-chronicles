@@ -90,7 +90,7 @@ function processWarBattleEnd($battle, User $player): string {
             $stat_gain_display .= $player->addStatGain($stat_to_gain, $stat_gain) . '.';
         }
 
-        // Village Rep Gains - PLACEHOLDER FOR WAR GAINS
+        // Village Rep Gains
         $rep_gain_string = "";
         if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_WAR)) {
             $rep_gain = $player->reputation->addRep(
@@ -100,6 +100,10 @@ function processWarBattleEnd($battle, User $player): string {
             if ($rep_gain > 0) {
                 $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
                 $rep_gain_string = "Defeating enemy war combatants has earned you $rep_gain Reputation.<br />";
+            }
+            // Daily Task
+            if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_WAR)) {
+                $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_WAR, $rep_gain);
             }
         }
 

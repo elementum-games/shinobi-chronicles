@@ -10,6 +10,9 @@ class DailyTask {
     const SUB_TASK_GEN = 'attributes';
     const SUB_TASK_JUTSU = 'jutsu';
 
+    const ACTIVITY_DAILY_PVE = 'PvE';
+    const ACTIVITY_DAILY_WAR = 'War';
+    const ACTIVITY_DAILY_PVP = 'PvP';
     const ACTIVITY_PVP = 'PVP';
     const ACTIVITY_ARENA = 'Arena';
     const ACTIVITY_MISSIONS = 'Missions';
@@ -21,6 +24,15 @@ class DailyTask {
     const DIFFICULTY_HARD = 'Hard';
 
     public static array $possible_task_names = [
+        DailyTask::ACTIVITY_DAILY_PVE => [
+            'Daily PvE Progress',
+        ],
+        DailyTask::ACTIVITY_DAILY_WAR => [
+            'Daily War Progress',
+        ],
+        DailyTask::ACTIVITY_DAILY_PVP => [
+            'Daily PvP Progress',
+        ],
         DailyTask::ACTIVITY_PVP => [
             'Defend the Past',
             'The Beast in the West',
@@ -36,6 +48,11 @@ class DailyTask {
             'Made for Error',
             'Codename RED',
         ],
+        DailyTask::ACTIVITY_SPECIAL_MISSIONS => [
+            'Call of Grace',
+            'Made for Error',
+            'Codename RED',
+        ],
         DailyTask::ACTIVITY_TRAINING => [
             'Breaking Rites',
             'Cry of Menace',
@@ -46,12 +63,18 @@ class DailyTask {
             'Hand of Midas',
             'Fill the Coffers',
         ],
+        DailyTask::ACTIVITY_WAR => [
+            'Call of Grace',
+            'Made for Error',
+            'Codename RED',
+        ],
     ];
 
     public static array $activity_labels = [
         DailyTask::ACTIVITY_PVP => 'PvP Battles',
         DailyTask::ACTIVITY_ARENA => 'Arena Battles',
         DailyTask::ACTIVITY_MISSIONS => 'Missions',
+        DailyTask::ACTIVITY_SPECIAL_MISSIONS => 'Special Missions',
         DailyTask::ACTIVITY_TRAINING => [
             DailyTask::SUB_TASK_SKILL => 'points',
             DailyTask::SUB_TASK_GEN => 'points',
@@ -83,19 +106,31 @@ class DailyTask {
         $this->progress = $db_data['progress'];
         $this->complete = (bool)$db_data['complete'];
     }
-    
+
     public function getPrompt(): string {
-        if($this->activity === DailyTask::ACTIVITY_TRAINING) {
-            $prompt = ucwords($this->activity) . " {$this->amount} {$this->sub_task} " . self::$activity_labels[$this->activity][$this->sub_task];
-        }
-        else {
-            $prompt = ucwords($this->sub_task) . " " . $this->amount . ' ';
-            if($this->activity === DailyTask::ACTIVITY_MISSIONS) {
-                $prompt .= Mission::$rank_names[$this->mission_rank] . '+ ' . self::$activity_labels[$this->activity];
-            }
-            else {
-                $prompt .= self::$activity_labels[$this->activity];
-            }
+        $prompt = '';
+        switch ($this->activity) {
+            case DailyTask::ACTIVITY_TRAINING:
+                $prompt = ucwords($this->activity) . " {$this->amount} {$this->sub_task} " . self::$activity_labels[$this->activity][$this->sub_task];
+                break;
+            case DailyTask::ACTIVITY_DAILY_PVE:
+                $prompt = "Complete Arena battles and Missions";
+                break;
+            case DailyTask::ACTIVITY_DAILY_WAR:
+                $prompt = "Participate in War and Espionage";
+                break;
+            case DailyTask::ACTIVITY_PVP:
+                $prompt = "Complete PvP battles and Spars";
+                break;
+            default:
+                $prompt = ucwords($this->sub_task) . " " . $this->amount . ' ';
+                if($this->activity === DailyTask::ACTIVITY_MISSIONS) {
+                    $prompt .= Mission::$rank_names[$this->mission_rank] . '+ ' . self::$activity_labels[$this->activity];
+                }
+                else {
+                    $prompt .= self::$activity_labels[$this->activity];
+                }
+                break;
         }
         return $prompt;
     }
@@ -112,6 +147,33 @@ class DailyTask {
     public static function getPossibleTasks(int $user_rank): array {
         // 50|75, 1000|5000
         $possible_task_types = [
+            DailyTask::ACTIVITY_DAILY_PVE => [
+                'type' => DailyTask::ACTIVITY_DAILY_PVE,
+                'sub_task' => [DailyTask::ACTIVITY_DAILY_PVE],
+                'max_amount' => [
+                    DailyTask::DIFFICULTY_EASY => 20,
+                    DailyTask::DIFFICULTY_MEDIUM => 30,
+                    DailyTask::DIFFICULTY_HARD => 40,
+                ],
+            ],
+            DailyTask::ACTIVITY_DAILY_WAR => [
+                'type' => DailyTask::ACTIVITY_DAILY_WAR,
+                'sub_task' => [DailyTask::ACTIVITY_DAILY_WAR],
+                'max_amount' => [
+                    DailyTask::DIFFICULTY_EASY => 20,
+                    DailyTask::DIFFICULTY_MEDIUM => 30,
+                    DailyTask::DIFFICULTY_HARD => 40,
+                ],
+            ],
+            DailyTask::ACTIVITY_DAILY_PVP => [
+                'type' => DailyTask::ACTIVITY_DAILY_PVP,
+                'sub_task' => [DailyTask::ACTIVITY_DAILY_PVP],
+                'max_amount' => [
+                    DailyTask::DIFFICULTY_EASY => 20,
+                    DailyTask::DIFFICULTY_MEDIUM => 30,
+                    DailyTask::DIFFICULTY_HARD => 40,
+                ],
+            ],
             DailyTask::ACTIVITY_PVP => [
                 'type' => DailyTask::ACTIVITY_PVP,
                 'sub_task' => [/*DailyTask::SUB_TASK_WIN_FIGHT, */DailyTask::SUB_TASK_COMPLETE],
@@ -275,42 +337,37 @@ class DailyTask {
      */
     public static function generateNewTasks(int $user_rank_num): array {
         $daily_tasks = [];
-
-        // Rank 1 only
-        if($user_rank_num == 1) {
-            $daily_tasks[] = DailyTask::generateTask(
-                $user_rank_num,
-                DailyTask::ACTIVITY_ARENA,
-                DailyTask::DIFFICULTY_MEDIUM
-            );
-            $daily_tasks[] = DailyTask::generateTask(
-                $user_rank_num,
-                DailyTask::ACTIVITY_EARN_MONEY,
-                DailyTask::DIFFICULTY_MEDIUM
-            );
-            return $daily_tasks;
+        switch ($user_rank_num) {
+            case 1:
+            case 2:
+                $daily_tasks[] = DailyTask::generateTask(
+                    $user_rank_num,
+                    DailyTask::ACTIVITY_DAILY_PVE,
+                    DailyTask::DIFFICULTY_MEDIUM
+                );
+                $daily_tasks[] = DailyTask::generateTask(
+                    $user_rank_num,
+                    DailyTask::ACTIVITY_EARN_MONEY,
+                    DailyTask::DIFFICULTY_MEDIUM
+                );
+            case 3:
+            case 4:
+                $daily_tasks[] = DailyTask::generateTask(
+                    $user_rank_num,
+                    DailyTask::ACTIVITY_DAILY_PVE,
+                    DailyTask::DIFFICULTY_MEDIUM
+                );
+                $daily_tasks[] = DailyTask::generateTask(
+                    $user_rank_num,
+                    DailyTask::ACTIVITY_DAILY_WAR,
+                    DailyTask::DIFFICULTY_MEDIUM
+                );
+                $daily_tasks[] = DailyTask::generateTask(
+                    $user_rank_num,
+                    DailyTask::ACTIVITY_DAILY_PVP,
+                    DailyTask::DIFFICULTY_MEDIUM
+                );
         }
-
-        // Standard
-        $daily_tasks[] = DailyTask::generateTask(
-            $user_rank_num,
-            DailyTask::ACTIVITY_ARENA,
-            DailyTask::DIFFICULTY_MEDIUM
-        );
-        $daily_tasks[] = DailyTask::generateTask(
-            $user_rank_num,
-            DailyTask::ACTIVITY_MISSIONS,
-            DailyTask::DIFFICULTY_MEDIUM
-        );
-
-        if($user_rank_num >= 3) {
-            $daily_tasks[] = DailyTask::generateTask(
-                $user_rank_num,
-                DailyTask::ACTIVITY_PVP,
-                DailyTask::DIFFICULTY_MEDIUM
-            );
-        }
-
         return $daily_tasks;
     }
 }

@@ -173,9 +173,9 @@ class UserReputation {
     // Only being killed within last 30 minutes will mitigate pvp rep losses (further chainkill mitigation)
     const RECENTLY_KILLED_BY_THRESHOLD = 1800;
 
-    const SPAR_REP_LOSS = 3;
-    const SPAR_REP_DRAW = 5;
-    const SPAR_REP_WIN = 7;
+    const SPAR_REP_LOSS = 0;
+    const SPAR_REP_DRAW = 1;
+    const SPAR_REP_WIN = 2;
 
     // Shop benefits
     const ITEM_SHOP_DISCOUNT_RATE = 10;

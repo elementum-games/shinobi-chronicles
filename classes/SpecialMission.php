@@ -478,6 +478,10 @@ class SpecialMission {
                     $reward_text .= ' You have gained ' . $rep_gain . " village reputation!";
                 }
             }
+            // Daily Task
+            if ($this->player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVE)) {
+                $this->player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVE, self::$difficulties[$this->difficulty]['rep_gain']);
+            }
         }
 
         $stat_to_gain = $this->player->getTrainingStatForArena();

@@ -446,6 +446,10 @@ class WarManager {
                 $message .= "\nGained " . $rep_gain . " village reputation!";
             }
         }
+        // Daily Task
+        if ($this->user->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_WAR)) {
+            $this->user->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_WAR, $rep_gain);
+        }
         $message .= '!';
         // update loot table
         $time = time();
