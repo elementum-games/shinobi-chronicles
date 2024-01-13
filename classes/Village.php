@@ -11,6 +11,7 @@ class Village {
     public int $village_id;
     public string $name;
     public int $points;
+    public int $monthly_points;
     public int $leader;
     public int $map_location_id;
     public int $region_id;
@@ -59,6 +60,7 @@ class Village {
         $this->region_id = $result['region_id'];
         $this->village_id = $result['village_id'];
         $this->points = $result['points'];
+        $this->monthly_points = $result['points'];
         $this->resources = json_decode($result['resources'], true);
         $this->policy_id = $result['policy_id'];
         $this->leader = $result['leader'];

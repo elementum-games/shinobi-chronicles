@@ -620,7 +620,7 @@ function VillageHQ({
                                 </div>
                                 <div className="points_item">
                                     <div className="points_label">monthly</div>
-                                    <div className="points_total">{pointsDataState.points}</div>
+                                    <div className="points_total">{pointsDataState.monthly_points}</div>
                                 </div>
                             </div>
                         </div>

@@ -198,11 +198,14 @@ class VillageManager {
     /**
      * @return array
      */
-    public static function getVillagePoints(System $system, string $village_id): int
+    public static function getVillagePoints(System $system, string $village_id): array
     {
-        $points_result = $system->db->query("SELECT `points` FROM `villages` WHERE `village_id` = {$village_id}");
+        $return_arr = [];
+        $points_result = $system->db->query("SELECT `points`, `monthly_points` FROM `villages` WHERE `village_id` = {$village_id}");
         $points_result = $system->db->fetch($points_result);
-        return $points_result['points'];
+        $return_arr['points'] = $points_result['points'];
+        $return_arr['monthly_points'] = $points_result['monthly_points'];
+        return $return_arr;
     }
 
     /**
