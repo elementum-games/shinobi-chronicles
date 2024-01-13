@@ -27,15 +27,6 @@
     --progress-bar-bg-color: #383838;
     --progress-bar-dark-bg-color: rgba(0,0,0,0.2);
     --progress-bar-fill-color: #6e0e11;
-    /* Structure */
-    --header-height: 35px;
-    --content-width: 930px;
-    --sidebar-width: 250px;
-    --content-sidebar-gap: 15px;
-    --header-sidebar-gap: 7px;
-    --topbar-height: 60px;
-    --hotbar-height: 85px;
-    --footer-height: 30px;
     /* Font Config */
     --font-primary: "Trebuchet MS";
     --font-primary-variant: small-caps;
@@ -78,14 +69,12 @@
     --hotbar-keybind-modal-height: 400px;
     /* Sidebar Config */
     --sidebar-header-background: #7f869a;
-    --sidebar-header-height: 23px;
     --sidebar-button-background-color: #c3c9d7;
     --sidebar-button-background-hover: #474b58;
     --sidebar-button-border-color: #7f869a;
     /* Header Config */
     --header-background-color: #151417;
     --header-border-color: #0c0d0e;
-    --header-border-height: 3px;
     --header-logout-color: #e6a0a0;
     --header-server-maint-color: #ff7973;
     /* Chat Config */
@@ -118,90 +107,7 @@
     --hq-clan-name-color: #6e0e11;
 }
 
-/* Helper Classes - TO-DO: remove helpers, organize module CSS classes */
-.ft-b {
-    font-weight: bold;
-}
-.ft-i {
-    font-style: italic;
-}
-.ft-p {
-    font-family: var(--font-primary);
-    font-variant: var(--font-primary-variant);
-}
-.ft-s {
-    font-family: var(--font-secondary);
-    font-variant: var(--font-secondary-variant);
-}
-
-.ft-c1 {
-    color: var(--font-color-1);
-}
-.ft-c2 {
-    color: var(--font-color-2);
-}
-.ft-c3 {
-    color: var(--font-color-3);
-}
-.ft-c4 {
-    color: var(--font-color-4);
-}
-.ft-c5 {
-    color: var(--font-color-5);
-}
-
-.ft-min {
-    font-size: 12px;
-}
-.ft-small {
-    font-size: 13px;
-}
-.ft-default {
-    font-size: 14px;
-}
-.ft-medium {
-    font-size: 15px;
-}
-.ft-large {
-    font-size: 17px;
-}
-.ft-xlarge {
-    font-size: 18px;
-}
-.ft-max {
-    font-size: 21px;
-}
-
-.t-center {
-    text-align: center;
-}
-.t-left {
-    text-align: left;
-}
-.t-hover:hover {
-    color: var(--text-hover);
-    cursor: pointer;
-}
-.d-none {
-    display: none;
-}
-.d-flex {
-    display: flex;
-}
-.d-in_flex {
-    display: inline-flex;
-}
-.d-in_block {
-    display: inline-block;
-}
-.jc-center {
-    justify-content: center;
-}
-
-html {
-    scroll-behavior: smooth
-}
-
+/* Main Content */
 body {
     background-color: var(--main-background-color);
     background-image: url(../../images/v2/sumu/background.jpg);
@@ -210,12 +116,8 @@ body {
     background-size: cover;
     background-position: center top;
 }
-
 #container {
     background: none;
-    width: 100%;
-    justify-content: center;
-    display: flex;
 }
     #container::before {
         content: "";
@@ -224,28 +126,14 @@ body {
         height: 100%;
         left: 50%;
         transform: translate(-50%, calc(-1 * var(--header-height) - var(--header-border-height)));
-
         z-index: -1;
     }
-
-#content_wrapper {
-    width: var(--content-width);
-    display: inline-block;
-    margin-left: var(--content-sidebar-gap);
-    margin-right: var(--content-sidebar-gap);
-    margin-bottom: var(--hotbar-height);
-}
-
 .contentHeader {
     font-family: var(--font-primary) !important;
     font-variant: var(--font-primary-variant);
     color: var(--font-color-1) !important;
     font-size: var(--font-large) !important;
-    display: flex !important;
-    flex-direction: row !important;
-    white-space: nowrap;
 }
-
 #contentHeaderLocation {
     font-family: var(--font-primary) !important;
     font-variant: var(--font-primary-variant);
@@ -253,15 +141,6 @@ body {
     font-size: var(--font-large) !important;
     white-space: pre;
 }
-
-.contentHeaderDivider {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    margin-left: 15px;
-    margin-right: 20px;
-}
-
 #contentHeaderCoords {
     font-family: var(--font-primary) !important;
     font-variant: var(--font-primary-variant);
@@ -269,9 +148,7 @@ body {
     font-size: var(--font-large) !important;
     white-space: pre;
 }
-
 #content {
-    width: 100%;
     background-image: var(--content-background-gradient);
     border-width: 2px;
     border-color: var(--content-border-color);
@@ -280,9 +157,6 @@ body {
     outline-color: var(--content-outline-color);
     outline-offset: 0px;
     outline-style: solid;
-    min-height: 500px;
-    padding-bottom: 5px;
-    margin: 0;
     margin-top: 14px;
 }
     #content::after {
@@ -298,7 +172,6 @@ body {
         background-size: cover; /* Adjust as needed */
         z-index: 1; /* Ensure the image is positioned above the #content */
     }
-
 .main_logo {
     height: 30px;
     width: 305px;
@@ -306,104 +179,15 @@ body {
     background-position: center;
     border: none;
 }
-
-.button-bar_small {
-    height: 22px;
-    width: 67px;
-    border: none;
-    background: url("/images/v2/decorations/barbutton.png") no-repeat;
-    background-position: center;
-}
-.button-bar_small:active {
-    background-size: 98%;
-}
-.button-bar_large {
-    height: 22px;
-    width: 108px;
-    border: none;
-    background: url("/images/v2/decorations/barbigbutton.png") no-repeat;
-    background-position: center;
-}
-.button-bar_large:active {
-    background-size: 98%;
-}
-
 #footer {
     font-family: var(--font-primary);
     font-size: 12px;
     color: var(--footer-font-color);
     background-color: var(--footer-background-color);
-    width: 100%;
-    height: var(--footer-height);
-    position: fixed;
-    bottom: 0;
-    z-index: 10;
-    margin-bottom: 0;
-    padding-bottom: 0;
-    margin-left: auto;
-    margin-right: auto;
-    display: flex;
-    justify-content: center;
 }
-
-.footer-left {
-    width: var(--sidebar-width);
-}
-
-.footer-right {
-}
-
 .footer_text {
     text-align: center;
     padding-top: 10px;
-}
-
-.nwbigcorner {
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.nebigcorner {
-    position: absolute;
-    top: 0;
-    right: 0;
-}
-
-.sebigcorner {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-}
-
-.swbigcorner {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-}
-
-.nwcorner {
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.necorner {
-    position: absolute;
-    top: 0;
-    right: 0;
-}
-
-.secorner {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-}
-
-.swcorner {
-    position: absolute;
-    bottom: 0;
-    left: 0;
 }
 
 /* Travel */
@@ -411,75 +195,6 @@ body {
     background: var(--travel-ui-color);
     border: 1px solid var(--travel-background-color);
     color: var(--font-color-3);
-}
-
-/* Avatar styles */
-.avy_none {
-    display: none !important;
-}
-.avy_round {
-    clip-path: circle(50% at 50% 50%);
-}
-.avy_three-point {
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-}
-.avy_three-point-inverted {
-    clip-path: polygon(50% 100%, 0 0, 100% 0);
-}
-.avy_four-point {
-    clip-path: none;
-}
-.avy_four-point-90 {
-    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-}
-.avy_four-point-oblique {
-    clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
-}
-.avy_five-point {
-    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
-}
-.avy_six-point {
-    clip-path: polygon(21% 0, 79% 0, 100% 50%, 79% 100%, 21% 100%, 0% 50%);
-}
-.avy_six-point-long {
-    clip-path: polygon(40% 0, 100% 0, 100% 60%, 60% 100%, 0 100%, 0 40%);
-}
-.avy_six-point-long-reverse {
-    clip-path: polygon(0 0, 60% 0, 100% 40%, 100% 100%, 40% 100%, 0 60%);
-}
-.avy_eight-point {
-    clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
-}
-.avy_eight-point-wide {
-    clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
-}
-.avy_nine-point {
-    clip-path: polygon(50% 0%, 83% 12%, 100% 43%, 94% 78%, 68% 100%, 32% 100%, 6% 78%, 0% 43%, 17% 12%);
-}
-.avy_twelve-point {
-    clip-path: polygon(0% 15%, 15% 15%, 15% 0%, 85% 0%, 85% 15%, 100% 15%, 100% 85%, 85% 85%, 85% 100%, 15% 100%, 15% 85%, 0% 85%);
-}
-
-.avatar_frame {
-    max-width: 100%;
-    max-height: 100%;
-
-    position: relative;
-    display: flex;
-
-    background: var(--avatar-frame-border_gradient);
-    padding: var(--avatar-frame-border-width-large);
-}
-.avy_frame_none {
-    padding: 0 !important;
-    background: none;
-}
-.avy_frame_shadow {
-    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5) 70%, rgba(0, 0, 0, 0) 95%) !important;
-}
-.avatar_img {
-    max-width: 100%;
-    max-height: 100%;
 }
 
 /* Content styles */
@@ -499,32 +214,6 @@ body {
         -1px 1px var(--shadow-size) var(--shadow-color),
         0 1px var(--shadow-size) var(--shadow-color),
         1px 1px var(--shadow-size) var(--shadow-color);
-}
-
-.box-primary {
-    box-sizing: border-box;
-
-    background-color: var(--box-color-default);
-
-    /* Corners in clockwise direction */
-    background-image:
-            url(/images/v2/sumu/necorner.png),
-            url(/images/v2/sumu/secorner.png),
-            url(/images/v2/sumu/swcorner.png),
-            url(/images/v2/sumu/nwcorner.png);
-    background-repeat:
-            no-repeat,
-            no-repeat,
-            no-repeat,
-            no-repeat;
-    background-position: top right, bottom right, bottom left, top left;
-
-}
-.box-secondary {
-    box-sizing: border-box;
-
-    background-color: var(--box-color-default);
-    border: 1px solid var(--border-color-default);
 }
 
 h2 {
@@ -553,8 +242,6 @@ input[type=checkbox] {
 
 /* Compatibility */
 .systemMessage {
-    width: 100%;
-    top: 15px;
     color: #b75353;
     font-weight: bold;
 }
@@ -627,642 +314,11 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
     background: #383838 !important;
 }
 
-/* Sumu Sidebar Header Override */
-.sb_header_bar {
-    background: linear-gradient(var(--sidebar-header-background) 0%, var(--sidebar-header-background) 100%) !important;
-    position: relative;
-}
-    .sb_header_bar::after {
-        content: "";
-        display: block;
-        position: absolute;
-        top: -3px;
-        left: -12px;
-        width: 173px;
-        height: 28px;
-        background: url(../../../images/v2/sumu/cloud.png) no-repeat top center;
-        background-size: cover; /* Adjust as needed */
-        z-index: 1; /* Ensure the image is positioned above the #content */
-    }
-.sb_header_line {
-    display: none;
-}
-.sb_header_image_wrapper {
-    display: none !important;
-}
-.sb_header_text_wrapper {
-    padding-top: 4px;
-    z-index: 2;
-    left: 5px !important;
-    text-shadow: none !important;
-    font-family: StickRice;
-    color: #3e424d;
-    font-size: 21px;
-    text-transform: uppercase;
-    font-weight: normal !important;
-}
-
-/* Sumu Profile Override */
-.skills .badge {
-    background-image: url(../../../images/v2/sumu/redplate.png) !important;
-}
-.attributes .badge {
-    background-image: url(../../../images/v2/sumu/blueplate.png) !important;
-}
-.profile_row_third {
-    background: url(../../../images/v2/sumu/nwbigcorner.png) no-repeat top left, url(../../../images/v2/sumu/sebigcorner.png) no-repeat bottom right !important;
-}
-.reputation_indicator {
-    background: #8690ac !important;
-}
-.bloodline_mastery_indicator {
-    background: #8690ac !important;
-}
-
-/* Sumu Travel Override */
-.travel-scout-attack span.direction {
-    background-image: url(../../../images/icons/right_hover.png) !important;
-}
-.quick-scout span.direction {
-    background-image: url(../../../images/icons/right_hover.png) !important;
-}
-
-/* Sumu Topbar Override */
-.main_logo {
-    background: url(../../../images/v2/sumu/sumulogo.png) no-repeat center !important;
-}
-
-/* Sumu Chat Override */
-.post_staff_title {
-    color: white !important;
-}
-.chat_pagination {
-    color: #5c73b3 !important;
-}
-    .chat_pagination:hover {
-        color: #939cb6 !important;
-    }
-.post_controls_container {
-    border: 1px solid #abb3c7 !important;
-    border-left: none !important;
-}
-.post_message_container {
-    border: 1px solid #abb3c7 !important;
-    border-left: none !important;
-    border-right: none !important;
-}
-.meme_toggle {
-    background: url(../../../images/v2/sumu/memeframe.png) no-repeat center !important;
-    height: 33px !important;
-    padding-bottom: 4px !important;
-}
-    .meme_toggle:hover {
-        background: url(../../../images/v2/sumu/memeframe_hover.png) no-repeat center !important;
-        color: #9a1c1d;
-    }
-.meme_close {
-    background: url(../../../images/v2/sumu/memeframe.png) no-repeat center !important;
-    height: 33px !important;
-    padding-bottom: 4px !important;
-}
-    .meme_close:hover {
-        background: url(../../../images/v2/sumu/memeframe_hover.png) no-repeat center !important;
-        color: #9a1c1d;
-    }
-.chat_submit_button {
-    background: url(../../../images/v2/sumu/sendframe.png) no-repeat center !important;
-    height: 33px !important;
-    padding-bottom: 4px !important;
-}
-    .chat_submit_button:hover {
-        background: url(../../../images/v2/sumu/sendframe_hover.png) no-repeat center !important;
-        color: #9a1c1d;
-    }
-#chat_input_box {
-    background-image: url(../../../images/v2/sumu/nwbigcorner.png), url(../../../images/v2/sumu/nebigcorner.png), url(../../../images/v2/sumu/sebigcorner.png), url(../../../images/v2/sumu/swbigcorner.png) !important;
-    background-position: top 0 left 0, top 0 right 0, bottom 0 right 0, bottom 0 left 0;
-    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
-}
-.quick_reply_box {
-    outline: none !important;
-    accent-color: #9a1c1d !important;
-}
-
-/* Content Header Overrides */
-.contentHeaderDivider > svg > line {
-    display: none;
-}
-
-/* Special Mission Override */
-#spec_miss_wrapper {
-    background: var(--sidebar-button-background-color);
-}
-.spec_miss_log_entry_text {
-    color: var(--font-color-3) !important;
-}
-.spec_miss_log_entry_timestamp {
-    color: var(--font-color-3) !important;
-}
-.spec_miss_log_entry_timestamp_wraooer {
-    color: var(--font-color-3) !important;
-}
-.spec_miss_page_warning {
-    color: var(--font-color-3) !important;
-}
-a#spec_miss_cancel {
-    color: var(--font-color-3) !important;
-}
-
-/* Inbox Override */
-#inbox_convo_list_title_container {
-    background: var(--sidebar-header-background);
-    border-bottom: 1px solid var(--sidebar-header-background);
-}
-#inbox_convo_main_controls_container {
-    background: var(--sidebar-header-background);
-}
-#inbox_convo_list, #inbox_convo_container, #inbox_convo_details_container {
-    scrollbar-color: var(--sidebar-button-border-color);
-}
-#inbox_container {
-    background: var(--sidebar-button-background-color);
-    border: 1px solid var(--sidebar-button-border-color);
-}
-#content #inbox_new {
-    background: var(--sidebar-header-background);
-    border-color: var(--sidebar-header-background);
-}
-#inbox_convo_list_title {
-    color: var(--font-color-2);
-}
-#inbox_convo_list_count {
-    color: var(--font-color-2);
-}
-#inbox_convo_textbox {
-    background: var(--content-background-color);
-    color: var(--font-color-3);
-    border-color: var(--font-color-3);
-}
-.inbox_convo_list_container_selected {
-    background: var(--content-background-color);
-}
-.inbox_convo_title {
-    color: var(--font-color-3);
-}
-.inbox_convo_list_container {
-    border-color: var(--sidebar-header-background);
-}
-#content #inbox_new span {
-    color: var(--font-color-2);
-}
-.inbox_message {
-    border-color: var(--sidebar-header-background);
-}
-#inbox_convo_textbox_characters_remaining {
-    color: var(--font-color-2);
-}
-.inbox_message_timestamp, .inbox_message_report {
-    color: var(--font-color-3);
-}
-#content .inbox_message_report a {
-    color: var(--font-color-3);
-}
-.inbox_message_self::before {
-    background: none;
-}
-#inbox_convo_details_container, #inbox_new_convo_container {
-    background: var(--sidebar-button-background-color);
-}
-.inbox_convo_details_title {
-    background: var(--sidebar-header-background);
-    color: var(--font-color-2);
-}
-
 /* Mobile Overrides */
 @media screen and (max-width: 999px) {
     #container {
-        flex-direction: column !important;
-        padding-bottom: 0px;
+        transform: scale(1);
+        transform-origin: top left;
         width: 100%;
     }
-
-    #footer {
-        display: none;
-    }
-
-    #hotbar {
-        display: none;
-    }
-
-    #content_wrapper {
-        margin-left: 0;
-        margin-right: 0;
-        margin-bottom: 0;
-        width: 100%;
-    }
-
-    #container::before {
-        display: none;
-    }
-
-    #content {
-        width: 100%;
-    }
-        #content::after {
-            background: none;
-        }
-
-    .sb_header_bar::after {
-        display: none;
-    }
-}
-
-/* Geisha Overrides */
-.contentDivHeader {
-    color: var(--text-hover) !important;
-    background: var(--sidebar-header-background);
-    border-radius: 0px;
-}
-#content {
-    color: var(--font-color-3);
-    font-family: var(--font-secondary);
-}
-.contentDiv, .contentDivMed {
-    background: var(--sidebar-button-background-color);
-}
-#content table.table th {
-    color: var(--text-hover);
-    background: var(--sidebar-header-background);
-    text-shadow: 0 1px 0 #000000;
-    font-family: var(--font-primary);
-    font-variant: var(--font-primary-variant);
-    font-size: var(--font-medium);
-}
-#content table.table {
-    background-color: var(--sidebar-button-background-color);
-    border-radius: 0px;
-    font-size: var(--font-default);
-    border: none;
-}
-#content td a {
-    color: var(--font-link);
-}
-#content a, a:visited {
-    color: var(--font-link);
-}
-#content table.table td.row1 {
-    background-color: var(--sidebar-button-background-color);
-}
-#content table.table td.row2 {
-    background: var(--content-background-color);
-}
-#content table.table td {
-    border: 1px solid var(--sidebar-button-border-color);
-}
-input {
-    background: var(--content-background-color);
-    color: var(--font-color-3);
-    border-color: var(--sidebar-button-border-color);
-}
-textarea {
-    background: var(--content-background-color);
-    color: var(--font-color-3);
-    border-color: var(--sidebar-button-border-color);
-}
-select {
-    background: white;
-    color: var(--font-color-3);
-    border-color: var(--sidebar-button-border-color);
-}
-#content .button, .contentDiv button {
-    background: var(--content-background-color);
-    color: var(--font-color-3);
-    border-color: var(--sidebar-button-border-color);
-}
-    #content .button:hover, .contentDiv button:hover {
-        background: var(--box-color-default);
-        color: var(--font-color-2);
-        border-color: var(--font-color-2);
-    }
-button {
-    background: var(--content-background-color);
-    color: var(--font-color-3);
-    border-color: var(--sidebar-button-border-color);
-}
-    button:hover {
-        background: var(--box-color-default);
-        color: var(--font-color-2);
-        border-color: var(--font-color-2);
-    }
-#handsealOverlay {
-    background-color: var(--sidebar-button-background-color) !important;
-}
-#jutsu .jutsuList {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: 30px;
-    box-sizing: border-box;
-    padding-top: 20px;
-}
-
-#jutsu .jutsuName {
-    background: var(--content-background-color) !important;
-    color: var(--font-color-3);
-    width: 200px;
-    height: 110px;
-    border-radius: 12px;
-    padding: 5px 10px 2px 10px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    outline: 1px solid #E0E0E0;
-    user-select: none;
-    overflow: hidden;
-}
-    #jutsu .jutsuName:hover {
-        background: var(--box-color-default) !important;
-    }
-    #jutsu .jutsuName.selected_jutsu {
-        outline: #4e2a3c 1px solid;
-        color: var(--font-color-2);
-        background: var(--box-color-default) !important;
-    }
-    #jutsu .jutsuName .jutsu_name {
-        font-family: var(--font-secondary);
-        color: #6e0e11;
-        font-size: 16px;
-        font-weight: bold;
-        overflow: hidden;
-        white-space: nowrap;
-    }
-    #jutsu .jutsuName .jutsu_type {
-        font-family: var(--font-secondary);
-        color: var(--font-color-2);
-        font-size: 13px;
-        font-variant: small-caps;
-        text-transform: lowercase;
-    }
-    #jutsu .jutsuName .jutsu_details {
-        font-family: var(--font-secondary);
-        color: var(--font-color-2);
-        font-size: 12px;
-        overflow: hidden;
-        white-space: nowrap;
-    }
-    #jutsu .jutsuName .jutsu_details_row {
-        display: flex;
-        justify-content: space-between;
-        text-align: center;
-        margin-bottom: 5px;
-        overflow: hidden;
-        white-space: nowrap;
-    }
-    #jutsu .jutsuName .jutsu_effect {
-        display: flex;
-        justify-content: space-between;
-        text-align: center;
-        overflow: hidden;
-        white-space: nowrap;
-    }
-    #jutsu .jutsuName[aria-disabled='true'] {
-        opacity: 0.5;
-    }
-    #jutsu .jutsuName[aria-disabled='true']:hover {
-        background: var(--box-color-default) !important;
-        cursor: default;
-    }
-.weapon {
-    background: var(--content-background-color) !important;
-    color: var(--font-color-3);
-    border-color: var(--font-color-3);
-}
-    .weapon:hover {
-        background: var(--box-color-default) !important;
-    }
-    .weapon.selected_weapon {
-    border-color: var(--font-color-2);
-    color: var(--font-color-2);
-    background: var(--box-color-default) !important;
-}
-#content ul.submenu {
-    background: var(--sidebar-header-color);
-    border: none;
-}
-    #content ul.submenu li {
-        background: var(--sidebar-header-background);
-    }
-    #content ul.submenu a {
-        color: var(--text-hover);
-        text-shadow: 0 1px 0 #000000;
-        font-family: var(--font-primary);
-        font-variant: var(--font-primary-variant);
-        font-size: var(--font-medium);
-    }
-        #content ul.submenu a:hover {
-            text-shadow: none;
-        }
-#content table.table tr:first-child td:last-child, #content table.table tr:first-child th:last-child {
-    border-top-right-radius: 0px;
-}
-#content table.table tr:first-child td:first-child, #content table.table tr:first-child th:first-child {
-    border-top-left-radius: 0px;
-}
-.healthFill {
-    background: var(--health-fill) !important;
-}
-.resourceFill.health {
-    background: var(--health-fill) !important;
-}
-.healthPreview {
-    background: var(--health-preview) !important;
-}
-.staminaFill {
-    background: var(--stamina-fill) !important;
-}
-.staminaPreview {
-    background: var(--stamina-preview) !important;
-}
-.chakraFill {
-    background: var(--chakra-fill) !important;
-}
-.chakraPreview {
-    background: var(--chakra-preview) !important;
-}
-.battle_text_ninjutsu {
-    color: var(--ninjutsu-text-color) !important;
-}
-.battle_text_taijutsu {
-    color: var(--taijutsu-text-color) !important;
-}
-.battle_text_genjutsu {
-    color: var(--genjutsu-text-color) !important;
-}
-.battle_text_heal {
-    color: var(--heal-text-color) !important;
-}
-#content table.table th a {
-    color: var(--text-hover);
-}
-#content table.table th a:hover {
-    color: var(--font-color-4);
-}
-.jutsu_filter_button {
-    background-color: var(--sidebar-button-background-color) !important;
-    color: var(--font-color-3) !important;
-    border-color: var(--sidebar-button-border-color) !important;
-}
-    .jutsu_filter_button.active {
-        background-color: var(--sidebar-button-background-hover) !important;
-        color: var(--font-color-2) !important;
-        border-color: var(--sidebar-button-border-color) !important;
-    }
-.kunaiPack {
-    background: var(--content-background-color) !important;
-    color: black !important;
-}
-#content table.table td.newsFooter {
-    background-color: var(--sidebar-header-background);
-}
-.jutsu_select_wrapper {
-    border-color: var(--sidebar-button-border-color) !important;
-}
-#handSeals p[data-selected="yes"] img {
-    border-color: var(--hand-seal-highlight) !important;
-}
-#handSeals .handsealNumber {
-    background-color: var(--hand-seal-highlight) !important;
-    color: var(--hand-seal-text);
-}
-#handseal_1 img {
-    content: url(../../images/v2/sumu/Seal1.png) !important;
-}
-#handseal_2 img {
-    content: url(../../images/v2/sumu/Seal2.png) !important;
-}
-#handseal_3 img {
-    content: url(../../images/v2/sumu/Seal3.png) !important;
-}
-#handseal_4 img {
-    content: url(../../images/v2/sumu/Seal4.png) !important;
-}
-#handseal_5 img {
-    content: url(../../images/v2/sumu/Seal5.png) !important;
-}
-#handseal_6 img {
-    content: url(../../images/v2/sumu/Seal6.png) !important;
-}
-#handseal_7 img {
-    content: url(../../images/v2/sumu/Seal7.png) !important;
-}
-#handseal_8 img {
-    content: url(../../images/v2/sumu/Seal8.png) !important;
-}
-#handseal_9 img {
-    content: url(../../images/v2/sumu/Seal9.png) !important;
-}
-#handseal_10 img {
-    content: url(../../images/v2/sumu/Seal10.png) !important;
-}
-#handseal_11 img {
-    content: url(../../images/v2/sumu/Seal11.png) !important;
-}
-#handseal_12 img {
-    content: url(../../images/v2/sumu/Seal12.png) !important;
-}
-
-/* VillageHQ Overrides */
-.kage_name {
-    color: #6e0e11 !important;
-    font-size: 17px !important;
-}
-.kage_title {
-    color: black !important;
-}
-.resource_produced, .resource_claimed, .warlog_green {
-    color: #2A8A48 !important;
-}
-.resource_lost, .resource_spent, .warlog_red {
-    color: #B03232 !important;
-}
-.kage_nameplate_decoration {
-    background: #c3c9d7 !important;
-}
-.kage_avatar_fill {
-    background: #9aa2b4 !important;
-}
-.elder_avatar_fill {
-    background: #9aa2b4 !important;
-}
-.elder_name {
-    background: #9aa2b4 !important;
-    color: var(--font-link) !important;
-}
-.elder_claim_button, .kage_claim_button {
-    background: linear-gradient(to bottom, #404f76 50%, #26355c 50%) !important;
-    color: #d2d6df !important;
-}
-    .elder_claim_button:hover, .kage_claim_button:hover {
-        color: white !important;
-    }
-.elder_avatar_wrapper, .kage_avatar_wrapper_empty {
-    background: #536184 !important;
-}
-.kage_kanji {
-    color: #536184 !important;
-}
-.kage_record_header {
-    color: var(--village-text-color-1) !important;
-}
-.kage_record_item_row_second {
-    color: var(--village-text-color-1) !important;
-}
-.kage_record_container, .strategic_info_container {
-    background: url(../../../images/v2/sumu/nwbigcorner.png) no-repeat top left, url(../../../images/v2/sumu/sebigcorner.png) no-repeat bottom right, url(../../../images/v2/sumu/swbigcorner.png) no-repeat bottom left, url(../../../images/v2/sumu/nebigcorner.png) no-repeat top right !important;
-}
-.kage_record_container, .strategic_info_item, .proposal_container .content,
-.village_policy_bonus_container, .village_policy_penalty_container, .village_policy_main_inner,
-.village_policy_name, .active_proposal_name_container {
-    background-color: var(--box-color-default) !important;
-}
-.village_policy_bonus_container, .village_policy_penalty_container, .village_policy_description,
-.strategic_info_seat, .previous_proposal_button_label, .next_proposal_button_label {
-    color: var(--village-text-color-1) !important;
-}
-.village_policy_phrase, .strategic_info_name, .strategic_info_label,
-.resources_inner_header .first a, .proposal_count, .warlog_war_score {
-    color: var(--village-text-color-2) !important;
-}
-.strategic_info_item {
-    border-top: 4px solid #383838 !important;
-    border-bottom: 4px solid #383838 !important;
-}
-.warlog_data_row {
-    background-color: var(--box-color-default) !important;
-}
-.global_leaderboard_container > :nth-child(2n) .warlog_data_row {
-    background-color: var(--box-color-default) !important;
-}
-.warlog_rank_wrapper {
-    background-color: var(--box-color-default) !important;
-}
-
-/* Abyss Overrides */
-.favor_exchange_header, .faction_mission_header, .forbidden_shop_container .section_title {
-    font-size: 16px !important;
-    font-family: var(--font-primary) !important;
-    font-variant: var(--font-primary-variant) !important;
-    color: var(--font-color-1) !important;
-}
-.currency_exchange_button.disabled {
-    cursor: default !important;
-    opacity: 0.5 !important;
-    color: white !important;
-}
-.favor_exchange_label {
-    color: #6e0e11 !important;
-    font-size: 12px !important;
-    font-family: 'Segoe UI' !important;
-    text-align: center !important;
 }
