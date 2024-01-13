@@ -117,6 +117,9 @@ function spar() {
 
             $player->challenge = 0;
             $battle_background = TravelManager::getLocationBattleBackgroundLink($system, $player->location);
+            if (TravelManager::locationIsInVillage($system, $player->location)) {
+                $battle_background = 'images/battle_backgrounds/Spar.jpg';
+            }
             if (empty($battle_background)) {
                 $battle_background = $player->region->battle_background_link;
             }

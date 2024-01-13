@@ -453,7 +453,7 @@ class Battle {
     }
 
     public function isPreparationPhase(): bool {
-        return $this->prepTimeRemaining() > 0 && in_array($this->battle_type, [Battle::TYPE_FIGHT]);
+        return $this->prepTimeRemaining() > 0 && in_array($this->battle_type, [Battle::TYPE_FIGHT, Battle::TYPE_CHALLENGE]);
     }
 
     /**
@@ -517,6 +517,7 @@ class Battle {
         $is_retreat = (int)$this->is_retreat;
         $this->system->db->query(
             "UPDATE `battles` SET
+            `start_time` = {$this->start_time},
             `turn_time` = {$this->turn_time},
             `turn_count` = {$this->turn_count},
             `winner` = '{$this->winner}',
