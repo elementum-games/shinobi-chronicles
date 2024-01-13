@@ -689,28 +689,39 @@ class User extends Fighter {
         $this->daily_tasks_reset = $this->daily_tasks->last_reset;
         if($UPDATE == User::UPDATE_FULL && !$remote_view) {
             // Process tasks completion
-            $completion_data = $this->daily_tasks->checkTaskCompletion();
-            if($completion_data != null) {
-                $this->addMoney($completion_data['money_gain'], 'Completed daily task');
-                $rep_gain = $this->reputation->addRep($completion_data['rep_gain'], UserReputation::ACTIVITY_TYPE_DAILY_TASK);
-                $task_display = "You have completed the task " . (sizeof($completion_data['tasks_completed']) > 1 ? "s" : "");
-                foreach ($completion_data['tasks_completed'] as $x => $t_name) {
-                    if ($x > 0) {
-                        if ($x == sizeof($completion_data['tasks_completed']) - 1) {
-                            $task_display .= " and ";
-                        } else {
-                            $task_display .= ", ";
-                        }
+            $completed_tasks = $this->daily_tasks->checkTaskCompletion();
+            $task_display = '';
+            $money_reward = 0;
+            if (!empty($completed_tasks)) {
+                foreach ($completed_tasks as $task) {
+                    $this->addMoney($task->reward, 'Completed daily task');
+                    $rep_activity_type = UserReputation::ACTIVITY_TYPE_DAILY_TASK;
+                    switch ($task->activity) {
+                        case DailyTask::ACTIVITY_DAILY_PVE:
+                            $rep_activity_type = UserReputation::ACTIVITY_TYPE_DAILY_TASK_PVE;
+                            break;
+                        case DailyTask::ACTIVITY_DAILY_WAR:
+                            $rep_activity_type = UserReputation::ACTIVITY_TYPE_DAILY_TASK_WAR;
+                            break;
+                        case DailyTask::ACTIVITY_DAILY_PVP:
+                            $rep_activity_type = UserReputation::ACTIVITY_TYPE_DAILY_TASK_PVP;
+                            break;
+                        default:
+                            break;
                     }
-                    $task_display .= "$t_name";
+                    $rep_gain = $this->reputation->addRep($task->rep_reward, $rep_activity_type);
+                    $new_notification = new NotificationDto(
+                        type: "daily_task",
+                        message: $task->name . " completed, gained " . $task->reward . "&yen; and " . $rep_gain . " Reputation",
+                        user_id: $this->player->user_id,
+                        created: time(),
+                        expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_DAILY_TASK * 86400),
+                        alert: true,
+                    );
+                    NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
                 }
-                $task_display .= " earning &yen;" . $completion_data['money_gain'] . " and $rep_gain Reputation.";
-
-                $this->system->message($task_display);
             }
         }
-
-
 
         // Clan
         $this->clan_id = (int)$user_data['clan_id'];

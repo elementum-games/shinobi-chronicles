@@ -99,6 +99,9 @@ class UserReputation {
     // Arena, special missions, etc
     const ACTIVITY_TYPE_PVE = 'pve';
     const ACTIVITY_TYPE_DAILY_TASK = 'daily_task';
+    const ACTIVITY_TYPE_DAILY_TASK_PVE = 'daily_task_pve';
+    const ACTIVITY_TYPE_DAILY_TASK_WAR = 'daily_task_war';
+    const ACTIVITY_TYPE_DAILY_TASK_PVP = 'daily_task_pvp';
     // War operations
     const ACTIVITY_TYPE_WAR = 'war';
     // PvP
@@ -317,6 +320,27 @@ class UserReputation {
         }
 
         switch($activity_type) {
+            case UserReputation::ACTIVITY_TYPE_DAILY_TASK_PVE:
+                // add to weekly but go over cap
+                $this->weekly_pve_rep += $amount;
+                if ($this->debug) {
+                    echo "Amount after PvE gain: $amount<br />";
+                }
+                break;
+            case UserReputation::ACTIVITY_TYPE_DAILY_TASK_WAR:
+                // add to weekly but go over cap
+                $this->weekly_war_rep += $amount;
+                if ($this->debug) {
+                    echo "Amount after War gain: $amount<br />";
+                }
+                break;
+            case UserReputation::ACTIVITY_TYPE_DAILY_TASK_PVP:
+                // add to weekly but go over cap
+                $this->weekly_pvp_rep += $amount;
+                if ($this->debug) {
+                    echo "Amount after PvP gain: $amount<br />";
+                }
+                break;
             case UserReputation::ACTIVITY_TYPE_PVE:
             case UserReputation::ACTIVITY_TYPE_DAILY_TASK:
                 // Bonus seal reputation

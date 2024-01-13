@@ -41,20 +41,18 @@ class UserDailyTasks {
     }
     public function checkTaskCompletion(): ?array
     {
-        $data = null;
+        $completed_tasks = null;
 
         /** @var DailyTask $task */
         foreach($this->tasks as $task) {
             if(!$task->complete && $task->progress >= $task->amount) {
                 $task->progress = $task->amount;
                 $task->complete = true;
-                $data['money_gain'] = $task->reward;
-                $data['rep_gain'] = $task->rep_reward;
-                $data['tasks_completed'][] = $task->name;
+                $completed_tasks[] = $task;
             }
         }
 
-        return $data;
+        return $completed_tasks;
     }
     public function hasTaskType($type):bool {
         if(is_null($this->current_task_types)) {

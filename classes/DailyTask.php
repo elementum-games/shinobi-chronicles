@@ -344,6 +344,7 @@ class DailyTask {
                     DailyTask::ACTIVITY_EARN_MONEY,
                     DailyTask::DIFFICULTY_MEDIUM
                 );
+                break;
             case 3:
             case 4:
                 $daily_tasks[] = DailyTask::generateTask(
@@ -361,6 +362,7 @@ class DailyTask {
                     DailyTask::ACTIVITY_DAILY_PVP,
                     DailyTask::DIFFICULTY_MEDIUM
                 );
+                break;
         }
         return $daily_tasks;
     }

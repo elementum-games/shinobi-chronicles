@@ -591,6 +591,33 @@ export function TopbarNotification({
                     >X</label>
                 </a>
             }
+            {notification.type === "daily_task" &&
+                <>
+                    <a href={notification.action_url}
+                        className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
+                        data-content={notification.message}
+                        data-time={timeRemainingDisplay}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            closeNotification(notification.notification_id, notification.action_url);
+                        }}
+                    >
+                        <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                            <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
+                            <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#5964a6" />
+                            <image className="topbar_notification_icon" height="83" width="83" x="9" y="7" href="images/v2/icons/checkmark.png" />
+                            <circle cx="75" cy="25" r="12" fill="#31e1a1" />
+                        </svg>
+                        <label
+                            className="topbar_close_notification"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                closeNotification(notification.notification_id);
+                            }}
+                        >X</label>
+                    </a>
+                </>
+            }
         </>
     )
 }

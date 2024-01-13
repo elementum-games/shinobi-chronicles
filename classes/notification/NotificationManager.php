@@ -48,6 +48,7 @@ class NotificationManager {
     const NOTIFICATION_KAGE_CHANGE = "kage_change";
     const NOTIFICATION_ACHIEVEMENT = "achievement";
     const NOTIFICATION_SPAR = "spar"; // General, used for blocking notifications
+    const NOTIFICATION_DAILY_TASK = "daily_task";
 
     const ACTIVE_PLAYER_DAYS_LAST_ACTIVE = 14;
 
@@ -57,6 +58,7 @@ class NotificationManager {
     const NOTIFICATION_EXPIRATION_DAYS_NEWS = 14;
     const NOTIFICATION_EXPIRATION_DAYS_CHAT = 7;
     const NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION = 1;
+    const NOTIFICATION_EXPIRATION_DAYS_DAILY_TASK = 1;
 
     public static function createNotification(NotificationDto $notification, System $system, int $UPDATE, int $limit = 5): bool {
         $db_modified = false;
