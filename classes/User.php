@@ -712,8 +712,8 @@ class User extends Fighter {
                     $rep_gain = $this->reputation->addRep($task->rep_reward, $rep_activity_type);
                     $new_notification = new NotificationDto(
                         type: "daily_task",
-                        message: $task->name . " completed, gained " . $task->reward . "&yen; and " . $rep_gain . " Reputation",
-                        user_id: $this->player->user_id,
+                        message: $task->name . " completed: gained " . $task->reward . " yen and " . $rep_gain . " Reputation",
+                        user_id: $this->user_id,
                         created: time(),
                         expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_DAILY_TASK * 86400),
                         alert: true,

@@ -138,7 +138,8 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
          "challenge_pending",
          "challenge_accepted",
          "kage_change",
-         "achievement"
+         "achievement",
+         "daily_task"
     ];
 
     return (
