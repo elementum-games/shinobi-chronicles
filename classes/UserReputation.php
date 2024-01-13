@@ -131,6 +131,9 @@ class UserReputation {
 
     const DAILY_TASK_REWARDS = [
         DailyTask::DIFFICULTY_EASY => [
+            DailyTask::ACTIVITY_DAILY_PVE => 20,
+            DailyTask::ACTIVITY_DAILY_WAR => 20,
+            DailyTask::ACTIVITY_DAILY_PVP => 10,
             DailyTask::ACTIVITY_EARN_MONEY => 5,
             DailyTask::ACTIVITY_ARENA => 20,
             DailyTask::ACTIVITY_TRAINING => 10,
@@ -138,6 +141,9 @@ class UserReputation {
             DailyTask::ACTIVITY_PVP => 10,
         ],
         DailyTask::DIFFICULTY_MEDIUM => [
+            DailyTask::ACTIVITY_DAILY_PVE => 30,
+            DailyTask::ACTIVITY_DAILY_WAR => 30,
+            DailyTask::ACTIVITY_DAILY_PVP => 15,
             DailyTask::ACTIVITY_EARN_MONEY => 10,
             DailyTask::ACTIVITY_ARENA => 30,
             DailyTask::ACTIVITY_TRAINING => 15,
@@ -145,6 +151,9 @@ class UserReputation {
             DailyTask::ACTIVITY_PVP => 15,
         ],
         DailyTask::DIFFICULTY_HARD => [
+            DailyTask::ACTIVITY_DAILY_PVE => 40,
+            DailyTask::ACTIVITY_DAILY_WAR => 40,
+            DailyTask::ACTIVITY_DAILY_PVP => 20,
             DailyTask::ACTIVITY_EARN_MONEY => 15,
             DailyTask::ACTIVITY_ARENA => 40,
             DailyTask::ACTIVITY_TRAINING => 20,

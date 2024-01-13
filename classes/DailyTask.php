@@ -48,11 +48,6 @@ class DailyTask {
             'Made for Error',
             'Codename RED',
         ],
-        DailyTask::ACTIVITY_SPECIAL_MISSIONS => [
-            'Call of Grace',
-            'Made for Error',
-            'Codename RED',
-        ],
         DailyTask::ACTIVITY_TRAINING => [
             'Breaking Rites',
             'Cry of Menace',
@@ -63,18 +58,12 @@ class DailyTask {
             'Hand of Midas',
             'Fill the Coffers',
         ],
-        DailyTask::ACTIVITY_WAR => [
-            'Call of Grace',
-            'Made for Error',
-            'Codename RED',
-        ],
     ];
 
     public static array $activity_labels = [
         DailyTask::ACTIVITY_PVP => 'PvP Battles',
         DailyTask::ACTIVITY_ARENA => 'Arena Battles',
         DailyTask::ACTIVITY_MISSIONS => 'Missions',
-        DailyTask::ACTIVITY_SPECIAL_MISSIONS => 'Special Missions',
         DailyTask::ACTIVITY_TRAINING => [
             DailyTask::SUB_TASK_SKILL => 'points',
             DailyTask::SUB_TASK_GEN => 'points',
@@ -119,7 +108,7 @@ class DailyTask {
             case DailyTask::ACTIVITY_DAILY_WAR:
                 $prompt = "Participate in War and Espionage";
                 break;
-            case DailyTask::ACTIVITY_PVP:
+            case DailyTask::ACTIVITY_DAILY_PVP:
                 $prompt = "Complete PvP battles and Spars";
                 break;
             default:
@@ -169,9 +158,9 @@ class DailyTask {
                 'type' => DailyTask::ACTIVITY_DAILY_PVP,
                 'sub_task' => [DailyTask::ACTIVITY_DAILY_PVP],
                 'max_amount' => [
-                    DailyTask::DIFFICULTY_EASY => 20,
-                    DailyTask::DIFFICULTY_MEDIUM => 30,
-                    DailyTask::DIFFICULTY_HARD => 40,
+                    DailyTask::DIFFICULTY_EASY => 10,
+                    DailyTask::DIFFICULTY_MEDIUM => 15,
+                    DailyTask::DIFFICULTY_HARD => 20,
                 ],
             ],
             DailyTask::ACTIVITY_PVP => [
@@ -292,7 +281,12 @@ class DailyTask {
         }
 
         // Assign task amount
-        $task_amount = mt_rand($min_task_amount, $max_task_amount);
+        $type_overrides = [DailyTask::ACTIVITY_DAILY_PVE, DailyTask::ACTIVITY_DAILY_WAR, DailyTask::ACTIVITY_DAILY_PVP];
+        if (in_array($task_config['type'], $type_overrides)) {
+            $task_amount = $max_task_amount;
+        } else {
+            $task_amount = mt_rand($min_task_amount, $max_task_amount);
+        }
 
         // Decide the Task difficulty for rewards
         $task_reward = 200 + (pow($user_rank_num, 2) * 150);
