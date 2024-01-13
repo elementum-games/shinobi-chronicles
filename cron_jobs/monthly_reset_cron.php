@@ -76,8 +76,12 @@ else {
     }
 }
 
-function monthlyCron(System $system, $debug = false): void {
+function monthlyCron(System $system, $debug = false): void
+{
     $queries = [];
+    $queries[] = "UPDATE `users` SET `prev_monthly_pvp` = `monthly_pvp`";
+    $queries[] = "UPDATE `teams` SET `prev_monthly_points` = `monthly_points`";
+    $queries[] = "UPDATE `villages` SET `prev_monthly_points` = `monthly_points`";
     $queries[] = "UPDATE `users` SET `monthly_pvp` = 0";
     $queries[] = "UPDATE `teams` SET `monthly_points` = 0";
     $queries[] = "UPDATE `villages` SET `monthly_points` = 0";

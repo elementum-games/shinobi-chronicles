@@ -12,6 +12,13 @@ final class MonthlyVillagePointsMigration extends AbstractMigration
         $this->execute("
             -- Alter table villages
             ALTER TABLE `villages` ADD `monthly_points` SMALLINT(6) NOT NULL DEFAULT '0';
+            ALTER TABLE `villages` ADD `prev_monthly_points` SMALLINT(6) NOT NULL DEFAULT '0';
+
+            -- Alter table users
+            ALTER TABLE `users` ADD `prev_monthly_pvp` SMALLINT(6) NOT NULL DEFAULT '0';
+
+            -- Alter table teams
+            ALTER TABLE `teams` ADD `prev_monthly_points` SMALLINT(6) NOT NULL DEFAULT '0';
         ");
     }
 
@@ -22,6 +29,13 @@ final class MonthlyVillagePointsMigration extends AbstractMigration
         $this->execute("
             -- Alter table villages
             ALTER TABLE `villages` DROP `monthly_points`;
+            ALTER TABLE `villages` DROP `prev_monthly_points`;
+
+            -- Alter table users
+            ALTER TABLE `users` DROP `prev_monthly_pvp`;
+
+            -- Alter table teams
+            ALTER TABLE `teams` DROP `prev_monthly_points`;
         ");
     }
 }
