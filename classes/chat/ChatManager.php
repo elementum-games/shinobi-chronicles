@@ -87,8 +87,10 @@ class ChatManager {
         $user_data_by_name = [];
         foreach ($result as $row) {
             // If user_id is set (newer post) add to list for batch
-            if ($row['user_id'] > 0 && !in_array($row['user_id'], $user_ids)) {
-                $user_ids[] = $row['user_id'];
+            if ($row['user_id'] > 0) {
+                if (!in_array($row['user_id'], $user_ids)) {
+                    $user_ids[] = (int)$row['user_id'];
+                }
             }
             // If user_id is not set (older post) get data for that user based on user_name
             else {
@@ -115,25 +117,28 @@ class ChatManager {
             }
         }
         // Get batch user data
-        $user_data_result = $this->system->db->query("
-            SELECT `users`.`user_id`, `users`.`staff_level`, `users`.`premium_credits_purchased`, `users`.`chat_effect`, `users`.`avatar_link`,
-            `user_settings`.`avatar_style`, `user_settings`.`avatar_frame`
-            FROM `users`
-            LEFT JOIN `user_settings` ON `users`.`user_id` = `user_settings`.`user_id`
-            WHERE `users`.`user_id` IN ('" . implode(', ', $user_ids) . "')
-        ");
-        $user_data_result = $this->system->db->fetch_all($user_data_result);
-        foreach ($user_data_result as $row) {
-            // if custom setting is not set
-            if (!isset($row['avatar_style'])) {
-                $row['avatar_style'] = "avy_round";
+        if (count($user_ids) > 0) {
+            $user_data_result = $this->system->db->query("
+                SELECT `users`.`user_id`, `users`.`staff_level`, `users`.`premium_credits_purchased`, `users`.`chat_effect`, `users`.`avatar_link`,
+                `user_settings`.`avatar_style`, `user_settings`.`avatar_frame`
+                FROM `users`
+                LEFT JOIN `user_settings` ON `users`.`user_id` = `user_settings`.`user_id`
+                WHERE `users`.`user_id` IN (" . implode(', ', $user_ids) . ")
+            ");
+            $user_data_result = $this->system->db->fetch_all($user_data_result);
+            foreach ($user_data_result as $row) {
+                // if custom setting is not set
+                if (!isset($row['avatar_style'])) {
+                    $row['avatar_style'] = "avy_round";
+                }
+                // if custom setting is not set
+                if (!isset($row['avatar_frame'])) {
+                    $row['avatar_frame'] = "avy_frame_default";
+                }
+                $user_data_by_id[$row['user_id']] = $row;
             }
-            // if custom setting is not set
-            if (!isset($row['avatar_frame'])) {
-                $row['avatar_frame'] = "avy_frame_default";
-            }
-            $user_data_by_id[$row['user_id']] = $row;
         }
+
         $posts = [];
         foreach ($result as $row) {
             $post = ChatPostDto::fromDb($row);
