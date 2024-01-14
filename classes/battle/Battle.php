@@ -555,7 +555,7 @@ class Battle {
            'current' => $this->fighter_health[$this->player2->combat_id],
            'max' => $this->player2->max_health,
          ];
-        BattleLog::addOrUpdateTurnLog($this->system, $this->battle_id, $this->turn_count, $this->battle_text, $fighter_health, $this->raw_active_effects);
+        BattleLog::addOrUpdateTurnLog($this->system, $this->battle_id, $this->turn_count, $this->battle_text, $fighter_health, $this->raw_active_effects, $this->round_count);
 
         $this->system->db->query("COMMIT;");
     }

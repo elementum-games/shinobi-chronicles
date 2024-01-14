@@ -248,7 +248,7 @@ if($battle->battle_text) {
 <?php $system->printMessage(); ?>
 <table id="battle_details" class='table'>
     <?php if ($battle->rounds > 1): ?>
-    <tr><th colspan="2">Round <?= $battle->round_count + 1 ?> of <?= $battle->rounds ?> | Turn <?= $battle->winner ? $battle->turn_count : $battle->turn_count + 1 ?></th></tr>
+    <tr><th colspan="2">Round <?= $battle->round_count ?> of <?= $battle->rounds ?> | Turn <?= $battle->winner ? $battle->turn_count : $battle->turn_count + 1 ?></th></tr>
     <?php else: ?>
     <tr><th colspan="2">Turn <?= $battle->winner ? $battle->turn_count : $battle->turn_count + 1 ?></th></tr>
     <?php endif; ?>

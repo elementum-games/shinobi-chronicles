@@ -368,8 +368,8 @@ class BattleManager {
             }
         }
 
-        $this->checkForWinner();
         $this->updateData();
+        $this->checkForWinner();
         $this->battle->fetchPlayerInventories();
 
         return $this->battle->winner;
@@ -636,12 +636,15 @@ class BattleManager {
 
         if($this->battle->player1->health > 0 && $this->battle->player2->health <= 0) {
             $this->battle->winner = $this->handleRoundCompletion(Battle::TEAM1);
+            $this->battle->updateData();
         }
         else if($this->battle->player2->health > 0 && $this->battle->player1->health <= 0) {
             $this->battle->winner = $this->handleRoundCompletion(Battle::TEAM2);
+            $this->battle->updateData();
         }
         else if($this->battle->player1->health <= 0 && $this->battle->player2->health <= 0) {
             $this->battle->winner = $this->handleRoundCompletion(Battle::DRAW);
+            $this->battle->updateData();
         }
 
         if($this->battle->winner && !$this->spectate) {
@@ -666,11 +669,11 @@ class BattleManager {
             return Battle::DRAW;
         }
         // if team1 majority of wins (total rounds)
-        if ($this->battle->team1_wins > floor($this->battle->rounds / 2) || ($this->battle->round_count >= $this->battle->rounds && $this->battle->team1_wins > $this->battle->team2_wins)) {
+        if ($this->battle->team1_wins > floor($this->battle->rounds / 2) || ($this->battle->round_count > $this->battle->rounds && $this->battle->team1_wins > $this->battle->team2_wins)) {
             return Battle::TEAM1;
         }
         // if team2 majority of wins (total rounds)
-        if ($this->battle->team2_wins > floor($this->battle->rounds / 2) || ($this->battle->round_count >= $this->battle->rounds && $this->battle->team2_wins > $this->battle->team1_wins)) {
+        if ($this->battle->team2_wins > floor($this->battle->rounds / 2) || ($this->battle->round_count > $this->battle->rounds && $this->battle->team2_wins > $this->battle->team1_wins)) {
             return Battle::TEAM2;
         }
         // if more rounds to go

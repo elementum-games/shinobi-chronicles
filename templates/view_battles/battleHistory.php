@@ -159,57 +159,63 @@
 <!-- Battle Log Display -->
 <?php if (isset($battle_logs) && count($battle_logs) > 1): ?>
     <table class="table" style="width: 90%; margin-left: auto; margin-right: auto; margin-bottom: -5px; margin-top: -5px;">
-    <tbody>
-        <tr>
-            <td style="text-align: center">
-                <a href="#" onclick="updateDisplay('full')">Full View</a>
-            </td>
-            <td style="text-align: center">
-                <a href="#" onclick="updateDisplay('simple')">Simple View</a>
-            </td>
-            <td style="text-align: center">
-                <a href="#" onclick="hideLogs()">Collapse All</a>
-            </td>
-            <td style="text-align: center">
-                <a href="#" onclick="showLogs()">Expand All</a>
-            </td>
-            <td style="text-align: center">
-                <a id="share_btn" href="#" onclick="copyUrl()">Share</a>
-            </td>
-        </tr>
-    </tbody>
-</table>
+        <tbody>
+            <tr>
+                <td style="text-align: center">
+                    <a href="#" onclick="updateDisplay('full')">Full View</a>
+                </td>
+                <td style="text-align: center">
+                    <a href="#" onclick="updateDisplay('simple')">Simple View</a>
+                </td>
+                <td style="text-align: center">
+                    <a href="#" onclick="hideLogs()">Collapse All</a>
+                </td>
+                <td style="text-align: center">
+                    <a href="#" onclick="showLogs()">Expand All</a>
+                </td>
+                <td style="text-align: center">
+                    <a id="share_btn" href="#" onclick="copyUrl()">Share</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
     <?php if ($display == "simple"): ?>
         <table class='table' style="text-align:center;">
             <?php foreach ($battle_logs as $log): ?>
             <?php if ($log['turn'] == 0): ?>
-            <?php continue; ?>
+                <?php continue; ?>
             <?php endif; ?>
             <tr>
-                <th style="cursor: pointer" onclick="toggleLog(<?= $log['turn'] ?>)" colspan="2">Turn <?= $log['turn'] ?></th>
+                <th style="cursor: pointer" onclick="toggleLog('<?= $log['turn'] . "_" . $log['round'] ?>')" colspan="2">Turn <?= $log['turn'] ?></th>
             </tr>
-            <tr class="turn turn_<?= $log['turn'] ?>">
+            <tr class="turn turn_<?= $log['turn'] . "_" . $log['round'] ?>">
                 <td colspan="2">
                     <?= $system->html_parse($log['content']) ?>
                 </td>
             </tr>
             <?php endforeach; ?>
         </table>
-        <?php else: ?>
+    <?php else: ?>
         <table class='table' style="text-align:center;">
             <?php foreach ($battle_logs as $log): ?>
-                    <?php if ($log['turn'] == 0): ?>
-                            <?php continue; ?>
-                    <?php endif; ?>
+                <?php if ($log['turn'] == 0): ?>
+                        <?php continue; ?>
+                <?php endif; ?>
+                <?php if ($battle_rounds > 1): ?>
                     <tr>
-                        <th style="cursor: pointer" onclick="toggleLog(<?= $log['turn'] ?>)" colspan="2">Turn <?= $log['turn'] ?></th>
+                        <th style="cursor: pointer" onclick="toggleLog('<?= $log['turn'] . "_" . $log['round'] ?>')" colspan="2">Round <?= $log['round'] ?> of <?= $battle_rounds ?> | Turn <?= $log['turn'] ?></th>
                     </tr>
-                    <?php if (isset($p1_max_health)): ?>
-                            <tr class="turn turn_<?= $log['turn'] ?>">
-                                <th><?= $p1_name ?></th>
-                                <th><?= $p2_name ?></th>
-                            </tr>
-                            <tr class="turn turn_<?= $log['turn'] ?>" style="background: linear-gradient(to right, var(--main-background-color) 0%, transparent 10%, transparent 90%, var(--main-background-color) 100%), url('<?= $battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
+                <?php else: ?>
+                    <tr>
+                        <th style="cursor: pointer" onclick="toggleLog('<?= $log['turn'] . "_" . $log['round'] ?>')" colspan="2">Turn <?= $log['turn'] ?></th>
+                    </tr>
+                <?php endif; ?>
+                <?php if (isset($p1_max_health)): ?>
+                <tr class="turn turn_<?php echo $log['turn'] . "_" . $log['round'] ?>">
+                    <th><?= $p1_name ?></th>
+                    <th><?= $p2_name ?></th>
+                </tr>
+                <tr class="turn turn_<?= $log['turn'] . "_" . $log['round'] ?>" style="background: linear-gradient(to right, var(--main-background-color) 0%, transparent 10%, transparent 90%, var(--main-background-color) 100%), url('<?= $battle_background_link ?>'); background-repeat: no-repeat; background-position: center; background-size: cover;">
                     <td id='bi_td_player' style="border-right: none">
                         <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 273px">
                             <img src='<?= $p1_avatar ?>' class='playerAvatar' alt='player_profile_img' />
@@ -249,63 +255,63 @@
                         </div>
                     </td>
                 </tr>
-            <?php endif; ?>
-            <?php if (count($log['active_effects']) > 0): ?>
-                <tr class="turn turn_<?= $log['turn'] ?>">
-                    <td style="border-top:none">
-                        <div class="active_effects_container">
-                            <?php foreach ($log['active_effects'] as $effect): ?>
-                            <?php if ($effect->target == $p1_key && $effect->turns > 0): ?>
-                            <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
-                                <div class="effect_name">
-                                    <?= System::unSlug($effect->effect) ?>
+                <?php endif; ?>
+                <?php if (count($log['active_effects']) > 0): ?>
+                    <tr class="turn turn_<?= $log['turn'] . "_" . $log['round'] ?>">
+                        <td style="border-top:none">
+                            <div class="active_effects_container">
+                                <?php foreach ($log['active_effects'] as $effect): ?>
+                                <?php if ($effect->target == $p1_key && $effect->turns > 0): ?>
+                                <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
+                                    <div class="effect_name">
+                                        <?= System::unSlug($effect->effect) ?>
+                                    </div>
+                                    <svg class="effect_duration_decoration" width="26" height="26">
+                                        <polygon points="0,13 13,0 26,13 13,26" fill="#ad9357" stroke="black" stroke-width="1"></polygon>
+                                    </svg>
+                                    <div class="effect_duration">
+                                        <?= System::unSlug($effect->turns) ?>
+                                    </div>
                                 </div>
-                                <svg class="effect_duration_decoration" width="26" height="26">
-                                    <polygon points="0,13 13,0 26,13 13,26" fill="#ad9357" stroke="black" stroke-width="1"></polygon>
-                                </svg>
-                                <div class="effect_duration">
-                                    <?= System::unSlug($effect->turns) ?>
-                                </div>
+                                <?php endif; ?>
+                                <?php endforeach; ?>
                             </div>
-                            <?php endif; ?>
-                            <?php endforeach; ?>
-                        </div>
-                    </td>
-                    <td style="border-top:none">
-                        <div class="active_effects_container">
-                            <?php foreach ($log['active_effects'] as $effect): ?>
-                            <?php if ($effect->target == $p2_key && $effect->turns > 0): ?>
-                            <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
-                                <div class="effect_name">
-                                    <?= System::unSlug($effect->effect) ?>
+                        </td>
+                        <td style="border-top:none">
+                            <div class="active_effects_container">
+                                <?php foreach ($log['active_effects'] as $effect): ?>
+                                <?php if ($effect->target == $p2_key && $effect->turns > 0): ?>
+                                <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
+                                    <div class="effect_name">
+                                        <?= System::unSlug($effect->effect) ?>
+                                    </div>
+                                    <svg class="effect_duration_decoration" width="26" height="26">
+                                        <polygon points="0,13 13,0 26,13 13,26" fill="#ad9357" stroke="black" stroke-width="1"></polygon>
+                                    </svg>
+                                    <div class="effect_duration">
+                                        <?= System::unSlug($effect->turns) ?>
+                                    </div>
                                 </div>
-                                <svg class="effect_duration_decoration" width="26" height="26">
-                                    <polygon points="0,13 13,0 26,13 13,26" fill="#ad9357" stroke="black" stroke-width="1"></polygon>
-                                </svg>
-                                <div class="effect_duration">
-                                    <?= System::unSlug($effect->turns) ?>
-                                </div>
+                                <?php endif; ?>
+                                <?php endforeach; ?>
                             </div>
-                            <?php endif; ?>
-                            <?php endforeach; ?>
-                        </div>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+                <?php if (isset($p1_max_health)): ?>
+                    <tr class="turn turn_<?= $log['turn'] . "_" . $log['round'] ?>">
+                        <th colspan="2">
+                            Battle Log
+                        </th>
+                    </tr>
+                <?php endif; ?>
+                <tr class="turn turn_<?= $log['turn'] . "_" . $log['round'] ?>">
+                    <td colspan="2">
+                        <?= $system->html_parse($log['content']) ?>
                     </td>
                 </tr>
-            <?php endif; ?>
-            <?php if (isset($p1_max_health)): ?>
-                <tr class="turn turn_<?= $log['turn'] ?>">
-                    <th colspan="2">
-                        Battle Log
-                    </th>
-                </tr>
-            <?php endif; ?>
-            <tr class="turn turn_<?= $log['turn'] ?>">
-                <td colspan="2">
-                    <?= $system->html_parse($log['content']) ?>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    </table>
+            <?php endforeach; ?>
+        </table>
     <?php endif; ?>
 <?php endif; ?>
 
