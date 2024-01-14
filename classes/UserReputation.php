@@ -683,6 +683,32 @@ class UserReputation {
         return $rep_loss;
     }
 
+    public function handleSpar(User $player, Fighter $opponent, int $spar_gain): int {
+        if (!($opponent instanceof User)) {
+            return 0;
+        }
+        if (!self::PVP_REP_ENABLED) {
+            return 0;
+        }
+        // Set current kill
+        $this->recent_players_killed_ids_array[$opponent->user_id][] = time();
+        // Get kill count
+        $kill_count = isset($this->recent_players_killed_ids_array[$opponent->user_id]) ? sizeof($this->recent_players_killed_ids_array[$opponent->user_id]) : 0;
+        // Encode and set last pvp kills
+        $this->encodePvpKills();
+
+        // Opponent killed too many times in mitigation frame, no gain
+        if ($kill_count > self::PVP_CHAIN_KILL_LIMIT) {
+            return 0;
+        }
+
+        // Weekly rep limit
+        if ($this->weekly_pvp_rep >= $this->weekly_pvp_cap) {
+            return 0;
+        }
+        return $player->reputation->addRep($spar_gain, UserReputation::ACTIVITY_TYPE_PVP);
+    }
+
     // Encode and set player last pvp kills
     public function encodePvpKills(): void {
         $this->recent_players_killed_ids = json_encode($this->recent_players_killed_ids_array);
