@@ -744,6 +744,12 @@ class System {
             $maintenanceBegin = new DateTimeImmutable(self::MAINTENANCE_BEGIN, new DateTimeZone(self::SERVER_TIME_ZONE));
             $maintenanceEnd = new DateTimeImmutable(self::MAINTENANCE_END, new DateTimeZone(self::SERVER_TIME_ZONE));
         }
+		
+		// Hard closure
+		if($db_maint['maintenance_end_time'] == -1) {
+			$this->SC_OPEN = false;
+			return null;
+		}
 
         // Maintenance time-frame error
         if($maintenanceBegin->getTimestamp() > $maintenanceEnd->getTimestamp()) {
