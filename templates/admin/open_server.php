@@ -1,5 +1,5 @@
 <?php if(!$system->SC_OPEN): ?>
-    <table calss="table">
+    <table class="table">
         <tr><th>Open SC</th></tr>
         <tr>
             <td>
