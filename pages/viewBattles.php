@@ -369,11 +369,11 @@ function viewBattles() {
                         $p2_key = $is_ai_battle ? "T2:NPC:" . $p2->id : "T2:U:" . $p2->id;
                         $effects = [];
                         $fighter_health = json_decode($turn['fighter_health'], true);
-                        if (isset($fighter_health)) {
-                            $p1_health = $fighter_health[$p1_key] ?? null;
-                            $p1_max_health = $fighter_health[$p1_key . ":MAX"] ?? $p1_max_health;
-                            $p2_health = $fighter_health[$p2_key] ?? null;
-                            $p2_max_health = $fighter_health[$p2_key . ":MAX"] ?? $p2_max_health;
+                        if (!empty($fighter_health)) {
+                            $p1_health = $fighter_health[$p1_key]['current'] ?? null;
+                            $p1_max_health = $fighter_health[$p1_key]['max'] ?? null;
+                            $p2_health = $fighter_health[$p2_key]['current'] ?? null;
+                            $p2_max_health = $fighter_health[$p2_key]['max'] ?? null;
                         }
                         $active_effects = json_decode($turn['active_effects'], true);
                         if (isset($active_effects)) {
