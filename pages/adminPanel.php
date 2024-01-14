@@ -46,6 +46,7 @@ function adminPanel() {
 
     // Open server from maintenance
     if($page== 'open_sc') {
+        $self_link .= "&page=open_sc";
         if(isset($_POST['open_server'])) {
             $system->db->query("UPDATE `system_storage` SET `maintenance_end`=0 LIMIT 1");
             if($system->db->last_affected_row) {
