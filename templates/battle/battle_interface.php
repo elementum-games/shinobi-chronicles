@@ -191,7 +191,8 @@ if($battle->battle_text) {
     .active_effects_container {
         display: flex;
         justify-content: center;
-        gap: 14px;
+        column-gap: 14px;
+        row-gap: 7px;
         flex-wrap: wrap;
     }
     .active_effect {
