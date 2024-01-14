@@ -19,7 +19,8 @@ final class SenseiKeyMigration extends AbstractMigration
                 SELECT sensei_id, MAX(is_active)
                 FROM sensei
                 GROUP BY sensei_id
-            );
+            )
+            GROUP BY sensei_id;
 
             -- Clear table
             DELETE FROM sensei;
