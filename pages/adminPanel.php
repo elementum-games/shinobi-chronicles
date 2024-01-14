@@ -49,7 +49,7 @@ function adminPanel() {
         $self_link .= "&page=open_sc";
         if(isset($_POST['open_sc'])) {
             $system->db->query("UPDATE `system_storage` SET `maintenance_end_time`=0, `maintenance_begin_time`=0 LIMIT 1");
-            if($system->db->last_affected_row) {
+            if($system->db->last_affected_rows) {
                 $system->message("Server opened!");
             }
             else {
