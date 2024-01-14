@@ -56,6 +56,8 @@ function adminPanel() {
                 $system->message("Error opening server!");
             }
         }
+
+        $system->printMessage();
         require 'templates/admin/open_server.php';
     }
     // Create NPC
