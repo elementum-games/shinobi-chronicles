@@ -295,7 +295,8 @@ function viewBattles() {
 
 
         /* View Log */
-        $logs_result;
+        $p1_avatar_size = 200;
+        $p2_avatar_size = 200;
         $battle_logs = [];
         if (isset($_GET['view_log'])) {
             $view = "battle_history";
