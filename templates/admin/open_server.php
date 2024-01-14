@@ -1,4 +1,4 @@
-<?php if(!$system->SC_OPEN): ?>
+<?php if($system->UPDATE_MAINTENANCE != null): ?>
     <table class="table">
         <tr><th>Open SC</th></tr>
         <tr>
