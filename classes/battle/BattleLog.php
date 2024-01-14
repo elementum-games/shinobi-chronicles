@@ -17,8 +17,8 @@ class BattleLog {
         $this->battle_id = $battle_id;
         $this->turn_number = $turn_number;
         $this->content = $content;
-        !empty($raw_battle_log['fighter_health']) ? json_decode($raw_battle_log['fighter_health'], true) : [],
-        !empty($raw_battle_log['active_effects']) ? $raw_battle_log['active_effects'] : '',
+        $this->fighter_health = $fighter_health;
+        $this->active_effects = $raw_active_effects;
     }
 
     /**
@@ -37,8 +37,8 @@ class BattleLog {
                 $raw_battle_log['battle_id'],
                 $raw_battle_log['turn_number'],
                 $raw_battle_log['content'],
-                json_decode($raw_battle_log['fighter_health'], true),
-                $raw_battle_log['active_effects']
+                !empty($raw_battle_log['fighter_health']) ? json_decode($raw_battle_log['fighter_health'], true) : [],
+                !empty($raw_battle_log['active_effects']) ? $raw_battle_log['active_effects'] : '',
             );
         }
         else {
