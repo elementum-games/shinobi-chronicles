@@ -43,7 +43,8 @@ export type NotificationType = {|
         | "challenge_pending"
         | "challenge_accepted"
         | "kage_change"
-        | "achievement",
+        | "achievement"
+        | "daily_task",
     +message: string,
     +notification_id: number,
     +user_id: number,

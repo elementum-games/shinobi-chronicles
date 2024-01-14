@@ -224,32 +224,37 @@ function processSparFightEnd(BattleManager $battle, User $player, System $system
 
     $reputation_eligible = isReputationEligible($battle, $player, $system);
 
-    if($battle->isPlayerWinner()) {
-		$result = "You win!";
+    if ($battle->isPlayerWinner()) {
+        $result = "You win!";
         if ($reputation_eligible) {
-            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_WIN, UserReputation::ACTIVITY_TYPE_PVE);
-            $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
-            $result .= "<br>You have gained $rep_gain village reputation!";
+            $rep_gain = $player->reputation->handleSpar($player, $battle->opponent, UserReputation::SPAR_REP_WIN);
+            if ($rep_gain > 0) {
+                $result .= "<br>Fellow Shinobi learned from your battle, gaining you $rep_gain village reputation.";
+            }
+            // Daily Task
+            if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVP)) {
+                $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, UserReputation::SPAR_REP_WIN);
+            }
         }
         return $result;
     }
     else if($battle->isOpponentWinner()) {
         $player->health = 5;
         $result = "You lose.";
-        if ($reputation_eligible) {
-            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_LOSS, UserReputation::ACTIVITY_TYPE_PVE);
-            $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
-            $result .= "<br>You have gained $rep_gain village reputation!";
-        }
         return $result;
     }
     else if($battle->isDraw()) {
         $player->health = 5;
         $result = "You both knocked each other out.";
         if ($reputation_eligible) {
-            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_DRAW, UserReputation::ACTIVITY_TYPE_PVE);
-            $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
-            $result .= "<br>You have gained $rep_gain village reputation!";
+            $rep_gain = $player->reputation->handleSpar($player, $battle->opponent, UserReputation::SPAR_REP_DRAW);
+            if ($rep_gain > 0) {
+                $result .= "<br>Fellow Shinobi learned from your battle, gaining you $rep_gain village reputation.";
+            }
+            // Daily Task
+            if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVP)) {
+                $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, UserReputation::SPAR_REP_DRAW);
+            }
         }
         return $result;
     }
@@ -292,11 +297,6 @@ function isReputationEligible(BattleManager $battle, User $player, System $syste
     $travelManager = new TravelManager($system, $player);
     $arena_coords = $travelManager->getColosseumCoords();
     if (!$player->location->equals($arena_coords) && !$player->location->equals($player->village_location)) {
-        return false;
-    }
-
-	// if rep timer available
-    if (!$player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
         return false;
     }
 
