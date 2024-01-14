@@ -44,6 +44,19 @@ function adminPanel() {
         $page = '';
     }
 
+    // Open server from maintenance
+    if($page== 'open_sc') {
+        if(isset($_POST['open_server'])) {
+            $system->db->query("UPDATE `system_storage` SET `maintenance_end`=0 LIMIT 1");
+            if($system->db->last_affected_row) {
+                $system->message("Server opened!");
+            }
+            else {
+                $system->message("Error opening server!");
+            }
+        }
+        require 'templates/admin/open_server.php';
+    }
     // Create NPC
     if($page == 'create_ai') {
         /* Variables
