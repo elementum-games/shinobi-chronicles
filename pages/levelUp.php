@@ -449,21 +449,32 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             require 'templates/level_rank_up/chuunin_written_exam.php';
         }
         if($player->exam_stage >= RankManager::CHUUNIN_STAGE_SURVIVAL_START && $player->exam_stage <= RankManager::CHUUNIN_STAGE_SURVIVAL_END) {
-            $opponents[RankManager::CHUUNIN_STAGE_SURVIVAL_START] = 6;
-            $opponents[RankManager::CHUUNIN_STAGE_SURVIVAL_MIDDLE] = 5;
+            // Academy Graduate
+            $opponents[RankManager::CHUUNIN_STAGE_SURVIVAL_START] = 5;
+            // Enraged Serpent
+            $opponents[RankManager::CHUUNIN_STAGE_SURVIVAL_MIDDLE] = 163;
+            // Talented Genin
             $opponents[RankManager::CHUUNIN_STAGE_SURVIVAL_END] = 10;
 
-            require 'templates/level_rank_up/chuunin_survival.php';
+            if ($player->exam_stage == RankManager::CHUUNIN_STAGE_SURVIVAL_START) {
+                require 'templates/level_rank_up/chuunin_survival_start.php';
+            } else if ($player->exam_stage == RankManager::CHUUNIN_STAGE_SURVIVAL_MIDDLE) {
+                require 'templates/level_rank_up/chuunin_survival_middle.php';
+            } else if ($player->exam_stage == RankManager::CHUUNIN_STAGE_SURVIVAL_END) {
+                require 'templates/level_rank_up/chuunin_survival_end.php';
+            }
+
+            $background = 'images/battle_backgrounds/Forest.jpg';
 
             if(!$player->battle_id) {
                 try {
                     $opponent = new NPC($system, $opponents[$player->exam_stage]);
                     $opponent->loadData();
                     if($system->USE_NEW_BATTLES) {
-                        BattleV2::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
+                        BattleV2::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP, battle_background_link: $background);
                     }
                     else {
-                        Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
+                        Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP, battle_background_link: $background);
                     }
                 } catch(RuntimeException $e) {
                     $system->message($e->getMessage());
@@ -490,11 +501,15 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             $player->battle_id = 0;
             if($battle->isPlayerWinner()) {
                 $player->exam_stage++;
-                if($player->exam_stage == RankManager::CHUUNIN_STAGE_SURVIVAL_END) {
+                if ($player->exam_stage == RankManager::CHUUNIN_STAGE_DUEL) {
                     $battle_result = "You defeated your opponent, who had the scroll you needed, and have advanced to the
-                    next stage of the exam. You can take a short break and heal up if you want, or continue to the
-                    final battle.<br />
-                    <a href='{$system->router->links['profile']}'>Take a break</a>
+                    next stage of the exam.<br />You receive praise from the instructors for your success, and are told that the next phase of the exam will begin after a rest.<br />
+                    <a href='{$system->router->links['profile']}'>Take a break</a><br>
+                    <a href='$self_link'>Continue</a>";
+                }
+                else if ($player->exam_stage == RankManager::CHUUNIN_STAGE_SURVIVAL_END) {
+                    $battle_result = "You successfully defeated the beast alongside your fellow Genin.<br />
+                    You stop to catch your breath, but you have little time to rest as you lock eyes with your opponent.<br />
                     <a href='$self_link'>Continue</a>";
                 }
                 else {
@@ -519,20 +534,23 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             }
         }
         else if($player->exam_stage == RankManager::CHUUNIN_STAGE_DUEL) {
-            $opponent_id = 11;
+            $opponent_ids = [136, 137, 138];
+            $opponent_id = $opponent_ids[array_rand($opponent_ids)];
 
             require 'templates/level_rank_up/chuunin_battle_exam.php';
+
+            $background = 'images/battle_backgrounds/Spar.jpg';
 
             if(!$player->battle_id) {
                 try {
                     $opponent = new NPC($system, $opponent_id);
-                    $opponent->loadData();
+                    $opponent->loadData($player);
 
                     if($system->USE_NEW_BATTLES) {
-                        BattleV2::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
+                        BattleV2::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP, battle_background_link: $background);
                     }
                     else {
-                        Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
+                        Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP, battle_background_link: $background);
                     }
                 } catch(RuntimeException $e) {
                     $system->message($e->getMessage());
