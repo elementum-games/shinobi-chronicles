@@ -386,43 +386,32 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
         $answer1 = $_POST['question1'];
         $answer2 = $_POST['question2'];
         $answer3 = $_POST['question3'];
+        $answer4 = $_POST['question4'];
+        $answer5 = $_POST['question5'];
 
         try {
-            // Question 1 - Illusion jutsu is what type
+            // Question 1 - Genjutsu
             if($answer1 != 'genjutsu') {
                 throw new RuntimeException('');
             }
 
-            // Question 2 - Armor protects against what
+            // Question 2 - Taijutsu
             if($answer2 != 'taijutsu') {
                 throw new RuntimeException('');
             }
 
-            // Question 3 - Most villagers
-            $result = $system->db->query("SELECT `name` FROM `villages`");
-            $villages = array();
-            while($row = $system->db->fetch($result)) {
-                $villages[] = $row;
+            // Question 3 - Ninjutsu
+            if ($answer2 != 'ninjutsu') {
+                throw new RuntimeException('');
             }
 
-            $count_query = "SELECT ";
-            foreach($villages as $id => $village) {
-                $count_query .= "COUNT(IF(`village` = '{$village['name']}', 1, NULL)) AS `" . $village['name'] . "`";
-                if($id < count($villages) - 1) {
-                    $count_query .= ', ';
-                }
-            }
-            $count_query .= " FROM `users`";
-            $result = $system->db->query($count_query);
-            $village_counts = $system->db->fetch($result);
-            $highest_village = 'Stone';
-            foreach($village_counts as $id => $village) {
-                if($village > $village_counts[$highest_village]) {
-                    $highest_village = $id;
-                }
+            // Question 4 - 5 Villages
+            if($answer3 != 'stone_cloud_leaf_sand_mist') {
+                throw new RuntimeException('');
             }
 
-            if($answer3 != $highest_village) {
+            // Question 4 - 5 Elements
+            if ($answer3 != 'fire_wind_lightning_earth_water') {
                 throw new RuntimeException('');
             }
 
