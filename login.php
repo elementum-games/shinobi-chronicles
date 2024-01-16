@@ -1,5 +1,6 @@
 <?php
 global $system;
+global $layout;
 global $login_error_text;
 
 if(!empty($_POST['login'])) {
@@ -55,11 +56,15 @@ if(!empty($_POST['login'])) {
                 );
             }
 
+            // Load user and set new login data
             $player = User::loadFromId($system, $_SESSION['user_id']);
             $player->loadData();
             $player->last_login = time();
             $player->log(User::LOG_LOGIN, $_SERVER['REMOTE_ADDR']);
             $player->updateData();
+
+            // Redirect to default page
+            header(header: "Location: {$system->router->base_url}");
         }
         // If wrong, increment failed logins
         else {
@@ -80,6 +85,11 @@ if(!empty($_POST['login'])) {
         }
     }catch (RuntimeException $e) {
         $system->message($e->getMessage());
+        // Force login error message on legacy layouts
+        if(!$layout->usesV2Interface()) {
+            $system->printMessage(force_display: true);
+        }
+        // Set login error message for new layouts
         $login_error_text = $e->getMessage();
     }
 }
