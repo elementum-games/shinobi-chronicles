@@ -39,11 +39,11 @@
                     <br />
 
                     <b>Which sequence correctly represents the cycle of elemental strengths and weaknesses?</b><br />
-                    <input type='radio' name='elementQuestion' value='fire_wind_lightning_earth_water' /> Fire > Wind > Lightning > Earth > Water > Fire<br />
-                    <input type='radio' name='elementQuestion' value='fire_water_earth_lightning_wind' /> Fire > Water > Earth > Lightning > Wind > Fire<br />
-                    <input type='radio' name='elementQuestion' value='earth_fire_water_wind_lightning' /> Earth > Fire > Water > Wind > Lightning > Earth<br />
-                    <input type='radio' name='elementQuestion' value='lightning_earth_fire_water_wind' /> Lightning > Earth > Fire > Water > Wind > Lightning<br />
-                    <input type='radio' name='elementQuestion' value='wind_lightning_water_fire_earth' /> Wind > Lightning > Water > Fire > Earth > Wind<br />
+                    <input type='radio' name='question5' value='fire_wind_lightning_earth_water' /> Fire > Wind > Lightning > Earth > Water > Fire<br />
+                    <input type='radio' name='question5' value='fire_water_earth_lightning_wind' /> Fire > Water > Earth > Lightning > Wind > Fire<br />
+                    <input type='radio' name='question5' value='earth_fire_water_wind_lightning' /> Earth > Fire > Water > Wind > Lightning > Earth<br />
+                    <input type='radio' name='question5' value='lightning_earth_fire_water_wind' /> Lightning > Earth > Fire > Water > Wind > Lightning<br />
+                    <input type='radio' name='question5' value='wind_lightning_water_fire_earth' /> Wind > Lightning > Water > Fire > Earth > Wind<br />
                     <br />
 
                     <p style="text-align: center;"><input type='submit' name='written_exam' value='Submit Answers' /></p>

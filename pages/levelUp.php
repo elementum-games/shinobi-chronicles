@@ -401,17 +401,17 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             }
 
             // Question 3 - Ninjutsu
-            if ($answer2 != 'ninjutsu') {
+            if ($answer3 != 'ninjutsu') {
                 throw new RuntimeException('');
             }
 
             // Question 4 - 5 Villages
-            if($answer3 != 'stone_cloud_leaf_sand_mist') {
+            if($answer4 != 'stone_cloud_leaf_sand_mist') {
                 throw new RuntimeException('');
             }
 
             // Question 4 - 5 Elements
-            if ($answer3 != 'fire_wind_lightning_earth_water') {
+            if ($answer5 != 'fire_wind_lightning_earth_water') {
                 throw new RuntimeException('');
             }
 
