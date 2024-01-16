@@ -681,10 +681,6 @@ if($LOGGED_IN) {
         );
 
         $system->printMessage();
-        if (!$player->global_message_viewed) {
-            $global_message = $system->fetchGlobalMessage();
-            $layout->renderGlobalMessage($system, $global_message);
-        }
 
         try {
             require("pages/profile.php");

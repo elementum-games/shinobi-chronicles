@@ -688,7 +688,7 @@ class StaffManager {
             case 'misc_tools':
                 if($this->isUserAdmin() || $permission_check) {
                     $tools = ['create_rank', 'edit_user', 'activate_user', 'stat_cut', 'staff_payments', 'give_bloodline',
-                        'edit_rank', 'edit_team', 'delete_user', 'dev_tools', 'manual_transaction', 'logs', 'reset_password'];
+                        'edit_rank', 'edit_team', 'delete_user', 'dev_tools', 'manual_transaction', 'logs', 'reset_password', 'server_maint'];
                 }
                 return $tools ?? array();
             default:
