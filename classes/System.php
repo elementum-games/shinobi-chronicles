@@ -136,6 +136,12 @@ class System {
 
     public bool $war_enabled = false;
 
+    // Currently this only enables errors on production
+    public static array $developers = [
+        1, // Lsmjudoka
+        254, // Hitori
+        1603, // Arth
+    ];
     public static array $explicit_words = [
         'fuck',
         'fuk',
