@@ -217,6 +217,7 @@ class System {
         'event' => self::GLOBAL_TEST_NOTIFICATION_SPAWN,
         'diplomacy' => self::GLOBAL_TEST_NOTIFICATION_SPAWN,
     ];
+    public bool $REQUIRE_USER_VERIFICATION;
 
     public function __construct() {
         require __DIR__ . "/../secure/vars.php";
@@ -243,6 +244,8 @@ class System {
         $this->checkForActiveEvent();
 
         $this->war_enabled = true;
+        // Temp verification fix to require users to validate email once we can send those again
+        $this->REQUIRE_USER_VERIFICATION = false;
     }
 
     /**
