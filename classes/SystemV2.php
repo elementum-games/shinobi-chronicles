@@ -6,6 +6,8 @@ class SystemV2 {
     const ENVIRONMENT_PROD = 'prod';
     const DEV_ONLY_FEATURES_DEFAULT = false;
     const LOCAL_HOST = true;
+
+    // Time-based settings
     const SERVER_TIME_ZONE = 'America/New_York';
     const REPUTATION_RESET_DAY = 'Friday';
     const REPUTATION_RESET_HOUR = 20;
@@ -32,6 +34,9 @@ class SystemV2 {
     /****************************************
      *            TIME FUNCTIONS            *
      ****************************************/
+
+    // Uses server time to determine reputation reset time.
+    // This must be store as DateTimeImmutable.
     public function loadRepReset(): void {
         // Reset is today
         if(strtolower($this->SERVER_TIME->format('l')) == strtolower(self::REPUTATION_RESET_DAY)) {
