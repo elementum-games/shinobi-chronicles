@@ -5,7 +5,10 @@ $PAGE_LOAD_START = microtime(as_float: true);
 
 // Load system
 require_once("classes/_autoload.php");
-$system = new System();
+//$system = new System();
+$system = SystemV2::initialize();
+
+exit;
 
 // Display errors on dev
 if($system->isDevEnvironment()) {
