@@ -378,9 +378,9 @@ class Battle {
                 }
             }
 
-            if($jutsu->rank == 1) continue;
+            if ($jutsu->rank == 1) continue;
 
-            if($jutsu->jutsu_type != $player1_primary_jutsu_type) {
+            if ($jutsu->jutsu_type != $player1_primary_jutsu_type) {
                 $jutsu->power *= 0.5;
                 foreach($jutsu->effects as $effect) {
                     $effect->display_effect_amount *= 0.5;
@@ -388,7 +388,7 @@ class Battle {
                 }
             }
         }
-        foreach($this->player2->jutsu as $jutsu) {
+        foreach ($this->player2->jutsu as $jutsu) {
             if ($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player2_equipped_jutsu_ids[$jutsu->id])) {
                 $jutsu->power *= 0.75;
                 foreach ($jutsu->effects as $effect) {
@@ -396,26 +396,15 @@ class Battle {
                     $effect->effect_amount *= 0.75;
                 }
             }
-        }
 
-        if (!$this->player2 instanceof NPC) {
-            foreach ($this->player2->jutsu as $jutsu) {
-                if ($jutsu->rank == 1)
-                    continue;
+            if ($jutsu->rank == 1) continue;
 
+            if (!$this->player2 instanceof NPC) {
                 if ($jutsu->jutsu_type != $player2_primary_jutsu_type) {
                     $jutsu->power *= 0.5;
                     foreach ($jutsu->effects as $effect) {
                         $effect->display_effect_amount *= 0.5;
                         $effect->effect_amount *= 0.5;
-                    }
-                }
-
-                if($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player2_equipped_jutsu_ids[$jutsu->id])) {
-                    $jutsu->power *= 0.75;
-                    foreach($jutsu->effects as $effect) {
-                        $effect->display_effect_amount *= 0.75;
-                        $effect->effect_amount *= 0.75;
                     }
                 }
             }
