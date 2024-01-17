@@ -295,7 +295,8 @@ function viewBattles() {
 
 
         /* View Log */
-        $logs_result;
+        $p1_avatar_size = 200;
+        $p2_avatar_size = 200;
         $battle_logs = [];
         if (isset($_GET['view_log'])) {
             $view = "battle_history";
@@ -310,13 +311,14 @@ function viewBattles() {
                 }
                 // get battle
                 $battle_result = $system->db->query("
-                    SELECT `player1`, `player2`, `battle_background_link` FROM `battles` WHERE `battle_id` = {$battle_id}
+                    SELECT `player1`, `player2`, `battle_background_link`, `rounds` FROM `battles` WHERE `battle_id` = {$battle_id}
                 ");
                 $battle_result = $system->db->fetch($battle_result);
                 if ($system->db->last_num_rows > 0) {
                     $is_ai_battle = false;
                     $p1 = EntityId::fromString($battle_result['player1']);
                     $p2 = EntityId::fromString($battle_result['player2']);
+                    $battle_rounds = $battle_result['rounds'];
                     $battle_background_link = null;
                     if (isset($battle_result['battle_background_link'])) {
                         $battle_background_link = $battle_result['battle_background_link'];
@@ -353,9 +355,9 @@ function viewBattles() {
                     $p2_avatar_size = $player2->getAvatarSize();
                 }
                 $logs_result = $system->db->query(
-                    "SELECT `turn_number`, `content`, `fighter_health`, `active_effects` FROM `battle_logs`
+                    "SELECT `turn_number`, `content`, `fighter_health`, `active_effects`, `round_number` FROM `battle_logs`
                     WHERE `battle_id` = '{$battle_id}'
-                    ORDER BY `turn_number` ASC"
+                    ORDER BY `round_number` ASC, `turn_number` ASC"
                 );
                 $p1_max_health = null;
                 $p2_max_health = null;
@@ -369,11 +371,11 @@ function viewBattles() {
                         $p2_key = $is_ai_battle ? "T2:NPC:" . $p2->id : "T2:U:" . $p2->id;
                         $effects = [];
                         $fighter_health = json_decode($turn['fighter_health'], true);
-                        if (isset($fighter_health)) {
-                            $p1_health = $fighter_health[$p1_key] ?? null;
-                            $p1_max_health = $fighter_health[$p1_key . ":MAX"] ?? $p1_max_health;
-                            $p2_health = $fighter_health[$p2_key] ?? null;
-                            $p2_max_health = $fighter_health[$p2_key . ":MAX"] ?? $p2_max_health;
+                        if (!empty($fighter_health)) {
+                            $p1_health = $fighter_health[$p1_key]['current'] ?? null;
+                            $p1_max_health = $fighter_health[$p1_key]['max'] ?? null;
+                            $p2_health = $fighter_health[$p2_key]['current'] ?? null;
+                            $p2_max_health = $fighter_health[$p2_key]['max'] ?? null;
                         }
                         $active_effects = json_decode($turn['active_effects'], true);
                         if (isset($active_effects)) {
@@ -383,6 +385,7 @@ function viewBattles() {
                         }
                         $battle_logs[] = [
                             'turn' => $turn['turn_number'],
+                            'round' => $turn['round_number'],
                             'content' => $battle_text,
                             'player1_health' => $p1_health,
                             'player2_health' => $p2_health,
