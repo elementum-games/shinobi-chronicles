@@ -310,7 +310,7 @@ class VillageManager {
                 }
                 // check requirements
                 if (!self::checkSeatRequirements($system, $player, $seat_type)) {
-                    return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_ELDER_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_ELDER_CLAIM_TIER]['min_rep'] . " Reputation";
+                    return "You do not meet the requirements!\nChuunin Rank, " . UserReputation::nameByRepRank(self::MIN_ELDER_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_ELDER_CLAIM_TIER]['min_rep'] . " Reputation";
                 }
                 // check if recently left this seat
                 $result = $system->db->query("SELECT * FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` = {$player->user_id} AND `seat_end` IS NOT NULL ORDER BY `seat_end` DESC LIMIT 1");
@@ -2302,7 +2302,7 @@ class VillageManager {
                 return true;
                 break;
             case 'elder':
-                if ($player->rank_num < 4) {
+                if ($player->rank_num < 3) {
                     return false;
                 }
                 if ($is_challenge) {
