@@ -934,7 +934,7 @@ values  (1, 'Leaf', 'Kobayashi', 1, '', 0, 0, 0, 0, 0, '0', './images/default_av
 
         // System Storage
     $this->execute(
-        "INSERT INTO `system_storage` (`global_message`. `time`) VALUES ('', '" . time() . "');"
+        "INSERT INTO `system_storage` (`global_message`, `time`) VALUES ('', '" . time() . "');"
     );
 
         $this->execute("COMMIT;");
