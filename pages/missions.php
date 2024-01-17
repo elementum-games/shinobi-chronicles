@@ -290,16 +290,20 @@ function runActiveMission(): bool {
                 // display mission details
                 echo "<table class='table' style='width: 90%'><tr><th>Current Mission</th></tr>
 			    <tr><td style='text-align:center;'><span style='font-weight:bold;'>" .
-                    ($mission->mission_type == 3 ? '[' . $player->team->name . '] ' : '') . "$mission->name</span><br />" .
+                ($mission->mission_type == 3 ? '[' . $player->team->name . '] ' : '') . "$mission->name</span><br />" .
                     $player->mission_stage['description'] . "</td></tr></table>";
 
                 // Initialize start of battle stuff
+                $battle_background = TravelManager::getLocationBattleBackgroundLink($system, $player->location);
+                if (empty($battle_background)) {
+                    $battle_background = $player->region->battle_background_link;
+                }
                 if(!$player->battle_id) {
                     if($system->USE_NEW_BATTLES) {
-                        BattleV2::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
+                        BattleV2::start($system, $player, $opponent, Battle::TYPE_AI_MISSION, battle_background_link: $battle_background);
                     }
                     else {
-                        Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
+                        Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION, battle_background_link: $battle_background);
                     }
                 }
 
@@ -514,11 +518,15 @@ function runActiveMission(): bool {
                         $opponent->loadData();
 
                         // Initialize start of battle stuff
+                        $battle_background = TravelManager::getLocationBattleBackgroundLink($system, $player->location);
+                        if (empty($battle_background)) {
+                            $battle_background = $player->region->battle_background_link;
+                        }
                         if (!$player->battle_id) {
                             if ($system->USE_NEW_BATTLES) {
-                                BattleV2::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
+                                BattleV2::start($system, $player, $opponent, Battle::TYPE_AI_MISSION, battle_background_link: $battle_background);
                             } else {
-                                Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
+                                Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION, battle_background_link: $battle_background);
                             }
                         }
 
