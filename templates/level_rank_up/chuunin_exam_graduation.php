@@ -13,10 +13,10 @@
     <tr><th><?=$exam_name?> Graduation</th></tr>
     <?php if(!$element): ?>
         <tr>
-            <td>
+            <td style="text-align: center">
                 Congratulations, you have passed the Chuunin Exam!<br />
                 <br />
-                After passing all three exams, you have been recognized as an official ninja of the <?= $player->village->name ?> Village. You now
+                After passing all three exams, you have been recognized as an official ninja of the <?= $player->village->name ?> Village. <br />You now
                 have more rights, and more responsibilities. You can create or join a team with up to 3 other ninja, as well as
                 take on C-rank and B-rank missions. You can no longer normally train or do arena fights inside the village, as your skills are too destructive to be
                 safe around the civilians. With your new uniform you can carry an extra weapon and wear another piece of armor, and as
@@ -30,15 +30,15 @@
                     <p style='text-align:center;'>
                         <b>Choose an element to focus on</b><br />
                         <i>(Note: Choose carefully, this will determine your primary chakra nature, which cannot be
-                            changed without AK)</i><br />
-                        <select name='element'>
+                            changed without Ancient Kunai)</i><br />
+                        <select style="margin-top: 5px;" name='element'>
                             <option value='Fire'>Fire</option>
                             <option value='Wind'>Wind</option>
                             <option value='Lightning'>Lightning</option>
                             <option value='Earth'>Earth</option>
                             <option value='Water'>Water</option>
                         </select><br />
-                        <input type='submit' value='Infuse Chakra' />
+                        <input style="margin-top: 5px;" type='submit' value='Infuse Chakra' />
                     </p>
                 </form>
             </td>
