@@ -18,7 +18,7 @@ require_once __DIR__ . "/classes/SenseiManager.php";
 require_once __DIR__ . "/classes/SpecialMission.php";
 require_once __DIR__ . "/classes/SupportManager.php";
 require_once __DIR__ . "/classes/System.php";
-require_once __DIR__ . "/classes/SystemV2.php"; // REMOVE
+require_once __DIR__ . "/classes/SystemV2.php";
 require_once __DIR__ . "/classes/User.php";
 
 require_once __DIR__ . "/classes/battle/Battle.php";

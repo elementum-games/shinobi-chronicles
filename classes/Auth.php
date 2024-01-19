@@ -3,7 +3,7 @@
 use DDTrace\Trace;
 
 require_once __DIR__ . "/User.php";
-require_once __DIR__ . "/System.php";
+require_once __DIR__ . "/SystemV2.php";
 require_once __DIR__ . "/exception/LoggedOutException.php";
 
 class Auth {

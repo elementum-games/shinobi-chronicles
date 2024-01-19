@@ -6,7 +6,7 @@ if(!isset($_SESSION['user_id'])) {
 
 require __DIR__ . "/../classes/_autoload.php";
 
-$system = new System();
+$system = System::initialize();
 $system->db->connect();
 
 $user = User::loadFromId($system, $_SESSION['user_id']);
