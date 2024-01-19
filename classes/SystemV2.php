@@ -971,7 +971,7 @@ class System {
         if($this->isDevEnvironment()) {
             $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-15', $SERVER_TIME_ZONE);
             $double_exp_start_time = new DateTimeImmutable('2023-12-25', $SERVER_TIME_ZONE);
-            $double_reputation_start_time = new DateTimeImmutable('2023-10-16', $SERVER_TIME_ZONE);
+            $double_reputation_start_time = new DateTimeImmutable('2024-01-19', $SERVER_TIME_ZONE);
         }
         // Set events on production environments
         else {
@@ -987,7 +987,7 @@ class System {
             $this->event = new DoubleExpEvent($double_exp_end_time);
         }
         // Double reputation gains
-        $double_reputation_end_time = new DateTimeImmutable('2023-10-30');
+        $double_reputation_end_time = new DateTimeImmutable('2024-01-2');
         if($this->SERVER_TIME > $double_reputation_start_time && $this->SERVER_TIME < $double_reputation_end_time) {
             $this->event = new DoubleReputationEvent($double_reputation_end_time);
         }
@@ -1019,40 +1019,33 @@ class System {
     /**
      * Closes and opens server in-real time, without needing manual code edits
      * Sets maintenance time-frame and displays a countdown on non-legacy layouts
-     * @return ?DateTimeImmutable
+     * @return void
      */
-    public function checkForMaintenance(): ?DateTimeImmutable {
+    public function checkForMaintenance(): void {
         // Check for db-based maintenance
         $db_maint = $this->db->query("SELECT `maintenance_begin_time`, `maintenance_end_time` FROM `system_storage`");
         $db_maint = $this->db->fetch($db_maint);
 
+        // Hard closure
+        if($db_maint['maintenance_end_time'] == -1) {
+            $this->SC_OPEN = false;
+            $this->UPDATE_MAINTENANCE = null;
+        }
+
         if($db_maint['maintenance_begin_time'] > $this->SERVER_TIME->getTimestamp() || $db_maint['maintenance_end_time'] > $this->SERVER_TIME->getTimestamp()) {
             $maintenanceBegin = $this->SERVER_TIME->setTimestamp($db_maint['maintenance_begin_time']);
             $maintenanceEnd = $this->SERVER_TIME->setTimestamp($db_maint['maintenance_end_time']);
-        }
-		
-		// Hard closure
-		if($db_maint['maintenance_end_time'] == -1) {
-			$this->SC_OPEN = false;
-			return null;
-		}
 
-        // Maintenance time-frame error
-        if($maintenanceBegin->getTimestamp() > $maintenanceEnd->getTimestamp()) {
-            return null;
+            // Display timer for maintenance window
+            if($this->SERVER_TIME->getTimestamp() < $maintenanceBegin->getTimestamp()) {
+                $this->UPDATE_MAINTENANCE = $maintenanceBegin;
+            }
+            // Close SC for maintenance window - NOTE: This can be overridden in vars.php if window can't be easily determined
+            if($this->SERVER_TIME->getTimestamp() > $maintenanceBegin->getTimestamp() && $this->SERVER_TIME->getTimestamp() < $maintenanceEnd->getTimestamp()) {
+                $this->SC_OPEN = false;
+                $this->UPDATE_MAINTENANCE = $maintenanceEnd;
+            }
         }
-
-        // Display timer for maintenance window
-        if($this->SERVER_TIME->getTimestamp() < $maintenanceBegin->getTimestamp()) {
-            return $maintenanceBegin;
-        }
-        // Close SC for maintenance window - NOTE: This can be overridden in vars.php if window can't be easily determined
-        if($this->SERVER_TIME->getTimestamp() > $maintenanceBegin->getTimestamp() && $this->SERVER_TIME->getTimestamp() < $maintenanceEnd->getTimestamp()) {
-            $this->SC_OPEN = false;
-            return $maintenanceEnd;
-        }
-
-        return null;
     }
 
     /**
@@ -1173,9 +1166,12 @@ class System {
             register_open: $REGISTER_OPEN
         );
 
-        // Load reputation layout, reputation reset and set layout
+        // Load reputation layout, reputation reset and check for server maintenance
         $system->loadRepReset();
         $system->checkForActiveEvent();
+        $system->checkForMaintenance();
+
+        // Load layout if this is not an api request
         if(!$api_request) {
             $system->setLayoutByName(self::DEFAULT_LAYOUT);
         }
