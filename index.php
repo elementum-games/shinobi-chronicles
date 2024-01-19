@@ -298,5 +298,6 @@ else {
         player: $player ?? null,
         page_load_time: $PAGE_LOAD_TIME
     );
+    $player->updateData();
     $system->db->commitTransaction();
 }

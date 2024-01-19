@@ -158,7 +158,7 @@ class SystemV2 {
         public Router $router,
         public bool $SC_OPEN,
         public readonly bool $USE_NEW_BATTLES,
-        public readonly bool $WAR_ENABLED,
+        public readonly bool $war_enabled,
         public readonly bool $REQUIRE_USER_VERIFICATION,
         public DateTimeImmutable $SERVER_TIME,
         public ?DateTimeImmutable $UPDATE_MAINTENANCE = null,
@@ -561,7 +561,7 @@ class SystemV2 {
      * Returns current time in rounded miliseconds
      * @return int
      */
-    public function currentTimeMs(): int {
+    public static function currentTimeMs(): int {
         return floor(microtime(true) * 1000);
     }
 
@@ -914,14 +914,14 @@ class SystemV2 {
 
     /**
      * Returns Layout based on provided layout name
-     * @var string $layout_name
+     * @var string $layout
      * @return Layout
      */
-    public function setLayoutByName(string $layout_name): Layout {
+    public function setLayoutByName(string $layout): Layout {
         // Legacy layout support
         $system = $this;
 
-        switch($layout_name) {
+        switch($layout) {
             case 'cextralite':
                 $this->layout = require "layout/cextralite.php";
                 break;
@@ -1156,7 +1156,7 @@ class SystemV2 {
             router: new Router($WEB_URL),
             SC_OPEN: $SC_OPEN,
             USE_NEW_BATTLES: $USE_NEW_BATTLES,
-            WAR_ENABLED: $WAR_ENABLED,
+            war_enabled: $WAR_ENABLED,
             REQUIRE_USER_VERIFICATION: $REQUIRE_USER_VERIFICATION,
             SERVER_TIME: new DateTimeImmutable("now", new DateTimeZone(self::SERVER_TIME_ZONE)),
             environment: $ENVIRONMENT,
