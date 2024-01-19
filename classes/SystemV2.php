@@ -999,9 +999,9 @@ class SystemV2 {
         }
 
         /******* HOLIDAY BOOSTS ********/
-        if (!isset($this->event) && in_array($current_datetime->format('M j'), array_keys(self::HOLIDAYS))) {
+        if (!isset($this->event) && in_array($this->SERVER_TIME->format('M j'), array_keys(self::HOLIDAYS))) {
 		    $endTime = new DateTimeImmutable("tomorrow", $SERVER_TIME_ZONE);
-		    $this->event = new HolidayBonusEvent($endTime, self::HOLIDAYS[$current_datetime->format('M j')]);
+		    $this->event = new HolidayBonusEvent($endTime, self::HOLIDAYS[$this->SERVER_TIME->format('M j')]);
 	    }
 
         /******* WEEKEND BOOSTS ********/
@@ -1012,7 +1012,7 @@ class SystemV2 {
 
         // This needs to be last - test notification on DEV servers
         if($this->testNotifications['event'] && is_null($this->event) && $this->isDevEnvironment()) {
-            $this->event = new DoubleExpEvent($current_datetime->modify("+2 weeks"));
+            $this->event = new DoubleExpEvent($this->SERVER_TIME->modify("+2 weeks"));
         }
     }
 
