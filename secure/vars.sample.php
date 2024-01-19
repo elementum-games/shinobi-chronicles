@@ -6,7 +6,7 @@ manually upload to your server, outside of git.
  */
 
 $ENVIRONMENT = System::ENVIRONMENT_DEV; // Use only ENVIRONMENT_DEV or ENVIRONMENT_PROD
-$ENABLE_DEV_ONLY_FEATURES = System::ENABLE_DEV_ONLY_FEATURES; // Boolean value
+$ENABLE_DEV_ONLY_FEATURES = System::DEV_ONLY_FEATURES_DEFAULT; // Boolean value
 $LOCAL_HOST_CONNECTION = System::LOCAL_HOST; // Boolean value, set to false for running on websites
 $REGISTER_OPEN = true;
 $SC_OPEN = true;
