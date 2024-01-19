@@ -2,7 +2,7 @@
 
 use JetBrains\PhpStorm\ArrayShape;
 
-require_once __DIR__ . '/../System.php';
+require_once __DIR__ . '/../SystemV2.php';
 require_once __DIR__ . '/../Coords.php';
 require_once __DIR__ . '/BattleV2.php';
 require_once __DIR__ . '/BattleFieldTile.php';

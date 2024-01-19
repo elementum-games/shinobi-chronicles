@@ -1,8 +1,8 @@
 <?php
 
-require __DIR__ . '/../../classes/System.php';
+require_once __DIR__ . '/../../classes/SystemV2.php';
 
-$system = new System();
+$system = System::initialize();
 
 echo $system->parseMarkdown(
     text: "

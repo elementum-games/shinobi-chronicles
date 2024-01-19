@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../classes/_sysRequires.php';
-class SystemV2 {
+class System {
     //TODO: Move these
     const KUNAI_PER_DOLLAR = 2; // Currnecy
     const CURRENCY_TYPE_MONEY = 'money'; // Currency
@@ -1088,6 +1088,7 @@ class SystemV2 {
 
     /**
      * Returns build file for react components
+     * @var string $component_name
      * @return string
      */
     public function getReactFile(string $component_name): string {
@@ -1097,6 +1098,7 @@ class SystemV2 {
 
     /**
      * Returns src string of css file
+     * @var string $file_name
      * @return string
      */
     public function getCssFileLink(string $file_name): string {
@@ -1131,7 +1133,13 @@ class SystemV2 {
         return $result;
     }
 
-    public static function initialize(): SystemV2 {
+    /**
+     * Initializes and returns system
+     * @param $api_request
+     * @return System
+     * @throws Exception
+     */
+    public static function initialize($api_request = false): System {
         /**
          * This must be called here to properly pull variables into initializer
          * @var $HOST
@@ -1151,7 +1159,7 @@ class SystemV2 {
          */
         require_once __DIR__ . '/../secure/vars.php';
 
-        $system = new SystemV2(
+        $system = new System(
             db: new Database($HOST, $USERNAME, $PASSWORD, $DATABASE),
             router: new Router($WEB_URL),
             SC_OPEN: $SC_OPEN,
@@ -1168,7 +1176,9 @@ class SystemV2 {
         // Load reputation layout, reputation reset and set layout
         $system->loadRepReset();
         $system->checkForActiveEvent();
-        $system->setLayoutByName(self::DEFAULT_LAYOUT);
+        if(!$api_request) {
+            $system->setLayoutByName(self::DEFAULT_LAYOUT);
+        }
 
         // Legacy layout support
         $system->timezoneOffset = date(format: 'Z');

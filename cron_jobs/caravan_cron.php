@@ -16,13 +16,13 @@ session_start();
  *      Creates resource logs
  */
 
-require_once __DIR__ . '/../classes/System.php';
+require_once __DIR__ . '/../classes/SystemV2.php';
 require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/war/WarManager.php';
 require_once __DIR__ . '/../classes/travel/Patrol.php';
 
-$system = new System();
+$system = System::initialize();
 $system->db->connect();
 
 if (!$system->db->con) {

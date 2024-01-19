@@ -3,7 +3,7 @@ session_start();
 
 require_once("classes/_autoload.php");
 
-$system = new System();
+$system = System::initialize();
 $system->db->startTransaction();
 $guest_support = true;
 $self_link = $system->router->base_url . 'support.php';

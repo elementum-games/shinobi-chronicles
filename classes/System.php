@@ -16,7 +16,7 @@ require_once __DIR__ . '/../classes/event/HolidayBonusEvent.php';
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
 */
-class System {
+class SystemOld {
     const ENVIRONMENT_DEV = 'dev';
     const ENABLE_DEV_ONLY_FEATURES = true;
     const ENVIRONMENT_PROD = 'prod';

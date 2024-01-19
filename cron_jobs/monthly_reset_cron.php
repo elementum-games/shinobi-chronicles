@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once __DIR__ . '/../classes/System.php';
+require_once __DIR__ . '/../classes/SystemV2.php';
 require_once __DIR__ . '/../classes/User.php';
 
 /**
@@ -15,7 +15,7 @@ require_once __DIR__ . '/../classes/User.php';
  *      Resets monthly Points for villages to 0
  */
 
-$system = new System();
+$system = System::initialize();
 $system->db->connect();
 
 if(!$system->db->con) {
