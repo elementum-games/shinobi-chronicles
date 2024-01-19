@@ -166,10 +166,10 @@ body {
         position: absolute;
         top: -38px;
         left: -33px;
-        width: 996px;
+        min-width: 107%;
         height: 144px;
         background: url(../../images/v2/sumu/topframe.png) no-repeat top center;
-        background-size: cover; /* Adjust as needed */
+        background-size: 100% 144px; /* Adjust as needed */
         z-index: 1; /* Ensure the image is positioned above the #content */
     }
 .main_logo {
@@ -189,6 +189,24 @@ body {
     text-align: center;
     padding-top: 10px;
 }
+
+/* Sumu Sidebar Header Override */
+.sb_header_bar {
+    background: linear-gradient(var(--sidebar-header-background) 0%, var(--sidebar-header-background) 100%) !important;
+    position: relative;
+}
+    .sb_header_bar::after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: -3px;
+        left: -12px;
+        width: 173px;
+        height: 28px;
+        background: url(../../../images/v2/sumu/cloud.png) no-repeat top center;
+        background-size: cover; /* Adjust as needed */
+        z-index: 1; /* Ensure the image is positioned above the #content */
+    }
 
 /* Travel */
 .systemMessage-new-info {
@@ -316,9 +334,15 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
 
 /* Mobile Overrides */
 @media screen and (max-width: 999px) {
-    #container {
-        transform: scale(1);
-        transform-origin: top left;
-        width: 100%;
+    #content::after {
+        display: none;
+    }
+    #content {
+        margin-top: 0px;
+        border: none;
+        outline: none;
+    }
+    .sb_header_bar::after {
+        display: none;
     }
 }

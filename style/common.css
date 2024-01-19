@@ -90,6 +90,7 @@ html {
         transform-origin: top left;
         width: calc(100% / 1.2) !important;
         margin-left: 0;
+        margin-right: 0;
     }
     #footer {
         display: none;

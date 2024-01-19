@@ -779,25 +779,6 @@ a#spec_miss_cancel {
     display: none;
 }
 
-/* Sumu Sidebar Header Override */
-.sb_header_bar {
-    background: linear-gradient(var(--sidebar-header-background) 0%, var(--sidebar-header-background) 100%) !important;
-    position: relative;
-}
-
-    .sb_header_bar::after {
-        content: "";
-        display: block;
-        position: absolute;
-        top: -3px;
-        left: -12px;
-        width: 173px;
-        height: 28px;
-        background: url(../../../images/v2/sumu/cloud.png) no-repeat top center;
-        background-size: cover; /* Adjust as needed */
-        z-index: 1; /* Ensure the image is positioned above the #content */
-    }
-
 .sb_header_line {
     display: none;
 }

@@ -364,3 +364,9 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
     background: var(--avatar-frame-border_gradient) !important;
 }
 
+/* Mobile Overrides */
+@media screen and (max-width: 999px) {
+    #content {
+        border: none;
+    }
+}
