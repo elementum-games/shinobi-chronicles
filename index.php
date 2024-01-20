@@ -33,7 +33,8 @@ if(!isset($_SESSION['user_id'])) {
         page_title: 'Home',
         page_name: 'home',
         render_header: false, render_sidebar: false,
-        render_topbar: false, page_load_start: $PAGE_LOAD_START,
+        render_topbar: false, render_content: false,
+        page_load_start: $PAGE_LOAD_START
     );
     $system->db->commitTransaction();
     exit;
@@ -144,6 +145,7 @@ else {
         $route = Router::$routes[$id] ?? null;
 
         try {
+            // Load page title
             if($layout->usesV2Interface()) {
                 $location_name = $player->current_location->location_id
                     ? ' ' . ' <div id="contentHeaderLocation">' . " | " . $player->current_location->name . '</div>'
@@ -158,13 +160,7 @@ else {
                 $location_coords = null;
                 $content_header_divider = null;
             }
-
-            // Load header content
-            $layout->renderBeforeContentHTML(
-                system: $system,
-                player: $player,
-                page_title: $route->title . $location_name . $location_coords . $content_header_divider
-            );
+            $page_title = $route->title . $location_name . $location_coords . $content_header_divider;
 
             // Check for valid route & permissions
             $system->router->assertRouteIsValid(route: $route, player: $player);
@@ -179,10 +175,11 @@ else {
                     $time_since_turn = time() - $battle_data['turn_time'];
 
                     if($battle_data['winner'] && $time_since_turn >= 60) {
-                        foreach($routes as $page_id => $page) {
+                        foreach(Router::$routes as $page_id => $page) {
                             $type = $page->battle_type ?? null;
                             if($type == $battle_data['battle_type']) {
                                 $id = $page_id;
+                                $route = Router::$routes[$id];
                             }
                         }
                     }
@@ -192,15 +189,12 @@ else {
             // Set self link
             $self_link = $system->router->base_url . '?id=' . $id;
 
-            // EVENTS - Legacy layouts
-            if($system->event != null && !$layout->usesV2Interface()) {
-                require 'templates/temp_event_header.php';
-            }
-
             // Load page
-            require('pages/' . $route->file_name);
             try {
-                ($route->function_name)();
+                Layout::renderPage(
+                    system: $system, player: $player ?? null, page_title: $page_title,
+                    page_id: $id
+                );
             } catch(DatabaseDeadlockException $e) {
                 // Wait random time between 100-500ms, then retry deadlocked transaction
                 $system->db->rollbackTransaction();
@@ -226,24 +220,15 @@ else {
     }
     // Load home page
     elseif(isset($_GET['home'])) {
-        require_once 'home.php';
-        $layout->renderBeforeContentHTML(
+        Layout::renderPage(
             system: $system,
-            player: $player,
+            player: null, // No need to check, no session started
             page_title: 'Home',
-            render_sidebar: false,
-            render_topbar: false,
-            render_content: false
+            page_name: 'home',
+            render_header: false, render_sidebar: false,
+            render_topbar: false, render_content: false,
+            page_load_start: $PAGE_LOAD_START
         );
-        try {
-            require('./templates/home.php');
-        } catch (RuntimeException $e) {
-            $system->db->rollbackTransaction();
-            $system->message($e->getMessage());
-            if(!$layout->usesV2Interface()) {
-                $system->printMessage(force_display: true);
-            }
-        }
     }
     // Default page
     else {
@@ -268,13 +253,6 @@ else {
         $player->updateData();
     }
 
-    // Render footer & commit db transaction
-    $PAGE_LOAD_TIME = round(num: microtime(as_float: true) - $PAGE_LOAD_START, precision: 3);
-    $layout->renderAfterContentHTML(
-        system: $system,
-        player: $player ?? null,
-        page_load_time: $PAGE_LOAD_TIME
-    );
     $player->updateData();
     $system->db->commitTransaction();
 }

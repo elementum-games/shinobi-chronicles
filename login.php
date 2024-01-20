@@ -1,6 +1,5 @@
 <?php
 global $system;
-global $layout;
 global $login_error_text;
 
 if(!empty($_POST['login'])) {
@@ -86,7 +85,7 @@ if(!empty($_POST['login'])) {
     }catch (RuntimeException $e) {
         $system->message($e->getMessage());
         // Force login error message on legacy layouts
-        if(!$layout->usesV2Interface()) {
+        if(!$systme->layout->usesV2Interface()) {
             $system->printMessage(force_display: true);
         }
         // Set login error message for new layouts
