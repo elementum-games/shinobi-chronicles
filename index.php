@@ -27,7 +27,7 @@ if(isset($_GET['logout']) && $_GET['logout'] == 1) {
 
 // Logged out
 if(!isset($_SESSION['user_id'])) {
-    Layout::rendederPage(
+    Layout::renderPage(
         system: $system,
         player: null, // No need to check, no session started
         page_title: 'Home',
