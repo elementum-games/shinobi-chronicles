@@ -85,7 +85,7 @@ if(!empty($_POST['login'])) {
     }catch (RuntimeException $e) {
         $system->message($e->getMessage());
         // Force login error message on legacy layouts
-        if(!$systme->layout->usesV2Interface()) {
+        if(!$system->layout->usesV2Interface()) {
             $system->printMessage(force_display: true);
         }
         // Set login error message for new layouts
