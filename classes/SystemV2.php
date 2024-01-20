@@ -509,7 +509,7 @@ class System {
      * @var int $size
      * @return string
      */
-    public function imageCheck(string $image_src, int $size): strig {
+    public function imageCheck(string $image_src, int $size): string {
         return "<img src='$image_src' style='max-width:{$size}px;max-height:{$size}px;' />";
     }
 
