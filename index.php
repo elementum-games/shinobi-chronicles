@@ -139,14 +139,25 @@ else {
         $system->log('player_action', $player->user_name, $log_contents);
     }
 
-    // Load page by ID
-    if(isset($_GET['id'])) {
-        $id = (int)$_GET['id'];
+    // Load hom pate
+    if(isset($_GET['home'])) {
+        Layout::renderPage(
+            system: $system,
+            player: null, // No need to check, no session started
+            page_title: 'Home',
+            page_name: 'home',
+            render_header: false, render_sidebar: false,
+            render_topbar: false, render_content: false,
+            page_load_start: $PAGE_LOAD_START
+        );
+    }
+    else {
+        $id = isset($_GET['id']) ? (int)$_GET['id'] : Router::PAGE_IDS['profile'];
         $route = Router::$routes[$id] ?? null;
 
         try {
             // Load page title
-            if($layout->usesV2Interface()) {
+            if($system->layout->usesV2Interface()) {
                 $location_name = $player->current_location->location_id
                     ? ' ' . ' <div id="contentHeaderLocation">' . " | " . $player->current_location->name . '</div>'
                     : null;
@@ -217,40 +228,6 @@ else {
                 $system->printMessage(true);
             }
         }
-    }
-    // Load home page
-    elseif(isset($_GET['home'])) {
-        Layout::renderPage(
-            system: $system,
-            player: null, // No need to check, no session started
-            page_title: 'Home',
-            page_name: 'home',
-            render_header: false, render_sidebar: false,
-            render_topbar: false, render_content: false,
-            page_load_start: $PAGE_LOAD_START
-        );
-    }
-    // Default page
-    else {
-        $layout->renderBeforeContentHTML(
-            system: $system,
-            player: $player,
-            page_title: "Profile"
-        );
-
-        // Display messages
-        $system->printMessage();
-
-        try {
-            require('pages/profile.php');
-            userProfile();
-        } catch (RuntimeException $e) {
-            $system->db->rollbackTransaction();
-            $system->message($e->getMessage());
-            $system->printMessage(force_display: true);
-        }
-
-        $player->updateData();
     }
 
     $player->updateData();

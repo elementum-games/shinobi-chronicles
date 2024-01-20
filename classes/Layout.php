@@ -383,7 +383,7 @@ class Layout {
             );
 
             // Legacy event display
-            if($system->event != null && !$system->layout->usesV2Interface) {
+            if($system->event != null && !$system->layout->usesV2Interface() && $player != null) {
                 require (__DIR__ . '/../templates/temp_event_header.php');
             }
 
