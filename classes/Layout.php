@@ -371,51 +371,46 @@ class Layout {
         bool $render_header = true, bool $render_sidebar = true,
         bool $render_topbar = true, bool $render_content = true,
         ?int $page_load_start = null, bool $render_footer = true,
-        bool $render_hotbar = false, bool $render_static_page = false
+        bool $render_hotbar = false
     ) {
         // Rendering by ID will take precedence over rendering by name
         $render_page = $page_id ?? $page_name;
-        if(!$render_static_page) {
-            $system->layout->renderBeforeContentHTML(
-                system: $system, player: $player, page_title: $page_title,
-                render_header: $render_header, render_sidebar: $render_sidebar,
-                render_topbar: $render_topbar, render_content: $render_content
-            );
+        $system->layout->renderBeforeContentHTML(
+            system: $system, player: $player, page_title: $page_title,
+            render_header: $render_header, render_sidebar: $render_sidebar,
+            render_topbar: $render_topbar, render_content: $render_content
+        );
 
-            // Legacy event display
-            if($system->event != null && !$system->layout->usesV2Interface() && $player != null) {
-                require (__DIR__ . '/../templates/temp_event_header.php');
-            }
-
-            // Render page by id
-            if(is_int($render_page)) {
-                $route = Router::$routes[$render_page];
-                require (__DIR__ . '/../pages/' . $route->file_name);
-                ($route->function_name)();
-            }
-            // Render page by name
-            // TODO: Make home page render based on ID
-            else {
-                switch($render_page) {
-                    default:
-                        // Render home page
-                        require_once (__DIR__ . '/../home.php');
-                        require_once (__DIR__ . '/../login.php');
-                        require_once (__DIR__ . '/../new_register.php');
-                        require (__DIR__ . '/../templates/home.php');
-                }
-            }
-
-            //Calc page load time
-            $page_load_time = ($page_load_start) ? microtime(as_float: true) - $page_load_start : $page_load_start;
-            $system->layout->renderAfterContentHTML(
-                system: $system, player: $player, page_load_time: $page_load_time,
-                render_content: $render_content, render_footer: $render_footer,
-                render_hotbar: $render_hotbar
-            );
+        // Legacy event display
+        if($system->event != null && !$system->layout->usesV2Interface() && $player != null) {
+            require (__DIR__ . '/../templates/temp_event_header.php');
         }
+
+        // Render page by id
+        if(is_int($render_page)) {
+            $route = Router::$routes[$render_page];
+            require (__DIR__ . '/../pages/' . $route->file_name);
+            ($route->function_name)();
+        }
+        // Render page by name
+        // TODO: Make home page render based on ID
         else {
-
+            switch($render_page) {
+                default:
+                    // Render home page
+                    require_once (__DIR__ . '/../home.php');
+                    require_once (__DIR__ . '/../login.php');
+                    require_once (__DIR__ . '/../new_register.php');
+                    require (__DIR__ . '/../templates/home.php');
+            }
         }
+
+        //Calc page load time
+        $page_load_time = ($page_load_start) ? microtime(as_float: true) - $page_load_start : $page_load_start;
+        $system->layout->renderAfterContentHTML(
+            system: $system, player: $player, page_load_time: $page_load_time,
+            render_content: $render_content, render_footer: $render_footer,
+            render_hotbar: $render_hotbar
+        );
     }
 }

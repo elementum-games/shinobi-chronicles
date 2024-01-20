@@ -143,7 +143,7 @@ else {
     if(isset($_GET['home'])) {
         Layout::renderPage(
             system: $system,
-            player: null, // No need to check, no session started
+            player: $player ?? null,
             page_title: 'Home',
             page_name: 'home',
             render_header: false, render_sidebar: false,
