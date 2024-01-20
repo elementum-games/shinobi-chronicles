@@ -392,7 +392,7 @@ class Layout {
                         require_once (__DIR__ . '/../home.php');
                         require_once (__DIR__ . '/../login.php');
                         require_once (__DIR__ . '/../new_register.php');
-                        requrie (__DIR__ . '/../templates/home.php');
+                        require (__DIR__ . '/../templates/home.php');
                 }
             }
 
