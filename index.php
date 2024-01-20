@@ -27,35 +27,13 @@ if(isset($_GET['logout']) && $_GET['logout'] == 1) {
 
 // Logged out
 if(!isset($_SESSION['user_id'])) {
-    $layout = $system->setLayoutByName(layout: System::DEFAULT_LAYOUT);
-    $layout->renderBeforeContentHTML(
+    Layout::rendederPage(
         system: $system,
-        player: null, //No need to check here, no user is logged in
+        player: null, // No need to check, no session started
         page_title: 'Home',
-        render_header: false,
-        render_sidebar: false,
-        render_topbar: false,
-        render_content: false
-    );
-
-    // Load home page data
-    require('home.php');
-    // Process login & register
-    // Todo: reset pass & activate account, once emails can be processed again
-    require('login.php');
-    require('new_register.php');
-    // Load page data
-    require('./templates/home.php');
-
-    // Calculate pate load time
-    $PAGE_LOAD_TIME = microtime(as_float: true) - $PAGE_LOAD_START;
-    $layout->renderAfterContentHTML(
-        system: $system,
-        player: null, // No need to check, no user is logged in
-        page_load_time: $PAGE_LOAD_TIME,
-        render_content: false,
-        render_footer: false,
-        render_hotbar: false
+        page_name: 'home',
+        render_header: false, render_sidebar: false,
+        render_topbar: false, page_load_start: $PAGE_LOAD_START,
     );
     $system->db->commitTransaction();
     exit;
