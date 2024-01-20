@@ -397,7 +397,7 @@ class Layout {
             }
 
             //Calc page load time
-            $page_load_time = ($page_load_start) ? micro_time(as_float: true) - $page_load_start : $page_load_start;
+            $page_load_time = ($page_load_start) ? microtime(as_float: true) - $page_load_start : $page_load_start;
             $system->layout->renderAfterContentHTML(
                 system: $system, player: $player, page_load_time: $page_load_time,
                 render_content: $render_content, render_footer: $render_footer,
