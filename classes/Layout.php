@@ -379,9 +379,16 @@ class Layout {
                 render_topbar: $render_topbar, render_content: $render_content
             );
 
+            // Legacy event display
+            if($system->event != null && !$system->layout->usesV2Interface) {
+                require (__DIR__ . '/../templates/temp_event_header.php');
+            }
+
             // Render page by id
             if(is_int($render_page)) {
-
+                $route = Router::$routes[$render_page];
+                require (__DIR__ . '/../pages/' . $route->file_name);
+                ($route->function_name)();
             }
             // Render page by name
             // TODO: Make home page render based on ID
