@@ -364,14 +364,14 @@ class Layout {
     public static function renderPage(
         System $system, 
         ?User $player,
-        string $page_title, ?int $page_id, ?string $page_name,
+        string $page_title, ?int $page_id = null, ?string $page_name = null,
         bool $render_header = true, bool $render_sidebar = true,
         bool $render_topbar = true, bool $render_content = true,
         ?int $page_load_start = null, bool $render_footer = true,
         bool $render_hotbar = false, bool $render_static_page = false
     ) {
         // Rendering by ID will take precedence over rendering by name
-        $render_page = !is_null($page_id) ? $page_id : $page_name;
+        $render_page = $page_id ?? $page_name;
         if(!$render_static_page) {
             $system->layout->renderBeforeContentHTML(
                 system: $system, player: $player, page_title: $page_title,
