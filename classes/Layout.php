@@ -371,7 +371,7 @@ class Layout {
         bool $render_hotbar = false, bool $render_static_page = false
     ) {
         // Rendering by ID will take precedence over rendering by name
-        $render_page = $page_id ?? $page_name;
+        $render_page = !is_null($page_id) ? $page_id : $page_name;
         if(!$render_static_page) {
             $system->layout->renderBeforeContentHTML(
                 system: $system, player: $player, page_title: $page_title,
