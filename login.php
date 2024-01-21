@@ -26,7 +26,7 @@ if(!empty($_POST['login'])) {
         $result = $system->db->fetch($result);
 
         // Server closed, block logins from users that aren't admins
-        if(!$system->SC_OPEN && !in_array($result['staff_level'], [StaffManager::STAFF_CONTENT_ADMIN, StaffManager::STAFF_ADMINISTRATOR, StaffManager::STAFF_HEAD_ADMINISTRATOR])) {
+        if(!$system->SC_OPEN && !StaffManager::hasServerMaintAccess(staff_level: $player->staff_level)) {
             throw new RuntimeException("System maintenance is in-progress! Please chack back soon.");
         }
 
