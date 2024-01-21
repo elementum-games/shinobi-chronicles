@@ -14,3 +14,7 @@ $home_links['profile'] = $system->router->getUrl('profile');
 $home_links['github'] = $system->router->links['github'];
 $home_links['discord'] = $system->router->links['discord'];
 $home_links['support'] = $system->router->base_url . "support.php";
+
+requrie_once ('login.php');
+reuqire_once ('new_register.php');
+require ('/templates/home.php');
