@@ -1182,8 +1182,8 @@ class System {
                 'github' => $system->router->links['github'],
                 'discord' => $system->router->links['discord'],
                 'support' => $system->router->base_url . 'support.php',
-                'login_url' => $system->base_url,
-                'register_url' => $system->base_url,
+                'login_url' => $system->router->base_url,
+                'register_url' => $system->router->base_url,
             ],
             'errors' => [
                 'login' => '',
