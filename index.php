@@ -27,12 +27,13 @@ if(isset($_GET['logout']) && $_GET['logout'] == 1) {
 
 // Logged out
 if(!isset($_SESSION['user_id'])) {
+    $route = Router::$routes['home'];
     $system->layout->renderBeforeContentHTML(
         system: $system,
         player: null, // No need to check here, no session set
-        page_title: 'Home',
-        render_header: false, render_sidebar: false,
-        render_topbar: false, render_content: false
+        page_title: $route->title,
+        render_header: $route->render_header, render_sidebar: $route->render_sidebar,
+        render_topbar: $route->render_topbar, render_content: $route->render_content
     );
 
     require_once 'home.php';
@@ -43,7 +44,7 @@ if(!isset($_SESSION['user_id'])) {
         system: $system,
         player: null, // No need to check, no session started
         page_load_time: $PAGE_LOAD_TIME,
-        render_content: false, render_hotbar: false
+        render_content: $route->render_content, render_hotbar: false
     );
     $system->db->commitTransaction();
     exit;
