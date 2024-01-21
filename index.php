@@ -27,14 +27,23 @@ if(isset($_GET['logout']) && $_GET['logout'] == 1) {
 
 // Logged out
 if(!isset($_SESSION['user_id'])) {
-    Layout::renderPage(
+    $system->layout->renderBeforeContentHTML(
+        system: $system,
+        player: null, // No need to check here, no session set
+        page_title: 'Home',
+        render_header: false, render_sidebar: false,
+        render_topbar: false, render_content: false
+    );
+
+    require_once 'home.php';
+
+    // Calc page load time
+    $PAGE_LOAD_TIME = microtime(as_float: true) - $PAGE_LOAD_START;
+    $system->layout->renderAftercontentHTML(
         system: $system,
         player: null, // No need to check, no session started
-        page_title: 'Home',
-        page_name: 'home',
-        render_header: false, render_sidebar: false,
-        render_topbar: false, render_content: false,
-        page_load_start: $PAGE_LOAD_START
+        page_load_time: $PAGE_LOAD_TIME,
+        render_content: false, render_hotbar: false
     );
     $system->db->commitTransaction();
     exit;
@@ -139,17 +148,19 @@ else {
         $system->log('player_action', $player->user_name, $log_contents);
     }
 
-    // Load hom pate
+    // Load requested page
+    $RENDER_CONTENT = true;
     if(isset($_GET['home'])) {
-        Layout::renderPage(
+        $RENDER_CONTENT = false;
+        $system->layout->renderBeforeContentHTML(
             system: $system,
-            player: $player ?? null,
+            player: null, // No need to check here, no session set
             page_title: 'Home',
-            page_name: 'home',
             render_header: false, render_sidebar: false,
-            render_topbar: false, render_content: false,
-            page_load_start: $PAGE_LOAD_START
+            render_topbar: false, render_content: $RENDER_CONTENT
         );
+    
+        require_once 'home.php';
     }
     else {
         $id = isset($_GET['id']) ? (int)$_GET['id'] : Router::PAGE_IDS['profile'];
@@ -173,9 +184,6 @@ else {
             }
             $page_title = $route->title . $location_name . $location_coords . $content_header_divider;
 
-            // Check for valid route & permissions
-            $system->router->assertRouteIsValid(route: $route, player: $player);
-
             // Force battle view if waiting too long
             if($player->battle_id && empty($route->battle_type)) {
                 $battle_result = $system->db->query(
@@ -197,15 +205,19 @@ else {
                 }
             }
 
+            // Check for valid route & permissions
+            $system->router->assertRouteIsValid(route: $route, player: $player);
+
             // Set self link
             $self_link = $system->router->base_url . '?id=' . $id;
 
-            // Load page
+            // Render page
+            $system->layout->renderBeforeContentHTML(
+                system: $system, player: $player ?? null, page_title: $page_title
+            );
+            require (__DIR__ . '/pages/' . $route->file_name);
             try {
-                Layout::renderPage(
-                    system: $system, player: $player ?? null, page_title: $page_title,
-                    page_id: $id
-                );
+                ($route->function_name)();
             } catch(DatabaseDeadlockException $e) {
                 // Wait random time between 100-500ms, then retry deadlocked transaction
                 $system->db->rollbackTransaction();
@@ -229,6 +241,15 @@ else {
             }
         }
     }
+
+    // Render after content
+    $PAGE_LOAD_TIME = microtime(as_float: true) - $PAGE_LOAD_START;
+    $system->layout->renderAfterContentHTML(
+        system: $system, player: $player ?? null,
+        page_load_time: $PAGE_LOAD_TIME,
+        render_content: $RENDER_CONTENT,
+        render_hotbar: false
+    );
 
     $player->updateData();
     $system->db->commitTransaction();
