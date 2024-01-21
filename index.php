@@ -70,8 +70,27 @@ else {
     $layout = $system->setLayoutByName($player->layout);
 
     // Master system closure
-    if(!$system->SC_OPEN && !$player->isContentAdmin()) {
-
+    if(!$system->SC_OPEN && (!$player->isContentAdmin() || !$player->isUserAdmin() || !$player->isHeadAdmin())) {
+        $system->layout->renderBeforeContentHTML(
+            system: $system,
+            player: $player ?? null,
+            page_title: 'Home',
+            render_header: false, render_sidebar: false,
+            render_topbar: false, render_content: false
+        );
+    
+        require_once 'home.php';
+    
+        // Calc page load time
+        $PAGE_LOAD_TIME = microtime(as_float: true) - $PAGE_LOAD_START;
+        $system->layout->renderAftercontentHTML(
+            system: $system,
+            player: null, // No need to check, no session started
+            page_load_time: $PAGE_LOAD_TIME,
+            render_content: false, render_hotbar: false
+        );
+        $system->db->commitTransaction();
+        exit;
     }
 
     // Check for game ban
