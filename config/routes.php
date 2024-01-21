@@ -5,6 +5,17 @@ require_once __DIR__ . '/../classes/Route.php';
 // KEEP IDS IN SYNC WITH Router::PAGE_IDS
 // NEXT ID: 39 (i.e. if you add 28, update this to 29 to help other contributors)
 return $routes = [
+    // Home page
+    'home' => new Route(
+        file_name: 'home.php',
+        title: 'Home',
+        function_name: 'home',
+        menu: Route::MENU_NONE,
+        render_header: false,
+        render_sidebar: false,
+        render_topbar: false,
+        render_content: false
+    ),
     // User Menu
     1 => new Route(
         file_name: 'profile.php',
