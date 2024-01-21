@@ -74,8 +74,7 @@ else {
         $system->layout->renderBeforeContentHTML(
             system: $system,
             player: $player ?? null,
-            page_title: 'Home',
-            render_header: (isset($player) && $player instanceof User) ? true : false, 
+            page_title: 'Home', render_header: $player ? true : false, 
             render_sidebar: false, render_topbar: false, render_content: false
         );
     
@@ -174,8 +173,7 @@ else {
         $system->layout->renderBeforeContentHTML(
             system: $system,
             player: null, // No need to check here, no session set
-            page_title: 'Home',
-            render_header: (isset($player) && $player instanceof User) ? true : false, 
+            page_title: 'Home', render_header: $player ? true : false, 
             render_sidebar: false, render_topbar: false, render_content: $RENDER_CONTENT
         );
     
