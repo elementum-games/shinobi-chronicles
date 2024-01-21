@@ -215,6 +215,12 @@ else {
             $system->layout->renderBeforeContentHTML(
                 system: $system, player: $player ?? null, page_title: $page_title
             );
+
+            // Legacy event notification
+            if(!$system->layout->usesV2Interface()) {
+                require_once ('templates/temp_event_header.php');
+            }
+
             require (__DIR__ . '/pages/' . $route->file_name);
             try {
                 ($route->function_name)();
