@@ -191,7 +191,8 @@ class System {
             'raid' => false,
             'event' => false,
             'diplomacy' => false,
-        ]
+        ],
+        public array $homeVars = [],
     ){}
 
     /******************************************************
@@ -1170,6 +1171,32 @@ class System {
         $system->loadRepReset();
         $system->checkForActiveEvent();
         $system->checkForMaintenance();
+
+        // Set home page variables
+        $system->homeVars = [
+            'view' => 'none',
+            /*'links' => [
+                'news_api' => $system->router->api_links['news'],
+                'logout' => $system->router->base_url . '?logout=1',
+                'profile' => $system->router->getUrl('profile'),
+                'github' => $system->router->links['github'],
+                'discord' => $system->router->links['discord'],
+                'support' => $system->router->base_url . 'support.php',
+                'login_url' => $system->base_url,
+                'register_url' => $system->base_url,
+            ],*/
+            'errors' => [
+                'login' => '',
+                'register' => '',
+                'reset' => '',
+            ],
+            'messages' => [
+                'login' => '',
+                'register' => '',
+                'reset' => '',
+            ],
+            'register_prefill' => [],
+        ];
 
         // Load layout if this is not an api request
         if(!$api_request) {

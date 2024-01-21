@@ -1,6 +1,5 @@
 <?php
 global $system;
-global $login_error_text;
 
 if(!empty($_POST['login'])) {
     try {
@@ -95,6 +94,6 @@ if(!empty($_POST['login'])) {
             $system->printMessage(force_display: true);
         }
         // Set login error message for new layouts
-        $login_error_text = $e->getMessage();
+        $system->homeVars['errors']['login'] = $e->getMessage();
     }
 }
