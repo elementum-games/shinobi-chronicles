@@ -770,4 +770,8 @@ class StaffManager {
     public function hasAdminPanel(): bool {
         return $this->isContentAdmin() || $this->isUserAdmin() || $this->isHeadAdmin();
     }
+
+    public function hasServerMaintAccess(int $staff_level) {
+        return in_array($staff_level, [self::STAFF_CONTENT_ADMIN, self::STAFF_ADMINISTRATOR, self::STAFF_HEAD_ADMINISTRATOR]);
+    }
 }

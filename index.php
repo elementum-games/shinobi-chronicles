@@ -70,7 +70,7 @@ else {
     $layout = $system->setLayoutByName($player->layout);
 
     // Master system closure
-    if(!$system->SC_OPEN && (!$player->isContentAdmin() || !$player->isUserAdmin() || !$player->isHeadAdmin())) {
+    if(!$system->SC_OPEN && !StaffManager::hasServerMaintAccess(staff_level: $player->staff_level)) {
         $system->layout->renderBeforeContentHTML(
             system: $system,
             player: $player ?? null,
