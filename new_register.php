@@ -17,10 +17,12 @@ if(isset($_POST['register'])) {
         $village = $system->db->clean($_POST['village']);
 
         // Store variables for any errors - force re-enter of password (security reasons)
-        $register_pre_fill['user_name'] = $user_name;
-        $register_pre_fill['email'] = $email;
-        $register_pre_fill['gender'] = $gender;
-        $register_pre_fill['village'] = $village;
+        $system->homeVars['register_prefill'] = [
+            'user_name' => $user_name,
+            'email' => $email,
+            'gender' => $gender,
+            'village' => $village,
+        ];
 
         // Username
         if (strlen($user_name) < User::MIN_NAME_LENGTH) {
@@ -147,17 +149,17 @@ if(isset($_POST['register'])) {
         if (mail($email, $subject, $message, $headers)) {
             ;
             $system->message("Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!");
-            //$login_message_text = "Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!";
-            $login_message_text = "Account created! Log in to continue.";
+            //$system->homeVars['messages']['login'] = "Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!";
+            $system->homeVars['messages']['login'] = "Account created! Log in to continue.";
         } else {
             $system->message("There was a problem sending the email to the address provided: $email. If you are unable to log in please submit a ticket or contact a staff member on discord for manual activation.");
-            $login_message_text = "Account created! Log in to continue.";
+            $system->homeVars['messages']['login'] = "Account created! Log in to continue.";
         }
     } catch (Exception $e) {
         $system->db->rollbackTransaction();
         $system->message($e->getMessage());
         error_log($e->getMessage());
-        $register_error_text = $e->getMessage();
-        $initial_home_view = 'register';
+        $system->homeVars['errors']['register'] = $e->getMessage();
+        $system->homeVars['view'] = 'register';
     }
 }
