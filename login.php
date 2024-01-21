@@ -25,6 +25,12 @@ if(!empty($_POST['login'])) {
         }
         // Fetch user data
         $result = $system->db->fetch($result);
+
+        // Server closed, block logins from users that aren't admins
+        if(!$system->SC_OPEN && !in_array($result['user_level'], [StaffManager::STAFF_CONTENT_ADMIN, StaffManager::STAFF_ADMINISTRATOR, StaffManager::STAFF_HEAD_ADMINISTRATOR])) {
+            throw new RuntimeException("System maintenance is in-progress! Please chack back soon.");
+        }
+
         // User not verified
         if(!$result['user_verified'] && $system->REQUIRE_USER_VERIFICATION) {
             throw new RuntimeException("Account not activated!");
