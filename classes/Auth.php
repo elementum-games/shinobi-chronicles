@@ -123,7 +123,7 @@ class Auth {
             $system->message($e->getMessage());
 
             // Force login error message on legacy layouts
-            if($system->layout->usesV2Interface()) {
+            if(!$system->layout->usesV2Interface()) {
                 $system->printMessage(force_display: true);
             }
 
