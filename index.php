@@ -22,7 +22,7 @@ else {
 
 // Check for logout
 if(isset($_GET['logout']) && $_GET['logout'] == 1) {
-    require 'logout.php';
+    Auth::processLogout(system: $system);
 }
 
 // Logged out
@@ -36,7 +36,8 @@ if(!isset($_SESSION['user_id'])) {
         render_topbar: $route->render_topbar, render_content: $route->render_content
     );
 
-    require_once 'home.php';
+    require (__DIR__ . '/pages/' . $route->file_name);
+    ($route->function_name)();
 
     // Calc page load time
     $PAGE_LOAD_TIME = microtime(as_float: true) - $PAGE_LOAD_START;
@@ -59,7 +60,7 @@ else {
 
     // Check for logout
     if($player->last_login < time() - (System::LOGOUT_LIMIT * 60)) {
-        require 'logout.php';
+        Auth::processLogout(system: $system);
         exit;
     }
 
