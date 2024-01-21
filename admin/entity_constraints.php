@@ -160,7 +160,7 @@ $constraints['edit_user'] = [
 ];
 
 /* NPC */
-$jutsu_effects = require 'admin/constraints/jutsu_effects.php';
+$jutsu_effects = require __DIR__ . '/constraints/jutsu_effects.php';
 
 $constraints['ai'] = [
     'rank' => [

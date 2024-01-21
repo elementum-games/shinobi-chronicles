@@ -756,13 +756,13 @@ class BattleManager {
     // PRIVATE API - ATTACK PROCESSING
 
     /**
-     * @param Fighter       $fighter
+     * @param Fighter             $fighter
      * @param LegacyFighterAction $action
      * @return BattleAttack
      * @throws RuntimeException
      */
     #[Trace]
-    protected function setupFighterAttack(Fighter $fighter, Fighter $target, LegacyFighterAction $action, ?Jutsu $jutsu = null, bool $simulation = false): BattleAttack {
+    public function setupFighterAttack(Fighter $fighter, Fighter $target, LegacyFighterAction $action, ?Jutsu $jutsu = null, bool $simulation = false): BattleAttack {
         $attack = new BattleAttack();
         // if jutsu is already given, use instead
         if (!empty($jutsu)) {
@@ -1147,7 +1147,7 @@ class BattleManager {
     #[Trace]
     public function jutsuCollision(
         Fighter $player1, Fighter $player2, &$player1_damage, &$player2_damage, BattleAttack &$player1_attack, BattleAttack &$player2_attack
-    ) {
+    ): string {
         $collision_text = '';
         $player1_jutsu = $player1_attack->jutsu;
         $player2_jutsu = $player2_attack->jutsu;

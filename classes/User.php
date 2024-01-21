@@ -786,10 +786,10 @@ class User extends Fighter {
             if($this->system->debug['bloodline']) {
                 echo "Debugging {$this->getName()}<br />";
                 foreach($this->bloodline->passive_boosts as $id => $boost) {
-                    echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
+                    echo "Boost: " . $boost->effect . " : " . $boost->power . "<br />";
                 }
                 foreach($this->bloodline->combat_boosts as $id => $boost) {
-                    echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
+                    echo "Boost: " . $boost->effect . " : " . $boost->power . "<br />";
                 }
                 echo "<br />";
             }
@@ -805,26 +805,26 @@ class User extends Fighter {
             if($this->system->debug['bloodline']) {
                 echo "Debugging {$this->getName()}<br />";
                 foreach($this->bloodline->passive_boosts as $id => $boost) {
-                    echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
+                    echo "Boost: " . $boost->effect . " : " . $boost->power . "<br />";
                 }
                 foreach($this->bloodline->combat_boosts as $id => $boost) {
-                    echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
+                    echo "Boost: " . $boost->effect . " : " . $boost->power . "<br />";
                 }
                 echo "<br />";
             }
 
             // Apply out-of-combat effects
             if(!empty($this->bloodline->passive_boosts)) {
-                foreach($this->bloodline->passive_boosts as $id => $effect) {
-                    switch($effect['effect']) {
+                foreach($this->bloodline->passive_boosts as $id => $boost) {
+                    switch($boost->effect) {
                         case 'scout_range':
-                            $this->scout_range += $effect['effect_amount'];
+                            $this->scout_range += $boost->effect_amount;
                             break;
                         case 'stealth':
-                            $this->stealth += $effect['effect_amount'];
+                            $this->stealth += $boost->effect_amount;
                             break;
                         case 'regen':
-                            $this->regen_boost += $effect['effect_amount'];
+                            $this->regen_boost += $boost->effect_amount;
                             break;
                         default:
                             break;
@@ -2609,9 +2609,5 @@ class User extends Fighter {
                 return Region::fromDb($region, get_coordinates: false);
             }
         }
-    }
-
-    public function getBaseStatTotal(): int {
-        return max(1, $this->total_stats);
     }
 }
