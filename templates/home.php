@@ -24,7 +24,7 @@ $NewsManager = new NewsManager($system, $player ?? null);
     window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(Home, {
-                homeLinks: <?= json_encode($home_links) ?>,
+                homeLinks: <?= json_encode($system->homeVars['links']) ?>,
                 isLoggedIn: "<?= isset($player) ?>",
                 isAdmin: "<?= isset($player) ? $player->hasAdminPanel() : false ?>",
                 version: "<?= System::VERSION_NAME ?>",
