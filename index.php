@@ -75,8 +75,8 @@ else {
             system: $system,
             player: $player ?? null,
             page_title: 'Home',
-            render_header: false, render_sidebar: false,
-            render_topbar: false, render_content: false
+            render_header: (isset($player) && $player instanceof User) ? true : false, 
+            render_sidebar: false, render_topbar: false, render_content: false
         );
     
         require_once 'home.php';
@@ -175,8 +175,8 @@ else {
             system: $system,
             player: null, // No need to check here, no session set
             page_title: 'Home',
-            render_header: false, render_sidebar: false,
-            render_topbar: false, render_content: $RENDER_CONTENT
+            render_header: (isset($player) && $player instanceof User) ? true : false, 
+            render_sidebar: false, render_topbar: false, render_content: $RENDER_CONTENT
         );
     
         require_once 'home.php';
