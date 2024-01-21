@@ -15,6 +15,7 @@ $home_links['github'] = $system->router->links['github'];
 $home_links['discord'] = $system->router->links['discord'];
 $home_links['support'] = $system->router->base_url . "support.php";
 
-require_once ('login.php');
-require_once ('new_register.php');
-require ('/templates/home.php');
+require_once (__DIR__ . '/login.php');
+require_once (__DIR__ . '/new_register.php');
+require (__DIR__ . '/templates/home.php');
+
