@@ -1175,6 +1175,7 @@ class System {
         // Set home page variables
         $system->homeVars = [
             'view' => 'none',
+            // TODO: This can be removed, header API has the two links used available
             'links' => [
                 'news_api' => $system->router->api_links['news'],
                 'logout' => $system->router->base_url . '?logout=1',
