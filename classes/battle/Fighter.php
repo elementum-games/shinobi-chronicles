@@ -151,19 +151,19 @@ abstract class Fighter {
             // Apply bloodline passive combat boosts
             $this->bloodline_offense_boosts = array();
             $this->bloodline_defense_boosts = array();
-            foreach($this->bloodline->combat_boosts as $jutsu_id => $effect) {
+            foreach($this->bloodline->combat_boosts as $jutsu_id => $boost) {
                 if($this->system->debug['bloodline']) {
-                    echo "[{$effect['effect']}] = {$effect['effect_amount']}<br />";
+                    echo "[{$boost->effect}] = {$boost->effect_amount}<br />";
                 }
 
-                switch($effect->effect) {
+                switch($boost->effect) {
                     // Nin/Tai/Gen boost applied in User::calcDamage()
                     case 'ninjutsu_boost':
                     case 'taijutsu_boost':
                     case 'genjutsu_boost':
                         $this->bloodline_offense_boosts[] = [
-                            'effect' => $effect['effect'],
-                            'effect_amount' => $effect['effect_amount']
+                            'effect' => $boost->effect,
+                            'effect_amount' => $boost->effect_amount
                         ];
                         break;
 
@@ -172,24 +172,24 @@ abstract class Fighter {
                     case 'taijutsu_resist':
                     case 'damage_resist':
                         $this->bloodline_defense_boosts[] = [
-                            'effect' => $effect['effect'],
-                            'effect_amount' => $effect['effect_amount'],
+                            'effect' => $boost->effect,
+                            'effect_amount' => $boost->effect_amount,
                         ];
                         break;
 
                     case 'cast_speed_boost':
-                        $this->bloodline_cast_speed_boost += $effect['effect_amount'];
-                        $this->cast_speed_boost += $effect['effect_amount'];
+                        $this->bloodline_cast_speed_boost += $boost->effect_amount;
+                        $this->cast_speed_boost += $boost->effect_amount;
                         break;
                     case 'speed_boost':
-                        $this->bloodline_speed_boost += $effect['effect_amount'];
-                        $this->speed_boost += $effect['effect_amount'];
+                        $this->bloodline_speed_boost += $boost->effect_amount;
+                        $this->speed_boost += $boost->effect_amount;
                         break;
                     case 'intelligence_boost':
-                        $this->intelligence_boost += $effect['effect_amount'];
+                        $this->intelligence_boost += $boost->effect_amount;
                         break;
                     case 'willpower_boost':
-                        $this->willpower_boost += $effect['effect_amount'];
+                        $this->willpower_boost += $boost->effect_amount;
                         break;
                 }
             }
