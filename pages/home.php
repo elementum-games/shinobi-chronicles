@@ -10,6 +10,6 @@ function home() {
         Auth::processLogin(system: $system, user_name: $user_name, password: $password);
     }
     // Process register
-    require_once (__DIR__ . '/new_register.php');
-    require (__DIR__ . '/templates/home.php');
+    require_once (__DIR__ . '/../new_register.php');
+    require (__DIR__ . '/../templates/home.php');
 }
