@@ -117,7 +117,7 @@ class Auth {
                 $player->updateData();
 
                 // Redirect to default page
-                header(header: "Location {$system->router->base_url}");
+                header(header: "Location: {$system->router->base_url}");
             }
         } catch(RuntimeException $e) {
             $system->message($e->getMessage());
@@ -142,7 +142,7 @@ class Auth {
             );
         }
 
-        session();
+        session_abort();
         header(header: "Location: {$system->router->base_url}");
     }
 }
