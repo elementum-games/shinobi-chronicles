@@ -158,7 +158,7 @@ function editBloodlinePage($system) {
         $result = $system->db->query("SELECT * FROM `bloodlines` ORDER BY `rank` ASC");
         $all_bloodlines = [];
         while($row = $system->db->fetch($result)) {
-            $all_bloodlines[$row['bloodline_id']] = new Bloodline($row);
+            $all_bloodlines[$row['bloodline_id']] = Bloodline::fromArray($row);
         }
 
         require 'templates/admin/edit_bloodline_select.php';

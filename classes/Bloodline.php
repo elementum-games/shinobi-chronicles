@@ -32,8 +32,8 @@ class Bloodline {
 
     public string $description;
 
-    protected ?string $base_passive_boosts;
-    protected ?string $base_combat_boosts;
+    protected array $base_passive_boosts;
+    protected array $base_combat_boosts;
 
     public array $passive_boosts = [];
     public array $combat_boosts = [];
@@ -76,8 +76,8 @@ class Bloodline {
         $this->base_jutsu = $base_jutsu;
         $this->jutsu = $jutsu;
 
-        $this->passive_boosts = $base_passive_boosts;
-        $this->combat_boosts = $base_combat_boosts;
+        $this->base_passive_boosts = $base_passive_boosts;
+        $this->base_combat_boosts = $base_combat_boosts;
     }
 
     /**
@@ -227,8 +227,11 @@ class Bloodline {
         ];
         $bloodline_skill += $bloodline_skill < 100 ? self::BASE_BLOODLINE_SKILL : 0;
 
+        $this->passive_boosts = $this->base_passive_boosts;
+        $this->combat_boosts = $this->base_combat_boosts;
+
         // Each ratio operates on assumption of 5 BLP
-        foreach($this->passive_boosts as $id => $boost) {
+        foreach($this->base_passive_boosts as $id => $boost) {
             $boost_power = round($boost->power / 5, 1);
 
             switch($boost->effect) {
@@ -271,7 +274,7 @@ class Bloodline {
             }
         }
 
-        foreach($this->combat_boosts as $id => $boost) {
+        foreach($this->base_combat_boosts as $id => $boost) {
             $boost_power = $boost->power / 5;
 
             switch($boost->effect) {
@@ -442,9 +445,9 @@ class Bloodline {
         if($user_bloodline['passive_boosts']) {
             $user_bloodline['passive_boosts'] = json_decode($user_bloodline['passive_boosts'], true);
             foreach($user_bloodline['passive_boosts'] as $id => $boost) {
-                if(isset($effects[$boost->effect])) {
+                if(isset($effects[$boost['effect']])) {
                     $user_bloodline['passive_boosts'][$id]['power'] =
-                        round($boost->power * $effects[$boost->effect]['multiplier'], 6);
+                        round($boost['power'] * $effects[$boost['effect']]['multiplier'], 6);
                 }
             }
             $user_bloodline['passive_boosts'] = json_encode($user_bloodline['passive_boosts']);
@@ -452,9 +455,9 @@ class Bloodline {
         if($user_bloodline['combat_boosts']) {
             $user_bloodline['combat_boosts'] = json_decode($user_bloodline['combat_boosts'], true);
             foreach($user_bloodline['combat_boosts'] as $id => $boost) {
-                if(isset($effects[$boost->effect])) {
+                if(isset($effects[$boost['effect']])) {
                     $user_bloodline['combat_boosts'][$id]['power'] =
-                        round($boost->power * $effects[$boost->effect]['multiplier'], 6);
+                        round($boost['power'] * $effects[$boost['effect']]['multiplier'], 6);
                 }
             }
             $user_bloodline['combat_boosts'] = json_encode($user_bloodline['combat_boosts']);
@@ -527,15 +530,15 @@ class Bloodline {
 
 class BloodlineBoost {
     public function __construct(
-        public int $power,
+        public float $power,
         public string $effect,
-        public int $effect_amount = 0,
+        public float $effect_amount = 0,
         public int $progress = 0
     ) {}
 
     public static function fromArray(array $data): BloodlineBoost {
         return new BloodlineBoost(
-            power: (int)$data['power'],
+            power: $data['power'],
             effect: $data['effect']
         );
     }
