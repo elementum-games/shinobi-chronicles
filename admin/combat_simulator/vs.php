@@ -104,7 +104,7 @@ if(isset($_POST['run_simulation'])) {
             hand_seals: 0
         );
         $player2_jutsu->setLevel(50, 0);
-        $player1->jutsu[$player1_jutsu->id] = $player1_jutsu;
+        $player2->jutsu[$player2_jutsu->id] = $player2_jutsu;
 
         $damages = calcDamage(
             player1: $player1,
