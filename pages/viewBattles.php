@@ -248,13 +248,15 @@ function viewBattles() {
         }
 
         $ai_names = [];
-        $ai_names_result = $system->db->query(
-            "SELECT `ai_id`, `name` FROM `ai_opponents`
-            WHERE `ai_id` IN(" . implode(',', $ai_ids) . ")
-        ");
-        $ai_names_result = $system->db->fetch_all($ai_names_result);
-        foreach ($ai_names_result as $ai) {
-            $ai_names[$ai['ai_id']] = $ai['name'];
+        if(count($ai_ids) > 0) {
+            $ai_names_result = $system->db->query(
+                "SELECT `ai_id`, `name` FROM `ai_opponents`
+                WHERE `ai_id` IN(" . implode(',', $ai_ids) . ")
+            ");
+            $ai_names_result = $system->db->fetch_all($ai_names_result);
+            foreach ($ai_names_result as $ai) {
+                $ai_names[$ai['ai_id']] = $ai['name'];
+            }
         }
 
         $ai_battles = [];
