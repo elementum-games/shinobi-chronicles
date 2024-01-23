@@ -1197,7 +1197,7 @@ function TrainingNotification({
   }, "X"))), notification.type === "stat_transfer" && /*#__PURE__*/React.createElement("a", {
     href: notification.action_url,
     className: "topbar_notification_wrapper stat_transfer",
-    "data-content": `${notification.message}: ${formatTimeRemaining(timeRemaining)} remaining`
+    "data-content": `${notification.message}: ${formatTimeRemaining(timeRemaining)}`
   }, /*#__PURE__*/React.createElement("svg", {
     className: "topbar_notification_svg",
     width: "40",
@@ -1238,5 +1238,5 @@ function formatTimeRemaining(seconds) {
   const formattedHours = hours.toString().padStart(2, '0');
   const formattedMinutes = minutes.toString().padStart(2, '0');
   const formattedSeconds = seconds.toString().padStart(2, '0');
-  return hours > 0 ? formattedHours + ':' + formattedMinutes + ':' + formattedSeconds : formattedMinutes + ':' + formattedSeconds;
+  return hours > 0 ? formattedHours + ':' + formattedMinutes + ':' + formattedSeconds : formattedMinutes + ':' + formattedSeconds + ' remaining';
 }
