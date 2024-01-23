@@ -61,8 +61,12 @@ function store() {
 			}
 			// Reputation discount benefit gear
 			if(($item->use_type == Item::USE_TYPE_ARMOR || $item->use_type == Item::USE_TYPE_WEAPON) && $player->reputation->benefits[UserReputation::BENEFIT_GEAR_DISCOUNT]) {
-				$item->purchase_cost = floor($item->purchase_cost * (1-UserReputation::ITEM_SHOP_DISCOUNT_RATE/100));
+				$item->purchase_cost = floor($item->purchase_cost * (1 - UserReputation::ITEM_SHOP_DISCOUNT_RATE/100));
 			}
+			// Just hack it in the item shop
+            if ($item->use_type == Item::USE_TYPE_CONSUMABLE && $player->rank_num == 4) {
+                $item->purchase_cost *= 2;
+            }
 
 			// Insert item into shop array
 			$shop_items[$row['item_id']] = $item;
