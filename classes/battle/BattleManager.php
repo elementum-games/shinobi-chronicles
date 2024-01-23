@@ -227,7 +227,7 @@ class BattleManager {
                                 unset($this->player->items[$item_id]);
                             }
 
-                            $this->player->health += $item->effect_amount;
+                            $this->player->health += ($item->effect_amount / 100) * $this->player->max_health;
                             if ($this->player->health >= $max_health) {
                                 $this->player->health = $max_health;
                             }
