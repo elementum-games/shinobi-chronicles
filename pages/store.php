@@ -46,8 +46,8 @@ function store() {
 		$shop_items = array();
 		$result = $system->db->query("
             SELECT * FROM `items`
-            WHERE `purchase_type` = " . Item::PURCHASE_TYPE_PURCHASABLE . " 
-            AND `rank` <= '$player->rank_num' 
+            WHERE `purchase_type` = " . Item::PURCHASE_TYPE_PURCHASABLE . "
+            AND `rank` <= '$player->rank_num'
             -- Disable purchasing weapons for now
             AND `use_type` != " . Item::USE_TYPE_WEAPON . "
             ORDER BY `rank` ASC, `purchase_cost` ASC
@@ -61,8 +61,12 @@ function store() {
 			}
 			// Reputation discount benefit gear
 			if(($item->use_type == Item::USE_TYPE_ARMOR || $item->use_type == Item::USE_TYPE_WEAPON) && $player->reputation->benefits[UserReputation::BENEFIT_GEAR_DISCOUNT]) {
-				$item->purchase_cost = floor($item->purchase_cost * (1-UserReputation::ITEM_SHOP_DISCOUNT_RATE/100));
+				$item->purchase_cost = floor($item->purchase_cost * (1 - UserReputation::ITEM_SHOP_DISCOUNT_RATE/100));
 			}
+			// Just hack it in the item shop
+            if ($item->use_type == Item::USE_TYPE_CONSUMABLE && $player->rank_num == 4) {
+                $item->purchase_cost *= 2;
+            }
 
 			// Insert item into shop array
 			$shop_items[$row['item_id']] = $item;
@@ -85,9 +89,9 @@ function store() {
 			}
 
 			if (isset($_GET['max'])) { // Code for handling buying bulk
-				$max_missing = ($player->hasItem($item_id)) ? $max_consumables - $player->items[$item_id]->quantity : $max_consumables;
+				$max_missing = ($player->hasItem($item_id)) ? $shop_items[$item_id]->max_quantity - $player->items[$item_id]->quantity : $shop_items[$item_id]->max_quantity;
 
-				if($player->items[$item_id]->quantity >= $max_consumables) {
+				if($player->items[$item_id]->quantity >= $shop_items[$item_id]->max_quantity) {
 					throw new RuntimeException("Your supply of this item is already full!");
 				}
 
@@ -109,7 +113,7 @@ function store() {
 
                 // Check for max consumables
                 if($player->hasItem($item_id) && $shop_items[$item_id]->use_type == 3) {
-                    if($player->items[$item_id]->quantity >= $max_consumables) {
+                    if($player->items[$item_id]->quantity >= $shop_items[$item_id]->max_quantity) {
                         throw new RuntimeException("Your supply of this item is already full!");
                     }
                 }
