@@ -62,6 +62,7 @@ class Village {
         $this->resources = json_decode($result['resources'], true);
         $this->policy_id = $result['policy_id'];
         $this->leader = $result['leader'];
+        $this->map_location_id = $result['map_location_id'];
     }
 
     public function addResource(int $resource_id, int $quantity) {

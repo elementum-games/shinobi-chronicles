@@ -78,7 +78,6 @@ return $routes = [
         function_name: 'travel',
         menu: Route::MENU_ACTIVITY,
         battle_ok: false,
-        village_ok: Route::IN_VILLAGE_OKAY,
         survival_mission_ok: false,
         challenge_lock_ok: false,
     ),
@@ -88,7 +87,7 @@ return $routes = [
         function_name: 'arena',
         menu: Route::MENU_ACTIVITY,
         battle_type: Battle::TYPE_AI_ARENA,
-        village_ok: Route::NOT_IN_VILLAGE,
+        allowed_location_types: [TravelManager::LOCATION_TYPE_DEFAULT],
         challenge_lock_ok: false,
     ),
     13 => new Route(
@@ -97,7 +96,7 @@ return $routes = [
         function_name: 'training',
         menu: Route::MENU_ACTIVITY,
         battle_ok: false,
-        village_ok: Route::NOT_IN_VILLAGE,
+        allowed_location_types: [TravelManager::LOCATION_TYPE_DEFAULT],
     ),
     14 => new Route(
         file_name: 'missions.php',
@@ -106,7 +105,6 @@ return $routes = [
         menu: Route::MENU_ACTIVITY,
         battle_type: Battle::TYPE_AI_MISSION,
         min_rank: 2,
-        village_ok: Route::IN_VILLAGE_OKAY,
         challenge_lock_ok: false,
     ),
     15 => new Route(
@@ -116,7 +114,6 @@ return $routes = [
         menu: Route::MENU_ACTIVITY,
         min_rank: 2,
         battle_ok: false,
-        village_ok: Route::IN_VILLAGE_OKAY,
         challenge_lock_ok: false,
     ),
     22 => new Route(
@@ -125,7 +122,6 @@ return $routes = [
         function_name: 'spar',
         menu: Route::MENU_ACTIVITY,
         battle_type: Battle::TYPE_SPAR,
-        village_ok: Route::IN_VILLAGE_OKAY,
         challenge_lock_ok: false,
     ),
     23 => new Route(
@@ -134,8 +130,7 @@ return $routes = [
         function_name: 'healingShop',
         menu: Route::MENU_ACTIVITY,
         battle_ok: false,
-        village_ok: Route::ONLY_IN_VILLAGE,
-        village_restriction_overrides: [Route::COLOSSEUM_OVERRIDE => "true"],
+        allowed_location_types: [TravelManager::LOCATION_TYPE_HOME_VILLAGE, TravelManager::LOCATION_TYPE_COLOSSEUM],
     ),
     26 => new Route(
         file_name: 'viewBattles.php',
@@ -143,7 +138,6 @@ return $routes = [
         function_name: 'viewBattles',
         menu: Route::MENU_ACTIVITY,
         battle_ok: false,
-        village_ok: Route::IN_VILLAGE_OKAY,
     ),
 
     // Village Menu
@@ -152,7 +146,7 @@ return $routes = [
         title: 'Shop',
         function_name: 'store',
         menu: Route::MENU_VILLAGE,
-        village_ok: Route::ONLY_IN_VILLAGE,
+        allowed_location_types: [TravelManager::LOCATION_TYPE_HOME_VILLAGE],
     ),
     9 => new Route(
         file_name: 'villageHQ_v2.php',

@@ -33,6 +33,15 @@ class TravelManager {
     const GRID_POSITIVE_Y = 9;
     const GRID_NEGATIVE_Y = 8;
 
+    const LOCATION_TYPE_DEFAULT = 'LOCATION_TYPE_DEFAULT';
+    const LOCATION_TYPE_HOME_VILLAGE = 'LOCATION_TYPE_HOME_VILLAGE';
+    const LOCATION_TYPE_ALLY_VILLAGE = 'LOCATION_TYPE_ALLY_VILLAGE';
+    const LOCATION_TYPE_ENEMY_VILLAGE = 'LOCATION_TYPE_ENEMY_VILLAGE';
+    const LOCATION_TYPE_COLOSSEUM = 'LOCATION_TYPE_COLOSSEUM';
+    const LOCATION_TYPE_ABYSS = 'LOCATION_TYPE_ABYSS';
+    const LOCATION_TYPE_TOWN = 'LOCATION_TYPE_TOWN';
+    const LOCATION_TYPE_CASTLE = 'LOCATION_TYPE_CASTLE';
+
     /**
      * @var TravelCoords[]
      */
@@ -56,6 +65,42 @@ class TravelManager {
         $count = (int)$system->db->fetch($result)['count'];
 
         return $count >= 1;
+    }
+
+    public static function getPlayerLocationType(System $system, User $user): string {
+        $query = $system->db->query("SELECT `villages`.`village_id`, `maps_locations`.`location_id`, `maps_locations`.`name` FROM `maps_locations`
+            LEFT JOIN `villages`
+            ON `villages`.`map_location_id` = `maps_locations`.`location_id`
+            WHERE `map_id` = {$user->location->map_id}
+            AND `x` = {$user->location->x}
+            AND `y` = {$user->location->y}
+        ");
+        $result = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            switch ($result['name']) {
+                case "Ayakashi's Abyss":
+                    return TravelManager::LOCATION_TYPE_ABYSS;
+                case "Underground Colosseum":
+                    return TravelManager::LOCATION_TYPE_COLOSSEUM;
+                case "Stone":
+                case "Cloud":
+                case "Leaf":
+                case "Sand":
+                case "Mist":
+                    if ($user->village->map_location_id == $result['location_id']) {
+                        return TravelManager::LOCATION_TYPE_HOME_VILLAGE;
+                    } else if ($user->village->isAlly($result['village_id'])) {
+                        return TravelManager::LOCATION_TYPE_ALLY_VILLAGE;
+                    } else {
+                        return TravelManager::LOCATION_TYPE_ENEMY_VILLAGE;
+                    }
+                default:
+                    return TravelManager::LOCATION_TYPE_DEFAULT;
+            }
+        } else {
+            return TravelManager::LOCATION_TYPE_DEFAULT;
+        }
+        // to-do check town, castle types
     }
 
     public function updateFilter(string $filter, string $filter_value): bool {
