@@ -3,6 +3,7 @@
 require_once __DIR__ . "/VillageSeatDto.php";
 require_once __DIR__ . "/VillageProposalDto.php";
 require_once __DIR__ . "/VillageStrategicInfoDto.php";
+require_once __DIR__ . "/VillageUpgradeManager.php";
 require_once __DIR__ . "/ChallengeRequestDto.php";
 require_once __DIR__ . "/../notification/NotificationManager.php";
 require_once __DIR__ . '/../notification/BlockedNotificationManager.php';

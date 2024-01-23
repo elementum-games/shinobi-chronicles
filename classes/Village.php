@@ -3,6 +3,7 @@
 require_once __DIR__ . '/SpecialMission.php';
 require_once __DIR__ . '/../classes/village/VillageRelation.php';
 require_once __DIR__ . '/../classes/village/VillagePolicy.php';
+require_once __DIR__ . '/../classes/village/VillageUpgradeManager.php';
 
 class Village {
     public System $system;
@@ -20,6 +21,9 @@ class Village {
     public array $relations = [];
     public int $policy_id = 0;
     public VillagePolicy $policy;
+    public array $buildings = [];
+    public array $upgrades = [];
+    public array $bonuses = [];
 
     // to-do: we should restructure how village data is being saved
     // player village should reference the village ID and this constructor should get row by ID
@@ -38,6 +42,8 @@ class Village {
             $this->coords = VillageManager::getLocation($this->system, $this->village_id);
             $this->relations = VillageManager::getRelationsForVillage($this->system, $this->village_id);
             $this->policy = new VillagePolicy($this->policy_id);
+            $this->buildings = VillageUpgradeManager::getBuildingsForVillage($this->system, $this->village_id);
+            $this->upgrades = VillageUpgradeManager::getUpgradesForVillage($this->system, $this->village_id);
         }
         // updated legacy constructor logic
         else {
@@ -47,6 +53,8 @@ class Village {
             $this->coords = VillageManager::getLocation($this->system, $this->village_id);
             $this->relations = VillageManager::getRelationsForVillage($this->system, $this->village_id);
             $this->policy = new VillagePolicy($this->policy_id);
+            $this->buildings = VillageUpgradeManager::getBuildingsForVillage($this->system, $this->village_id);
+            $this->upgrades = VillageUpgradeManager::getUpgradesForVillage($this->system, $this->village_id);
         }
     }
 
