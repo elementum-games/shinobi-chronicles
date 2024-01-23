@@ -359,15 +359,36 @@ class TrainingManager {
      * @param int $rank
      * @return int
      */
-    public static function getAIStatGain(string $difficulty_level, int $rank): int {
+    public static function getAIStatGain(string $difficulty_level, int $rank): int
+    {
         switch ($difficulty_level) {
             case NPC::DIFFICULTY_NONE:
                 return 1;
             case NPC::DIFFICULTY_EASY:
                 return 1;
             case NPC::DIFFICULTY_NORMAL:
+                switch ($rank) {
+                    case 1:
+                    case 2:
+                        return 2;
+                    case 3:
+                    case 4:
+                        return 3;
+                    case 5:
+                        return 4;
+                }
                 return 2;
             case NPC::DIFFICULTY_HARD:
+                switch ($rank) {
+                    case 1:
+                    case 2:
+                        return 4;
+                    case 3:
+                    case 4:
+                        return 6;
+                    case 5:
+                        return 8;
+                }
                 return 4;
             default:
                 return 1;
