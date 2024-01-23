@@ -423,8 +423,7 @@ function runActiveMission(): bool {
                 echo Mission::processRewards($mission, $player, $system);
                 $player->clearMission();
                 $player->last_ai_ms = System::currentTimeMs();
-
-                echo "<a href='$self_link'>Continue</a>
+                echo "<a href='{$system->router->getUrl("travel")}'>Continue</a>
 				</td></tr></table>";
             }
             // Default
