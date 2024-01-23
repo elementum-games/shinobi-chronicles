@@ -79,7 +79,7 @@ class ForbiddenSeal {
             'journal_image_y' => 200,
             'journal_image_display' => '300x200',
             'journal_youtube_embed' => false,
-            'chat_post_size' => 350,
+            'chat_post_size' => 300,
             'pm_size' => 1000,
             'extra_jutsu_equips' => 0,
             'extra_weapon_equips' => 0,
@@ -128,7 +128,7 @@ class ForbiddenSeal {
             'journal_image_y' => 500,
             'journal_image_display' => '500x500', //Premium page display only.
             'journal_youtube_embed' => false,
-            'chat_post_size' => 450,
+            'chat_post_size' => 400,
             'pm_size' => 1500,
             'extra_jutsu_equips' => 0,
             'extra_weapon_equips' => 0,
@@ -177,7 +177,7 @@ class ForbiddenSeal {
             'journal_image_y' => 500,
             'journal_image_display' => '500x500', //Premium page display only.
             'journal_youtube_embed' => false,
-            'chat_post_size' => 450,
+            'chat_post_size' => 400,
             'pm_size' => 1500,
             'extra_jutsu_equips' => 1,
             'extra_weapon_equips' => 1,
@@ -226,7 +226,7 @@ class ForbiddenSeal {
             'journal_image_y' => 600,
             'journal_image_display' => '600x600', //Premium page display only.
             'journal_youtube_embed' => true,
-            'chat_post_size' => 450,
+            'chat_post_size' => 400,
             'pm_size' => 1500,
             'extra_jutsu_equips' => 1,
             'extra_weapon_equips' => 1,
