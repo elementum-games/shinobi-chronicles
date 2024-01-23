@@ -132,7 +132,7 @@ class Auth {
         }
     }
 
-    public static function processLogout(System $system) {
+    public static function processLogout(System $system): void {
         $_SESSION = array();
         if(ini_get(option: 'session.use_cookies')) {
             $params = session_get_cookie_params();
