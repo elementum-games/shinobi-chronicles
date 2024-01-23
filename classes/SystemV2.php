@@ -1129,17 +1129,17 @@ class System {
 
     /**
      * Initializes and returns system
-     * @param $api_request
+     * @param bool $api_request
      * @return System
      * @throws Exception
      */
-    public static function initialize($api_request = false): System {
+    public static function initialize(bool $api_request = false): System {
         /**
          * This must be called here to properly pull variables into initializer
-         * @var $HOST
-         * @var $USERNAME
-         * @var $PASSWORD
-         * @var $DATABASE
+         * @var $host
+         * @var $username
+         * @var $password
+         * @var $database
          *
          * @var string $ENVIRONMENT
          * @var string $WEB_URL
@@ -1154,7 +1154,7 @@ class System {
         require_once __DIR__ . '/../secure/vars.php';
 
         $system = new System(
-            db: new Database($HOST, $USERNAME, $PASSWORD, $DATABASE),
+            db: new Database($host, $username, $password, $database),
             router: new Router($WEB_URL),
             SC_OPEN: $SC_OPEN,
             USE_NEW_BATTLES: $USE_NEW_BATTLES,

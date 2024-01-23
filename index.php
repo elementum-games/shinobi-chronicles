@@ -80,7 +80,9 @@ else {
             render_sidebar: false, render_topbar: false, render_content: false
         );
     
-        require_once 'home.php';
+        $route = Router::$routes['home'];
+        require (__DIR__ . '/pages/' . $route->file_name);
+        ($route->function_name)();
     
         // Calc page load time
         $PAGE_LOAD_TIME = microtime(as_float: true) - $PAGE_LOAD_START;
@@ -171,6 +173,7 @@ else {
     // Load requested page
     $RENDER_CONTENT = true;
     if(isset($_GET['home'])) {
+        $route = Router::$routes['home'];
         $RENDER_CONTENT = false;
         $system->layout->renderBeforeContentHTML(
             system: $system,
@@ -178,8 +181,9 @@ else {
             page_title: 'Home', render_header: $player ? true : false, 
             render_sidebar: false, render_topbar: false, render_content: $RENDER_CONTENT
         );
-    
-        require_once 'home.php';
+
+        require (__DIR__ . '/pages/' . $route->file_name);
+        ($route->function_name)();
     }
     else {
         $id = isset($_GET['id']) ? (int)$_GET['id'] : Router::PAGE_IDS['profile'];
