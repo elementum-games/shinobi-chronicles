@@ -227,14 +227,14 @@ class BattleManager {
                                 unset($this->player->items[$item_id]);
                             }
 
-                            $this->player->health += $item->effect_amount;
+                            $this->player->health += ($item->effect_amount / 100) * $this->player->max_health;
                             if ($this->player->health >= $max_health) {
                                 $this->player->health = $max_health;
                             }
 
                             $this->player->updateData();
                             $this->player->updateInventory();
-                            $this->battle->battle_text .= sprintf("%s used a %s and healed for %.0f[br]", $this->player->user_name, $item->name, $item->effect_amount);
+                            $this->battle->battle_text .= sprintf("%s used a %s and healed for %.0f%% HP[br]", $this->player->user_name, $item->name, $item->effect_amount);
                             $this->updateData();
                         }
                     }
