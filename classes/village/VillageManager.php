@@ -2310,7 +2310,7 @@ class VillageManager {
                 expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_PROPOSAL * 86400),
                 alert: false,
             );
-            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_MULTIPLE);
+            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
         }
     }
 
