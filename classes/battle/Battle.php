@@ -559,7 +559,6 @@ class Battle {
 
         // for each jutsu:
         // - check if has linked jutsu
-        // - check if used last turn
         // - add linked jutsu if not exists
         foreach ($this->player1->jutsu as $jutsu) {
             if ($jutsu->linked_jutsu_id > 0) {
@@ -582,7 +581,7 @@ class Battle {
             if ($jutsu->linked_jutsu_id > 0 && $this->player2 instanceof User) {
                 $id = "J" . $jutsu->id . ":T2:U:" . $this->player2->user_id;
                 if (isset($this->jutsu_cooldowns[$id]) && $this->jutsu_cooldowns[$id] > 0) {
-                    if (!isset($this->player1->jutsu[$jutsu->linked_jutsu_id])) {
+                    if (!isset($this->player2->jutsu[$jutsu->linked_jutsu_id])) {
                         $linked_jutsu = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` = {$jutsu->linked_jutsu_id}");
                         $linked_jutsu = $this->system->db->fetch($linked_jutsu);
                         $this->player2->jutsu[$jutsu->linked_jutsu_id] = Jutsu::fromArray($jutsu->linked_jutsu_id, $linked_jutsu);
