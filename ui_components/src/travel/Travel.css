@@ -85,7 +85,6 @@
     max-height: 412px;
     flex-grow: 0;
     display: flex;
-    border: 1px solid var(--border-color-default);
     position: absolute;
     right: 44px;
     top: 35px;
@@ -214,6 +213,7 @@
     justify-content: center;
     z-index: 20;
     gap: 10px;
+    width: 0px;
 }
 
 #content .travel-buttons .button {
