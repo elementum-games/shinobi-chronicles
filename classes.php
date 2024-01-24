@@ -77,6 +77,7 @@ require_once __DIR__ . "/classes/forbidden_shop/ForbiddenShopManager.php";
 require_once __DIR__ . "/classes/Village.php";
 require_once __DIR__ . "/classes/village/VillageRelation.php";
 require_once __DIR__ . "/classes/village/VillageManager.php";
+require_once __DIR__ . "/classes/village/VillageUpgradeManager.php";
 require_once __DIR__ . "/classes/village/VillageAPIResponse.php";
 require_once __DIR__ . "/classes/village/VillageApiPresenter.php";
 

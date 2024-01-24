@@ -1,5 +1,8 @@
 <?php
 
+require_once __DIR__ . "/VillageBuildingDto.php";
+require_once __DIR__ . "/VillageUpgradeDto.php";
+
 class VillageUpgradeManager {
     const BUILDING_VILLAGE_HQ = 1;
     const BUILDING_WORKSHOP = 2;
