@@ -15,8 +15,11 @@ function userSettings() {
 
 	// Forbidden seal increase
     if($player->staff_level && $player->forbidden_seal->level == 0) {
-        $psuedoSeal = new ForbiddenSeal($system, ForbiddenSeal::$STAFF_SEAL_LEVEL);
-        $psuedoSeal->setBenefits();
+        $psuedoSeal = ForbiddenSeal::fromDb(
+            system: $system,
+            seal_level: ForbiddenSeal::$STAFF_SEAL_LEVEL,
+            seal_end_time: time()+ForbiddenSeal::SECONDS_IN_DAY
+        );
         $max_journal_length = $psuedoSeal->journal_size;
     }
 	else {

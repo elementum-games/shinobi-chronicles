@@ -333,7 +333,7 @@
                 ><?= stripslashes($journal) ?></textarea>
                 <br />
                 <span id='remainingCharacters' class='red'></span>
-                <input type='submit' name='change_journal' value='Update' />
+                <input type='submit' name='journal' value='Update' />
             </form>
             <?php else: ?>
                 <p>You are currently banned from editing your journal.</p>

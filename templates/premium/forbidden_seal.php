@@ -160,6 +160,13 @@
         </td>
     </tr>
     <tr>
+        <th>Battle History</th>
+        <td></td>
+        <td style='vertical-align: top;'>View previous <?= $twinSeal->max_battle_history_view ?> battle logs</td>
+        <td style='vertical-align: top;'>View previous <?= $fourDragonSeal->max_battle_history_view ?> battle logs </td>
+        <td style='vertical-align: top;'>View previous <?= $eightDeitiesSeal->max_battle_history_view ?> battle logs</td>
+    </tr>
+    <tr>
         <th>Equipment</th>
         <td></td>
         <td></td>
@@ -175,15 +182,13 @@
         </td>
     </tr>
     <tr>
-        <th>Other</th>
+        <th>Reputation Gain</th>
         <td></td>
-        <td style='vertical-align: top;'>View logs of your last <?= $twinSeal->max_battle_history_view ?> battles</td>
+        <td style='vertical-align: top;'></td>
         <td style='vertical-align: top;'>
-            View logs of your last <?= $fourDragonSeal->max_battle_history_view ?> battles<br />
             +<?= $fourDragonSeal->bonus_pve_reputation ?> Reputation from PVE sources
         </td>
         <td style='vertical-align: top;'>
-            View logs of your last <?= $eightDeitiesSeal->max_battle_history_view ?> battles<br />
             +<?= $eightDeitiesSeal->bonus_pve_reputation ?> Reputation from PVE sources
         </td>
     </tr>

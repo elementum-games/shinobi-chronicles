@@ -469,7 +469,11 @@ function premiumShop(): void {
                 if (!isset($_POST['change_forbidden_seal'])) {
                     // Convert remaining premium time to days and calculate AK value
                     $akCredit = $player->forbidden_seal->calcRemainingCredit();
-                    $new_seal = new ForbiddenSeal($system, $seal_level);
+                    $new_seal = ForbiddenSeal::fromDb(
+                        system: $system,
+                        seal_level: $seal_level,
+                        seal_end_time: time() + ForbiddenSeal::SECONDS_IN_DAY
+                    );
 
                     // TEMPORARY SALE LOGIC
                     $remainingCredit = max(0, $akCredit - $ak_cost);
@@ -546,12 +550,11 @@ function premiumShop(): void {
                     . " for {$seal_length} days.");
 
                 //Load blank seal
-                $player->forbidden_seal = new ForbiddenSeal($system, 0, 0);
-                //Set new seal
-                $player->forbidden_seal->addSeal($seal_level, $seal_length);
-
-                //Load benefits for displaying market & storing in db
-                $player->forbidden_seal->setBenefits();
+                $player->forbidden_seal = ForbiddenSeal::fromDb(
+                    system: $system,
+                    seal_level: $seal_level,
+                    seal_end_time: time() + ($seal_length * ForbiddenSeal::SECONDS_IN_DAY)
+                );
                 $player->forbidden_seal_loaded = true;
 
                 $system->message("Seal infused!");
@@ -887,17 +890,29 @@ function premiumShop(): void {
     }
 
     //Load premium seals
-    $baseDisplay = new ForbiddenSeal($system, 0);
-    $baseDisplay->setBenefits();
+    $baseDisplay = ForbiddenSeal::fromDb(
+        system: $system,
+        seal_level: 0,
+        seal_end_time: time() + ForbiddenSeal::SECONDS_IN_DAY
+    );
 
-    $twinSeal = new ForbiddenSeal($system, 1);
-    $twinSeal->setBenefits();
+    $twinSeal = ForbiddenSeal::fromDb(
+        system: $system,
+        seal_level: 1,
+        seal_end_time: time() + ForbiddenSeal::SECONDS_IN_DAY
+    );
 
-    $fourDragonSeal = new ForbiddenSeal($system, 2);
-    $fourDragonSeal->setBenefits();
+    $fourDragonSeal = ForbiddenSeal::fromDb(
+        system: $system,
+        seal_level: 2,
+        seal_end_time: time() + ForbiddenSeal::SECONDS_IN_DAY
+    );
 
-    $eightDeitiesSeal = new ForbiddenSeal($system, 3);
-    $eightDeitiesSeal->setBenefits();
+    $eightDeitiesSeal = ForbiddenSeal::fromDb(
+        system: $system,
+        seal_level: 3,
+        seal_end_time: time() + ForbiddenSeal::SECONDS_IN_DAY
+    );
 
     require "templates/premium/premium.php";
 }

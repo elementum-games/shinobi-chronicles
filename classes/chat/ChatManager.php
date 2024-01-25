@@ -493,7 +493,7 @@ class ChatManager {
         // Validate post and submit to DB
         //Increase chat length limit for seal users & staff members
         if($this->player->staff_level && $this->player->forbidden_seal->level == 0) {
-            $chat_max_post_length = ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['chat_post_size'];
+            $chat_max_post_length = ForbiddenSeal::CHAT_POST_SIZES[ForbiddenSeal::$STAFF_SEAL_LEVEL];
         }
         if($this->player->forbidden_seal->level != 0) {
             $chat_max_post_length = $this->player->forbidden_seal->chat_post_size;
