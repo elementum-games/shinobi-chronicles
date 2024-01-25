@@ -20,7 +20,7 @@ class ForbiddenSeal {
     ];
     const AVATAR_FILE_SIZES = [
         0 => self::ONE_MEGABYTE,
-        1 => self::ONE_MEGABYTE,
+        1 => 1.5 * self::ONE_MEGABYTE, // Changed from 1 => 1.5 during refactor
         2 => 2 * self::ONE_MEGABYTE,
         3 => 2.5 * self::ONE_MEGABYTE, // Changed from 2 => 2.5 during refactor
     ];

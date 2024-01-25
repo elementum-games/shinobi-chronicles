@@ -293,7 +293,7 @@ a.pink, a.pink:hover, span.pink {
 /* Orange */
 a.chat_user_name.orange, a.orange:hover, a.orange:visited, span.orange {
     color: #ffa500 !important;
-    text-shadow: var(--name-shadow-dark);
+    text-shadow: var(--name-shadow-light);
 }
 .post_user_avatar_wrapper.orange, .avatar_frame.orange {
     background: linear-gradient(0deg, rgba(255, 165, 0, 1) 0%, rgba(255, 172, 0, 1) 100%);
@@ -301,7 +301,7 @@ a.chat_user_name.orange, a.orange:hover, a.orange:visited, span.orange {
 
 /* Silver */
 a.chat_user_name.platinum, a.platinum:hover, a.platinum:visited, span.platinum {
-    color: #C0C0DEFF !important;
+    color: #dfdfeb !important;
     text-shadow: var(--name-shadow-light);
 }
 .post_user_avatar_wrapper.platinum, .avatar_frame.platinum {
@@ -338,7 +338,7 @@ a.headModerator, a.headModerator:hover, a.headModerator:visited, span.headModera
 /* Content Admin */
 a.contentAdmin, a.contentAdmin:hover, a.contentAdmin:visited, span.contentAdmin {
     color: #6140c1 !important;
-    text-shadow: var(--name-shadow-dark);
+    text-shadow: var(--name-shadow-light);
 }
 .post_user_avatar_wrapper.contentAdmin, .avatar_frame.contentAdmin {
     background: linear-gradient(0deg, #6140c1 0%, #6140c1 100%);
@@ -347,7 +347,7 @@ a.contentAdmin, a.contentAdmin:hover, a.contentAdmin:visited, span.contentAdmin 
 /* Administrator */
 a.administrator, a.administrator:hover, a.administrator:visited, span.administrator {
     color: #d73839 !important;
-    text-shadow: var(--name-shadow-dark);
+    text-shadow: var(--name-shadow-light);
 }
 .post_user_avatar_wrapper.administrator, .avatar_frame.administrator {
     background: linear-gradient(0deg, #d73839 0%, #d73839 100%);

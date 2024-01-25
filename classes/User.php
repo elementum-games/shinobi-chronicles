@@ -2081,7 +2081,7 @@ class User extends Fighter {
         $return = [];
 
         if($this->forbidden_seal->level != 0 || $this->isHeadAdmin()) {
-            if($this->isHeadAdmin()) {
+            if($this->isHeadAdmin() && $this->forbidden_seal->level == 0) {
                 $return = array_merge($return, ForbiddenSeal::getSealLevelNameColors(ForbiddenSeal::$STAFF_SEAL_LEVEL));
             }
             else {
