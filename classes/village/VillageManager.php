@@ -1712,7 +1712,7 @@ class VillageManager {
             $message .= "\n You have gained {$rep_adjustment} Reputation!";
             $player->updateData();
         } else if ($rep_adjustment < 0) {
-            $player->reputation->subtractRep((-1 * $rep_adjustment), UserReputation::ACTIVITY_TYPE_UNCAPPED);
+            $player->reputation->subtractRep(abs($rep_adjustment), UserReputation::ACTIVITY_TYPE_UNCAPPED);
             $message .= "\n You have lost {$rep_adjustment} Reputation!";
             $player->updateData();
         }
