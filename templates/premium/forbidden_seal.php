@@ -101,10 +101,22 @@
     </tr>
     <tr>
         <th>Inbox</th>
-        <td><?= $baseDisplay->inbox_size ?> messages</td>
-        <td><?= $twinSeal->inbox_size ?> messages</td>
-        <td><?= $fourDragonSeal->inbox_size ?> messages</td>
-        <td><?= $eightDeitiesSeal->inbox_size ?> messages</td>
+        <td>
+            <?= $baseDisplay->inbox_size ?> messages<br />
+            <?= $baseDisplay->pm_size ?> characters
+        </td>
+        <td>
+            <?= $twinSeal->inbox_size ?> messages<br />
+            <?= $twinSeal->pm_size ?> characters
+        </td>
+        <td>
+            <?= $fourDragonSeal->inbox_size ?> messages<br />
+            <?= $fourDragonSeal->pm_size ?> characters
+        </td>
+        <td>
+            <?= $eightDeitiesSeal->inbox_size ?> messages<br />
+            <?= $eightDeitiesSeal->pm_size ?> characters
+        </td>
     </tr>
     <tr>
         <th>Journal</th>
