@@ -326,7 +326,7 @@ a.chat_user_name.orange, a.orange:hover, a.orange:visited, span.orange {
 
 /* Silver */
 a.chat_user_name.platinum, a.platinum:hover, a.platinum:visited, span.platinum {
-    color: #C0C0DEFF !important;
+    color: #dfdfeb !important;
 }
 .post_user_avatar_wrapper.platinum, .avatar_frame.platinum {
     background: linear-gradient(0deg, rgba(192, 192, 222, 1) 0%, rgba(120, 120, 150, 1) 100%);
