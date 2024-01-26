@@ -41,6 +41,8 @@ else $NewsManager = new NewsManager($system);
                 loginMessageText: "<?= $login_message_text ?>",
                 registerPreFill: <?= json_encode($register_pre_fill) ?>,
                 initialNewsPosts: <?= json_encode(NewsAPIPresenter::newsPostResponse($NewsManager, $system)) ?>,
+                scOpen: <?= (int) $system->SC_OPEN ?>,
+                reopenTimeWindow: "<?= $system->getMaintenenceEndTime() ?>",
             }),
             homeContainer
         );

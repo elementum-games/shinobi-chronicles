@@ -88,10 +88,19 @@ function Topbar({
     notificationAPIData.userNotifications.forEach(notification => checkNotificationAlert(notification));
     return () => clearInterval(notificationIntervalId);
   }, []);
+  notificationData.sort((a, b) => {
+    if (a.type === 'training' && b.type !== 'training') {
+      return 1; // Move 'training' type to the start
+    } else if (a.type !== 'training' && b.type === 'training') {
+      return -1; // Move non-'training' types after
+    }
+
+    return 0; // No change in order for types other than 'training'
+  });
 
   // Display
   const leftNotificationTypes = ["training", "training_complete", "stat_transfer"];
-  const rightNotificationTypes = ["specialmission", "specialmission_complete", "specialmission_failed", "mission", "mission_team", "mission_clan", "rank", "system", "warning", "report", "battle", "challenge", "team", "marriage", "student", "inbox", "chat", "caravan", "raid_ally", "raid_enemy", "event", "seat_challenge", "lock_challenge", "proposal_created", "proposal_passed", "proposal_canceled", "proposal_expired", "policy_change", "diplomacy_declare_war", "diplomacy_form_alliance", "diplomacy_end_war", "diplomacy_end_alliance", "news", "challenge_pending", "challenge_accepted", "kage_change", "achievement"];
+  const rightNotificationTypes = ["specialmission", "specialmission_complete", "specialmission_failed", "mission", "mission_team", "mission_clan", "rank", "system", "warning", "report", "battle", "challenge", "team", "marriage", "student", "inbox", "chat", "caravan", "raid_ally", "raid_enemy", "event", "seat_challenge", "lock_challenge", "proposal_created", "proposal_passed", "proposal_canceled", "proposal_expired", "policy_change", "diplomacy_declare_war", "diplomacy_form_alliance", "diplomacy_end_war", "diplomacy_end_alliance", "news", "challenge_pending", "challenge_accepted", "kage_change", "achievement", "daily_task"];
   return /*#__PURE__*/React.createElement("div", {
     id: "topbar",
     className: "d-flex"

@@ -66,12 +66,12 @@ $current_rank = 1;
             </td>
             <td>
                 <?php foreach($bloodline->passive_boosts as $boost): ?>
-                    <p><?= $boost['power'] ?> <?= $boost['effect'] ?></p>
+                    <p><?= $boost->power ?> <?= $boost->effect ?></p>
                 <?php endforeach; ?>
             </td>
             <td>
                 <?php foreach($bloodline->combat_boosts as $boost): ?>
-                    <p><?= $boost['power'] ?> <?= $boost['effect'] ?></p>
+                    <p><?= $boost->power ?> <?= $boost->effect ?></p>
                 <?php endforeach; ?>
             </td>
         </tr>

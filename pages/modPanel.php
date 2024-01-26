@@ -528,7 +528,8 @@ function modPanel() {
 				if(strlen($message) > 1000) {
 					throw new RuntimeException("Message is too long! (" . strlen($message) . "/1000 chars)");
 				}
-				$system->db->query("UPDATE `system_storage` SET `global_message`='$message', `time`='".time()."'");
+				
+				$system->db->query("UPDATE `system_storage` SET `global_message`='$message', `time`='" . time() . "'");
 				$system->db->query("UPDATE `users` SET `global_message_viewed`=0");
 				$player->global_message_viewed = 0;
                 $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD, "$player->user_name($player->user_id) posted global: <br />"

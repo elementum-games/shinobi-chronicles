@@ -90,7 +90,7 @@
                         <input
                             type="number"
                             name="passive_boosts[<?= $i ?>][power]"
-                            value="<?= $existing_bloodline?->passive_boosts[$i]['power'] ?? 0 ?>"
+                            value="<?= $existing_bloodline?->passive_boosts[$i]->power ?? 0 ?>"
                         >
                         <br />
 
@@ -100,7 +100,7 @@
                             <?php foreach($bloodline_constraints['passive_boosts']['variables']['effect']['options'] as $value): ?>
                                 <option
                                     value="<?= $value ?>"
-                                    <?= ($existing_bloodline?->passive_boosts[$i]['effect'] ?? "") == $value ? "selected='selected'" : "" ?>
+                                    <?= ($existing_bloodline?->passive_boosts[$i]->effect ?? "") == $value ? "selected='selected'" : "" ?>
                                 ><?= System::unSlug($value) ?></option>
                             <?php endforeach; ?>
                         </select>
@@ -117,7 +117,7 @@
                             type="number"
                             step="0.1"
                             name="combat_boosts[<?= $i ?>][power]"
-                            value="<?= $existing_bloodline?->combat_boosts[$i]['power'] ?? 0 ?>"
+                            value="<?= $existing_bloodline?->combat_boosts[$i]->power ?? 0 ?>"
                         >
                         <br />
 
@@ -127,7 +127,7 @@
                             <?php foreach($bloodline_constraints['combat_boosts']['variables']['effect']['options'] as $value): ?>
                                 <option
                                     value="<?= $value ?>"
-                                    <?= ($existing_bloodline?->combat_boosts[$i]['effect'] ?? "") == $value ? "selected='selected'" : "" ?>
+                                    <?= ($existing_bloodline?->combat_boosts[$i]->effect ?? "") == $value ? "selected='selected'" : "" ?>
                                 ><?= System::unSlug($value) ?></option>
                             <?php endforeach; ?>
                         </select>

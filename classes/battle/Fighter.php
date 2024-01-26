@@ -151,43 +151,45 @@ abstract class Fighter {
             // Apply bloodline passive combat boosts
             $this->bloodline_offense_boosts = array();
             $this->bloodline_defense_boosts = array();
-            foreach($this->bloodline->combat_boosts as $jutsu_id => $effect) {
+            foreach($this->bloodline->combat_boosts as $jutsu_id => $boost) {
                 if($this->system->debug['bloodline']) {
-                    echo "[{$effect['effect']}] = {$effect['effect_amount']}<br />";
+                    echo "[{$boost->effect}] = {$boost->effect_amount}<br />";
                 }
 
-                switch($effect['effect']) {
+                switch($boost->effect) {
                     // Nin/Tai/Gen boost applied in User::calcDamage()
                     case 'ninjutsu_boost':
                     case 'taijutsu_boost':
                     case 'genjutsu_boost':
-                        $x = count($this->bloodline_offense_boosts);
-                        $this->bloodline_offense_boosts[$x]['effect'] = $effect['effect'];
-                        $this->bloodline_offense_boosts[$x]['effect_amount'] = $effect['effect_amount'];
+                        $this->bloodline_offense_boosts[] = [
+                            'effect' => $boost->effect,
+                            'effect_amount' => $boost->effect_amount
+                        ];
                         break;
 
                     case 'ninjutsu_resist':
                     case 'genjutsu_resist':
                     case 'taijutsu_resist':
                     case 'damage_resist':
-                        $x = count($this->bloodline_defense_boosts);
-                        $this->bloodline_defense_boosts[$x]['effect'] = $effect['effect'];
-                        $this->bloodline_defense_boosts[$x]['effect_amount'] = $effect['effect_amount'];
+                        $this->bloodline_defense_boosts[] = [
+                            'effect' => $boost->effect,
+                            'effect_amount' => $boost->effect_amount,
+                        ];
                         break;
 
                     case 'cast_speed_boost':
-                        $this->bloodline_cast_speed_boost += $effect['effect_amount'];
-                        $this->cast_speed_boost += $effect['effect_amount'];
+                        $this->bloodline_cast_speed_boost += $boost->effect_amount;
+                        $this->cast_speed_boost += $boost->effect_amount;
                         break;
                     case 'speed_boost':
-                        $this->bloodline_speed_boost += $effect['effect_amount'];
-                        $this->speed_boost += $effect['effect_amount'];
+                        $this->bloodline_speed_boost += $boost->effect_amount;
+                        $this->speed_boost += $boost->effect_amount;
                         break;
                     case 'intelligence_boost':
-                        $this->intelligence_boost += $effect['effect_amount'];
+                        $this->intelligence_boost += $boost->effect_amount;
                         break;
                     case 'willpower_boost':
-                        $this->willpower_boost += $effect['effect_amount'];
+                        $this->willpower_boost += $boost->effect_amount;
                         break;
                 }
             }
@@ -253,15 +255,15 @@ abstract class Fighter {
         $genjutsu_skill = $this->genjutsu_skill;
         if ($this->bloodline != null) {
             foreach ($this->bloodline->combat_boosts as $combat_boost) {
-                switch ($combat_boost['effect']) {
+                switch ($combat_boost->effect) {
                     case 'ninjutsu_boost':
-                        $ninjutsu_skill += $combat_boost['effect_amount'];
+                        $ninjutsu_skill += $combat_boost->effect_amount;
                         break;
                     case 'taijutsu_boost':
-                        $taijutsu_skill += $combat_boost['effect_amount'];
+                        $taijutsu_skill += $combat_boost->effect_amount;
                         break;
                     case 'genjutsu_boost':
-                        $genjutsu_skill += $combat_boost['effect_amount'];
+                        $genjutsu_skill += $combat_boost->effect_amount;
                         break;
                     default:
                         break;
@@ -553,7 +555,9 @@ abstract class Fighter {
         return $include_bloodline ? $this->speed + $this->bloodline_speed_boost : $this->speed;
     }
 
-    abstract function getBaseStatTotal(): int;
+    public function getBaseStatTotal(): int {
+        return max(1, $this->total_stats);
+    }
 
     // Actions
     abstract public function useJutsu(Jutsu $jutsu);

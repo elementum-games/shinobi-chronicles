@@ -69,6 +69,7 @@ class VillageManager {
     const WAR_COOLDOWN_DAYS = 1;
 
     const MAX_TRADE_RESOURCE_TYPE = 25000;
+    const TRADE_COOLDOWN_DAYS = 1;
 
     public static function getLocation(System $system, string $village_id): ?TravelCoords {
         $result = $system->db->query(
@@ -197,11 +198,14 @@ class VillageManager {
     /**
      * @return array
      */
-    public static function getVillagePoints(System $system, string $village_id): int
+    public static function getVillagePoints(System $system, string $village_id): array
     {
-        $points_result = $system->db->query("SELECT `points` FROM `villages` WHERE `village_id` = {$village_id}");
+        $return_arr = [];
+        $points_result = $system->db->query("SELECT `points`, `monthly_points` FROM `villages` WHERE `village_id` = {$village_id}");
         $points_result = $system->db->fetch($points_result);
-        return $points_result['points'];
+        $return_arr['points'] = $points_result['points'];
+        $return_arr['monthly_points'] = $points_result['monthly_points'];
+        return $return_arr;
     }
 
     /**
@@ -306,7 +310,7 @@ class VillageManager {
                 }
                 // check requirements
                 if (!self::checkSeatRequirements($system, $player, $seat_type)) {
-                    return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_ELDER_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_ELDER_CLAIM_TIER]['min_rep'] . " Reputation";
+                    return "You do not meet the requirements!\nChuunin Rank, " . UserReputation::nameByRepRank(self::MIN_ELDER_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_ELDER_CLAIM_TIER]['min_rep'] . " Reputation";
                 }
                 // check if recently left this seat
                 $result = $system->db->query("SELECT * FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` = {$player->user_id} AND `seat_end` IS NOT NULL ORDER BY `seat_end` DESC LIMIT 1");
@@ -900,10 +904,11 @@ class VillageManager {
                 $challenger = User::loadFromId($system, $challenge_result['challenger_id']);
                 $challenger->loadData(User::UPDATE_NOTHING);
             }
+            $challenge_background = 'images/battle_backgrounds/Spar.jpg';
             if ($system->USE_NEW_BATTLES) {
-                $battle_id = BattleV2::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE);
+                $battle_id = BattleV2::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE, battle_background_link: $challenge_background, rounds: 3);
             } else {
-                $battle_id = Battle::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE);
+                $battle_id = Battle::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE, battle_background_link: $challenge_background, rounds: 3);
             }
             $system->db->query("UPDATE `challenge_requests` SET `battle_id` = {$battle_id} WHERE `request_id` = {$player->locked_challenge}");
             return;
@@ -1605,6 +1610,20 @@ class VillageManager {
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
                     return "Villages must be allied in order to trade!";
                 }
+                // check trade cooldown
+                $proposal_type = self::PROPOSAL_TYPE_OFFER_TRADE;
+                $last_trade_offer = $system->db->query("SELECT * FROM `proposals` WHERE `type` = '{$proposal_type}'
+                AND (`village_id` = {$proposal['village_id']} OR `target_village_id` = {$proposal['village_id']})
+                AND (`village_id` = {$proposal['target_village_id']} OR `target_village_id` = {$proposal['target_village_id']})
+                ORDER BY `end_time` DESC LIMIT 1");
+                $last_trade_offer = $system->db->fetch($last_trade_offer);
+                if ($system->db->last_num_rows > 0 && isset($last_trade_offer['end_time'])) {
+                    $trade_cooldown = ($last_trade_offer['end_time'] + self::TRADE_COOLDOWN_DAYS * 86400) - time();
+                    if ($trade_cooldown > 0) {
+                        $message = "You must wait another " . $system->time_remaining($trade_cooldown) . " before offering another trade with this village!";
+                        return $message;
+                    }
+                }
                 // check has resources / regions
                 $trade_data = json_decode($proposal['trade_data'], true);
                 $is_valid_trade = self::checkTradeValid($system, $player->village->village_id, $proposal['target_village_id'], $trade_data['offered_resources'], $trade_data['offered_regions'], $trade_data['requested_resources'], $trade_data['requested_regions']);
@@ -1993,6 +2012,30 @@ class VillageManager {
         if (!$is_valid_trade) {
             return "One or either village does not have the necessary items to complete the trade.";
         }
+        // check player cooldown on submit proposal
+        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
+        $last_proposal = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
+                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
+                $time_remaining = $system->timeRemaining($seconds_remaining, 'long');
+                return "Cannot submit another proposal for " . $time_remaining . ".";
+            }
+        }
+        // check trade cooldown
+        $proposal_type = self::PROPOSAL_TYPE_OFFER_TRADE;
+        $last_trade_offer = $system->db->query("SELECT * FROM `proposals` WHERE `type` = '{$proposal_type}'
+                AND (`village_id` = {$player->village->village_id} OR `target_village_id` = {$player->village->village_id})
+                AND (`village_id` = {$target_village_id} OR `target_village_id` = {$target_village_id})
+                ORDER BY `end_time` DESC LIMIT 1");
+        $last_trade_offer = $system->db->fetch($last_trade_offer);
+        if ($system->db->last_num_rows > 0 && isset($last_trade_offer['end_time'])) {
+            $trade_cooldown = ($last_trade_offer['end_time'] + self::TRADE_COOLDOWN_DAYS * 86400) - time();
+            if ($trade_cooldown > 0) {
+                $message = "You must wait another " . $system->time_remaining($trade_cooldown) . " before offering another trade with this village!";
+                return $message;
+            }
+        }
         // insert into DB
         $trade_data = [
             "offered_resources" => $offered_resources,
@@ -2062,9 +2105,23 @@ class VillageManager {
         // update regions
         foreach ($offered_regions as $region) {
             $system->db->query("UPDATE `regions` SET `village` = {$village2_id} WHERE `region_id` = {$region}");
+            // update patrols, move back 5 minutes
+            $patrol_spawn = time() + (60 * 5);
+            $system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$village2_id} WHERE `region_id` = {$region}");
+            // update caravans, change only caravans that haven't spawned
+            $name = VillageManager::VILLAGE_NAMES[$village2_id] . " Caravan";
+            $time = time();
+            $system->db->query("UPDATE `caravans` SET `village_id` = {$village2_id}, `name` = '{$name}' WHERE `region_id` = {$region} AND `start_time` > {$time}");
         }
         foreach ($requested_regions as $region) {
             $system->db->query("UPDATE `regions` SET `village` = {$village1_id} WHERE `region_id` = {$region}");
+            // update patrols, move back 5 minutes
+            $patrol_spawn = time() + (60 * 5);
+            $system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$village1_id} WHERE `region_id` = {$region}");
+            // update caravans, change only caravans that haven't spawned
+            $name = VillageManager::VILLAGE_NAMES[$village1_id] . " Caravan";
+            $time = time();
+            $system->db->query("UPDATE `caravans` SET `village_id` = {$village1_id}, `name` = '{$name}' WHERE `region_id` = {$region} AND `start_time` > {$time}");
         }
         // update resources
         $villages_result = $system->db->query("SELECT * FROM `villages` WHERE `village_id` = {$village1_id} OR `village_id`={$village2_id} LIMIT 2");
@@ -2245,7 +2302,7 @@ class VillageManager {
                 return true;
                 break;
             case 'elder':
-                if ($player->rank_num < 4) {
+                if ($player->rank_num < 3) {
                     return false;
                 }
                 if ($is_challenge) {

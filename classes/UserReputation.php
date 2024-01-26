@@ -99,6 +99,9 @@ class UserReputation {
     // Arena, special missions, etc
     const ACTIVITY_TYPE_PVE = 'pve';
     const ACTIVITY_TYPE_DAILY_TASK = 'daily_task';
+    const ACTIVITY_TYPE_DAILY_TASK_PVE = 'daily_task_pve';
+    const ACTIVITY_TYPE_DAILY_TASK_WAR = 'daily_task_war';
+    const ACTIVITY_TYPE_DAILY_TASK_PVP = 'daily_task_pvp';
     // War operations
     const ACTIVITY_TYPE_WAR = 'war';
     // PvP
@@ -131,6 +134,9 @@ class UserReputation {
 
     const DAILY_TASK_REWARDS = [
         DailyTask::DIFFICULTY_EASY => [
+            DailyTask::ACTIVITY_DAILY_PVE => 20,
+            DailyTask::ACTIVITY_DAILY_WAR => 20,
+            DailyTask::ACTIVITY_DAILY_PVP => 10,
             DailyTask::ACTIVITY_EARN_MONEY => 5,
             DailyTask::ACTIVITY_ARENA => 20,
             DailyTask::ACTIVITY_TRAINING => 10,
@@ -138,6 +144,9 @@ class UserReputation {
             DailyTask::ACTIVITY_PVP => 10,
         ],
         DailyTask::DIFFICULTY_MEDIUM => [
+            DailyTask::ACTIVITY_DAILY_PVE => 30,
+            DailyTask::ACTIVITY_DAILY_WAR => 30,
+            DailyTask::ACTIVITY_DAILY_PVP => 15,
             DailyTask::ACTIVITY_EARN_MONEY => 10,
             DailyTask::ACTIVITY_ARENA => 30,
             DailyTask::ACTIVITY_TRAINING => 15,
@@ -145,6 +154,9 @@ class UserReputation {
             DailyTask::ACTIVITY_PVP => 15,
         ],
         DailyTask::DIFFICULTY_HARD => [
+            DailyTask::ACTIVITY_DAILY_PVE => 40,
+            DailyTask::ACTIVITY_DAILY_WAR => 40,
+            DailyTask::ACTIVITY_DAILY_PVP => 20,
             DailyTask::ACTIVITY_EARN_MONEY => 15,
             DailyTask::ACTIVITY_ARENA => 40,
             DailyTask::ACTIVITY_TRAINING => 20,
@@ -173,9 +185,9 @@ class UserReputation {
     // Only being killed within last 30 minutes will mitigate pvp rep losses (further chainkill mitigation)
     const RECENTLY_KILLED_BY_THRESHOLD = 1800;
 
-    const SPAR_REP_LOSS = 3;
-    const SPAR_REP_DRAW = 5;
-    const SPAR_REP_WIN = 7;
+    const SPAR_REP_LOSS = 0;
+    const SPAR_REP_DRAW = 1;
+    const SPAR_REP_WIN = 2;
 
     // Shop benefits
     const ITEM_SHOP_DISCOUNT_RATE = 10;
@@ -308,6 +320,27 @@ class UserReputation {
         }
 
         switch($activity_type) {
+            case UserReputation::ACTIVITY_TYPE_DAILY_TASK_PVE:
+                // add to weekly but go over cap
+                $this->weekly_pve_rep += $amount;
+                if ($this->debug) {
+                    echo "Amount after PvE gain: $amount<br />";
+                }
+                break;
+            case UserReputation::ACTIVITY_TYPE_DAILY_TASK_WAR:
+                // add to weekly but go over cap
+                $this->weekly_war_rep += $amount;
+                if ($this->debug) {
+                    echo "Amount after War gain: $amount<br />";
+                }
+                break;
+            case UserReputation::ACTIVITY_TYPE_DAILY_TASK_PVP:
+                // add to weekly but go over cap
+                $this->weekly_pvp_rep += $amount;
+                if ($this->debug) {
+                    echo "Amount after PvP gain: $amount<br />";
+                }
+                break;
             case UserReputation::ACTIVITY_TYPE_PVE:
             case UserReputation::ACTIVITY_TYPE_DAILY_TASK:
                 // Bonus seal reputation
@@ -483,8 +516,28 @@ class UserReputation {
             case NPC::DIFFICULTY_EASY:
                 return 1;
             case NPC::DIFFICULTY_NORMAL:
+                switch ($rank) {
+                    case 1:
+                    case 2:
+                        return 2;
+                    case 3:
+                    case 4:
+                        return 3;
+                    case 5:
+                        return 4;
+                }
                 return 2;
             case NPC::DIFFICULTY_HARD:
+                switch ($rank) {
+                    case 1:
+                    case 2:
+                        return 4;
+                    case 3:
+                    case 4:
+                        return 6;
+                    case 5:
+                        return 8;
+                }
                 return 4;
             default:
                 return 1;
@@ -648,6 +701,32 @@ class UserReputation {
 
         $player->reputation->subtractRep($rep_loss, UserReputation::ACTIVITY_TYPE_PVP);
         return $rep_loss;
+    }
+
+    public function handleSpar(User $player, Fighter $opponent, int $spar_gain): int {
+        if (!($opponent instanceof User)) {
+            return 0;
+        }
+        if (!self::PVP_REP_ENABLED) {
+            return 0;
+        }
+        // Set current kill
+        $this->recent_players_killed_ids_array[$opponent->user_id][] = time();
+        // Get kill count
+        $kill_count = isset($this->recent_players_killed_ids_array[$opponent->user_id]) ? sizeof($this->recent_players_killed_ids_array[$opponent->user_id]) : 0;
+        // Encode and set last pvp kills
+        $this->encodePvpKills();
+
+        // Opponent killed too many times in mitigation frame, no gain
+        if ($kill_count > self::PVP_CHAIN_KILL_LIMIT) {
+            return 0;
+        }
+
+        // Weekly rep limit
+        if ($this->weekly_pvp_rep >= $this->weekly_pvp_cap) {
+            return 0;
+        }
+        return $player->reputation->addRep($spar_gain, UserReputation::ACTIVITY_TYPE_PVP);
     }
 
     // Encode and set player last pvp kills

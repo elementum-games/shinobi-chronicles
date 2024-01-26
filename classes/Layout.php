@@ -196,10 +196,7 @@ class Layout {
             }
 
             $class = '';
-            if($page->village_ok === Route::ONLY_IN_VILLAGE) {
-                $class = 'only-allowed-in-village';
-            }
-            if($page->village_ok === Route::NOT_IN_VILLAGE && $player->rank_num > 2) {
+            if(!$page->allowed_location_types[TravelManager::LOCATION_TYPE_HOME_VILLAGE] && $player->rank_num > 2) {
                 $class = 'not-allowed-in-village';
             }
 

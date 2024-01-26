@@ -616,7 +616,7 @@ function VillageHQ({
     className: "points_label"
   }, "monthly"), /*#__PURE__*/React.createElement("div", {
     className: "points_total"
-  }, pointsDataState.points)))))), /*#__PURE__*/React.createElement("div", {
+  }, pointsDataState.monthly_points)))))), /*#__PURE__*/React.createElement("div", {
     className: "row second"
   }, /*#__PURE__*/React.createElement("div", {
     className: "column first"
@@ -850,7 +850,7 @@ function KageQuarters({
     } else {
       setModalState("confirm_policy");
       setModalHeader("Confirmation");
-      setModalText("Are you sure you want to change policies? You will be unable to select a new policy for 14 days.");
+      setModalText("Are you sure you want to change policies? You will be unable to select a new policy for 3 days.");
     }
   };
   const DeclareWar = () => {
@@ -1151,7 +1151,17 @@ function KageQuarters({
   }, "Confirm"), /*#__PURE__*/React.createElement("div", {
     className: "modal_cancel_button",
     onClick: () => setModalState("closed")
-  }, "cancel")), modalState == "confirm_offer_trade" && /*#__PURE__*/React.createElement(React.Fragment, null, TradeDisplay({
+  }, "cancel")), modalState == "confirm_offer_trade" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    class: "schedule_challenge_subtext_wrapper",
+    style: {
+      marginBottom: "20px",
+      marginTop: "-10px"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    class: "schedule_challenge_subtext"
+  }, "Each village can offer up to 25000 resources of each resource type per trade."), /*#__PURE__*/React.createElement("span", {
+    class: "schedule_challenge_subtext"
+  }, "Trades have a cooldown of 24 hours.")), TradeDisplay({
     viewOnly: false,
     offeringVillageResources: resourceDataState,
     offeringVillageRegions: strategicDisplayLeft.regions,
@@ -1761,9 +1771,11 @@ function KageQuarters({
         readOnly: true
       }), /*#__PURE__*/React.createElement("div", {
         className: "trade_display_resource_name"
-      }, resource.resource_name), total && /*#__PURE__*/React.createElement("div", {
+      }, resource.resource_name), total ? /*#__PURE__*/React.createElement("div", {
         className: "trade_display_resource_total"
-      }, total));
+      }, total) : /*#__PURE__*/React.createElement("div", {
+        className: "trade_display_resource_total"
+      }, "???"));
     })), /*#__PURE__*/React.createElement("div", {
       className: "header"
     }, "Offered Regions"), /*#__PURE__*/React.createElement("div", {
@@ -1799,9 +1811,11 @@ function KageQuarters({
         readOnly: true
       }), /*#__PURE__*/React.createElement("div", {
         className: "trade_display_resource_name"
-      }, resource.resource_name), total && /*#__PURE__*/React.createElement("div", {
+      }, resource.resource_name), total ? /*#__PURE__*/React.createElement("div", {
         className: "trade_display_resource_total"
-      }, total));
+      }, total) : /*#__PURE__*/React.createElement("div", {
+        className: "trade_display_resource_total"
+      }, "???"));
     })), /*#__PURE__*/React.createElement("div", {
       className: "header"
     }, "Requested Regions"), /*#__PURE__*/React.createElement("div", {
@@ -1827,7 +1841,7 @@ function KageQuarters({
       }, /*#__PURE__*/React.createElement("input", {
         type: "number",
         min: "0",
-        max: total ? total : null,
+        max: total ? total : 25000,
         step: "100",
         placeholder: "0",
         className: "trade_display_resource_input",
@@ -1835,9 +1849,11 @@ function KageQuarters({
         onChange: e => handleOfferedResourcesChange(resource.resource_name, parseInt(e.target.value))
       }), /*#__PURE__*/React.createElement("div", {
         className: "trade_display_resource_name"
-      }, resource.resource_name), total && /*#__PURE__*/React.createElement("div", {
+      }, resource.resource_name), total ? /*#__PURE__*/React.createElement("div", {
         className: "trade_display_resource_total"
-      }, total));
+      }, total) : /*#__PURE__*/React.createElement("div", {
+        className: "trade_display_resource_total"
+      }, "???"));
     })), /*#__PURE__*/React.createElement("div", {
       className: "header"
     }, "Offer Regions"), /*#__PURE__*/React.createElement("div", {
@@ -1865,7 +1881,7 @@ function KageQuarters({
       }, /*#__PURE__*/React.createElement("input", {
         type: "number",
         min: "0",
-        max: total ? total : null,
+        max: total ? total : 25000,
         step: "100",
         placeholder: "0",
         className: "trade_display_resource_input",
@@ -1873,9 +1889,11 @@ function KageQuarters({
         onChange: e => handleRequestedResourcesChange(resource.resource_name, parseInt(e.target.value))
       }), /*#__PURE__*/React.createElement("div", {
         className: "trade_display_resource_name"
-      }, resource.resource_name), total && /*#__PURE__*/React.createElement("div", {
+      }, resource.resource_name), total ? /*#__PURE__*/React.createElement("div", {
         className: "trade_display_resource_total"
-      }, total));
+      }, total) : /*#__PURE__*/React.createElement("div", {
+        className: "trade_display_resource_total"
+      }, "???"));
     })), /*#__PURE__*/React.createElement("div", {
       className: "header"
     }, "Request Regions"), /*#__PURE__*/React.createElement("div", {

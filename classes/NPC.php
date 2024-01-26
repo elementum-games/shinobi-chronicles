@@ -458,10 +458,6 @@ class NPC extends Fighter {
 
     }
 
-    public function getBaseStatTotal(): int {
-        return max(1, $this->total_stats);
-    }
-
     /**
      * @param System $system
      * @param string $entity_id_str

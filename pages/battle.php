@@ -179,7 +179,10 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $result .= "You win the fight and earn ¥$pvp_yen![br]";
 
         $system->db->query(
-            "UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='{$player->village->name}' LIMIT 1"
+            "UPDATE `villages` SET 
+            `points` = `points` + '{$village_point_gain}',
+            `monthly_points` = `monthly_points` + '{$village_point_gain}'
+            WHERE `name`= '{$player->village->name}' LIMIT 1"
         );
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
@@ -189,6 +192,10 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                 $rep_gained = $player->reputation->handlePvPWin($player, $battle->opponent, true);
                 if ($rep_gained > 0) {
                     $result .= "You have earned $rep_gained village reputation.[br]";
+                }
+                // Daily Task
+                if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVP)) {
+                    $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, $rep_gained);
                 }
             }
             // Loot - winner takes half loser's if retreat, which is all remaining since loser has left battle in order to flag as retreat
@@ -202,6 +209,10 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                 $rep_gained = $player->reputation->handlePvPWin($player, $battle->opponent);
                 if ($rep_gained > 0) {
                     $result .= "You have earned $rep_gained village reputation.[br]";
+                }
+                // Daily Task
+                if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVP)) {
+                    $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, $rep_gained);
                 }
             }
             // Loot

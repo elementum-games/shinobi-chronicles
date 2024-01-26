@@ -68,7 +68,7 @@ function gear(): void {
                 throw new RuntimeException("Invalid item!");
             }
 
-            if($player->health >= $player->max_health) {
+            if($player->health >= $player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100)) {
                 throw new RuntimeException("Your health is already maxed out!");
             }
 
@@ -79,11 +79,11 @@ function gear(): void {
             switch($player->items[$item_id]->effect) {
                 case 'heal':
                     $player->items[$item_id]->quantity--;
-                    $player->health += $player->items[$item_id]->effect_amount;
-                    if($player->health > $player->max_health) {
-                        $player->health = $player->max_health;
+                    $player->health += ($player->items[$item_id]->effect_amount / 100) * $player->max_health;
+                    if($player->health > $player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100)) {
+                        $player->health = $player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100);
                     }
-                    $system->message("Restored " . $player->items[$item_id]->effect_amount . " HP.");
+                    $system->message("Restored " . $player->items[$item_id]->effect_amount . "% HP.");
                     break;
                 default:
                     break;

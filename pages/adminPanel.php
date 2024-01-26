@@ -44,6 +44,87 @@ function adminPanel() {
         $page = '';
     }
 
+    // Open server from maintenance
+    if($page== 'server_maint') {
+        $self_link .= "&page=server_maint";
+		
+		// Open server
+        if(isset($_POST['open_sc'])) {
+            $system->db->query("UPDATE `system_storage` SET `maintenance_end_time`=0, `maintenance_begin_time`=0 LIMIT 1");
+            if($system->db->last_affected_rows) {
+				$system->UPDATE_MAINTENANCE = null;
+				$system->SC_OPEN = true;
+                $system->message("Server opened!");
+            }
+            else {
+                $system->message("Error opening server!");
+            }
+        }
+		// Start maintenance
+		if(isset($_POST['start_maint'])) {
+			try {
+				$allowed_types = ['min', 'hour'];
+				$begin_type = $_POST['begin_type'];
+				$end_type = $_POST['end_type'];
+
+				$begin_time = (int) $_POST['begin_time'];
+				$end_time = (int) $_POST['end_time'];
+				
+				if(!in_array($begin_type, $allowed_types)) {
+					throw new RuntimeException("Invalid begin type!");
+				}
+				if(!in_array($end_type, $allowed_types)) {
+					throw new RuntimeException("Invalid end type!");
+				}
+				
+				$begin_time_multiplier = ($begin_type == 'min') ? 60 : 3600;
+				$end_time_multiplier = ($end_type == 'min') ? 60 : 3600;
+				
+				$begin_seconds = $begin_time * $begin_time_multiplier;
+				$end_seconds = $end_time * $end_time_multiplier;
+				
+				// Server countdown must be at least 5 minutes
+				if($begin_seconds < 300) {
+					throw new RuntimeException("You must allow at least 5 minutes prior to maintenance period!");
+				}
+				// Downtime must be at least 5 minutes
+				if($end_seconds < 300) {
+					throw new RuntimeException("Server must remain closed for at least 5 minutes!");
+				}
+				
+				$TIME = new DateTimeImmutable('now', new DateTimezone(System::SERVER_TIME_ZONE));
+				
+				$BEGIN_TIME = $TIME->setTimestamp($TIME->getTimestamp() + $begin_seconds);
+				$END_TIME = $TIME->setTimestamp($BEGIN_TIME->getTimestamp() + $end_seconds);
+				
+				$system->db->query("UPDATE `system_storage` SET `maintenance_begin_time`='{$BEGIN_TIME->getTimestamp()}', `maintenance_end_time`='{$END_TIME->getTimestamp()}' LIMIT 1");
+				
+				if($system->db->last_affected_rows) {
+					$system->UPDATE_MAINTENANCE = $BEGIN_TIME;
+					$system->message("Maintenance started!");
+				}
+				else {
+					$system->message("Error beginning maintenance!");
+				}
+			}catch(RuntimeException $e) {
+				$system->message($e->getMessage());
+			}
+		}
+		// Hard close server
+		if(isset($_POST['close_server'])) {
+			$system->db->query("UPDATE `system_storage` SET `maintenance_end_time`=-1 LIMIT 1");
+			if($system->db->last_affected_rows) {
+				$system->SC_OPEN = false;
+				$system->message("Server closed!");
+			}
+			else {
+				$system->message("Error closing server!");
+			}
+		}
+
+        $system->printMessage();
+        require 'templates/admin/sc_maint.php';
+    }
     // Create NPC
     if($page == 'create_ai') {
         /* Variables

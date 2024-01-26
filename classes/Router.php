@@ -158,46 +158,20 @@ class Router {
             }
         }
 
-        // Check for being in village is not okay/okay/required
-        if(isset($route->village_ok)) {
-            // Player is allowed in up to rank 3, then must go outside village
-            if($player->rank_num > 2 && $route->village_ok === Route::NOT_IN_VILLAGE
-                && TravelManager::locationIsInVillage($system, $player->location)
-            ) {
-                throw new RuntimeException("You cannot access this page while in a village!");
-            }
-
-            if($route->village_ok === Route::ONLY_IN_VILLAGE && !$player->location->equals($player->village_location)) {
-                $contents_arr = [];
-                foreach($_GET as $key => $val) {
-                    $contents_arr[] = "GET[{$key}]=$val";
-                }
-                foreach($_POST as $key => $val) {
-                    $contents_arr[] = "POST[{$key}]=$val";
-                }
-                $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
-
-                throw new RuntimeException("You must be in your village to access this page!");
-            }
-
-            if ($route->village_ok === Route::VILLAGE_OR_COLOSSEUM && !$player->location->equals($player->village_location)) {
-                $result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
-                $location_result = $system->db->fetch($result);
-                $arena_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
-                if (!$player->location->equals($arena_coords)) {
-                    $contents_arr = [];
-                    foreach($_GET as $key => $val) {
-                        $contents_arr[] = "GET[{$key}]=$val";
-                    }
-                    foreach($_POST as $key => $val) {
-                        $contents_arr[] = "POST[{$key}]=$val";
-                    }
-                    $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
-
-                    throw new RuntimeException("You must be in your village or Underground Colosseum to access this page!");
+        // Check location restrictions
+        $player_location_type = TravelManager::getPlayerLocationType($system, $player);
+        if ($player_location_type == TravelManager::LOCATION_TYPE_HOME_VILLAGE) {
+            if (!$route->allowed_location_types[TravelManager::LOCATION_TYPE_HOME_VILLAGE]) {
+                // Player is allowed in up to rank 3, then must go outside village
+                if ($player->rank_num > 2) {
+                    throw new RuntimeException("You cannot access this page while in a village!");
                 }
             }
         }
+        else if (!$route->allowed_location_types[$player_location_type]) {
+            throw new RuntimeException("You can not access this page at your current location!");
+        }
+
         if(isset($route->min_rank)) {
             if($player->rank_num < $route->min_rank) {
                 throw new RuntimeException("You are not a high enough rank to access this page!");

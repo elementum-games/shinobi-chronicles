@@ -18,7 +18,7 @@ class Battle {
     const MAX_TURN_LENGTH = 40;
     const PREP_LENGTH = 20;
 
-    const MAX_PRE_FIGHT_HEAL_PERCENT = 85;
+    const MAX_PRE_FIGHT_HEAL_PERCENT = 95;
 
     const TEAM1 = 'T1';
     const TEAM2 = 'T2';
@@ -29,7 +29,7 @@ class Battle {
     const MIN_DEBUFF_RATIO = 0.1;
     const MAX_DIFFUSE_PERCENT = 0.75;
 
-    const REPUTATION_DAMAGE_RESISTANCE_BOOST = 15;
+    const REPUTATION_DAMAGE_RESISTANCE_BOOST = 5;
 
     private System $system;
 
@@ -81,6 +81,11 @@ class Battle {
 
     public string $battle_background_link;
 
+    public int $rounds = 1;
+    public int $round_count = 0;
+    public int $team1_wins;
+    public int $team2_wins;
+
     /**
      * @param System  $system
      * @param Fighter $player1
@@ -90,7 +95,7 @@ class Battle {
      * @throws RuntimeException
      */
     public static function start(
-        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null, string $battle_background_link = ''
+        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null, string $battle_background_link = '', int $rounds = 1
     ) {
         $json_empty_array = '[]';
 
@@ -135,7 +140,8 @@ class Battle {
                 `fighter_jutsu_used` = '" . $json_empty_array . "',
                 `is_retreat` = '" . (int)false . "',
                 `patrol_id` = " . (!empty($patrol_id) ? $patrol_id : "NULL") . ",
-                `battle_background_link` = '{$battle_background_link}'
+                `battle_background_link` = '{$battle_background_link}',
+                `rounds` = {$rounds}
         ");
         $battle_id = $system->db->last_insert_id;
 
@@ -261,6 +267,11 @@ class Battle {
         $this->player2_last_damage_taken = $battle['player2_last_damage_taken'];
 
         $this->battle_background_link = empty($battle['battle_background_link']) ? '' : $battle['battle_background_link'];
+
+        $this->rounds = $battle['rounds'];
+        $this->round_count = $battle['round_count'];
+        $this->team1_wins = $battle['team1_wins'];
+        $this->team2_wins = $battle['team2_wins'];
     }
 
     /**
@@ -367,9 +378,9 @@ class Battle {
                 }
             }
 
-            if($jutsu->rank == 1) continue;
+            if ($jutsu->rank == 1) continue;
 
-            if($jutsu->jutsu_type != $player1_primary_jutsu_type) {
+            if ($jutsu->jutsu_type != $player1_primary_jutsu_type) {
                 $jutsu->power *= 0.5;
                 foreach($jutsu->effects as $effect) {
                     $effect->display_effect_amount *= 0.5;
@@ -377,7 +388,7 @@ class Battle {
                 }
             }
         }
-        foreach($this->player2->jutsu as $jutsu) {
+        foreach ($this->player2->jutsu as $jutsu) {
             if ($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player2_equipped_jutsu_ids[$jutsu->id])) {
                 $jutsu->power *= 0.75;
                 foreach ($jutsu->effects as $effect) {
@@ -385,26 +396,15 @@ class Battle {
                     $effect->effect_amount *= 0.75;
                 }
             }
-        }
-      
-        if (!$this->player2 instanceof NPC) {
-            foreach ($this->player2->jutsu as $jutsu) {
-                if ($jutsu->rank == 1)
-                    continue;
 
+            if ($jutsu->rank == 1) continue;
+
+            if (!$this->player2 instanceof NPC) {
                 if ($jutsu->jutsu_type != $player2_primary_jutsu_type) {
                     $jutsu->power *= 0.5;
                     foreach ($jutsu->effects as $effect) {
                         $effect->display_effect_amount *= 0.5;
                         $effect->effect_amount *= 0.5;
-                    }
-                }
-
-                if($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player2_equipped_jutsu_ids[$jutsu->id])) {
-                    $jutsu->power *= 0.75;
-                    foreach($jutsu->effects as $effect) {
-                        $effect->display_effect_amount *= 0.75;
-                        $effect->effect_amount *= 0.75;
                     }
                 }
             }
@@ -442,7 +442,7 @@ class Battle {
     }
 
     public function isPreparationPhase(): bool {
-        return $this->prepTimeRemaining() > 0 && in_array($this->battle_type, [Battle::TYPE_FIGHT]);
+        return $this->prepTimeRemaining() > 0 && in_array($this->battle_type, [Battle::TYPE_FIGHT, Battle::TYPE_CHALLENGE]);
     }
 
     /**
@@ -506,6 +506,7 @@ class Battle {
         $is_retreat = (int)$this->is_retreat;
         $this->system->db->query(
             "UPDATE `battles` SET
+            `start_time` = {$this->start_time},
             `turn_time` = {$this->turn_time},
             `turn_count` = {$this->turn_count},
             `winner` = '{$this->winner}',
@@ -526,11 +527,24 @@ class Battle {
             `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "',
 
             `player1_last_damage_taken` = {$this->player1->last_damage_taken},
-            `player2_last_damage_taken` = {$this->player2->last_damage_taken}
+            `player2_last_damage_taken` = {$this->player2->last_damage_taken},
+
+            `round_count` = {$this->round_count},
+            `team1_wins` = {$this->team1_wins},
+            `team2_wins` = {$this->team2_wins}
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
         );
 
-        BattleLog::addOrUpdateTurnLog($this->system, $this->battle_id, $this->turn_count, $this->battle_text);
+        $fighter_health = $this->fighter_health;
+        $fighter_health[$this->player1->combat_id] = [
+           'current' => $this->fighter_health[$this->player1->combat_id],
+           'max' => $this->player1->max_health,
+         ];
+         $fighter_health[$this->player2->combat_id] = [
+           'current' => $this->fighter_health[$this->player2->combat_id],
+           'max' => $this->player2->max_health,
+         ];
+        BattleLog::addOrUpdateTurnLog($this->system, $this->battle_id, $this->turn_count, $this->battle_text, $fighter_health, $this->raw_active_effects, $this->round_count);
 
         $this->system->db->query("COMMIT;");
     }

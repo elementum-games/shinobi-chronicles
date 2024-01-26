@@ -1,0 +1,188 @@
+@font-face {
+    src: url("/style/fonts/STICKRICE-8JEZ.TTF");
+    font-family: stickrice;
+}
+
+:root {
+    /* Structure */
+    --header-height: 35px;
+    --content-width: 930px;
+    --sidebar-width: 250px;
+    --content-sidebar-gap: 15px;
+    --header-sidebar-gap: 7px;
+    --topbar-height: 60px;
+    --hotbar-height: 85px;
+    --footer-height: 30px;
+    /* Hotbar Config */
+    --hotbar-keybind-modal-width: 700px;
+    --hotbar-keybind-modal-height: 400px;
+    /* Sidebar Config */
+    --sidebar-header-height: 23px;
+    /* Header Config */
+    --header-border-height: 3px;
+    /* Style helpers */
+    --clip-tall-hexagon: polygon(50% 0%,95% 20%,95% 80%,50% 100%,5% 80%,5% 20%);
+}
+
+/* Layout Config */
+html {
+    scroll-behavior: smooth
+}
+#container {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+}
+#content_wrapper {
+    width: var(--content-width);
+    display: inline-block;
+    margin-left: var(--content-sidebar-gap);
+    margin-right: var(--content-sidebar-gap);
+    margin-bottom: var(--hotbar-height);
+}
+.contentHeader {
+    display: flex !important;
+    flex-direction: row !important;
+    white-space: nowrap;
+}
+.contentHeaderDivider {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+    margin-right: 20px;
+}
+#content {
+    width: 100%;
+    min-height: 500px;
+    padding-bottom: 5px;
+    margin: 0;
+}
+#footer {
+    width: 100%;
+    height: var(--footer-height);
+    position: fixed;
+    bottom: 0;
+    z-index: 10;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: center;
+}
+.footer-left {
+    width: var(--sidebar-width);
+}
+.footer-right {
+}
+.footer_text {
+    text-align: center;
+    padding-top: 10px;
+}
+
+/* Mobile Overrides */
+@media screen and (max-width: 999px) {
+    #container {
+        flex-direction: column !important;
+        padding-bottom: 0px;
+        transform: scale(1.2);
+        transform-origin: top left;
+        width: calc(100% / 1.2) !important;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    #footer {
+        display: none;
+    }
+    #hotbar {
+        display: none;
+    }
+    #content_wrapper {
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 0;
+        width: 100%;
+    }
+    #container::before {
+        display: none;
+    }
+    #content {
+        width: 100%;
+    }
+}
+
+/* Global Classes */
+.box-primary {
+    box-sizing: border-box;
+}
+.systemMessage {
+    width: 100%;
+    top: 5px;
+}
+
+/* Avatar Classes */
+.avy_none {
+    display: none !important;
+}
+.avy_round {
+    clip-path: circle(50% at 50% 50%);
+}
+.avy_three-point {
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+.avy_three-point-inverted {
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+}
+.avy_four-point {
+    clip-path: none;
+}
+.avy_four-point-90 {
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+.avy_four-point-oblique {
+    clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+}
+.avy_five-point {
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+}
+.avy_six-point {
+    clip-path: polygon(21% 0, 79% 0, 100% 50%, 79% 100%, 21% 100%, 0% 50%);
+}
+.avy_six-point-long {
+    clip-path: polygon(40% 0, 100% 0, 100% 60%, 60% 100%, 0 100%, 0 40%);
+}
+.avy_six-point-long-reverse {
+    clip-path: polygon(0 0, 60% 0, 100% 40%, 100% 100%, 40% 100%, 0 60%);
+}
+.avy_eight-point {
+    clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+}
+.avy_eight-point-wide {
+    clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+}
+.avy_nine-point {
+    clip-path: polygon(50% 0%, 83% 12%, 100% 43%, 94% 78%, 68% 100%, 32% 100%, 6% 78%, 0% 43%, 17% 12%);
+}
+.avy_twelve-point {
+    clip-path: polygon(0% 15%, 15% 15%, 15% 0%, 85% 0%, 85% 15%, 100% 15%, 100% 85%, 85% 85%, 85% 100%, 15% 100%, 15% 85%, 0% 85%);
+}
+.avatar_frame {
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    display: flex;
+    background: var(--avatar-frame-border_gradient);
+    padding: var(--avatar-frame-border-width-large);
+}
+.avy_frame_none {
+    padding: 0 !important;
+    background: none;
+}
+.avy_frame_shadow {
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5) 70%, rgba(0, 0, 0, 0) 95%) !important;
+}
+.avatar_img {
+    max-width: 100%;
+    max-height: 100%;
+}

@@ -681,10 +681,6 @@ if($LOGGED_IN) {
         );
 
         $system->printMessage();
-        if (!$player->global_message_viewed) {
-            $global_message = $system->fetchGlobalMessage();
-            $layout->renderGlobalMessage($system, $global_message);
-        }
 
         try {
             require("pages/profile.php");
@@ -708,7 +704,7 @@ else {
     if (!$system->layout->usesV2Interface()) {
         $system->printMessage(true);
     }
-    if(!$system->SC_OPEN) {
+    if(!$system->SC_OPEN && !$system->layout->usesV2Interface()) {
         echo "<table class='table'><tr><th>Game Maintenance</th></tr>
         <tr><td style='text-align:center;'>
         Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!

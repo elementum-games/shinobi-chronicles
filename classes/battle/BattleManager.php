@@ -227,14 +227,14 @@ class BattleManager {
                                 unset($this->player->items[$item_id]);
                             }
 
-                            $this->player->health += $item->effect_amount;
+                            $this->player->health += ($item->effect_amount / 100) * $this->player->max_health;
                             if ($this->player->health >= $max_health) {
                                 $this->player->health = $max_health;
                             }
 
                             $this->player->updateData();
                             $this->player->updateInventory();
-                            $this->battle->battle_text .= sprintf("%s used a %s and healed for %.0f[br]", $this->player->user_name, $item->name, $item->effect_amount);
+                            $this->battle->battle_text .= sprintf("%s used a %s and healed for %.0f%% HP[br]", $this->player->user_name, $item->name, $item->effect_amount);
                             $this->updateData();
                         }
                     }
@@ -308,7 +308,7 @@ class BattleManager {
                         throw new RuntimeException($result->error_message);
                     }
 
-                    // Check for weapon if non-BL taijutsu
+                    /* Check for weapon if non-BL taijutsu
                     $weapon_id = 0;
                     $weapon_element = Jutsu::ELEMENT_NONE;
                     if($jutsu_type == Jutsu::TYPE_TAIJUTSU && !empty($_POST['weapon_id'])) {
@@ -326,10 +326,10 @@ class BattleManager {
                         if(!in_array($weapon_element, $this->player->elements)) {
                             $weapon_element = Jutsu::ELEMENT_NONE;
                         }
-                    }
+                    }*/
 
                     // Log jutsu used
-                    $this->setPlayerAction($this->player, $player_jutsu, $weapon_id, $weapon_element);
+                    $this->setPlayerAction($this->player, $player_jutsu, 0, Jutsu::ELEMENT_NONE);
 
                     //update player turn time
                     $this->battle->updatePlayerTime($this->player->id);
@@ -368,8 +368,8 @@ class BattleManager {
             }
         }
 
-        $this->checkForWinner();
         $this->updateData();
+        $this->checkForWinner();
         $this->battle->fetchPlayerInventories();
 
         return $this->battle->winner;
@@ -635,13 +635,16 @@ class BattleManager {
         }
 
         if($this->battle->player1->health > 0 && $this->battle->player2->health <= 0) {
-            $this->battle->winner = Battle::TEAM1;
+            $this->battle->winner = $this->handleRoundCompletion(Battle::TEAM1);
+            $this->battle->updateData();
         }
         else if($this->battle->player2->health > 0 && $this->battle->player1->health <= 0) {
-            $this->battle->winner = Battle::TEAM2;
+            $this->battle->winner = $this->handleRoundCompletion(Battle::TEAM2);
+            $this->battle->updateData();
         }
         else if($this->battle->player1->health <= 0 && $this->battle->player2->health <= 0) {
-            $this->battle->winner = Battle::DRAW;
+            $this->battle->winner = $this->handleRoundCompletion(Battle::DRAW);
+            $this->battle->updateData();
         }
 
         if($this->battle->winner && !$this->spectate) {
@@ -649,6 +652,63 @@ class BattleManager {
         }
 
         return $this->battle->winner;
+    }
+
+    #[Trace]
+    private function handleRoundCompletion(string $round_winner): string {
+        // if round winner is team1, increment wins
+        if ($round_winner == Battle::TEAM1) {
+            $this->battle->team1_wins++;
+        }
+        // if round winner is team2, increment wins
+        if ($round_winner == Battle::TEAM2) {
+            $this->battle->team2_wins++;
+        }
+        // if single-round battle and round is draw
+        if ($this->battle->rounds <= 1 && $round_winner == Battle::DRAW) {
+            return Battle::DRAW;
+        }
+        // if team1 majority of wins (total rounds)
+        if ($this->battle->team1_wins > floor($this->battle->rounds / 2) || ($this->battle->round_count > $this->battle->rounds && $this->battle->team1_wins > $this->battle->team2_wins)) {
+            return Battle::TEAM1;
+        }
+        // if team2 majority of wins (total rounds)
+        if ($this->battle->team2_wins > floor($this->battle->rounds / 2) || ($this->battle->round_count > $this->battle->rounds && $this->battle->team2_wins > $this->battle->team1_wins)) {
+            return Battle::TEAM2;
+        }
+        // if more rounds to go
+        if ($this->battle->round_count < $this->battle->rounds) {
+            $this->battle->round_count++;
+            $this->resetBattle();
+            return '';
+        }
+        // if rounds completed but no winner
+        if ($this->battle->team1_wins == $this->battle->team2_wins) {
+            $this->battle->round_count++;
+            $this->resetBattle();
+            return '';
+        }
+        // return no winner as failsafe
+        return '';
+    }
+
+    #[Trace]
+    private function resetBattle() {
+        $this->battle->player1->health = $this->battle->player1->max_health;
+        $this->battle->fighter_health[$this->battle->player1->combat_id] = $this->battle->player1->max_health;
+        $this->battle->player1_last_damage_taken = 0;
+        $this->battle->player2->health = $this->battle->player2->max_health;
+        $this->battle->fighter_health[$this->battle->player2->combat_id] = $this->battle->player2->max_health;
+        $this->battle->player2_last_damage_taken = 0;
+        $this->effects->active_effects = [];
+        $this->battle->jutsu_cooldowns = [];
+        $this->battle->turn_count = 0;
+        $this->battle->turn_time = time();
+        $this->battle->player1_time = Battle::MAX_TURN_LENGTH;
+        $this->battle->player2_time = Battle::MAX_TURN_LENGTH;
+        $this->battle->player1->updateData();
+        $this->battle->player2->updateData();
+        $this->battle->start_time = time();
     }
 
     /**
@@ -696,13 +756,13 @@ class BattleManager {
     // PRIVATE API - ATTACK PROCESSING
 
     /**
-     * @param Fighter       $fighter
+     * @param Fighter             $fighter
      * @param LegacyFighterAction $action
      * @return BattleAttack
      * @throws RuntimeException
      */
     #[Trace]
-    protected function setupFighterAttack(Fighter $fighter, Fighter $target, LegacyFighterAction $action, ?Jutsu $jutsu = null, bool $simulation = false): BattleAttack {
+    public function setupFighterAttack(Fighter $fighter, Fighter $target, LegacyFighterAction $action, ?Jutsu $jutsu = null, bool $simulation = false): BattleAttack {
         $attack = new BattleAttack();
         // if jutsu is already given, use instead
         if (!empty($jutsu)) {
@@ -1087,7 +1147,7 @@ class BattleManager {
     #[Trace]
     public function jutsuCollision(
         Fighter $player1, Fighter $player2, &$player1_damage, &$player2_damage, BattleAttack &$player1_attack, BattleAttack &$player2_attack
-    ) {
+    ): string {
         $collision_text = '';
         $player1_jutsu = $player1_attack->jutsu;
         $player2_jutsu = $player2_attack->jutsu;

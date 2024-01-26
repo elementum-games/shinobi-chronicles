@@ -405,9 +405,9 @@ class BattleEffectsManager {
 
     public function applyBloodlineActiveBoosts(Fighter $fighter, Fighter $opponent) {
         if(!empty($fighter->bloodline->combat_boosts)) {
-            foreach($fighter->bloodline->combat_boosts as $id=>$effect) {
-                if ($effect['effect'] == 'heal') {
-                    $heal_power = $effect['effect_amount'] / max($opponent->getBaseStatTotal(), 1);
+            foreach($fighter->bloodline->combat_boosts as $id=>$boost) {
+                if ($boost->effect == 'heal') {
+                    $heal_power = $boost->effect_amount / max($opponent->getBaseStatTotal(), 1);
                     // if higher than soft cap, apply penalty
                     if ($heal_power > BattleManager::HEAL_SOFT_CAP) {
                         $heal_power = (($heal_power - BattleManager::HEAL_SOFT_CAP) * BattleManager::HEAL_SOFT_CAP_RATIO) + BattleManager::HEAL_SOFT_CAP;
@@ -416,7 +416,7 @@ class BattleEffectsManager {
                     if ($heal_power > BattleManager::HEAL_HARD_CAP) {
                         $heal_power = BattleManager::HEAL_HARD_CAP;
                     }
-                    $effect['effect_amount'] = $heal_power * $fighter->last_damage_taken;
+                    $boost->effect_amount = $heal_power * $fighter->last_damage_taken;
                 }
                 $this->applyActiveEffect(
                     $fighter,
@@ -425,8 +425,8 @@ class BattleEffectsManager {
                         user: $fighter->combat_id,
                         target: $fighter->combat_id,
                         turns: 1,
-                        effect: $effect['effect'],
-                        effect_amount: $effect['effect_amount'],
+                        effect: $boost->effect,
+                        effect_amount: $boost->effect_amount,
                         damage_type: Jutsu::TYPE_TAIJUTSU
                     )
                 );

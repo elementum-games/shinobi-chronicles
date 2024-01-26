@@ -35,8 +35,10 @@ class VillageApiPresenter {
     }
     public static function pointsDataResponse(System $system, User $player): array
     {
+        $points_arr = VillageManager::getVillagePoints($system, $player->village->village_id);
         return [
-            "points" => VillageManager::getVillagePoints($system, $player->village->village_id),
+            "points" => $points_arr['points'],
+            "monthly_points" => $points_arr['monthly_points'],
         ];
     }
     public static function diplomacyDataResponse(System $system, User $player): array

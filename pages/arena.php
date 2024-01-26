@@ -179,16 +179,17 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
             $stat_to_gain = $player->getTrainingStatForArena();
 
             $stat_gain_display = '<br />During the fight you realized a way to use your ' . System::unSlug($stat_to_gain) . ' a little
-            more effectively.';
+            more effectively.<br />';
             $stat_gain = TrainingManager::getAIStatGain($opponent->difficulty_level, $player->rank_num);
             $stat_gain_display .= $player->addStatGain($stat_to_gain, $stat_gain) . '.';
         }
 
         // Village Rep Gains
         $rep_gain_string = "";
+        $rep_gain = $player->reputation->calcArenaReputation($opponent->difficulty_level, $player->rank_num);
         if($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
             $rep_gain = $player->reputation->addRep(
-                amount: $player->reputation->calcArenaReputation($opponent->difficulty_level, $player->rank_num),
+                amount: $rep_gain,
                 activity_type: UserReputation::ACTIVITY_TYPE_PVE
             );
             if($rep_gain > 0) {
@@ -238,8 +239,11 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->last_pvp_ms = System::currentTimeMs();
 
         // Daily Tasks
-        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_ARENA)) {
+        if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_ARENA)) {
             $player->daily_tasks->progressTask(DailyTask::ACTIVITY_ARENA, 1);
+        }
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVE)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVE, $rep_gain);
         }
     }
     else if($battle->isOpponentWinner()) {
@@ -291,9 +295,10 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
 
         // Village Rep Gains
         $rep_gain_string = "";
+        $rep_gain = floor($player->reputation->calcArenaReputation($opponent->difficulty_level, $player->rank_num) / 2);
         if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
             $rep_gain = $player->reputation->addRep(
-                amount: floor($player->reputation->calcArenaReputation($opponent->difficulty_level, $player->rank_num) / 2),
+                amount: $rep_gain,
                 activity_type: UserReputation::ACTIVITY_TYPE_PVE
             );
             if ($rep_gain > 0) {
@@ -341,6 +346,11 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         //$player->moveToVillage();
         $player->battle_id = 0;
         $player->last_pvp_ms = System::currentTimeMs();
+
+        // Daily Tasks
+        if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVE)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVE, $rep_gain);
+        }
     }
 
     return $battle_result;
