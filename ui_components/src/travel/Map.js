@@ -1,5 +1,6 @@
 
-export const Map = ({ mapData, scoutData, patrolData, playerId, ranksToView, strategicView, displayGrid}) => {
+export const Map = ({ mapData, scoutData, npcData, playerId, ranksToView, strategicView, displayGrid }) => {
+    console.log(npcData);
     // Visible field info
     const map_div = document.getElementsByClassName('travel-container')[0];
 
@@ -148,8 +149,8 @@ export const Map = ({ mapData, scoutData, patrolData, playerId, ranksToView, str
                         playerId={playerId}
                         ranksToView={ranksToView}
                     />
-                    <MapNearbyPatrols
-                        patrolData={patrolData || []}
+                    <MapNearbyNPCs
+                        npcData={npcData || []}
                         tileWidth={tile_width}
                         tileHeight={tile_height}
                         playerId={playerId}
@@ -475,35 +476,35 @@ function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId, ranksToV
     );
 }
 
-function MapNearbyPatrols({ patrolData, tileWidth, tileHeight, strategicView }) {
+function MapNearbyNPCs({ npcData, tileWidth, tileHeight, strategicView }) {
     return (
-        <div id="patrol_locations" className='map_locations'>
-            {patrolData
-                .map((patrol, index) => (
-                    <div key={patrol.patrol_id + '_' + patrol.patrol_type}
+        <div id="npc_locations" className='map_locations'>
+            {npcData
+                .map((npc, index) => (
+                    <div key={npc.npc_id + '_' + npc.npc_type}
                         className='map_location'
                         style={{
                             cursor: "pointer",
-                            transform: `translate3d(${(patrol.target_x - 1) * tileWidth}px, ${(patrol.target_y - 1) * tileHeight}px, 0)`,
+                            transform: `translate3d(${(npc.target_x - 1) * tileWidth}px, ${(npc.target_y - 1) * tileHeight}px, 0)`,
                             backfaceVisibility: "hidden",
                         }}>
-                        <div className='map_location_tooltip'>{patrol.patrol_name}</div>
-                        <div className={alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type + ' tier_' + patrol.tier}></div>
-                        {(patrol.resources.length !== 0 && strategicView) &&
-                            <div className='patrol_details'>
-                            {patrol.resources[1] &&
-                                <div className='patrol_details_resource'>
-                                <img className='patrol_details_resource_icon' src='/images/map/icons/materials.png' />  {patrol.resources[1]} Materials
+                        <div className='map_location_tooltip'>{npc.npc_name}</div>
+                        <div className={alignmentClassNPC(npc.alignment, npc.village_id) + ' ' + npc.npc_type + ' tier_' + npc.tier}></div>
+                        {(npc.resources.length !== 0 && strategicView) &&
+                            <div className='npc_details'>
+                            {npc.resources[1] &&
+                                <div className='npc_details_resource'>
+                                <img className='npc_details_resource_icon' src='/images/map/icons/materials.png' />  {npc.resources[1]} Materials
                                 </div>
                             }
-                            {patrol.resources[2] &&
-                                <div className='patrol_details_resource'>
-                                <img className='patrol_details_resource_icon' src='/images/map/icons/food.png' />  {patrol.resources[2]} Food
+                            {npc.resources[2] &&
+                                <div className='npc_details_resource'>
+                                <img className='npc_details_resource_icon' src='/images/map/icons/food.png' />  {npc.resources[2]} Food
                                 </div>
                             }
-                            {patrol.resources[3] &&
-                                <div className='patrol_details_resource'>
-                                <img className='patrol_details_resource_icon' src='/images/map/icons/wealth.png' />  {patrol.resources[3]} Wealth
+                            {npc.resources[3] &&
+                                <div className='npc_details_resource'>
+                                <img className='npc_details_resource_icon' src='/images/map/icons/wealth.png' />  {npc.resources[3]} Wealth
                                 </div>
                             }
                             </div>
@@ -635,34 +636,34 @@ const alignmentClassPlayer = (alignment, village_id) => {
     return class_name;
 }
 
-const alignmentClassPatrol = (alignment, village_id) => {
+const alignmentClassNPC = (alignment, village_id) => {
     let class_name = '';
     switch (alignment) {
         case 'Ally':
-            class_name += 'patrol_ally';
+            class_name += 'npc_ally';
             break;
         case 'Enemy':
-            class_name += 'patrol_enemy';
+            class_name += 'npc_enemy';
             break;
         case 'Neutral':
-            class_name += 'patrol_neutral';
+            class_name += 'npc_neutral';
             break;
     }
     switch (village_id) {
         case 1:
-            class_name += ' patrol_stone';
+            class_name += ' npc_stone';
             break;
         case 2:
-            class_name += ' patrol_cloud';
+            class_name += ' npc_cloud';
             break;
         case 3:
-            class_name += ' patrol_leaf';
+            class_name += ' npc_leaf';
             break;
         case 4:
-            class_name += ' patrol_sand';
+            class_name += ' npc_sand';
             break;
         case 5:
-            class_name += ' patrol_mist';
+            class_name += ' npc_mist';
             break;
     }
     return class_name;

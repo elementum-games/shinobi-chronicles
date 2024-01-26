@@ -87,7 +87,7 @@ function Travel({
   const [feedback, setFeedback] = React.useState(null);
   const [mapData, setMapData] = React.useState(null);
   const [scoutData, setScoutData] = React.useState(null);
-  const [patrolData, setPatrolData] = React.useState(null);
+  const [npcData, setNpcData] = React.useState(null);
   const [ranksToView, setRanksToView] = React.useState({
     1: false,
     2: false,
@@ -133,7 +133,7 @@ function Travel({
       setDisplayGrid(response.data.mapData.player_filters.display_grid === "true");
       setMapData(response.data.mapData);
       setScoutData(response.data.nearbyPlayers);
-      setPatrolData(response.data.nearbyPatrols);
+      setNpcData(response.data.nearbyNPCs);
     });
   };
   const MovePlayer = direction => {
@@ -169,7 +169,7 @@ function Travel({
         lastTravelSuccessTime.current = requestEnd;
         setMapData(response.data.mapData);
         setScoutData(response.data.nearbyPlayers);
-        setPatrolData(response.data.nearbyPatrols);
+        setNpcData(response.data.nearbyNPCs);
       } else {
         debug('Cannot move player.');
       }
@@ -438,7 +438,7 @@ function Travel({
   })), mapData && scoutData && /*#__PURE__*/React.createElement(Map, {
     mapData: mapData,
     scoutData: scoutData,
-    patrolData: patrolData,
+    npcData: npcData,
     playerId: playerId,
     ranksToView: ranksToView,
     strategicView: strategicView,

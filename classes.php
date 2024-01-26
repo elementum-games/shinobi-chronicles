@@ -59,7 +59,7 @@ require_once __DIR__ . "/classes/travel/MapLocation.php";
 require_once __DIR__ . "/classes/travel/NearbyPlayers.php";
 require_once __DIR__ . "/classes/travel/Region.php";
 require_once __DIR__ . "/classes/travel/RegionCoords.php";
-require_once __DIR__ . "/classes/travel/Patrol.php";
+require_once __DIR__ . "/classes/travel/MapNPC.php";
 require_once __DIR__ . "/classes/travel/Travel.php";
 require_once __DIR__ . "/classes/travel/TravelAPIResponse.php";
 require_once __DIR__ . "/classes/travel/TravelApiPresenter.php";

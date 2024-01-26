@@ -39,12 +39,6 @@ class WarManager {
         3 => "Elite Patrol",
         4 => "War Hero",
     ];
-    const PATROL_AI = [
-        1 => 8,
-        2 => 17,
-        3 => 130,
-        4 => 17,
-    ];
     const PATROL_CHANCE = [
         1 => 65,
         2 => 25,
@@ -122,7 +116,7 @@ class WarManager {
     /**
      * @throws RuntimeException
      */
-    public function beginWarAction(int $war_action_type, int $target_id, Patrol $patrol = null) {
+    public function beginWarAction(int $war_action_type, int $target_id, MapNPC $npc = null) {
         if ($this->user->rank_num <= 2) {
             throw new RuntimeException("Invalid rank!");
         }
@@ -168,10 +162,10 @@ class WarManager {
                 break;
             case WarAction::WAR_ACTION_LOOT:
                 // must be neutral or at war
-                if ($this->user->village->relations[$patrol->village_id]->relation_type != VillageRelation::RELATION_NEUTRAL && $this->user->village->relations[$patrol->village_id]->relation_type != VillageRelation::RELATION_WAR) {
+                if ($this->user->village->relations[$npc->village_id]->relation_type != VillageRelation::RELATION_NEUTRAL && $this->user->village->relations[$npc->village_id]->relation_type != VillageRelation::RELATION_WAR) {
                     throw new RuntimeException("Invalid war_action target!");
                 }
-                WarAction::beginWarAction($this->system, $this->user, $patrol->id, $war_action_type, $patrol->village_id);
+                WarAction::beginWarAction($this->system, $this->user, $npc->id, $war_action_type, $npc->village_id);
                 break;
             default:
                 throw new RuntimeException("Invalid war_action type!");
@@ -267,7 +261,7 @@ class WarManager {
                     $valid_war_actions[WarAction::WAR_ACTION_REINFORCE] .= "<br><span class='reinforce_button_text'>{$health_gain} health</span>";
                 }
             } else {
-                switch ($this->user->village->relations[$target_location['village']]->relation_type) {
+                switch ($this->user->village->relations[$target_location['occupying_village_id']]->relation_type) {
                     case VillageRelation::RELATION_NEUTRAL:
                         $valid_war_actions = [
                             WarAction::WAR_ACTION_INFILTRATE => System::unSlug(WarAction::WAR_ACTION_TYPE[WarAction::WAR_ACTION_INFILTRATE]),
@@ -306,11 +300,11 @@ class WarManager {
         $caravans = $this->system->db->fetch_all($caravans);
         $region_locations = $this->system->db->query("SELECT * FROM `region_locations`");
         $region_locations = $this->system->db->fetch_all($region_locations);
-        foreach ($caravans as $caravan) {
-            $patrol = new Patrol($caravan, "caravan");
-            $patrol->setLocation($this->system, $region_locations);
-            $patrol->setAlignment($this->user);
-            if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) == 0 && $patrol->alignment != "Ally") {
+        foreach ($caravans as $caravan_data) {
+            $caravan = new MapNPC($caravan_data, "caravan");
+            $caravan->setLocation($this->system, $region_locations);
+            $caravan->setAlignment($this->user);
+            if ($this->user->location->distanceDifference(new TravelCoords($caravan->current_x, $caravan->current_y, $caravan->map_id)) == 0 && $caravan->alignment != "Ally") {
                 $valid_war_actions = [
                     WarAction::WAR_ACTION_LOOT => System::unSlug(WarAction::WAR_ACTION_TYPE[WarAction::WAR_ACTION_LOOT]),
                 ];
@@ -320,7 +314,7 @@ class WarManager {
         return $valid_war_actions;
     }
 
-    function tryBeginPatrolBattle(Patrol $patrol) {
+    function tryBeginPatrolBattle(MapNPC $patrol) {
         $patrol_location = new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id);
         // if rank below chuunin
         if ($this->user->rank_num < 3) {
@@ -468,7 +462,7 @@ class WarManager {
         ");
         $location_result = $this->system->db->fetch_all($location_result);
         foreach ($location_result as $location) {
-            if ($location['defense'] > 0 && $location['village'] == $patrol_result['village_id']) {
+            if ($location['defense'] > 0 && $location['occupying_village_id'] == $patrol_result['village_id']) {
                 $location['defense']--;
                 $this->system->db->query("UPDATE `region_locations` SET `defense` = {$location['defense']} WHERE `region_location_id` = {$location['region_location_id']}");
             }

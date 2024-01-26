@@ -848,13 +848,13 @@ class TravelManager {
     }
 
     /**
-     * @return Patrol[]
+     * @return MapNPC[]
      * @throws DatabaseDeadlockException
      * @throws DatabaseDeadlockException
      * @throws DatabaseDeadlockException
      */
     #[Trace]
-    public function fetchNearbyPatrols(): array {
+    public function fetchNearbyNPCs(): array {
         $return_arr = [];
 
         // exit if war disabled
@@ -868,7 +868,7 @@ class TravelManager {
         $region_locations = $this->system->db->query("SELECT * FROM `region_locations`");
         $region_locations = $this->system->db->fetch_all($region_locations);
         foreach ($result as $row) {
-            $patrol = new Patrol($row, "patrol");
+            $patrol = new MapNPC($row, "patrol");
             $patrol->setLocation($this->system, $region_locations);
             $patrol->setAlignment($this->user);
             $distance = $this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id));
@@ -884,20 +884,20 @@ class TravelManager {
         foreach ($result as $row) {
             // if travel time is set then only display if active
             if (!empty($row['travel_time'])) {
-                if ($row['travel_time'] + ($row['start_time'] * 1000) + Patrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
-                    $patrol = new Patrol($row, "caravan");
-                    $patrol->setLocation($this->system, $region_locations);
-                    $patrol->setAlignment($this->user);
-                    if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
-                        $return_arr[] = $patrol;
+                if ($row['travel_time'] + ($row['start_time'] * 1000) + MapNPC::DESTINATION_BUFFER_MS > (time() * 1000)) {
+                    $caravan = new MapNPC($row, "caravan");
+                    $caravan->setLocation($this->system, $region_locations);
+                    $caravan->setAlignment($this->user);
+                    if ($this->user->location->distanceDifference(new TravelCoords($caravan->current_x, $caravan->current_y, $caravan->map_id)) <= $this->user->scout_range) {
+                        $return_arr[] = $caravan;
                     }
                 }
             } else {
-                $patrol = new Patrol($row, "caravan");
-                $patrol->setLocation($this->system, $region_locations);
-                $patrol->setAlignment($this->user);
-                if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
-                    $return_arr[] = $patrol;
+                $caravan = new MapNPC($row, "caravan");
+                $caravan->setLocation($this->system, $region_locations);
+                $caravan->setAlignment($this->user);
+                if ($this->user->location->distanceDifference(new TravelCoords($caravan->current_x, $caravan->current_y, $caravan->map_id)) <= $this->user->scout_range) {
+                    $return_arr[] = $caravan;
                 }
             }
         }
@@ -1201,12 +1201,12 @@ class TravelManager {
             $caravans = $this->system->db->fetch_all($caravans);
             $region_locations = $this->system->db->query("SELECT * FROM `region_locations`");
             $region_locations = $this->system->db->fetch_all($region_locations);
-            foreach ($caravans as $caravan) {
-                $patrol = new Patrol($caravan, "caravan");
-                $patrol->setLocation($this->system, $region_locations);
-                $patrol->setAlignment($this->user);
-                if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) == 0 && $patrol->alignment != "Ally") {
-                    $this->warManager->beginWarAction($war_action_type, $patrol->id, $patrol);
+            foreach ($caravans as $caravan_data) {
+                $caravan = new MapNPC($caravan_data, "caravan");
+                $caravan->setLocation($this->system, $region_locations);
+                $caravan->setAlignment($this->user);
+                if ($this->user->location->distanceDifference(new TravelCoords($caravan->current_x, $caravan->current_y, $caravan->map_id)) == 0 && $caravan->alignment != "Ally") {
+                    $this->warManager->beginWarAction($war_action_type, $caravan->id, $caravan);
                     $message = System::unSlug(WarAction::WAR_ACTION_TYPE_DESCRIPTOR[$war_action_type]) . "!";
                     $this->user->updateData();
                     $this->setTravelMessage($message);

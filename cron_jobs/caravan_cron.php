@@ -20,7 +20,7 @@ require_once __DIR__ . '/../classes/System.php';
 require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/war/WarManager.php';
-require_once __DIR__ . '/../classes/travel/Patrol.php';
+require_once __DIR__ . '/../classes/travel/MapNPC.php';
 
 $system = new System();
 $system->db->connect();
@@ -159,7 +159,7 @@ function hourlyCaravan(System $system, $debug = true): void
         $travel_time = $caravan_time;
         $region_id = $region['region_id'];
         $village_id = $region['village'];
-        $caravan_type = Patrol::CARAVAN_TYPE_RESOURCE;
+        $caravan_type = MapNPC::CARAVAN_TYPE_RESOURCE;
         $resources = json_encode($caravan_resources);
         $name = $villages[$region['village']]->name . " Caravan";
         $queries[] = "INSERT INTO `caravans` (`start_time`, `travel_time`, `region_id`, `village_id`, `caravan_type`, `resources`, `name`)

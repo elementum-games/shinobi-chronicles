@@ -1,11 +1,11 @@
 <?php
 
-class Patrol {
+class MapNPC {
 
     const CARAVAN_TYPE_RESOURCE = 'resource';
     const CARAVAN_TYPE_SUPPLY = 'supply';
-    const PATROL_TYPE_CARAVAN = 'caravan';
-    const PATROL_TYPE_PATROL = 'patrol';
+    const MAP_NPC_TYPE_CARAVAN = 'caravan';
+    const MAP_NPC_TYPE_PATROL = 'patrol';
 
     public int $id;
     public int $start_time;
@@ -15,16 +15,17 @@ class Patrol {
     public int $current_x;
     public int $current_y;
     public int $map_id = 1;
-    public string $name = "Patrol";
+    public string $name;
     public int $level = 100;
     public int $village_id;
     public ?int $ai_id = null;
-    public string $patrol_type;
+    public string $type;
     public string $alignment;
     public ?int $tier = null;
     public array $resources = [];
-    const DESTINATION_BUFFER_MS = 5000; // duration non-looped patrols should appear at their destination
-    public function __construct(array $row, string $patrol_type) {
+    public string $caravan_type;
+    const DESTINATION_BUFFER_MS = 5000; // duration non-looped npcs should appear at their destination
+    public function __construct(array $row, string $type) {
         foreach ($row as $key => $value) {
             if ($key == 'resources') {
                 $this->$key = json_decode($value, true);
@@ -32,13 +33,13 @@ class Patrol {
                 $this->$key = $value;
             }
         }
-        $this->patrol_type = $patrol_type;
+        $this->type = $type;
     }
     public function setLocation(System $system, array $region_locations) {
         $route_locations = [];
         $loop = false;
-        switch ($this->patrol_type) {
-            case self::PATROL_TYPE_PATROL:
+        switch ($this->type) {
+            case self::MAP_NPC_TYPE_PATROL:
                 $loop = true;
                 // patrols loop between each location within their region
                 $location_list = array_filter($region_locations, function($location) {
@@ -55,7 +56,7 @@ class Patrol {
                     }
                 }
                 break;
-            case self::PATROL_TYPE_CARAVAN:
+            case self::MAP_NPC_TYPE_CARAVAN:
                 $loop = false;
                 // get village location
                 $village_result = $system->db->query("SELECT `x`, `y` FROM `maps_locations`
@@ -92,62 +93,11 @@ class Patrol {
             $position = $this->calculatePositionNormalized(time() * 1000, $this->start_time * 1000, $loop_duration, $route_locations, $loop);
         }
         else {
-            throw new RuntimeException("Invalid Patrol Configuration");
+            throw new RuntimeException("Invalid MapNPC Configuration");
         }
         $this->current_x = $position['x'];
         $this->current_y = $position['y'];
     }
-
-    /* Piecewise Linear Interpolation Formula
-    function calculatePosition($t, $T_start, $T_cycle, $points)
-    {
-        $n = count($points);
-        $T_norm = (($t - $T_start) % $T_cycle) / $T_cycle;
-        $segmentLength = 1 / $n;
-
-        for ($i = 0; $i < $n; $i++) {
-            $t1 = $i * $segmentLength;
-            $t2 = ($i + 1) * $segmentLength;
-
-            if ($T_norm >= $t1 && $T_norm <= $t2) {
-                $ratio = ($T_norm - $t1) / ($t2 - $t1);
-                $nextIndex = ($i + 1) % $n; // Circular loop back to the first point after the last
-                $x = $points[$i]['x'] + $ratio * ($points[$nextIndex]['x'] - $points[$i]['x']);
-                $y = $points[$i]['y'] + $ratio * ($points[$nextIndex]['y'] - $points[$i]['y']);
-
-                // if adjacent to given point consider at that point
-                if (abs($x - $points[$i]['x']) + abs($y - $points[$i]['y']) < 2) {
-                    return ['x' => $points[$i]['x'], 'y' => $points[$i]['y']];
-                }
-
-                return ['x' => $x, 'y' => $y];
-            }
-        }
-
-        return ['x' => $points[0]['x'], 'y' => $points[0]['y']];
-    }*/
-
-    /* Reverses the formula to generate a new start time for a point - this is used to correct the position if the patrol is stationary for a time
-    function findNewStartTime($t, $T_cycle, $points, $desiredPoint)
-    {
-        $n = count($points);
-        $segmentLength = 1 / $n;
-
-        for ($i = 0; $i < $n; $i++) {
-            $nextIndex = ($i + 1) % $n;
-            $dx = $points[$nextIndex]['x'] - $points[$i]['x'];
-            $dy = $points[$nextIndex]['y'] - $points[$i]['y'];
-
-            $ratio = (($desiredPoint['x'] - $points[$i]['x']) / $dx + ($desiredPoint['y'] - $points[$i]['y']) / $dy) / 2;
-            if ($ratio >= 0 && $ratio <= 1) {
-                $T_norm = $i * $segmentLength + $ratio * $segmentLength;
-                $T_start = $t - $T_norm * $T_cycle;
-                return $T_start;
-            }
-        }
-
-        return null;
-    }*/
 
     // Used to determine the total points in the path for speed calculations
     private function totalIntermediatePoints($points, $step_size = 1)
@@ -170,7 +120,7 @@ class Patrol {
         return sqrt(pow($x2 - $x1, 2) + pow($y2 - $y1, 2));
     }
 
-    /* Variation of the original formula that uses an equal time for each segment between given points.
+    /* Variation of a piecewise linear interpolation formula that uses an equal time for each segment between given points.
      * $t: The current time.
      * $T_start: The start time of the cycle.
      * $T_cycle: The total duration of one cycle.

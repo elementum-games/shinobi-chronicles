@@ -6,7 +6,7 @@ class TravelApiPresenter {
             'success' => $success,
             'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $travelManager, system: $system),
             'nearbyPlayers' => TravelApiPresenter::nearbyPlayersResponse(travelManager: $travelManager),
-            'nearbyPatrols' => TravelApiPresenter::nearbyPatrolsResponse(travelManager: $travelManager),
+            'nearbyNPCs' => TravelApiPresenter::nearbyNPCsResponse(travelManager: $travelManager),
             'travel_message' => $travelManager->travel_message,
         ];
     }
@@ -85,24 +85,24 @@ class TravelApiPresenter {
         );
     }
 
-    public static function nearbyPatrolsResponse(TravelManager $travelManager): array
+    public static function nearbyNPCsResponse(TravelManager $travelManager): array
     {
         return array_map(
-            function (Patrol $nearbyPatrol) {
+            function (MapNPC $nearbyNPC) {
                 return [
-                    'patrol_id' => $nearbyPatrol->id,
-                    'patrol_name' => $nearbyPatrol->name,
-                    'target_x' => $nearbyPatrol->current_x,
-                    'target_y' => $nearbyPatrol->current_y,
-                    'target_map_id' => $nearbyPatrol->map_id,
-                    'patrol_type' => $nearbyPatrol->patrol_type,
-                    'alignment' => $nearbyPatrol->alignment,
-                    'village_id' => $nearbyPatrol->village_id,
-                    'tier' => $nearbyPatrol->tier,
-                    'resources' => $nearbyPatrol->resources,
+                    'npc_id' => $nearbyNPC->id,
+                    'npc_name' => $nearbyNPC->name,
+                    'target_x' => $nearbyNPC->current_x,
+                    'target_y' => $nearbyNPC->current_y,
+                    'target_map_id' => $nearbyNPC->map_id,
+                    'npc_type' => $nearbyNPC->type,
+                    'alignment' => $nearbyNPC->alignment,
+                    'village_id' => $nearbyNPC->village_id,
+                    'tier' => $nearbyNPC->tier,
+                    'resources' => $nearbyNPC->resources,
                 ];
             },
-            $travelManager->fetchNearbyPatrols()
+            $travelManager->fetchNearbyNPCs()
         );
     }
 
