@@ -82,5 +82,5 @@ require_once __DIR__ . "/classes/village/VillageAPIResponse.php";
 require_once __DIR__ . "/classes/village/VillageApiPresenter.php";
 
 require_once __DIR__ . "/classes/war/WarManager.php";
-require_once __DIR__ . "/classes/war/Operation.php";
+require_once __DIR__ . "/classes/war/WarAction.php";
 require_once __DIR__ . "/classes/war/WarLogManager.php";

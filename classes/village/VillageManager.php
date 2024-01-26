@@ -1543,15 +1543,6 @@ class VillageManager {
                 $message = "Accepted peace offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
-                // if village occupied by enemy, return to owner's control
-                $system->db->query("UPDATE `region_locations`
-                    INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
-                    SET `region_locations`.`occupying_village_id` = NULL
-                    WHERE `regions`.`village` = {$proposal['target_village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['village_id']}");
-                $system->db->query("UPDATE `region_locations`
-                    INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
-                    SET `region_locations`.`occupying_village_id` = NULL
-                    WHERE `regions`.`village` = {$proposal['village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['target_village_id']}");
                 break;
             case self::PROPOSAL_TYPE_ACCEPT_ALLIANCE:
                 // check neutral
@@ -1595,15 +1586,6 @@ class VillageManager {
                 $message = "Forced peace with " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
-                // if village occupied by enemy, return to owner's control
-                $system->db->query("UPDATE `region_locations`
-                    INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
-                    SET `region_locations`.`occupying_village_id` = NULL
-                    WHERE `regions`.`village` = {$proposal['target_village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['village_id']}");
-                $system->db->query("UPDATE `region_locations`
-                    INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
-                    SET `region_locations`.`occupying_village_id` = NULL
-                    WHERE `regions`.`village` = {$proposal['village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['target_village_id']}");
                 break;
             case self::PROPOSAL_TYPE_OFFER_TRADE:
                 // check is ally
@@ -1712,9 +1694,7 @@ class VillageManager {
             $supply_points = [];
             $resource_counts = $system->db->query("SELECT `region_locations`.`resource_id`, COUNT(`region_locations`.`resource_id`) AS `supply_points`
                 FROM `region_locations`
-                INNER JOIN `regions` ON `region_locations`.`region_id` = `regions`.`region_id`
-                WHERE (`regions`.`village` = {$i} AND `region_locations`.`occupying_village_id` IS NULL)
-                OR `region_locations`.`occupying_village_id` = {$i}
+                WHERE `region_locations`.`occupying_village_id` = {$i}
                 GROUP BY `region_locations`.`resource_id`");
             $resource_data = [];
             while ($row = $system->db->fetch($resource_counts)) {
@@ -2106,6 +2086,8 @@ class VillageManager {
         // update regions
         foreach ($offered_regions as $region) {
             $system->db->query("UPDATE `regions` SET `village` = {$village2_id} WHERE `region_id` = {$region}");
+            // update castles and towns in region if available to trade
+            $system->db->query("UPDATE `region_locations` SET `occupying_village_id` = {$village2_id} WHERE `region_id` = {$region} AND `occupying_village_id` = {$village1_id}");
             // update patrols, move back 5 minutes
             $patrol_spawn = time() + (60 * 5);
             $system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$village2_id} WHERE `region_id` = {$region}");
@@ -2116,6 +2098,8 @@ class VillageManager {
         }
         foreach ($requested_regions as $region) {
             $system->db->query("UPDATE `regions` SET `village` = {$village1_id} WHERE `region_id` = {$region}");
+            // update castles and towns in region if available to trade
+            $system->db->query("UPDATE `region_locations` SET `occupying_village_id` = {$village1_id} WHERE `region_id` = {$region} AND `occupying_village_id` = {$village2_id}");
             // update patrols, move back 5 minutes
             $patrol_spawn = time() + (60 * 5);
             $system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$village1_id} WHERE `region_id` = {$region}");

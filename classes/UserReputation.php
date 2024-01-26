@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . "/war/Operation.php";
+require_once __DIR__ . "/war/WarAction.php";
 
 class UserReputation {
     public static array $VillageRep = [
@@ -102,7 +102,7 @@ class UserReputation {
     const ACTIVITY_TYPE_DAILY_TASK_PVE = 'daily_task_pve';
     const ACTIVITY_TYPE_DAILY_TASK_WAR = 'daily_task_war';
     const ACTIVITY_TYPE_DAILY_TASK_PVP = 'daily_task_pvp';
-    // War operations
+    // War Actions
     const ACTIVITY_TYPE_WAR = 'war';
     // PvP
     const ACTIVITY_TYPE_PVP = 'pvp';
@@ -124,12 +124,12 @@ class UserReputation {
         SpecialMission::DIFFICULTY_HARD => 6,
         SpecialMission::DIFFICULTY_NIGHTMARE => 8,
     ];
-    const OPERATION_GAINS = [
-        Operation::OPERATION_REINFORCE => 3,
-        Operation::OPERATION_INFILTRATE => 4,
-        Operation::OPERATION_RAID => 5,
-        Operation::OPERATION_LOOT => 0,
-        Operation::OPERATION_LOOT_TOWN => 0,
+    const WAR_ACTION_GAINS = [
+        WarAction::WAR_ACTION_REINFORCE => 3,
+        WarAction::WAR_ACTION_INFILTRATE => 4,
+        WarAction::WAR_ACTION_RAID => 5,
+        WarAction::WAR_ACTION_LOOT => 0,
+        WarAction::WAR_ACTION_LOOT_TOWN => 0,
     ];
 
     const DAILY_TASK_REWARDS = [

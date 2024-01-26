@@ -24,18 +24,18 @@ export const Map = ({
      0 offset = tile 1
      +5 offset = tile 6
      -5 offset = tile -4
-       To visualize, imagine the stage is like this. Player location on X
+      To visualize, imagine the stage is like this. Player location on X
      | visible |
      | 1 2 3 4 | 5 6 7 8
          X
-       Easy, offset is 0, first tile is one. What if player moves two tiles to the right?
-           | visible |
+      Easy, offset is 0, first tile is one. What if player moves two tiles to the right?
+          | visible |
      1 2 | 3 4 5 6 | 7 8
              X
-       There are 4 visible tiles, so the stage midpoint is visible tile 2. This is where the player should be shown,
+      There are 4 visible tiles, so the stage midpoint is visible tile 2. This is where the player should be shown,
      but the player is on coordinate 4. Thus we push the stage 2 tiles to the left so that the second visible tile
      is coordinate 4.
-       How do we calculate the starting coordinate in this example? We need to offset the first visible tile by +2 which
+      How do we calculate the starting coordinate in this example? We need to offset the first visible tile by +2 which
      is equal to player X - stage midpoint X.
    */
   const stage_offset_x = player_x - stage_midpoint_x;
@@ -58,7 +58,7 @@ export const Map = ({
   const map_height = parseInt(mapData.end_y) - parseInt(mapData.start_y) + 1;
   const PlayerStyle = {
     position: "absolute",
-    backgroundImage: mapData.operation_type ? null : `url(./${mapData.invulnerable ? 'images/ninja_head_grey.png' : mapData.player_icon})`,
+    backgroundImage: mapData.war_action_type ? null : `url(./${mapData.invulnerable ? 'images/ninja_head_grey.png' : mapData.player_icon})`,
     top: 0,
     left: 0,
     transform: `translate3d(
@@ -546,16 +546,16 @@ function Player({
   return /*#__PURE__*/React.createElement("div", {
     id: "map_player",
     style: playerStyle
-  }, mapData.operation_type && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    className: "operation_text"
-  }, mapData.operation_type), /*#__PURE__*/React.createElement("div", {
-    id: "operation_progress_bar"
+  }, mapData.war_action_type && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "war_action_text"
+  }, mapData.war_action_type), /*#__PURE__*/React.createElement("div", {
+    id: "war_action_progress_bar"
   }, /*#__PURE__*/React.createElement("svg", {
     height: "32",
     width: "32",
     viewBox: "0 0 50 50"
   }, /*#__PURE__*/React.createElement("circle", {
-    id: "operation_progress_circle_background_outer",
+    id: "war_action_progress_circle_background_outer",
     stroke: "#592424",
     cx: "24.5",
     cy: "24",
@@ -565,7 +565,7 @@ function Player({
     fill: "none",
     transform: "rotate(-90, 24.5, 24)"
   }), /*#__PURE__*/React.createElement("circle", {
-    id: "operation_progress_circle_background",
+    id: "war_action_progress_circle_background",
     stroke: "#592424",
     cx: "24.5",
     cy: "24",
@@ -577,7 +577,7 @@ function Player({
     strokeDashoffset: "0",
     transform: "rotate(-90, 24.5, 24)"
   }), /*#__PURE__*/React.createElement("circle", {
-    id: "operation_progress_circle",
+    id: "war_action_progress_circle",
     stroke: "#ff6a6a",
     cx: "24.5",
     cy: "24",
@@ -586,10 +586,10 @@ function Player({
     strokeMiterlimit: "0",
     fill: "none",
     strokeDasharray: "62.83",
-    strokeDashoffset: 62.83 - 62.83 / 100 * mapData.operation_progress,
+    strokeDashoffset: 62.83 - 62.83 / 100 * mapData.war_action_progress,
     transform: "rotate(-90, 24.5, 24)"
   }), /*#__PURE__*/React.createElement("circle", {
-    id: "operation_interval_circle",
+    id: "war_action_interval_circle",
     stroke: "#00b044",
     cx: "24.5",
     cy: "24",
@@ -598,7 +598,7 @@ function Player({
     strokeMiterlimit: "0",
     fill: "none",
     strokeDasharray: "100",
-    strokeDashoffset: 100 - 100 / 100 * mapData.operation_interval,
+    strokeDashoffset: 100 - 100 / 100 * mapData.war_action_interval,
     transform: "rotate(-90, 24.5, 24)"
   })))), mapData.is_protected && /*#__PURE__*/React.createElement("img", {
     className: "player_protected_icon",

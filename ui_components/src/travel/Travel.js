@@ -33,10 +33,10 @@ import { ScoutArea } from "./ScoutArea.js";
     region_objectives:   object,
     map_objectives:      object,
     battle_url:          string,
-    operations:          object,
-    operation_type:      string,
-    operation_progress:  int,
-    operation_interval:  int,
+    war_actions:         object,
+    war_action_type:     string,
+    war_action_progress: int,
+    war_action_interval: int,
     travel_message:      string,
     loot_count:          int,
  * }} mapData
@@ -300,12 +300,12 @@ function Travel({
         });
     }
 
-    const BeginOperation = (type) => {
+    const BeginWarAction = (type) => {
         apiFetch(
             travelAPILink,
             {
-                request: 'BeginOperation',
-                operation_type: type,
+                request: 'BeginWarAction',
+                war_action_type: type,
             }
         ).then((response) => {
             if (response.errors.length) {
@@ -323,11 +323,11 @@ function Travel({
         });
     }
 
-    const CancelOperation = () => {
+    const CancelWarAction = () => {
         apiFetch(
             travelAPILink,
             {
-                request: 'CancelOperation',
+                request: 'CancelWarAction',
             }
         ).then((response) => {
             if (response.errors.length) {
@@ -496,12 +496,12 @@ function Travel({
                                     <button className='button'>{mapData.action_message}</button>
                                 </a>
                             )}
-                            {(mapData && mapData.operation_type) && (
-                                <button className='button' onClick={() => CancelOperation()}>Cancel</button>
+                            {(mapData && mapData.war_action_type) && (
+                                <button className='button' onClick={() => CancelWarAction()}>Cancel</button>
                             )}
-                            {((mapData && mapData.operations && !mapData.operation_type) && typeof mapData.operations_type === 'undefined') && (
-                                Object.entries(mapData.operations).map(([key, value], index) => (
-                                    <button key={index} onClick={() => BeginOperation(key)} className='button' dangerouslySetInnerHTML={{ __html: value }}>
+                            {(mapData && mapData.war_actions && !mapData.war_action_type) && (
+                                Object.entries(mapData.war_actions).map(([key, value], index) => (
+                                    <button key={index} onClick={() => BeginWarAction(key)} className='button' dangerouslySetInnerHTML={{ __html: value }}>
                                     </button>
                                 ))
                             )}

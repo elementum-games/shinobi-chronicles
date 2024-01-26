@@ -33,10 +33,10 @@ import { ScoutArea } from "./ScoutArea.js";
     region_objectives:   object,
     map_objectives:      object,
     battle_url:          string,
-    operations:          object,
-    operation_type:      string,
-    operation_progress:  int,
-    operation_interval:  int,
+    war_actions:         object,
+    war_action_type:     string,
+    war_action_progress: int,
+    war_action_interval: int,
     travel_message:      string,
     loot_count:          int,
  * }} mapData
@@ -250,10 +250,10 @@ function Travel({
       window.location.href = response.data.redirect;
     });
   };
-  const BeginOperation = type => {
+  const BeginWarAction = type => {
     apiFetch(travelAPILink, {
-      request: 'BeginOperation',
-      operation_type: type
+      request: 'BeginWarAction',
+      war_action_type: type
     }).then(response => {
       if (response.errors.length) {
         handleErrors(response.errors);
@@ -269,9 +269,9 @@ function Travel({
       setMapData(response.data.mapData);
     });
   };
-  const CancelOperation = () => {
+  const CancelWarAction = () => {
     apiFetch(travelAPILink, {
-      request: 'CancelOperation'
+      request: 'CancelWarAction'
     }).then(response => {
       if (response.errors.length) {
         handleErrors(response.errors);
@@ -417,12 +417,12 @@ function Travel({
     href: mapData.action_url
   }, /*#__PURE__*/React.createElement("button", {
     className: "button"
-  }, mapData.action_message)), mapData && mapData.operation_type && /*#__PURE__*/React.createElement("button", {
+  }, mapData.action_message)), mapData && mapData.war_action_type && /*#__PURE__*/React.createElement("button", {
     className: "button",
-    onClick: () => CancelOperation()
-  }, "Cancel"), mapData && mapData.operations && !mapData.operation_type && typeof mapData.operations_type === 'undefined' && Object.entries(mapData.operations).map(([key, value], index) => /*#__PURE__*/React.createElement("button", {
+    onClick: () => CancelWarAction()
+  }, "Cancel"), mapData && mapData.war_actions && !mapData.war_action_type && Object.entries(mapData.war_actions).map(([key, value], index) => /*#__PURE__*/React.createElement("button", {
     key: index,
-    onClick: () => BeginOperation(key),
+    onClick: () => BeginWarAction(key),
     className: "button",
     dangerouslySetInnerHTML: {
       __html: value

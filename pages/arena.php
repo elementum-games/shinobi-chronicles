@@ -17,8 +17,8 @@ function arena(): bool {
 		$system->printMessage();
 		return false;
 	}
-    if ($player->operation > 0) {
-        $system->message("You cannot access this page while in an operation!");
+    if ($player->war_action_id > 0) {
+        $system->message("You cannot access this page while taking a war action!");
         $system->printMessage();
         return false;
     }
