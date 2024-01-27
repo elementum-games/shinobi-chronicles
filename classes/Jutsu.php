@@ -126,6 +126,8 @@ class Jutsu {
 
     public int $linked_jutsu_id = 0;
 
+    private bool $rank_scaling_applied = false;
+
     /**
      * Jutsu constructor.
      * @param int         $id
@@ -344,5 +346,27 @@ class Jutsu {
         }
 
         return $jutsu;
+    }
+
+
+    public function applyRankScaling(int $player_rank_num): void {
+        if($this->rank_scaling_applied) {
+            // Applying this twice to the same jutsu would cause it to be super overpowered
+            throw new RuntimeException("Rank scaling already applied!");
+        }
+        $this->rank_scaling_applied = true;
+
+        if ($this->purchase_type == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
+            if ($player_rank_num == 3) {
+                $this->use_cost *= 2;
+                $this->base_power *= Jutsu::CHUUNIN_SCALE_MULTIPLIER;
+                $this->power *= Jutsu::CHUUNIN_SCALE_MULTIPLIER;
+            }
+            else if ($player_rank_num == 4) {
+                $this->use_cost *= 3;
+                $this->base_power *= Jutsu::JONIN_SCALE_MULTIPLIER;
+                $this->power *= Jutsu::CHUUNIN_SCALE_MULTIPLIER;
+            }
+        }
     }
 }
