@@ -112,6 +112,8 @@ if ($system->db->last_num_rows > 0) {
         text-align: left;
 
         padding: 8px;
+
+        background-color: #f2f2f2;
     }
 
     .jutsu_input {
@@ -120,7 +122,7 @@ if ($system->db->last_num_rows > 0) {
 
     input[type='submit'] {
         display: block;
-        margin: 5px auto auto;
+        margin: 10px auto auto;
     }
 </style>
 
@@ -129,6 +131,12 @@ if ($system->db->last_num_rows > 0) {
         let bloodlineSelect = document.getElementById(`bloodline_prefill_${fighterKey}`);
         if(bloodlineSelect == null) {
             console.error("Invalid bloodline select element");
+            return;
+        }
+
+        let selectedBloodline = bloodlineSelect.selectedOptions[0];
+        if(parseInt(selectedBloodline.value) === 0) {
+            console.warn("No bloodline selected!");
             return;
         }
 
@@ -175,8 +183,13 @@ if ($system->db->last_num_rows > 0) {
             <br />
 
             Bloodline boosts<br />
-            <select id='bloodline_prefill_<?= $fighter_form_key ?>' name='<?= $fighter_form_key ?>_bloodline_id'>
+            <select
+                id='bloodline_prefill_<?= $fighter_form_key ?>'
+                name='<?= $fighter_form_key ?>_bloodline_id'
+                onchange='prefillBloodline("<?= $fighter_form_key ?>")'
+            >
                 <?php foreach($bloodlines_by_rank as $rank => $bloodlines): ?>
+                    <option value='0'>Select to auto-fill boosts</option>
                     <optgroup label="<?= Bloodline::$public_ranks[$rank] ?>">
                         <?php foreach($bloodlines as $bloodline): ?>
                             <option
@@ -193,8 +206,7 @@ if ($system->db->last_num_rows > 0) {
                         <?php endforeach; ?>
                     </optgroup>
                 <?php endforeach; ?>
-            </select>
-            <button type='button' onclick='prefillBloodline("<?= $fighter_form_key ?>")'>Pre-fill</button><br />
+            </select><br />
             <br />
             <?php for($i = 1; $i <= 3; $i++): ?>
                 <select
