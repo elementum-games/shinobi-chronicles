@@ -335,7 +335,7 @@ class BattleEffectsManagerV2 {
 
     public function applyBloodlineActiveBoosts(Fighter $fighter): void {
         if(!empty($fighter->bloodline->combat_boosts)) {
-            foreach($fighter->bloodline->combat_boosts as $id=>$effect) {
+            foreach($fighter->bloodline->combat_boosts as $id=>$boost) {
                 $this->applyActiveEffect(
                     $fighter,
                     $fighter,
@@ -343,8 +343,8 @@ class BattleEffectsManagerV2 {
                         user: $fighter->combat_id,
                         target: $fighter->combat_id,
                         turns: 1,
-                        effect: $effect['effect'],
-                        effect_amount: $effect['effect_amount'],
+                        effect: $boost->effect,
+                        effect_amount: $boost->effect_amount,
                         damage_type: Jutsu::TYPE_TAIJUTSU
                     )
                 );

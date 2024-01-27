@@ -176,7 +176,7 @@ class BattleLogV2 {
                     new_effect_announcements: $action_log['new_effect_announcements']
                 );
             }, $fighter_action_logs),
-            fighter_health: json_decode($raw_data['fighter_health']),
+            fighter_health: json_decode($raw_data['fighter_health'], true),
             raw_active_effects: $raw_data['active_effects'],
         );
     }
