@@ -3,10 +3,13 @@
 class VillagePolicy {
     const POLICY_BONUS_INFILTRATE_SPEED = "INFILTRATE_SPEED";
     const POLICY_BONUS_INFILTRATE_DEFENSE = "INFILTRATE_DEFENSE";
+    const POLICY_BONUS_INFILTRATE_STABILITY = "INFILTRATE_STABILITY";
     const POLICY_BONUS_REINFORCE_SPEED = "REINFORCE_SPEED";
     const POLICY_BONUS_REINFORCE_DEFENSE = "REINFORCE_DEFENSE";
+    const POLICY_BONUS_REINFORCE_STABILITY = "REINFORCE_STABILITY";
     const POLICY_BONUS_RAID_SPEED = "RAID_SPEED";
     const POLICY_BONUS_RAID_DEFENSE = "RAID_DEFENSE";
+    const POLICY_BONUS_RAID_STABILITY = "RAID_STABILITY";
     const POLICY_BONUS_CARAVAN_SPEED = "CARAVAN_SPEED";
     const POLICY_BONUS_PATROL_RESPAWN = "PATROL_RESPAWN";
     const POLICY_BONUS_PATROL_TIER = "PATROL_TIER";
@@ -42,10 +45,13 @@ class VillagePolicy {
     public System $system;
     public int $infiltrate_speed;
     public int $infiltrate_defense;
+    public int $infiltrate_stability;
     public int $reinforce_speed;
     public int $reinforce_defense;
+    public int $reinforce_stability;
     public int $raid_speed;
     public int $raid_defense;
+    public int $raid_stability;
     public int $caravan_speed;
     public int $patrol_respawn;
     public int $patrol_tier;
@@ -69,10 +75,13 @@ class VillagePolicy {
             self::POLICY_NONE => [
                 self::POLICY_BONUS_INFILTRATE_SPEED => 0,
                 self::POLICY_BONUS_INFILTRATE_DEFENSE => 0,
+                self::POLICY_BONUS_INFILTRATE_STABILITY => 0,
                 self::POLICY_BONUS_REINFORCE_SPEED => 0,
                 self::POLICY_BONUS_REINFORCE_DEFENSE => 0,
+                self::POLICY_BONUS_REINFORCE_STABILITY => 0,
                 self::POLICY_BONUS_RAID_SPEED => 0,
                 self::POLICY_BONUS_RAID_DEFENSE => 0,
+                self::POLICY_BONUS_RAID_STABILITY => 0,
                 self::POLICY_BONUS_CARAVAN_SPEED => 0,
                 self::POLICY_BONUS_PATROL_RESPAWN => 0,
                 self::POLICY_BONUS_PATROL_TIER => 0,
@@ -92,10 +101,13 @@ class VillagePolicy {
             self::POLICY_GROWTH => [
                 self::POLICY_BONUS_INFILTRATE_SPEED => 0,
                 self::POLICY_BONUS_INFILTRATE_DEFENSE => 0,
+                self::POLICY_BONUS_INFILTRATE_STABILITY => 0,
                 self::POLICY_BONUS_REINFORCE_SPEED => 0,
                 self::POLICY_BONUS_REINFORCE_DEFENSE => 0,
+                self::POLICY_BONUS_REINFORCE_STABILITY => 0,
                 self::POLICY_BONUS_RAID_SPEED => 0,
                 self::POLICY_BONUS_RAID_DEFENSE => 0,
+                self::POLICY_BONUS_RAID_STABILITY => 0,
                 self::POLICY_BONUS_CARAVAN_SPEED => 25,
                 self::POLICY_BONUS_PATROL_RESPAWN => 0,
                 self::POLICY_BONUS_PATROL_TIER => 0,
@@ -115,10 +127,13 @@ class VillagePolicy {
             self::POLICY_ESPIONAGE => [
                 self::POLICY_BONUS_INFILTRATE_SPEED => 25,
                 self::POLICY_BONUS_INFILTRATE_DEFENSE => 1,
+                self::POLICY_BONUS_INFILTRATE_STABILITY => 0,
                 self::POLICY_BONUS_REINFORCE_SPEED => 0,
                 self::POLICY_BONUS_REINFORCE_DEFENSE => 0,
+                self::POLICY_BONUS_REINFORCE_STABILITY => 0,
                 self::POLICY_BONUS_RAID_SPEED => 0,
                 self::POLICY_BONUS_RAID_DEFENSE => 0,
+                self::POLICY_BONUS_RAID_STABILITY => 0,
                 self::POLICY_BONUS_CARAVAN_SPEED => 0,
                 self::POLICY_BONUS_PATROL_RESPAWN => 0,
                 self::POLICY_BONUS_PATROL_TIER => 0,
@@ -138,10 +153,13 @@ class VillagePolicy {
             self::POLICY_DEFENSE => [
                 self::POLICY_BONUS_INFILTRATE_SPEED => 0,
                 self::POLICY_BONUS_INFILTRATE_DEFENSE => 0,
+                self::POLICY_BONUS_INFILTRATE_STABILITY => 0,
                 self::POLICY_BONUS_REINFORCE_SPEED => 25,
                 self::POLICY_BONUS_REINFORCE_DEFENSE => 1,
+                self::POLICY_BONUS_REINFORCE_STABILITY => 0,
                 self::POLICY_BONUS_RAID_SPEED => 0,
                 self::POLICY_BONUS_RAID_DEFENSE => 0,
+                self::POLICY_BONUS_RAID_STABILITY => 0,
                 self::POLICY_BONUS_CARAVAN_SPEED => 0,
                 self::POLICY_BONUS_PATROL_RESPAWN => 0,
                 self::POLICY_BONUS_PATROL_TIER => 1,
@@ -161,10 +179,13 @@ class VillagePolicy {
             self::POLICY_WAR => [
                 self::POLICY_BONUS_INFILTRATE_SPEED => 0,
                 self::POLICY_BONUS_INFILTRATE_DEFENSE => 0,
+                self::POLICY_BONUS_INFILTRATE_STABILITY => 0,
                 self::POLICY_BONUS_REINFORCE_SPEED => 0,
                 self::POLICY_BONUS_REINFORCE_DEFENSE => 0,
+                self::POLICY_BONUS_REINFORCE_STABILITY => 0,
                 self::POLICY_BONUS_RAID_SPEED => 25,
                 self::POLICY_BONUS_RAID_DEFENSE => 1,
+                self::POLICY_BONUS_RAID_STABILITY => 0,
                 self::POLICY_BONUS_CARAVAN_SPEED => 0,
                 self::POLICY_BONUS_PATROL_RESPAWN => 25,
                 self::POLICY_BONUS_PATROL_TIER => 0,
@@ -193,10 +214,13 @@ class VillagePolicy {
     {
         $this->infiltrate_speed = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_INFILTRATE_SPEED];
         $this->infiltrate_defense = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_INFILTRATE_DEFENSE];
+        $this->infiltrate_stability = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_INFILTRATE_STABILITY];
         $this->reinforce_speed = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_REINFORCE_SPEED];
         $this->reinforce_defense = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_REINFORCE_DEFENSE];
+        $this->reinforce_stability = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_REINFORCE_STABILITY];
         $this->raid_speed = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_RAID_SPEED];
         $this->raid_defense = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_RAID_DEFENSE];
+        $this->raid_stability = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_RAID_STABILITY];
         $this->caravan_speed = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_CARAVAN_SPEED];
         $this->patrol_respawn = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_PATROL_RESPAWN];
         $this->patrol_tier = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_PATROL_TIER];

@@ -194,7 +194,7 @@ class WarAction {
                             $location_target['max_health'] = WarManager::BASE_CASTLE_HEALTH;
                             break;
                         case 'village':
-                            $location_target['max_health'] = WarManager::BASE_VILLAGE_HEALTH;
+                            $location_target['max_health'] = WarManager::BASE_TOWN_HEALTH;
                             break;
                         default:
                             break;
@@ -302,6 +302,7 @@ class WarAction {
             case self::WAR_ACTION_INFILTRATE:
                 WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_INFILTRATE, $this->target_village);
                 $defense_reduction = 1 + $this->user->village->policy->infiltrate_defense;
+                $stability_reduction = 1 + $this->user->village->policy->infiltrate_stability;
                 if ($location_target['defense'] > 0) {
                     $result = max($location_target['defense'] - $defense_reduction, 0);
                     $defense_reduction = $location_target['defense'] - $result;
@@ -312,10 +313,21 @@ class WarAction {
                 } else {
                     $message .= "\nTarget Defense already at 0!";
                 }
+                if ($location_target['stability'] > WarManager::MIN_STABILITY) {
+                    $result = max($location_target['stability'] - $stability_reduction, WarManager::MIN_STABILITY);
+                    $stability_reduction = $location_target['stability'] - $result;
+                    $location_target['stability'] = $result;
+                    $message .= "\nDecreased target Stability by {$stability_reduction}!";
+                    WarLogManager::logAction($this->system, $this->user, $stability_reduction, WarLogManager::WAR_LOG_STABILITY_REDUCED, $this->target_village);
+                    $this->system->db->query("UPDATE `region_locations` SET `stability` = {$location_target['stability']} WHERE `region_location_id` = {$this->target_id}");
+                } else {
+                    $message .= "\nTarget Stability already at " . WarManager::MIN_STABILITY ."!";
+                }
                 break;
             case self::WAR_ACTION_REINFORCE:
                 WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_REINFORCE, $this->target_village);
                 $defense_gain = 1 + $this->user->village->policy->reinforce_defense;
+                $stability_gain = 1 + $this->user->village->policy->reinforce_stability;
                 if ($location_target['defense'] < 100) {
                     $result = min($location_target['defense'] + $defense_gain, 100);
                     $defense_gain = $result - $location_target['defense'];
@@ -326,17 +338,30 @@ class WarAction {
                 } else {
                     $message .= "\nTarget Defense already at 100!";
                 }
+                if ($location_target['stability'] < WarManager::MAX_STABILITY) {
+                    $result = min($location_target['stability'] + $stability_gain, 100);
+                    $stability_gain = $result - $location_target['stability'];
+                    $location_target['stability'] = $result;
+                    $message .= "\nIncreased target Stability by {$stability_gain}!";
+                    WarLogManager::logAction($this->system, $this->user, $stability_gain, WarLogManager::WAR_LOG_STABILITY_GAINED, $this->target_village);
+                    $this->system->db->query("UPDATE `region_locations` SET `stability` = {$location_target['stability']} WHERE `region_location_id` = {$this->target_id}");
+                } else {
+                    $message .= "\nTarget Stability already at " . WarManager::MAX_STABILITY . "!";
+                }
                 break;
             case self::WAR_ACTION_RAID:
                 WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_RAID, $this->target_village);
                 $defense_reduction = 1 + $this->user->village->policy->raid_defense;
+                $stability_reduction = 1 + $this->user->village->policy->raid_stability;
                 if ($location_target['health'] <= 0 && $location_target['type'] == 'castle') {
                     WarLogManager::logRegionCapture($this->system, $this->user, $location_target['region_id']);
                     // change region ownership
                     $this->system->db->query("UPDATE `regions` SET `village` = {$this->user->village->village_id} WHERE `region_id` = {$location_target['region_id']}");
-                    // update castle health to 50%, defense to 25, occupying village
-                    $castle_hp = floor(WarManager::BASE_CASTLE_HEALTH * 0.5);
-                    $this->system->db->query("UPDATE `region_locations` SET `health` = {$castle_hp}, `defense` = 25, `occupying_village_id` = {$this->user->village->village_id} WHERE `region_id` = {$location_target['region_id']} AND `type` = 'castle'");
+                    // update castle health to 50%, defense to 25, stability to 25, occupying village
+                    $castle_hp = floor(WarManager::BASE_CASTLE_HEALTH * (WarManager::INITIAL_LOCATION_CAPTURE_HEALTH_PERCENT / 100));
+                    $castle_defense = WarManager::INITIAL_LOCATION_CAPTURE_DEFENSE;
+                    $castle_stability = WarManager::INITIAL_LOCATION_CAPTURE_STABILITY;
+                    $this->system->db->query("UPDATE `region_locations` SET `health` = {$castle_hp}, `defense` = {$castle_defense}, `stability` = {$castle_stability}, `occupying_village_id` = {$this->user->village->village_id} WHERE `region_id` = {$location_target['region_id']} AND `type` = 'castle'");
                     // update patrols, move back 5 minutes
                     $patrol_spawn = time() + (60 * 5);
                     $this->system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$this->user->village->village_id} WHERE `region_id` = {$location_target['region_id']}");
@@ -344,22 +369,34 @@ class WarAction {
                     $name = VillageManager::VILLAGE_NAMES[$this->user->village->village_id] . " Caravan";
                     $time = time();
                     $this->system->db->query("UPDATE `caravans` SET `village_id` = {$this->user->village->village_id}, `name` = '{$name}' WHERE `region_id` = {$location_target['region_id']} AND `start_time` > {$time}");
-                }
-                else if ($location_target['health'] <= 0 && $location_target['type'] == 'village') {
+                } else if ($location_target['health'] <= 0 && $location_target['type'] == 'village') {
                     WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_VILLAGES_CAPTURED, $this->target_village);
-                    // occupy village and set HP/defense
-                    $village_hp = floor(WarManager::BASE_VILLAGE_HEALTH * 0.5);
-                    $this->system->db->query("UPDATE `region_locations` SET `occupying_village_id` = {$this->user->village->village_id}, `health` = {$village_hp}, `defense` = 25 WHERE `region_location_id` = {$location_target['region_location_id']}");
-                }
-                else if ($location_target['defense'] > 0) {
-                    $result = max($location_target['defense'] - $defense_reduction, 0);
-                    $defense_reduction = $location_target['defense'] - $result;
-                    $location_target['defense'] = $result;
-                    $message .= "\nDecreased target Defense by {$defense_reduction}!";
-                    WarLogManager::logAction($this->system, $this->user, $defense_reduction, WarLogManager::WAR_LOG_DEFENSE_REDUCED, $this->target_village);
-                    $this->system->db->query("UPDATE `region_locations` SET `defense` = {$location_target['defense']} WHERE `region_location_id` = {$this->target_id}");
+                    // occupy town and set HP/defense/stability
+                    $town_hp = floor(WarManager::BASE_TOWN_HEALTH * (WarManager::INITIAL_LOCATION_CAPTURE_HEALTH_PERCENT / 100));
+                    $town_defense = WarManager::INITIAL_LOCATION_CAPTURE_DEFENSE;
+                    $town_stability = WarManager::INITIAL_LOCATION_CAPTURE_STABILITY;
+                    $this->system->db->query("UPDATE `region_locations` SET `occupying_village_id` = {$this->user->village->village_id}, `health` = {$town_hp}, `defense` = {$town_defense}, `stability` = {$town_stability} WHERE `region_location_id` = {$location_target['region_location_id']}");
                 } else {
-                    $message .= "\nTarget Defense already at 0!";
+                    if ($location_target['defense'] > 0) {
+                        $result = max($location_target['defense'] - $defense_reduction, 0);
+                        $defense_reduction = $location_target['defense'] - $result;
+                        $location_target['defense'] = $result;
+                        $message .= "\nDecreased target Defense by {$defense_reduction}!";
+                        WarLogManager::logAction($this->system, $this->user, $defense_reduction, WarLogManager::WAR_LOG_DEFENSE_REDUCED, $this->target_village);
+                        $this->system->db->query("UPDATE `region_locations` SET `defense` = {$location_target['defense']} WHERE `region_location_id` = {$this->target_id}");
+                    } else {
+                        $message .= "\nTarget Defense already at 0!";
+                    }
+                    if ($location_target['stability'] > WarManager::MIN_STABILITY) {
+                        $result = max($location_target['stability'] - $stability_reduction, WarManager::MIN_STABILITY);
+                        $stability_reduction = $location_target['stability'] - $result;
+                        $location_target['stability'] = $result;
+                        $message .= "\nDecreased target Stability by {$stability_reduction}!";
+                        WarLogManager::logAction($this->system, $this->user, $stability_reduction, WarLogManager::WAR_LOG_STABILITY_REDUCED, $this->target_village);
+                        $this->system->db->query("UPDATE `region_locations` SET `stability` = {$location_target['stability']} WHERE `region_location_id` = {$this->target_id}");
+                    } else {
+                        $message .= "\nTarget Stability already at " . WarManager::MIN_STABILITY . "!";
+                    }
                 }
                 break;
             case self::WAR_ACTION_LOOT:

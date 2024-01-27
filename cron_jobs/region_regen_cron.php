@@ -87,7 +87,6 @@ function processRegionRegenInterval(System $system, $debug = true): void
     $region_result = $system->db->fetch_all($region_result);
     $queries = [];
     // get villages
-    $village_resource_production = [];
     $village_result = $system->db->query("SELECT * FROM `villages`");
     $village_result = $system->db->fetch_all($village_result);
     $villages = [];
@@ -106,17 +105,19 @@ function processRegionRegenInterval(System $system, $debug = true): void
             switch ($region_location['type']) {
                 case 'castle':
                     // increase health, cap at max
-                    $region_location['health'] = min($region_location['health'] + WarManager::BASE_CASTLE_REGEN_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES, WarManager::BASE_CASTLE_HEALTH);
+                    $regen = (WarManager::BASE_CASTLE_REGEN_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES) * max((1 + ($region_location['stability'] / 100)), 0);
+                    $region_location['health'] = min($region_location['health'] + $regen, WarManager::BASE_CASTLE_HEALTH);
                     // get castle reference
                     $castle = &$region_location;
                     break;
                 case 'village';
+                    // increase health, cap at max
+                    $regen = (WarManager::BASE_TOWN_REGEN_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES) * max((1 + ($region_location['stability'] / 100)), 0);
+                    $region_location['health'] = min($region_location['health'] + $regen, WarManager::BASE_TOWN_HEALTH);
                     // give a bonus to castle regen if not occupied
                     if (empty($region_location['occupying_village_id'])) {
-                        $village_regen_share += floor((WarManager::VILLAGE_REGEN_SHARE_PERCENT / 100) * WarManager::BASE_VILLAGE_REGEN_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES);
+                        $village_regen_share += floor((WarManager::TOWN_REGEN_SHARE_PERCENT / 100) * $regen);
                     }
-                    // increase health, cap at max
-                    $region_location['health'] = min($region_location['health'] + WarManager::BASE_VILLAGE_REGEN_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES, WarManager::BASE_VILLAGE_HEALTH);
                     break;
                 default;
                     break;

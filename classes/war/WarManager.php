@@ -3,20 +3,31 @@
 require_once __DIR__ . "/WarAction.php";
 
 class WarManager {
-    const BASE_TOWN_RESOURCE_PRODUCTION = 25;
-    const BASE_CASTLE_RESOURCE_PRODUCTION = 50;
+    const BASE_TOWN_RESOURCE_PRODUCTION = 15; // 2x at full stability, 26/hour at 75%
+    const BASE_CASTLE_RESOURCE_PRODUCTION = 20; // 2x at full stability, 35/hour at 75%
     const VILLAGE_BASE_RESOURCE_PRODUCTION = 75;
     const BASE_CARAVAN_TIME_MS = 300000; // 5 minute travel time
     const CARAVAN_TIMER_HOURS = 6; // 24m average caravan spawn timer, so 19 minute average downtime
-    const BASE_VILLAGE_REGEN_PER_MINUTE = 40; // 2400/hour
-    const BASE_CASTLE_REGEN_PER_MINUTE = 45; // 2700/hour
-    const VILLAGE_REGEN_SHARE_PERCENT = 100; // 2 villages + base = 7500/hour max
-    const BASE_VILLAGE_HEALTH = 5000;
+    const BASE_TOWN_REGEN_PER_MINUTE = 150; // 2x at full stability, Chuu max raid damage at 75% stability
+    const BASE_CASTLE_REGEN_PER_MINUTE = 300; // 2x at full stability, Jon max raid damage at 75% stability
+    const TOWN_REGEN_SHARE_PERCENT = 100; // 2 villages + base, 1200/min max at 2x villages 100% stability
+    const BASE_TOWN_HEALTH = 5000;
     const BASE_CASTLE_HEALTH = 15000;
-    const BASE_VILLAGE_DEFENSE = 50;
+    const BASE_TOWN_DEFENSE = 50;
     const BASE_CASTLE_DEFENSE = 75;
+    const BASE_CASTLE_STABILITY = 75;
+    const BASE_TOWN_STABILITY = 0;
+    const OCCUPIED_TOWN_STABILITY_PENALTY = 100;
+    const BASE_STABILITY_SHIFT_PER_HOUR = 1;
+    const BASE_DEFENSE_SHIFT_PER_HOUR = 1;
+    const MAX_STABILITY = 100;
+    const MIN_STABILITY = -100;
+    const INITIAL_LOCATION_CAPTURE_HEALTH_PERCENT = 50;
+    const INITIAL_LOCATION_CAPTURE_DEFENSE = 25;
+    const INITIAL_LOCATION_CAPTURE_STABILITY = 25;
 
-    // region_regen_cron.php must run on matching cadence to this interval, if you change this value, change the cron job config to run region_regen_cron.php at whatever the new value is
+    // region_regen_cron.php must run on matching cadence to this interval
+    // if you change this value, change the cron job config to run region_regen_cron.php at whatever the new value is
     const REGEN_INTERVAL_MINUTES = 5;
 
     const RESOURCE_MATERIALS = 1;
@@ -51,6 +62,29 @@ class WarManager {
     const YEN_PER_RESOURCE = 20;
     const RESOURCES_PER_STAT = 10;
     const RESOURCES_PER_REPUTATION = 10;
+
+    const REGION_ORIGINAL_VILLAGE = [
+        1 => 1,
+        2 => 2,
+        3 => 3,
+        4 => 4,
+        5 => 5,
+        6 => 1,
+        7 => 1,
+        8 => 1,
+        9 => 2,
+        10 => 2,
+        11 => 2,
+        12 => 3,
+        13 => 3,
+        14 => 3,
+        15 => 4,
+        16 => 4,
+        17 => 4,
+        18 => 5,
+        19 => 5,
+        20 => 5
+    ];
 
     private System $system;
     private User $user;

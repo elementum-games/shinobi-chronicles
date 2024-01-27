@@ -127,15 +127,53 @@ function hourlyRegion(System $system, $debug = true): void
         $region_location_result = $system->db->query("SELECT * FROM `region_locations` WHERE `region_id` = {$region['region_id']}");
         $region_location_result = $system->db->fetch_all($region_location_result);
 
-        /* step 1: update resource count */
+        /* update stability */
+        $castle_stability = 0;
+        $castle_occupying_village_id = 0;
+        foreach ($region_location_result as $region_location) {
+            if ($region_location['type'] === 'castle') {
+                $castle_occupying_village_id = $region_location['occupying_village_id'];
+                $stability_baseline = WarManager::BASE_CASTLE_STABILITY;
+                if ($region_location['stability'] < $stability_baseline) {
+                    $region_location['stability'] += WarManager::BASE_STABILITY_SHIFT_PER_HOUR;
+                    $region_location['stability'] = min($region_location['stability'], $stability_baseline);
+                } else if ($region_location['stability'] > $stability_baseline) {
+                    $region_location['stability'] -= WarManager::BASE_STABILITY_SHIFT_PER_HOUR;
+                    $region_location['stability'] = max($region_location['stability'], $stability_baseline);
+                }
+                $castle_stability = $region_location['stability'];
+            }
+        }
+        foreach ($region_location_result as $region_location) {
+            if ($region_location['type'] === 'village') {
+                $stability_baseline = WarManager::BASE_TOWN_STABILITY;
+                // if castle owned
+                if ($castle_occupying_village_id == $region_location['occupying_village_id']) {
+                    $stability_baseline += $castle_stability;
+                }
+                // if non-native region
+                if ($region_location['occupying_village_id'] != WarManager::REGION_ORIGINAL_VILLAGE[$region['region_id']]) {
+                    $stability_baseline -= WarManager::OCCUPIED_TOWN_STABILITY_PENALTY;
+                }
+                if ($region_location['stability'] < $stability_baseline) {
+                    $region_location['stability'] += WarManager::BASE_STABILITY_SHIFT_PER_HOUR;
+                    $region_location['stability'] = min($region_location['stability'], $stability_baseline);
+                } else if ($region_location['stability'] > $stability_baseline) {
+                    $region_location['stability'] -= WarManager::BASE_STABILITY_SHIFT_PER_HOUR;
+                    $region_location['stability'] = max($region_location['stability'], $stability_baseline);
+                }
+            }
+        }
+
+        /* update resource count */
         foreach ($region_location_result as &$region_location) {
             // if one of the home regions, collect resources bypassing caravans
             switch ($region_location['type']) {
                 case 'castle':
-                    $production = WarManager::BASE_CASTLE_RESOURCE_PRODUCTION;
+                    $production = WarManager::BASE_CASTLE_RESOURCE_PRODUCTION * max((1 + ($region_location['stability'] / 100)), 0);
                     break;
                 case 'village';
-                    $production = WarManager::BASE_TOWN_RESOURCE_PRODUCTION;
+                    $production = WarManager::BASE_TOWN_RESOURCE_PRODUCTION * max((1 + ($region_location['stability'] / 100)), 0);
                     break;
                 default;
                     break;
@@ -154,33 +192,33 @@ function hourlyRegion(System $system, $debug = true): void
             unset($region_location);
         }
 
-        /* step 2: update defense */
+        /* update defense */
         foreach ($region_location_result as &$region_location) {
             switch ($region_location['type']) {
                 case 'castle':
-                    if ($region_location['defense'] > WarManager::BASE_CASTLE_DEFENSE) {
-                        $region_location['defense'] -= 1;
-                        if ($region_location['defense'] < WarManager::BASE_CASTLE_DEFENSE) {
-                            $region_location['defense'] = WarManager::BASE_CASTLE_DEFENSE;
+                    if ($region_location['defense'] > $region_location['stability']) {
+                        $region_location['defense'] -= WarManager::BASE_DEFENSE_SHIFT_PER_HOUR;
+                        if ($region_location['defense'] < $region_location['stability']) {
+                            $region_location['defense'] = $region_location['stability'];
                         }
                     }
-                    else if ($region_location['defense'] < WarManager::BASE_CASTLE_DEFENSE) {
-                        $region_location['defense'] += 1;
-                        if ($region_location['defense'] > WarManager::BASE_CASTLE_DEFENSE) {
-                            $region_location['defense'] = WarManager::BASE_CASTLE_DEFENSE;
+                    else if ($region_location['defense'] < $region_location['stability']) {
+                        $region_location['defense'] += WarManager::BASE_DEFENSE_SHIFT_PER_HOUR;
+                        if ($region_location['defense'] > $region_location['stability']) {
+                            $region_location['defense'] = $region_location['stability'];
                         }
                     }
                     break;
                 case 'village';
-                    if ($region_location['defense'] > WarManager::BASE_VILLAGE_DEFENSE) {
-                        $region_location['defense'] -= 1;
-                        if ($region_location['defense'] < WarManager::BASE_VILLAGE_DEFENSE) {
-                            $region_location['defense'] = WarManager::BASE_VILLAGE_DEFENSE;
+                    if ($region_location['defense'] > $region_location['stability']) {
+                        $region_location['defense'] -= WarManager::BASE_DEFENSE_SHIFT_PER_HOUR;
+                        if ($region_location['defense'] < $region_location['stability']) {
+                            $region_location['defense'] = $region_location['stability'];
                         }
-                    } else if ($region_location['defense'] < WarManager::BASE_VILLAGE_DEFENSE) {
-                        $region_location['defense'] += 1;
-                        if ($region_location['defense'] > WarManager::BASE_VILLAGE_DEFENSE) {
-                            $region_location['defense'] = WarManager::BASE_VILLAGE_DEFENSE;
+                    } else if ($region_location['defense'] < $region_location['stability']) {
+                        $region_location['defense'] += WarManager::BASE_DEFENSE_SHIFT_PER_HOUR;
+                        if ($region_location['defense'] > $region_location['stability']) {
+                            $region_location['defense'] = $region_location['stability'];
                         }
                     }
                     break;
@@ -190,12 +228,13 @@ function hourlyRegion(System $system, $debug = true): void
             unset($region_location);
         }
 
-        /* step 3: update region_locations */
+        /* update region_locations */
         foreach ($region_location_result as $region_location) {
             $queries[] = "UPDATE `region_locations`
                 SET `resource_count` = {$region_location['resource_count']},
                 `health` = {$region_location['health']},
-                `defense` = {$region_location['defense']}
+                `defense` = {$region_location['defense']},
+                `stability` = {$region_location['stability']}
                 WHERE `id` = {$region_location['id']}";
         }
     }
