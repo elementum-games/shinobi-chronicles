@@ -1037,7 +1037,7 @@ function KageQuarters({
       });
     } else {
       setModalState("confirm_boost_vote");
-      setModalText("Are you sure you wish to boost this vote?\nThe Kage will gain/lose 500 Reputation based on their decision. This will cost 500 Reputation when the proposal is enacted.");
+      setModalText("When a vote Against is boosted:\n The Kage will lose 500 Reputation when the proposal is enacted.\n\nWhen a vote In Favor is boosted:\nTotal Reputation loss from Against votes will be reduced by 500.\n\nBoosting a vote will cost 500 Reputation when the proposal is passed.\n\nHowever, a boosted vote In Favor will only cost Reputation if there is a boosted vote Against. If there are more boosted votes In Favor than Against, the cost will be split between between votes In Favor.");
       setModalHeader("Confirmation");
     }
   };
@@ -1332,9 +1332,7 @@ function KageQuarters({
   }, /*#__PURE__*/React.createElement("div", {
     className: currentProposal && (currentProposal.enact_time_remaining !== null || currentProposal.votes.length == seatDataState.filter(seat => seat.seat_type == "elder" && seat.seat_id != null).length) ? "proposal_enact_button" : "proposal_enact_button disabled",
     onClick: () => EnactProposal()
-  }, "enact proposal"), proposalRepAdjustment > 0 && /*#__PURE__*/React.createElement("div", {
-    className: "rep_change positive"
-  }, "REPUATION GAIN: +", proposalRepAdjustment), proposalRepAdjustment < 0 && /*#__PURE__*/React.createElement("div", {
+  }, "enact proposal"), proposalRepAdjustment < 0 && /*#__PURE__*/React.createElement("div", {
     className: "rep_change negative"
   }, "REPUTATION LOSS: ", proposalRepAdjustment))), playerSeatState.seat_type == "elder" && /*#__PURE__*/React.createElement(React.Fragment, null, !currentProposal && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button_wrapper"
@@ -1391,7 +1389,7 @@ function KageQuarters({
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/icons/trade.png",
     className: "trade_view_button_icon"
-  }))), /*#__PURE__*/React.createElement("div", {
+  }))), currentProposal.votes.find(vote => vote.user_id == playerID).rep_adjustment == 0 && /*#__PURE__*/React.createElement("div", {
     className: "proposal_boost_vote_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_boost_vote_button",

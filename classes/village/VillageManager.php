@@ -1639,7 +1639,7 @@ class VillageManager {
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
-                return "Sent trade offer to " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                $message = "Sent trade offer to " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
                 break;
             case self::PROPOSAL_TYPE_ACCEPT_TRADE:
                 // check at war
@@ -1659,7 +1659,7 @@ class VillageManager {
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
-                return "Accepted trade offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                $message = "Accepted trade offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
                 break;
             default:
                 return "Invalid proposal type.";
@@ -1667,12 +1667,42 @@ class VillageManager {
         }
         // process reputation change
         $rep_adjustment = 0;
+        $total_negative_votes = 0;
+        $total_positive_votes = 0;
+        $rep_loss_from_positive_votes = 0;
+        $rep_loss_from_positive_votes_modifier = 0;
         foreach ($votes as $vote) {
-            if ($vote['rep_adjustment'] != 0) {
-                $rep_adjustment += $vote['rep_adjustment'];
+            if ($vote['rep_adjustment'] < 0) {
+                $total_negative_votes++;
+            }
+            if ($vote['rep_adjustment'] > 0) {
+                $total_positive_votes++;
+            }
+        }
+        // e.g. 1 negative vote, 2 positive votes, 0 net rep_adjustment, -500 for the negative voter, -250 for each positive voter
+        if ($total_negative_votes > 0) {
+            $rep_adjustment = self::VOTE_BOOST_COST * $total_negative_votes * -1;
+            if ($total_positive_votes > 0) {
+                $rep_adjustment += $total_positive_votes * self::VOTE_BOOST_COST;
+                $rep_adjustment = min($rep_adjustment, 0);
+                $rep_loss_from_positive_votes_modifier = min($total_negative_votes / $total_positive_votes, 1);
+                $rep_loss_from_positive_votes = self::VOTE_BOOST_COST * $rep_loss_from_positive_votes_modifier;
+            }
+        }
+        foreach ($votes as $vote) {
+            if ($vote['rep_adjustment'] > 0 && $rep_loss_from_positive_votes > 0) {
                 $user = User::loadFromId($system, $vote['user_id']);
                 $user->loadData();
-                $user->reputation->subtractRep($vote['rep_adjustment'], UserReputation::ACTIVITY_TYPE_UNCAPPED);
+                $user->reputation->subtractRep($rep_loss_from_positive_votes, UserReputation::ACTIVITY_TYPE_UNCAPPED);
+                $system->db->query("UPDATE `vote_logs` SET `rep_adjustment` = {$rep_loss_from_positive_votes} WHERE `vote_id` = {$vote['vote_id']}");
+                $user->updateData();
+            } else if ($vote['rep_adjustment'] > 0 && $rep_loss_from_positive_votes == 0) {
+                $system->db->query("UPDATE `vote_logs` SET `rep_adjustment` = {$rep_loss_from_positive_votes} WHERE `vote_id` = {$vote['vote_id']}");
+            }
+            if ($vote['rep_adjustment'] < 0) {
+                $user = User::loadFromId($system, $vote['user_id']);
+                $user->loadData();
+                $user->reputation->subtractRep(self::VOTE_BOOST_COST, UserReputation::ACTIVITY_TYPE_UNCAPPED);
                 $user->updateData();
             }
         }
@@ -1682,7 +1712,7 @@ class VillageManager {
             $message .= "\n You have gained {$rep_adjustment} Reputation!";
             $player->updateData();
         } else if ($rep_adjustment < 0) {
-            $player->reputation->subtractRep($rep_adjustment, UserReputation::ACTIVITY_TYPE_UNCAPPED);
+            $player->reputation->subtractRep(abs($rep_adjustment), UserReputation::ACTIVITY_TYPE_UNCAPPED);
             $message .= "\n You have lost {$rep_adjustment} Reputation!";
             $player->updateData();
         }
@@ -2280,7 +2310,7 @@ class VillageManager {
                 expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_PROPOSAL * 86400),
                 alert: false,
             );
-            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_MULTIPLE);
+            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
         }
     }
 
