@@ -93,6 +93,8 @@ class User extends Fighter {
     const PVP_IMMUNITY_SECONDS = 120;
     const SPECIAL_MISSION_STEALTH_BONUS = 1;
 
+    const POST_FIGHT_CONSUMABLE_HEAL_REDUCTION_MS = 2500;
+
     public static int $jutsu_train_gain = 5;
 
     public System $system;
@@ -1769,7 +1771,6 @@ class User extends Fighter {
         $this->setPremiumCredits($this->premium_credits - $amount, $description);
     }
 
-
     /* function moteToVillage()
         moves user to village */
     public function moveToVillage() {
@@ -2137,6 +2138,26 @@ class User extends Fighter {
             break;
         }
         return floor($max_size / $divisor) . $suffix;
+    }
+
+    public function consumableHealReductionMsLeft(): int {
+        $time_since_last_fight = System::currentTimeMs() - $this->last_pvp_ms;
+        return User::POST_FIGHT_CONSUMABLE_HEAL_REDUCTION_MS - $time_since_last_fight;
+    }
+
+    public function maxConsumableHealAmountPercent(): int {
+        if($this->battle_id) {
+            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT;
+        }
+        if($this->consumableHealReductionMsLeft() > 0) {
+            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT;
+        }
+
+        return 100;
+    }
+
+    public function maxConsumableHealAmount(): int {
+        return $this->max_health * ($this->maxConsumableHealAmountPercent() / 100);
     }
 
     public function expForNextLevel(?int $extra_levels = 0): float|int {

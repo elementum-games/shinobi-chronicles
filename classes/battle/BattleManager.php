@@ -217,7 +217,7 @@ class BattleManager {
                     if ($item_id && $this->player->itemQuantity($item_id) > 0) {
                         $item = $this->player->items[$item_id];
 
-                        $max_health = $this->player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100);
+                        $max_health = $this->player->maxConsumableHealAmount();
 
                         if ($this->player->health >= $max_health) {
                             throw new RuntimeException("You can't heal any further!");

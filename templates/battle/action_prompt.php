@@ -414,7 +414,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
     <tr><td style="text-align: center;" id="handSeal_td" colspan='2'>
         <div style='margin:0;position:relative;'>
             <p style='text-align:center;font-style:italic;'>
-                (You can use healing items during prep phase, but cannot heal past <?= Battle::MAX_PRE_FIGHT_HEAL_PERCENT ?>% of your max health)
+                (You can use healing items during prep phase, but cannot heal past <?= $player->maxConsumableHealAmountPercent() ?>% of your max health)
             </p>
             <?php
             $heal_items = [];
