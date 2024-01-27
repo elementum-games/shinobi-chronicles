@@ -35,6 +35,9 @@ if(isset($_POST['run_simulation'])) {
         $player1_jutsu = $player1->addJutsu(
             jutsu_type: $player1_data['jutsu_type'],
             base_power: (int)$player1_data['jutsu_power'],
+            effect: $player1_data['jutsu_effect'],
+            effect_amount: (int)$player1_data['jutsu_effect_amount'],
+            effect_length: (int)$player1_data['jutsu_effect_length'],
         );
 
         $player2 = TestFighter::fromFormData(
@@ -46,6 +49,9 @@ if(isset($_POST['run_simulation'])) {
         $player2_jutsu = $player2->addJutsu(
             jutsu_type: $player2_data['jutsu_type'],
             base_power: (int)$player2_data['jutsu_power'],
+            effect: $player2_data['jutsu_effect'],
+            effect_amount: (int)$player2_data['jutsu_effect_amount'],
+            effect_length: (int)$player2_data['jutsu_effect_length'],
         );
 
         $damages = calcDamage(

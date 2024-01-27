@@ -17,11 +17,17 @@
         display: inline-block;
     }
     .jutsu_input label {
-        width: 90px;
+        width: 110px;
         margin: 3px auto;
     }
 
     .jutsu_input {
+        margin: 3px auto 5px;
+        padding: 3px;
+        background: rgba(0,0,0,0.02);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .effect_input {
         margin: 5px auto;
     }
 </style>
@@ -75,13 +81,24 @@
         
         let typeEl = document.getElementById(`${fighterKey}_jutsu_type`);
         let powerEl = document.getElementById(`${fighterKey}_jutsu_power`);
+        let effectEl = document.getElementById(`${fighterKey}_jutsu_effect`);
+        let effectAmountEl = document.getElementById(`${fighterKey}_jutsu_effect_amount`);
+        let effectLengthEl = document.getElementById(`${fighterKey}_jutsu_effect_length`);
 
         typeEl.value = selectedJutsu.jutsu_type;
         powerEl.value = selectedJutsu.base_power;
+
+        effectEl.value = selectedJutsu.effect;
+        effectAmountEl.value = selectedJutsu.effect_amount;
+        effectLengthEl.value = selectedJutsu.effect_length;
     }
 </script>
 
 <?php
+
+function selected($condition): string {
+    return $condition ? "selected='selected'" : '';
+}
 
 /**
  * @param System $system
@@ -91,6 +108,9 @@
 function displayFighterInput(System $system, string $fighter_form_key): void {
     /** @var string[] $bloodline_combat_boosts */
     require __DIR__ . '/../constraints/bloodline.php';
+
+    /** @var string[] */
+    $jutsu_effects = require __DIR__ . '/../constraints/jutsu_effects.php';
 
     $bloodlines_by_rank = [];
     /** @var Jutsu[][] $jutsu_by_group */
@@ -153,11 +173,7 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
                         <option
                             value='<?= $bloodline->bloodline_id ?>'
                             data-boosts='<?= json_encode($bloodline->base_combat_boosts) ?>'
-                            <?= (
-                            ($_POST["{$fighter_form_key}_bloodline_id"] ?? '') == $bloodline->bloodline_id
-                                ? "selected='selected'"
-                                : ''
-                            ) ?>
+                            <?= selected(($_POST["{$fighter_form_key}_bloodline_id"] ?? '') == $bloodline->bloodline_id) ?>
                         >
                             <?= $bloodline->name ?>
                         </option>
@@ -174,7 +190,7 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
                     <option value='none'>None</option>
                     <?php foreach($bloodline_combat_boosts as $boost): ?>
                         <option value='<?= $boost ?>'
-                            <?= (($_POST[$fighter_form_key]["bloodline_boost_{$i}"] ?? '') == $boost ? "selected='selected'" : '') ?>
+                            <?= selected(($_POST[$fighter_form_key]["bloodline_boost_{$i}"] ?? '') == $boost) ?>
                         >
                             <?= $boost ?>
                         </option>
@@ -191,8 +207,8 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
             <?php endfor; ?>
         </p>
 
+        <b>Jutsu</b><br />
         <div class='jutsu_input'>
-            <b>Jutsu</b><br />
             <select
                 id='<?= $fighter_form_key ?>_jutsu_prefill'
                 name='<?= $fighter_form_key ?>_jutsu_id'
@@ -206,13 +222,26 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
                             <option
                                 value='<?= $jutsu->id ?>'
                                 data-jutsu='<?= json_encode($jutsu) ?>'
-                                <?= (($_POST["{$fighter_form_key}_jutsu_id"] ?? '') == $jutsu->id ? "selected='selected'" : '') ?>
+                                <?= selected(($_POST["{$fighter_form_key}_jutsu_id"] ?? '') == $jutsu->id) ?>
                             >
                                 <?= $jutsu->name ?>
                             </option>
                         <?php endforeach; ?>
                     </optgroup>
                 <?php endforeach; ?>
+            </select><br />
+
+            <label>Offense:</label>
+            <select id='<?= $fighter_form_key ?>_jutsu_type' name='<?= $fighter_form_key ?>[jutsu_type]'>
+                <option value='ninjutsu' <?= selected(($_POST[$fighter_form_key]['jutsu_type'] ?? '') == 'ninjutsu') ?>>
+                    Ninjutsu
+                </option>
+                <option value='taijutsu' <?= selected(($_POST[$fighter_form_key]['jutsu_type'] ?? '') == 'taijutsu') ?>>
+                    Taijutsu
+                </option>
+                <option value='genjutsu' <?= selected(($_POST[$fighter_form_key]['jutsu_type'] ?? '') == 'genjutsu') ?>>
+                    Genjutsu
+                </option>
             </select><br />
 
             <label>Base Power:</label>
@@ -225,19 +254,32 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
                 style='width:70px;'
             /><br />
 
-            <label>Offense:</label>
-            <select id='<?= $fighter_form_key ?>_jutsu_type' name='<?= $fighter_form_key ?>[jutsu_type]'>
-                <option value='ninjutsu' <?= (($_POST[$fighter_form_key]['jutsu_type'] ?? '') == 'ninjutsu' ? "selected='selected'" : '') ?>>
-                    Ninjutsu
-                </option>
-                <option value='taijutsu' <?= (($_POST[$fighter_form_key]['jutsu_type'] ?? '') == 'taijutsu' ? "selected='selected'" : '') ?>>
-                    Taijutsu
-                </option>
-                <option value='genjutsu' <?= (($_POST[$fighter_form_key]['jutsu_type'] ?? '') == 'genjutsu' ? "selected='selected'" : '') ?>>
-                    Genjutsu
-                </option>
-            </select><br />
+            <div class='effect_input'>
+                <label>Effect</label>
+                <select id='<?= $fighter_form_key ?>_jutsu_effect' name='<?= $fighter_form_key ?>[jutsu_effect]'>
+                    <?php foreach($jutsu_effects as $effect): ?>
+                        <option value='<?= $effect ?>' <?= selected($_POST[$fighter_form_key]['jutsu_effect'] == $effect) ?>>
+                            <?= System::unSlug($effect) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
 
+                <label>Effect Amount:</label>
+                <input
+                    type='number'
+                    id='<?= $fighter_form_key ?>_jutsu_effect_amount'
+                    name='<?= $fighter_form_key ?>[jutsu_effect_amount]'
+                    value='<?= $_POST[$fighter_form_key]['jutsu_effect_amount'] ?? 0 ?>'
+                />
+
+                <label>Effect Length:</label>
+                <input
+                    type='number'
+                    id='<?= $fighter_form_key ?>_jutsu_effect_length'
+                    name='<?= $fighter_form_key ?>[jutsu_effect_length]'
+                    value='<?= $_POST[$fighter_form_key]['jutsu_effect_length'] ?? 0 ?>'
+                />
+            </div>
         </div>
     </div>
     <?php

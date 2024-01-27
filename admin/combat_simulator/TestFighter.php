@@ -50,17 +50,24 @@ class TestFighter extends Fighter {
         return true;
     }
 
-    public function addJutsu(string $jutsu_type, float $base_power): Jutsu {
+    public function addJutsu(
+        string $jutsu_type,
+        float $base_power,
+        string $effect,
+        int $effect_amount,
+        int $effect_length
+    ): Jutsu {
+        $id = count($this->jutsu) + 1;
         $jutsu = new Jutsu(
-            id: 1,
-            name: 'p1j',
+            id: $id,
+            name: $this->name . 'j' . $id,
             rank: $this->rank,
             jutsu_type: $jutsu_type,
             base_power: $base_power,
             range: 1,
-            effect_1: 'none',
-            base_effect_amount_1: 0,
-            effect_length_1: 0,
+            effect_1: $effect,
+            base_effect_amount_1: $effect_amount,
+            effect_length_1: $effect_length,
             effect_2: 'none',
             base_effect_amount_2: 0,
             effect_length_2: 0,
@@ -138,6 +145,8 @@ class TestFighter extends Fighter {
             );
             $fighter->applyBloodlineBoosts();
         }
+
+        $fighter->jutsu = [];
 
         return $fighter;
     }
