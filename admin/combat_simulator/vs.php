@@ -175,7 +175,7 @@ if ($system->db->last_num_rows > 0) {
         ];
         ?>
         <div class='versusFighterInput' style='margin-left: 20px;'>
-            <?= ucwords($fighter_form_key) ?><br />
+            <b><?= ucwords($fighter_form_key) ?></b><br />
             <?php foreach($stats as $stat): ?>
                 <label style='width:110px;'><?= $stat ?>:</label>
                 <input type='number' step='10' name='<?= $fighter_form_key ?>[<?= $stat ?>]' value='<?= $_POST[$fighter_form_key][$stat] ?? 0 ?>' /><br />
@@ -188,8 +188,8 @@ if ($system->db->last_num_rows > 0) {
                 name='<?= $fighter_form_key ?>_bloodline_id'
                 onchange='prefillBloodline("<?= $fighter_form_key ?>")'
             >
+                <option value='0'>Select to auto-fill boosts</option>
                 <?php foreach($bloodlines_by_rank as $rank => $bloodlines): ?>
-                    <option value='0'>Select to auto-fill boosts</option>
                     <optgroup label="<?= Bloodline::$public_ranks[$rank] ?>">
                         <?php foreach($bloodlines as $bloodline): ?>
                             <option
