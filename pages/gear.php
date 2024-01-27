@@ -78,12 +78,17 @@ function gear(): void {
 
             switch($player->items[$item_id]->effect) {
                 case 'heal':
+                    $before_health_percent = ($player->health / $player->max_health) * 100;
+
                     $player->items[$item_id]->quantity--;
                     $player->health += ($player->items[$item_id]->effect_amount / 100) * $player->max_health;
                     if($player->health > $player->maxConsumableHealAmount()) {
                         $player->health = $player->maxConsumableHealAmount();
                     }
-                    $system->message("Restored " . $player->items[$item_id]->effect_amount . "% HP.");
+
+                    $after_health_percent = ($player->health / $player->max_health) * 100;
+
+                    $system->message("Restored " . round($after_health_percent - $before_health_percent, 1) . "% HP.");
                     break;
                 default:
                     break;
