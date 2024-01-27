@@ -165,7 +165,7 @@
                 $hand_seals = [];
                 if($existing_jutsu != null && $existing_jutsu->jutsu_type != Jutsu::TYPE_TAIJUTSU) {
                     $hand_seals = explode("-", $existing_jutsu->hand_seals);
-                    $hand_seals = array_map('intval', $hand_seals);
+                    $hand_seals = array_map(intval(...), $hand_seals);
                 }
             ?>
             const initialHandSeals = <?= json_encode($hand_seals) ?>;
