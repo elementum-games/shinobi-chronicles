@@ -437,6 +437,17 @@ class BattleManagerV2 {
         }
     }
 
+    public function getCooldowns(): array {
+        return $this->battle->jutsu_cooldowns;
+    }
+
+    public function simulateAIAttack(Jutsu $ai_jutsu): array {
+        return [
+            'ai_simulated_damage_taken' => 100,
+            'player_simulated_damage_taken' => 100,
+        ];
+    }
+
     // PRIVATE API - TURN LIFECYCLE
 
     /**

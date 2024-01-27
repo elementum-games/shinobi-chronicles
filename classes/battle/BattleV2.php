@@ -448,5 +448,4 @@ class BattleV2 {
     public function getLastTurnLog(): ?BattleLogV2 {
         return $this->log[$this->turn_count - 1] ?? null;
     }
-
 }
