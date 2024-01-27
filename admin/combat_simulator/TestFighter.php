@@ -50,6 +50,39 @@ class TestFighter extends Fighter {
         return true;
     }
 
+    public function addJutsu(string $jutsu_type, float $base_power): Jutsu {
+        $jutsu = new Jutsu(
+            id: 1,
+            name: 'p1j',
+            rank: $this->rank,
+            jutsu_type: $jutsu_type,
+            base_power: $base_power,
+            range: 1,
+            effect_1: 'none',
+            base_effect_amount_1: 0,
+            effect_length_1: 0,
+            effect_2: 'none',
+            base_effect_amount_2: 0,
+            effect_length_2: 0,
+            description: 'no',
+            battle_text: 'nope',
+            cooldown: 0,
+            use_type: Jutsu::USE_TYPE_PROJECTILE,
+            target_type: Jutsu::TARGET_TYPE_TILE,
+            use_cost: 0,
+            purchase_cost: 0,
+            purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
+            parent_jutsu: 0,
+            element: Jutsu::ELEMENT_NONE,
+            hand_seals: 0
+        );
+
+        $jutsu->setLevel(100, 0);
+        $this->jutsu[$jutsu->id] = $jutsu;
+
+        return $jutsu;
+    }
+
     public static function fromFormData(System $system, RankManager $rankManager, array $fighter_data, string $name): TestFighter {
         $fighter = new TestFighter();
         $fighter->rank = 3;

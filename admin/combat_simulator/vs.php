@@ -35,33 +35,10 @@ if(isset($_POST['run_simulation'])) {
             fighter_data: $player1_data,
             name: "Player 1"
         );
-        $player1_jutsu = new Jutsu(
-            id: 1,
-            name: 'p1j',
-            rank: $player1->rank,
+        $player1_jutsu = $player1->addJutsu(
             jutsu_type: $player1_data['jutsu_type'],
             base_power: (int)$player1_data['jutsu_power'],
-            range: 1,
-            effect_1: 'none',
-            base_effect_amount_1: 0,
-            effect_length_1: 0,
-            effect_2: 'none',
-            base_effect_amount_2: 0,
-            effect_length_2: 0,
-            description: 'nope',
-            battle_text: 'no',
-            cooldown: 0,
-            use_type: Jutsu::USE_TYPE_PROJECTILE,
-            target_type: Jutsu::TARGET_TYPE_TILE,
-            use_cost: 0,
-            purchase_cost: 0,
-            purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
-            parent_jutsu: 0,
-            element: Jutsu::ELEMENT_NONE,
-            hand_seals: 1
         );
-        $player1_jutsu->setLevel(50, 0);
-        $player1->jutsu[$player1_jutsu->id] = $player1_jutsu;
 
         $player2 = TestFighter::fromFormData(
             system: $system,
@@ -69,33 +46,10 @@ if(isset($_POST['run_simulation'])) {
             fighter_data: $player2_data,
             name: "Player 2"
         );
-        $player2_jutsu = new Jutsu(
-            id: 1,
-            name: 'p1j',
-            rank: $player2->rank,
+        $player2_jutsu = $player2->addJutsu(
             jutsu_type: $player2_data['jutsu_type'],
             base_power: (int)$player2_data['jutsu_power'],
-            range: 1,
-            effect_1: 'none',
-            base_effect_amount_1: 0,
-            effect_length_1: 0,
-            effect_2: 'none',
-            base_effect_amount_2: 0,
-            effect_length_2: 0,
-            description: 'no',
-            battle_text: 'nope',
-            cooldown: 0,
-            use_type: Jutsu::USE_TYPE_PROJECTILE,
-            target_type: Jutsu::TARGET_TYPE_TILE,
-            use_cost: 0,
-            purchase_cost: 0,
-            purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
-            parent_jutsu: 0,
-            element: Jutsu::ELEMENT_NONE,
-            hand_seals: 0
         );
-        $player2_jutsu->setLevel(50, 0);
-        $player2->jutsu[$player2_jutsu->id] = $player2_jutsu;
 
         $damages = calcDamage(
             player1: $player1,
@@ -125,6 +79,14 @@ if(isset($_POST['run_simulation'])) {
         </div>";
     } catch (Exception $e) {
         echo $e->getMessage();
+    }
+}
+
+$bloodlines_by_rank = [];
+$result = $system->db->query("SELECT * FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
+if ($system->db->last_num_rows > 0) {
+    while ($row = $system->db->fetch($result)) {
+        $bloodlines_by_rank[$row['rank']][$row['bloodline_id']] = Bloodline::fromArray($row);
     }
 }
 
@@ -162,8 +124,39 @@ if(isset($_POST['run_simulation'])) {
     }
 </style>
 
+<script>
+    function prefillBloodline(fighterKey) {
+        let bloodlineSelect = document.getElementById(`bloodline_prefill_${fighterKey}`);
+        if(bloodlineSelect == null) {
+            console.error("Invalid bloodline select element");
+            return;
+        }
+
+        let selectedBloodlineBoosts = JSON.parse(
+            bloodlineSelect.selectedOptions[0].getAttribute("data-boosts")
+        );
+
+        selectedBloodlineBoosts.forEach((boost, i) => {
+            let boostEl = document.getElementById(`${fighterKey}_bloodline_boost_${i + 1}`);
+            let boostAmountEl = document.getElementById(`${fighterKey}_bloodline_boost_${i + 1}_amount`);
+
+            console.log(`${fighterKey}_bloodline_boost_${i + 1}`, boostEl);
+            console.log(`${fighterKey}_bloodline_boost_${i + 1}_amount`, boostAmountEl);
+
+            boostEl.value = boost.effect;
+            boostAmountEl.value = boost.power;
+        });
+    }
+</script>
+
 <?php
-    function displayFighterInput(string $fighter_form_key, array $bloodline_combat_boosts): void {
+    /**
+     * @param string $fighter_form_key
+     * @param array  $bloodline_combat_boosts
+     * @param Bloodline[][]  $bloodlines_by_rank
+     * @return void
+     */
+    function displayFighterInput(string $fighter_form_key, array $bloodline_combat_boosts, array $bloodlines_by_rank): void {
         $stats = [
             'ninjutsu_skill',
             'taijutsu_skill',
@@ -172,14 +165,62 @@ if(isset($_POST['run_simulation'])) {
             'speed',
             'cast_speed',
         ];
-
         ?>
         <div class='versusFighterInput' style='margin-left: 20px;'>
-            Player 2<br />
+            <?= ucwords($fighter_form_key) ?><br />
             <?php foreach($stats as $stat): ?>
                 <label style='width:110px;'><?= $stat ?>:</label>
                 <input type='number' step='10' name='<?= $fighter_form_key ?>[<?= $stat ?>]' value='<?= $_POST[$fighter_form_key][$stat] ?? 0 ?>' /><br />
             <?php endforeach; ?>
+            <br />
+
+            Bloodline boosts<br />
+            <select id='bloodline_prefill_<?= $fighter_form_key ?>' name='<?= $fighter_form_key ?>_bloodline_id'>
+                <?php foreach($bloodlines_by_rank as $rank => $bloodlines): ?>
+                    <optgroup label="<?= Bloodline::$public_ranks[$rank] ?>">
+                        <?php foreach($bloodlines as $bloodline): ?>
+                            <option
+                                value='<?= $bloodline->bloodline_id ?>'
+                                data-boosts='<?= json_encode($bloodline->base_combat_boosts) ?>'
+                                <?= (
+                                    ($_POST["{$fighter_form_key}_bloodline_id"] ?? '') == $bloodline->bloodline_id
+                                        ? "selected='selected'"
+                                        : ''
+                                ) ?>
+                            >
+                                <?= $bloodline->name ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                <?php endforeach; ?>
+            </select>
+            <button type='button' onclick='prefillBloodline("<?= $fighter_form_key ?>")'>Pre-fill</button><br />
+            <br />
+            <?php for($i = 1; $i <= 3; $i++): ?>
+                <select
+                    id='<?= $fighter_form_key?>_bloodline_boost_<?= $i ?>'
+                    name='<?= $fighter_form_key ?>[bloodline_boost_<?= $i ?>]'
+                >
+                    <option value='none'>None</option>
+                    <?php foreach($bloodline_combat_boosts as $boost): ?>
+                        <option value='<?= $boost ?>'
+                            <?= (($_POST[$fighter_form_key]["bloodline_boost_{$i}"] ?? '') == $boost ? "selected='selected'" : '') ?>
+                        >
+                            <?= $boost ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <input
+                    type='number'
+                    id='<?= $fighter_form_key?>_bloodline_boost_<?= $i ?>_amount'
+                    name='<?= $fighter_form_key ?>[bloodline_boost_<?= $i ?>_power]'
+                    style='width:60px'
+                    value='<?= $_POST[$fighter_form_key]["bloodline_boost_{$i}_power"] ?? 0 ?>'
+                />
+                <br />
+            <?php endfor; ?>
+            <br />
+            <br />
 
             <div class='jutsu_input'>
                 <label style='width:110px;'>Jutsu power:</label>
@@ -203,27 +244,6 @@ if(isset($_POST['run_simulation'])) {
                     Genjutsu
                 </label><br />
             </div>
-
-            Bloodline boosts<br />
-            <?php for($i = 1; $i <= 3; $i++): ?>
-                <select name='<?= $fighter_form_key ?>[bloodline_boost_<?= $i ?>]'>
-                    <option value='none'>None</option>
-                    <?php foreach($bloodline_combat_boosts as $boost): ?>
-                        <option value='<?= $boost ?>'
-                            <?= (($_POST[$fighter_form_key]["bloodline_boost_{$i}"] ?? '') == $boost ? "selected='selected'" : '') ?>
-                        >
-                            <?= $boost ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <input
-                        type='number'
-                        name='<?= $fighter_form_key ?>[bloodline_boost_<?= $i ?>_power]'
-                        style='width:60px'
-                        value='<?= $_POST[$fighter_form_key]["bloodline_boost_{$i}_power"] ?? 0 ?>'
-                />
-                <br />
-            <?php endfor; ?>
         </div>
         <?php
     }
@@ -231,8 +251,16 @@ if(isset($_POST['run_simulation'])) {
 
 <form action='vs.php' method='post'>
     <div class='vs_container'>
-        <?php displayFighterInput('fighter1', $bloodline_combat_boosts); ?>
-        <?php displayFighterInput('fighter2', $bloodline_combat_boosts); ?>
+        <?php displayFighterInput(
+            fighter_form_key: 'fighter1',
+            bloodline_combat_boosts: $bloodline_combat_boosts,
+            bloodlines_by_rank: $bloodlines_by_rank
+        ); ?>
+        <?php displayFighterInput(
+            fighter_form_key: 'fighter2',
+            bloodline_combat_boosts: $bloodline_combat_boosts,
+            bloodlines_by_rank: $bloodlines_by_rank
+        ); ?>
         <input type='submit' name='run_simulation' value='Run Simulation' />
     </div>
 </form>

@@ -32,8 +32,8 @@ class Bloodline {
 
     public string $description;
 
-    protected array $base_passive_boosts;
-    protected array $base_combat_boosts;
+    public array $base_passive_boosts;
+    public array $base_combat_boosts;
 
     public array $passive_boosts = [];
     public array $combat_boosts = [];
