@@ -123,7 +123,7 @@
                         <span class='button' style='min-width:8em; margin: 0'><?= $item->name ?><br />
                             <span style='font-weight:normal;'>Amount: <?= $item->quantity ?></span><br/>
                             <?php if($item->effect == 'heal'): ?>
-                                <span style='font-weight:normal;'>(Heal <?= $item->effect_amount ?> HP)</span>
+                                <span style='font-weight:normal;'>(Heal <?= $item->effect_amount ?>% HP)</span>
                             <?php endif; ?>
                         </span>
                     </a>

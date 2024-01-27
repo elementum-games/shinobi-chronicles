@@ -85,7 +85,6 @@
     max-height: 412px;
     flex-grow: 0;
     display: flex;
-    border: 1px solid var(--border-color-default);
     position: absolute;
     right: 44px;
     top: 35px;
@@ -174,6 +173,7 @@
     animation-delay: 5s;
     animation-fill-mode: forwards;
     white-space: pre;
+    z-index: 11;
 }
 
 .travel-messages {
@@ -213,6 +213,7 @@
     justify-content: center;
     z-index: 20;
     gap: 10px;
+    width: 0px;
 }
 
 #content .travel-buttons .button {
@@ -337,7 +338,6 @@
     flex-flow: row wrap;
     justify-content: flex-start;
     position: relative;
-    z-index: 10;
     background: var(--theme-content-darker-bg-color);
     border: 1px solid var(--travel-background-color);
 }

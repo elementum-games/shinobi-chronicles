@@ -179,7 +179,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
             $stat_to_gain = $player->getTrainingStatForArena();
 
             $stat_gain_display = '<br />During the fight you realized a way to use your ' . System::unSlug($stat_to_gain) . ' a little
-            more effectively.';
+            more effectively.<br />';
             $stat_gain = TrainingManager::getAIStatGain($opponent->difficulty_level, $player->rank_num);
             $stat_gain_display .= $player->addStatGain($stat_to_gain, $stat_gain) . '.';
         }

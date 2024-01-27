@@ -211,7 +211,7 @@
                 <tr class='table_multicolumns' style='text-align:center;'>
                     <td style='width:35%;'><?= $item->name ?>
                         <?php if($owned): ?>
-                            <br />(Owned: <?= $owned ?>/<?= $max_consumables ?>)
+                            <br />(Owned: <?= $owned ?>/<?= $item->max_quantity ?>)
                         <?php endif; ?>
                     </td>
                     <td style='width:25%;'><?= System::unSlug($item->effect) ?></td>
