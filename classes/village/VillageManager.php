@@ -1165,6 +1165,10 @@ class VillageManager {
         if ($seat->seat_type != "kage") {
             return "You do not meet the seat requirements.";
         }
+        // check policy id
+        if ($policy_id < 1 || $policy_id > 5) {
+            return "Invalid policy.";
+        }
         // check cooldown on policy
         $query = $system->db->query("SELECT `start_time` FROM `policy_logs` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} LIMIT 1");
         $last_change = $system->db->fetch($query);

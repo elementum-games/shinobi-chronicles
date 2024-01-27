@@ -1122,7 +1122,10 @@
 .war_glow {
     text-shadow: 0 0 0px #402727, 0 0 1px #402727, 0 0 2px #402727, 0 0 3px #402727, 0 0 4px #402727, 0 0 5px #402727, 0 0 6px #402727, 0 0 7px #b10000, 0 0 8px #b10000;
 }
-.policy_bonus_item, .policy_penalty_item {
+.prosperity_glow {
+    text-shadow: 0 0 0px #251e14, 0 0 1px #251e14, 0 0 2px #251e14, 0 0 3px #251e14, 0 0 4px #251e14, 0 0 5px #251e14, 0 0 6px #251e14, 0 0 7px #251e14, 0 0 8px #bb9334;
+}
+.policy_bonus_item, .policy_resource_item, .policy_penalty_item {
     display: flex;
     line-height: 10px;
     margin-left: 15px;
