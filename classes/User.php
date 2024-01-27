@@ -93,7 +93,7 @@ class User extends Fighter {
     const PVP_IMMUNITY_SECONDS = 120;
     const SPECIAL_MISSION_STEALTH_BONUS = 1;
 
-    const POST_FIGHT_CONSUMABLE_HEAL_REDUCTION_MS = 150000;
+    const POST_FIGHT_CONSUMABLE_HEAL_REDUCTION_MS = 2500;
 
     public static int $jutsu_train_gain = 5;
 
