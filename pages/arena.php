@@ -50,9 +50,11 @@ function arena(): bool {
             // check if the current location disallows ai fights
             if ($player->rank_num > 2 && $player->current_location->location_id && $player->current_location->ai_allowed == 0) {
                 $system->message('You cannot fight at this location');
-            } else if ($player->last_ai_ms > $max_last_ai_ms) {
+            }
+            else if ($player->last_ai_ms > $max_last_ai_ms) {
                 $system->message("Please wait " . ceil(($player->last_ai_ms - $max_last_ai_ms) / 1000) . " more seconds!");
-            } else {
+            }
+            else {
                 try {
                     $ai_difficulty = $_GET['difficulty'];
                     $ai = getArenaOpponent($ai_difficulty, $player, $system);

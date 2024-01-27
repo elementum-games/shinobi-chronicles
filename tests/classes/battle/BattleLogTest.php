@@ -21,7 +21,9 @@ class BattleLogTest extends TestCase {
             turn_number: 1,
             turn_phase: 'movement',
             content: '',
-            fighter_action_logs: []
+            fighter_action_logs: [],
+            fighter_health: [],
+            raw_active_effects: ''
         );
 
         $fighter1_action_text = "Does the thing";
