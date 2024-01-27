@@ -1,6 +1,6 @@
 <?php
 /* Jutsu */
-$jutsu_effects = require 'admin/constraints/jutsu_effects.php';
+$jutsu_effects = require __DIR__ . '/jutsu_effects.php';
 
 $ranks = [];
 for($x = 1; $x <= System::SC_MAX_RANK; $x++) {

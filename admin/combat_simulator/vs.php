@@ -7,23 +7,14 @@ require __DIR__ . "/TestFighter.php";
 require __DIR__ . "/calcDamage.php";
 
 /** @var string[] $bloodline_combat_boosts */
-require_once __DIR__ . '/../entity_constraints.php';
+require_once __DIR__ . '/../constraints/bloodline.php';
 
 $rankManager = new RankManager($system);
 $rankManager->loadRanks();
 
-$stats = [
-    'ninjutsu_skill',
-    'taijutsu_skill',
-    'genjutsu_skill',
-    'bloodline_skill',
-    'speed',
-    'cast_speed',
-];
-
 if(isset($_POST['run_simulation'])) {
-    $player1_data = $_POST['stats1'];
-    $player2_data = $_POST['stats2'];
+    $player1_data = $_POST['fighter1'];
+    $player2_data = $_POST['fighter2'];
 
     $valid_jutsu_types = [
         Jutsu::TYPE_NINJUTSU,
@@ -144,186 +135,105 @@ if(isset($_POST['run_simulation'])) {
         display: inline-block;
     }
 
+    .vs_container {
+        width: 800px;
+        margin: 5px auto;
+        text-align: center;
+    }
+
     .versusFighterInput {
         width:300px;
         display:inline-block;
         border:1px solid #000000;
         border-radius:10px;
+
+        text-align: left;
+
+        padding: 8px;
+    }
+
+    .jutsu_input {
+        margin: 5px auto;
+    }
+
+    input[type='submit'] {
+        display: block;
+        margin: 5px auto auto;
     }
 </style>
 
-<div>
-    <form action='vs.php' method='post'>
-        <div class='versusFighterInput'>
-            Player 1<br />
-            <?php foreach($stats as $stat): ?>
-                <label style='width:110px;'><?= $stat ?>:</label>
-                <input type='text' name='stats1[<?= $stat ?>]' value='<?= $_POST['stats1'][$stat] ?? 10 ?>' /><br />
-            <?php endforeach; ?>
-            <label style='width:110px;'>Jutsu power:</label>
-            <input type='text' name='stats1[jutsu_power]' value='<?= $_POST['stats1']['jutsu_power'] ?? 1 ?>' /><br />
-            <label>
-                <input type='radio' name='stats1[jutsu_type]' value='ninjutsu'
-                    <?= ($_POST['stats1']['jutsu_type'] ?? null == 'ninjutsu' ? "checked='checked'" : '') ?>
-                />
-                Ninjutsu
-            </label><br />
-            <label>
-                <input type='radio' name='stats1[jutsu_type]' value='taijutsu'
-                    <?= ($_POST['stats1']['jutsu_type'] == 'taijutsu' ? "checked='checked'" : '') ?>
-                />
-                Taijutsu
-            </label><br />
-            <label>
-                <input type='radio' name='stats1[jutsu_type]' value='genjutsu'
-                    <?= ($_POST['stats1']['jutsu_type'] == 'genjutsu' ? "checked='checked'" : '') ?>
-                />
-                Genjutsu
-            </label><br />
-            <br />
-            Bloodline boost 1<br />
-            <select name='stats1[bloodline_boost_1]'>
-                <option value='none'>None</option>
-                <?php foreach($bloodline_combat_boosts as $boost): ?>
-                    <option value='<?= $boost ?>'
-                        <?= ($_POST['stats1']['bloodline_boost_1'] == $boost ? "selected='selected'" : '') ?>
-                    >
-                        <?= $boost ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <input
-                type='number'
-                name='stats1[bloodline_boost_1_power]'
-                style='width:60px'
-                value='<?= $_POST['stats1']['bloodline_boost_1_power'] ?? 0 ?>'
-            />
-            <br />
+<?php
+    function displayFighterInput(string $fighter_form_key, array $bloodline_combat_boosts): void {
+        $stats = [
+            'ninjutsu_skill',
+            'taijutsu_skill',
+            'genjutsu_skill',
+            'bloodline_skill',
+            'speed',
+            'cast_speed',
+        ];
 
-            Bloodline boost 2<br />
-            <select name='stats1[bloodline_boost_2]'>
-                <option value='none'>None</option>
-                <?php foreach($bloodline_combat_boosts as $boost): ?>
-                    <option value='<?= $boost ?>'
-                        <?= ($_POST['stats1']['bloodline_boost_2'] == $boost ? "selected='selected'" : '') ?>
-                    >
-                        <?= $boost ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <input
-                type='number'
-                name='stats1[bloodline_boost_2_power]'
-                style='width:60px'
-                value='<?= $_POST['stats1']['bloodline_boost_2_power'] ?? 0 ?>'
-            />
-            <br />
-
-            Bloodline boost 3<br />
-            <select name='stats1[bloodline_boost_3]'>
-                <option value='none'>None</option>
-                <?php foreach($bloodline_combat_boosts as $boost): ?>
-                    <option value='<?= $boost ?>'
-                        <?= ($_POST['stats1']['bloodline_boost_3'] == $boost ? "selected='selected'" : '') ?>
-                    >
-                        <?= $boost ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <input
-                type='number'
-                name='stats1[bloodline_boost_3_power]'
-                style='width:60px'
-                value='<?= $_POST['stats1']['bloodline_boost_3_power'] ?? 0 ?>'
-            />
-            <br />
-        </div>
+        ?>
         <div class='versusFighterInput' style='margin-left: 20px;'>
             Player 2<br />
             <?php foreach($stats as $stat): ?>
                 <label style='width:110px;'><?= $stat ?>:</label>
-                <input type='text' name='stats2[<?= $stat ?>]' value='<?= $_POST['stats2'][$stat] ?? 10 ?>' /><br />
+                <input type='number' step='10' name='<?= $fighter_form_key ?>[<?= $stat ?>]' value='<?= $_POST[$fighter_form_key][$stat] ?? 0 ?>' /><br />
             <?php endforeach; ?>
-            <label style='width:110px;'>Jutsu power:</label>
-            <input type='text' name='stats2[jutsu_power]' value='<?= $_POST['stats2']['jutsu_power'] ?? 1 ?>' /><br />
-            <label>
-                <input type='radio' name='stats2[jutsu_type]' value='ninjutsu'
-                    <?= ($_POST['stats2']['jutsu_type'] == 'ninjutsu' ? "checked='checked'" : '') ?>
-                />
-                Ninjutsu
-            </label><br />
-            <label>
-                <input type='radio' name='stats2[jutsu_type]' value='taijutsu'
-                    <?= ($_POST['stats2']['jutsu_type'] == 'taijutsu' ? "checked='checked'" : '') ?>
-                />
-                Taijutsu
-            </label><br />
-            <label>
-                <input type='radio' name='stats2[jutsu_type]' value='genjutsu'
-                    <?= ($_POST['stats2']['jutsu_type'] == 'genjutsu' ? "checked='checked'" : '') ?>
-                />
-                Genjutsu
-            </label><br />
-            <br />
-            Bloodline boost 1<br />
-            <select name='stats2[bloodline_boost_1]'>
-                <option value='none'>None</option>
-                <?php foreach($bloodline_combat_boosts as $boost): ?>
-                    <option value='<?= $boost ?>'
-                        <?= ($_POST['stats2']['bloodline_boost_1'] == $boost ? "selected='selected'" : '') ?>
-                    >
-                        <?= $boost ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <input
-                type='number'
-                name='stats2[bloodline_boost_1_power]'
-                style='width:60px'
-                value='<?= $_POST['stats2']['bloodline_boost_1_power'] ?? 0 ?>'
-            />
-            <br />
 
-            Bloodline boost 2<br />
-            <select name='stats2[bloodline_boost_2]'>
-                <option value='none'>None</option>
-                <?php foreach($bloodline_combat_boosts as $boost): ?>
-                    <option value='<?= $boost ?>'
-                        <?= ($_POST['stats2']['bloodline_boost_2'] == $boost ? "selected='selected'" : '') ?>
-                    >
-                        <?= $boost ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <input
-                type='number'
-                name='stats2[bloodline_boost_2_power]'
-                style='width:60px'
-                value='<?= $_POST['stats2']['bloodline_boost_2_power'] ?? 0 ?>'
-            />
-            <br />
+            <div class='jutsu_input'>
+                <label style='width:110px;'>Jutsu power:</label>
+                <input type='text' name='<?= $fighter_form_key ?>[jutsu_power]' value='<?= $_POST[$fighter_form_key]['jutsu_power'] ?? 1 ?>' /><br />
+                <label>
+                    <input type='radio' name='<?= $fighter_form_key ?>[jutsu_type]' value='ninjutsu'
+                        <?= (($_POST[$fighter_form_key]['jutsu_type'] ?? '') == 'ninjutsu' ? "checked='checked'" : '') ?>
+                    />
+                    Ninjutsu
+                </label><br />
+                <label>
+                    <input type='radio' name='<?= $fighter_form_key ?>[jutsu_type]' value='taijutsu'
+                        <?= (($_POST[$fighter_form_key]['jutsu_type'] ?? '') == 'taijutsu' ? "checked='checked'" : '') ?>
+                    />
+                    Taijutsu
+                </label><br />
+                <label>
+                    <input type='radio' name='<?= $fighter_form_key ?>[jutsu_type]' value='genjutsu'
+                        <?= (($_POST[$fighter_form_key]['jutsu_type'] ?? '') == 'genjutsu' ? "checked='checked'" : '') ?>
+                    />
+                    Genjutsu
+                </label><br />
+            </div>
 
-            Bloodline boost 3<br />
-            <select name='stats2[bloodline_boost_3]'>
-                <option value='none'>None</option>
-                <?php foreach($bloodline_combat_boosts as $boost): ?>
-                    <option value='<?= $boost ?>'
-                        <?= ($_POST['stats2']['bloodline_boost_3'] == $boost ? "selected='selected'" : '') ?>
-                    >
-                        <?= $boost ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <input
-                type='number'
-                name='stats2[bloodline_boost_3_power]'
-                style='width:60px'
-                value='<?= $_POST['stats2']['bloodline_boost_3_power'] ?? 0 ?>'
-            />
-            <br />
+            Bloodline boosts<br />
+            <?php for($i = 1; $i <= 3; $i++): ?>
+                <select name='<?= $fighter_form_key ?>[bloodline_boost_<?= $i ?>]'>
+                    <option value='none'>None</option>
+                    <?php foreach($bloodline_combat_boosts as $boost): ?>
+                        <option value='<?= $boost ?>'
+                            <?= (($_POST[$fighter_form_key]["bloodline_boost_{$i}"] ?? '') == $boost ? "selected='selected'" : '') ?>
+                        >
+                            <?= $boost ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <input
+                        type='number'
+                        name='<?= $fighter_form_key ?>[bloodline_boost_<?= $i ?>_power]'
+                        style='width:60px'
+                        value='<?= $_POST[$fighter_form_key]["bloodline_boost_{$i}_power"] ?? 0 ?>'
+                />
+                <br />
+            <?php endfor; ?>
         </div>
-        <br />
+        <?php
+    }
+?>
+
+<form action='vs.php' method='post'>
+    <div class='vs_container'>
+        <?php displayFighterInput('fighter1', $bloodline_combat_boosts); ?>
+        <?php displayFighterInput('fighter2', $bloodline_combat_boosts); ?>
         <input type='submit' name='run_simulation' value='Run Simulation' />
-    </form>
-</div>
+    </div>
+</form>
 
