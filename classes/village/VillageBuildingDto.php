@@ -7,7 +7,8 @@ class VillageBuildingDto {
         public int $village_id,
         public int $tier = 0,
         public int $health = 0,
-        public ?int $build_start_time = null,
-        public ?int $build_end_time = null
+        public string $status = VillageUpgradeManager::BUILDING_STATUS_DEFAULT,
+        public ?int $construction_progress = null,
+        public ?int $construction_progress_required = null
     ) {}
 }

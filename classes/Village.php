@@ -23,7 +23,7 @@ class Village {
     public VillagePolicy $policy;
     public array $buildings = [];
     public array $upgrades = [];
-    public array $bonuses = [];
+    public array $active_upgrade_effects = [];
 
     // to-do: we should restructure how village data is being saved
     // player village should reference the village ID and this constructor should get row by ID
@@ -44,6 +44,7 @@ class Village {
             $this->policy = new VillagePolicy($this->policy_id);
             $this->buildings = VillageUpgradeManager::getBuildingsForVillage($this->system, $this->village_id);
             $this->upgrades = VillageUpgradeManager::getUpgradesForVillage($this->system, $this->village_id);
+            $this->active_upgrade_effects = VillageUpgradeManager::initializeEffectsForVillage($this->system, $this->upgrades);
         }
         // updated legacy constructor logic
         else {
@@ -55,6 +56,7 @@ class Village {
             $this->policy = new VillagePolicy($this->policy_id);
             $this->buildings = VillageUpgradeManager::getBuildingsForVillage($this->system, $this->village_id);
             $this->upgrades = VillageUpgradeManager::getUpgradesForVillage($this->system, $this->village_id);
+            $this->active_upgrade_effects = VillageUpgradeManager::initializeEffectsForVillage($this->system, $this->upgrades);
         }
     }
 

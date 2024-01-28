@@ -18,8 +18,9 @@ final class VillageUpgradeMigration extends AbstractMigration
             `village_id` INT(11) NOT NULL ,
             `tier` INT(11) NOT NULL DEFAULT '0',
             `health` INT(11) NOT NULL DEFAULT '0',
-            `build_start_time` INT(11) NULL DEFAULT NULL,
-            `build_end_time` INT(11) NULL DEFAULT NULL,
+            `status` VARCHAR(20) NOT NULL DEFAULT 'default',
+            `construction_progress` INT(11) NULL DEFAULT NULL,
+            `construction_progress_required` INT(11) NULL DEFAULT NULL,
             PRIMARY KEY (`id`));
 
             -- Create table village_upgrades
@@ -27,24 +28,24 @@ final class VillageUpgradeMigration extends AbstractMigration
             (`id` INT(11) NOT NULL AUTO_INCREMENT,
             `key` VARCHAR(100) NOT NULL,
             `village_id` INT(11) NOT NULL,
-            `is_active` TINYINT(1) NOT NULL DEFAULT '0',
-            `research_start_time` INT(11) NULL DEFAULT NULL,
-            `research_end_time` INT(11) NULL DEFAULT NULL,
+            `status` VARCHAR(20) NOT NULL DEFAULT 'locked',
+            `research_progress` INT(11) NULL DEFAULT NULL,
+            `research_progress_required` INT(11) NULL DEFAULT NULL,
             PRIMARY KEY (`id`));
 
             -- Alter table region_locations
             ALTER TABLE `region_locations` ADD `stability` INT(11) DEFAULT 0;
             ALTER TABLE `region_locations` CHANGE `id` `region_location_id` INT(11) NOT NULL AUTO_INCREMENT;
-            
+
             -- Rename table operations
             RENAME TABLE `operations` TO `war_actions`;
 
             -- Rename column operation_id
             ALTER TABLE `war_actions` CHANGE `operation_id` `war_action_id` INT(11) NOT NULL AUTO_INCREMENT;
-            ALTER TABLE `war_actions` DROP PRIMARY KEY, ADD PRIMARY KEY (`war_action_id`); 
+            ALTER TABLE `war_actions` DROP PRIMARY KEY, ADD PRIMARY KEY (`war_action_id`);
 
             -- Rename column operation
-            ALTER TABLE `users` CHANGE `operation` `war_action_id` INT(11) NOT NULL DEFAULT '0'; 
+            ALTER TABLE `users` CHANGE `operation` `war_action_id` INT(11) NOT NULL DEFAULT '0';
 
             -- Use occupying_village_id as source of truth for region_locations
             UPDATE region_locations
@@ -117,10 +118,10 @@ final class VillageUpgradeMigration extends AbstractMigration
 
             -- Rename column operation_id
             ALTER TABLE `war_actions` CHANGE `war_action_id` `operation_id` INT(11) NOT NULL AUTO_INCREMENT;
-            ALTER TABLE `war_actions` DROP PRIMARY KEY, ADD PRIMARY KEY (`operation_id`); 
+            ALTER TABLE `war_actions` DROP PRIMARY KEY, ADD PRIMARY KEY (`operation_id`);
 
             -- Rename column war_action_id
-            ALTER TABLE `users` CHANGE `war_action_id` `operation` INT(11) NOT NULL DEFAULT '0'; 
+            ALTER TABLE `users` CHANGE `war_action_id` `operation` INT(11) NOT NULL DEFAULT '0';
 
             -- Clear occupying village_id
             UPDATE region_locations SET region_locations.occupying_village_id = NULL;
