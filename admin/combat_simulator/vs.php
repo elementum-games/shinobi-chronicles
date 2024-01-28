@@ -35,7 +35,7 @@ if(isset($_POST['run_simulation'])) {
         $player1->combat_id = Battle::combatId(Battle::TEAM1, $player1);
         $player1_jutsu = $player1->addJutsu(
             jutsu_type: $player1_data['jutsu_type'],
-            base_power: (int)$player1_data['jutsu_power'],
+            base_power: $player1_data['jutsu_power'],
             effect: $player1_data['jutsu_effect'],
             effect_amount: (int)$player1_data['jutsu_effect_amount'],
             effect_length: (int)$player1_data['jutsu_effect_length'],
@@ -50,7 +50,7 @@ if(isset($_POST['run_simulation'])) {
         $player2->combat_id = Battle::combatId(Battle::TEAM2, $player2);
         $player2_jutsu = $player2->addJutsu(
             jutsu_type: $player2_data['jutsu_type'],
-            base_power: (int)$player2_data['jutsu_power'],
+            base_power: $player2_data['jutsu_power'],
             effect: $player2_data['jutsu_effect'],
             effect_amount: (int)$player2_data['jutsu_effect_amount'],
             effect_length: (int)$player2_data['jutsu_effect_length'],

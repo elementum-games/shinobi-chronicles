@@ -407,6 +407,10 @@ abstract class Fighter {
             $offense *= 1.15;
         }*/
 
+        if($this->system->debug['damage'])  {
+            echo "Pre-rand off: {$offense} / Power: {$attack->power}<br />";
+        }
+
         $rand = mt_rand(self::MIN_RAND, self::MAX_RAND);
         if($disable_randomness) {
             $rand = (self::MIN_RAND + self::MAX_RAND) / 2;
