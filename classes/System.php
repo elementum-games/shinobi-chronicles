@@ -17,7 +17,7 @@ class System {
     //TODO: Move these
     const KUNAI_PER_DOLLAR = 2; // Currnecy
     const CURRENCY_TYPE_MONEY = 'money'; // Currency
-    const CURRENCY_TYPE_PREMIIUM_CREDITS = 'premium_credits'; // Currency
+    const CURRENCY_TYPE_PREMIUM_CREDITS = 'premium_credits'; // Currency
     const BLOODLINE_ROLL_CHANCE = 50; // Bloodline
     const ARENA_COOLDOWN = 4 * 1000; // Battle??
     const DEFAULT_LAYOUT = 'new_geisha'; // Layout
