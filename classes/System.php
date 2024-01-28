@@ -1,5 +1,18 @@
 <?php
-require_once __DIR__ . '/../classes/_sysRequires.php';
+require_once __DIR__ . '/Database.php';
+require_once __DIR__ . '/EntityId.php';
+require_once __DIR__ . '/User.php';
+require_once __DIR__ . '/MarkdownParser.php';
+require_once __DIR__ . '/API.php';
+require_once __DIR__ . '/Layout.php';
+require_once __DIR__ . '/Router.php';
+require_once __DIR__ . '/Route.php';
+
+require_once __DIR__ . '/../classes/event/DoubleExpEvent.php';
+require_once __DIR__ . '/../classes/event/DoubleReputationEvent.php';
+require_once __DIR__ . '/../classes/event/BonusExpWeekend.php';
+require_once __DIR__ . '/../classes/event/HolidayBonusEvent.php';
+
 class System {
     //TODO: Move these
     const KUNAI_PER_DOLLAR = 2; // Currnecy
