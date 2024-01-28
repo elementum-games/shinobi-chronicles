@@ -361,7 +361,7 @@ class VillageManager {
         if (isset($player_seat_id)) {
             $challenge_result = $system->db->query("SELECT * FROM `challenge_requests`
                 WHERE `seat_id` = {$player_seat_id}
-                AND `end_time` != null
+                AND `end_time` IS NULL
                 ORDER BY `created_time` ASC LIMIT 1
             ");
             $challenge_result = $system->db->fetch($challenge_result);
@@ -387,8 +387,6 @@ class VillageManager {
         }
         // if active challenges to your seat, auto win for the challenger
         if (isset($first_challenger)) {
-            // verify challenger meets requirements
-            self::checkSeatRequirements($system, $first_challenger, $player_seat_type);
             // claim seat for challenger
             self::claimSeat($system, $first_challenger, $player_seat_type);
         }
