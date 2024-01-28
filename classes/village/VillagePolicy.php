@@ -144,9 +144,9 @@ class VillagePolicy {
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => false,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
-                self::POLICY_BASE_MATERIALS_PRODUCTION => 0,
-                self::POLICY_BASE_FOOD_PRODUCTION => 0,
-                self::POLICY_BASE_WEALTH_PRODUCTION => 0,
+                self::POLICY_BASE_MATERIALS_PRODUCTION => 70,
+                self::POLICY_BASE_FOOD_PRODUCTION => 100,
+                self::POLICY_BASE_WEALTH_PRODUCTION => 40,
             ],
             self::POLICY_ESPIONAGE => [
                 self::POLICY_BONUS_INFILTRATE_SPEED => 25,
@@ -176,9 +176,9 @@ class VillagePolicy {
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
-                self::POLICY_BASE_MATERIALS_PRODUCTION => 0,
-                self::POLICY_BASE_FOOD_PRODUCTION => 0,
-                self::POLICY_BASE_WEALTH_PRODUCTION => 0,
+                self::POLICY_BASE_MATERIALS_PRODUCTION => 70,
+                self::POLICY_BASE_FOOD_PRODUCTION => 40,
+                self::POLICY_BASE_WEALTH_PRODUCTION => 100,
             ],
             self::POLICY_DEFENSE => [
                 self::POLICY_BONUS_INFILTRATE_SPEED => 0,
@@ -208,9 +208,9 @@ class VillagePolicy {
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
-                self::POLICY_BASE_MATERIALS_PRODUCTION => 0,
-                self::POLICY_BASE_FOOD_PRODUCTION => 0,
-                self::POLICY_BASE_WEALTH_PRODUCTION => 0,
+                self::POLICY_BASE_MATERIALS_PRODUCTION => 100,
+                self::POLICY_BASE_FOOD_PRODUCTION => 70,
+                self::POLICY_BASE_WEALTH_PRODUCTION => 40,
             ],
             self::POLICY_WAR => [
                 self::POLICY_BONUS_INFILTRATE_SPEED => 0,
@@ -240,9 +240,9 @@ class VillagePolicy {
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => false,
-                self::POLICY_BASE_MATERIALS_PRODUCTION => 0,
-                self::POLICY_BASE_FOOD_PRODUCTION => 0,
-                self::POLICY_BASE_WEALTH_PRODUCTION => 0,
+                self::POLICY_BASE_MATERIALS_PRODUCTION => 70,
+                self::POLICY_BASE_FOOD_PRODUCTION => 70,
+                self::POLICY_BASE_WEALTH_PRODUCTION => 70,
             ],
             self::POLICY_PROSPERITY => [
                 self::POLICY_BONUS_INFILTRATE_SPEED => 0,
@@ -272,9 +272,9 @@ class VillagePolicy {
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 25,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
-                self::POLICY_BASE_MATERIALS_PRODUCTION => 0,
-                self::POLICY_BASE_FOOD_PRODUCTION => 0,
-                self::POLICY_BASE_WEALTH_PRODUCTION => 0,
+                self::POLICY_BASE_MATERIALS_PRODUCTION => 40,
+                self::POLICY_BASE_FOOD_PRODUCTION => 70,
+                self::POLICY_BASE_WEALTH_PRODUCTION => 100,
             ],
         ];
     }
@@ -314,6 +314,6 @@ class VillagePolicy {
         $this->alliance_enabled = self::$POLICY_EFFECTS[$policy_id][self::POLICY_RESTRICTION_ALLIANCE_ENABLED];
         $this->materials_production = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BASE_MATERIALS_PRODUCTION];
         $this->food_production = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BASE_FOOD_PRODUCTION];
-        $this->wealth_production = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_WEALTH];
+        $this->wealth_production = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BASE_WEALTH_PRODUCTION];
     }
 }

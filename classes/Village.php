@@ -4,6 +4,8 @@ require_once __DIR__ . '/SpecialMission.php';
 require_once __DIR__ . '/../classes/village/VillageRelation.php';
 require_once __DIR__ . '/../classes/village/VillagePolicy.php';
 require_once __DIR__ . '/../classes/village/VillageUpgradeManager.php';
+require_once __DIR__ . '/../classes/village//BuildingConfig.php';
+require_once __DIR__ . '/../classes/village//UpgradeConfig.php';
 
 class Village {
     public System $system;
@@ -47,8 +49,8 @@ class Village {
             $this->buildings = VillageUpgradeManager::getBuildingsForVillage($this->system, $this->village_id);
             $this->upgrades = VillageUpgradeManager::getUpgradesForVillage($this->system, $this->village_id);
             $this->active_upgrade_effects = VillageUpgradeManager::initializeEffectsForVillage($this->system, $this->upgrades);
-            $this->construction_speed += $this->policy->construction_speed + $this->active_upgrade_effects[VillageUpgradeManager::UPGRADE_EFFECT_CONSTRUCTION_SPEED];
-            $this->research_speed += $this->policy->research_speed + $this->active_upgrade_effects[VillageUpgradeManager::UPGRADE_EFFECT_RESEARCH_SPEED];
+            $this->construction_speed += $this->policy->construction_speed + $this->active_upgrade_effects[UpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED];
+            $this->research_speed += $this->policy->research_speed + $this->active_upgrade_effects[UpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED];
         }
         // updated legacy constructor logic
         else {
@@ -61,8 +63,8 @@ class Village {
             $this->buildings = VillageUpgradeManager::getBuildingsForVillage($this->system, $this->village_id);
             $this->upgrades = VillageUpgradeManager::getUpgradesForVillage($this->system, $this->village_id);
             $this->active_upgrade_effects = VillageUpgradeManager::initializeEffectsForVillage($this->system, $this->upgrades);
-            $this->construction_speed += $this->policy->construction_speed + $this->active_upgrade_effects[VillageUpgradeManager::UPGRADE_EFFECT_CONSTRUCTION_SPEED];
-            $this->research_speed += $this->policy->research_speed + $this->active_upgrade_effects[VillageUpgradeManager::UPGRADE_EFFECT_RESEARCH_SPEED];
+            $this->construction_speed += $this->policy->construction_speed + $this->active_upgrade_effects[UpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED];
+            $this->research_speed += $this->policy->research_speed + $this->active_upgrade_effects[UpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED];
         }
     }
 

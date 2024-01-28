@@ -65,6 +65,8 @@ class VillageUpgradeManager {
         // initialize array with defaults
         $effects = [
             UpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 0,
+            UpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 0,
+            UpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 0,
         ];
         // go through all active upgrades and add effects to array
         foreach ($upgrades as $upgrade) {
