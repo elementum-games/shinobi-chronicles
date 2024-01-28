@@ -500,8 +500,11 @@ function team() {
             $leader_avatar_size = User::AVATAR_MAX_SIZE;
             if(is_object(json_decode($result['forbidden_seal']))) {
                 $result['forbidden_seal'] = json_decode($result['forbidden_seal'], true);
-                $pseudoSeal = new ForbiddenSeal($system, $result['forbidden_seal']['level'], $result['forbidden_seal']['time']);
-                $pseudoSeal->setBenefits();
+                $pseudoSeal = ForbiddenSeal::fromDb(
+                    system: $system,
+                    seal_level: $result['forbidden_seal']['level'],
+                    seal_end_time: $result['forbidden_seal']['time']
+                );
                 $leader_avatar_size = $pseudoSeal->avatar_size;
             }
         }
