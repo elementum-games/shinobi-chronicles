@@ -1,14 +1,47 @@
 <?php
 
+class TestBattleManager extends BattleManager {
+    /**
+     * @param array $player1_effects
+     * @param array $player2_effects
+     * @return void
+     */
+    public function setupPassiveEffects(array $player1_effects, array $player2_effects): void {
+        $this->effects->active_effects = array_merge(
+            $this->effects->active_effects,
+            $player1_effects,
+            $player2_effects
+        );
+        $this->effects->applyPassiveEffects($this->battle->player1, $this->battle->player2);
+    }
+
+    public function setFighters(Fighter $player1, Fighter $player2) {
+        $this->battle->player1 = $player1;
+        $this->battle->player2 = $player2;
+    }
+
+    public static function init(
+        System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true
+    ): TestBattleManager {
+        return new TestBattleManager($system, $player, $battle_id, $spectate, $load_fighters);
+    }
+}
+
 /**
  * @param Fighter $player1
  * @param Fighter $player2
  * @param Jutsu   $player1_jutsu
  * @param Jutsu   $player2_jutsu
+ * @param BattleEffect[]   $player1_effects
+ * @param BattleEffect[]   $player2_effects
  * @return array
- * @throws RuntimeException|DatabaseDeadlockException
+ * @throws DatabaseDeadlockException
  */
-function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Jutsu $player2_jutsu): array {
+function calcDamage(
+    Fighter $player1, Fighter $player2,
+    Jutsu $player1_jutsu, Jutsu $player2_jutsu,
+    array $player1_effects, array $player2_effects
+): array {
     global $system;
     global $user;
 
@@ -17,7 +50,15 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
 
     // Collision
     $battle_id = Battle::start($system, $player1, $player2, Battle::TYPE_SPAR);
-    $battle = BattleManager::init($system, $user, $battle_id, true, false);
+    $battle = TestBattleManager::init(
+        system: $system,
+        player: $user,
+        battle_id: $battle_id,
+        spectate: true,
+        load_fighters: false
+    );
+    $battle->setFighters($player1, $player2);
+    $battle->setupPassiveEffects($player1_effects, $player2_effects);
 
     $player1_attack = $battle->setupFighterAttack(
         fighter: $player1,

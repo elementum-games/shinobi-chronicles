@@ -92,7 +92,7 @@ class TestFighter extends Fighter {
 
     public static function fromFormData(System $system, RankManager $rankManager, array $fighter_data, string $name): TestFighter {
         $fighter = new TestFighter();
-        $fighter->rank = 3;
+        $fighter->rank = 4;
         $fighter->health = 1000000;
         $fighter->max_health = 1000000;
         $fighter->name = $name;
@@ -103,8 +103,8 @@ class TestFighter extends Fighter {
         $fighter->bloodline_skill = (int)$fighter_data['bloodline_skill'];
         $fighter->speed = (int)$fighter_data['speed'];
         $fighter->cast_speed = (int)$fighter_data['cast_speed'];
-        $fighter->intelligence = 10;
-        $fighter->willpower = 10;
+        $fighter->intelligence = 0;
+        $fighter->willpower = 0;
         $fighter->setTotalStats();
 
         $fighter_bloodline_boosts = [];

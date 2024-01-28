@@ -36,7 +36,7 @@ class BattleManager {
 
     private int $battle_id;
 
-    private Battle $battle;
+    protected Battle $battle;
 
     public User $player;
     public Fighter $opponent;
@@ -51,7 +51,7 @@ class BattleManager {
 
     // Components
     // private BattleField $field;
-    private BattleEffectsManager $effects;
+    protected BattleEffectsManager $effects;
 
     /** @var Jutsu[] */
     public array $default_attacks;
@@ -109,7 +109,9 @@ class BattleManager {
      * @throws RuntimeException
      */
     #[Trace]
-    public static function init(System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true): BattleManager {
+    public static function init(
+        System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true
+    ): BattleManager {
         return new BattleManager($system, $player, $battle_id, $spectate, $load_fighters);
     }
 
@@ -465,6 +467,67 @@ class BattleManager {
 
     public function getBattleType(): int {
         return $this->battle->battle_type;
+    }
+
+    public function getPatrolId(): int {
+        return $this->battle->patrol_id;
+    }
+
+    /**
+     * @return BattleEffect[]
+     */
+    public function getEffects(): array {
+        return $this->effects->active_effects;
+    }
+
+    public function simulateAIAttack(Jutsu $ai_jutsu): array {
+        // clone battlers for simulation
+        $simulated_player = clone $this->battle->player1;
+        $simulated_ai = clone $this->battle->player2;
+
+        // setup attacks
+        $player_simulated_attack = $this->setupFighterAttack(
+            $simulated_player,
+            $simulated_ai,
+            $this->battle->fighter_actions[$simulated_player->combat_id],
+            simulation: true
+        );
+        $ai_simulated_action = new LegacyFighterAction($ai_jutsu->id, Jutsu::PURCHASE_TYPE_DEFAULT, null, null);
+        $ai_simulated_attack = $this->setupFighterAttack(
+            $simulated_ai,
+            $simulated_player,
+            $ai_simulated_action,
+            jutsu: $ai_jutsu,
+            simulation: true
+        );
+
+        // run jutsu collision
+        $this->jutsuCollision(
+            $simulated_player,
+            $simulated_ai,
+            $player_simulated_attack->raw_damage,
+            $ai_simulated_attack->raw_damage,
+            $player_simulated_attack,
+            $ai_simulated_attack
+        );
+
+        // apply attacks
+        $simulated_player->last_damage_taken = 0;
+        $simulated_ai->last_damage_taken = 0;
+        $this->applyAttack($player_simulated_attack, $simulated_player, $simulated_ai, simulation: true);
+        $this->applyAttack($ai_simulated_attack, $simulated_ai, $simulated_player, simulation: true);
+
+        // return results for AI logic
+        // we can send a lot more in this array if necessary
+        $return_arr = [
+            'ai_simulated_damage_taken' => $simulated_ai->last_damage_taken,
+            'player_simulated_damage_taken' => $simulated_player->last_damage_taken,
+        ];
+        return $return_arr;
+    }
+
+    public function getCooldowns(): array {
+        return $this->battle->jutsu_cooldowns;
     }
 
 
@@ -1718,67 +1781,5 @@ class BattleManager {
         if ($this->ai_jutsu_used->cooldown > 0) {
             $this->battle->jutsu_cooldowns[$this->ai_jutsu_used->combat_id] = $this->ai_jutsu_used->cooldown;
         }
-    }
-
-    public function getPatrolId(): int {
-        return $this->battle->patrol_id;
-    }
-
-    /**
-    * @return BattleEffect[]
-    */
-    public function getEffects(): array {
-        return $this->effects->active_effects;
-    }
-
-    public function simulateAIAttack(Jutsu $ai_jutsu): array {
-        // clone battlers for simulation
-        $simulated_player = clone $this->battle->player1;
-        $simulated_ai = clone $this->battle->player2;
-
-        // setup attacks
-        $player_simulated_attack = $this->setupFighterAttack(
-            $simulated_player,
-            $simulated_ai,
-            $this->battle->fighter_actions[$simulated_player->combat_id],
-            simulation: true
-        );
-        $ai_simulated_action = new LegacyFighterAction($ai_jutsu->id, Jutsu::PURCHASE_TYPE_DEFAULT, null, null);
-        $ai_simulated_attack = $this->setupFighterAttack(
-            $simulated_ai,
-            $simulated_player,
-            $ai_simulated_action,
-            jutsu: $ai_jutsu,
-            simulation: true
-        );
-
-        // run jutsu collision
-        $this->jutsuCollision(
-            $simulated_player,
-            $simulated_ai,
-            $player_simulated_attack->raw_damage,
-            $ai_simulated_attack->raw_damage,
-            $player_simulated_attack,
-            $ai_simulated_attack
-        );
-
-        // apply attacks
-        $simulated_player->last_damage_taken = 0;
-        $simulated_ai->last_damage_taken = 0;
-        $this->applyAttack($player_simulated_attack, $simulated_player, $simulated_ai, simulation: true);
-        $this->applyAttack($ai_simulated_attack, $simulated_ai, $simulated_player, simulation: true);
-
-        // return results for AI logic
-        // we can send a lot more in this array if necessary
-        $return_arr = [
-            'ai_simulated_damage_taken' => $simulated_ai->last_damage_taken,
-            'player_simulated_damage_taken' => $simulated_player->last_damage_taken,
-        ];
-        return $return_arr;
-    }
-
-    // expose battle cooldowns
-    public function getCooldowns(): array {
-        return $this->battle->jutsu_cooldowns;
     }
 }

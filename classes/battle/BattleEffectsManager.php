@@ -5,6 +5,60 @@ require_once __DIR__ . '/BattleEffect.php';
 class BattleEffectsManager {
     const MAX_SPEED_REDUCTION = 50;
 
+    const DAMAGE_EFFECTS = [
+        'none',
+        'recoil',
+        'reflect',
+        'immolate',
+        'residual_damage',
+        'delayed_residual',
+    ];
+    const CLASH_EFFECTS = [
+        'barrier',
+        'counter',
+        'substitution',
+        'reflect',
+        'piercing'
+    ];
+    const BUFF_EFFECTS = [
+        'release_genjutsu',
+        'ninjutsu_boost',
+        'taijutsu_boost',
+        'genjutsu_boost',
+        'speed_boost',
+        'cast_speed_boost',
+        'intelligence_boost',
+        'willpower_boost',
+        'fire_boost',
+        'wind_boost',
+        'lightning_boost',
+        'earth_boost',
+        'water_boost',
+        'evasion_boost',
+        'resist_boost',
+        'ninjutsu_resist',
+        'taijutsu_resist',
+        'genjutsu_resist',
+    ];
+    const DEBUFF_EFFECTS = [
+        'ninjutsu_nerf',
+        'taijutsu_nerf',
+        'genjutsu_nerf',
+        'cast_speed_nerf',
+        'speed_nerf',
+        'endurance_nerf',
+        'intelligence_nerf',
+        'willpower_nerf',
+        'vulnerability',
+        'fire_vulnerability',
+        'wind_vulnerability',
+        'lightning_vulnerability',
+        'earth_vulnerability',
+        'water_vulnerability',
+        'evasion_nerf',
+        'offense_nerf',
+    ];
+
     protected System $system;
 
     /** @var BattleEffect[]  */
@@ -44,11 +98,8 @@ class BattleEffectsManager {
 
         $apply_effect = true;
 
-        $debuff_power = ($jutsu->power <= 0) ? 0 : $raw_damage / $jutsu->power / 15;
-
         if ($this->system->debug['battle_effects']) {
             echo sprintf("JP: %s (%s)<br />", $jutsu->power, $effect->effect);
-            echo sprintf("%s / %s<br />", $raw_damage, $debuff_power);
         }
 
         switch ($effect->effect) {
@@ -100,7 +151,6 @@ class BattleEffectsManager {
             case 'willpower_boost':
             case 'intelligence_nerf':
             case 'willpower_nerf':
-                $effect->effect_amount = round($debuff_power * ($effect->effect_amount / 100), 2);
                 break;
             case Jutsu::USE_TYPE_BARRIER:
                 $effect->effect_amount = $raw_damage;

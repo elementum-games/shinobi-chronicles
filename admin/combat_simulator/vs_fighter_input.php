@@ -20,9 +20,16 @@
         width: 110px;
         margin: 3px auto;
     }
+    .active_effects_input label {
+        width: 130px;
+    }
+
+    .active_effects_input {
+        margin-bottom: 10px;
+    }
 
     .jutsu_input {
-        margin: 3px auto 5px;
+        margin: 1px auto 5px;
         padding: 3px;
         background: rgba(0,0,0,0.02);
         border: 1px solid rgba(0,0,0,0.05);
@@ -109,9 +116,6 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
     /** @var string[] $bloodline_combat_boosts */
     require __DIR__ . '/../constraints/bloodline.php';
 
-    /** @var string[] */
-    $jutsu_effects = require __DIR__ . '/../constraints/jutsu_effects.php';
-
     $bloodlines_by_rank = [];
     /** @var Jutsu[][] $jutsu_by_group */
     $jutsu_by_group = [];
@@ -160,7 +164,7 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
         <?php endforeach; ?>
         <br />
 
-        Bloodline boosts<br />
+        <b>Bloodline boosts</b><br />
         <select
             id='bloodline_prefill_<?= $fighter_form_key ?>'
             name='<?= $fighter_form_key ?>_bloodline_id'
@@ -206,6 +210,53 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
                 <br />
             <?php endfor; ?>
         </p>
+
+        <b>Active Effects</b><br />
+        <div class='active_effects_input'>
+            <?php for($i = 1; $i <= 3; $i++): ?>
+                <div style='margin:4px auto;'>
+                    <label>Effect <?= $i ?></label>
+                    <select id='<?= $fighter_form_key ?>_active_effect_<?= $i ?>' name='<?= $fighter_form_key ?>[active_effects][<?= $i ?>][effect]'>
+                        <optgroup label="Damage">
+                            <?php foreach(BattleEffectsManager::DAMAGE_EFFECTS as $effect): ?>
+                                <option value='<?= $effect ?>' <?= selected($_POST[$fighter_form_key]['active_effects'][$i]['effect'] == $effect) ?>>
+                                    <?= System::unSlug($effect) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                        <optgroup label="Clash">
+                            <?php foreach(BattleEffectsManager::CLASH_EFFECTS as $effect): ?>
+                                <option value='<?= $effect ?>' <?= selected($_POST[$fighter_form_key]['active_effects'][$i]['effect'] == $effect) ?>>
+                                    <?= System::unSlug($effect) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                        <optgroup label="Buff">
+                            <?php foreach(BattleEffectsManager::BUFF_EFFECTS as $effect): ?>
+                                <option value='<?= $effect ?>' <?= selected($_POST[$fighter_form_key]['active_effects'][$i]['effect'] == $effect) ?>>
+                                    <?= System::unSlug($effect) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                        <optgroup label="Debuff">
+                            <?php foreach(BattleEffectsManager::DEBUFF_EFFECTS as $effect): ?>
+                                <option value='<?= $effect ?>' <?= selected($_POST[$fighter_form_key]['active_effects'][$i]['effect'] == $effect) ?>>
+                                    <?= System::unSlug($effect) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                    </select><br />
+
+                    <label>Effect <?= $i ?> Amount:</label>
+                    <input
+                        type='number'
+                        id='<?= $fighter_form_key ?>_active_effect_<?= $i ?>_amount'
+                        name='<?= $fighter_form_key ?>[active_effects][<?= $i ?>][amount]'
+                        value='<?= $_POST[$fighter_form_key]['active_effects'][$i]['amount'] ?? 0 ?>'
+                    />
+                </div>
+            <?php endfor; ?>
+        </div>
 
         <b>Jutsu</b><br />
         <div class='jutsu_input'>
@@ -257,11 +308,34 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
             <div class='effect_input'>
                 <label>Effect</label>
                 <select id='<?= $fighter_form_key ?>_jutsu_effect' name='<?= $fighter_form_key ?>[jutsu_effect]'>
-                    <?php foreach($jutsu_effects as $effect): ?>
-                        <option value='<?= $effect ?>' <?= selected($_POST[$fighter_form_key]['jutsu_effect'] == $effect) ?>>
-                            <?= System::unSlug($effect) ?>
-                        </option>
-                    <?php endforeach; ?>
+                    <optgroup label="Damage">
+                        <?php foreach(BattleEffectsManager::DAMAGE_EFFECTS as $effect): ?>
+                            <option value='<?= $effect ?>' <?= selected($_POST[$fighter_form_key]['jutsu_effect'] == $effect) ?>>
+                                <?= System::unSlug($effect) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                    <optgroup label="Clash">
+                        <?php foreach(BattleEffectsManager::CLASH_EFFECTS as $effect): ?>
+                            <option value='<?= $effect ?>' <?= selected($_POST[$fighter_form_key]['jutsu_effect'] == $effect) ?>>
+                                <?= System::unSlug($effect) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                    <optgroup label="Buff">
+                        <?php foreach(BattleEffectsManager::BUFF_EFFECTS as $effect): ?>
+                            <option value='<?= $effect ?>' <?= selected($_POST[$fighter_form_key]['jutsu_effect'] == $effect) ?>>
+                                <?= System::unSlug($effect) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                    <optgroup label="Debuff">
+                        <?php foreach(BattleEffectsManager::DEBUFF_EFFECTS as $effect): ?>
+                            <option value='<?= $effect ?>' <?= selected($_POST[$fighter_form_key]['jutsu_effect'] == $effect) ?>>
+                                <?= System::unSlug($effect) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
                 </select>
 
                 <label>Effect Amount:</label>

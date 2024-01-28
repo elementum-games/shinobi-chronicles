@@ -1,5 +1,6 @@
 <?php
-/* Jutsu */
+
+// Update BattleEffectsManager's type lists if you add an effect here
 $jutsu_effects = [
     'none',
     'release_genjutsu',
@@ -45,5 +46,6 @@ $jutsu_effects = [
     'delayed_residual',
     'reflect',
 ];
+// Update BattleEffectsManager's type lists if you add an effect here
 
 return $jutsu_effects;

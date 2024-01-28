@@ -32,6 +32,7 @@ if(isset($_POST['run_simulation'])) {
             fighter_data: $player1_data,
             name: "Player 1"
         );
+        $player1->combat_id = Battle::combatId(Battle::TEAM1, $player1);
         $player1_jutsu = $player1->addJutsu(
             jutsu_type: $player1_data['jutsu_type'],
             base_power: (int)$player1_data['jutsu_power'],
@@ -46,6 +47,7 @@ if(isset($_POST['run_simulation'])) {
             fighter_data: $player2_data,
             name: "Player 2"
         );
+        $player2->combat_id = Battle::combatId(Battle::TEAM2, $player2);
         $player2_jutsu = $player2->addJutsu(
             jutsu_type: $player2_data['jutsu_type'],
             base_power: (int)$player2_data['jutsu_power'],
@@ -54,11 +56,35 @@ if(isset($_POST['run_simulation'])) {
             effect_length: (int)$player2_data['jutsu_effect_length'],
         );
 
+        // Effects
+        $player1_effects = [];
+        $player2_effects = [];
+        foreach($player1_data['active_effects'] as $active_effect) {
+            $player1_effects[] = new BattleEffect(
+                user: $player1->combat_id,
+                target: $player1->combat_id,
+                turns: 1,
+                effect: $active_effect['effect'],
+                effect_amount: $active_effect['amount']
+            );
+        }
+        foreach($player2_data['active_effects'] as $active_effect) {
+            $player2_effects[] = new BattleEffect(
+                user: $player2->combat_id,
+                target: $player2->combat_id,
+                turns: 1,
+                effect: $active_effect['effect'],
+                effect_amount: $active_effect['amount']
+            );
+        }
+
         $damages = calcDamage(
             player1: $player1,
             player2: $player2,
             player1_jutsu: $player1_jutsu,
-            player2_jutsu: $player2_jutsu
+            player2_jutsu: $player2_jutsu,
+            player1_effects: $player1_effects,
+            player2_effects: $player2_effects
         );
 
         echo "<div style='width:500px;background-color:#EAEAEA;text-align:center;margin-left:auto;margin-right:auto;
