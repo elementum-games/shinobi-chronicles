@@ -72,14 +72,14 @@ else {
         $system->layout->renderBeforeContentHTML(
             system: $system,
             player: $player ?? null,
-            page_title: 'Home', render_header: $player ? true : false, 
+            page_title: 'Home', render_header: $player ? true : false,
             render_sidebar: false, render_topbar: false, render_content: false
         );
-    
+
         $route = Router::$routes['home'];
         require (__DIR__ . '/pages/' . $route->file_name);
         ($route->function_name)();
-    
+
         // Calc page load time
         $PAGE_LOAD_TIME = microtime(as_float: true) - $PAGE_LOAD_START;
         $system->layout->renderAftercontentHTML(
@@ -174,7 +174,7 @@ else {
         $system->layout->renderBeforeContentHTML(
             system: $system,
             player: null, // No need to check here, no session set
-            page_title: 'Home', render_header: $player ? true : false, 
+            page_title: 'Home', render_header: $player ? true : false,
             render_sidebar: false, render_topbar: false, render_content: $RENDER_CONTENT
         );
 
@@ -225,7 +225,14 @@ else {
             }
 
             // Check for valid route & permissions
-            $system->router->assertRouteIsValid(route: $route, player: $player);
+            try {
+                $system->router->assertRouteIsValid(route: $route, player: $player);
+            } catch(RuntimeException $e) {
+                $system->message($e->getMessage());
+                $system->layout->renderBeforeContentHTML(system: $system, player: $player ?? null, page_title: '');
+                $system->printMessage(force_display: true);
+                exit;
+            }
 
             // Set self link
             $self_link = $system->router->base_url . '?id=' . $id;
