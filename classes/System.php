@@ -1142,11 +1142,11 @@ class System {
 
     /**
      * Initializes and returns system
-     * @param bool $api_request
+     * @param bool $load_layout
      * @return System
      * @throws Exception
      */
-    public static function initialize(bool $api_request = false): System {
+    public static function initialize(bool $load_layout = false): System {
         /**
          * This must be called here to properly pull variables into initializer
          * @var $host
@@ -1213,7 +1213,7 @@ class System {
         ];
 
         // Load layout if this is not an api request
-        if(!$api_request) {
+        if(!$load_layout) {
             $system->setLayoutByName(self::DEFAULT_LAYOUT);
         }
 
