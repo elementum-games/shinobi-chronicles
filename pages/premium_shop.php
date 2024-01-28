@@ -468,7 +468,7 @@ function premiumShop(): void {
                 // Confirm change in seal... time will not be reimbursed
                 if (!isset($_POST['change_forbidden_seal'])) {
                     // Convert remaining premium time to days and calculate AK value
-                    $akCredit = $player->forbidden_seal->calcRemainingCredit();
+                    $akCredit = $premiumShopManager->calcRemainingSealCredit($player->forbidden_seal->level, $player->forbidden_seal->seal_time_remaining);
                     $new_seal = ForbiddenSeal::fromDb(
                         system: $system,
                         seal_level: $seal_level,
@@ -521,7 +521,7 @@ function premiumShop(): void {
                         of their {$player->forbidden_seal->name}.";
                     // Recalculate adjusted akCost
                     if ($player->forbidden_seal->level > 0) {
-                        $akCredit = $player->forbidden_seal->calcRemainingCredit();
+                        $akCredit = $premiumShopManager->calcRemainingSealCredit($player->forbidden_seal->level, $player->forbidden_seal->seal_time_remaining);
 
                         //TEMPORARY SALE LOGIC
                         if($premiumShopManager->tierThreeSaleActive() && $seal_level == 3) {

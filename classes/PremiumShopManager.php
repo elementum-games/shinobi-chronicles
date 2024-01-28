@@ -126,6 +126,13 @@ class PremiumShopManager {
         return $cost - floor($cost * $discount_rate);
     }
 
+    public function calcRemainingSealCredit(int $seal_level, int $time_remaining): int {
+        $monthly_cost = $this->costs['forbidden_seal_monthly_cost'][$seal_level];
+        $days_per_ak = $monthly_cost / 30; // This is okay to be float val
+        $days_remaining = floor($time_remaining / 86400);
+        return(floor($days_per_ak * $days_remaining));
+    }
+
     private function initStatTransferVars(): void {
         $this->stat_transfer_points_per_min = 10;
         $this->stat_transfer_points_per_ak = 600;

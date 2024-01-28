@@ -248,12 +248,7 @@ class ForbiddenSeal {
         public int $extra_jutsu_equips,
         public int $extra_armor_equips,
         public int $extra_weapon_equips,
-        public int $max_battle_history_view,
-
-        // Ancient Market displays
-        public string $name_color_display,
-        public string $avatar_size_display,
-        public string $journal_image_display
+        public int $max_battle_history_view
     ){}
 
     public function checkExpiration(): void {
@@ -282,37 +277,11 @@ class ForbiddenSeal {
             default => json_encode(array('level' => $this->level, 'time' => $this->seal_end_time))
         };
     }
-    public function calcRemainingCredit(): int {
-        match($this->level) {
-            1 => $days_per_ak = 6,
-            2 => $days_per_ak = 2,
-            default => $days_per_ak = 1
-        };
-        return floor(floor($this->seal_time_remaining / self::SECONDS_IN_DAY) / $days_per_ak);
-    }
     public static function getDimensionDisplay(int $val_1, ?int $val_2 = null): string {
         if(is_null($val_2)) {
             $val_2 = $val_1;
         }
         return $val_1 . 'x' . $val_2;
-    }
-    public static function getNameColorDisplay(array $name_colors): string {
-        $return = '';
-        $count = 0;
-        foreach($name_colors as $name => $className) {
-            if($name == 'default') {
-                continue;
-            }
-            $return .= "<span class='{$className}' style='font-weight:bold;'>" . ucwords($name) . "</span>";
-            $count++;
-            if($count%2 == 0) {
-                $return .= "<br /> ";
-            }
-            else {
-                $return .= '/';
-            }
-        }
-        return substr($return, 0, strlen($return)-1);
     }
     public static function getAvyFrames(int $seal_level): array {
         $frames = self::DEFAULT_AVATAR_FRAMES;
@@ -385,14 +354,7 @@ class ForbiddenSeal {
             extra_jutsu_equips: self::BONUS_EQUIPS[$seal_level]['jutsu'],
             extra_armor_equips: self::BONUS_EQUIPS[$seal_level]['armor'],
             extra_weapon_equips: self::BONUS_EQUIPS[$seal_level]['weapon'],
-            max_battle_history_view: self::MAX_BATTlE_HISTORY[$seal_level],
-
-            name_color_display: self::getNameColorDisplay(self::getSealLevelNameColors(seal_level:$seal_level)),
-            avatar_size_display: self::getDimensionDisplay(self::AVATAR_SIZES[$seal_level]),
-            journal_image_display: self::getDimensionDisplay(
-                self::JOURNAL_IMG_SIZES[$seal_level]['x'],
-                self::JOURNAL_IMG_SIZES[$seal_level]['y']
-            )
+            max_battle_history_view: self::MAX_BATTlE_HISTORY[$seal_level]
         );
     }
 }

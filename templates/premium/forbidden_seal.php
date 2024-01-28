@@ -13,6 +13,25 @@
  * @var string $view
  * @var array $available_name_colors
  */
+
+function nameColorDisplay(array $name_colors): string {
+    $return = '';
+        $count = 0;
+        foreach($name_colors as $name => $className) {
+            if($name == 'default') {
+                continue;
+            }
+            $return .= "<span class='{$className}' style='font-weight:bold;'>" . ucwords($name) . "</span>";
+            $count++;
+            if($count%2 == 0) {
+                $return .= "<br /> ";
+            }
+            else {
+                $return .= '/';
+            }
+        }
+        return substr($return, 0, strlen($return)-1);
+}
 ?>
 
 <table class='table'>
@@ -73,10 +92,10 @@
     </tr>
     <tr>
         <th>Chat Name Colors</th>
-        <td></td>
-        <td><?= $twinSeal->name_color_display ?></td>
-        <td><?= $fourDragonSeal->name_color_display ?></td>
-        <td><?= $eightDeitiesSeal->name_color_display ?></td>
+        <td><?= nameColorDisplay($baseDisplay->name_colors);?></td>
+        <td><?= nameColorDisplay($twinSeal->name_colors);?></td>
+        <td><?= nameColorDisplay($fourDragonSeal->name_colors);?></td>
+        <td><?= nameColorDisplay($eightDeitiesSeal->name_colors);?></td>
     </tr>
     <tr>
         <th>Avatar</th>
@@ -122,19 +141,19 @@
         <th>Journal</th>
         <td>
             <?= $baseDisplay->journal_size ?> characters<br />
-            <?= $baseDisplay->journal_image_display ?> images
+            <?= $baseDisplay->journal_image_x . 'x' . $baseDisplay->journal_image_y ?> images
         </td>
         <td>
             <?= $twinSeal->journal_size ?> characters<br />
-            <?= $twinSeal->journal_image_display ?> images
+            <?= $twinSeal->journal_image_x . 'x' . $twinSeal->journal_image_y?> images
         </td>
         <td>
             <?= $fourDragonSeal->journal_size ?> characters<br />
-            <?= $fourDragonSeal->journal_image_display ?> images
+            <?= $fourDragonSeal->journal_image_x . 'x' . $fourDragonSeal->journal_image_y ?> images
         </td>
         <td>
             <?= $eightDeitiesSeal->journal_size ?> characters<br />
-            <?= $eightDeitiesSeal->journal_image_display ?> images<br />
+            <?= $eightDeitiesSeal->journal_image_x . 'x' . $eightDeitiesSeal->journal_image_y ?> images<br />
             YouTube video embeds
         </td>
     </tr>
