@@ -11,13 +11,9 @@ $system = System::initialize();
 if($system->isDevEnvironment()) {
     ini_set(option: 'display_errors', value: 'On');
 }
-// Disable errors on production for non-developers
-else {
-    $value = 'Off';
-    if(isset($_SESSION['user_id']) && in_array($_SESSION['user_id'], System::$developers)) {
-        $value = 'On';
-    }
-    ini_set(option: 'display_errors', value: $value);
+// Display errors on production for developers
+if(isset($_SESSION['user_id']) && in_array($_SESSION['user_id'], System::$developers)) {
+    ini_set(option: 'display_errors', value: 'On');
 }
 
 // Check for logout
@@ -32,8 +28,8 @@ if(!isset($_SESSION['user_id'])) {
         system: $system,
         player: null, // No need to check here, no session set
         page_title: $route->title,
-        render_header: $route->render_header, render_sidebar: $route->render_sidebar,
-        render_topbar: $route->render_topbar, render_content: $route->render_content
+        render_header: false, render_sidebar: false,
+        render_topbar: false, render_content: false
     );
 
     require (__DIR__ . '/pages/' . $route->file_name);
@@ -45,7 +41,7 @@ if(!isset($_SESSION['user_id'])) {
         system: $system,
         player: null, // No need to check, no session started
         page_load_time: $PAGE_LOAD_TIME,
-        render_content: $route->render_content, render_hotbar: false
+        render_content: false
     );
     $system->db->commitTransaction();
     exit;
@@ -90,7 +86,7 @@ else {
             system: $system,
             player: null, // No need to check, no session started
             page_load_time: $PAGE_LOAD_TIME,
-            render_content: false, render_hotbar: false
+            render_content: false
         );
         $system->db->commitTransaction();
         exit;
@@ -276,8 +272,7 @@ else {
     $system->layout->renderAfterContentHTML(
         system: $system, player: $player ?? null,
         page_load_time: $PAGE_LOAD_TIME,
-        render_content: $RENDER_CONTENT,
-        render_hotbar: false
+        render_content: $RENDER_CONTENT
     );
 
     $player->updateData();

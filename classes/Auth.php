@@ -53,7 +53,7 @@ class Auth {
 
             // Block login to unauthorized users during server maint
             if(!$system->SC_OPEN && !StaffManager::hasServerMaintAccess(staff_level: $user_data['staff_level'])) {
-                throw new RuntimeException("Server is closed! Try againsoon.");
+                throw new RuntimeException("Server is closed! Try again soon.");
             }
 
             // User not verified
