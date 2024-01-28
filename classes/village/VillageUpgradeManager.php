@@ -108,7 +108,19 @@ class VillageUpgradeManager {
 
     }
 
-    public static function checkConstructionComplete(System $system, VillageBuildingDto $building): void {
+    public static function beginResearch(System $system, Village $village, $upgrade_id): void {
+
+    }
+
+    public static function checkConstructionRequirements(System $system, Village $village): bool {
+
+    }
+
+    public static function checkResearchRequirements(System $system, Village $village): bool {
+
+    }
+
+    public static function checkToggleRequirements(System $system, Village $village): bool {
 
     }
 }
