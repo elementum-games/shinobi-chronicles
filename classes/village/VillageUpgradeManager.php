@@ -2,59 +2,10 @@
 
 require_once __DIR__ . "/VillageBuildingDto.php";
 require_once __DIR__ . "/VillageUpgradeDto.php";
+require_once __DIR__ . "/BuildingConfig.php";
+require_once __DIR__ . "/UpgradeConfig.php";
 
 class VillageUpgradeManager {
-    const BUILDING_STATUS_DEFAULT = 'default'; // used when no special status
-    const BUILDING_STATUS_UPGRADING = 'upgrading'; // used when upgrading to next tier
-    const BUILDING_STATUS_REPAIRING = 'disabled'; // used when disabled, currently unused
-    const BUILDING_STATUS_REPAIRING = 'repairing'; // used when repairing damage, currently unused
-
-    const BUILDING_VILLAGE_HQ = 1;
-    const BUILDING_WORKSHOP = 2;
-    const BUILDING_ACADEMY = 3;
-    const BUILDING_HOSPITAL = 4;
-    const BUILDING_ANBU_HQ = 5;
-    const BUILDING_MARKET = 6;
-    const BUILDING_RAMEN_STAND = 7;
-    const BUILDING_SHRINE = 8;
-
-    const BUILDING_NAMES = [
-        self::BUILDING_VILLAGE_HQ => 'Village HQ',
-        self::BUILDING_WORKSHOP => 'Workshop',
-        self::BUILDING_ACADEMY => 'Academy',
-        self::BUILDING_HOSPITAL => 'Hospital',
-        self::BUILDING_ANBU_HQ => 'ANBU HQ',
-        self::BUILDING_MARKET => 'Market',
-        self::BUILDING_RAMEN_STAND => 'Ramen Stand',
-        self::BUILDING_SHRINE => 'Shrine',
-    ];
-
-    const UPGRADE_STATUS_LOCKED = 'locked'; // default status
-    const UPGRADE_STATUS_RESEARCHING = 'researching'; // used when unlocking
-    const UPGRADE_STATUS_UNLOCKED = 'unlocked'; // state for unlocked, permanent upgrades
-    const UPGRADE_STATUS_INACTIVE = 'inactive'; // state for unlocked, toggled OFF upgrades
-    const UPGRADE_STATUS_ACTIVE = 'active'; // stat for unlocked, toggle ON upgrades
-
-    // keys used for individual upgrade identifiers
-    const UPGRADE_KEY_BONUS_FOOD_I = 'BONUS_FOOD_I';
-    const UPGRADE_KEY_BONUS_FOOD_II = 'BONUS_FOOD_II';
-    const UPGRADE_KEY_BONUS_FOOD_III = 'BONUS_FOOD_III';
-
-    // constant used to identify individual effects that may be present in multiple upgrades
-    const UPGRADE_EFFECT_MATERIALS_UPKEEP = 'MATERIALS_UPKEEP';
-    const UPGRADE_EFFECT_FOOD_UPKEEP = 'FOOD_UPKEEP';
-    const UPGRADE_EFFECT_WEALTH_UPKEEP = 'WEALTH_UPKEEP';
-    const UPGRADE_EFFECT_MATERIALS_PRODUCTION = 'MATERIALS_PRODUCTION';
-    const UPGRADE_EFFECT_FOOD_PRODUCTION = 'FOOD_PRODUCTION';
-    const UPGRADE_EFFECT_WEALTH_PRODUCTION = 'WEALTH_PRODUCTION';
-    const UPGRADE_EFFECT_CONSTRUCTION_SPEED = 'CONSTRUCTION_SPEED';
-    const UPGRADE_EFFECT_RESEARCH_SPEED = 'RESEARCH_SPEED';
-
-    // display names for each upgrade
-    const UPGRADE_NAMES = [
-        self::UPGRADE_KEY_BONUS_FOOD_I => 'Some Name',
-    ];
-
     /**
      * @param System  $system
      * @param int $village_id
@@ -113,7 +64,7 @@ class VillageUpgradeManager {
     public static function initializeEffectsForVillage(System $system, array $upgrades): array {
         // initialize array with defaults
         $effects = [
-            self::UPGRADE_EFFECT_FOOD_PRODUCTION => 0,
+            UpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 0,
         ];
         // go through all active upgrades and add effects to array
         foreach ($upgrades as $upgrade) {
@@ -136,16 +87,28 @@ class VillageUpgradeManager {
     public static function getEffectsByUpgradeKey(string $key): array {
         $effects = [];
         switch ($key) {
-            case self::UPGRADE_KEY_BONUS_FOOD_I:
-                $effects[self::UPGRADE_EFFECT_FOOD_PRODUCTION] = 10;
+            case UpgradeConfig::UPGRADE_KEY_BONUS_FOOD_I:
+                $effects[UpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION] = 10;
                 break;
-            case self::UPGRADE_KEY_BONUS_FOOD_II:
-                $effects[self::UPGRADE_EFFECT_FOOD_PRODUCTION] = 20;
+            case UpgradeConfig::UPGRADE_KEY_BONUS_FOOD_II:
+                $effects[UpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION] = 20;
                 break;
-            case self::UPGRADE_KEY_BONUS_FOOD_III:
-                $effects[self::UPGRADE_EFFECT_FOOD_PRODUCTION] = 30;
+            case UpgradeConfig::UPGRADE_KEY_BONUS_FOOD_III:
+                $effects[UpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION] = 30;
                 break;
         }
         return $effects;
+    }
+
+    public static function beginConstruction(System $system, Village $village, $building_id): void {
+
+    }
+
+    public static function cancelConstruction(System $system, Village $village, $building_id): void {
+
+    }
+
+    public static function checkConstructionComplete(System $system, VillageBuildingDto $building): void {
+
     }
 }
