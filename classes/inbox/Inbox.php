@@ -291,7 +291,7 @@ class Inbox {
             $max_size = $forbidden_seal->inbox_size;
         } 
         elseif (is_array($forbidden_seal)) {
-            $max_size = ForbiddenSeal::$benefits[$forbidden_seal['level']]['inbox_size'];
+            $max_size = ForbiddenSeal::INBOX_SIZES[ForbiddenSeal::$STAFF_SEAL_LEVEL];
         }
         return $max_size;
     }
@@ -311,7 +311,7 @@ class Inbox {
      */
     public static function checkMaxMessageLength($forbidden_seal, $staff_level): int {
         if($staff_level) {
-            return ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['pm_size'];
+            return ForbiddenSeal::INBOX_MESSAGE_SIZE[ForbiddenSeal::$STAFF_SEAL_LEVEL];
         }
         elseif($forbidden_seal instanceof ForbiddenSeal) {
             return $forbidden_seal->pm_size;

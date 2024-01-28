@@ -1400,6 +1400,21 @@ p {
                 -1px -1px 1px #681d0d;
 }
 
+/* Orange */
+a.chat_user_name.orange, a.orange:hover, a.orange:visited, span.orange {
+    color: #ffa500 !important;
+}
+/* Silver */
+a.chat_user_name.platinum, a.platinum:hover, a.platinum:visited, span.platinum {
+    color: #dfdfeb !important;
+    --color-text-shadow: rgba(0,0,0,0.4);
+    text-shadow:
+            0 1px 1px var(--color-text-shadow),
+            0 -1px 1px var(--color-text-shadow),
+            -1px 0 1px var(--color-text-shadow),
+            1px 0 1px var(--color-text-shadow);
+}
+
 #content .gold,
 #content .table .gold,
 #content .table a.gold,

@@ -105,6 +105,10 @@
     --diplomacy-item-border: #8a91ae;
     --hq-number-background-color: #d2d6df;
     --hq-clan-name-color: #6e0e11;
+    /* Name color */
+    --name-shadow-default: 0 0 1px #353535, 0 0 2px #353535;
+    --name-shadow-light: 0 0 1px #000, 0 0 2px #000;
+    --name-shadow-dark: 0 0 1px #000, 0 0 2px #000, 0 0 3px #000;
 }
 
 /* Main Content */
@@ -222,16 +226,16 @@ body {
     --shadow-size: 1px;
     text-shadow:
         /* top row */
-        -1px -1px var(--shadow-size) var(--shadow-color),
-        0 -1px var(--shadow-size) var(--shadow-color),
-        1px -1px var(--shadow-size) var(--shadow-color),
+        -1px -1px 1px var(--shadow-color),
+        0 -1px 1px var(--shadow-color),
+        1px -1px 1px var(--shadow-color),
         /* left and right */
-        -1px 0 var(--shadow-size) var(--shadow-color),
-        1px 0 var(--shadow-size) var(--shadow-color),
+        -1px 0 1px var(--shadow-color),
+        1px 0 1px var(--shadow-color),
         /* bottom row */
-        -1px 1px var(--shadow-size) var(--shadow-color),
-        0 1px var(--shadow-size) var(--shadow-color),
-        1px 1px var(--shadow-size) var(--shadow-color);
+        -1px 1px 1px var(--shadow-color),
+        0 1px 1px var(--shadow-color),
+        1px 1px 1px var(--shadow-color);
 }
 
 h2 {
@@ -269,64 +273,90 @@ a.userLink:hover {
     text-decoration: underline !important;
 }
 /* Blue */
-a.blue, a.blue:hover {
+a.blue, a.blue:hover, span.blue {
     color: #3b5cb6 !important;
+    text-shadow: var(--name-shadow-light);
 }
 .post_user_avatar_wrapper.blue, .avatar_frame.blue, .avatar_frame.visited {
     background: linear-gradient(0deg, #3b5cb6 0%, #3b5cb6 100%);
 }
 
 /* Pink */
-a.pink, a.pink:hover {
+a.pink, a.pink:hover, span.pink {
     color: #f69edc !important;
+    text-shadow: var(--name-shadow-light);
 }
 .post_user_avatar_wrapper.pink, .avatar_frame.pink, .avatar_frame.visited {
     background: linear-gradient(0deg, rgba(182, 94, 123, 1) 0%, rgba(246, 158, 220, 1) 100%);
 }
 
+/* Orange */
+a.chat_user_name.orange, a.orange:hover, a.orange:visited, span.orange {
+    color: #ffa500 !important;
+    text-shadow: var(--name-shadow-dark);
+}
+.post_user_avatar_wrapper.orange, .avatar_frame.orange {
+    background: linear-gradient(0deg, rgba(255, 165, 0, 1) 0%, rgba(255, 172, 0, 1) 100%);
+}
+
+/* Silver */
+a.chat_user_name.platinum, a.platinum:hover, a.platinum:visited, span.platinum {
+    color: #dfdfeb !important;
+    text-shadow: var(--name-shadow-light);
+}
+.post_user_avatar_wrapper.platinum, .avatar_frame.platinum {
+    background: linear-gradient(0deg, rgba(192, 192, 222, 1) 0%, rgba(120, 120, 150, 1) 100%);
+}
+
 /* Gold */
-a.chat_user_name.gold, a.gold:hover, a.gold:visited {
+a.chat_user_name.gold, a.gold:hover, a.gold:visited, span.gold {
     color: #c7a417 !important;
+    text-shadow: var(--name-shadow-light);
 }
 .post_user_avatar_wrapper.gold, .avatar_frame.gold {
     background: linear-gradient(0deg, #c7a417 0%, #c7a417 100%);
 }
 
 /* Moderator */
-a.chat_user_name.moderator, a.moderator:hover, a.moderator:visited {
+a.chat_user_name.moderator, a.moderator:hover, a.moderator:visited, span.moderator {
     color: #31a759 !important;
+    text-shadow: var(--name-shadow-light);
 }
 .post_user_avatar_wrapper.moderator, .avatar_frame.moderator {
     background: linear-gradient(0deg, #31a759 0%, #31a759 100%);
 }
 
 /* Head Moderator */
-a.headModerator, a.headModerator:hover, a.headModerator:visited {
+a.headModerator, a.headModerator:hover, a.headModerator:visited, span.headModerator {
     color: #34a3b3 !important;
+    text-shadow: var(--name-shadow-light);
 }
 .post_user_avatar_wrapper.headModerator, .avatar_frame.headModerator {
     background: linear-gradient(0deg, #34a3b3 0%, #34a3b3 100%);
 }
 
 /* Content Admin */
-a.contentAdmin, a.contentAdmin:hover, a.contentAdmin:visited {
+a.contentAdmin, a.contentAdmin:hover, a.contentAdmin:visited, span.contentAdmin {
     color: #6140c1 !important;
+    text-shadow: var(--name-shadow-dark);
 }
 .post_user_avatar_wrapper.contentAdmin, .avatar_frame.contentAdmin {
     background: linear-gradient(0deg, #6140c1 0%, #6140c1 100%);
 }
 
 /* Administrator */
-a.administrator, a.administrator:hover, a.administrator:visited {
+a.administrator, a.administrator:hover, a.administrator:visited, span.administrator {
     color: #d73839 !important;
+    text-shadow: var(--name-shadow-dark);
 }
 .post_user_avatar_wrapper.administrator, .avatar_frame.administrator {
     background: linear-gradient(0deg, #d73839 0%, #d73839 100%);
 }
 
 /* Default User */
-a.normalUser, a.normalUser:hover, a.normalUser:visited {
+a.normalUser, a.normalUser:hover, a.normalUser:visited, span.normalUser {
     color: #383838 !important;
+    text-shadow: var(--name-shadow-default);
 }
 .post_user_avatar_wrapper.normalUser, .avatar_frame.normalUser {
     background: #383838 !important;

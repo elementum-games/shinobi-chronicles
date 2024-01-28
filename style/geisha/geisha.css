@@ -591,32 +591,42 @@ a.staffMember {
 	text-shadow: 0 -1px 1px;
 }
 
-#chatReactContainer a.blue, #chatReactContainer a.blue:hover {
+#chatReactContainer a.blue, #chatReactContainer a.blue:hover, #content span.blue {
 	color: #0000C0;
 }
-#chatReactContainer a.pink, #chatReactContainer a.pink:hover {
+#chatReactContainer a.pink, #chatReactContainer a.pink:hover, #content span.pink {
 	color: #E030C0;
 }
-#chatReactContainer a.gold, #chatReactContainer a.gold:hover {
+/* Orange */
+a.chat_user_name.orange, a.orange:hover, a.orange:visited, span.orange {
+	color: #ffa500 !important;
+}
+/* Silver */
+a.chat_user_name.platinum, a.platinum:hover, a.platinum:visited, span.platinum {
+	color: #dfdfeb !important;
+	--color-text-shadow: rgba(0,0,0,0.4);
+	text-shadow: 0 1px 1px var(--color-text-shadow), 0 -1px 1px var(--color-text-shadow), -1px 0 1px var(--color-text-shadow), 1px 0 1px var(--color-text-shadow);
+}
+#chatReactContainer a.gold, #chatReactContainer a.gold:hover, #content span.gold {
 	--color-text-shadow: rgba(0,0,0,0.4);
 	text-shadow: 0 1px 1px var(--color-text-shadow), 0 -1px 1px var(--color-text-shadow), -1px 0 1px var(--color-text-shadow), 1px 0 1px var(--color-text-shadow);
 	color: rgb(255,215,0);
 }
 
-#chatReactContainer a.moderator, #chatReactContainer a.moderator:hover {
+#chatReactContainer a.moderator, #chatReactContainer a.moderator:hover, #content span.moderator {
 	color: #009020;
 }
-#chatReactContainer a.headModerator, #chatReactContainer a.headModerator:hover {
+#chatReactContainer a.headModerator, #chatReactContainer a.headModerator:hover, #content span.headModerator {
 	color: #0090A0;
 }
-#chatReactContainer a.contentAdmin, #chatReactContainer a.contentAdmin:hover {
+#chatReactContainer a.contentAdmin, #chatReactContainer a.contentAdmin:hover, #content span.contentAdmin {
 	color: #A000B0;
 }
-#chatReactContainer a.administrator, #chatReactContainer a.administrator:hover {
+#chatReactContainer a.administrator, #chatReactContainer a.administrator:hover, #content span.administrator {
 	color: #A00000;
 }
 
-#chatReactContainer a.chat.normalUser, #chatReactContainer .chat.normalUser:hover {
+#chatReactContainer a.chat.normalUser, #chatReactContainer .chat.normalUser:hover, #content span.normalUser {
 	color: #000000;
 }
 
