@@ -100,27 +100,30 @@ function hourlyRegion(System $system, $debug = true): void
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);
         $production = WarManager::VILLAGE_BASE_RESOURCE_PRODUCTION + $villages[$village['village_id']]->policy->home_production_boost;
-        $villages[$village['village_id']]->addResource(1, $production);
-        $villages[$village['village_id']]->addResource(2, $production);
-        $villages[$village['village_id']]->addResource(3, $production);
+        $materials_production = $villages[$village['village_id']]->policy->materials_production;
+        $food_production = $villages[$village['village_id']]->policy->food_production;
+        $wealth_production = $villages[$village['village_id']]->policy->wealth_production;
+        $villages[$village['village_id']]->addResource(1, $materials_production);
+        $villages[$village['village_id']]->addResource(2, $food_production);
+        $villages[$village['village_id']]->addResource(3, $wealth_production);
         $queries[] = "INSERT INTO `resource_logs`
                         (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                        VALUES ({$village['village_id']}, 1, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", {$production}, " . time() . ")";
+                        VALUES ({$village['village_id']}, 1, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", {$materials_production}, " . time() . ")";
         $queries[] = "INSERT INTO `resource_logs`
                         (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                        VALUES ({$village['village_id']}, 1, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$production}, " . time() . ")";
+                        VALUES ({$village['village_id']}, 1, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$materials_production}, " . time() . ")";
         $queries[] = "INSERT INTO `resource_logs`
                         (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                        VALUES ({$village['village_id']}, 2, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", {$production}, " . time() . ")";
+                        VALUES ({$village['village_id']}, 2, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", {$food_production}, " . time() . ")";
         $queries[] = "INSERT INTO `resource_logs`
                         (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                        VALUES ({$village['village_id']}, 2, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$production}, " . time() . ")";
+                        VALUES ({$village['village_id']}, 2, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$food_production}, " . time() . ")";
         $queries[] = "INSERT INTO `resource_logs`
                         (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                        VALUES ({$village['village_id']}, 3, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", {$production}, " . time() . ")";
+                        VALUES ({$village['village_id']}, 3, " . VillageManager::RESOURCE_LOG_PRODUCTION . ", {$wealth_production}, " . time() . ")";
         $queries[] = "INSERT INTO `resource_logs`
                         (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                        VALUES ({$village['village_id']}, 3, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$production}, " . time() . ")";
+                        VALUES ({$village['village_id']}, 3, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$wealth_production}, " . time() . ")";
     }
     foreach ($region_result as $region) {
         // get region locations for region
@@ -167,7 +170,6 @@ function hourlyRegion(System $system, $debug = true): void
 
         /* update resource count */
         foreach ($region_location_result as &$region_location) {
-            // if one of the home regions, collect resources bypassing caravans
             switch ($region_location['type']) {
                 case 'castle':
                     $production = WarManager::BASE_CASTLE_RESOURCE_PRODUCTION * max((1 + ($region_location['stability'] / 100)), 0);
@@ -178,14 +180,13 @@ function hourlyRegion(System $system, $debug = true): void
                 default;
                     break;
             }
+            // if one of the home regions, collect resources bypassing caravans
             if ($region['region_id'] <= 5) {
-                if (empty($region['occupying_village_id'])) {
-                    $villages[$region['village']]->addResource($region_location['resource_id'], $region_location['resource_count']);
-                    $queries[] = "INSERT INTO `resource_logs`
-                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                        VALUES ({$region['village']}, {$region_location['resource_id']}, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$region_location['resource_count']}, " . time() . ")";
-                    $region_location['resource_count'] = 0;
-                }
+                $villages[$region['village']]->addResource($region_location['resource_id'], $region_location['resource_count']);
+                $queries[] = "INSERT INTO `resource_logs`
+                    (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                    VALUES ({$region_location['occupying_village_id']}, {$region_location['resource_id']}, " . VillageManager::RESOURCE_LOG_COLLECTION . ", {$region_location['resource_count']}, " . time() . ")";
+                $region_location['resource_count'] = 0;
             }
             $region_location['resource_count'] += $production;
             !empty($village_resource_production[$region['village']][$region_location['resource_id']]) ? $village_resource_production[$region['village']][$region_location['resource_id']] += $production : $village_resource_production[$region['village']][$region_location['resource_id']] = $production;
@@ -241,34 +242,6 @@ function hourlyRegion(System $system, $debug = true): void
 
     /* update villages */
     foreach ($villages as $village) {
-        /* apply policy upkeep and log expense */
-        $materials_upkeep = $village->policy->materials_upkeep;
-        $food_upkeep = $village->policy->food_upkeep;
-        $wealth_upkeep = $village->policy->wealth_upkeep;
-        if ($materials_upkeep > 0) {
-            $change = $village->subtractResource(WarManager::RESOURCE_MATERIALS, $materials_upkeep);
-            if ($change > 0) {
-                $queries[] = "INSERT INTO `resource_logs`
-                (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                VALUES ({$village->village_id}, " . WarManager::RESOURCE_MATERIALS . ", " . VillageManager::RESOURCE_LOG_EXPENSE . ", " . $change . ", " . time() . ")";
-            }
-        }
-        if ($food_upkeep > 0) {
-            $change = $village->subtractResource(WarManager::RESOURCE_FOOD, $food_upkeep);
-            if ($change > 0) {
-            $queries[] = "INSERT INTO `resource_logs`
-                (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                VALUES ({$village->village_id}, " . WarManager::RESOURCE_FOOD . ", " . VillageManager::RESOURCE_LOG_EXPENSE . ", " . $change . ", " . time() . ")";
-            }
-        }
-        if ($wealth_upkeep > 0) {
-            $change = $village->subtractResource(WarManager::RESOURCE_WEALTH, $wealth_upkeep);
-            if ($change > 0) {
-                $queries[] = "INSERT INTO `resource_logs`
-                (`village_id`, `resource_id`, `type`, `quantity`, `time`)
-                VALUES ({$village->village_id}, " . WarManager::RESOURCE_WEALTH . ", " . VillageManager::RESOURCE_LOG_EXPENSE . ", " . $change . ", " . time() . ")";
-            }
-        }
         /* log resource production */
         if (!empty($village_resource_production[$village->village_id])) {
             /* log production */
