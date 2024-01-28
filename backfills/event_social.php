@@ -5,7 +5,7 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] != 1) {
 }
 
 require("classes/_autoload.php");
-$system = new System();
+$system = System::initialize();
 $system->db->connect();
 $village = 'Leaf';
 if($_POST['message']) {

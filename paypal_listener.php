@@ -4,7 +4,7 @@ if(!$_POST) {
 }
 
 require("classes/_autoload.php");
-$system = new System();
+$system = System::initialize();
 $system->db->connect();
 
 

@@ -5,11 +5,19 @@ Make a copy of this as vars.php and change values to the ones for your environme
 manually upload to your server, outside of git.
  */
 
-$ENVIRONMENT = 'dev';
-$web_url = 'http://localhost/';
+// This may be called outside the index, System is required for some of the default settings
+require_once __DIR__ . '/../classes/System.php';
 
+$ENVIRONMENT = System::ENVIRONMENT_DEV; // Use only ENVIRONMENT_DEV or ENVIRONMENT_PROD
+$ENABLE_DEV_ONLY_FEATURES = System::DEV_ONLY_FEATURES_DEFAULT; // Boolean value
+$LOCAL_HOST_CONNECTION = System::LOCAL_HOST; // Boolean value, set to false for running on websites
+$REGISTER_OPEN = true;
 $SC_OPEN = true;
-$register_open = true;
+$USE_NEW_BATTLES = false;
+$WAR_ENABLED = true;
+$REQUIRE_USER_VERIFICATION = false;
+
+$WEB_URL = 'http://localhost/';
 
 //Host needs to match the DB's host. For docker setup, rename it to "shinobi-chronicles-db".
 $host = 'localhost';

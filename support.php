@@ -3,7 +3,7 @@ session_start();
 
 require_once("classes/_autoload.php");
 
-$system = new System();
+$system = System::initialize();
 $system->db->startTransaction();
 $guest_support = true;
 $self_link = $system->router->base_url . 'support.php';
@@ -16,21 +16,28 @@ if(isset($_SESSION['user_id'])) {
     $guest_support = false;
     $player = User::loadFromId($system, $_SESSION['user_id']);
     $player->loadData();
-    $layout = $system->setLayoutByName($player->layout);
+    $system->setLayoutByName($player->layout);
     $staff_level = $player->staff_level;
     $user_id = $player->user_id;
 
     $supportSystem = new SupportManager($system, $player);
 }
 else {
-    $layout = $system->setLayoutByName("shadow_ribbon");
+    $system->setLayoutByName('shadow_ribbon');
     $supportSystem = new SupportManager($system);
 }
 
 $request_types = $supportSystem->getSupportTypes($staff_level);
 $supportCreated = false;
 
-$layout->renderBeforeContentHTML($system, $player ?? null, "Support");
+$system->layout->renderBeforeContentHTML(
+    system: $system,
+    player: $player ?? null,
+    page_title: "Support",
+    render_header: !is_null($player),
+    render_sidebar: !is_null($player),
+    render_topbar: false
+);
 
 if($player != null) {
     //Form submitted // 11/6/21 SM{V2} supported
@@ -213,9 +220,9 @@ if($player != null) {
         }
     }
 
-    if ($layout->key != "new_geisha") {
+    if ($system->layout->key != "new_geisha") {
         // Load side menu
-        $layout->renderSideMenu($player, $player->system->router);
+        $system->layout->renderSideMenu($player, $player->system->router);
     }
 }
 else {
@@ -339,6 +346,6 @@ else {
     require('templates/guestSupport.php');
 }
 
-$layout->renderAfterContentHTML($system, $player);
+$system->layout->renderAfterContentHTML($system, $player);
 
 $system->db->commitTransaction();

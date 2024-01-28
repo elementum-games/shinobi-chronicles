@@ -16,7 +16,7 @@ require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/UserReputation.php';
 
-$system = new System();
+$system = System::initialize(load_layout: true);
 $system->db->connect();
 
 if(!$system->db->con) {
