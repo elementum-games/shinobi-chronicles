@@ -214,7 +214,7 @@ class ForbiddenSeal {
         public System $system,
         public int $level,
         public string $name,
-        public int $seal_end_time,
+        public ?int $seal_end_time,
         public int $seal_time_remaining,
         public int $logout_timer,
 
@@ -341,13 +341,13 @@ class ForbiddenSeal {
         return $name_colors;
     }
 
-    public static function fromDb(System $system, int $seal_level, int $seal_end_time): ForbiddenSeal {
+    public static function fromDb(System $system, int $seal_level, ?int $seal_end_time): ForbiddenSeal {
         if(!isset(self::$forbidden_seal_names[$seal_level])) {
             throw new RuntimeException("Invalid seal level!");
         }
 
         // Seal expired
-        if($seal_end_time < time()) {
+        if(!is_null($seal_end_time) && $seal_end_time < time()) {
             $seal_level = 0;
         }
 

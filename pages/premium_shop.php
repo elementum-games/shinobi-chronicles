@@ -893,25 +893,25 @@ function premiumShop(): void {
     $baseDisplay = ForbiddenSeal::fromDb(
         system: $system,
         seal_level: 0,
-        seal_end_time: time() + ForbiddenSeal::SECONDS_IN_DAY
+        seal_end_time: null
     );
 
     $twinSeal = ForbiddenSeal::fromDb(
         system: $system,
         seal_level: 1,
-        seal_end_time: time() + ForbiddenSeal::SECONDS_IN_DAY
+        seal_end_time: null
     );
 
     $fourDragonSeal = ForbiddenSeal::fromDb(
         system: $system,
         seal_level: 2,
-        seal_end_time: time() + ForbiddenSeal::SECONDS_IN_DAY
+        seal_end_time: null
     );
 
     $eightDeitiesSeal = ForbiddenSeal::fromDb(
         system: $system,
         seal_level: 3,
-        seal_end_time: time() + ForbiddenSeal::SECONDS_IN_DAY
+        seal_end_time: null
     );
 
     require "templates/premium/premium.php";
