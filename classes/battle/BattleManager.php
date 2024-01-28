@@ -636,15 +636,15 @@ class BattleManager {
 
         if($this->battle->player1->health > 0 && $this->battle->player2->health <= 0) {
             $this->battle->winner = $this->handleRoundCompletion(Battle::TEAM1);
-            $this->battle->updateData();
+            $this->updateData();
         }
         else if($this->battle->player2->health > 0 && $this->battle->player1->health <= 0) {
             $this->battle->winner = $this->handleRoundCompletion(Battle::TEAM2);
-            $this->battle->updateData();
+            $this->updateData();
         }
         else if($this->battle->player1->health <= 0 && $this->battle->player2->health <= 0) {
             $this->battle->winner = $this->handleRoundCompletion(Battle::DRAW);
-            $this->battle->updateData();
+            $this->updateData();
         }
 
         if($this->battle->winner && !$this->spectate) {
