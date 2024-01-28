@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../classes/SystemV2.php';
+require_once __DIR__ . '/../../classes/System.php';
 
 $system = System::initialize();
 
