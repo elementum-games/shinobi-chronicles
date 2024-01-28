@@ -20,9 +20,9 @@ function Chat({
   const [error, setError] = React.useState(null);
   if (banInfo.isBanned) {
     return /*#__PURE__*/React.createElement(ChatBanInfo, {
-      banName: banInfo.name,
-      banDescription: banInfo.description,
-      banTimeRemaining: banInfo.timeRemaining
+      banName: banInfo.banName,
+      banDescription: banInfo.banDescription,
+      banTimeRemaining: banInfo.banTimeRemaining
     });
   }
   const refreshChat = function () {
@@ -119,7 +119,7 @@ function ChatBanInfo({
     style: {
       textAlign: "center"
     }
-  }, banDescription, banTimeRemaining != null && /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("b", null, "Time Remaining:"), " ", banTimeRemaining), /*#__PURE__*/React.createElement("br", null), "Visit the ", /*#__PURE__*/React.createElement("a", {
+  }, banDescription, /*#__PURE__*/React.createElement("br", null), banTimeRemaining != null && /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("b", null, "Time Remaining:"), " ", banTimeRemaining), /*#__PURE__*/React.createElement("br", null), "Visit the ", /*#__PURE__*/React.createElement("a", {
     href: "/support.php"
   }, "Support Center"), " to appeal this."))));
 }

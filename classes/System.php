@@ -142,6 +142,9 @@ class System {
     const ENVIRONMENT_PROD = 'prod';
     const DEV_ONLY_FEATURES_DEFAULT = false;
     const LOCAL_HOST = true;
+    const USE_NEW_BATTLES = false;
+    const WAR_ENABLED = true;
+    const REQUIRE_USER_VERIFICATION = false;
 
     const VERSION_NUMBER = '0.11';
     const VERSION_NAME = '0.11 Warring Shadows';
@@ -1168,16 +1171,16 @@ class System {
 
         $system = new System(
             db: new Database($host, $username, $password, $database),
-            router: new Router($WEB_URL),
+            router: new Router($web_url),
             SC_OPEN: $SC_OPEN,
-            USE_NEW_BATTLES: $USE_NEW_BATTLES,
-            war_enabled: $WAR_ENABLED,
-            REQUIRE_USER_VERIFICATION: $REQUIRE_USER_VERIFICATION,
+            USE_NEW_BATTLES: $USE_NEW_BATTLES ?? self::USE_NEW_BATTLES,
+            war_enabled: $WAR_ENABLED ?? self::WAR_ENABLED,
+            REQUIRE_USER_VERIFICATION: $REQUIRE_USER_VERIFICATION ?? self::REQUIRE_USER_VERIFICATION,
             SERVER_TIME: new DateTimeImmutable("now", new DateTimeZone(self::SERVER_TIME_ZONE)),
             environment: $ENVIRONMENT,
-            enable_dev_only_features: $ENABLE_DEV_ONLY_FEATURES,
-            local_host: $LOCAL_HOST_CONNECTION,
-            register_open: $REGISTER_OPEN
+            enable_dev_only_features: $ENABLE_DEV_ONLY_FEATURES ?? self::DEV_ONLY_FEATURES_DEFAULT,
+            local_host: $LOCAL_HOST_CONNECTION ?? self::LOCAL_HOST,
+            register_open: $register_open
         );
 
         // Load reputation layout, reputation reset and check for server maintenance
