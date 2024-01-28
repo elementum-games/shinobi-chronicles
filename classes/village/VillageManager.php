@@ -347,25 +347,74 @@ class VillageManager {
     }
 
     /**
-     * @return bool
+     * @return string
      */
     public static function resign(System $system, User $player): string
     {
+        $message = '';
         $time = time();
         $player_seat = $player->village_seat;
+        $player_seat_id = $player_seat->seat_id;
+        $player_seat_type = $player_seat->seat_type;
+        // get challenger if set
+        $first_challenger = null;
+        if (isset($player_seat_id)) {
+            $challenge_result = $system->db->query("SELECT * FROM `challenge_requests`
+                WHERE `seat_id` = {$player_seat_id}
+                AND `end_time` != null
+                ORDER BY `created_time` ASC LIMIT 1
+            ");
+            $challenge_result = $system->db->fetch($challenge_result);
+            if ($system->db->last_num_rows > 0) {
+                $first_challenger = User::loadFromId($system, $challenge_result['challenger_id']);
+                $first_challenger->loadData(User::UPDATE_NOTHING);
+            }
+        }
         // clear active challenges
         self::cancelUserChallenges($system, $player->user_id);
         // clear active votes
         $system->db->query("DELETE `vote_logs` FROM `vote_logs` INNER JOIN `proposals` on `vote_logs`.`proposal_id` = `proposals`.`proposal_id` WHERE `vote_logs`.`user_id` = {$player->user_id} AND `proposals`.`end_time` IS NULL");
+        // exit seat
         $result = $system->db->query("UPDATE `village_seats` SET `seat_end` = {$time} WHERE `seat_end` IS NULL AND `user_id` = {$player->user_id}");
         if ($player_seat->seat_type == "kage") {
             $result = $system->db->query("UPDATE `villages` SET `leader` = 0 WHERE `village_id` = {$player->village->village_id}");
         }
         if ($system->db->last_affected_rows > 0) {
             $player->village_seat = self::getPlayerSeat($system, $player);
-            return "You have resigned from your position!";
+            $message = "You have resigned from your position!";
         } else {
-            return "No village seat found!";
+            $message = "No village seat found!";
+        }
+        // if active challenges to your seat, auto win for the challenger
+        if (isset($first_challenger)) {
+            // verify challenger meets requirements
+            self::checkSeatRequirements($system, $first_challenger, $player_seat_type);
+            // claim seat for challenger
+            self::claimSeat($system, $first_challenger, $player_seat_type);
+        }
+        return $message;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function exitSeat(System $system, User $player): bool {
+        $time = time();
+        $player_seat = $player->village_seat;
+        // clear active challenges
+        self::cancelUserChallenges($system, $player->user_id);
+        // clear active votes
+        $system->db->query("DELETE `vote_logs` FROM `vote_logs` INNER JOIN `proposals` on `vote_logs`.`proposal_id` = `proposals`.`proposal_id` WHERE `vote_logs`.`user_id` = {$player->user_id} AND `proposals`.`end_time` IS NULL");
+        // exit seat
+        $result = $system->db->query("UPDATE `village_seats` SET `seat_end` = {$time} WHERE `seat_end` IS NULL AND `user_id` = {$player->user_id}");
+        if ($player_seat->seat_type == "kage") {
+            $result = $system->db->query("UPDATE `villages` SET `leader` = 0 WHERE `village_id` = {$player->village->village_id}");
+        }
+        if ($system->db->last_affected_rows > 0) {
+            $player->village_seat = self::getPlayerSeat($system, $player);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -959,7 +1008,7 @@ class VillageManager {
                 // verify challenger meets requirements
                 self::checkSeatRequirements($system, $challenger, $seat_result['seat_type']);
                 // remove seat holder from seat
-                self::resign($system, $seat_holder);
+                self::exitSeat($system, $seat_holder);
                 // claim seat for challenger
                 self::claimSeat($system, $challenger, $seat_result['seat_type']);
                 break;
