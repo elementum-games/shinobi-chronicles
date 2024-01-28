@@ -11,10 +11,6 @@ return $routes = [
         title: 'Home',
         function_name: 'home',
         menu: Route::MENU_NONE,
-        render_header: false,
-        render_sidebar: false,
-        render_topbar: false,
-        render_content: false
     ),
     // User Menu
     1 => new Route(

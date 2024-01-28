@@ -20,11 +20,9 @@ if(isset($_SESSION['user_id'])) {
     $staff_level = $player->staff_level;
     $user_id = $player->user_id;
 
-    $render_sidebar_header = true;
     $supportSystem = new SupportManager($system, $player);
 }
 else {
-    $render_sidebar_header = false;
     $system->setLayoutByName('shadow_ribbon');
     $supportSystem = new SupportManager($system);
 }
@@ -36,8 +34,8 @@ $system->layout->renderBeforeContentHTML(
     system: $system,
     player: $player ?? null,
     page_title: "Support",
-    render_header: $render_sidebar_header,
-    render_sidebar: $render_sidebar_header,
+    render_header: !is_null($player),
+    render_sidebar: !is_null($player),
     render_topbar: false
 );
 

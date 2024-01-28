@@ -27,13 +27,6 @@ class Route {
         public bool $challenge_lock_ok = true,
 
         public ?Closure $user_check = null,
-        public bool $dev_only = false,
-
-        // Layout controls
-        public bool $render_header = true,
-        public bool $render_sidebar = true,
-        public bool $render_topbar = true,
-        public bool $render_content = true,
-        public bool $render_footer = true
+        public bool $dev_only = false
     ) {}
 }
