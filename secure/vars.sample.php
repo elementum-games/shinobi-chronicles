@@ -6,7 +6,7 @@ manually upload to your server, outside of git.
  */
 
 // This may be called outside the index, System is required for some of the default settings
-require_once __DIR__ . '/../classes/SystemV2.php';
+require_once __DIR__ . '/../classes/System.php';
 
 $ENVIRONMENT = System::ENVIRONMENT_DEV; // Use only ENVIRONMENT_DEV or ENVIRONMENT_PROD
 $ENABLE_DEV_ONLY_FEATURES = System::DEV_ONLY_FEATURES_DEFAULT; // Boolean value

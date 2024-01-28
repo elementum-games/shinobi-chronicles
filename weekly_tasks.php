@@ -6,7 +6,7 @@ if(php_sapi_name() !== "cli") {
    exit;
 }
 
-require_once __DIR__ . "/classes/SystemV2.php";
+require_once __DIR__ . "/classes/System.php";
 require_once __DIR__ . "/classes/Clan.php";
 
 $system = System::initialize();

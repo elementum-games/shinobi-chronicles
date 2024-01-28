@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once "classes/SystemV2.php";
+require_once "classes/System.php";
 $system = System::initialize();
 $system->db->startTransaction();
 $layout = $system->setLayoutByName("shadow_ribbon");

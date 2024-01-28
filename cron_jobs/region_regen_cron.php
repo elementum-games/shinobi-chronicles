@@ -10,7 +10,7 @@ session_start();
  *      Applies region_location regen, bonus for castles based on local village health
  */
 
-require_once __DIR__ . '/../classes/SystemV2.php';
+require_once __DIR__ . '/../classes/System.php';
 require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/war/WarManager.php';
