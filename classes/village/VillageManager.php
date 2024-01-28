@@ -356,6 +356,22 @@ class VillageManager {
         $player_seat = $player->village_seat;
         $player_seat_id = $player_seat->seat_id;
         $player_seat_type = $player_seat->seat_type;
+        // get challenger if set
+        $challenger = null;
+        if (isset($player_seat_id)) {
+            $challenge_result = $system->db->query("SELECT * FROM `challenge_requests`
+                WHERE `seat_id` = {$player_seat_id}
+                AND `end_time` != null
+                ORDER BY `created_time` ASC LIMIT 1
+            ");
+            $challenge_result = $system->db->fetch($challenge_result);
+            if ($system->db->last_num_rows > 0) {
+                $challenger = User::loadFromId($system, $challenge_result['challenger_id']);
+                $challenger->loadData(User::UPDATE_NOTHING);
+            }
+        }
+        // clear active challenges
+        self::cancelUserChallenges($system, $player->user_id);
         // clear active votes
         $system->db->query("DELETE `vote_logs` FROM `vote_logs` INNER JOIN `proposals` on `vote_logs`.`proposal_id` = `proposals`.`proposal_id` WHERE `vote_logs`.`user_id` = {$player->user_id} AND `proposals`.`end_time` IS NULL");
         // exit seat
@@ -370,24 +386,12 @@ class VillageManager {
             $message = "No village seat found!";
         }
         // if active challenges to your seat, auto win for the challenger
-        if (isset($player_seat_id)) {
-            $challenge_result = $system->db->query("SELECT * FROM `challenge_requests`
-                WHERE `seat_id` = {$player_seat_id}
-                AND `end_time` != null
-                ORDER BY `created_time` ASC LIMIT 1
-            ");
-            $challenge_result = $system->db->fetch($challenge_result);
-            if ($system->db->last_num_rows > 0) {
-                $challenger = User::loadFromId($system, $challenge_result['challenger_id']);
-                $challenger->loadData(User::UPDATE_NOTHING);
-                // verify challenger meets requirements
-                self::checkSeatRequirements($system, $challenger, $player_seat_type);
-                // claim seat for challenger
-                self::claimSeat($system, $challenger, $player_seat_type);
-            }
+        if (isset($challenger)) {
+            // verify challenger meets requirements
+            self::checkSeatRequirements($system, $challenger, $player_seat_type);
+            // claim seat for challenger
+            self::claimSeat($system, $challenger, $player_seat_type);
         }
-        // clear active challenges
-        self::cancelUserChallenges($system, $player->user_id);
         return $message;
     }
 
