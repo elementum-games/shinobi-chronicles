@@ -33,10 +33,10 @@ import { ScoutArea } from "./ScoutArea.js";
     region_objectives:   object,
     map_objectives:      object,
     battle_url:          string,
-    operations:          object,
-    operation_type:      string,
-    operation_progress:  int,
-    operation_interval:  int,
+    war_actions:         object,
+    war_action_type:     string,
+    war_action_progress: int,
+    war_action_interval: int,
     travel_message:      string,
     loot_count:          int,
  * }} mapData
@@ -87,7 +87,7 @@ function Travel({
   const [feedback, setFeedback] = React.useState(null);
   const [mapData, setMapData] = React.useState(null);
   const [scoutData, setScoutData] = React.useState(null);
-  const [patrolData, setPatrolData] = React.useState(null);
+  const [npcData, setNpcData] = React.useState(null);
   const [ranksToView, setRanksToView] = React.useState({
     1: false,
     2: false,
@@ -133,7 +133,7 @@ function Travel({
       setDisplayGrid(response.data.mapData.player_filters.display_grid === "true");
       setMapData(response.data.mapData);
       setScoutData(response.data.nearbyPlayers);
-      setPatrolData(response.data.nearbyPatrols);
+      setNpcData(response.data.nearbyNPCs);
     });
   };
   const MovePlayer = direction => {
@@ -169,7 +169,7 @@ function Travel({
         lastTravelSuccessTime.current = requestEnd;
         setMapData(response.data.mapData);
         setScoutData(response.data.nearbyPlayers);
-        setPatrolData(response.data.nearbyPatrols);
+        setNpcData(response.data.nearbyNPCs);
       } else {
         debug('Cannot move player.');
       }
@@ -250,10 +250,10 @@ function Travel({
       window.location.href = response.data.redirect;
     });
   };
-  const BeginOperation = type => {
+  const BeginWarAction = type => {
     apiFetch(travelAPILink, {
-      request: 'BeginOperation',
-      operation_type: type
+      request: 'BeginWarAction',
+      war_action_type: type
     }).then(response => {
       if (response.errors.length) {
         handleErrors(response.errors);
@@ -269,9 +269,9 @@ function Travel({
       setMapData(response.data.mapData);
     });
   };
-  const CancelOperation = () => {
+  const CancelWarAction = () => {
     apiFetch(travelAPILink, {
-      request: 'CancelOperation'
+      request: 'CancelWarAction'
     }).then(response => {
       if (response.errors.length) {
         handleErrors(response.errors);
@@ -417,12 +417,12 @@ function Travel({
     href: mapData.action_url
   }, /*#__PURE__*/React.createElement("button", {
     className: "button"
-  }, mapData.action_message)), mapData && mapData.operation_type && /*#__PURE__*/React.createElement("button", {
+  }, mapData.action_message)), mapData && mapData.war_action_type && /*#__PURE__*/React.createElement("button", {
     className: "button",
-    onClick: () => CancelOperation()
-  }, "Cancel"), mapData && mapData.operations && !mapData.operation_type && typeof mapData.operations_type === 'undefined' && Object.entries(mapData.operations).map(([key, value], index) => /*#__PURE__*/React.createElement("button", {
+    onClick: () => CancelWarAction()
+  }, "Cancel"), mapData && mapData.war_actions && !mapData.war_action_type && Object.entries(mapData.war_actions).map(([key, value], index) => /*#__PURE__*/React.createElement("button", {
     key: index,
-    onClick: () => BeginOperation(key),
+    onClick: () => BeginWarAction(key),
     className: "button",
     dangerouslySetInnerHTML: {
       __html: value
@@ -438,7 +438,7 @@ function Travel({
   })), mapData && scoutData && /*#__PURE__*/React.createElement(Map, {
     mapData: mapData,
     scoutData: scoutData,
-    patrolData: patrolData,
+    npcData: npcData,
     playerId: playerId,
     ranksToView: ranksToView,
     strategicView: strategicView,

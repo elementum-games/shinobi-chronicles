@@ -947,7 +947,7 @@
     animation: none;
 }
 
-#patrol_locations .map_location {
+#npc_locations .map_location {
     transition: all 2s linear;
     z-index: 4;
 }
@@ -1006,28 +1006,28 @@
 .caravan {
     background: url(../../../images/map/icons/caravan.png);
 }
-.patrol_stone {
+.npc_stone {
     filter: url("#stone_glow");
 }
-.patrol_cloud {
+.npc_cloud {
     filter: url("#cloud_glow");
 }
-.patrol_leaf {
+.npc_leaf {
     filter: url("#leaf_glow");
 }
-.patrol_sand {
+.npc_sand {
     filter: url("#sand_glow");
 }
-.patrol_mist {
+.npc_mist {
     filter: url("#mist_glow");
 }
-.patrol_ally {
+.npc_ally {
     filter: url("#ally_glow");
 }
-.patrol_neutral {
+.npc_neutral {
     filter: url("#neutral_glow");
 }
-.patrol_enemy {
+.npc_enemy {
     filter: url("#enemy_glow");
 }
 
@@ -1160,7 +1160,7 @@
     transform: rotate(-135deg) translate(5px, 0px);
 }
 
-.operation_text {
+.war_action_text {
     color: #ffecd4;
     font-family: 'Segoe UI';
     font-style: italic;
@@ -1184,24 +1184,24 @@
     }
 }
 
-#operation_progress_bar {
+#war_action_progress_bar {
     top: 1px;
     position: absolute;
 }
 
-#operation_progress_circle_background {
+#war_action_progress_circle_background {
     transition-property: stroke-dashoffset;
     transition-duration: 0.5s;
     transition-timing-function: ease-out;
 }
 
-#operation_progress_circle {
+#war_action_progress_circle {
     transition-property: stroke-dashoffset;
     transition-duration: 0.5s;
     transition-timing-function: ease-out;
 }
 
-#operation_interval_circle {
+#war_action_interval_circle {
     transition-property: stroke-dashoffset;
     transition-duration: 0.25s;
     transition-timing-function: ease-out;
@@ -1344,7 +1344,7 @@
     margin-left: 2px;
 }
 
-.patrol_details {
+.npc_details {
     display: none;
     flex-direction: column;
     align-items: flex-start;
@@ -1369,14 +1369,14 @@
     text-shadow: 1px 0px 2px black;
     gap: 2px;
 }
-.map_location:hover .patrol_details {
+.map_location:hover .npc_details {
     display: flex;
 }
-.patrol_details_resource {
+.npc_details_resource {
     line-height: 18px;
     display: flex;
 }
-.patrol_details_resource_icon {
+.npc_details_resource_icon {
     height: 18px;
     width: 18px;
 }

@@ -167,10 +167,10 @@ class TravelManager {
             throw new InvalidMovementException('You are currently in a Special Mission and cannot travel!');
         }
 
-        // check if the user is in an active operation
-        if ($this->user->operation) {
-            $operation = $this->warManager->getOperationById($this->user->operation);
-            $message = "You are currently " . Operation::OPERATION_TYPE_DESCRIPTOR[$operation->type] . " and cannot travel!";
+        // check if the user is in an active war action
+        if ($this->user->war_action_id) {
+            $war_action = $this->warManager->getWarActionById($this->user->war_action_id);
+            $message = "You are currently " . WarAction::WAR_ACTION_TYPE_DESCRIPTOR[$war_action->type] . " and cannot travel!";
             throw new InvalidMovementException($message);
         }
 
@@ -291,7 +291,7 @@ class TravelManager {
                     `users`.`village`,
                     `users`.`rank`,
                     `users`.`stealth`,
-                    `users`.`operation`,
+                    `users`.`war_action_id`,
                     `users`.`level`,
                     `users`.`attack_id`,
                     `users`.`battle_id`,
@@ -367,7 +367,7 @@ class TravelManager {
                 && $user_alignment !== 'Ally') {
                 if ((int)$user['rank'] === $this->user->rank_num) {
                     $can_attack = true;
-                } else if ($user['operation'] > 0) {
+                } else if ($user['war_action_id'] > 0) {
                     $can_attack = true;
                 } else if ($loot_count > 0) {
                     $can_attack = true;
@@ -410,8 +410,6 @@ class TravelManager {
                 is_protected: false,
             );
         }
-
-
 
         // Check for protection
         foreach($return_arr as $nearby_player) {
@@ -683,7 +681,7 @@ class TravelManager {
 
             // bypass rank restruction if target taking war action or carrying loot
             if ($user->rank_num !== $this->user->rank_num) {
-                if ($user->operation == 0) {
+                if ($user->war_action_id == 0) {
                     $loot_count = 0;
                     $loot_result = $this->system->db->query("SELECT COUNT(*) as `count` FROM `loot` WHERE `user_id` = {$user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL LIMIT 1");
                     if ($this->system->db->last_num_rows > 0) {
@@ -722,9 +720,9 @@ class TravelManager {
                     throw new RuntimeException("Target has died within the last minute, please wait " .
                         ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
                 }*/
-            if ($this->user->operation > 0) {
-                $operation = $this->warManager->getOperationById($this->user->operation);
-                $message = "You cannot attack while " . Operation::OPERATION_TYPE_DESCRIPTOR[$operation->type] . "!";
+            if ($this->user->war_action_id > 0) {
+                $war_action = $this->warManager->getWarActionById($this->user->war_action_id);
+                $message = "You cannot attack while " . WarAction::WAR_ACTION_TYPE_DESCRIPTOR[$war_action->type] . "!";
                 throw new RuntimeException($message);
             }
             if ($this->dbFetchIsProtectedByAlly($user) && $this->user->rank_num >= 4) {
@@ -771,7 +769,7 @@ class TravelManager {
     }
 
     /**
-     * Do not use this method for batch operations, use isProtectedByAlly instead
+     * Do not use this method for batch war actions, use isProtectedByAlly instead
      *
      * @param User $user
      * @return bool
@@ -895,13 +893,13 @@ class TravelManager {
     }
 
     /**
-     * @return Patrol[]
+     * @return MapNPC[]
      * @throws DatabaseDeadlockException
      * @throws DatabaseDeadlockException
      * @throws DatabaseDeadlockException
      */
     #[Trace]
-    public function fetchNearbyPatrols(): array {
+    public function fetchNearbyNPCs(): array {
         $return_arr = [];
 
         // exit if war disabled
@@ -915,7 +913,7 @@ class TravelManager {
         $region_locations = $this->system->db->query("SELECT * FROM `region_locations`");
         $region_locations = $this->system->db->fetch_all($region_locations);
         foreach ($result as $row) {
-            $patrol = new Patrol($row, "patrol");
+            $patrol = new MapNPC($row, "patrol");
             $patrol->setLocation($this->system, $region_locations);
             $patrol->setAlignment($this->user);
             $distance = $this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id));
@@ -931,20 +929,20 @@ class TravelManager {
         foreach ($result as $row) {
             // if travel time is set then only display if active
             if (!empty($row['travel_time'])) {
-                if ($row['travel_time'] + ($row['start_time'] * 1000) + Patrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
-                    $patrol = new Patrol($row, "caravan");
-                    $patrol->setLocation($this->system, $region_locations);
-                    $patrol->setAlignment($this->user);
-                    if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
-                        $return_arr[] = $patrol;
+                if ($row['travel_time'] + ($row['start_time'] * 1000) + MapNPC::DESTINATION_BUFFER_MS > (time() * 1000)) {
+                    $caravan = new MapNPC($row, "caravan");
+                    $caravan->setLocation($this->system, $region_locations);
+                    $caravan->setAlignment($this->user);
+                    if ($this->user->location->distanceDifference(new TravelCoords($caravan->current_x, $caravan->current_y, $caravan->map_id)) <= $this->user->scout_range) {
+                        $return_arr[] = $caravan;
                     }
                 }
             } else {
-                $patrol = new Patrol($row, "caravan");
-                $patrol->setLocation($this->system, $region_locations);
-                $patrol->setAlignment($this->user);
-                if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
-                    $return_arr[] = $patrol;
+                $caravan = new MapNPC($row, "caravan");
+                $caravan->setLocation($this->system, $region_locations);
+                $caravan->setAlignment($this->user);
+                if ($this->user->location->distanceDifference(new TravelCoords($caravan->current_x, $caravan->current_y, $caravan->map_id)) <= $this->user->scout_range) {
+                    $return_arr[] = $caravan;
                 }
             }
         }
@@ -1107,12 +1105,7 @@ class TravelManager {
         $objectives = [];
 
         // Get Region Objectives
-        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `type`, `x`, `y`, `resource_id`, `resource_count`, `defense`, `occupying_village_id`,
-            COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) AS `village`,
-            `villages`.`name` as `village_name`, `villages`.`village_id`
-            FROM `region_locations`
-            INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
-            INNER JOIN `villages` ON COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) = `villages`.`village_id`");
+        $region_result = $this->system->db->query("SELECT * FROM `region_locations`");
         $region_objectives = $this->system->db->fetch_all($region_result);
         foreach ($region_objectives as $obj) {
             $distance = $this->user->location->distanceDifference(
@@ -1137,10 +1130,10 @@ class TravelManager {
                             defense: $obj['defense'],
                             objective_type: $obj['type'],
                             image: $image,
-                            village_id: $obj['village_id'],
+                            village_id: $obj['occupying_village_id'],
                             resource_id: $obj['resource_id'],
                             resource_count: $obj['resource_count'],
-                            is_occupied: !empty($obj['occupying_village_id']),
+                            stability: $obj['stability'],
                         );
                         break;
                     case "tower":
@@ -1157,10 +1150,10 @@ class TravelManager {
                             defense: $obj['defense'],
                             objective_type: $obj['type'],
                             image: $image,
-                            village_id: $obj['village_id'],
+                            village_id: $obj['occupying_village_id'],
                             resource_id: $obj['resource_id'],
                             resource_count: $obj['resource_count'],
-                            is_occupied: !empty($obj['occupying_village_id']),
+                            stability: $obj['stability'],
                         );
                     case "village":
                         if ($distance <= $this->user->scout_range) {
@@ -1171,15 +1164,15 @@ class TravelManager {
                                 map_id: 1,
                                 x: $obj['x'],
                                 y: $obj['y'],
-                                objective_health: $this->system->war_enabled ? $obj['health'] : WarManager::BASE_VILLAGE_HEALTH,
-                                objective_max_health: WarManager::BASE_VILLAGE_HEALTH,
+                                objective_health: $this->system->war_enabled ? $obj['health'] : WarManager::BASE_TOWN_HEALTH,
+                                objective_max_health: WarManager::BASE_TOWN_HEALTH,
                                 defense: $obj['defense'],
                                 objective_type: $obj['type'],
                                 image: $image,
-                                village_id: $obj['village_id'],
+                                village_id: $obj['occupying_village_id'],
                                 resource_id: $obj['resource_id'],
                                 resource_count: $obj['resource_count'],
-                                is_occupied: !empty($obj['occupying_village_id']),
+                                stability: $obj['stability'],
                             );
                         }
                         break;
@@ -1230,11 +1223,9 @@ class TravelManager {
     /**
      * @return bool
      * @throws DatabaseDeadlockException
-     * @throws DatabaseDeadlockException
-     * @throws DatabaseDeadlockException
      */
     #[Trace]
-    function beginOperation($operation_type): bool {
+    function beginWarAction($war_action_type): bool {
         $message = '';
         /*
         if ($this->user->pvp_immunity_ms > System::currentTimeMs()) {
@@ -1249,19 +1240,19 @@ class TravelManager {
             $this->setTravelMessage($message);
             return false;
         }
-        if ($operation_type == Operation::OPERATION_LOOT) {
+        if ($war_action_type == WarAction::WAR_ACTION_LOOT) {
             $time = time();
             $caravans = $this->system->db->query("SELECT * FROM `caravans` where `start_time` < {$time} && `village_id` != {$this->user->village->village_id}");
             $caravans = $this->system->db->fetch_all($caravans);
             $region_locations = $this->system->db->query("SELECT * FROM `region_locations`");
             $region_locations = $this->system->db->fetch_all($region_locations);
-            foreach ($caravans as $caravan) {
-                $patrol = new Patrol($caravan, "caravan");
-                $patrol->setLocation($this->system, $region_locations);
-                $patrol->setAlignment($this->user);
-                if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) == 0 && $patrol->alignment != "Ally") {
-                    $this->warManager->beginOperation($operation_type, $patrol->id, $patrol);
-                    $message = System::unSlug(Operation::OPERATION_TYPE_DESCRIPTOR[$operation_type]) . "!";
+            foreach ($caravans as $caravan_data) {
+                $caravan = new MapNPC($caravan_data, "caravan");
+                $caravan->setLocation($this->system, $region_locations);
+                $caravan->setAlignment($this->user);
+                if ($this->user->location->distanceDifference(new TravelCoords($caravan->current_x, $caravan->current_y, $caravan->map_id)) == 0 && $caravan->alignment != "Ally") {
+                    $this->warManager->beginWarAction($war_action_type, $caravan->id, $caravan);
+                    $message = System::unSlug(WarAction::WAR_ACTION_TYPE_DESCRIPTOR[$war_action_type]) . "!";
                     $this->user->updateData();
                     $this->setTravelMessage($message);
                     return true;
@@ -1269,7 +1260,7 @@ class TravelManager {
             }
             return false;
         } else {
-            $target = $this->system->db->query("SELECT `id` FROM `region_locations`
+            $target = $this->system->db->query("SELECT `region_location_id` FROM `region_locations`
                 WHERE `x` = {$this->user->location->x}
                 AND `y` = {$this->user->location->y}
                 AND `map_id` = {$this->user->location->map_id}
@@ -1279,8 +1270,8 @@ class TravelManager {
                 throw new RuntimeException("No valid target found!");
             }
             $target = $this->system->db->fetch($target);
-            $this->warManager->beginOperation($operation_type, $target['id']);
-            $message = System::unSlug(Operation::OPERATION_TYPE_DESCRIPTOR[$operation_type]) . "!";
+            $this->warManager->beginWarAction($war_action_type, $target['region_location_id']);
+            $message = System::unSlug(WarAction::WAR_ACTION_TYPE_DESCRIPTOR[$war_action_type]) . "!";
             $this->user->updateData();
             $this->setTravelMessage($message);
             return true;
@@ -1291,27 +1282,25 @@ class TravelManager {
      * @return bool
      */
     #[Trace]
-    function cancelOperation(): bool {
+    function cancelWarAction(): bool {
         $message = '';
-        $this->warManager->cancelOperation();
+        $this->warManager->cancelWarAction();
         $this->user->updateData();
-        //$message = "Operation cancelled!";
         $this->setTravelMessage($message);
         return true;
     }
 
     #[Trace]
-    function checkOperation() {
+    function checkWarAction() {
         $message = '';
-        if ($this->system->war_enabled && $this->user->operation > 0) {
+        if ($this->system->war_enabled && $this->user->war_action_id > 0) {
             try {
-                $message = $this->warManager->processOperation($this->user->operation);
+                $message = $this->warManager->processWarAction($this->user->war_action_id);
             } catch (RuntimeException $e) {
-                //$message = "Operation cancelled";
                 if ($this->system->isDevEnvironment()) {
                     $message .= ": " . $e->getMessage();
                 }
-                $this->user->operation = 0;
+                $this->user->war_action_id = 0;
             }
         }
         $this->user->updateData();
