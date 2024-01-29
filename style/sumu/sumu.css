@@ -271,7 +271,7 @@ a.userLink:hover {
     text-decoration: underline !important;
 }
 /* Blue */
-a.blue, a.blue:hover {
+a.blue, a.blue:hover, span.blue {
     color: #92c0ff !important;
     text-shadow: var(--name-shadow-default) !important;
 }
@@ -280,7 +280,7 @@ a.blue, a.blue:hover {
 }
 
 /* Pink */
-a.pink, a.pink:hover {
+a.pink, a.pink:hover, span.pink {
     color: #f69edc !important;
     text-shadow: var(--name-shadow-default) !important;
 }
@@ -307,7 +307,7 @@ a.chat_user_name.platinum, a.platinum:hover, a.platinum:visited, span.platinum {
 }
 
 /* Gold */
-a.chat_user_name.gold, a.gold:hover, a.gold:visited {
+a.chat_user_name.gold, a.gold:hover, a.gold:visited, span.gold {
     color: #c6ab5c !important;
     text-shadow: var(--name-shadow-default) !important;
 }
@@ -316,7 +316,7 @@ a.chat_user_name.gold, a.gold:hover, a.gold:visited {
 }
 
 /* Moderator */
-a.chat_user_name.moderator, a.moderator:hover, a.moderator:visited {
+a.chat_user_name.moderator, a.moderator:hover, a.moderator:visited, span.moderator {
     color: #c7a417 !important;
     text-shadow: var(--name-shadow-default) !important;
 }
@@ -325,7 +325,7 @@ a.chat_user_name.moderator, a.moderator:hover, a.moderator:visited {
 }
 
 /* Head Moderator */
-a.headModerator, a.headModerator:hover, a.headModerator:visited {
+a.headModerator, a.headModerator:hover, a.headModerator:visited, span.headModerator {
     color: #34a3b3 !important;
     text-shadow: var(--name-shadow-default) !important;
 }
@@ -334,7 +334,7 @@ a.headModerator, a.headModerator:hover, a.headModerator:visited {
 }
 
 /* Content Admin */
-a.contentAdmin, a.contentAdmin:hover, a.contentAdmin:visited {
+a.contentAdmin, a.contentAdmin:hover, a.contentAdmin:visited, span.contentAdmin {
     color: #c3afff !important;
     text-shadow: var(--name-shadow-default) !important;
 }
@@ -343,7 +343,7 @@ a.contentAdmin, a.contentAdmin:hover, a.contentAdmin:visited {
 }
 
 /* Administrator */
-a.administrator, a.administrator:hover, a.administrator:visited {
+a.administrator, a.administrator:hover, a.administrator:visited, span.administrator {
     color: #f57677 !important;
     text-shadow: var(--name-shadow-default) !important;
 }
@@ -352,7 +352,7 @@ a.administrator, a.administrator:hover, a.administrator:visited {
 }
 
 /* Default User */
-a.normalUser, a.normalUser:hover, a.normalUser:visited {
+a.normalUser, a.normalUser:hover, a.normalUser:visited, span.normalUser {
     color: #c5baa3 !important;
     text-shadow: var(--name-shadow-default) !important;
 }
