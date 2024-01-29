@@ -412,7 +412,7 @@ class NotificationAPIManager {
                 foreach ($result as $row) {
                     // if travel time is set then only display if active
                     if (!empty($row['travel_time'])) {
-                        if ($row['travel_time'] + ($row['start_time'] * 1000) + Patrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
+                        if ($row['travel_time'] + ($row['start_time'] * 1000) + MapNPC::DESTINATION_BUFFER_MS > (time() * 1000)) {
                             $notifications[] = new NotificationDto(
                                 action_url: $this->system->router->getUrl('travel'),
                                 type: NotificationManager::NOTIFICATION_CARAVAN,

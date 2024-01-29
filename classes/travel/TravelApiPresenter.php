@@ -126,7 +126,6 @@ class TravelApiPresenter {
                     'resource_count' => $regionObjective->resource_count,
                     'resource_name' => WarManager::RESOURCE_NAMES[$regionObjective->resource_id],
                     'stability' => $regionObjective->stability,
-                    'rebellion_active' => $regionObjective->rebellion_active,
                 ];
             },
             $travelManager->fetchRegionObjectives()

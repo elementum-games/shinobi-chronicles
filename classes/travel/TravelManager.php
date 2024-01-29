@@ -447,7 +447,7 @@ class TravelManager {
         if ($this->system->isDevEnvironment()) {
             $placeholder_coords = new TravelCoords(19, 14, 1);
 
-            for ($i = 0; $i < 0; $i++) {
+            for ($i = 0; $i < 2; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
@@ -468,7 +468,7 @@ class TravelManager {
                     is_protected: false,
                 );
             }
-            for ($i = 0; $i < 0; $i++) {
+            for ($i = 0; $i < 2; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
@@ -489,7 +489,7 @@ class TravelManager {
                     is_protected: false,
                 );
             }
-            for ($i = 0; $i < 0; $i++) {
+            for ($i = 0; $i < 2; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
@@ -1118,7 +1118,7 @@ class TravelManager {
             if ($distance <= self::DISPLAY_RADIUS) {
                 switch ($obj['type']) {
                     case "castle":
-                        $default_image = "/images/map/icons/castle.png";
+                        $image = "/images/map/icons/castle.png";
                         $objectives[] = new RegionObjective(
                             id: $obj['region_location_id'],
                             name: $obj['name'],
@@ -1129,17 +1129,16 @@ class TravelManager {
                             objective_max_health: WarManager::BASE_CASTLE_HEALTH,
                             defense: $obj['defense'],
                             objective_type: $obj['type'],
-                            image: !empty($obj['background_image']) ? $obj['background_image'] : $default_image,
+                            image: $image,
                             village_id: $obj['occupying_village_id'],
                             resource_id: $obj['resource_id'],
                             resource_count: $obj['resource_count'],
                             stability: $obj['stability'],
-                            rebellion_active: $obj['rebellion_active'],
                         );
                         break;
                     case "tower":
                         break;
-                        $default_image = "/images/map/icons/tower.png";
+                        $image = "/images/map/icons/tower.png";
                         $objectives[] = new RegionObjective(
                             id: $obj['region_location_id'],
                             name: $obj['name'],
@@ -1150,16 +1149,15 @@ class TravelManager {
                             objective_max_health: $obj['max_health'],
                             defense: $obj['defense'],
                             objective_type: $obj['type'],
-                            image: !empty($obj['background_image']) ? $obj['background_image'] : $default_image,
+                            image: $image,
                             village_id: $obj['occupying_village_id'],
                             resource_id: $obj['resource_id'],
                             resource_count: $obj['resource_count'],
                             stability: $obj['stability'],
-                            rebellion_active: $obj['rebellion_active'],
                         );
                     case "village":
                         if ($distance <= $this->user->scout_range) {
-                            $default_image = "/images/map/icons/village.png";
+                            $image = "/images/map/icons/village.png";
                             $objectives[] = new RegionObjective(
                                 id: $obj['region_location_id'],
                                 name: $obj['name'],
@@ -1170,12 +1168,11 @@ class TravelManager {
                                 objective_max_health: WarManager::BASE_TOWN_HEALTH,
                                 defense: $obj['defense'],
                                 objective_type: $obj['type'],
-                                image: !empty($obj['background_image']) ? $obj['background_image'] : $default_image,
+                                image: $image,
                                 village_id: $obj['occupying_village_id'],
                                 resource_id: $obj['resource_id'],
                                 resource_count: $obj['resource_count'],
                                 stability: $obj['stability'],
-                                rebellion_active: $obj['rebellion_active'],
                             );
                         }
                         break;
