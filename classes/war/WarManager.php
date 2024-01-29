@@ -1,22 +1,33 @@
 <?php
 
-require_once __DIR__ . "/Operation.php";
+require_once __DIR__ . "/WarAction.php";
 
 class WarManager {
-    const BASE_TOWN_RESOURCE_PRODUCTION = 25;
-    const BASE_CASTLE_RESOURCE_PRODUCTION = 50;
+    const BASE_TOWN_RESOURCE_PRODUCTION = 15; // 2x at full stability, 26/hour at 75%
+    const BASE_CASTLE_RESOURCE_PRODUCTION = 20; // 2x at full stability, 35/hour at 75%
     const VILLAGE_BASE_RESOURCE_PRODUCTION = 75;
     const BASE_CARAVAN_TIME_MS = 300000; // 5 minute travel time
     const CARAVAN_TIMER_HOURS = 6; // 24m average caravan spawn timer, so 19 minute average downtime
-    const BASE_VILLAGE_REGEN_PER_MINUTE = 40; // 2400/hour
-    const BASE_CASTLE_REGEN_PER_MINUTE = 45; // 2700/hour
-    const VILLAGE_REGEN_SHARE_PERCENT = 100; // 2 villages + base = 7500/hour max
-    const BASE_VILLAGE_HEALTH = 5000;
+    const BASE_TOWN_REGEN_PER_MINUTE = 150; // 2x at full stability, Chuu max raid damage at 75% stability
+    const BASE_CASTLE_REGEN_PER_MINUTE = 300; // 2x at full stability, Jon max raid damage at 75% stability
+    const TOWN_REGEN_SHARE_PERCENT = 100; // 2 villages + base, 1200/min max at 2x villages 100% stability
+    const BASE_TOWN_HEALTH = 5000;
     const BASE_CASTLE_HEALTH = 15000;
-    const BASE_VILLAGE_DEFENSE = 50;
+    const BASE_TOWN_DEFENSE = 50;
     const BASE_CASTLE_DEFENSE = 75;
+    const BASE_CASTLE_STABILITY = 75;
+    const BASE_TOWN_STABILITY = 0;
+    const OCCUPIED_TOWN_STABILITY_PENALTY = 100;
+    const BASE_STABILITY_SHIFT_PER_HOUR = 1;
+    const BASE_DEFENSE_SHIFT_PER_HOUR = 1;
+    const MAX_STABILITY = 100;
+    const MIN_STABILITY = -100;
+    const INITIAL_LOCATION_CAPTURE_HEALTH_PERCENT = 50;
+    const INITIAL_LOCATION_CAPTURE_DEFENSE = 25;
+    const INITIAL_LOCATION_CAPTURE_STABILITY = 25;
 
-    // region_regen_cron.php must run on matching cadence to this interval, if you change this value, change the cron job config to run region_regen_cron.php at whatever the new value is
+    // region_regen_cron.php must run on matching cadence to this interval
+    // if you change this value, change the cron job config to run region_regen_cron.php at whatever the new value is
     const REGEN_INTERVAL_MINUTES = 5;
 
     const RESOURCE_MATERIALS = 1;
@@ -39,12 +50,6 @@ class WarManager {
         3 => "Elite Patrol",
         4 => "War Hero",
     ];
-    const PATROL_AI = [
-        1 => 8,
-        2 => 17,
-        3 => 130,
-        4 => 17,
-    ];
     const PATROL_CHANCE = [
         1 => 65,
         2 => 25,
@@ -57,6 +62,29 @@ class WarManager {
     const YEN_PER_RESOURCE = 20;
     const RESOURCES_PER_STAT = 10;
     const RESOURCES_PER_REPUTATION = 10;
+
+    const REGION_ORIGINAL_VILLAGE = [
+        1 => 1,
+        2 => 2,
+        3 => 3,
+        4 => 4,
+        5 => 5,
+        6 => 1,
+        7 => 1,
+        8 => 1,
+        9 => 2,
+        10 => 2,
+        11 => 2,
+        12 => 3,
+        13 => 3,
+        14 => 3,
+        15 => 4,
+        16 => 4,
+        17 => 4,
+        18 => 5,
+        19 => 5,
+        20 => 5
+    ];
 
     private System $system;
     private User $user;
@@ -75,46 +103,46 @@ class WarManager {
     /**
      * @throws RuntimeException
      */
-    public function getOperationById(int $operation_id): Operation {
-        $operation_result = $this->system->db->query("SELECT * FROM `operations` WHERE `operation_id` = {$operation_id} LIMIT 1");
+    public function getWarActionById(int $war_action_id): WarAction {
+        $war_action_result = $this->system->db->query("SELECT * FROM `war_actions` WHERE `war_action_id` = {$war_action_id} LIMIT 1");
         if ($this->system->db->last_num_rows == 0) {
-            throw new RuntimeException("Operation not found");
+            throw new RuntimeException("War Action not found");
         }
-        $operation_result = $this->system->db->fetch($operation_result);
-        $operation = new Operation($this->system, $this->user, $operation_result);
-        return $operation;
+        $war_action_result = $this->system->db->fetch($war_action_result);
+        $war_action = new WarAction($this->system, $this->user, $war_action_result);
+        return $war_action;
     }
 
     /**
      * @throws RuntimeException
      */
-    public function processOperation(int $operation_id, ?int $status = null): string
+    public function processWarAction(int $war_action_id, ?int $status = null): string
     {
         $message = '';
-        $operation = $this->getOperationById($operation_id);
+        $war_action = $this->getWarActionById($war_action_id);
         if (!empty($status)) {
-            $operation->status = $status;
+            $war_action->status = $status;
         }
-        // check operation target valid
-        switch ($operation->status) {
-            case Operation::OPERATION_ACTIVE:
-                if (!$this->checkOperationValid($operation)) {
-                    $message = "Operation no longer valid!";
-                    $this->cancelOperation();
+        // check war_action target valid
+        switch ($war_action->status) {
+            case WarAction::WAR_ACTION_ACTIVE:
+                if (!$this->checkWarActionValid($war_action)) {
+                    $message = "War Action no longer valid!";
+                    $this->cancelWarAction();
                     break;
                 }
-                $message = $operation->progressActiveOperation();
+                $message = $war_action->progressActiveWarAction();
                 break;
-            case Operation::OPERATION_COMPLETE:
-                $message = $operation->handleCompletion();
-                $operation->updateData();
+            case WarAction::WAR_ACTION_COMPLETE:
+                $message = $war_action->handleCompletion();
+                $war_action->updateData();
                 break;
-            case Operation::OPERATION_FAILED:
-                $operation->handleFailure();
-                $operation->updateData();
+            case WarAction::WAR_ACTION_FAILED:
+                $war_action->handleFailure();
+                $war_action->updateData();
                 break;
             default:
-                throw new RuntimeException("Invalid operation status!");
+                throw new RuntimeException("Invalid war_action status!");
         }
         return $message;
     }
@@ -122,82 +150,73 @@ class WarManager {
     /**
      * @throws RuntimeException
      */
-    public function beginOperation(int $operation_type, int $target_id, Patrol $patrol = null) {
+    public function beginWarAction(int $war_action_type, int $target_id, MapNPC $npc = null) {
         if ($this->user->rank_num <= 2) {
             throw new RuntimeException("Invalid rank!");
         }
         if ($this->user->battle_id > 0) {
             throw new RuntimeException("You are currently in battle!");
         }
-        if ($operation_type != Operation::OPERATION_LOOT) {
-            $target = $this->system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`, `regions`.`village` as `original_village`
+        if ($war_action_type != WarAction::WAR_ACTION_LOOT) {
+            $target = $this->system->db->query("SELECT `region_locations`.*
             FROM `region_locations`
-            INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
-            WHERE `id` = {$target_id} LIMIT 1");
+            WHERE `region_location_id` = {$target_id} LIMIT 1");
             if ($this->system->db->last_num_rows == 0) {
-                throw new RuntimeException("Invalid operation target!");
+                throw new RuntimeException("Invalid war_action target!");
             }
             $target = $this->system->db->fetch($target);
             // must be at target location
             $target_location = new TravelCoords($target['x'], $target['y'], $target['map_id']);
             if ($this->user->location->toString() != $target_location->toString()) {
-                throw new RuntimeException("Invalid operation target!");
+                throw new RuntimeException("Invalid war_action target!");
             }
         }
 
-        switch ($operation_type) {
-            case Operation::OPERATION_INFILTRATE:
+        switch ($war_action_type) {
+            case WarAction::WAR_ACTION_INFILTRATE:
                 // must be neutral or at war
-                if ($this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_NEUTRAL && $this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_WAR) {
-                    throw new RuntimeException("Invalid operation target!");
+                if ($this->user->village->relations[$target['occupying_village_id']]->relation_type != VillageRelation::RELATION_NEUTRAL && $this->user->village->relations[$target['occupying_village_id']]->relation_type != VillageRelation::RELATION_WAR) {
+                    throw new RuntimeException("Invalid war_action target!");
                 }
-                Operation::beginOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
+                WarAction::beginWarAction($this->system, $this->user, $target_id, $war_action_type, $target['occupying_village_id']);
                 break;
-            case Operation::OPERATION_REINFORCE:
+            case WarAction::WAR_ACTION_REINFORCE:
                 // must be owned or ally
-                if ($target['village'] != $this->user->village->village_id && $this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_ALLIANCE) {
-                    throw new RuntimeException("Invalid operation target!");
+                if ($target['occupying_village_id'] != $this->user->village->village_id && $this->user->village->relations[$target['occupying_village_id']]->relation_type != VillageRelation::RELATION_ALLIANCE) {
+                    throw new RuntimeException("Invalid war_action target!");
                 }
-                Operation::beginOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
+                WarAction::beginWarAction($this->system, $this->user, $target_id, $war_action_type, $target['occupying_village_id']);
                 break;
-            case Operation::OPERATION_RAID:
+            case WarAction::WAR_ACTION_RAID:
                 // must be at war
-                if ($this->user->village->relations[$target['village']]->relation_type != VillageRelation::RELATION_WAR) {
-                    throw new RuntimeException("Invalid operation target!");
+                if ($this->user->village->relations[$target['occupying_village_id']]->relation_type != VillageRelation::RELATION_WAR) {
+                    throw new RuntimeException("Invalid war_action target!");
                 }
-                Operation::beginOperation($this->system, $this->user, $target_id, $operation_type, $target['village']);
+                WarAction::beginWarAction($this->system, $this->user, $target_id, $war_action_type, $target['occupying_village_id']);
                 break;
-            case Operation::OPERATION_LOOT:
+            case WarAction::WAR_ACTION_LOOT:
                 // must be neutral or at war
-                if ($this->user->village->relations[$patrol->village_id]->relation_type != VillageRelation::RELATION_NEUTRAL && $this->user->village->relations[$patrol->village_id]->relation_type != VillageRelation::RELATION_WAR) {
-                    throw new RuntimeException("Invalid operation target!");
+                if ($this->user->village->relations[$npc->village_id]->relation_type != VillageRelation::RELATION_NEUTRAL && $this->user->village->relations[$npc->village_id]->relation_type != VillageRelation::RELATION_WAR) {
+                    throw new RuntimeException("Invalid war_action target!");
                 }
-                Operation::beginOperation($this->system, $this->user, $patrol->id, $operation_type, $patrol->village_id);
-                break;
-            case Operation::OPERATION_LOOT_TOWN:
-                // must be occupied by self or ally
-                if (empty($target['occupying_village_id']) || !$this->user->village->isAlly($target['occupying_village_id'])) {
-                    throw new RuntimeException("Invalid operation target!");
-                }
-                Operation::beginOperation($this->system, $this->user, $target_id, $operation_type, $target['original_village']);
+                WarAction::beginWarAction($this->system, $this->user, $npc->id, $war_action_type, $npc->village_id);
                 break;
             default:
-                throw new RuntimeException("Invalid operation type!");
+                throw new RuntimeException("Invalid war_action type!");
         }
     }
 
     /**
      * @throws RuntimeException
      */
-    public function checkOperationValid(Operation $operation): bool {
+    public function checkWarActionValid(WarAction $war_action): bool {
         if ($this->user->battle_id > 0) {
             return false;
         }
-        if ($operation->type != Operation::OPERATION_LOOT) {
-            $target = $this->system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`, `regions`.`village` as `original_village`
+        if ($war_action->type != WarAction::WAR_ACTION_LOOT) {
+            $target = $this->system->db->query("SELECT `region_locations`.*
             FROM `region_locations`
-            INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
-            WHERE `id` = {$operation->target_id} LIMIT 1");
+            WHERE `region_location_id` = {$war_action->target_id} LIMIT 1");
             if ($this->system->db->last_num_rows == 0) {
                 return false;
             }
@@ -208,34 +227,28 @@ class WarManager {
                 return false;
             }
         }
-        switch ($operation->type) {
-            case Operation::OPERATION_INFILTRATE:
+        switch ($war_action->type) {
+            case WarAction::WAR_ACTION_INFILTRATE:
                 // must be neutral or at war
-                if ($this->user->village->isAlly($target['village'])) {
+                if ($this->user->village->isAlly($target['occupying_village_id'])) {
                     return false;
                 }
                 break;
-            case Operation::OPERATION_REINFORCE:
+            case WarAction::WAR_ACTION_REINFORCE:
                 // must be owned or ally
-                if ($target['village'] != $this->user->village->village_id && !$this->user->village->isAlly($target['village'])) {
+                if ($target['occupying_village_id'] != $this->user->village->village_id && !$this->user->village->isAlly($target['occupying_village_id'])) {
                     return false;
                 }
                 break;
-            case Operation::OPERATION_RAID:
+            case WarAction::WAR_ACTION_RAID:
                 // must be at war
-                if (!$this->user->village->isEnemy($target['village'])) {
+                if (!$this->user->village->isEnemy($target['occupying_village_id'])) {
                     return false;
                 }
                 break;
-            case Operation::OPERATION_LOOT:
+            case WarAction::WAR_ACTION_LOOT:
                 // must be neutral or at war
-                if ($this->user->village->isAlly($operation->target_village)) {
-                    return false;
-                }
-                break;
-            case OPERATION::OPERATION_LOOT_TOWN:
-                // must be occupied by self
-                if (empty($target['occupying_village_id']) || !$this->user->village->isAlly($target['occupying_village_id'])) {
+                if ($this->user->village->isAlly($war_action->target_village)) {
                     return false;
                 }
                 break;
@@ -245,75 +258,68 @@ class WarManager {
         return true;
     }
 
-    public function cancelOperation() {
-        Operation::cancelOperation($this->system, $this->user);
+    public function cancelWarAction() {
+        WarAction::cancelWarAction($this->system, $this->user);
     }
 
     /**
      * @return array
      */
-    public function getValidOperations(bool $for_display = false): array {
-        $valid_operations = [];
+    public function getValidWarActions(bool $for_display = false): array {
+        $valid_war_actions = [];
 
         // exit if war disabled
         if (!$this->system->war_enabled) {
-            return $valid_operations;
+            return $valid_war_actions;
         }
         // exit if rank below Chuunin
         if ($this->user->rank_num <= 2) {
-            return $valid_operations;
+            return $valid_war_actions;
         }
 
         // get region location where location = player location
-        $target_location = $this->system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`, `regions`.`village` as `original_village`
+        $target_location = $this->system->db->query("SELECT `region_locations`.*
             FROM `region_locations`
-            INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
             WHERE `x` = {$this->user->location->x}
             AND `y` = {$this->user->location->y}
             AND `map_id` = {$this->user->location->map_id} LIMIT 1");
         if ($this->system->db->last_num_rows > 0) {
             $target_location = $this->system->db->fetch($target_location);
-            // check each operation type, return array
-            if ($target_location['village'] == $this->user->village->village_id) {
-                $valid_operations = [
-                    Operation::OPERATION_REINFORCE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_REINFORCE]),
+            // check each war action type, return array
+            if ($target_location['occupying_village_id'] == $this->user->village->village_id) {
+                $valid_war_actions = [
+                    WarAction::WAR_ACTION_REINFORCE => System::unSlug(WarAction::WAR_ACTION_TYPE[WarAction::WAR_ACTION_REINFORCE]),
                 ];
                 if ($for_display) {
                     $health_gain = floor($this->user->level / 2);
-                    $valid_operations[Operation::OPERATION_REINFORCE] .= "<br><span class='reinforce_button_text'>{$health_gain} health</span>";
-                }
-                if (!empty($target_location['occupying_village_id'])) {
-                    $valid_operations[Operation::OPERATION_LOOT_TOWN] = System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_LOOT_TOWN]);
+                    $valid_war_actions[WarAction::WAR_ACTION_REINFORCE] .= "<br><span class='reinforce_button_text'>{$health_gain} health</span>";
                 }
             } else {
-                switch ($this->user->village->relations[$target_location['village']]->relation_type) {
+                switch ($this->user->village->relations[$target_location['occupying_village_id']]->relation_type) {
                     case VillageRelation::RELATION_NEUTRAL:
-                        $valid_operations = [
-                            Operation::OPERATION_INFILTRATE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_INFILTRATE]),
+                        $valid_war_actions = [
+                            WarAction::WAR_ACTION_INFILTRATE => System::unSlug(WarAction::WAR_ACTION_TYPE[WarAction::WAR_ACTION_INFILTRATE]),
                         ];
                         break;
                     case VillageRelation::RELATION_ALLIANCE:
-                        $valid_operations = [
-                            Operation::OPERATION_REINFORCE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_REINFORCE])
+                        $valid_war_actions = [
+                            WarAction::WAR_ACTION_REINFORCE => System::unSlug(WarAction::WAR_ACTION_TYPE[WarAction::WAR_ACTION_REINFORCE])
                         ];
                         if ($for_display) {
                             $health_gain = floor($this->user->level / 2);
-                            $valid_operations[Operation::OPERATION_REINFORCE] .= "<br><span class='reinforce_button_text'>{$health_gain} health</span>";
-                        }
-                        if (!empty($target_location['occupying_village_id'])) {
-                            $valid_operations[Operation::OPERATION_LOOT_TOWN] = System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_LOOT_TOWN]);
+                            $valid_war_actions[WarAction::WAR_ACTION_REINFORCE] .= "<br><span class='reinforce_button_text'>{$health_gain} health</span>";
                         }
                         break;
                     case VillageRelation::RELATION_WAR:
-                        $valid_operations = [
-                            Operation::OPERATION_INFILTRATE => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_INFILTRATE]),
-                            Operation::OPERATION_RAID => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_RAID]),
+                        $valid_war_actions = [
+                            WarAction::WAR_ACTION_INFILTRATE => System::unSlug(WarAction::WAR_ACTION_TYPE[WarAction::WAR_ACTION_INFILTRATE]),
+                            WarAction::WAR_ACTION_RAID => System::unSlug(WarAction::WAR_ACTION_TYPE[WarAction::WAR_ACTION_RAID]),
                         ];
                         if ($for_display) {
                             $defense_reduction = min($target_location['defense'] / 100, 1);
                             $damage = intval($this->user->level * (1 - $defense_reduction));
                             $damage = max($damage, 0);
-                            $valid_operations[Operation::OPERATION_RAID] .= "<br><span class='raid_button_text'>{$damage} damage</span>";
+                            $valid_war_actions[WarAction::WAR_ACTION_RAID] .= "<br><span class='raid_button_text'>{$damage} damage</span>";
                         }
                         break;
                     case 'default':
@@ -328,21 +334,21 @@ class WarManager {
         $caravans = $this->system->db->fetch_all($caravans);
         $region_locations = $this->system->db->query("SELECT * FROM `region_locations`");
         $region_locations = $this->system->db->fetch_all($region_locations);
-        foreach ($caravans as $caravan) {
-            $patrol = new Patrol($caravan, "caravan");
-            $patrol->setLocation($this->system, $region_locations);
-            $patrol->setAlignment($this->user);
-            if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) == 0 && $patrol->alignment != "Ally") {
-                $valid_operations = [
-                    Operation::OPERATION_LOOT => System::unSlug(Operation::OPERATION_TYPE[Operation::OPERATION_LOOT]),
+        foreach ($caravans as $caravan_data) {
+            $caravan = new MapNPC($caravan_data, "caravan");
+            $caravan->setLocation($this->system, $region_locations);
+            $caravan->setAlignment($this->user);
+            if ($this->user->location->distanceDifference(new TravelCoords($caravan->current_x, $caravan->current_y, $caravan->map_id)) == 0 && $caravan->alignment != "Ally") {
+                $valid_war_actions = [
+                    WarAction::WAR_ACTION_LOOT => System::unSlug(WarAction::WAR_ACTION_TYPE[WarAction::WAR_ACTION_LOOT]),
                 ];
             }
         }
 
-        return $valid_operations;
+        return $valid_war_actions;
     }
 
-    function tryBeginPatrolBattle(Patrol $patrol) {
+    function tryBeginPatrolBattle(MapNPC $patrol) {
         $patrol_location = new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id);
         // if rank below chuunin
         if ($this->user->rank_num < 3) {
@@ -368,8 +374,8 @@ class WarManager {
         if ($this->user->special_mission > 0) {
             return;
         }
-        if ($this->user->operation > 0) {
-            $this->cancelOperation();
+        if ($this->user->war_action_id > 0) {
+            $this->cancelWarAction();
         }
         $ai = $this->getRandomPatrolAI($patrol->tier, $patrol->ai_id);
         $ai = new NPC($this->system, $ai);
@@ -484,16 +490,15 @@ class WarManager {
         $respawn_time = time() + round(self::PATROL_RESPAWN_TIME * (100 / (100 + $this->user->village->policy->patrol_respawn)), 1);
         $this->system->db->query("UPDATE `patrols` SET `start_time` = {$respawn_time}, `name` = '{$name}', `ai_id` = {$ai_id}, `tier` = {$tier} WHERE `id` = {$patrol_id}");
         // decrease region location defense in region that matches patrol's village
-        $location_result = $this->system->db->query("SELECT `region_locations`.*, COALESCE(`region_locations`.`occupying_village_id`, `regions`.`village`) as `village`
+        $location_result = $this->system->db->query("SELECT `region_locations`.*
             FROM `region_locations`
-            INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
             WHERE `region_locations`.`region_id` = {$patrol_result['region_id']}
         ");
         $location_result = $this->system->db->fetch_all($location_result);
         foreach ($location_result as $location) {
-            if ($location['defense'] > 0 && $location['village'] == $patrol_result['village_id']) {
+            if ($location['defense'] > 0 && $location['occupying_village_id'] == $patrol_result['village_id']) {
                 $location['defense']--;
-                $this->system->db->query("UPDATE `region_locations` SET `defense` = {$location['defense']} WHERE `id` = {$location['id']}");
+                $this->system->db->query("UPDATE `region_locations` SET `defense` = {$location['defense']} WHERE `region_location_id` = {$location['region_location_id']}");
             }
         }
         $message = 'Enemy region Defense decreased by 1.<br>';
@@ -579,25 +584,25 @@ class WarManager {
      */
     public static function getPlayerAttackOrDefendRaidTargets(System $system, User $player): array {
         // only get recently updated raids, prevent something like starting a raid and logging out = perpetual notif
-        $num_raid_cycles = 100 / Operation::BASE_OPERATION_INTERVAL_PROGRESS_PERCENT;
-        $max_raid_duration_ms = $num_raid_cycles * Operation::BASE_OPERATION_INTERVAL_SECONDS * 1000;
+        $num_raid_cycles = 100 / WarAction::BASE_WAR_ACTION_INTERVAL_PROGRESS_PERCENT;
+        $max_raid_duration_ms = $num_raid_cycles * WarAction::BASE_WAR_ACTION_INTERVAL_SECONDS * 1000;
         $oldest_active_raid_time = (microtime(true) * 1000) - $max_raid_duration_ms;
 
         $result = $system->db->query("SELECT
-            `operations`.`user_village` as `attacking_user_village`,
-            `operations`.`target_id`,
-            `operations`.`target_village`,
+            `war_actions`.`user_village` as `attacking_user_village`,
+            `war_actions`.`target_id`,
+            `war_actions`.`target_village`,
             `region_locations`.`x`,
             `region_locations`.`y`,
             `region_locations`.`map_id`,
             `region_locations`.`name`
-            FROM `operations`
-            INNER JOIN `region_locations` ON `region_locations`.`id` = `operations`.`target_id`
+            FROM `war_actions`
+            INNER JOIN `region_locations` ON `region_locations`.`region_location_id` = `war_actions`.`target_id`
             AND `user_id` != {$player->user_id}
             AND `last_update_ms` > {$oldest_active_raid_time}
-            AND `status` = " . Operation::OPERATION_ACTIVE . "
-            AND `operations`.`type` = " . Operation::OPERATION_RAID . "
-            GROUP BY `operations`.`target_id`, `operations`.`target_village`, `attacking_user_village`");
+            AND `status` = " . WarAction::WAR_ACTION_ACTIVE . "
+            AND `war_actions`.`type` = " . WarAction::WAR_ACTION_RAID . "
+            GROUP BY `war_actions`.`target_id`, `war_actions`.`target_village`, `attacking_user_village`");
         $raw_raid_targets = $system->db->fetch_all($result);
 
         $raid_targets = [];

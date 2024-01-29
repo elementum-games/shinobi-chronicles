@@ -3,6 +3,9 @@
 require_once __DIR__ . '/SpecialMission.php';
 require_once __DIR__ . '/../classes/village/VillageRelation.php';
 require_once __DIR__ . '/../classes/village/VillagePolicy.php';
+require_once __DIR__ . '/../classes/village/VillageUpgradeManager.php';
+require_once __DIR__ . '/../classes/village//BuildingConfig.php';
+require_once __DIR__ . '/../classes/village//UpgradeConfig.php';
 
 class Village {
     public System $system;
@@ -20,6 +23,11 @@ class Village {
     public array $relations = [];
     public int $policy_id = 0;
     public VillagePolicy $policy;
+    public array $buildings = [];
+    public array $upgrades = [];
+    public array $active_upgrade_effects = [];
+    public float $construction_speed = 1; // corresponds to 1 per second
+    public float $research_speed = 1; // corresponds to 1 per second
 
     // to-do: we should restructure how village data is being saved
     // player village should reference the village ID and this constructor should get row by ID
@@ -38,6 +46,11 @@ class Village {
             $this->coords = VillageManager::getLocation($this->system, $this->village_id);
             $this->relations = VillageManager::getRelationsForVillage($this->system, $this->village_id);
             $this->policy = new VillagePolicy($this->policy_id);
+            $this->buildings = VillageUpgradeManager::getBuildingsForVillage($this->system, $this->village_id);
+            $this->upgrades = VillageUpgradeManager::getUpgradesForVillage($this->system, $this->village_id);
+            $this->active_upgrade_effects = VillageUpgradeManager::initializeEffectsForVillage($this->system, $this->upgrades);
+            $this->construction_speed += $this->policy->construction_speed + $this->active_upgrade_effects[UpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED];
+            $this->research_speed += $this->policy->research_speed + $this->active_upgrade_effects[UpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED];
         }
         // updated legacy constructor logic
         else {
@@ -47,6 +60,11 @@ class Village {
             $this->coords = VillageManager::getLocation($this->system, $this->village_id);
             $this->relations = VillageManager::getRelationsForVillage($this->system, $this->village_id);
             $this->policy = new VillagePolicy($this->policy_id);
+            $this->buildings = VillageUpgradeManager::getBuildingsForVillage($this->system, $this->village_id);
+            $this->upgrades = VillageUpgradeManager::getUpgradesForVillage($this->system, $this->village_id);
+            $this->active_upgrade_effects = VillageUpgradeManager::initializeEffectsForVillage($this->system, $this->upgrades);
+            $this->construction_speed += $this->policy->construction_speed + $this->active_upgrade_effects[UpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED];
+            $this->research_speed += $this->policy->research_speed + $this->active_upgrade_effects[UpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED];
         }
     }
 
