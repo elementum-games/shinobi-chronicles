@@ -317,20 +317,20 @@ a.chat_user_name.gold, a.gold:hover, a.gold:visited, span.gold {
 
 /* Moderator */
 a.chat_user_name.moderator, a.moderator:hover, a.moderator:visited, span.moderator {
-    color: #31a759 !important;
+    color: #67d18c !important;
     text-shadow: var(--name-shadow-default) !important;
 }
 .post_user_avatar_wrapper.moderator, .avatar_frame.moderator {
-    background: linear-gradient(0deg, #c7a417 0%, #c7a417 100%);
+    background: linear-gradient(0deg, rgba(64, 124, 78, 1) 0%, rgba(103, 209, 140, 1) 100%);
 }
 
 /* Head Moderator */
 a.headModerator, a.headModerator:hover, a.headModerator:visited, span.headModerator {
-    color: #34a3b3 !important;
+    color: #83ddea !important;
     text-shadow: var(--name-shadow-default) !important;
 }
 .post_user_avatar_wrapper.headModerator, .avatar_frame.headModerator {
-    background: linear-gradient(0deg, #34a3b3 0%, #34a3b3 100%);
+    background: linear-gradient(0deg, rgba(82, 133, 129, 1) 0%, rgba(131, 221, 234, 1) 100%);
 }
 
 /* Content Admin */
