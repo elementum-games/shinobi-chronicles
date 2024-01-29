@@ -6,7 +6,7 @@ require __DIR__ . '/APIResponse.php';
 
 class API {
     public static function init($row_lock = true): System {
-        $system = System::initialize(load_layout: false);
+        $system = System::initialize(load_layout: true);
         $system->db->connect();
         $system->db->startTransaction($row_lock);
         $system->is_api_request = true;
