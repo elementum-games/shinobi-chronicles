@@ -353,11 +353,11 @@ a.administrator, a.administrator:hover, a.administrator:visited, span.administra
 
 /* Default User */
 a.normalUser, a.normalUser:hover, a.normalUser:visited, span.normalUser {
-    color: #c5baa3 !important;
-    text-shadow: var(--name-shadow-default) !important;
+    color: #383838 !important;
+    text-shadow: none !important;
 }
 .post_user_avatar_wrapper.normalUser, .avatar_frame.normalUser {
-    background: var(--avatar-frame-border_gradient) !important;
+    background: #383838 !important;
 }
 
 /* Mobile Overrides */
