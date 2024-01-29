@@ -308,7 +308,7 @@ a.chat_user_name.platinum, a.platinum:hover, a.platinum:visited, span.platinum {
 
 /* Gold */
 a.chat_user_name.gold, a.gold:hover, a.gold:visited, span.gold {
-    color: #c6ab5c !important;
+    color: #c7a417 !important;
     text-shadow: var(--name-shadow-default) !important;
 }
 .post_user_avatar_wrapper.gold, .avatar_frame.gold {
@@ -317,7 +317,7 @@ a.chat_user_name.gold, a.gold:hover, a.gold:visited, span.gold {
 
 /* Moderator */
 a.chat_user_name.moderator, a.moderator:hover, a.moderator:visited, span.moderator {
-    color: #c7a417 !important;
+    color: #31a759 !important;
     text-shadow: var(--name-shadow-default) !important;
 }
 .post_user_avatar_wrapper.moderator, .avatar_frame.moderator {
