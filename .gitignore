@@ -15,7 +15,7 @@ docker/
 .vscode/settings.json
 <<<<<<< HEAD
 docker-compose.yml
-.vscode/tasks.json
+.vscode
 docker/seed_db.sh
 =======
 /package-lock.json
