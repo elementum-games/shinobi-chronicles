@@ -12,9 +12,9 @@ final class VillageUpgradeMigration extends AbstractMigration
     {
         $this->execute("
             -- Create table village_buildings
-            CREATE TABLE ``village_buildings`
+            CREATE TABLE `village_buildings`
             (`id` INT(11) NOT NULL AUTO_INCREMENT,
-            `building_id` INT(11) NOT NULL,
+            `key` VARCHAR(20) NOT NULL,
             `village_id` INT(11) NOT NULL ,
             `tier` INT(11) NOT NULL DEFAULT '0',
             `health` INT(11) NOT NULL DEFAULT '0',
@@ -54,46 +54,47 @@ final class VillageUpgradeMigration extends AbstractMigration
             WHERE region_locations.occupying_village_id IS NULL;
 
             -- Fill village_buildings default
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('1', '1', '1', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('2', '1', '1', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('3', '1', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('4', '1', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('5', '1', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('6', '1', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('7', '1', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('8', '1', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('1', '2', '1', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('2', '2', '1', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('3', '2', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('4', '2', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('5', '2', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('6', '2', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('7', '2', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('8', '2', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('1', '3', '1', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('2', '3', '1', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('3', '3', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('4', '3', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('5', '3', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('6', '3', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('7', '3', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('8', '3', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('1', '4', '1', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('2', '4', '1', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('3', '4', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('4', '4', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('5', '4', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('6', '4', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('7', '4', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('8', '4', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('1', '5', '1', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('2', '5', '1', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('3', '5', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('4', '5', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('5', '5', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('6', '5', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('7', '5', '0', '0', NULL, NULL);
-            INSERT INTO `village_buildings` (`building_id`, `village_id`, `tier`, `health`, `build_start_time`, `build_end_time`) VALUES ('8', '5', '0', '0', NULL, NULL);
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('VILLAGE_HQ', '1', '1');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('ACADEMY', '1', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('HOSPITAL', '1', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('ANBU_HQ', '1', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('WORKSHOP', '1', '1');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('MARKET', '1', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('SHRINE', '1', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('RAMEN_STAND', '1', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('VILLAGE_HQ', '2', '1');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('ACADEMY', '2', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('HOSPITAL', '2', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('ANBU_HQ', '2', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('WORKSHOP', '2', '1');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('MARKET', '2', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('SHRINE', '2', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('RAMEN_STAND', '2', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('VILLAGE_HQ', '3', '1');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('ACADEMY', '3', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('HOSPITAL', '3', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('ANBU_HQ', '3', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('WORKSHOP', '3', '1');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('MARKET', '3', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('SHRINE', '3', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('RAMEN_STAND', '3', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('VILLAGE_HQ', '4', '1');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('ACADEMY', '4', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('HOSPITAL', '4', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('ANBU_HQ', '4', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('WORKSHOP', '4', '1');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('MARKET', '4', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('SHRINE', '4', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('RAMEN_STAND', '4', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('VILLAGE_HQ', '5', '1');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('ACADEMY', '5', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('HOSPITAL', '5', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('ANBU_HQ', '5', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('WORKSHOP', '5', '1');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('MARKET', '5', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('SHRINE', '5', '0');
+            INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('RAMEN_STAND', '5', '0');
+
         ");
     }
 
