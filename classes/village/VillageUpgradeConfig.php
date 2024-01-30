@@ -1927,172 +1927,262 @@ class VillageUpgradeConfig {
             VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY => 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T1_ENABLED => 1
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T2_ENABLED => 1
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T3_ENABLED => 1
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_UPGRADE_UPKEEP => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_UPGRADE_UPKEEP => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_UPGRADE_UPKEEP => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY => 5,
+            VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY => 5,
+            VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY => 5,
+            VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_TRAINING_SPEED => 3
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_TRAINING_SPEED => 3
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_TRAINING_SPEED => 3
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_XP_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_XP_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_XP_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_VILLAGE_REGEN => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_VILLAGE_REGEN => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_VILLAGE_REGEN => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_HEAL_ITEM_COST => 10
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_HEAL_ITEM_COST => 10
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_HEAL_ITEM_COST => 10
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_WAR_ACTION_COST => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_WAR_ACTION_COST => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_WAR_ACTION_COST => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_DAMAGE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_DAMAGE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_DAMAGE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_INFILTRATE_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_INFILTRATE_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_INFILTRATE_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY => -5,
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY => -5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY => -5,
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY => -5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY => -5,
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY => -5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T1_ENABLED => 1
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T2_ENABLED => 1
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T3_ENABLED => 1
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_HEAL => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_HEAL => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_HEAL => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 25
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 50
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 75
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 25
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 50
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 75
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 50
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 75
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 100
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 100000
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 500000
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_BLOODLINE_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_BLOODLINE_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_BLOODLINE_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_SET_ONE => 1
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_SHINOBI_COST => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_SHINOBI_COST => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_SHINOBI_COST => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_ENABLED => 1
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_CHANCE => 5
         ],
     ];
 }
