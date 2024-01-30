@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__ . "/UpgradeConfig.php";
+require_once __DIR__ . "/VillageUpgradeConfig.php";
 
-class BuildingConfig {
+class VillageBuildingConfig {
     /* status options for an instance of a building */
     const BUILDING_STATUS_DEFAULT = 'default'; // used when no special status
     const BUILDING_STATUS_UPGRADING = 'upgrading'; // used when upgrading to next tier
