@@ -840,598 +840,653 @@ class VillageUpgradeConfig {
     const UPGRADE_RESEARCH_REQUIREMENTS = [
         VillageUpgradeConfig::UPGRADE_KEY_TEST => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 1,
+                VillageBuildingConfig::BUILDING_ACADEMY => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I,
+                VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 1,
+                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 2,
+                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 3,
+                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 1,
+                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 2,
+                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 3,
+                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 1,
+                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 2,
+                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 3,
+                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 1,
+                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 2,
+                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 3,
+                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 1,
+                VillageBuildingConfig::BUILDING_ACADEMY => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 2,
+                VillageBuildingConfig::BUILDING_ACADEMY => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 3,
+                VillageBuildingConfig::BUILDING_ACADEMY => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 1,
+                VillageBuildingConfig::BUILDING_ACADEMY => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 2,
+                VillageBuildingConfig::BUILDING_ACADEMY => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 3,
+                VillageBuildingConfig::BUILDING_ACADEMY => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_HOSPITAL => 1,
+                VillageBuildingConfig::BUILDING_HOSPITAL => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_HOSPITAL => 2,
+                VillageBuildingConfig::BUILDING_HOSPITAL => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_HOSPITAL => 3,
+                VillageBuildingConfig::BUILDING_HOSPITAL => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_HOSPITAL => 1,
+                VillageBuildingConfig::BUILDING_HOSPITAL => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_HOSPITAL => 2,
+                VillageBuildingConfig::BUILDING_HOSPITAL => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_HOSPITAL => 3,
+                VillageBuildingConfig::BUILDING_HOSPITAL => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 1,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 2,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 3,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 1,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 2,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 3,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 1,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 2,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 3,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 1,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 2,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 3,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 1,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 2,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 3,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 1,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 2,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 3,
+                VillageBuildingConfig::BUILDING_ANBU_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 1,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 2,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 3,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 1,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 2,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 3,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 1,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 2,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 3,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 1,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 2,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 3,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 1,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 2,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 3,
+                VillageBuildingConfig::BUILDING_WORKSHOP => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 1,
+                VillageBuildingConfig::BUILDING_MARKET => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 2,
+                VillageBuildingConfig::BUILDING_MARKET => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 3,
+                VillageBuildingConfig::BUILDING_MARKET => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 1,
+                VillageBuildingConfig::BUILDING_MARKET => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 2,
+                VillageBuildingConfig::BUILDING_MARKET => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 3,
+                VillageBuildingConfig::BUILDING_MARKET => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 1,
+                VillageBuildingConfig::BUILDING_MARKET => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 2,
+                VillageBuildingConfig::BUILDING_MARKET => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 3,
+                VillageBuildingConfig::BUILDING_MARKET => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 1,
+                VillageBuildingConfig::BUILDING_MARKET => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 2,
+                VillageBuildingConfig::BUILDING_MARKET => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_SHRINE => 1,
+                VillageBuildingConfig::BUILDING_SHRINE => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_SHRINE => 2,
+                VillageBuildingConfig::BUILDING_SHRINE => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_SHRINE => 3,
+                VillageBuildingConfig::BUILDING_SHRINE => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_SHRINE => 1,
+                VillageBuildingConfig::BUILDING_SHRINE => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_SHRINE => 2,
+                VillageBuildingConfig::BUILDING_SHRINE => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_SHRINE => 3,
+                VillageBuildingConfig::BUILDING_SHRINE => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 1,
+                VillageBuildingConfig::BUILDING_RAMEN_STAND => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 1,
+                VillageBuildingConfig::BUILDING_RAMEN_STAND => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 2,
+                VillageBuildingConfig::BUILDING_RAMEN_STAND => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 3,
+                VillageBuildingConfig::BUILDING_RAMEN_STAND => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 1,
+                VillageBuildingConfig::BUILDING_RAMEN_STAND => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 2,
+                VillageBuildingConfig::BUILDING_RAMEN_STAND => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 3,
+                VillageBuildingConfig::BUILDING_RAMEN_STAND => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 1,
+                VillageBuildingConfig::BUILDING_RAMEN_STAND => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 2,
+                VillageBuildingConfig::BUILDING_RAMEN_STAND => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 3,
+                VillageBuildingConfig::BUILDING_RAMEN_STAND => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I
             ],
         ],
     ];
