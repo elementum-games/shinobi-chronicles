@@ -1182,6 +1182,12 @@ class VillageManager {
                 }, $trade_data['requested_regions']);
             }
 
+            if (empty($proposal['upgrade_data'])) {
+                $upgrade_data = [];
+            } else {
+                $upgrade_data = [];
+            }
+
             $proposal_history[] = new VillageProposalDto(
                 proposal_id: $proposal['proposal_id'],
                 village_id: $proposal['village_id'],
@@ -1196,6 +1202,9 @@ class VillageManager {
                 vote_time_remaining: $proposal['vote_time_remaining'],
                 enact_time_remaining: $proposal['enact_time_remaining'],
                 trade_data: $trade_data,
+                building_key: $proposal['building_key'],
+                upgrade_key: $proposal['upgrade_key'],
+                upgrade_data: $upgrade_data,
                 votes: $proposal['votes'],
             );
             unset($proposal);

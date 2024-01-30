@@ -15,8 +15,9 @@ class VillageProposalDto {
         public ?string $vote_time_remaining,
         public ?string $enact_time_remaining,
         public array $trade_data = [],
-        public ?string $building_key = null,
-        public ?string $upgrade_key = null,
+        public ?int $building_key = null,
+        public ?int $upgrade_key = null,
+        public array $upgrade_data = [],
         public array $votes = [],
     ) {}
 }
