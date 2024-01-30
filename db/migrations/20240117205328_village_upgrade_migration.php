@@ -14,11 +14,11 @@ final class VillageUpgradeMigration extends AbstractMigration
             -- Create table village_buildings
             CREATE TABLE `village_buildings`
             (`id` INT(11) NOT NULL AUTO_INCREMENT,
-            `key` VARCHAR(20) NOT NULL,
+            `key` VARCHAR(50) NOT NULL,
             `village_id` INT(11) NOT NULL ,
             `tier` INT(11) NOT NULL DEFAULT '0',
             `health` INT(11) NOT NULL DEFAULT '0',
-            `status` VARCHAR(20) NOT NULL DEFAULT 'default',
+            `status` VARCHAR(50) NOT NULL DEFAULT 'default',
             `construction_progress` INT(11) NULL DEFAULT NULL,
             `construction_progress_required` INT(11) NULL DEFAULT NULL,
             PRIMARY KEY (`id`));
@@ -26,9 +26,9 @@ final class VillageUpgradeMigration extends AbstractMigration
             -- Create table village_upgrades
             CREATE TABLE `village_upgrades`
             (`id` INT(11) NOT NULL AUTO_INCREMENT,
-            `key` VARCHAR(100) NOT NULL,
+            `key` VARCHAR(50) NOT NULL,
             `village_id` INT(11) NOT NULL,
-            `status` VARCHAR(20) NOT NULL DEFAULT 'locked',
+            `status` VARCHAR(50) NOT NULL DEFAULT 'locked',
             `research_progress` INT(11) NULL DEFAULT NULL,
             `research_progress_required` INT(11) NULL DEFAULT NULL,
             PRIMARY KEY (`id`));
@@ -46,6 +46,11 @@ final class VillageUpgradeMigration extends AbstractMigration
 
             -- Rename column operation
             ALTER TABLE `users` CHANGE `operation` `war_action_id` INT(11) NOT NULL DEFAULT '0';
+
+            -- Alter table proposals
+            ALTER TABLE `proposals` ADD `building_key` VARCHAR(50) NULL;
+            ALTER TABLE `proposals` ADD `upgrade_key` VARCHAR(50) NULL;
+            ALTER TABLE `proposals` ADD `upgrade_data` TEXT NULL;
 
             -- Use occupying_village_id as source of truth for region_locations
             UPDATE region_locations
@@ -95,6 +100,17 @@ final class VillageUpgradeMigration extends AbstractMigration
             INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('SHRINE', '5', '0');
             INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('RAMEN_STAND', '5', '0');
 
+            -- Fill village_upgrades default
+            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('RESEARCH_I', '1', 'active');
+            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('CONSTRUCTION_I', '1', 'active');
+            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('RESEARCH_I', '2', 'active');
+            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('CONSTRUCTION_I', '2', 'active');
+            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('RESEARCH_I', '3', 'active');
+            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('CONSTRUCTION_I', '3', 'active');
+            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('RESEARCH_I', '4', 'active');
+            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('CONSTRUCTION_I', '4', 'active');
+            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('RESEARCH_I', '5', 'active');
+            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('CONSTRUCTION_I', '5', 'active');
         ");
     }
 
@@ -126,6 +142,11 @@ final class VillageUpgradeMigration extends AbstractMigration
 
             -- Clear occupying village_id
             UPDATE region_locations SET region_locations.occupying_village_id = NULL;
+
+            -- Alter table proposals
+            ALTER TABLE `proposals` DROP `building_key`;
+            ALTER TABLE `proposals` DROP `upgrade_key`;
+            ALTER TABLE `proposals` DROP `upgrade_data`;
         ");
     }
 }
