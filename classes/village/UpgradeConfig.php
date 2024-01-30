@@ -1693,4 +1693,178 @@ class UpgradeConfig {
             WarManager::RESOURCE_WEALTH => 0,
         ],
     ];
+
+    /* upkeep effects indexed by upgrade key */
+    const UPGRADE_EFFECTS => [
+        UpgradeConfig::UPGRADE_KEY_TEST => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_RESEARCH_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_RESEARCH_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_RESEARCH_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_HERBICULTURE_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_HERBICULTURE_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_HERBICULTURE_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_SALTED_EARTH_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => [
+        ],
+        UpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => [
+        ],
+    ];
 }
