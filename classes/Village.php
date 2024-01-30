@@ -4,8 +4,8 @@ require_once __DIR__ . '/SpecialMission.php';
 require_once __DIR__ . '/../classes/village/VillageRelation.php';
 require_once __DIR__ . '/../classes/village/VillagePolicy.php';
 require_once __DIR__ . '/../classes/village/VillageUpgradeManager.php';
-require_once __DIR__ . '/../classes/village//BuildingConfig.php';
-require_once __DIR__ . '/../classes/village//UpgradeConfig.php';
+require_once __DIR__ . '/../classes/village/VillageBuildingConfig.php';
+require_once __DIR__ . '/../classes/village/VillageUpgradeConfig.php';
 
 class Village {
     public System $system;

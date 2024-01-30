@@ -9,22 +9,6 @@ class VillageUpgradeConfig {
     const UPGRADE_STATUS_UNLOCKED = 'unlocked'; // state for unlocked, permanent upgrades
     const UPGRADE_STATUS_INACTIVE = 'inactive'; // state for unlocked, toggled OFF upgrades
     const UPGRADE_STATUS_ACTIVE = 'active'; // stat for unlocked, toggle ON upgrades
-    const UPGRADE_STATUS_ACTIVATING = 'activating'; // used when toggling ON
-
-    /* research requirement types */
-    const UPGRADE_REQUIREMENT_BUILDINGS = "BUILDINGS";
-    const UPGRADE_REQUIREMENT_UPGRADES = "UPGRADES";
-
-    /* base values used for upgrade configuration */
-    const BASE_T1_RESEARCH_COST = 4800;
-    const BASE_T2_RESEARCH_COST = 8400;
-    const BASE_T3_RESEARCH_COST = 25200;
-    const BASE_T1_UPKEEP_COST = 2;
-    const BASE_T2_UPKEEP_COST = 4;
-    const BASE_T3_UPKEEP_COST = 8;
-    const BASE_T1_RESEARCH_TIME_DAYS = 1;
-    const BASE_T2_RESEARCH_TIME_DAYS = 7;
-    const BASE_T3_RESEARCH_TIME_DAYS = 21;
 
     /* keys used for individual upgrade identifiers */
     const UPGRADE_KEY_TEST = 'TEST';
@@ -96,123 +80,38 @@ class VillageUpgradeConfig {
     const UPGRADE_KEY_MERCHANTS_GUILD_III = 'MERCHANTS_GUILD_III';
     const UPGRADE_KEY_WAREHOUSES_I = 'WAREHOUSES_I';
     const UPGRADE_KEY_WAREHOUSES_II = 'WAREHOUSES_II';
-    const UPGRADE_KEY_SUPPLY_LINES_I = 'SUPPLY_LINES_I';
-    const UPGRADE_KEY_SUPPLY_LINES_II = 'SUPPLY_LINES_II';
-    const UPGRADE_KEY_SUPPLY_LINES_III = 'SUPPLY_LINES_III';
     const UPGRADE_KEY_ANCESTRAL_LEGACY_I = 'ANCESTRAL_LEGACY_I';
     const UPGRADE_KEY_ANCESTRAL_LEGACY_II = 'ANCESTRAL_LEGACY_II';
     const UPGRADE_KEY_ANCESTRAL_LEGACY_III = 'ANCESTRAL_LEGACY_III';
     const UPGRADE_KEY_FORTUNES_BOUNTY_I = 'FORTUNES_BOUNTY_I';
     const UPGRADE_KEY_FORTUNES_BOUNTY_II = 'FORTUNES_BOUNTY_II';
     const UPGRADE_KEY_FORTUNES_BOUNTY_III = 'FORTUNES_BOUNTY_III';
-    const UPGRADE_KEY_INSPIRED_ITAMAE_I = 'INSPIRED_ITAMAE_I';
+    const UPGRADE_KEY_NEW_RECIPE_I = 'NEW_RECIPE_I';
     const UPGRADE_KEY_QUALITY_INGREDIENTS_I = 'QUALITY_INGREDIENTS_I';
     const UPGRADE_KEY_QUALITY_INGREDIENTS_II = 'QUALITY_INGREDIENTS_II';
     const UPGRADE_KEY_QUALITY_INGREDIENTS_III = 'QUALITY_INGREDIENTS_III';
-    const UPGRADE_KEY_NINJA_FRIENDLY_RATES_I = 'NINJA_FRIENDLY_RATES_I';
-    const UPGRADE_KEY_NINJA_FRIENDLY_RATES_II = 'NINJA_FRIENDLY_RATES_II';
-    const UPGRADE_KEY_NINJA_FRIENDLY_RATES_III = 'NINJA_FRIENDLY_RATES_III';
-    const UPGRADE_KEY_INSPIRED_ITAMAE_II = 'INSPIRED_ITAMAE_II';
+    const UPGRADE_KEY_SHINOBI_DISCOUNT_I = 'SHINOBI_DISCOUNT_I';
+    const UPGRADE_KEY_SHINOBI_DISCOUNT_II = 'SHINOBI_DISCOUNT_II';
+    const UPGRADE_KEY_SHINOBI_DISCOUNT_III = 'SHINOBI_DISCOUNT_III';
+    const UPGRADE_KEY_INSPIRED_ITAMAE_I = 'INSPIRED_ITAMAE_I';
     const UPGRADE_KEY_LUCK_IN_LEFTOVERS_I = 'LUCK_IN_LEFTOVERS_I';
     const UPGRADE_KEY_LUCK_IN_LEFTOVERS_II = 'LUCK_IN_LEFTOVERS_II';
 
-    /* Used for auto population */
-    const UPGRADE_KEYS = [
-        VillageUpgradeConfig::UPGRADE_KEY_TEST,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_III,
-        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I,
-        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II,
-        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III,
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I,
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II,
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III,
-        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I,
-        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II,
-        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III,
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I,
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II,
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III,
-        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I,
-        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II,
-        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III,
-        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I,
-        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II,
-        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_III,
-        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I,
-        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II,
-        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_III,
-        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I,
-        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II,
-        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_III,
-        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I,
-        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II,
-        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_III,
-        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I,
-        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II,
-        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III,
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I,
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II,
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III,
-        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I,
-        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II,
-        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III,
-        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I,
-        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II,
-        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_III,
-        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I,
-        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II,
-        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_III,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III,
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I,
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II,
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III,
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I,
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II,
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III,
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I,
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II,
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III,
-        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I,
-        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II,
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I,
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II,
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III,
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I,
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II,
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III,
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I,
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II,
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I,
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II,
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III,
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I,
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II,
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III,
-        VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I,
-        VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II,
-    ];
-
+    /* constant used to identify individual effects that may be present in multiple upgrades */
+    const UPGRADE_EFFECT_MATERIALS_UPKEEP = 'MATERIALS_UPKEEP';
+    const UPGRADE_EFFECT_FOOD_UPKEEP = 'FOOD_UPKEEP';
+    const UPGRADE_EFFECT_WEALTH_UPKEEP = 'WEALTH_UPKEEP';
     const UPGRADE_EFFECT_MATERIALS_PRODUCTION = 'MATERIALS_PRODUCTION';
     const UPGRADE_EFFECT_FOOD_PRODUCTION = 'FOOD_PRODUCTION';
     const UPGRADE_EFFECT_WEALTH_PRODUCTION = 'WEALTH_PRODUCTION';
     const UPGRADE_EFFECT_CONSTRUCTION_SPEED = 'CONSTRUCTION_SPEED';
     const UPGRADE_EFFECT_RESEARCH_SPEED = 'RESEARCH_SPEED';
+    const UPGRADE_EFFECT_RESEARCH_T1_ENABLED = 'RESEARCH_T1';
+    const UPGRADE_EFFECT_RESEARCH_T2_ENABLED = 'RESEARCH_T2_ENABLED';
+    const UPGRADE_EFFECT_RESEARCH_T3_ENABLED = 'RESEARCH_T3_ENABLED';
+    const UPGRADE_EFFECT_CONSTRUCTION_T1_ENABLED = 'CONSTRUCTION_T1_ENABLED';
+    const UPGRADE_EFFECT_CONSTRUCTION_T2_ENABLED = 'CONSTRUCTION_T2_ENABLED';
+    const UPGRADE_EFFECT_CONSTRUCTION_T3_ENABLED = 'CONSTRUCTION_T3_ENABLED';
     const UPGRADE_EFFECT_UPGRADE_UPKEEP = 'UPGRADE_UPKEEP';
     const UPGRADE_EFFECT_BASE_STABILITY = 'BASE_STABILITY';
     const UPGRADE_EFFECT_MAX_STABILITY = 'MAX_STABILITY';
@@ -224,7 +123,8 @@ class VillageUpgradeConfig {
     const UPGRADE_EFFECT_RAID_SPEED = 'RAID_SPEED';
     const UPGRADE_EFFECT_RAID_DAMAGE = 'RAID_DAMAGE';
     const UPGRADE_EFFECT_INFILTRATE_SPEED = 'INFILTRATE_SPEED';
-    const UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY_REDUCTION = 'OCCUPIED_BASE_STABILITY';
+    const UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY = 'OCCUPIED_BASE_STABILITY';
+    const UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY = 'OCCUPIED_MAX_STABILITY';
     const UPGRADE_EFFECT_PATROL_TIER_CHANCE = 'PATROL_TIER_CHANCE';
     const UPGRADE_EFFECT_REINFORCE_SPEED = 'REINFORCE_SPEED';
     const UPGRADE_EFFECT_REINFORCE_HEAL = 'REINFORCE_HEAL';
@@ -238,140 +138,17 @@ class VillageUpgradeConfig {
     const UPGRADE_EFFECT_RAMEN_COST = 'RAMEN_COST';
     const UPGRADE_EFFECT_MYSTERY_RAMEN_ENABLED = 'MYSTERY_RAMEN_ENABLED';
     const UPGRADE_EFFECT_MYSTERY_RAMEN_CHANCE = 'MYSTERY_RAMEN_CHANCE';
-    const UPGRADE_EFFECT_CARAVAN_SPEED = 'CARAVAN_SPEED';
 
-    /* Used for auto population */
-    const UPGRADE_EFFECTS_LIST = [
-        VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION,
-        VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION,
-        VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION,
-        VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_UPGRADE_UPKEEP,
-        VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY,
-        VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY,
-        VillageUpgradeConfig::UPGRADE_EFFECT_TRAINING_SPEED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_XP_CHANCE,
-        VillageUpgradeConfig::UPGRADE_EFFECT_VILLAGE_REGEN,
-        VillageUpgradeConfig::UPGRADE_EFFECT_HEAL_ITEM_COST,
-        VillageUpgradeConfig::UPGRADE_EFFECT_WAR_ACTION_COST,
-        VillageUpgradeConfig::UPGRADE_EFFECT_RAID_SPEED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_RAID_DAMAGE,
-        VillageUpgradeConfig::UPGRADE_EFFECT_INFILTRATE_SPEED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY_REDUCTION,
-        VillageUpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE,
-        VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_SPEED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_HEAL,
-        VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP,
-        VillageUpgradeConfig::UPGRADE_EFFECT_TOWN_HP,
-        VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY,
-        VillageUpgradeConfig::UPGRADE_EFFECT_BLOODLINE_CHANCE,
-        VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE,
-        VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_SET_ONE,
-        VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION,
-        VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST,
-        VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_ENABLED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_CHANCE,
-        VillageUpgradeConfig::UPGRADE_EFFECT_CARAVAN_SPEED
-    ];
-
-    /* tiers for each upgrade indexed by upgrade key */
-    const UPGRADE_TIERS = [
-        VillageUpgradeConfig::UPGRADE_KEY_TEST => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => 2,
-        VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => 3
-    ];
+    /* research requirement types */
+    const UPGRADE_REQUIREMENT_BUILDINGS = "BUILDINGS";
+    const UPGRADE_REQUIREMENT_UPGRADES = "UPGRADES";
 
     /* display names for each upgrade indexed by upgrade key */
     const UPGRADE_NAMES = [
         VillageUpgradeConfig::UPGRADE_KEY_TEST => 'Test Upgrade',
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I => 'Research I',
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II => 'Research II',
+        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III => 'Research III',
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III => 'Research III',
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => 'Research Subsidies I',
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II => 'Research Subsidies II',
@@ -438,117 +215,22 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => 'Merchants Guild III',
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => 'Warehouses I',
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => 'Warehouses II',
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => 'Supply Lines I',
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => 'Supply Lines II',
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => 'Supply Lines III',
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => 'Ancestral Legacy I',
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => 'Ancestral Legacy II',
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => 'Ancestral Legacy III',
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => 'Fortunes Bounty I',
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => 'Fortunes Bounty II',
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => 'Fortunes Bounty III',
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 'Inspired Itamae I',
+        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => 'New Recipe I',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => 'Quality Ingredients I',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => 'Quality Ingredients II',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => 'Quality Ingredients III',
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => 'Ninja Friendly Rates I',
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => 'Ninja Friendly Rates II',
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => 'Ninja Friendly Rates III',
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => 'Inspired Itamae II',
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => 'Shinobi Discount I',
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => 'Shinobi Discount II',
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => 'Shinobi Discount III',
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 'Inspired Itamae I',
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => 'Luck In Leftovers I',
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => 'Luck In Leftovers II',
-    ];
-
-    /* display descriptions for each upgrade indexed by upgrade key */
-    const UPGRADE_DESCRIPTIONS = [
-        VillageUpgradeConfig::UPGRADE_KEY_TEST => 'Test description for an upgrade.',
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I => '5% increased research speed',
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II => '5% increased research speed',
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III => '5% increased research speed',
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => '5% increased research speed',
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II => '5% increased research speed',
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_III => '5% increased research speed',
-        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I => '5% reduced upkeep from upgrades',
-        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II => '5% reduced upkeep from upgrades',
-        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III => '5% reduced upkeep from upgrades',
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I => '+5 baseline and maximum Stability',
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II => '+5 baseline and maximum Stability',
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III => '+5 baseline and maximum Stability',
-        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I => '3% increased training speed',
-        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II => '3% increased training speed',
-        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III => '3% increased training speed',
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I => '+3% chance for double XP gains from battle',
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II => '+3% chance for double XP gains from battle',
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III => '+3% chance for double XP gains from battle',
-        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I => '5% increased village regen',
-        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II => '5% increased village regen',
-        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III => '5% increased village regen',
-        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I => '10% decreased cost of healing items',
-        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II => '10% decreased cost of healing items',
-        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_III => '10% decreased cost of healing items',
-        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I => '5% decreased pool cost of war actions',
-        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II => '5% decreased pool cost of war actions',
-        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_III => '5% decreased pool cost of war actions',
-        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I => '5% increased Raid speed',
-        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II => '5% increased Raid speed',
-        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_III => '5% increased Raid speed',
-        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I => '5% increased Raid damage',
-        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II => '5% increased Raid damage',
-        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_III => '5% increased Raid damage',
-        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I => '5% increased Infiltrate speed',
-        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II => '5% increased Infiltrate speed',
-        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III => '5% increased Infiltrate speed',
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => '-5 base and max Stability for occupied villages',
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => '-5 base and max Stability for occupied villages',
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => '-5 base and max Stability for occupied villages',
-        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I => '+5% chance to spawn higher tier patrols',
-        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II => '+5% chance to spawn higher tier patrols',
-        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III => '+5% chance to spawn higher tier patrols',
-        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I => '5% increased construction speed',
-        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II => '5% increased construction speed',
-        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III => '5% increased construction speed',
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I => '5% increased construction speed',
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II => '5% increased construction speed',
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_III => '5% increased construction speed',
-        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I => '5% increased Reinforce speed',
-        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II => '5% increased Reinforce speed',
-        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_III => '5% increased Reinforce speed',
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I => '5% increased Reinforce heal',
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II => '5% increased Reinforce heal',
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III => '5% increased Reinforce heal',
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => '5% increased castle and town health',
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => '5% increased castle and town health',
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => '5% increased castle and town health',
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => '+25 Materials production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => '+50 Materials production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => '+75 Materials production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => '+25 Food production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => '+50 Food production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => '+75 Food production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => '+25 Wealth production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => '+50 Wealth production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => '+75 Wealth production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => '+100000 resource capacity',
-        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => '+300000 resource capacity',
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => '+5% increased caravan speed',
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => '+5% increased caravan speed',
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => '+5% increased caravan speed',
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => '10% increased chance of obtaining a bloodline',
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => '10% increased chance of obtaining a bloodline',
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => '10% increased chance of obtaining a bloodline',
-        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => '+5% chance for double yen gains from battle',
-        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => '+5% chance for double yen gains from battle',
-        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => '+5% chance for double yen gains from battle',
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 'Unlocks new ramen recipes',
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => 'Allows Mystery Ramen to appear',
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => '+5 minutes to ramen buff duration',
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => '+5 minutes to ramen duration',
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => '+5 minutes to ramen duration',
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => '5% decreased ramen cost',
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => '5% decreased ramen cost',
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => '5% decreased ramen cost',
-        VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => '+5% chance for Mystery Ramen to appear',
-        VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => '+5% chance for Mystery Ramen to appear',
     ];
 
     /* research cost indexed by upgrade key, then resource type */
@@ -559,1210 +241,1028 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_WEALTH => 30000,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 1.5 * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5 * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 1.5 * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 0.5 * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 1.5 * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 1.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 1.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 1.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 1.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 1.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 1.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 1.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 1.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 1.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 1.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 1.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 1.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 1.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 1.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 1.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 2 * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 2 * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 0.5 * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 0.5 * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 2 * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 0.5 * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 0.5 * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 1.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 1.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 1.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 1.5 * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 1.5 * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 0.5 * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 2,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2 * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2 * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
+        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 1.5,
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 1.5,
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 1.5,
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
     ];
 
     /* research time indexed by upgrade key */
     const UPGRADE_RESEARCH_TIME = [
-        VillageUpgradeConfig::UPGRADE_KEY_TEST =>  self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_III =>  self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II =>  self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => self::BASE_T1_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => self::BASE_T2_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => self::BASE_T3_RESEARCH_TIME_DAYS,
+        VillageUpgradeConfig::UPGRADE_KEY_TEST => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I => 0,
+        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I => 0,
+        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => 3,
+        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => 15,
+        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => 25,
     ];
 
     /* research requirements indexed by upgrade key, then requirement type */
     const UPGRADE_RESEARCH_REQUIREMENTS = [
         VillageUpgradeConfig::UPGRADE_KEY_TEST => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 1
+                VillageBuildingConfig::BUILDING_ACADEMY => 1,
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I
+                VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I,
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_VILLAGE_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ACADEMY => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_HOSPITAL => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_HOSPITAL => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_HOSPITAL => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_HOSPITAL => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_HOSPITAL => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_HOSPITAL => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_ANBU_HQ => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_WORKSHOP => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I
-            ],
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => [
-            VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 1
-            ],
-            VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-            ],
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => [
-            VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 2
-            ],
-            VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I
-            ],
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => [
-            VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKETPLACE => 3
-            ],
-            VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_SHRINE => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_SHRINE => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_SHRINE => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_SHRINE => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_SHRINE => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_SHRINE => 3
-            ],
-            VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II
-            ],
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
-            VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => [
+        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 3
-            ],
-            VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II
-            ],
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => [
-            VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => [
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I
             ],
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => [
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II
+            ],
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => [
+            VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
+            ],
+            VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+            ],
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
+            VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
+            ],
+            VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I
             ],
         ],
     ];
@@ -1790,199 +1290,199 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST * 1.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST * 1.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST * 1.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST * 1.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST * 1.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST * 1.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST * 2,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I => [
             WarManager::RESOURCE_MATERIALS => 0,
@@ -2000,108 +1500,108 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST * 1.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST * 1.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST * 1.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST * 2,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => [
             WarManager::RESOURCE_MATERIALS => 0,
             WarManager::RESOURCE_FOOD => 0,
-            WarManager::RESOURCE_WEALTH => 25,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => [
             WarManager::RESOURCE_MATERIALS => 0,
             WarManager::RESOURCE_FOOD => 0,
-            WarManager::RESOURCE_WEALTH => 25,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => [
             WarManager::RESOURCE_MATERIALS => 0,
             WarManager::RESOURCE_FOOD => 0,
-            WarManager::RESOURCE_WEALTH => 25,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => [
             WarManager::RESOURCE_MATERIALS => 0,
             WarManager::RESOURCE_FOOD => 0,
-            WarManager::RESOURCE_WEALTH => 25,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => [
             WarManager::RESOURCE_MATERIALS => 0,
             WarManager::RESOURCE_FOOD => 0,
-            WarManager::RESOURCE_WEALTH => 25,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => [
             WarManager::RESOURCE_MATERIALS => 0,
             WarManager::RESOURCE_FOOD => 0,
-            WarManager::RESOURCE_WEALTH => 25,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => [
-            WarManager::RESOURCE_MATERIALS => 25,
-            WarManager::RESOURCE_FOOD => 25,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
             WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => [
-            WarManager::RESOURCE_MATERIALS => 25,
-            WarManager::RESOURCE_FOOD => 25,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
             WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => [
-            WarManager::RESOURCE_MATERIALS => 25,
-            WarManager::RESOURCE_FOOD => 25,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
             WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => [
@@ -2113,21 +1613,6 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_MATERIALS => 0,
             WarManager::RESOURCE_FOOD => 0,
             WarManager::RESOURCE_WEALTH => 0,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => [
             WarManager::RESOURCE_MATERIALS => 0,
@@ -2145,69 +1630,69 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
             WarManager::RESOURCE_MATERIALS => 0,
             WarManager::RESOURCE_FOOD => 0,
             WarManager::RESOURCE_WEALTH => 0,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => [
+        VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => [
             WarManager::RESOURCE_MATERIALS => 0,
             WarManager::RESOURCE_FOOD => 0,
             WarManager::RESOURCE_WEALTH => 0,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST * 0.5,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST * 0.5,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST * 0.5,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST * 2,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST * 2,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST * 2,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST * 0.5,
-        ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
         ],
     ];
 
@@ -2218,268 +1703,172 @@ class VillageUpgradeConfig {
             VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY => 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_UPGRADE_UPKEEP => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_UPGRADE_UPKEEP => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_UPGRADE_UPKEEP => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY => 5,
-            VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY => 5,
-            VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY => 5,
-            VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_TRAINING_SPEED => 3
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_TRAINING_SPEED => 3
         ],
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_TRAINING_SPEED => 3
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_XP_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_XP_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_XP_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_VILLAGE_REGEN => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_VILLAGE_REGEN => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_VILLAGE_REGEN => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_HEAL_ITEM_COST => 10
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_HEAL_ITEM_COST => 10
         ],
         VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_HEAL_ITEM_COST => 10
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_WAR_ACTION_COST => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_WAR_ACTION_COST => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_WAR_ACTION_COST => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_DAMAGE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_DAMAGE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_DAMAGE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_INFILTRATE_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_INFILTRATE_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_INFILTRATE_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY_REDUCTION => 5,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY_REDUCTION => 5,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY_REDUCTION => 5,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_HEAL => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_HEAL => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_HEAL => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 25
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 50
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 75
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 25
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 50
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 75
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 50
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 75
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 100
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 100000
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 300000
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CARAVAN_SPEED => 5
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CARAVAN_SPEED => 5
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CARAVAN_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_BLOODLINE_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_BLOODLINE_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_BLOODLINE_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE => 5
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_SET_ONE => 1
+        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => [
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION => 5
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST => 5
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => [
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST => 5
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => [
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST => 5
+        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => [
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_ENABLED => 1
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_CHANCE => 5
         ],
     ];
 }
