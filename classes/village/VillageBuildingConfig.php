@@ -10,14 +10,14 @@ class VillageBuildingConfig {
     const BUILDING_STATUS_REPAIRING = 'repairing'; // used when repairing damage, currently unused
 
     /* indentifiers for each building */
-    const BUILDING_VILLAGE_HQ = 1;
-    const BUILDING_WORKSHOP = 2;
-    const BUILDING_ACADEMY = 3;
-    const BUILDING_HOSPITAL = 4;
-    const BUILDING_ANBU_HQ = 5;
-    const BUILDING_MARKET = 6;
-    const BUILDING_RAMEN_STAND = 7;
-    const BUILDING_SHRINE = 8;
+    const BUILDING_VILLAGE_HQ = 'VILLAGE_HQ';
+    const BUILDING_WORKSHOP = 'WORKSHOP';
+    const BUILDING_ACADEMY = 'ACADEMY';
+    const BUILDING_HOSPITAL = 'HOSPITAL';
+    const BUILDING_ANBU_HQ = 'ANBU_HQ';
+    const BUILDING_MARKET = 'MARKET';
+    const BUILDING_SHRINE = 'SHRINE';
+    const BUILDING_RAMEN_STAND = 'RAMEN_STAND';
 
     /* names for each building */
     const BUILDING_NAMES = [
@@ -39,138 +39,138 @@ class VillageBuildingConfig {
     const BUILDING_CONSTRUCTION_COST = [
         self::BUILDING_VILLAGE_HQ => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager:: RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 10800,
+                WarManager::RESOURCE_FOOD => 4320,
+                WarManager:: RESOURCE_WEALTH => 6480,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager:: RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 54000,
+                WarManager::RESOURCE_FOOD => 21600,
+                WarManager:: RESOURCE_WEALTH => 32400,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager:: RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 270000,
+                WarManager::RESOURCE_FOOD => 108000,
+                WarManager:: RESOURCE_WEALTH => 162000,
             ],
         ],
         self::BUILDING_WORKSHOP => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 12960,
+                WarManager::RESOURCE_FOOD => 4320,
+                WarManager::RESOURCE_WEALTH => 4320,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 64800,
+                WarManager::RESOURCE_FOOD => 21600,
+                WarManager::RESOURCE_WEALTH => 21600,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 324000,
+                WarManager::RESOURCE_FOOD => 108000,
+                WarManager::RESOURCE_WEALTH => 108000,
             ],
         ],
         self::BUILDING_ACADEMY => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 8640,
+                WarManager::RESOURCE_FOOD => 6480,
+                WarManager::RESOURCE_WEALTH => 6480,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 43200,
+                WarManager::RESOURCE_FOOD => 32400,
+                WarManager::RESOURCE_WEALTH => 32400,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 216000,
+                WarManager::RESOURCE_FOOD => 162000,
+                WarManager::RESOURCE_WEALTH => 162000,
             ],
         ],
         self::BUILDING_HOSPITAL => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 8640,
+                WarManager::RESOURCE_FOOD => 6480,
+                WarManager::RESOURCE_WEALTH => 6480,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 43200,
+                WarManager::RESOURCE_FOOD => 32400,
+                WarManager::RESOURCE_WEALTH => 32400,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 216000,
+                WarManager::RESOURCE_FOOD => 162000,
+                WarManager::RESOURCE_WEALTH => 162000,
             ],
         ],
         self::BUILDING_ANBU_HQ => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 10800,
+                WarManager::RESOURCE_FOOD => 4320,
+                WarManager::RESOURCE_WEALTH => 6480,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 54000,
+                WarManager::RESOURCE_FOOD => 21600,
+                WarManager::RESOURCE_WEALTH => 32400,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 270000,
+                WarManager::RESOURCE_FOOD => 108000,
+                WarManager::RESOURCE_WEALTH => 162000,
             ],
         ],
         self::BUILDING_MARKET => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 4320,
+                WarManager::RESOURCE_FOOD => 4320,
+                WarManager::RESOURCE_WEALTH => 12960,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 21600,
+                WarManager::RESOURCE_FOOD => 21600,
+                WarManager::RESOURCE_WEALTH => 64800,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
-            ],
-        ],
-        self::BUILDING_RAMEN_STAND => [
-            1 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
-            ],
-            2 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
-            ],
-            3 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 108000,
+                WarManager::RESOURCE_FOOD => 108000,
+                WarManager::RESOURCE_WEALTH => 32400,
             ],
         ],
         self::BUILDING_SHRINE => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 8640,
+                WarManager::RESOURCE_FOOD => 6480,
+                WarManager::RESOURCE_WEALTH => 6480,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 43200,
+                WarManager::RESOURCE_FOOD => 32400,
+                WarManager::RESOURCE_WEALTH => 32400,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 0,
-                WarManager::RESOURCE_FOOD => 0,
-                WarManager::RESOURCE_WEALTH => 0,
+                WarManager::RESOURCE_MATERIALS => 216000,
+                WarManager::RESOURCE_FOOD => 162000,
+                WarManager::RESOURCE_WEALTH => 162000,
+            ],
+        ],
+        self::BUILDING_RAMEN_STAND => [
+            1 => [
+                WarManager::RESOURCE_MATERIALS => 4320,
+                WarManager::RESOURCE_FOOD => 12960,
+                WarManager::RESOURCE_WEALTH => 4320,
+            ],
+            2 => [
+                WarManager::RESOURCE_MATERIALS => 21600,
+                WarManager::RESOURCE_FOOD => 64800,
+                WarManager::RESOURCE_WEALTH => 21600,
+            ],
+            3 => [
+                WarManager::RESOURCE_MATERIALS => 108000,
+                WarManager::RESOURCE_FOOD => 324000,
+                WarManager::RESOURCE_WEALTH => 108000,
             ],
         ],
     ];
@@ -178,208 +178,44 @@ class VillageBuildingConfig {
     /* construction time indexed by building ID, then tier */
     const BUILDING_CONSTRUCTION_TIME = [
         self::BUILDING_VILLAGE_HQ => [
-            1 => 0,
-            2 => 0,
-            3 => 0,
+            1 => 3,
+            2 => 15,
+            3 => 75,
         ],
         self::BUILDING_WORKSHOP => [
-            1 => 0,
-            2 => 0,
-            3 => 0,
+            1 => 3,
+            2 => 15,
+            3 => 75,
         ],
         self::BUILDING_ACADEMY => [
-            1 => 0,
-            2 => 0,
-            3 => 0,
+            1 => 3,
+            2 => 15,
+            3 => 75,
         ],
         self::BUILDING_HOSPITAL => [
-            1 => 0,
-            2 => 0,
-            3 => 0,
+            1 => 3,
+            2 => 15,
+            3 => 75,
         ],
         self::BUILDING_ANBU_HQ => [
-            1 => 0,
-            2 => 0,
-            3 => 0,
+            1 => 3,
+            2 => 15,
+            3 => 75,
         ],
         self::BUILDING_MARKET => [
-            1 => 0,
-            2 => 0,
-            3 => 0,
-        ],
-        self::BUILDING_RAMEN_STAND => [
-            1 => 0,
-            2 => 0,
-            3 => 0,
+            1 => 3,
+            2 => 15,
+            3 => 75,
         ],
         self::BUILDING_SHRINE => [
-            1 => 0,
-            2 => 0,
-            3 => 0,
-        ],
-    ];
-
-    /* construction requirements indexed by building ID, then tier, then type */
-    const BUILDING_CONSTRUCTION_REQUIREMENTS = [
-        self::BUILDING_VILLAGE_HQ => [
-            1 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            2 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            3 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-        ],
-        self::BUILDING_WORKSHOP => [
-            1 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            2 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            3 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-        ],
-        self::BUILDING_ACADEMY => [
-            1 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            2 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            3 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-        ],
-        self::BUILDING_HOSPITAL => [
-            1 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            2 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            3 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-        ],
-        self::BUILDING_ANBU_HQ => [
-            1 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            2 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            3 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-        ],
-        self::BUILDING_MARKET => [
-            1 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            2 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            3 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
+            1 => 3,
+            2 => 15,
+            3 => 75,
         ],
         self::BUILDING_RAMEN_STAND => [
-            1 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            2 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            3 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-        ],
-        self::BUILDING_SHRINE => [
-            1 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            2 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
-            3 => [
-                self::BUILDING_REQUIREMENT_BUILDINGS => [
-                ],
-                self::BUILDING_REQUIREMENT_UPGRADES => [
-                ],
-            ],
+            1 => 3,
+            2 => 15,
+            3 => 75,
         ],
     ];
 }
