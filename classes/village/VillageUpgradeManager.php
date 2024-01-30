@@ -20,7 +20,7 @@ class VillageUpgradeManager {
         foreach ($building_data as $building) {
             $buildings[] = new VillageBuildingDto(
                 id: $building['id'],
-                building_id: $building['building_id'],
+                key: $building['key'],
                 village_id: $building['village_id'],
                 tier: $building['tier'],
                 health: $building['health'],
