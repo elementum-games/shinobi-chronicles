@@ -2,8 +2,8 @@
 
 require_once __DIR__ . "/VillageBuildingDto.php";
 require_once __DIR__ . "/VillageUpgradeDto.php";
-require_once __DIR__ . "/BuildingConfig.php";
-require_once __DIR__ . "/UpgradeConfig.php";
+require_once __DIR__ . "/VillageBuildingConfig.php";
+require_once __DIR__ . "/VillageUpgradeConfig.php";
 
 class VillageUpgradeManager {
     /**
@@ -64,49 +64,49 @@ class VillageUpgradeManager {
     public static function initializeEffectsForVillage(System $system, array $upgrades): array {
         // initialize array with defaults
         $effects = [
-            UpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 0,
-            UpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_MATERIALS_UPKEEP => 0,
-            UpgradeConfig::UPGRADE_EFFECT_FOOD_UPKEEP => 0,
-            UpgradeConfig::UPGRADE_EFFECT_WEALTH_UPKEEP => 0,
-            UpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 0,
-            UpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 0,
-            UpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 0,
-            UpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_RESEARCH_T1_ENABLED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_RESEARCH_T2_ENABLED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_RESEARCH_T3_ENABLED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T1_ENABLED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T2_ENABLED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T3_ENABLED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_UPGRADE_UPKEEP => 0,
-            UpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY => 0,
-            UpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY => 0,
-            UpgradeConfig::UPGRADE_EFFECT_TRAINING_SPEED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_XP_CHANCE => 0,
-            UpgradeConfig::UPGRADE_EFFECT_VILLAGE_REGEN => 0,
-            UpgradeConfig::UPGRADE_EFFECT_HEAL_ITEM_COST => 0,
-            UpgradeConfig::UPGRADE_EFFECT_WAR_ACTION_COST => 0,
-            UpgradeConfig::UPGRADE_EFFECT_RAID_SPEED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_RAID_DAMAGE => 0,
-            UpgradeConfig::UPGRADE_EFFECT_INFILTRATE_SPEED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY => 0,
-            UpgradeConfig::UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY => 0,
-            UpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE => 0,
-            UpgradeConfig::UPGRADE_EFFECT_REINFORCE_SPEED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_REINFORCE_HEAL => 0,
-            UpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 0,
-            UpgradeConfig::UPGRADE_EFFECT_TOWN_HP => 0,
-            UpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 0,
-            UpgradeConfig::UPGRADE_EFFECT_BLOODLINE_CHANCE => 0,
-            UpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE => 0,
-            UpgradeConfig::UPGRADE_EFFECT_RAMEN_SET_ONE => 0,
-            UpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION => 0,
-            UpgradeConfig::UPGRADE_EFFECT_RAMEN_COST => 0,
-            UpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_ENABLED => 0,
-            UpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_CHANCE => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_UPKEEP => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_UPKEEP => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_UPKEEP => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T1_ENABLED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T2_ENABLED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T3_ENABLED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T1_ENABLED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T2_ENABLED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T3_ENABLED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_UPGRADE_UPKEEP => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_TRAINING_SPEED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_XP_CHANCE => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_VILLAGE_REGEN => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_HEAL_ITEM_COST => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_WAR_ACTION_COST => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_SPEED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_DAMAGE => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_INFILTRATE_SPEED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_SPEED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_HEAL => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_TOWN_HP => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_BLOODLINE_CHANCE => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_SET_ONE => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_ENABLED => 0,
+            VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_CHANCE => 0,
         ];
         // go through all active upgrades and add effects to array
         foreach ($upgrades as $upgrade) {
@@ -129,8 +129,8 @@ class VillageUpgradeManager {
     public static function getEffectsByUpgradeKey(string $key): array {
         $effects = [];
         switch ($key) {
-            case UpgradeConfig::UPGRADE_KEY_TEST:
-                $effects[UpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION] = 10;
+            case VillageUpgradeConfig::UPGRADE_KEY_TEST:
+                $effects[VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION] = 10;
                 break;
         }
         return $effects;
