@@ -120,8 +120,8 @@ class VillageUpgradeConfig {
     const UPGRADE_EFFECT_RAID_SPEED = 'RAID_SPEED';
     const UPGRADE_EFFECT_RAID_DAMAGE = 'RAID_DAMAGE';
     const UPGRADE_EFFECT_INFILTRATE_SPEED = 'INFILTRATE_SPEED';
-    const UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY = 'OCCUPIED_BASE_STABILITY';
-    const UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY = 'OCCUPIED_MAX_STABILITY';
+    const UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY_REDUCTION = 'OCCUPIED_BASE_STABILITY';
+    const UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY_REDUCTION = 'OCCUPIED_MAX_STABILITY';
     const UPGRADE_EFFECT_PATROL_TIER_CHANCE = 'PATROL_TIER_CHANCE';
     const UPGRADE_EFFECT_REINFORCE_SPEED = 'REINFORCE_SPEED';
     const UPGRADE_EFFECT_REINFORCE_HEAL = 'REINFORCE_HEAL';
@@ -2038,16 +2038,16 @@ class VillageUpgradeConfig {
             VillageUpgradeConfig::UPGRADE_EFFECT_INFILTRATE_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY => -5,
-            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY => -5
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY_REDUCTION => 5,
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY_REDUCTION => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY => -5,
-            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY => -5
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY_REDUCTION => 5,
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY_REDUCTION => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY => -5,
-            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY => -5
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY_REDUCTION => 5,
+            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY_REDUCTION => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I => [
             VillageUpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE => 5
@@ -2167,13 +2167,13 @@ class VillageUpgradeConfig {
             VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_SHINOBI_COST => 5
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_SHINOBI_COST => 5
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_SHINOBI_COST => 5
+            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
             VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_ENABLED => 1
