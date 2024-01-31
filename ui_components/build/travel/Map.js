@@ -347,13 +347,13 @@ function RegionObjectives({
     if (stability > 100) {
       const excessStability = stability - 100;
       const excessPercentage = excessStability / maxStability * 100;
-      backgroundColor = `linear-gradient(to right, rgba(0, 0, 128, 0.6) 0%, rgba(0, 0, 128, 0.6) ${excessPercentage}%, rgba(0, 128, 0, 0.6) ${excessPercentage}%, rgba(0, 128, 0, 0.6) 100%)`;
+      backgroundColor = `linear-gradient(to right, rgba(0, 0, 128, 0.6) 0%, rgba(0, 0, 128, 0.6) ${excessPercentage}%, #096209cc ${excessPercentage}%, #096209cc 100%)`;
     } else if (stability > 0) {
       const barWidth = stability / maxStability * 100;
-      backgroundColor = `linear-gradient(to right, rgba(0, 100, 0, 0.6) ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
+      backgroundColor = `linear-gradient(to right, #096209cc ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
     } else if (stability < 0) {
       const barWidth = -stability / maxStability * 100;
-      backgroundColor = `linear-gradient(to right, rgba(128, 0, 0, 0.6) ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
+      backgroundColor = `linear-gradient(to right, #620909cc ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
     } else {
       backgroundColor = '#3c2b2bcc'; // Original background
     }
