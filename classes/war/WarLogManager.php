@@ -18,6 +18,8 @@ class WarLogManager {
     const WAR_LOG_VILLAGES_CAPTURED = 'villages_captured';
     const WAR_LOG_PVP_WINS = 'pvp_wins';
     const WAR_LOG_POINTS_GAINED = 'points_gained';
+    const WAR_LOG_STABILITY_REDUCED = 'stability_reduced';
+    const WAR_LOG_STABILITY_GAINED = 'stability_gained';
 
     const SCORE_WEIGHT_DAMAGE_DEALT = 0.1;
     const SCORE_WEIGHT_DAMAGE_HEALED = 0.1;
@@ -28,6 +30,9 @@ class WarLogManager {
     const SCORE_WEIGHT_RESOURCES_STOLEN = 7.5;
     const SCORE_WEIGHT_PVP_WINS = 100;
     const SCORE_WEIGHT_PATROL_WINS = 25;
+    const SCORE_WEIGHT_POINTS_GAINED = 0;
+    const SCORE_WEIGHT_STABILITY_REDUCED = 0;
+    const SCORE_WEIGHT_STABILITY_GAINED = 0;
 
     const WAR_LOG_TYPE_PLAYER = "player";
     const WAR_LOG_TYPE_VILLAGE = "village";
@@ -106,6 +111,8 @@ class WarLogManager {
             case self::WAR_LOG_DAMAGE_HEALED:
             case self::WAR_LOG_DEFENSE_GAINED:
             case self::WAR_LOG_RESOURCES_CLAIMED:
+            case self::WAR_LOG_STABILITY_REDUCED:
+            case self::WAR_LOG_STABILITY_GAINED:
                 $result = $system->db->query("SELECT SUM(`{$type}`) AS `total` FROM `player_war_logs` WHERE `user_id` = {$player->user_id} AND `relation_id` IS NULL");
                 $result = $system->db->fetch($result);
                 if (empty($result['total'])) {
@@ -273,6 +280,8 @@ class WarLogManager {
         $objective_score += $warLog->defense_gained * self::SCORE_WEIGHT_DEFENSE_GAINED;
         $objective_score += $warLog->regions_captured * self::SCORE_WEIGHT_REGIONS_CAPTURED;
         $objective_score += $warLog->villages_captured * self::SCORE_WEIGHT_VILLAGES_CAPTURED;
+        $objective_score += $warLog->stability_reduced * self::SCORE_WEIGHT_STABILITY_REDUCED;
+        $objective_score += $warLog->stability_gained * self::SCORE_WEIGHT_STABILITY_GAINED;
 
         // calculate resource score
         $resource_score += $warLog->resources_stolen * self::SCORE_WEIGHT_RESOURCES_STOLEN;

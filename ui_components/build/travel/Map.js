@@ -339,24 +339,45 @@ function RegionObjectives({
       backfaceVisibility: "hidden",
       filter: "blur(0)"
     }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: 'region_objective_tooltip' + (objective.is_occupied ? ' occupied' : ''),
-    style: {
-      display: strategicView || objective.x == player_x && objective.y == player_y ? 'flex' : 'none'
+  }, (() => {
+    let backgroundColor;
+    const stability = objective.stability;
+    const maxStability = 100; // assuming 100 is the max value for positive and negative
+
+    if (stability > 100) {
+      const excessStability = stability - 100;
+      const excessPercentage = excessStability / maxStability * 100;
+      backgroundColor = `linear-gradient(to right, rgba(0, 0, 128, 0.6) 0%, rgba(0, 0, 128, 0.6) ${excessPercentage}%, rgba(0, 128, 0, 0.6) ${excessPercentage}%, rgba(0, 128, 0, 0.6) 100%)`;
+    } else if (stability > 0) {
+      const barWidth = stability / maxStability * 100;
+      backgroundColor = `linear-gradient(to right, rgba(0, 100, 0, 0.6) ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
+    } else if (stability < 0) {
+      const barWidth = -stability / maxStability * 100;
+      backgroundColor = `linear-gradient(to right, rgba(128, 0, 0, 0.6) ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
+    } else {
+      backgroundColor = '#3c2b2bcc'; // Original background
     }
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "region_objective_tooltip_name"
-  }, objective.name), /*#__PURE__*/React.createElement("div", {
-    className: "region_objective_tooltip_tags"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "region_objective_tooltip_defense"
-  }, objective.defense), /*#__PURE__*/React.createElement("img", {
-    className: "region_objective_tooltip_village",
-    src: getVillageIcon(objective.village_id)
-  }), /*#__PURE__*/React.createElement("img", {
-    className: "region_objective_tooltip_resource",
-    src: getResourceIcon(objective.resource_id)
-  }))), strategicView && /*#__PURE__*/React.createElement("div", {
+
+    return /*#__PURE__*/React.createElement("div", {
+      className: 'region_objective_tooltip' + (objective.is_occupied ? ' occupied' : ''),
+      style: {
+        display: strategicView || objective.x == player_x && objective.y == player_y ? 'flex' : 'none',
+        background: backgroundColor
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "region_objective_tooltip_name"
+    }, objective.name), /*#__PURE__*/React.createElement("div", {
+      className: "region_objective_tooltip_tags"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "region_objective_tooltip_defense"
+    }, objective.defense), /*#__PURE__*/React.createElement("img", {
+      className: "region_objective_tooltip_village",
+      src: getVillageIcon(objective.village_id)
+    }), /*#__PURE__*/React.createElement("img", {
+      className: "region_objective_tooltip_resource",
+      src: getResourceIcon(objective.resource_id)
+    })));
+  })(), strategicView && /*#__PURE__*/React.createElement("div", {
     className: "region_objective_details"
   }, /*#__PURE__*/React.createElement("div", {
     className: "region_objective_details_resource"
@@ -368,7 +389,11 @@ function RegionObjectives({
   }, /*#__PURE__*/React.createElement("img", {
     className: "region_objective_details_health_icon",
     src: objective.image
-  }), "  ", objective.objective_health, " / ", objective.objective_max_health)), objective.objective_health !== undefined && objective.objective_max_health > 0 && (() => {
+  }), "  ", objective.objective_health, " / ", objective.objective_max_health), /*#__PURE__*/React.createElement("div", {
+    className: "region_objective_details_stability"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "region_objective_details_stability_icon"
+  }, objective.stability), "  stability")), objective.objective_health !== undefined && objective.objective_max_health > 0 && (() => {
     const percentage = objective.objective_health / objective.objective_max_health * 100;
     let barColor;
     let strokeColor = '#2b2c2c';

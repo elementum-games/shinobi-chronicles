@@ -373,14 +373,41 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, pl
                                 filter: "blur(0)",
                             }}
                         >
-                            <div className={'region_objective_tooltip' + (objective.is_occupied ? ' occupied' : '')} style={{ display: strategicView || (objective.x == player_x && objective.y == player_y) ? 'flex' : 'none' }}>
-                                <span className='region_objective_tooltip_name'>{objective.name}</span>
-                                <div className='region_objective_tooltip_tags'>
-                                    <span className='region_objective_tooltip_defense'>{objective.defense}</span>
-                                    <img className='region_objective_tooltip_village' src={getVillageIcon(objective.village_id)} />
-                                    <img className='region_objective_tooltip_resource' src={getResourceIcon(objective.resource_id)} />
-                                </div>
-                            </div>
+                            {(() => {
+                                let backgroundColor;
+
+                                const stability = objective.stability;
+                                const maxStability = 100; // assuming 100 is the max value for positive and negative
+
+                                if (stability > 100) {
+                                    const excessStability = stability - 100;
+                                    const excessPercentage = (excessStability / maxStability) * 100;
+                                    backgroundColor = `linear-gradient(to right, rgba(0, 0, 128, 0.6) 0%, rgba(0, 0, 128, 0.6) ${excessPercentage}%, rgba(0, 128, 0, 0.6) ${excessPercentage}%, rgba(0, 128, 0, 0.6) 100%)`;
+                                } else if (stability > 0) {
+                                    const barWidth = (stability / maxStability) * 100;
+                                    backgroundColor = `linear-gradient(to right, rgba(0, 100, 0, 0.6) ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
+                                } else if (stability < 0) {
+                                    const barWidth = (-stability / maxStability) * 100;
+                                    backgroundColor = `linear-gradient(to right, rgba(128, 0, 0, 0.6) ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
+                                } else {
+                                    backgroundColor = '#3c2b2bcc'; // Original background
+                                }
+                                return (
+                                    <div className={'region_objective_tooltip' + (objective.is_occupied ? ' occupied' : '')}
+                                        style={{
+                                            display: strategicView || (objective.x == player_x && objective.y == player_y) ? 'flex' : 'none',
+                                            background: backgroundColor
+                                        }}
+                                    >
+                                        <span className='region_objective_tooltip_name'>{objective.name}</span>
+                                        <div className='region_objective_tooltip_tags'>
+                                            <span className='region_objective_tooltip_defense'>{objective.defense}</span>
+                                            <img className='region_objective_tooltip_village' src={getVillageIcon(objective.village_id)} />
+                                            <img className='region_objective_tooltip_resource' src={getResourceIcon(objective.resource_id)} />
+                                        </div>
+                                    </div>
+                                );
+                            })()}
                             {strategicView &&
                                 <div className='region_objective_details'>
                                     {/*<div className='region_objective_details_name'>
@@ -394,6 +421,9 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, pl
                                     </div>*/}
                                     <div className='region_objective_details_health'>
                                         <img className='region_objective_details_health_icon' src={objective.image} />  {objective.objective_health} / {objective.objective_max_health}
+                                    </div>
+                                    <div className='region_objective_details_stability'>
+                                        <span className='region_objective_details_stability_icon'>{objective.stability}</span>  stability
                                     </div>
                                 </div>
                             }
