@@ -634,6 +634,16 @@
     box-sizing: border-box;
     padding-right: 1px;
 }
+.region_objective_tooltip_stability {
+    height: 18px;
+    width: 18px;
+    background-image: url('/images/map/icons/stability.png');
+    background-size: cover;
+    line-height: 17px;
+    font-size: smaller;
+    box-sizing: border-box;
+    padding-right: 1px;
+}
 .region_objective_tooltip_village {
     height: 18px;
     width: 18px;
@@ -1321,6 +1331,22 @@
     height: 18px;
     width: 18px;
     background-image: url('/images/map/icons/shield.png');
+    background-size: cover;
+    line-height: 17px;
+    font-size: smaller;
+    box-sizing: border-box;
+    padding-right: 1px;
+}
+.region_objective_details_stability {
+    display: flex;
+    line-height: 18px;
+    text-transform: capitalize;
+}
+.region_objective_details_stability_icon {
+    display: inline-block;
+    height: 18px;
+    width: 18px;
+    background-image: url('/images/map/icons/stability.png');
     background-size: cover;
     line-height: 17px;
     font-size: smaller;
