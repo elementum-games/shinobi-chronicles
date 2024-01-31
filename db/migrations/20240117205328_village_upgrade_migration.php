@@ -52,6 +52,14 @@ final class VillageUpgradeMigration extends AbstractMigration
             ALTER TABLE `proposals` ADD `upgrade_key` VARCHAR(50) NULL;
             ALTER TABLE `proposals` ADD `upgrade_data` TEXT NULL;
 
+            -- Alter table player_war_logs
+            ALTER TABLE `player_war_logs` ADD `stability_gained` INT(11) NOT NULL DEFAULT '0';
+            ALTER TABLE `player_war_logs` ADD `stability_reduced` INT(11) NOT NULL DEFAULT '0'; 
+
+            -- Alter table village_war_logs
+            ALTER TABLE `village_war_logs` ADD `stability_gained` INT(11) NOT NULL DEFAULT '0';
+            ALTER TABLE `village_war_logs` ADD `stability_reduced` INT(11) NOT NULL DEFAULT '0';
+
             -- Use occupying_village_id as source of truth for region_locations
             UPDATE region_locations
             JOIN regions ON region_locations.region_id = regions.region_id
@@ -147,6 +155,14 @@ final class VillageUpgradeMigration extends AbstractMigration
             ALTER TABLE `proposals` DROP `building_key`;
             ALTER TABLE `proposals` DROP `upgrade_key`;
             ALTER TABLE `proposals` DROP `upgrade_data`;
+
+            -- Alter table player_war_logs
+            ALTER TABLE `player_war_logs` DROP `stability_gained`;
+            ALTER TABLE `player_war_logs` DROP `stability_reduced`;
+
+            -- Alter table village_war_logs
+            ALTER TABLE `village_war_logs` DROP `stability_gained`;
+            ALTER TABLE `village_war_logs` DROP `stability_reduced`;
         ");
     }
 }

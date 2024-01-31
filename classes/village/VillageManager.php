@@ -57,6 +57,11 @@ class VillageManager {
     const PROPOSAL_TYPE_BREAK_ALLIANCE = "break_alliance";
     const PROPOSAL_TYPE_OFFER_TRADE = "offer_trade";
     const PROPOSAL_TYPE_ACCEPT_TRADE = "accept_trade";
+    const PROPOSAL_TYPE_BEGIN_CONSTRUCTION = "begin_construction";
+    const PROPOSAL_TYPE_BEGIN_RESEARCH = "begin_research";
+    const PROPOSAL_TYPE_CANCEL_CONSTRUCTION = "cancel_construction";
+    const PROPOSAL_TYPE_CANCEL_RESEARCH = "cancel_research";
+    const PROPOSAL_TYPE_SET_UPGRADES = "set_upgrades";
 
     const CHALLENGE_EXPIRE_DAYS = 1;
     const CHALLENGE_MIN_DELAY_HOURS = 12;

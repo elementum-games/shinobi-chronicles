@@ -382,24 +382,24 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, pl
                                 if (stability > 100) {
                                     const excessStability = stability - 100;
                                     const excessPercentage = (excessStability / maxStability) * 100;
-                                    backgroundColor = `linear-gradient(to right, rgba(0, 0, 128, 0.6) 0%, rgba(0, 0, 128, 0.6) ${excessPercentage}%, #295C26cc ${excessPercentage}%, #295C26cc 100%)`;
+                                    backgroundColor = `linear-gradient(to right, rgba(0, 0, 128, 0.6) 0%, rgba(0, 0, 128, 0.6) ${excessPercentage}%, rgba(0, 128, 0, 0.6) ${excessPercentage}%, rgba(0, 128, 0, 0.6) 100%)`;
                                 } else if (stability > 0) {
                                     const barWidth = (stability / maxStability) * 100;
-                                    backgroundColor = `linear-gradient(to right, #295C26cc ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
+                                    backgroundColor = `linear-gradient(to right, rgba(0, 100, 0, 0.6) ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
                                 } else if (stability < 0) {
                                     const barWidth = (-stability / maxStability) * 100;
-                                    backgroundColor = `linear-gradient(to right, #620909cc ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
+                                    backgroundColor = `linear-gradient(to right, rgba(128, 0, 0, 0.6) ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
                                 } else {
                                     backgroundColor = '#3c2b2bcc'; // Original background
                                 }
                                 return (
-                                    <div className={`region_objective_tooltip${objective.rebellion_active ? ' rebellion_glow' : ''}`}
+                                    <div className={'region_objective_tooltip' + (objective.is_occupied ? ' occupied' : '')}
                                         style={{
                                             display: strategicView || (objective.x == player_x && objective.y == player_y) ? 'flex' : 'none',
                                             background: backgroundColor
                                         }}
                                     >
-                                        <span className={`region_objective_tooltip_name${objective.rebellion_active ? ' rebellion_text' : ''}`}>{objective.name}</span>
+                                        <span className='region_objective_tooltip_name'>{objective.name}</span>
                                         <div className='region_objective_tooltip_tags'>
                                             <span className='region_objective_tooltip_defense'>{objective.defense}</span>
                                             <img className='region_objective_tooltip_village' src={getVillageIcon(objective.village_id)} />
