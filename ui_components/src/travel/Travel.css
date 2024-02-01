@@ -540,6 +540,9 @@
     left: -16px;
     top: -32px;
 }
+.region_objective.village {
+
+}
 .map_objective.target {
     position: absolute;
     height: 48px;
@@ -1278,7 +1281,7 @@
     flex-direction: column;
     align-items: flex-start;
     position: absolute;
-    bottom: -65px;
+    bottom: -85px;
     left: 50%;
     right: 0;
     transform: translateX(-50%);
