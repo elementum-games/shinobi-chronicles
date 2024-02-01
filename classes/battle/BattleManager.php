@@ -503,12 +503,10 @@ class BattleManager {
 
         // run jutsu collision
         $this->jutsuCollision(
-            $simulated_player,
-            $simulated_ai,
-            $player_simulated_attack->raw_damage,
-            $ai_simulated_attack->raw_damage,
-            $player_simulated_attack,
-            $ai_simulated_attack
+            player1: $simulated_player,
+            player2: $simulated_ai,
+            player1_attack: $player_simulated_attack,
+            player2_attack: $ai_simulated_attack
         );
 
         // apply attacks
@@ -610,9 +608,10 @@ class BattleManager {
         $collision_text = null;
         if($player1_attack != null && $player2_attack != null) {
             $collision_text = $this->jutsuCollision(
-                $this->battle->player1, $this->battle->player2,
-                $player1_attack->raw_damage, $player2_attack->raw_damage,
-                $player1_attack, $player2_attack
+                player1: $this->battle->player1,
+                player2: $this->battle->player2,
+                player1_attack: $player1_attack,
+                player2_attack: $player2_attack
             );
         }
 
@@ -825,7 +824,13 @@ class BattleManager {
      * @throws RuntimeException
      */
     #[Trace]
-    public function setupFighterAttack(Fighter $fighter, Fighter $target, LegacyFighterAction $action, ?Jutsu $jutsu = null, bool $simulation = false): BattleAttack {
+    public function setupFighterAttack(
+        Fighter $fighter,
+        Fighter $target,
+        LegacyFighterAction $action,
+        ?Jutsu $jutsu = null,
+        bool $simulation = false
+    ): BattleAttack {
         $attack = new BattleAttack();
         // if jutsu is already given, use instead
         if (!empty($jutsu)) {
@@ -1109,10 +1114,12 @@ class BattleManager {
         if (!str_contains($attack->jutsu->name, "Move ")) {
             if ($attack->jutsu->weapon_id) {
                 $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . " / " . System::unSlug($user->items[$attack->jutsu->weapon_id]->name) . "</br>" . '</i></span></b>';
-            } else {
+            }
+            else {
                 if ($attack->jutsu->element != Jutsu::ELEMENT_NONE && $attack->jutsu->element != "none") {
                     $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->element) . " Style: " . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
-                } else {
+                }
+                else {
                     $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
                 }
             }
@@ -1122,29 +1129,31 @@ class BattleManager {
         $element_text = ' with ' . $attack->jutsu->element;
 
         if(empty($attack->jutsu->effect_only)) {
-              if($damage_resisted > 0 ) {
-                    $text .= "<p style=\"font-weight:bold;\">
-                            {$user->getName()} deals
-                                <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
-                                    " . sprintf('%.0f', $attack_damage) . " damage
-                                </span>
-                                    to {$target->getName()}" . ($has_element ? $element_text : "") . ".
-                                <span style=\"font-weight:bold;\">
-                                    (resists
-                                 <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
-                                    " . sprintf('%.0f', $damage_resisted) . "
-                                </span>
-                                 damage)
-                            </p>";
-            } else {
+            if($damage_resisted > 0) {
                 $text .= "<p style=\"font-weight:bold;\">
-                            {$user->getName()} deals
-                                <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
-                                    " . sprintf('%.0f', $attack_damage) . " damage
-                                </span>
-                                    to {$target->getName()}" . ($has_element ? $element_text : "") . ".
-                                </p>"; }
-                    }
+                        {$user->getName()} deals
+                            <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
+                                " . sprintf('%.0f', $attack_damage) . " damage
+                            </span>
+                                to {$target->getName()}" . ($has_element ? $element_text : "") . ".
+                            <span style=\"font-weight:bold;\">
+                                (resists
+                             <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
+                                " . sprintf('%.0f', $damage_resisted) . "
+                            </span>
+                             damage)
+                        </p>";
+            }
+            else {
+                $text .= "<p style=\"font-weight:bold;\">
+                {$user->getName()} deals
+                    <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
+                        " . sprintf('%.0f', $attack_damage) . " damage
+                    </span>
+                        to {$target->getName()}" . ($has_element ? $element_text : "") . ".
+                    </p>";
+            }
+        }
 
         if ($attack->recoil_percent > 0) {
             if ($recoil_damage_resisted > 0) {
@@ -1209,13 +1218,18 @@ class BattleManager {
      */
     #[Trace]
     public function jutsuCollision(
-        Fighter $player1, Fighter $player2, &$player1_damage, &$player2_damage, BattleAttack &$player1_attack, BattleAttack &$player2_attack
+        Fighter $player1, Fighter $player2, BattleAttack &$player1_attack, BattleAttack &$player2_attack
     ): string {
         $collision_text = '';
+
         $player1_jutsu = $player1_attack->jutsu;
         $player2_jutsu = $player2_attack->jutsu;
+
         $player1_jutsu_is_attack = in_array($player1_jutsu->use_type, Jutsu::$attacking_use_types);
         $player2_jutsu_is_attack = in_array($player2_jutsu->use_type, Jutsu::$attacking_use_types);
+
+        $player1_damage = $player1_attack->raw_damage;
+        $player2_damage = $player2_attack->raw_damage;
 
         // Fire > Wind > Lightning > Earth > Water > Fire
         $elemental_clash_damage_modifier = self::ELEMENTAL_CLASH_MODIFIER;

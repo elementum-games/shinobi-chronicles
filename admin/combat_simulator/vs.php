@@ -60,6 +60,8 @@ if(isset($_POST['run_simulation'])) {
         $player1_effects = [];
         $player2_effects = [];
         foreach($player1_data['active_effects'] as $active_effect) {
+            if($active_effect['effect'] == 'none') continue;
+
             $player1_effects[] = new BattleEffect(
                 user: $player1->combat_id,
                 target: $player1->combat_id,
@@ -69,6 +71,8 @@ if(isset($_POST['run_simulation'])) {
             );
         }
         foreach($player2_data['active_effects'] as $active_effect) {
+            if($active_effect['effect'] == 'none') continue;
+
             $player2_effects[] = new BattleEffect(
                 user: $player2->combat_id,
                 target: $player2->combat_id,

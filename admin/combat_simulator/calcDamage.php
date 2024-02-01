@@ -12,6 +12,7 @@ class TestBattleManager extends BattleManager {
             $player1_effects,
             $player2_effects
         );
+
         $this->effects->applyPassiveEffects($this->battle->player1, $this->battle->player2);
     }
 
@@ -45,11 +46,8 @@ function calcDamage(
     global $system;
     global $user;
 
-    $player1_raw_damage = $player1->calcDamage($player1_jutsu, true);
-    $player2_raw_damage = $player2->calcDamage($player2_jutsu, true);
-
-    // Collision
-    $battle_id = Battle::start($system, $player1, $player2, Battle::TYPE_SPAR);
+    // AI battle = disabled randomness
+    $battle_id = Battle::start($system, $player1, $player2, Battle::TYPE_AI_ARENA);
     $battle = TestBattleManager::init(
         system: $system,
         player: $user,
@@ -81,16 +79,18 @@ function calcDamage(
         )
     );
 
+    $player1_raw_damage = $player1_attack->raw_damage;
+    $player2_raw_damage = $player2_attack->raw_damage;
+
     $collision_text = $battle->jutsuCollision(
         player1: $player1,
         player2: $player2,
-        player1_damage: $player1_raw_damage,
-        player2_damage: $player2_raw_damage,
         player1_attack: $player1_attack,
         player2_attack: $player2_attack
     );
 
-    $system->db->query("DELETE FROM battles WHERE `battle_id`={$battle_id}");
+    $system->db->query("DELETE FROM `battles` WHERE `battle_id`={$battle_id}");
+    $system->db->query("DELETE FROM `battle_logs` WHERE `battle_id`={$battle_id}");
 
     $player1_collision_damage = $player1_raw_damage;
     $player2_collision_damage = $player2_raw_damage;

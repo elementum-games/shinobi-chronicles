@@ -92,6 +92,7 @@ class TestFighter extends Fighter {
 
     public static function fromFormData(System $system, RankManager $rankManager, array $fighter_data, string $name): TestFighter {
         $fighter = new TestFighter();
+        $fighter->id = 1;
         $fighter->rank = 4;
         $fighter->health = 1000000;
         $fighter->max_health = 1000000;
