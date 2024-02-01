@@ -176,9 +176,16 @@ if(!empty($_POST['run_simulation'])) {
     $player2->health = $player2->max_health;
 
     // Calc damage ranges
-    $damage = calcDamage($player1, $player2, $player1_jutsu, $player2_jutsu);
-    $damages[$level]['player1'] = $damage['player1']['damage'];
-    $damages[$level]['player2'] = $damage['player2']['damage'];
+    $damage = calcDamage(
+        player1: $player1,
+        player2: $player2,
+        player1_jutsu: $player1_jutsu,
+        player2_jutsu: $player2_jutsu,
+        player2_effects: [],
+        player1_effects: []
+    );
+    $damages[$level]['player1'] = $damage['player1']['damage_dealt'];
+    $damages[$level]['player2'] = $damage['player2']['damage_dealt'];
     $damages[$level]['health'] = $health;
 
     for($level = $base_level + 1; $level <= $max_level; $level++) {
@@ -223,9 +230,16 @@ if(!empty($_POST['run_simulation'])) {
         $player1_jutsu->setLevel($player1_jutsu->level + $jutsu_level_gain, 0);
         $player2_jutsu->setLevel($player2_jutsu->level + $jutsu_level_gain, 0);
 
-        $damage = calcDamage($player1, $player2, $player1_jutsu, $player2_jutsu);
-        $damages[$level]['player1'] = $damage['player1']['damage'];
-        $damages[$level]['player2'] = $damage['player2']['damage'];
+        $damage = calcDamage(
+            player1: $player1,
+            player2: $player2,
+            player1_jutsu: $player1_jutsu,
+            player2_jutsu: $player2_jutsu,
+            player1_effects: [],
+            player2_effects: []
+        );
+        $damages[$level]['player1'] = $damage['player1']['damage_dealt'];
+        $damages[$level]['player2'] = $damage['player2']['damage_dealt'];
         $damages[$level]['health'] = $health;
 
     }

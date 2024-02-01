@@ -9,6 +9,8 @@ require __DIR__ . "/calcDamage.php";
 $rankManager = new RankManager($system);
 $rankManager->loadRanks();
 
+$results = null;
+
 if(isset($_POST['run_simulation'])) {
     $player1_data = $_POST['fighter1'];
     $player2_data = $_POST['fighter2'];
@@ -82,7 +84,7 @@ if(isset($_POST['run_simulation'])) {
             );
         }
 
-        $damages = calcDamage(
+        $results = calcDamage(
             player1: $player1,
             player2: $player2,
             player1_jutsu: $player1_jutsu,
@@ -90,26 +92,6 @@ if(isset($_POST['run_simulation'])) {
             player1_effects: $player1_effects,
             player2_effects: $player2_effects
         );
-
-        echo "<div style='width:500px;background-color:#EAEAEA;text-align:center;margin-left:auto;margin-right:auto;
-            padding:8px;border:1px solid #000000;border-radius:10px;'>
-        Player 1:<br />
-        {$damages['player1']['raw_damage']} raw damage<br />
-        {$damages['player1']['collision_damage']} post-collision damage<br />
-        {$damages['player1']['damage']} final damage<br />";
-
-        if($damages['collision_text']) {
-            echo "<hr />" . $damages['collision_text'] . "<hr />";
-        }
-        else {
-            echo "<hr />";
-        }
-
-        echo "Player 2:<br />
-        {$damages['player2']['raw_damage']} raw damage<br />
-        {$damages['player2']['collision_damage']} post-collision damage<br />
-        {$damages['player2']['damage']} final damage<br />
-        </div>";
     } catch (Exception $e) {
         echo $e->getMessage();
     }
@@ -130,8 +112,65 @@ require 'vs_fighter_input.php';
         display: block;
         margin: 10px auto auto;
     }
+
+    .results {
+        width:550px;
+        background-color:#EAEAEA;
+        text-align:left;
+        margin-left:auto;
+        margin-right:auto;
+        padding:8px;
+        border:1px solid #000000;
+        border-radius:10px;
+
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 2%;
+    }
+
+    .player1, .player2 {
+        width: 48%;
+        box-sizing: border-box;
+        padding: 5px;
+
+        background-color:#fafafa;
+    }
+    .collision {
+        width: 100%;
+        margin-top: 10px;
+        background-color:#fafafa;
+        text-align: center;
+        padding: 5px;
+    }
 </style>
 
+
+<?php if($results != null): ?>
+    <div class='results'>
+        <div class='player1'>
+            <b>Player 1:</b><br />
+            <?= number_format($results['player1']['raw_damage']) ?> raw damage<br />
+            <?= number_format($results['player1']['collision_damage']) ?> post-collision damage<br />
+            <?= number_format($results['player1']['damage_dealt']) ?> final damage dealt<br />
+            <br />
+            <?= number_format($results['player1']['damage_taken'], 2) ?> damage taken<br />
+        </div>
+        <div class='player2'>
+            <b>Player 2:</b><br />
+            <?= number_format($results['player2']['raw_damage']) ?> raw damage<br />
+            <?= number_format($results['player2']['collision_damage']) ?> post-collision damage<br />
+            <?= number_format($results['player2']['damage_dealt']) ?> final damage dealt<br />
+            <br />
+            <?= number_format($results['player2']['damage_taken'], 2) ?> damage taken<br />
+        </div>
+        <?php if($results['collision_text']): ?>
+            <div class='collision'>
+                <?= $results['collision_text'] ?>
+            </div>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
 <form action='vs.php' method='post'>
     <div class='vs_container'>
         <?php displayFighterInput(system: $system, fighter_form_key: 'fighter1'); ?>

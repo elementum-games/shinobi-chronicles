@@ -925,7 +925,7 @@ class BattleManager {
     }
 
     #[Trace]
-    protected function applyAttack(BattleAttack $attack, Fighter $user, Fighter $target, bool $simulation = false) {
+    public function applyAttack(BattleAttack $attack, Fighter $user, Fighter $target, bool $simulation = false) {
         $attack_damage = $attack->raw_damage;
         $counter_damage = 0;
         $counter_damage_raw = 0;
@@ -1028,7 +1028,7 @@ class BattleManager {
             }
         }
 
-        if (empty($attack->jutsu->effect_only)) {
+        if (!$attack->jutsu->effect_only) {
             $attack_damage = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type, element: $attack->jutsu->element);
             $attack_damage_raw = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type, apply_resists: false, element: $attack->jutsu->element);
             $damage_resisted = round($attack_damage_raw - $attack_damage, 2);

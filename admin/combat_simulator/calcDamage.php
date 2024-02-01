@@ -95,20 +95,28 @@ function calcDamage(
     $player1_collision_damage = $player1_raw_damage;
     $player2_collision_damage = $player2_raw_damage;
 
+    $player1_starting_health = $player1->health;
+    $player2_starting_health = $player2->health;
+
     $player1_damage = $player2->calcDamageTaken($player1_collision_damage, $player1_jutsu->jutsu_type);
     $player2_damage = $player1->calcDamageTaken($player2_collision_damage, $player2_jutsu->jutsu_type);
+
+    $battle->applyAttack($player1_attack, $player1, $player2);
+    $battle->applyAttack($player2_attack, $player2, $player1);
 
     // Display
     return [
         'player1' => [
             'raw_damage' => $player1_raw_damage,
             'collision_damage' => $player1_collision_damage,
-            'damage' => $player1_damage,
+            'damage_dealt' => $player1_damage,
+            'damage_taken' => $player1_starting_health - $player1->health,
         ],
         'player2' => [
             'raw_damage' => $player2_raw_damage,
             'collision_damage' => $player2_collision_damage,
-            'damage' => $player2_damage,
+            'damage_dealt' => $player2_damage,
+            'damage_taken' => $player2_starting_health - $player2->health,
         ],
         'collision_text' => $collision_text,
     ];
