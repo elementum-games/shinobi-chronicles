@@ -1228,8 +1228,8 @@ class BattleManager {
         $player1_jutsu_is_attack = in_array($player1_jutsu->use_type, Jutsu::$attacking_use_types);
         $player2_jutsu_is_attack = in_array($player2_jutsu->use_type, Jutsu::$attacking_use_types);
 
-        $player1_damage = $player1_attack->raw_damage;
-        $player2_damage = $player2_attack->raw_damage;
+        $player1_damage = &$player1_attack->raw_damage;
+        $player2_damage = &$player2_attack->raw_damage;
 
         // Fire > Wind > Lightning > Earth > Water > Fire
         $elemental_clash_damage_modifier = self::ELEMENTAL_CLASH_MODIFIER;
