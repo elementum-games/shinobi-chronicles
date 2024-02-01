@@ -243,7 +243,7 @@ else {
             );
 
             // Legacy event notification
-            if(!$system->layout->usesV2Interface()) {
+            if(!$system->layout->usesV2Interface() && !is_null($system->event)) {
                 require_once ('templates/temp_event_header.php');
             }
 
