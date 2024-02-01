@@ -382,10 +382,10 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, pl
                                 if (stability > 100) {
                                     const excessStability = stability - 100;
                                     const excessPercentage = (excessStability / maxStability) * 100;
-                                    backgroundColor = `linear-gradient(to right, rgba(0, 0, 128, 0.6) 0%, rgba(0, 0, 128, 0.6) ${excessPercentage}%, rgba(0, 128, 0, 0.6) ${excessPercentage}%, rgba(0, 128, 0, 0.6) 100%)`;
+                                    backgroundColor = `linear-gradient(to right, rgba(0, 0, 128, 0.6) 0%, rgba(0, 0, 128, 0.6) ${excessPercentage}%, #295C26cc ${excessPercentage}%, #295C26cc 100%)`;
                                 } else if (stability > 0) {
                                     const barWidth = (stability / maxStability) * 100;
-                                    backgroundColor = `linear-gradient(to right, rgba(0, 100, 0, 0.6) ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
+                                    backgroundColor = `linear-gradient(to right, #295C26cc ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
                                 } else if (stability < 0) {
                                     const barWidth = (-stability / maxStability) * 100;
                                     backgroundColor = `linear-gradient(to right, #620909cc ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
