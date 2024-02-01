@@ -152,6 +152,7 @@ require 'vs_fighter_input.php';
             <b>Player 1:</b><br />
             <?= number_format($results['player1']['raw_damage']) ?> raw damage<br />
             <?= number_format($results['player1']['collision_damage']) ?> post-collision damage<br />
+            <?= number_format($results['player1']['damage_before_resist']) ?> pre-resist damage<br />
             <?= number_format($results['player1']['damage_dealt']) ?> final damage dealt<br />
             <br />
             <?= number_format($results['player1']['damage_taken'], 2) ?> damage taken<br />
@@ -160,6 +161,7 @@ require 'vs_fighter_input.php';
             <b>Player 2:</b><br />
             <?= number_format($results['player2']['raw_damage']) ?> raw damage<br />
             <?= number_format($results['player2']['collision_damage']) ?> post-collision damage<br />
+            <?= number_format($results['player2']['damage_before_resist']) ?> pre-resist damage<br />
             <?= number_format($results['player2']['damage_dealt']) ?> final damage dealt<br />
             <br />
             <?= number_format($results['player2']['damage_taken'], 2) ?> damage taken<br />
