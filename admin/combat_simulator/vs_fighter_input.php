@@ -246,7 +246,9 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
     $stat_preset_options = [
         '33_33_33',
         '40_40_20',
-        '0_85_15'
+        '50_50_0',
+        '0_85_15',
+        '0_100_0',
     ];
 
     ?>
