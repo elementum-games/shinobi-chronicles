@@ -68,6 +68,8 @@
                 document.getElementById(`${fighterKey}_bloodline_skill`).value = blSkill * statCap;
                 document.getElementById(`${fighterKey}_speed`).value = 0;
                 document.getElementById(`${fighterKey}_cast_speed`).value = speed * statCap;
+
+                document.getElementById(`${fighterKey}_jutsu_type`).value = 'ninjutsu';
                 break;
             case 'tai':
                 document.getElementById(`${fighterKey}_ninjutsu_skill`).value = 0;
@@ -76,6 +78,8 @@
                 document.getElementById(`${fighterKey}_bloodline_skill`).value = blSkill * statCap;
                 document.getElementById(`${fighterKey}_speed`).value = speed * statCap;
                 document.getElementById(`${fighterKey}_cast_speed`).value = 0;
+
+                document.getElementById(`${fighterKey}_jutsu_type`).value = 'taijutsu';
                 break;
             case 'gen':
                 document.getElementById(`${fighterKey}_ninjutsu_skill`).value = 0;
@@ -84,6 +88,8 @@
                 document.getElementById(`${fighterKey}_bloodline_skill`).value = blSkill * statCap;
                 document.getElementById(`${fighterKey}_speed`).value = 0;
                 document.getElementById(`${fighterKey}_cast_speed`).value = speed * statCap;
+
+                document.getElementById(`${fighterKey}_jutsu_type`).value = 'genjutsu';
                 break;
             default:
                 console.warn('invalid offense type!');
