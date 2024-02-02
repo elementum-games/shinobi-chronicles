@@ -41,6 +41,8 @@ class Database {
         $con = new mysqli($this->host, $this->username, $this->password) or throw new RuntimeException(mysqli_error($this->con));
         mysqli_select_db($con, $this->database) or throw new RuntimeException(mysqli_error($this->con));
 
+        mysqli_query($con, "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
+
         $this->con = $con;
         return $con;
     }
