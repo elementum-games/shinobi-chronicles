@@ -166,7 +166,6 @@ class TestFighter extends Fighter {
                 stats_max_level: $rankManager->statsForRankAndLevel($rank->id, $rank->max_level),
                 regen_rate: $fighter->regen_rate
             );
-            $fighter->applyBloodlineBoosts();
         }
 
         $fighter->jutsu = [];

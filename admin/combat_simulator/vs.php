@@ -70,6 +70,21 @@ if(isset($_POST['run_simulation'])) {
             player1_effects: $player1_effects,
             player2_effects: $player2_effects
         );
+
+        $results['winning_fighter'] = null;
+        $results['winning_percent'] = 0;
+        $results['damage_difference'] = 0;
+
+        if($results['player1']['damage_taken'] > $results['player2']['damage_taken']) {
+            $results['winning_fighter'] = 'player2';
+            $results['winning_percent'] = (($results['player1']['damage_taken'] / $results['player2']['damage_taken']) * 100) - 100;
+            $results['damage_difference'] = $results['player1']['damage_taken'] - $results['player2']['damage_taken'];
+        }
+        if($results['player2']['damage_taken'] > $results['player1']['damage_taken']) {
+            $results['winning_fighter'] = 'player1';
+            $results['winning_percent'] = (($results['player2']['damage_taken'] / $results['player1']['damage_taken']) * 100) - 100;
+            $results['damage_difference'] = $results['player2']['damage_taken'] - $results['player1']['damage_taken'];
+        }
     } catch (Exception $e) {
         echo $e->getMessage();
     }
@@ -114,10 +129,14 @@ require 'vs_fighter_input.php';
 
         background-color:#fafafa;
     }
+    .winner {
+        background-color: #a0ffa0;
+    }
+
     .collision {
         width: 100%;
         margin-top: 10px;
-        background-color:#fafafa;
+        background-color: #fafafa;
         text-align: center;
         padding: 5px;
     }
@@ -126,7 +145,7 @@ require 'vs_fighter_input.php';
 
 <?php if($results != null): ?>
     <div class='results'>
-        <div class='player1'>
+        <div class='player1 <?= ($results['winning_fighter'] == 'player1' ? 'winner' : '') ?>'>
             <b>Player 1:</b><br />
             <?= number_format($results['player1']['raw_damage']) ?> raw damage<br />
             <?= number_format($results['player1']['collision_damage']) ?> post-collision damage<br />
@@ -135,7 +154,7 @@ require 'vs_fighter_input.php';
             <br />
             <?= number_format($results['player1']['damage_taken'], 2) ?> damage taken<br />
         </div>
-        <div class='player2'>
+        <div class='player2 <?= ($results['winning_fighter'] == 'player2' ? 'winner' : '') ?>'>
             <b>Player 2:</b><br />
             <?= number_format($results['player2']['raw_damage']) ?> raw damage<br />
             <?= number_format($results['player2']['collision_damage']) ?> post-collision damage<br />
@@ -144,11 +163,20 @@ require 'vs_fighter_input.php';
             <br />
             <?= number_format($results['player2']['damage_taken'], 2) ?> damage taken<br />
         </div>
-        <?php if($results['collision_text']): ?>
-            <div class='collision'>
-                <?= $results['collision_text'] ?>
-            </div>
-        <?php endif; ?>
+        <div class='collision'>
+            <?php if($results['collision_text']): ?>
+                <?= $results['collision_text'] ?><br />
+            <?php endif; ?>
+
+            <?php if($results['winning_fighter'] == 'player1'): ?>
+                Player 1 won by <?= number_format($results['winning_percent'], 2) ?>%
+                (<?= number_format($results['damage_difference'], 2) ?> damage)<br />
+            <?php endif; ?>
+            <?php if($results['winning_fighter'] == 'player2'): ?>
+                Player 2 won by <?= number_format($results['winning_percent'], 2) ?>%
+                (<?= number_format($results['damage_difference'], 2) ?> damage)<br />
+            <?php endif; ?>
+        </div>
     </div>
 <?php endif; ?>
 <form action='vs.php' method='post'>
