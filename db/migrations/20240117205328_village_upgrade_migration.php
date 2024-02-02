@@ -54,7 +54,7 @@ final class VillageUpgradeMigration extends AbstractMigration
 
             -- Alter table player_war_logs
             ALTER TABLE `player_war_logs` ADD `stability_gained` INT(11) NOT NULL DEFAULT '0';
-            ALTER TABLE `player_war_logs` ADD `stability_reduced` INT(11) NOT NULL DEFAULT '0'; 
+            ALTER TABLE `player_war_logs` ADD `stability_reduced` INT(11) NOT NULL DEFAULT '0';
 
             -- Alter table village_war_logs
             ALTER TABLE `village_war_logs` ADD `stability_gained` INT(11) NOT NULL DEFAULT '0';
@@ -122,6 +122,23 @@ final class VillageUpgradeMigration extends AbstractMigration
             INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('CONSTRUCTION_I', '4', 'active');
             INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('RESEARCH_I', '5', 'active');
             INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('CONSTRUCTION_I', '5', 'active');
+
+            -- Update region_location names
+            UPDATE region_locations SET name = 'Ishiyama Castle' WHERE `region_location_id` = 16;
+            UPDATE region_locations SET name = 'Daichikyū Castle' WHERE `region_location_id` = 1;
+            UPDATE region_locations SET name = 'Doheki Castle' WHERE `region_location_id` = 10;
+            UPDATE region_locations SET name = 'Aoiyama Castle' WHERE `region_location_id` = 49;
+            UPDATE region_locations SET name = 'Midoriyama Castle' WHERE `region_location_id` = 25;
+            UPDATE region_locations SET name = 'Akaiyama Castle' WHERE `region_location_id` = 28;
+            UPDATE region_locations SET name = 'Ōtaiyō Castle' WHERE `region_location_id` = 32;
+            UPDATE region_locations SET name = 'Ōhirahara Castle' WHERE `region_location_id` = 37;
+            UPDATE region_locations SET name = 'Sakurama Castle' WHERE `region_location_id` = 58;
+            UPDATE region_locations SET name = 'Sabaku-ishi Castle' WHERE `region_location_id` = 4;
+            UPDATE region_locations SET name = 'Ōkaze Castle' WHERE `region_location_id` = 34;
+            UPDATE region_locations SET name = 'Arashiyama Castle' WHERE `region_location_id` = 56;
+            UPDATE region_locations SET name = 'Ōkaiyō Castle' WHERE `region_location_id` = 46;
+            UPDATE region_locations SET name = 'Kiriyama Castle' WHERE `region_location_id` = 40;
+            UPDATE region_locations SET name = 'Mikadzuki Castle' WHERE `region_location_id` = 53;
         ");
     }
 
