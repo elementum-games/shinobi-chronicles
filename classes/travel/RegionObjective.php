@@ -16,5 +16,6 @@ class RegionObjective {
         public int $resource_id,
         public int $resource_count,
         public int $stability,
+        public bool $rebellion_active,
     ) {}
 }

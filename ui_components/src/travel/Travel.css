@@ -686,9 +686,26 @@
     width: 60px;
     bottom: -14px;
 }
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 10px red;
+    }
+
+    100% {
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0);
+    }
+}
+.rebellion_glow {
+    animation: pulseGlow 2s infinite ease-out;
+}
+.rebellion_text {
+}
 
 /* Player */
-
 #map_player {
     width: 32px;
     height: 32px;
