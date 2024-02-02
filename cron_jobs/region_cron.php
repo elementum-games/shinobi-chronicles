@@ -19,7 +19,7 @@ require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/inbox/Inbox.php';
 require_once __DIR__ . '/../classes/war/WarManager.php';
-require_once __DIR__ . '/../classes/travel/Patrol.php';
+require_once __DIR__ . '/../classes/travel/MapNPC.php';
 
 $system = System::initialize(load_layout: false);
 $system->db->connect();
@@ -100,7 +100,6 @@ function hourlyRegion(System $system, $debug = true): void
     // apply base production
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);
-        $production = WarManager::VILLAGE_BASE_RESOURCE_PRODUCTION + $villages[$village['village_id']]->policy->home_production_boost;
         $materials_production = $villages[$village['village_id']]->policy->materials_production;
         $food_production = $villages[$village['village_id']]->policy->food_production;
         $wealth_production = $villages[$village['village_id']]->policy->wealth_production;
@@ -134,23 +133,30 @@ function hourlyRegion(System $system, $debug = true): void
         /* update stability */
         $castle_stability = 0;
         $castle_occupying_village_id = 0;
-        foreach ($region_location_result as $region_location) {
+        foreach ($region_location_result as &$region_location) {
             if ($region_location['type'] === 'castle') {
                 $castle_occupying_village_id = $region_location['occupying_village_id'];
                 $stability_baseline = WarManager::BASE_CASTLE_STABILITY;
+                $stability_gap = abs($stability_baseline - $region_location['stability']);
+                $stability_shift = min(WarManager::BASE_STABILITY_SHIFT_PER_HOUR + floor($stability_gap / WarManager::STABILITY_DEFENSE_SHIFT_INCREMENT), WarManager::MAX_STABILITY_DEFENSE_SHIFT);
                 if ($region_location['stability'] < $stability_baseline) {
-                    $region_location['stability'] += WarManager::BASE_STABILITY_SHIFT_PER_HOUR;
+                    $region_location['stability'] += $stability_shift;
                     $region_location['stability'] = min($region_location['stability'], $stability_baseline);
                 } else if ($region_location['stability'] > $stability_baseline) {
-                    $region_location['stability'] -= WarManager::BASE_STABILITY_SHIFT_PER_HOUR;
+                    $region_location['stability'] -= $stability_shift;
                     $region_location['stability'] = max($region_location['stability'], $stability_baseline);
                 }
                 $castle_stability = $region_location['stability'];
             }
+            unset($region_location);
         }
-        foreach ($region_location_result as $region_location) {
+        foreach ($region_location_result as &$region_location) {
             if ($region_location['type'] === 'village') {
                 $stability_baseline = WarManager::BASE_TOWN_STABILITY;
+                // if home region
+                if ($region_location['region_id'] < 5) {
+                    $stability_baseline += WarManager::HOME_REGION_STABILITY_BONUS;
+                }
                 // if castle owned
                 if ($castle_occupying_village_id == $region_location['occupying_village_id']) {
                     $stability_baseline += $castle_stability;
@@ -159,14 +165,17 @@ function hourlyRegion(System $system, $debug = true): void
                 if ($region_location['occupying_village_id'] != WarManager::REGION_ORIGINAL_VILLAGE[$region['region_id']]) {
                     $stability_baseline -= WarManager::OCCUPIED_TOWN_STABILITY_PENALTY;
                 }
+                $stability_gap = abs($stability_baseline - $region_location['stability']);
+                $stability_shift = min(WarManager::BASE_STABILITY_SHIFT_PER_HOUR + floor($stability_gap / WarManager::STABILITY_DEFENSE_SHIFT_INCREMENT), WarManager::MAX_STABILITY_DEFENSE_SHIFT);
                 if ($region_location['stability'] < $stability_baseline) {
-                    $region_location['stability'] += WarManager::BASE_STABILITY_SHIFT_PER_HOUR;
+                    $region_location['stability'] += $stability_shift;
                     $region_location['stability'] = min($region_location['stability'], $stability_baseline);
                 } else if ($region_location['stability'] > $stability_baseline) {
-                    $region_location['stability'] -= WarManager::BASE_STABILITY_SHIFT_PER_HOUR;
+                    $region_location['stability'] -= $stability_shift;
                     $region_location['stability'] = max($region_location['stability'], $stability_baseline);
                 }
             }
+            unset($region_location);
         }
 
         /* update resource count */
@@ -196,32 +205,38 @@ function hourlyRegion(System $system, $debug = true): void
 
         /* update defense */
         foreach ($region_location_result as &$region_location) {
+            $defense_gap = abs($region_location['stability'] - $region_location['defense']);
+            $defense_shift = min(WarManager::BASE_DEFENSE_SHIFT_PER_HOUR + floor($defense_gap / WarManager::STABILITY_DEFENSE_SHIFT_INCREMENT), WarManager::MAX_STABILITY_DEFENSE_SHIFT);
             switch ($region_location['type']) {
                 case 'castle':
                     if ($region_location['defense'] > $region_location['stability']) {
-                        $region_location['defense'] -= WarManager::BASE_DEFENSE_SHIFT_PER_HOUR;
+                        $region_location['defense'] -= $defense_shift;
                         if ($region_location['defense'] < $region_location['stability']) {
                             $region_location['defense'] = $region_location['stability'];
                         }
+                        $region_location['defense'] = max($region_location['defense'], 0);
                     }
                     else if ($region_location['defense'] < $region_location['stability']) {
-                        $region_location['defense'] += WarManager::BASE_DEFENSE_SHIFT_PER_HOUR;
+                        $region_location['defense'] += $defense_shift;
                         if ($region_location['defense'] > $region_location['stability']) {
                             $region_location['defense'] = $region_location['stability'];
                         }
+                        $region_location['defense'] = min($region_location['defense'], 100);
                     }
                     break;
                 case 'village';
                     if ($region_location['defense'] > $region_location['stability']) {
-                        $region_location['defense'] -= WarManager::BASE_DEFENSE_SHIFT_PER_HOUR;
+                        $region_location['defense'] -= $defense_shift;
                         if ($region_location['defense'] < $region_location['stability']) {
                             $region_location['defense'] = $region_location['stability'];
                         }
+                        $region_location['defense'] = max($region_location['defense'], 0);
                     } else if ($region_location['defense'] < $region_location['stability']) {
-                        $region_location['defense'] += WarManager::BASE_DEFENSE_SHIFT_PER_HOUR;
+                        $region_location['defense'] += $defense_shift;
                         if ($region_location['defense'] > $region_location['stability']) {
                             $region_location['defense'] = $region_location['stability'];
                         }
+                        $region_location['defense'] = min($region_location['defense'], 100);
                     }
                     break;
                 default;
@@ -237,7 +252,7 @@ function hourlyRegion(System $system, $debug = true): void
                 `health` = {$region_location['health']},
                 `defense` = {$region_location['defense']},
                 `stability` = {$region_location['stability']}
-                WHERE `id` = {$region_location['id']}";
+                WHERE `region_location_id` = {$region_location['region_location_id']}";
         }
     }
 
