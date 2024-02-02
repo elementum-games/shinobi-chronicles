@@ -68,8 +68,8 @@ abstract class Fighter {
     public int $bloodline_id;
     public ?Bloodline $bloodline = null;
 
-    public array $bloodline_offense_boosts;
-    public array $bloodline_defense_boosts;
+    public array $bloodline_offense_boosts = [];
+    public array $bloodline_defense_boosts = [];
     public float $bloodline_cast_speed_boost = 0;
     public float $bloodline_speed_boost = 0;
 
@@ -142,7 +142,7 @@ abstract class Fighter {
 
     public function applyBloodlineBoosts() {
         // Temp number fix inside
-        if($this->bloodline_id) {
+        if($this->bloodline != null) {
             if($this->system->debug['bloodline']) {
                 echo "Setting passive combat boosts for {$this->getName()}<br />";
                 echo "<br />";
@@ -537,6 +537,7 @@ abstract class Fighter {
         } else {
             $damage = $raw_damage;
         }
+
         if ($damage < 0.0) {
             $damage = 0;
         }

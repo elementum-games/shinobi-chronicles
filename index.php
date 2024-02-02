@@ -8,7 +8,9 @@ require_once("classes/_autoload.php");
 $system = System::initialize();
 
 // Display errors on dev
+echo 'hi';
 if($system->isDevEnvironment()) {
+    echo 'hi';
     ini_set(option: 'display_errors', value: 'On');
 }
 // Display errors on production for developers

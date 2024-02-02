@@ -95,7 +95,11 @@ class BattleManager {
         if($load_fighters) {
             $this->loadFighters();
 
-            $this->effects->applyPassiveEffects($this->battle->player1, $this->battle->player2);
+            $this->effects->applyPassiveEffects(
+                player1: $this->battle->player1,
+                player2: $this->battle->player2,
+                battle_type: $this->battle->battle_type
+            );
         }
     }
 
@@ -1162,7 +1166,6 @@ class BattleManager {
                 $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . round($recoil_damage, 0) . "</span> recoil damage-" . '</span></br>';
             }
         }
-
         if ($attack->countered_percent > 0) {
             if ($counter_damage_resisted > 0) {
                 $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type}\">" . round($counter_damage, 0) . "</span> counter damage- (resists " . "<span class=\"battle_text_{$attack->countered_jutsu_type}\">" . round($counter_damage_resisted) . "</span>" . " counter damage)" . '</span></br>';
@@ -1170,7 +1173,6 @@ class BattleManager {
                 $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type}\">" . round($counter_damage, 0) . "</span> counter damage-" . '</span></br>';
             }
         }
-
         if ($attack->immolate_raw_damage > 0) {
             if ($immolate_damage_resisted > 0) {
                 $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . round($immolate_damage, 0) . "</span> immolation damage- (resists " . "<span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . round($immolate_damage_resisted) . "</span>" . " immolation damage)" . '</span></br>';

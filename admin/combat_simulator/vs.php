@@ -59,30 +59,8 @@ if(isset($_POST['run_simulation'])) {
         );
 
         // Effects
-        $player1_effects = [];
-        $player2_effects = [];
-        foreach($player1_data['active_effects'] as $active_effect) {
-            if($active_effect['effect'] == 'none') continue;
-
-            $player1_effects[] = new BattleEffect(
-                user: $player1->combat_id,
-                target: $player1->combat_id,
-                turns: 1,
-                effect: $active_effect['effect'],
-                effect_amount: $active_effect['amount']
-            );
-        }
-        foreach($player2_data['active_effects'] as $active_effect) {
-            if($active_effect['effect'] == 'none') continue;
-
-            $player2_effects[] = new BattleEffect(
-                user: $player2->combat_id,
-                target: $player2->combat_id,
-                turns: 1,
-                effect: $active_effect['effect'],
-                effect_amount: $active_effect['amount']
-            );
-        }
+        $player1_effects = $player1->activeEffectsFromFormData($player1_data['active_effects']);
+        $player2_effects = $player2->activeEffectsFromFormData($player2_data['active_effects']);
 
         $results = calcDamage(
             player1: $player1,

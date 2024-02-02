@@ -16,7 +16,7 @@ require_once __DIR__ . '/../classes/inbox/Inbox.php';
  *      Resets monthly Points for villages to 0
  */
 
-$system = System::initialize(load_layout: true);
+$system = System::initialize(load_layout: false);
 $system->db->connect();
 
 if(!$system->db->con) {

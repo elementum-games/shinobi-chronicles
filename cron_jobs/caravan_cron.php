@@ -23,7 +23,7 @@ require_once __DIR__ . '/../classes/inbox/Inbox.php';
 require_once __DIR__ . '/../classes/war/WarManager.php';
 require_once __DIR__ . '/../classes/travel/Patrol.php';
 
-$system = System::initialize(load_layout: true);
+$system = System::initialize(load_layout: false);
 $system->db->connect();
 
 if (!$system->db->con) {

@@ -9,6 +9,24 @@ class TestFighter extends Fighter {
     public string $gender = 'Non-binary';
     public int $total_stats;
 
+    public function activeEffectsFromFormData(array $active_effects): array {
+        $effects = [];
+
+        foreach($active_effects as $active_effect) {
+            if($active_effect['effect'] == 'none') continue;
+
+            $effects[] = new BattleEffect(
+                user: $this->combat_id,
+                target: $this->combat_id,
+                turns: 1,
+                effect: $active_effect['effect'],
+                effect_amount: $active_effect['amount']
+            );
+        }
+
+        return $effects;
+    }
+
     public function getAvatarSize(): int {
         return 125;
     }
@@ -86,6 +104,10 @@ class TestFighter extends Fighter {
 
         $jutsu->setLevel(100, 0);
         $this->jutsu[$jutsu->id] = $jutsu;
+        $this->equipped_jutsu[] = [
+            'id' => $jutsu->id,
+            'type' => $jutsu->jutsu_type,
+        ];
 
         return $jutsu;
     }
@@ -148,6 +170,7 @@ class TestFighter extends Fighter {
         }
 
         $fighter->jutsu = [];
+        $fighter->equipped_jutsu = [];
 
         return $fighter;
     }
