@@ -1118,7 +1118,7 @@ class TravelManager {
             if ($distance <= self::DISPLAY_RADIUS) {
                 switch ($obj['type']) {
                     case "castle":
-                        $image = "/images/map/icons/castle.png";
+                        $image = "/images/map/icons/test7.png";
                         $objectives[] = new RegionObjective(
                             id: $obj['region_location_id'],
                             name: $obj['name'],
@@ -1134,6 +1134,7 @@ class TravelManager {
                             resource_id: $obj['resource_id'],
                             resource_count: $obj['resource_count'],
                             stability: $obj['stability'],
+                            rebellion_active: $obj['rebellion_active'],
                         );
                         break;
                     case "tower":
@@ -1154,10 +1155,11 @@ class TravelManager {
                             resource_id: $obj['resource_id'],
                             resource_count: $obj['resource_count'],
                             stability: $obj['stability'],
+                            rebellion_active: $obj['rebellion_active'],
                         );
                     case "village":
                         if ($distance <= $this->user->scout_range) {
-                            $image = "/images/map/icons/village.png";
+                            $image = "/images/map/icons/Untitled3.png";
                             $objectives[] = new RegionObjective(
                                 id: $obj['region_location_id'],
                                 name: $obj['name'],
@@ -1173,6 +1175,7 @@ class TravelManager {
                                 resource_id: $obj['resource_id'],
                                 resource_count: $obj['resource_count'],
                                 stability: $obj['stability'],
+                                rebellion_active: $obj['rebellion_active'],
                             );
                         }
                         break;

@@ -393,13 +393,13 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, pl
                                     backgroundColor = '#3c2b2bcc'; // Original background
                                 }
                                 return (
-                                    <div className={'region_objective_tooltip' + (objective.is_occupied ? ' occupied' : '')}
+                                    <div className={`region_objective_tooltip${objective.rebellion_active ? ' rebellion_glow' : ''}`}
                                         style={{
                                             display: strategicView || (objective.x == player_x && objective.y == player_y) ? 'flex' : 'none',
                                             background: backgroundColor
                                         }}
                                     >
-                                        <span className='region_objective_tooltip_name'>{objective.name}</span>
+                                        <span className={`region_objective_tooltip_name${objective.rebellion_active ? ' rebellion_text' : ''}`}>{objective.name}</span>
                                         <div className='region_objective_tooltip_tags'>
                                             <span className='region_objective_tooltip_defense'>{objective.defense}</span>
                                             <img className='region_objective_tooltip_village' src={getVillageIcon(objective.village_id)} />
