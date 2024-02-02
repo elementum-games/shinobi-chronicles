@@ -374,8 +374,18 @@ class WarAction {
                     // occupy town and set HP/defense/stability
                     $town_hp = floor(WarManager::BASE_TOWN_HEALTH * (WarManager::INITIAL_LOCATION_CAPTURE_HEALTH_PERCENT / 100));
                     $town_defense = WarManager::INITIAL_LOCATION_CAPTURE_DEFENSE;
-                    $town_stability = WarManager::INITIAL_LOCATION_CAPTURE_STABILITY;
-                    $this->system->db->query("UPDATE `region_locations` SET `occupying_village_id` = {$this->user->village->village_id}, `health` = {$town_hp}, `defense` = {$town_defense}, `stability` = {$town_stability} WHERE `region_location_id` = {$location_target['region_location_id']}");
+                    // if retaken by original village, clear rebellion and capture normally
+                    $town_stability = $location_target['stability'];
+                    $town_rebellion = $location_target['rebellion_active'];
+                    if ($location_target['rebellion_active']) {
+                        if ($this->user_village == WarManager::REGION_ORIGINAL_VILLAGE[$location_target['region_id']]) {
+                            $town_stability = WarManager::INITIAL_LOCATION_CAPTURE_STABILITY;
+                            $town_rebellion = 0;
+                        }
+                    } else {
+                        $town_stability = WarManager::INITIAL_LOCATION_CAPTURE_STABILITY;
+                    }
+                    $this->system->db->query("UPDATE `region_locations` SET `occupying_village_id` = {$this->user->village->village_id}, `health` = {$town_hp}, `defense` = {$town_defense}, `stability` = {$town_stability}, `rebellion_active` = {$town_rebellion} WHERE `region_location_id` = {$location_target['region_location_id']}");
                 } else {
                     if ($location_target['defense'] > 0) {
                         $result = max($location_target['defense'] - $defense_reduction, 0);
