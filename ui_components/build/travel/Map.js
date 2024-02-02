@@ -359,13 +359,13 @@ function RegionObjectives({
     }
 
     return /*#__PURE__*/React.createElement("div", {
-      className: 'region_objective_tooltip' + (objective.is_occupied ? ' occupied' : ''),
+      className: `region_objective_tooltip${objective.rebellion_active ? ' rebellion_glow' : ''}`,
       style: {
         display: strategicView || objective.x == player_x && objective.y == player_y ? 'flex' : 'none',
         background: backgroundColor
       }
     }, /*#__PURE__*/React.createElement("span", {
-      className: "region_objective_tooltip_name"
+      className: `region_objective_tooltip_name${objective.rebellion_active ? ' rebellion_text' : ''}`
     }, objective.name), /*#__PURE__*/React.createElement("div", {
       className: "region_objective_tooltip_tags"
     }, /*#__PURE__*/React.createElement("span", {
