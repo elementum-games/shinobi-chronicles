@@ -99,7 +99,20 @@ function processRegionRegenInterval(System $system, $debug = true): void
         $region_location_result = $system->db->query("SELECT * FROM `region_locations` WHERE `region_id` = {$region['region_id']}");
         $region_location_result = $system->db->fetch_all($region_location_result);
 
-        /* step 1: update health */
+        /* step 1: roll for rebellion */
+        foreach ($region_location_result as &$region_location) {
+            // if village, and stability is negative, and not original village, roll for rebellion
+            if ($region_location['type'] == 'village' && $region_location['stability'] < 0 && $region_location['occupying_village_id'] != WarManager::REGION_ORIGINAL_VILLAGE[$region['region_id']]) {
+                // rebellin chance is proportional to stability, spread evenly over each hour
+                $rebellion_chance = abs($region_location['stability']) / (60 / WarManager::REGEN_INTERVAL_MINUTES);
+                if (mt_rand(0, 100) < $rebellion_chance) {
+                    $region_location['rebellion_active'] = 1;
+                }
+            }
+            unset($region_location);
+        }
+
+        /* step 2: update health */
         $castle = null;
         $village_regen_share = 0;
         foreach ($region_location_result as &$region_location) {
@@ -112,12 +125,27 @@ function processRegionRegenInterval(System $system, $debug = true): void
                     $castle = &$region_location;
                     break;
                 case 'village';
-                    // increase health, cap at max
-                    $regen = (WarManager::BASE_TOWN_REGEN_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES) * max((1 + ($region_location['stability'] / 100)), 0);
-                    $region_location['health'] = min($region_location['health'] + $regen, WarManager::BASE_TOWN_HEALTH);
-                    // give a bonus to castle regen if not occupied
-                    if (empty($region_location['occupying_village_id'])) {
-                        $village_regen_share += floor((WarManager::TOWN_REGEN_SHARE_PERCENT / 100) * $regen);
+                    if ($region_location['rebellion_active']) {
+                        $damage = (WarManager::BASE_REBELLION_DAMAGE_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES) * max((1 + (-1 * $region_location['stability'] / 100)), 0);
+                        $region_location['health'] = max($region_location['health'] - $damage, 0);
+                        // if health reaches 0, change control
+                        if ($region_location['health'] == 0) {
+                            $region_location['occupying_village_id'] = WarManager::REGION_ORIGINAL_VILLAGE[$region['region_id']];
+                            $region_location['rebellion_active'] = 0;
+                            $region_location['health'] = (WarManager::INITIAL_LOCATION_CAPTURE_HEALTH_PERCENT / 100) * WarManager::BASE_TOWN_HEALTH;
+                            $region_location['defense'] = WarManager::INITIAL_LOCATION_CAPTURE_DEFENSE;
+                            $region_location['stability'] = WarManager::INITIAL_LOCATION_CAPTURE_STABILITY;
+                        }
+                    } else {
+                        // increase health, cap at max
+                        $regen = (WarManager::BASE_TOWN_REGEN_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES) * max((1 + ($region_location['stability'] / 100)), 0);
+                        $region_location['health'] = min($region_location['health'] + $regen, WarManager::BASE_TOWN_HEALTH);
+                        // give a bonus to castle regen if same owner
+                        if (isset($castle)) {
+                            if ($region_location['occupying_village_id'] == $castle['occupying_village_id']) {
+                                $village_regen_share += floor((WarManager::TOWN_REGEN_SHARE_PERCENT / 100) * $regen);
+                            }
+                        }
                     }
                     break;
                 default;
@@ -125,18 +153,22 @@ function processRegionRegenInterval(System $system, $debug = true): void
             }
             unset($region_location);
         }
+
         // if castle exists, add bonus regen from villages
         if (!empty($castle)) {
             $castle['health'] = min($castle['health'] + $village_regen_share, WarManager::BASE_CASTLE_HEALTH);
             unset($castle);
         }
 
-        /* step 2: update region_locations */
+        /* update region_locations */
         foreach ($region_location_result as $region_location) {
-            $queries[] = "UPDATE `region_locations`
-                SET `resource_count` = {$region_location['resource_count']},
-                `health` = {$region_location['health']}
-                WHERE `id` = {$region_location['id']}";
+            $queries[] = "UPDATE `region_locations` SET
+                `health` = {$region_location['health']},
+                `defense` = {$region_location['defense']},
+                `stability` = {$region_location['stability']},
+                `rebellion_active` = {$region_location['rebellion_active']},
+                `occupying_village_id` = {$region_location['occupying_village_id']}
+                WHERE `region_location_id` = {$region_location['region_location_id']}";
         }
     }
 

@@ -11,6 +11,7 @@ class WarManager {
     const BASE_TOWN_REGEN_PER_MINUTE = 150; // 2x at full stability, Chuu max raid damage at 75% stability
     const BASE_CASTLE_REGEN_PER_MINUTE = 300; // 2x at full stability, Jon max raid damage at 75% stability
     const TOWN_REGEN_SHARE_PERCENT = 100; // 2 villages + base, 1200/min max at 2x villages 100% stability
+    const BASE_REBELLION_DAMAGE_PER_MINUTE = 150; // 2x at -100 stability, Chuu max raid damage at -75% stability
     const BASE_TOWN_HEALTH = 5000;
     const BASE_CASTLE_HEALTH = 15000;
     const BASE_TOWN_DEFENSE = 50;
@@ -20,8 +21,11 @@ class WarManager {
     const OCCUPIED_TOWN_STABILITY_PENALTY = 100;
     const BASE_STABILITY_SHIFT_PER_HOUR = 1;
     const BASE_DEFENSE_SHIFT_PER_HOUR = 1;
+    const STABILITY_DEFENSE_SHIFT_INCREMENT = 20; // for every 20 points gap between current and resting point, shift 1 point
+    const MAX_STABILITY_DEFENSE_SHIFT = 5;
     const MAX_STABILITY = 100;
     const MIN_STABILITY = -100;
+    const HOME_REGION_STABILITY_BONUS = 75;
     const INITIAL_LOCATION_CAPTURE_HEALTH_PERCENT = 50;
     const INITIAL_LOCATION_CAPTURE_DEFENSE = 25;
     const INITIAL_LOCATION_CAPTURE_STABILITY = 25;
