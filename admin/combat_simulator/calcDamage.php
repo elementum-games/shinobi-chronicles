@@ -96,8 +96,8 @@ function calcDamage(
     $system->db->query("DELETE FROM `battles` WHERE `battle_id`={$battle_id}");
     $system->db->query("DELETE FROM `battle_logs` WHERE `battle_id`={$battle_id}");
 
-    $player1_collision_damage = $player1_raw_damage;
-    $player2_collision_damage = $player2_raw_damage;
+    $player1_collision_damage = $player1_attack->raw_damage;
+    $player2_collision_damage = $player2_attack->raw_damage;
 
     $player1_starting_health = $player1->health;
     $player2_starting_health = $player2->health;
@@ -125,9 +125,6 @@ function calcDamage(
         defense_type: $player2_jutsu->jutsu_type,
         apply_resists: false
     );
-
-    $battle->applyAttack($player1_attack, $player1, $player2);
-    $battle->applyAttack($player2_attack, $player2, $player1);
 
     // Display
     return [
