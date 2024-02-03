@@ -179,12 +179,14 @@ require 'vs_fighter_input.php';
             <?php endif; ?>
 
             <?php if($results['winning_fighter'] == 'player1'): ?>
-                Player 1 won by <?= number_format($results['winning_percent'], 2) ?>%
-                (<?= number_format($results['damage_difference'], 2) ?> damage)<br />
+                <br />
+                <b>Player 1 won by <?= number_format($results['winning_percent'], 2) ?>%
+                (<?= number_format($results['damage_difference'], 2) ?> damage)</b><br />
             <?php endif; ?>
             <?php if($results['winning_fighter'] == 'player2'): ?>
-                Player 2 won by <?= number_format($results['winning_percent'], 2) ?>%
-                (<?= number_format($results['damage_difference'], 2) ?> damage)<br />
+                <br />
+                <b>Player 2 won by <?= number_format($results['winning_percent'], 2) ?>%
+                (<?= number_format($results['damage_difference'], 2) ?> damage)</b><br />
             <?php endif; ?>
         </div>
     </div>
