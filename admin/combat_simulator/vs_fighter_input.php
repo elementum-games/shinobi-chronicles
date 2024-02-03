@@ -1,6 +1,6 @@
 <style>
     .versusFighterInput {
-        width:300px;
+        width:325px;
         display:inline-block;
         border:1px solid #000000;
         border-radius:10px;
@@ -17,7 +17,7 @@
         display: inline-block;
     }
     .jutsu_input label {
-        width: 110px;
+        width: 125px;
         margin: 3px auto;
     }
     .active_effects_input label {
@@ -69,7 +69,7 @@
                 document.getElementById(`${fighterKey}_speed`).value = 0;
                 document.getElementById(`${fighterKey}_cast_speed`).value = speed * statCap;
 
-                document.getElementById(`${fighterKey}_jutsu_type`).value = 'ninjutsu';
+                document.getElementById(`${fighterKey}_jutsu1_type`).value = 'ninjutsu';
                 break;
             case 'tai':
                 document.getElementById(`${fighterKey}_ninjutsu_skill`).value = 0;
@@ -79,7 +79,7 @@
                 document.getElementById(`${fighterKey}_speed`).value = speed * statCap;
                 document.getElementById(`${fighterKey}_cast_speed`).value = 0;
 
-                document.getElementById(`${fighterKey}_jutsu_type`).value = 'taijutsu';
+                document.getElementById(`${fighterKey}_jutsu1_type`).value = 'taijutsu';
                 break;
             case 'gen':
                 document.getElementById(`${fighterKey}_ninjutsu_skill`).value = 0;
@@ -89,7 +89,7 @@
                 document.getElementById(`${fighterKey}_speed`).value = 0;
                 document.getElementById(`${fighterKey}_cast_speed`).value = speed * statCap;
 
-                document.getElementById(`${fighterKey}_jutsu_type`).value = 'genjutsu';
+                document.getElementById(`${fighterKey}_jutsu1_type`).value = 'genjutsu';
                 break;
             default:
                 console.warn('invalid offense type!');
@@ -117,16 +117,13 @@
             let boostEl = document.getElementById(`${fighterKey}_bloodline_boost_${i + 1}`);
             let boostAmountEl = document.getElementById(`${fighterKey}_bloodline_boost_${i + 1}_amount`);
 
-            console.log(`${fighterKey}_bloodline_boost_${i + 1}`, boostEl);
-            console.log(`${fighterKey}_bloodline_boost_${i + 1}_amount`, boostAmountEl);
-
             boostEl.value = boost.effect;
             boostAmountEl.value = boost.power;
         });
     }
 
-    function prefillJutsu(fighterKey) {
-        let jutsuSelect = document.getElementById(`${fighterKey}_jutsu_prefill`);
+    function prefillJutsu(fighterKey, jutsuKey) {
+        let jutsuSelect = document.getElementById(`${fighterKey}_${jutsuKey}_prefill`);
         if(jutsuSelect == null) {
             console.error("Invalid jutsu select element");
             return;
@@ -139,21 +136,28 @@
         }
 
         let selectedJutsu = JSON.parse(selectedJutsuEl.getAttribute("data-jutsu"));
-
-        console.log(selectedJutsu);
         
-        let typeEl = document.getElementById(`${fighterKey}_jutsu_type`);
-        let powerEl = document.getElementById(`${fighterKey}_jutsu_power`);
-        let effectEl = document.getElementById(`${fighterKey}_jutsu_effect`);
-        let effectAmountEl = document.getElementById(`${fighterKey}_jutsu_effect_amount`);
-        let effectLengthEl = document.getElementById(`${fighterKey}_jutsu_effect_length`);
+        let typeEl = document.getElementById(`${fighterKey}_${jutsuKey}_type`);
+        let powerEl = document.getElementById(`${fighterKey}_${jutsuKey}_power`);
+
+        let effectEl = document.getElementById(`${fighterKey}_${jutsuKey}_effect`);
+        let effectAmountEl = document.getElementById(`${fighterKey}_${jutsuKey}_effect_amount`);
+        let effectLengthEl = document.getElementById(`${fighterKey}_${jutsuKey}_effect_length`);
+
+        let effect2El = document.getElementById(`${fighterKey}_${jutsuKey}_effect2`);
+        let effect2AmountEl = document.getElementById(`${fighterKey}_${jutsuKey}_effect2_amount`);
+        let effect2LengthEl = document.getElementById(`${fighterKey}_${jutsuKey}_effect2_length`);
 
         typeEl.value = selectedJutsu.jutsu_type;
         powerEl.value = selectedJutsu.base_power;
 
-        effectEl.value = selectedJutsu.effect;
-        effectAmountEl.value = selectedJutsu.effect_amount;
-        effectLengthEl.value = selectedJutsu.effect_length;
+        effectEl.value = selectedJutsu.effects[0].effect;
+        effectAmountEl.value = selectedJutsu.effects[0].effect_amount;
+        effectLengthEl.value = selectedJutsu.effects[0].effect_length;
+
+        effect2El.value = selectedJutsu.effects[1].effect;
+        effect2AmountEl.value = selectedJutsu.effects[1].effect_amount;
+        effect2LengthEl.value = selectedJutsu.effects[1].effect_length;
     }
 </script>
 
@@ -161,6 +165,173 @@
 
 function selected($condition): string {
     return $condition ? "selected='selected'" : '';
+}
+
+/**
+ * @param string $fighter_form_key
+ * @param int    $jutsu_index
+ * @param array  $FORM_DATA
+ * @param Jutsu[]  $jutsu_by_group
+ * @return void
+ */
+function displayJutsuInput(string $fighter_form_key, int $jutsu_index, array $FORM_DATA, array $jutsu_by_group) {
+    $jutsu_form_key = "jutsu{$jutsu_index}";
+    $jutsu_form_data = $FORM_DATA[$fighter_form_key][$jutsu_form_key];
+
+    ?>
+    <div class='jutsu_input'>
+        <select
+            id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_prefill'
+            name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][id]'
+            onchange='prefillJutsu("<?= $fighter_form_key ?>", "<?= $jutsu_form_key ?>")'
+            style='margin: 2px auto 6px'
+        >
+            <option value='0'>Select to auto-fill jutsu</option>
+            <?php foreach($jutsu_by_group as $group => $jutsu_list): ?>
+                <optgroup label="<?= $group ?>">
+                    <?php foreach($jutsu_list as $jutsu): ?>
+                        <option
+                            value='<?= $jutsu->id ?>'
+                            data-jutsu='<?= json_encode($jutsu) ?>'
+                            <?= selected(($jutsu_form_data['id']) == $jutsu->id) ?>
+                        >
+                            <?= $jutsu->name ?>
+                        </option>
+                    <?php endforeach; ?>
+                </optgroup>
+            <?php endforeach; ?>
+        </select><br />
+
+        <label>Offense:</label>
+        <select id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_type' name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][type]'>
+            <option value='ninjutsu' <?= selected(($jutsu_form_data['type']) == 'ninjutsu') ?>>
+                Ninjutsu
+            </option>
+            <option value='taijutsu' <?= selected(($jutsu_form_data['type']) == 'taijutsu') ?>>
+                Taijutsu
+            </option>
+            <option value='genjutsu' <?= selected(($jutsu_form_data['type']) == 'genjutsu') ?>>
+                Genjutsu
+            </option>
+        </select><br />
+
+        <label>Base Power:</label>
+        <input
+            type='number'
+            step='0.05'
+            id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_power'
+            name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][power]'
+            value='<?= $jutsu_form_data['power'] ?>'
+            style='width:70px;'
+        /><br />
+
+        <div class='effect_input'>
+            <label>Effect</label>
+            <select
+                id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_effect'
+                name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][effect]'
+            >
+                <optgroup label="Damage">
+                    <?php foreach(BattleEffectsManager::DAMAGE_EFFECTS as $effect): ?>
+                        <option value='<?= $effect ?>' <?= selected($jutsu_form_data['effect'] == $effect) ?>>
+                            <?= System::unSlug($effect) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </optgroup>
+                <optgroup label="Clash">
+                    <?php foreach(BattleEffectsManager::CLASH_EFFECTS as $effect): ?>
+                        <option value='<?= $effect ?>' <?= selected($jutsu_form_data['effect'] == $effect) ?>>
+                            <?= System::unSlug($effect) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </optgroup>
+                <optgroup label="Buff">
+                    <?php foreach(BattleEffectsManager::BUFF_EFFECTS as $effect): ?>
+                        <option value='<?= $effect ?>' <?= selected($jutsu_form_data['effect'] == $effect) ?>>
+                            <?= System::unSlug($effect) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </optgroup>
+                <optgroup label="Debuff">
+                    <?php foreach(BattleEffectsManager::DEBUFF_EFFECTS as $effect): ?>
+                        <option value='<?= $effect ?>' <?= selected($jutsu_form_data['effect'] == $effect) ?>>
+                            <?= System::unSlug($effect) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </optgroup>
+            </select>
+
+            <label>Effect Amount:</label>
+            <input
+                type='number'
+                id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_effect_amount'
+                name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][effect_amount]'
+                value='<?= $jutsu_form_data['effect_amount'] ?>'
+            />
+
+            <label>Effect Length:</label>
+            <input
+                type='number'
+                id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_effect_length'
+                name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][effect_length]'
+                value='<?= $jutsu_form_data['effect_length'] ?>'
+            />
+        </div>
+        <div class='effect_input'>
+            <label>Effect 2</label>
+            <select
+                    id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_effect2'
+                    name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][effect2]'
+            >
+                <optgroup label="Damage">
+                    <?php foreach(BattleEffectsManager::DAMAGE_EFFECTS as $effect): ?>
+                        <option value='<?= $effect ?>' <?= selected($jutsu_form_data['effect2'] == $effect) ?>>
+                            <?= System::unSlug($effect) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </optgroup>
+                <optgroup label="Clash">
+                    <?php foreach(BattleEffectsManager::CLASH_EFFECTS as $effect): ?>
+                        <option value='<?= $effect ?>' <?= selected($jutsu_form_data['effect2'] == $effect) ?>>
+                            <?= System::unSlug($effect) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </optgroup>
+                <optgroup label="Buff">
+                    <?php foreach(BattleEffectsManager::BUFF_EFFECTS as $effect): ?>
+                        <option value='<?= $effect ?>' <?= selected($jutsu_form_data['effect2'] == $effect) ?>>
+                            <?= System::unSlug($effect) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </optgroup>
+                <optgroup label="Debuff">
+                    <?php foreach(BattleEffectsManager::DEBUFF_EFFECTS as $effect): ?>
+                        <option value='<?= $effect ?>' <?= selected($jutsu_form_data['effect2'] == $effect) ?>>
+                            <?= System::unSlug($effect) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </optgroup>
+            </select>
+
+            <label>Effect 2 Amount:</label>
+            <input
+                type='number'
+                id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_effect2_amount'
+                name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][effect2_amount]'
+                value='<?= $jutsu_form_data['effect2_amount'] ?>'
+            />
+
+            <label>Effect 2 Length:</label>
+            <input
+                type='number'
+                id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_effect2_length'
+                name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][effect2_length]'
+                value='<?= $jutsu_form_data['effect2_length'] ?>'
+            />
+        </div>
+    </div>
+
+    <?php
 }
 
 /**
@@ -216,12 +387,17 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
     $num_active_effects = 3;
 
     $default_values = [
-        'jutsu_id' => 0,
-        'jutsu_type' => 'ninjutsu',
-        'jutsu_power' => 4,
-        'jutsu_effect' => 'none',
-        'jutsu_effect_amount' => 0,
-        'jutsu_effect_length' => 0,
+        'jutsu1' => [
+            'id' => 0,
+            'type' => 'ninjutsu',
+            'power' => 4,
+            'effect' => 'none',
+            'effect_amount' => 0,
+            'effect_length' => 0,
+            'effect2' => 'none',
+            'effect2_amount' => 0,
+            'effect2_length' => 0,
+        ],
         'bloodline_id' => 0,
         'active_effects' => [],
     ];
@@ -409,102 +585,14 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
         </div>
 
         <b>Jutsu</b><br />
-        <div class='jutsu_input'>
-            <select
-                id='<?= $fighter_form_key ?>_jutsu_prefill'
-                name='<?= $fighter_form_key ?>[jutsu_id]'
-                onchange='prefillJutsu("<?= $fighter_form_key ?>")'
-                style='margin: 2px auto 6px'
-            >
-                <option value='0'>Select to auto-fill jutsu</option>
-                <?php foreach($jutsu_by_group as $group => $jutsu_list): ?>
-                    <optgroup label="<?= $group ?>">
-                        <?php foreach($jutsu_list as $jutsu): ?>
-                            <option
-                                value='<?= $jutsu->id ?>'
-                                data-jutsu='<?= json_encode($jutsu) ?>'
-                                <?= selected(($FORM_DATA[$fighter_form_key]['jutsu_id']) == $jutsu->id) ?>
-                            >
-                                <?= $jutsu->name ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </optgroup>
-                <?php endforeach; ?>
-            </select><br />
-
-            <label>Offense:</label>
-            <select id='<?= $fighter_form_key ?>_jutsu_type' name='<?= $fighter_form_key ?>[jutsu_type]'>
-                <option value='ninjutsu' <?= selected(($FORM_DATA[$fighter_form_key]['jutsu_type']) == 'ninjutsu') ?>>
-                    Ninjutsu
-                </option>
-                <option value='taijutsu' <?= selected(($FORM_DATA[$fighter_form_key]['jutsu_type']) == 'taijutsu') ?>>
-                    Taijutsu
-                </option>
-                <option value='genjutsu' <?= selected(($FORM_DATA[$fighter_form_key]['jutsu_type']) == 'genjutsu') ?>>
-                    Genjutsu
-                </option>
-            </select><br />
-
-            <label>Base Power:</label>
-            <input
-                type='number'
-                step='0.1'
-                id='<?= $fighter_form_key ?>_jutsu_power'
-                name='<?= $fighter_form_key ?>[jutsu_power]'
-                value='<?= $FORM_DATA[$fighter_form_key]['jutsu_power'] ?>'
-                style='width:70px;'
-            /><br />
-
-            <div class='effect_input'>
-                <label>Effect</label>
-                <select id='<?= $fighter_form_key ?>_jutsu_effect' name='<?= $fighter_form_key ?>[jutsu_effect]'>
-                    <optgroup label="Damage">
-                        <?php foreach(BattleEffectsManager::DAMAGE_EFFECTS as $effect): ?>
-                            <option value='<?= $effect ?>' <?= selected($FORM_DATA[$fighter_form_key]['jutsu_effect'] == $effect) ?>>
-                                <?= System::unSlug($effect) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </optgroup>
-                    <optgroup label="Clash">
-                        <?php foreach(BattleEffectsManager::CLASH_EFFECTS as $effect): ?>
-                            <option value='<?= $effect ?>' <?= selected($FORM_DATA[$fighter_form_key]['jutsu_effect'] == $effect) ?>>
-                                <?= System::unSlug($effect) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </optgroup>
-                    <optgroup label="Buff">
-                        <?php foreach(BattleEffectsManager::BUFF_EFFECTS as $effect): ?>
-                            <option value='<?= $effect ?>' <?= selected($FORM_DATA[$fighter_form_key]['jutsu_effect'] == $effect) ?>>
-                                <?= System::unSlug($effect) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </optgroup>
-                    <optgroup label="Debuff">
-                        <?php foreach(BattleEffectsManager::DEBUFF_EFFECTS as $effect): ?>
-                            <option value='<?= $effect ?>' <?= selected($FORM_DATA[$fighter_form_key]['jutsu_effect'] == $effect) ?>>
-                                <?= System::unSlug($effect) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </optgroup>
-                </select>
-
-                <label>Effect Amount:</label>
-                <input
-                    type='number'
-                    id='<?= $fighter_form_key ?>_jutsu_effect_amount'
-                    name='<?= $fighter_form_key ?>[jutsu_effect_amount]'
-                    value='<?= $FORM_DATA[$fighter_form_key]['jutsu_effect_amount'] ?>'
-                />
-
-                <label>Effect Length:</label>
-                <input
-                    type='number'
-                    id='<?= $fighter_form_key ?>_jutsu_effect_length'
-                    name='<?= $fighter_form_key ?>[jutsu_effect_length]'
-                    value='<?= $FORM_DATA[$fighter_form_key]['jutsu_effect_length'] ?>'
-                />
-            </div>
-        </div>
+        <?php
+            displayJutsuInput(
+                fighter_form_key: $fighter_form_key,
+                jutsu_index: 1,
+                FORM_DATA: $FORM_DATA,
+                jutsu_by_group: $jutsu_by_group
+            );
+        ?>
     </div>
     <?php
 }

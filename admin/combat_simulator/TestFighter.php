@@ -73,7 +73,10 @@ class TestFighter extends Fighter {
         float $base_power,
         string $effect,
         int $effect_amount,
-        int $effect_length
+        int $effect_length,
+        string $effect2,
+        int $effect2_amount,
+        int $effect2_length
     ): Jutsu {
         $id = count($this->jutsu) + 1;
         $jutsu = new Jutsu(
@@ -86,9 +89,9 @@ class TestFighter extends Fighter {
             effect_1: $effect,
             base_effect_amount_1: $effect_amount,
             effect_length_1: $effect_length,
-            effect_2: 'none',
-            base_effect_amount_2: 0,
-            effect_length_2: 0,
+            effect_2: $effect2,
+            base_effect_amount_2: $effect2_amount,
+            effect_length_2: $effect2_length,
             description: 'no',
             battle_text: 'nope',
             cooldown: 0,

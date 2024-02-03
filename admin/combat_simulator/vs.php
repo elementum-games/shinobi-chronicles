@@ -21,10 +21,10 @@ if(isset($_POST['run_simulation'])) {
         Jutsu::TYPE_GENJUTSU,
     ];
     try {
-        if(!in_array($player1_data['jutsu_type'], $valid_jutsu_types)) {
+        if(!in_array($player1_data['jutsu1']['type'], $valid_jutsu_types)) {
             throw new RuntimeException("Invalid jutsu type for player 1!");
         }
-        if(!in_array($player2_data['jutsu_type'], $valid_jutsu_types)) {
+        if(!in_array($player2_data['jutsu1']['type'], $valid_jutsu_types)) {
             throw new RuntimeException("Invalid jutsu type for player 2!");
         }
 
@@ -36,11 +36,14 @@ if(isset($_POST['run_simulation'])) {
         );
         $player1->combat_id = Battle::combatId(Battle::TEAM1, $player1);
         $player1_jutsu = $player1->addJutsu(
-            jutsu_type: $player1_data['jutsu_type'],
-            base_power: $player1_data['jutsu_power'],
-            effect: $player1_data['jutsu_effect'],
-            effect_amount: (int)$player1_data['jutsu_effect_amount'],
-            effect_length: (int)$player1_data['jutsu_effect_length'],
+            jutsu_type: $player1_data['jutsu1']['type'],
+            base_power: $player1_data['jutsu1']['power'],
+            effect: $player1_data['jutsu1']['effect'],
+            effect_amount: (int)$player1_data['jutsu1']['effect_amount'],
+            effect_length: (int)$player1_data['jutsu1']['effect_length'],
+            effect2: $player1_data['jutsu1']['effect2'],
+            effect2_amount: (int)$player1_data['jutsu1']['effect2_amount'],
+            effect2_length: (int)$player1_data['jutsu1']['effect2_length'],
         );
 
         $player2 = TestFighter::fromFormData(
@@ -51,11 +54,14 @@ if(isset($_POST['run_simulation'])) {
         );
         $player2->combat_id = Battle::combatId(Battle::TEAM2, $player2);
         $player2_jutsu = $player2->addJutsu(
-            jutsu_type: $player2_data['jutsu_type'],
-            base_power: $player2_data['jutsu_power'],
-            effect: $player2_data['jutsu_effect'],
-            effect_amount: (int)$player2_data['jutsu_effect_amount'],
-            effect_length: (int)$player2_data['jutsu_effect_length'],
+            jutsu_type: $player2_data['jutsu1']['type'],
+            base_power: $player2_data['jutsu1']['power'],
+            effect: $player2_data['jutsu1']['effect'],
+            effect_amount: (int)$player2_data['jutsu1']['effect_amount'],
+            effect_length: (int)$player2_data['jutsu1']['effect_length'],
+            effect2: $player2_data['jutsu1']['effect2'],
+            effect2_amount: (int)$player2_data['jutsu1']['effect2_amount'],
+            effect2_length: (int)$player2_data['jutsu1']['effect2_length'],
         );
 
         // Effects
@@ -77,12 +83,16 @@ if(isset($_POST['run_simulation'])) {
 
         if($results['player1']['damage_taken'] > $results['player2']['damage_taken']) {
             $results['winning_fighter'] = 'player2';
-            $results['winning_percent'] = (($results['player1']['damage_taken'] / $results['player2']['damage_taken']) * 100) - 100;
+            $results['winning_percent'] = (
+                ($results['player1']['damage_taken'] / max(1, $results['player2']['damage_taken'])) * 100
+            ) - 100;
             $results['damage_difference'] = $results['player1']['damage_taken'] - $results['player2']['damage_taken'];
         }
         if($results['player2']['damage_taken'] > $results['player1']['damage_taken']) {
             $results['winning_fighter'] = 'player1';
-            $results['winning_percent'] = (($results['player2']['damage_taken'] / $results['player1']['damage_taken']) * 100) - 100;
+            $results['winning_percent'] = (
+                ($results['player2']['damage_taken'] / max(1, $results['player1']['damage_taken'])) * 100
+            ) - 100;
             $results['damage_difference'] = $results['player2']['damage_taken'] - $results['player1']['damage_taken'];
         }
     } catch (Exception $e) {

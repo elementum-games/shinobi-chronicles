@@ -365,7 +365,7 @@ class Jutsu {
             else if ($player_rank_num == 4) {
                 $this->use_cost *= 3;
                 $this->base_power *= Jutsu::JONIN_SCALE_MULTIPLIER;
-                $this->power *= Jutsu::CHUUNIN_SCALE_MULTIPLIER;
+                $this->power *= Jutsu::JONIN_SCALE_MULTIPLIER;
             }
         }
     }
