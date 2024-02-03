@@ -35,16 +35,7 @@ if(isset($_POST['run_simulation'])) {
             name: "Player 1"
         );
         $player1->combat_id = Battle::combatId(Battle::TEAM1, $player1);
-        $player1_jutsu = $player1->addJutsu(
-            jutsu_type: $player1_data['jutsu1']['type'],
-            base_power: $player1_data['jutsu1']['power'],
-            effect: $player1_data['jutsu1']['effect'],
-            effect_amount: (int)$player1_data['jutsu1']['effect_amount'],
-            effect_length: (int)$player1_data['jutsu1']['effect_length'],
-            effect2: $player1_data['jutsu1']['effect2'],
-            effect2_amount: (int)$player1_data['jutsu1']['effect2_amount'],
-            effect2_length: (int)$player1_data['jutsu1']['effect2_length'],
-        );
+        $player1_jutsu = $player1->addJutsuFromFormData($player1_data['jutsu1']);
 
         $player2 = TestFighter::fromFormData(
             system: $system,
@@ -53,16 +44,7 @@ if(isset($_POST['run_simulation'])) {
             name: "Player 2"
         );
         $player2->combat_id = Battle::combatId(Battle::TEAM2, $player2);
-        $player2_jutsu = $player2->addJutsu(
-            jutsu_type: $player2_data['jutsu1']['type'],
-            base_power: $player2_data['jutsu1']['power'],
-            effect: $player2_data['jutsu1']['effect'],
-            effect_amount: (int)$player2_data['jutsu1']['effect_amount'],
-            effect_length: (int)$player2_data['jutsu1']['effect_length'],
-            effect2: $player2_data['jutsu1']['effect2'],
-            effect2_amount: (int)$player2_data['jutsu1']['effect2_amount'],
-            effect2_length: (int)$player2_data['jutsu1']['effect2_length'],
-        );
+        $player2_jutsu = $player2->addJutsuFromFormData($player2_data['jutsu1']);
 
         // Effects
         $player1_effects = $player1->activeEffectsFromFormData($player1_data['active_effects']);

@@ -68,30 +68,30 @@ class TestFighter extends Fighter {
         return true;
     }
 
-    public function addJutsu(
-        string $jutsu_type,
-        float $base_power,
-        string $effect,
-        int $effect_amount,
-        int $effect_length,
-        string $effect2,
-        int $effect2_amount,
-        int $effect2_length
-    ): Jutsu {
+    public function addJutsu(Jutsu $jutsu): void {
+        $jutsu->setLevel(100, 0);
+        $this->jutsu[$jutsu->id] = $jutsu;
+        $this->equipped_jutsu[] = [
+            'id' => $jutsu->id,
+            'type' => $jutsu->jutsu_type,
+        ];
+    }
+
+    public function addJutsuFromFormData(array $form_data): Jutsu {
         $id = count($this->jutsu) + 1;
         $jutsu = new Jutsu(
             id: $id,
             name: $this->name . 'j' . $id,
             rank: $this->rank,
-            jutsu_type: $jutsu_type,
-            base_power: $base_power,
+            jutsu_type: $form_data['type'],
+            base_power: $form_data['power'],
             range: 1,
-            effect_1: $effect,
-            base_effect_amount_1: $effect_amount,
-            effect_length_1: $effect_length,
-            effect_2: $effect2,
-            base_effect_amount_2: $effect2_amount,
-            effect_length_2: $effect2_length,
+            effect_1: $form_data['effect'],
+            base_effect_amount_1: (int)$form_data['effect_amount'],
+            effect_length_1: (int)$form_data['effect_length'],
+            effect_2: $form_data['effect2'],
+            base_effect_amount_2: (int)$form_data['effect2_amount'],
+            effect_length_2: (int)$form_data['effect2_length'],
             description: 'no',
             battle_text: 'nope',
             cooldown: 0,
@@ -101,16 +101,11 @@ class TestFighter extends Fighter {
             purchase_cost: 0,
             purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
             parent_jutsu: 0,
-            element: Jutsu::ELEMENT_NONE,
+            element: $form_data['element'],
             hand_seals: 0
         );
 
-        $jutsu->setLevel(100, 0);
-        $this->jutsu[$jutsu->id] = $jutsu;
-        $this->equipped_jutsu[] = [
-            'id' => $jutsu->id,
-            'type' => $jutsu->jutsu_type,
-        ];
+        $this->addJutsu($jutsu);
 
         return $jutsu;
     }

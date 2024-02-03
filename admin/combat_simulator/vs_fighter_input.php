@@ -203,7 +203,10 @@ function displayJutsuInput(string $fighter_form_key, int $jutsu_index, array $FO
         </select><br />
 
         <label>Offense:</label>
-        <select id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_type' name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][type]'>
+        <select
+            id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_type'
+            name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][type]'
+        >
             <option value='ninjutsu' <?= selected(($jutsu_form_data['type']) == 'ninjutsu') ?>>
                 Ninjutsu
             </option>
@@ -224,6 +227,21 @@ function displayJutsuInput(string $fighter_form_key, int $jutsu_index, array $FO
             value='<?= $jutsu_form_data['power'] ?>'
             style='width:70px;'
         /><br />
+
+        <label>Element:</label>
+        <select
+            id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_element'
+            name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][element]'
+        >
+            <?php foreach(Jutsu::$elements as $element): ?>
+                <option
+                    value='<?= $element ?>'
+                    <?= selected(($jutsu_form_data['element']) == $element) ?>
+                >
+                    <?= System::unSlug($element) ?>
+                </option>
+            <?php endforeach; ?>
+        </select><br />
 
         <div class='effect_input'>
             <label>Effect</label>
@@ -391,6 +409,7 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
             'id' => 0,
             'type' => 'ninjutsu',
             'power' => 4,
+            'element' => Jutsu::ELEMENT_NONE,
             'effect' => 'none',
             'effect_amount' => 0,
             'effect_length' => 0,
