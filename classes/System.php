@@ -1022,7 +1022,11 @@ class System {
         }
 
         /******* WEEKEND BOOSTS ********/
-        if (!isset($this->event) && (System::currentDayOfWeek() == 0 || System::currentDayOfWeek() == 6)) {
+        if (!isset($this->event) && (
+            System::currentDayOfWeek() == 0
+            || System::currentDayOfWeek() == 6
+            || (System::currentDayOfWeek() == 5 && System::currentHour() > 17)
+        )) {
             $endTime = new DateTimeImmutable('next Monday', $SERVER_TIME_ZONE);
             $this->event = new BonusExpWeekend($endTime);
         }
