@@ -175,7 +175,7 @@ require 'vs_fighter_input.php';
         </div>
         <div class='collision'>
             <?php if($results['collision_text']): ?>
-                <?= $results['collision_text'] ?><br />
+                <?= str_replace("[br]", "<br />", $results['collision_text']) ?><br />
             <?php endif; ?>
 
             <?php if($results['winning_fighter'] == 'player1'): ?>
