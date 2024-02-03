@@ -1,6 +1,5 @@
 import { apiFetch } from "../utils/network.js";
 import { StrategicInfoItem } from "./StrategicInfoItem.js";
-import { ModalProvider } from "../utils/modalContext.js";
 
 export function WorldInfo({
     villageName,
