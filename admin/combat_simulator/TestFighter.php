@@ -9,6 +9,24 @@ class TestFighter extends Fighter {
     public string $gender = 'Non-binary';
     public int $total_stats;
 
+    public function activeEffectsFromFormData(array $active_effects): array {
+        $effects = [];
+
+        foreach($active_effects as $active_effect) {
+            if($active_effect['effect'] == 'none') continue;
+
+            $effects[] = new BattleEffect(
+                user: $this->combat_id,
+                target: $this->combat_id,
+                turns: 1,
+                effect: $active_effect['effect'],
+                effect_amount: $active_effect['amount']
+            );
+        }
+
+        return $effects;
+    }
+
     public function getAvatarSize(): int {
         return 125;
     }
@@ -55,7 +73,10 @@ class TestFighter extends Fighter {
         float $base_power,
         string $effect,
         int $effect_amount,
-        int $effect_length
+        int $effect_length,
+        string $effect2,
+        int $effect2_amount,
+        int $effect2_length
     ): Jutsu {
         $id = count($this->jutsu) + 1;
         $jutsu = new Jutsu(
@@ -68,9 +89,9 @@ class TestFighter extends Fighter {
             effect_1: $effect,
             base_effect_amount_1: $effect_amount,
             effect_length_1: $effect_length,
-            effect_2: 'none',
-            base_effect_amount_2: 0,
-            effect_length_2: 0,
+            effect_2: $effect2,
+            base_effect_amount_2: $effect2_amount,
+            effect_length_2: $effect2_length,
             description: 'no',
             battle_text: 'nope',
             cooldown: 0,
@@ -86,12 +107,17 @@ class TestFighter extends Fighter {
 
         $jutsu->setLevel(100, 0);
         $this->jutsu[$jutsu->id] = $jutsu;
+        $this->equipped_jutsu[] = [
+            'id' => $jutsu->id,
+            'type' => $jutsu->jutsu_type,
+        ];
 
         return $jutsu;
     }
 
     public static function fromFormData(System $system, RankManager $rankManager, array $fighter_data, string $name): TestFighter {
         $fighter = new TestFighter();
+        $fighter->id = 1;
         $fighter->rank = 4;
         $fighter->health = 1000000;
         $fighter->max_health = 1000000;
@@ -143,10 +169,10 @@ class TestFighter extends Fighter {
                 stats_max_level: $rankManager->statsForRankAndLevel($rank->id, $rank->max_level),
                 regen_rate: $fighter->regen_rate
             );
-            $fighter->applyBloodlineBoosts();
         }
 
         $fighter->jutsu = [];
+        $fighter->equipped_jutsu = [];
 
         return $fighter;
     }

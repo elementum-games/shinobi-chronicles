@@ -12,7 +12,12 @@ class TestBattleManager extends BattleManager {
             $player1_effects,
             $player2_effects
         );
-        $this->effects->applyPassiveEffects($this->battle->player1, $this->battle->player2);
+
+        $this->effects->applyPassiveEffects(
+            player1: $this->battle->player1,
+            player2: $this->battle->player2,
+            battle_type: $this->battle->battle_type
+        );
     }
 
     public function setFighters(Fighter $player1, Fighter $player2) {
@@ -45,11 +50,8 @@ function calcDamage(
     global $system;
     global $user;
 
-    $player1_raw_damage = $player1->calcDamage($player1_jutsu, true);
-    $player2_raw_damage = $player2->calcDamage($player2_jutsu, true);
-
-    // Collision
-    $battle_id = Battle::start($system, $player1, $player2, Battle::TYPE_SPAR);
+    // AI battle = disabled randomness
+    $battle_id = Battle::start($system, $player1, $player2, Battle::TYPE_AI_ARENA);
     $battle = TestBattleManager::init(
         system: $system,
         player: $user,
@@ -81,34 +83,64 @@ function calcDamage(
         )
     );
 
+    $player1_raw_damage = $player1_attack->raw_damage;
+    $player2_raw_damage = $player2_attack->raw_damage;
+
     $collision_text = $battle->jutsuCollision(
         player1: $player1,
         player2: $player2,
-        player1_damage: $player1_raw_damage,
-        player2_damage: $player2_raw_damage,
         player1_attack: $player1_attack,
         player2_attack: $player2_attack
     );
 
-    $system->db->query("DELETE FROM battles WHERE `battle_id`={$battle_id}");
+    $system->db->query("DELETE FROM `battles` WHERE `battle_id`={$battle_id}");
+    $system->db->query("DELETE FROM `battle_logs` WHERE `battle_id`={$battle_id}");
 
-    $player1_collision_damage = $player1_raw_damage;
-    $player2_collision_damage = $player2_raw_damage;
+    $player1_collision_damage = $player1_attack->raw_damage;
+    $player2_collision_damage = $player2_attack->raw_damage;
+
+    $player1_starting_health = $player1->health;
+    $player2_starting_health = $player2->health;
+
+    // these will get reduced by the attack, copy the values
+    $player1_bloodline_defense_boosts = $player1->bloodline_defense_boosts;
+    $player2_bloodline_defense_boosts = $player2->bloodline_defense_boosts;
+
+    $battle->applyAttack(attack: $player1_attack, user: $player1, target: $player2);
+    $battle->applyAttack(attack: $player2_attack, user: $player2, target: $player1);
+
+    $player1->bloodline_defense_boosts = $player1_bloodline_defense_boosts;
+    $player2->bloodline_defense_boosts = $player2_bloodline_defense_boosts;
 
     $player1_damage = $player2->calcDamageTaken($player1_collision_damage, $player1_jutsu->jutsu_type);
     $player2_damage = $player1->calcDamageTaken($player2_collision_damage, $player2_jutsu->jutsu_type);
+
+    $player1_damage_no_resists = $player2->calcDamageTaken(
+        raw_damage: $player1_collision_damage,
+        defense_type: $player1_jutsu->jutsu_type,
+        apply_resists: false
+    );
+    $player2_damage_no_resists = $player1->calcDamageTaken(
+        raw_damage: $player2_collision_damage,
+        defense_type: $player2_jutsu->jutsu_type,
+        apply_resists: false
+    );
 
     // Display
     return [
         'player1' => [
             'raw_damage' => $player1_raw_damage,
             'collision_damage' => $player1_collision_damage,
-            'damage' => $player1_damage,
+            'damage_before_resist' => $player1_damage_no_resists,
+            'damage_dealt' => $player1_damage,
+            'damage_taken' => $player1_starting_health - $player1->health,
         ],
         'player2' => [
             'raw_damage' => $player2_raw_damage,
             'collision_damage' => $player2_collision_damage,
-            'damage' => $player2_damage,
+            'damage_before_resist' => $player2_damage_no_resists,
+            'damage_dealt' => $player2_damage,
+            'damage_taken' => $player2_starting_health - $player2->health,
         ],
         'collision_text' => $collision_text,
     ];

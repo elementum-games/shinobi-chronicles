@@ -68,8 +68,8 @@ abstract class Fighter {
     public int $bloodline_id;
     public ?Bloodline $bloodline = null;
 
-    public array $bloodline_offense_boosts;
-    public array $bloodline_defense_boosts;
+    public array $bloodline_offense_boosts = [];
+    public array $bloodline_defense_boosts = [];
     public float $bloodline_cast_speed_boost = 0;
     public float $bloodline_speed_boost = 0;
 
@@ -142,7 +142,7 @@ abstract class Fighter {
 
     public function applyBloodlineBoosts() {
         // Temp number fix inside
-        if($this->bloodline_id) {
+        if($this->bloodline != null) {
             if($this->system->debug['bloodline']) {
                 echo "Setting passive combat boosts for {$this->getName()}<br />";
                 echo "<br />";
@@ -302,7 +302,7 @@ abstract class Fighter {
      */
     public function calcDamage(Jutsu $attack, bool $disable_randomness = false): float|int {
         if($this->system->debug['damage'])  {
-            echo "Debugging damage for {$this->getName()}<br />";
+            echo "<br />Debugging damage for {$this->getName()}<br />";
         }
 
         $speed = $this->speed + $this->speed_boost;
@@ -364,7 +364,7 @@ abstract class Fighter {
             default:
                 throw new RuntimeException("Invalid jutsu type!");
         }
-        $offense_boost = 0;
+        $flat_offense_boost = 0;
 
         if(!empty($this->bloodline_offense_boosts)) {
             foreach($this->bloodline_offense_boosts as $id => $boost) {
@@ -381,64 +381,58 @@ abstract class Fighter {
                 }
 
                 $effect_amount = round($boost['effect_amount'] * $multiplier, 2);
-                $offense_boost += $effect_amount;
+                $flat_offense_boost += $effect_amount;
             }
         }
 
         if($this->system->debug['damage'])  {
-            echo "Off: $offense +($offense_boost) -> " . ($offense + $offense_boost) . "<br />";
+            echo "Base offense: $offense<br />
+                Flat boost: $flat_offense_boost<br />";
         }
 
-        $offense += $offense_boost;
-        $offense = round($offense, 2);
+        $offense += $flat_offense_boost;
         if($offense < 0) {
             $offense = 0;
         }
 
         // TEMP FIX
         if($offense > 900) {
-            $extra_offense = $offense - 900;
-            $extra_offense *= 0.6;
+            $extra_offense = ($offense - 900) * 0.6;
             $offense = $extra_offense + 900;
         }
 
-        /* Make up for genjutsu's delayed damage. This assumes fights are about 10 turns
-        if($attack->jutsu_type == Jutsu::TYPE_GENJUTSU) {
-            $offense *= 1.15;
-        }*/
-
+        // Apply boost/nerf
+        $off_modifier = 1 + $off_boost - $off_nerf;
         if($this->system->debug['damage'])  {
-            echo "Pre-rand off: {$offense} / Power: {$attack->power}<br />";
+            echo "Off boost/nerf: {$off_boost} / {$off_nerf}<br />";
         }
+
+        // if net offense nerf, apply caps
+        if ($off_modifier < 1) {
+            $nerf_percent = 1 - $off_modifier;
+
+            if ($nerf_percent > BattleManager::OFFENSE_NERF_SOFT_CAP) {
+                $nerf_percent = (
+                        ($nerf_percent - BattleManager::OFFENSE_NERF_SOFT_CAP) *    BattleManager::OFFENSE_NERF_SOFT_CAP_RATIO
+                    ) + BattleManager::OFFENSE_NERF_SOFT_CAP;
+            }
+
+            $nerf_percent = min($nerf_percent, BattleManager::OFFENSE_NERF_HARD_CAP);
+            $off_modifier = 1 - $nerf_percent;
+        }
+
+        if($this->system->debug['damage']) {
+            echo "Final offense modifier: {$off_modifier}<br />";
+        }
+
+        $offense = round($offense * $off_modifier, 2);
 
         $rand = mt_rand(self::MIN_RAND, self::MAX_RAND);
         if($disable_randomness) {
             $rand = (self::MIN_RAND + self::MAX_RAND) / 2;
         }
 
-        $damage = $offense * $attack->power * $rand;
-
-        // Add non-BL damage boosts
-        if($this->system->debug['damage']) {
-            echo "Damage/boost/nerf: $damage / {$off_boost} / {$off_nerf}} <br />";
-        }
-
-        $off_modifier = 1 + $off_boost - $off_nerf;
-        // if net offense nerf, apply caps
-        if ($off_modifier < 1) {
-            $nerf_percent = 1 - $off_modifier;
-            // if higher than soft cap, apply penalty
-            if ($nerf_percent > BattleManager::OFFENSE_NERF_SOFT_CAP) {
-                $nerf_percent = (
-                    ($nerf_percent - BattleManager::OFFENSE_NERF_SOFT_CAP) *    BattleManager::OFFENSE_NERF_SOFT_CAP_RATIO
-                ) + BattleManager::OFFENSE_NERF_SOFT_CAP;
-            }
-            // if still higher than cap cap, set to hard cap
-           $nerf_percent = min($nerf_percent, BattleManager::OFFENSE_NERF_HARD_CAP);
-            $off_modifier = 1 - $nerf_percent;
-        }
-        $damage = round($damage * $off_modifier, 2);
-
+        $damage = round($offense * $attack->power * $rand, 2);
         if($damage < 0) {
             $damage = 0;
         }
@@ -450,9 +444,19 @@ abstract class Fighter {
      * @param        $raw_damage
      * @param string $defense_type ninjutsu, genjutsu, taijutsu
      * @param bool   $residual_damage
+     * @param bool   $apply_resists
+     * @param string $element
+     * @param bool   $is_raw_damage
      * @return float|int
      */
-    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false, bool $apply_resists = true, string $element = Jutsu::ELEMENT_NONE, bool $is_raw_damage = true): float|int {
+    public function calcDamageTaken(
+        $raw_damage,
+        string $defense_type,
+        bool $residual_damage = false,
+        bool $apply_resists = true,
+        string $element = Jutsu::ELEMENT_NONE,
+        bool $is_raw_damage = true
+    ): float|int {
         $defense = self::BASE_DEFENSE;
 
         if($defense <= 0) {
@@ -533,6 +537,7 @@ abstract class Fighter {
         } else {
             $damage = $raw_damage;
         }
+
         if ($damage < 0.0) {
             $damage = 0;
         }

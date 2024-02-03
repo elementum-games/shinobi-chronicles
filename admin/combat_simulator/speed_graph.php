@@ -228,7 +228,7 @@ try {
             </tr>";
     foreach($scenarios as $scenario) {
         $player2_speed_ratio = round($scenario['player2_speed'] / $player1->speed, 2);
-        $player2_damage_ratio = round($scenario['damages']['player2']['damage'] / $scenario['damages']['player1']['damage'], 2);
+        $player2_damage_ratio = round($scenario['damages']['player2']['damage_dealt'] / $scenario['damages']['player1']['damage_dealt'], 2);
 
         /*            echo "<div class='scenario'>"
                         . "<label class='playerLabel'>Player 1:</label>"
@@ -239,7 +239,7 @@ try {
                         . "<br />"
                         . "<b>Speed ratio: {$player2_speed_ratio}x</b><br />"
                         . "<b>Damage: {$player2_damage_ratio}x</b><br />"
-                        // . "({$scenario['damages']['player2']['damage']} vs {$scenario['damages']['player1']['damage']})</b>"
+                        // . "({$scenario['damages']['player2']['damage_dealt']} vs {$scenario['damages']['player1']['damage_dealt']})</b>"
                     . "</div>";*/
 
         echo "<tr>

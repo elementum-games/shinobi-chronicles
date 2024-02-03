@@ -197,10 +197,85 @@ class BattleEffectsManager {
     }
 
     /** @noinspection DuplicatedCode */
-    public function applyPassiveEffects(Fighter $player1, Fighter $player2) {
-        // Apply passive effects
-        $effect_target = null;
-        $effect_user = null;
+    public function applyPassiveEffects(Fighter $player1, Fighter $player2, string $battle_type): void {
+        $player1->applyBloodlineBoosts();
+        $player2->applyBloodlineBoosts();
+
+        // Setup bloodline defense bonus
+        if (!empty($player1->bloodline_defense_boosts)) {
+            foreach ($player1->bloodline_defense_boosts as $id => $boost) {
+                $boost_type = explode('_', $boost['effect'])[0];
+                if ($boost_type != 'damage') {
+                    continue;
+                }
+                $player1->resist_boost += $boost['effect_amount'] / $player2->getBaseStatTotal();
+            }
+        }
+        if (!empty($player2->bloodline_defense_boosts)) {
+            foreach ($player2->bloodline_defense_boosts as $id => $boost) {
+                $boost_type = explode('_', $boost['effect'])[0];
+                if ($boost_type != 'damage') {
+                    continue;
+                }
+                $player2->resist_boost += $boost['effect_amount'] / $player1->getBaseStatTotal();
+            }
+        }
+
+        // Weaken jutsu that do not match player's primary jutsu type, or are not equipped
+        $player1_primary_jutsu_type = $player1->getPrimaryJutsuType();
+        $player2_primary_jutsu_type = $player2->getPrimaryJutsuType();
+
+        $player1_equipped_jutsu_ids = array_flip(
+            array_map(function($equipped_jutsu) {
+                return $equipped_jutsu['id'];
+            }, $player1->equipped_jutsu)
+        );
+        $player2_equipped_jutsu_ids = array_flip(
+            array_map(function ($equipped_jutsu) {
+                return $equipped_jutsu['id'];
+            }, $player2->equipped_jutsu)
+        );
+
+        foreach ($player1->jutsu as $jutsu) {
+            if ($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player1_equipped_jutsu_ids[$jutsu->id])) {
+                $jutsu->power *= 0.75;
+                foreach($jutsu->effects as $effect) {
+                    $effect->display_effect_amount *= 0.75;
+                    $effect->effect_amount *= 0.75;
+                }
+            }
+
+            if ($jutsu->rank == 1) continue;
+
+            if ($jutsu->jutsu_type != $player1_primary_jutsu_type) {
+                $jutsu->power *= 0.5;
+                foreach($jutsu->effects as $effect) {
+                    $effect->display_effect_amount *= 0.5;
+                    $effect->effect_amount *= 0.5;
+                }
+            }
+        }
+        foreach ($player2->jutsu as $jutsu) {
+            if ($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player2_equipped_jutsu_ids[$jutsu->id])) {
+                $jutsu->power *= 0.75;
+                foreach ($jutsu->effects as $effect) {
+                    $effect->display_effect_amount *= 0.75;
+                    $effect->effect_amount *= 0.75;
+                }
+            }
+
+            if ($jutsu->rank == 1) continue;
+
+            if (!$player2 instanceof NPC) {
+                if ($jutsu->jutsu_type != $player2_primary_jutsu_type) {
+                    $jutsu->power *= 0.5;
+                    foreach ($jutsu->effects as $effect) {
+                        $effect->display_effect_amount *= 0.5;
+                        $effect->effect_amount *= 0.5;
+                    }
+                }
+            }
+        }
 
         // Jutsu passive effects
         foreach($this->active_effects as $id => $effect) {
@@ -209,22 +284,11 @@ class BattleEffectsManager {
                     $effect->target . '(' . $effect->turns . ' turns left)<br />';
             }
 
-            if($effect->target == $player1->combat_id) {
-                $effect_target =& $player1;
-            }
-            else {
-                $effect_target =& $player2;
-            }
-            if($effect->user == $player1->combat_id) {
-                $effect_user =& $player1;
-            }
-            else {
-                $effect_user =& $player2;
-            }
-            $this->applyPassiveEffect($effect_target, $effect);
+            $this->applyPassiveEffect(
+                target: $effect->target == $player1->combat_id ? $player1 : $player2,
+                effect: $effect
+            );
         }
-        unset($effect_target);
-        unset($effect_user);
 
         // Apply genjutsu passive effects
         foreach($this->active_genjutsu as $id => $genjutsu) {
@@ -246,6 +310,16 @@ class BattleEffectsManager {
         // Apply item passive effects
         $this->applyArmorEffects($player1);
         $this->applyArmorEffects($player2);
+
+        if ($battle_type == Battle::TYPE_CHALLENGE) {
+            $tier_difference = $player1->reputation->rank - $player2->reputation->rank;
+            if ($tier_difference > 0) {
+                $player1->reputation_defense_boost = Battle::REPUTATION_DAMAGE_RESISTANCE_BOOST * abs($tier_difference);
+            }
+            else if ($tier_difference < 0) {
+                $player2->reputation_defense_boost = Battle::REPUTATION_DAMAGE_RESISTANCE_BOOST * abs($tier_difference);
+            }
+        }
     }
 
     public function applyArmorEffects(Fighter $fighter): void {

@@ -53,4 +53,24 @@ function create_link($system, string $menu_item_slug): void {
             </td>
         </tr>
     <?php endif ?>
+    <?php if($player->staff_manager->isUserAdmin()): ?>
+        <tr>
+            <td>
+                <?php
+                array_map(function($menu_item_slug) use ($system){
+                    create_link($system, $menu_item_slug);
+                }, $player->staff_manager->getAdminPanelPerms('misc_tools'));
+                ?>
+            </td>
+        </tr>
+    <?php endif ?>
+    <?php if($player->staff_manager->isHeadAdmin()): ?>
+        <tr><td>
+            <a
+                style='width:auto;'
+                href='<?= $system->router->base_url ?>admin/combat_simulator/vs.php'
+                target='_blank'
+            >Combat Simulator - Vs Mode</a>
+        </td></tr>
+    <?php endif; ?>
 </table>

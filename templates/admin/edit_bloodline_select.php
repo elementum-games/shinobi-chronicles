@@ -65,12 +65,12 @@ $current_rank = 1;
                 Clan ID: <?= $bloodline->clan_id ?>
             </td>
             <td>
-                <?php foreach($bloodline->passive_boosts as $boost): ?>
+                <?php foreach($bloodline->base_passive_boosts as $boost): ?>
                     <p><?= $boost->power ?> <?= $boost->effect ?></p>
                 <?php endforeach; ?>
             </td>
             <td>
-                <?php foreach($bloodline->combat_boosts as $boost): ?>
+                <?php foreach($bloodline->base_combat_boosts as $boost): ?>
                     <p><?= $boost->power ?> <?= $boost->effect ?></p>
                 <?php endforeach; ?>
             </td>

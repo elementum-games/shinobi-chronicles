@@ -1022,7 +1022,11 @@ class System {
         }
 
         /******* WEEKEND BOOSTS ********/
-        if (!isset($this->event) && (System::currentDayOfWeek() == 0 || System::currentDayOfWeek() == 6)) {
+        if (!isset($this->event) && (
+            System::currentDayOfWeek() == 0
+            || System::currentDayOfWeek() == 6
+            || (System::currentDayOfWeek() == 5 && System::currentHour() > 17)
+        )) {
             $endTime = new DateTimeImmutable('next Monday', $SERVER_TIME_ZONE);
             $this->event = new BonusExpWeekend($endTime);
         }
@@ -1117,6 +1121,9 @@ class System {
 
     /**
      * Helper function
+     * @param $number
+     * @param $min
+     * @param $max
      * @return int
      */
     public static function clampNumber($number, $min, $max): int {
@@ -1149,7 +1156,7 @@ class System {
      * @return System
      * @throws Exception
      */
-    public static function initialize(bool $load_layout = false): System {
+    public static function initialize(bool $load_layout = true): System {
         /**
          * This must be called here to properly pull variables into initializer
          * @var $host
@@ -1166,6 +1173,9 @@ class System {
          * @var bool $USE_NEW_BATTLES
          * @var bool $WAR_ENABLED
          * @var bool $REQUIRE_USER_VERIFICATION
+         *
+         * @var string $web_url
+         * @var bool $register_open
          */
         require_once __DIR__ . '/../secure/vars.php';
 
@@ -1216,7 +1226,7 @@ class System {
         ];
 
         // Load layout if this is not an api request
-        if(!$load_layout) {
+        if($load_layout) {
             $system->setLayoutByName(self::DEFAULT_LAYOUT);
         }
 
