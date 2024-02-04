@@ -139,6 +139,7 @@
         
         let typeEl = document.getElementById(`${fighterKey}_${jutsuKey}_type`);
         let powerEl = document.getElementById(`${fighterKey}_${jutsuKey}_power`);
+        let elementEl = document.getElementById(`${fighterKey}_${jutsuKey}_element`);
 
         let effectEl = document.getElementById(`${fighterKey}_${jutsuKey}_effect`);
         let effectAmountEl = document.getElementById(`${fighterKey}_${jutsuKey}_effect_amount`);
@@ -150,6 +151,7 @@
 
         typeEl.value = selectedJutsu.jutsu_type;
         powerEl.value = selectedJutsu.base_power;
+        elementEl.value = selectedJutsu.element;
 
         effectEl.value = selectedJutsu.effects[0].effect;
         effectAmountEl.value = selectedJutsu.effects[0].effect_amount;
