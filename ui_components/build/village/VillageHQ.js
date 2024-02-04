@@ -1,4 +1,5 @@
 import { apiFetch } from "../utils/network.js";
+import { useModal } from '../utils/modalContext.js';
 export function VillageHQ({
   playerID,
   playerSeatState,
@@ -30,6 +31,9 @@ export function VillageHQ({
   const [modalHeader, setModalHeader] = React.useState(null);
   const [modalText, setModalText] = React.useState(null);
   const [challengeTarget, setChallengeTarget] = React.useState(null);
+  const {
+    openModal
+  } = useModal();
   const DisplayFromDays = days => {
     switch (days) {
       case 1:
@@ -88,25 +92,25 @@ export function VillageHQ({
     });
   };
   const Resign = () => {
-    if (modalState == "confirm_resign") {
-      apiFetch(villageAPI, {
-        request: 'Resign'
-      }).then(response => {
-        if (response.errors.length) {
-          handleErrors(response.errors);
-          return;
-        }
-        setSeatDataState(response.data.seatData);
-        setPlayerSeatState(response.data.playerSeat);
-        setModalHeader("Confirmation");
-        setModalText(response.data.response_message);
-        setModalState("response_message");
-      });
-    } else {
+    apiFetch(villageAPI, {
+      request: 'Resign'
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      setSeatDataState(response.data.seatData);
+      setPlayerSeatState(response.data.playerSeat);
       setModalHeader("Confirmation");
-      setModalState("confirm_resign");
-      setModalText("Are you sure you wish to resign from your current position?");
-    }
+      setModalText(response.data.response_message);
+      setModalState("response_message");
+      openModal({
+        header: 'Confirmation',
+        text: response.data.response_message,
+        ContentComponent: null,
+        onConfirm: null
+      });
+    });
   };
   const Challenge = target_seat => {
     setChallengeTarget(target_seat);
@@ -352,7 +356,12 @@ export function VillageHQ({
     className: "kage_title"
   }, kage.is_provisional ? kage.seat_title + ": " + kage.provisional_days_label : kage.seat_title + " of " + villageName), kage.seat_id && kage.seat_id == playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
     className: "kage_resign_button",
-    onClick: () => Resign()
+    onClick: () => openModal({
+      header: 'Confirmation',
+      text: 'Are you sure you wish to resign from your current position?',
+      ContentComponent: null,
+      onConfirm: () => Resign()
+    })
   }, "resign"), !kage.seat_id && /*#__PURE__*/React.createElement("div", {
     className: "kage_claim_button",
     onClick: () => ClaimSeat("kage")
