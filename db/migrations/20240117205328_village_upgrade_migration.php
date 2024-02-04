@@ -63,6 +63,9 @@ final class VillageUpgradeMigration extends AbstractMigration
             -- Alter table region_locations
             ALTER TABLE `region_locations` ADD `rebellion_active` TINYINT(1) NOT NULL DEFAULT '0';
 
+            -- Alter table region_locations
+            ALTER TABLE `region_locations` ADD `background_image` VARCHAR(100) NOT NULL; 
+
             -- Use occupying_village_id as source of truth for region_locations
             UPDATE region_locations
             JOIN regions ON region_locations.region_id = regions.region_id
@@ -139,7 +142,7 @@ final class VillageUpgradeMigration extends AbstractMigration
             UPDATE region_locations SET name = 'Ōkaiyō Castle' WHERE `region_location_id` = 46;
             UPDATE region_locations SET name = 'Kiriyama Castle' WHERE `region_location_id` = 40;
             UPDATE region_locations SET name = 'Mikadzuki Castle' WHERE `region_location_id` = 53;
-        ");
+");
     }
 
     /**

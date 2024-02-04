@@ -1,8 +1,9 @@
-import { apiFetch } from "../utils/network.js";
+import { ModalProvider } from "../utils/modalContext.js";
 import { WarTable } from "./WarTable.js";
 import { VillageHQ } from "./VillageHQ.js";
 import { WorldInfo } from "./WorldInfo.js";
 import { KageQuarters } from "./KageQuarters.js";
+import { VillageUpgrades } from "./VillageUpgrades.js";
 import { StrategicInfoItem } from "./StrategicInfoItem.js";
 import { TimeGrid } from "./VillageHQ.js";
 import { TimeGridResponse } from "./VillageHQ.js";
@@ -22,8 +23,7 @@ function Village({
   proposalData,
   strategicData,
   challengeData,
-  playerWarLogData,
-  warRecordData,
+  warLogData,
   kageRecords
 }) {
   const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
@@ -143,7 +143,7 @@ function Village({
     }
     return data;
   }
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement(ModalProvider, null, /*#__PURE__*/React.createElement("div", {
     className: "navigation_row"
   }, /*#__PURE__*/React.createElement("div", {
     className: "nav_button",
@@ -155,8 +155,9 @@ function Village({
     className: "nav_button",
     onClick: () => setVillageTab("warTable")
   }, "war table"), /*#__PURE__*/React.createElement("div", {
-    className: "nav_button disabled"
-  }, "members & teams"), /*#__PURE__*/React.createElement("div", {
+    className: "nav_button",
+    onClick: () => setVillageTab("villageUpgrades")
+  }, "upgrades"), /*#__PURE__*/React.createElement("div", {
     className: playerSeatState.seat_id != null ? "nav_button" : "nav_button disabled",
     onClick: () => setVillageTab("kageQuarters")
   }, "kage's quarters")), villageTab == "villageHQ" && /*#__PURE__*/React.createElement(VillageHQ, {
@@ -214,13 +215,10 @@ function Village({
     StrategicInfoItem: StrategicInfoItem,
     getPolicyDisplayData: getPolicyDisplayData
   }), villageTab == "warTable" && /*#__PURE__*/React.createElement(WarTable, {
-    playerWarLogData: playerWarLogData,
-    warRecordData: warRecordData,
-    strategicDataState: strategicDataState,
+    warLogData: warLogData,
     villageAPI: villageAPI,
     handleErrors: handleErrors,
-    getVillageIcon: getVillageIcon,
-    getPolicyDisplayData: getPolicyDisplayData
-  }));
+    getVillageIcon: getVillageIcon
+  }), villageTab == "villageUpgrades" && /*#__PURE__*/React.createElement(VillageUpgrades, null));
 }
 window.Village = Village;
