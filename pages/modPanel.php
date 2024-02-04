@@ -36,7 +36,7 @@ function modPanel() {
 			if(!isset($_POST['ban_type'])) {
 				throw new RuntimeException("Invalid ban type!");
 			}
-			if(!isset($_POST['ban_length'])) {
+			if(!isset($_POST['ban_length_key'])) {
 				throw new RuntimeException("Invalid ban length!");
 			}
 			$user_name = $system->db->clean($_POST['user_name']);
