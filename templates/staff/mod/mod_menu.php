@@ -30,9 +30,9 @@
                         </select>
                         <p style='margin-top:8px;'>
                             <label for='ban_length'>Ban length:</label>
-                            <select name='ban_length' style='width:100px;'>
-                                <?php foreach($ban_lengths as $id => $name): ?>
-                                    <option value="<?=$id?>"><?=$name?></option>
+                            <select name='ban_length_key' style='width:100px;'>
+                                <?php foreach($ban_lengths as $name => $minutes): ?>
+                                    <option value="<?=$name?>"><?=System::unSlug($name)?></option>
                                 <?php endforeach ?>
                             </select>
                         </p>

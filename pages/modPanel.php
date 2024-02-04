@@ -41,18 +41,20 @@ function modPanel() {
 			}
 			$user_name = $system->db->clean($_POST['user_name']);
 			$ban_type = $system->db->clean($_POST['ban_type']);
-			$ban_length = $system->db->clean($_POST['ban_length']);
+			$ban_length_key = $system->db->clean($_POST['ban_length_key']);
 
             //Check ban type
 			if(array_search($ban_type, StaffManager::$ban_menu_items) === false) {
 				throw new RuntimeException("Invalid ban type!");
 			}
             //Check ban length
-            if(!isset($ban_lengths[$ban_length])) {
+            if(!isset($ban_lengths[$ban_length_key])) {
                 throw new RuntimeException("Invalid ban length!");
             }
 
-            if($ban_length < StaffManager::PERM_BAN_VALUE && $ban_type == StaffManager::BAN_TYPE_GAME) {
+            $ban_length = $ban_lengths[$ban_length_key];
+
+            if($ban_length < StaffManager::MINUTES_PER_DAY && $ban_type == StaffManager::BAN_TYPE_GAME) {
                 throw new RuntimeException("This ban length is only valid for Chat and PM!");
             }
 
