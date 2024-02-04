@@ -1118,7 +1118,7 @@ class TravelManager {
             if ($distance <= self::DISPLAY_RADIUS) {
                 switch ($obj['type']) {
                     case "castle":
-                        $image = "/images/map/icons/test7.png";
+                        $default_image = "/images/map/icons/castles/Castle3.png";
                         $objectives[] = new RegionObjective(
                             id: $obj['region_location_id'],
                             name: $obj['name'],
@@ -1129,7 +1129,7 @@ class TravelManager {
                             objective_max_health: WarManager::BASE_CASTLE_HEALTH,
                             defense: $obj['defense'],
                             objective_type: $obj['type'],
-                            image: $image,
+                            image: !empty($obj['background_image']) ? $obj['background_image'] : $default_image,
                             village_id: $obj['occupying_village_id'],
                             resource_id: $obj['resource_id'],
                             resource_count: $obj['resource_count'],
@@ -1139,7 +1139,7 @@ class TravelManager {
                         break;
                     case "tower":
                         break;
-                        $image = "/images/map/icons/tower.png";
+                        $default_image = "/images/map/icons/tower.png";
                         $objectives[] = new RegionObjective(
                             id: $obj['region_location_id'],
                             name: $obj['name'],
@@ -1150,7 +1150,7 @@ class TravelManager {
                             objective_max_health: $obj['max_health'],
                             defense: $obj['defense'],
                             objective_type: $obj['type'],
-                            image: $image,
+                            image: !empty($obj['background_image']) ? $obj['background_image'] : $default_image,
                             village_id: $obj['occupying_village_id'],
                             resource_id: $obj['resource_id'],
                             resource_count: $obj['resource_count'],
@@ -1159,7 +1159,7 @@ class TravelManager {
                         );
                     case "village":
                         if ($distance <= $this->user->scout_range) {
-                            $image = "/images/map/icons/Untitled3.png";
+                            $default_image = "/images/map/icons/Untitled3.png";
                             $objectives[] = new RegionObjective(
                                 id: $obj['region_location_id'],
                                 name: $obj['name'],
@@ -1170,7 +1170,7 @@ class TravelManager {
                                 objective_max_health: WarManager::BASE_TOWN_HEALTH,
                                 defense: $obj['defense'],
                                 objective_type: $obj['type'],
-                                image: $image,
+                                image: !empty($obj['background_image']) ? $obj['background_image'] : $default_image,
                                 village_id: $obj['occupying_village_id'],
                                 resource_id: $obj['resource_id'],
                                 resource_count: $obj['resource_count'],
