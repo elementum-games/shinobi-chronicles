@@ -367,8 +367,9 @@ export function VillageHQ({
                                                 ContentComponent: null,
                                                 onConfirm: () => Resign(),
                                             })
-                                        }
-                                    >resign</div>
+                                        }>
+                                        resign
+                                    </div>
                                 }
                                 {!kage.seat_id &&
                                     <div className="kage_claim_button" onClick={() => ClaimSeat("kage")}>claim</div>
