@@ -1,4 +1,4 @@
-export function Modal({ isOpen, header, text, ContentComponent, onConfirm, onClose }) {
+export function Modal({ isOpen, header, text, ContentComponent, componentProps, onConfirm, onClose }) {
     return (
         <>
             {isOpen && "closed" && (
@@ -9,7 +9,7 @@ export function Modal({ isOpen, header, text, ContentComponent, onConfirm, onClo
                         <div className="modal_text">{text}</div>
                         {ContentComponent && (
                             <div className="modal_content">
-                                <ContentComponent />
+                                <ContentComponent {...componentProps} />
                             </div>
                         )}
                         {onConfirm && ( 
