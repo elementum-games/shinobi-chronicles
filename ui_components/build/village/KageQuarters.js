@@ -1,6 +1,7 @@
 import { apiFetch } from "../utils/network.js";
 import { StrategicInfoItem } from "./StrategicInfoItem.js";
-import { ModalProvider } from "../utils/modalContext.js";
+import { useModal } from '../utils/modalContext.js';
+import { TradeDisplay } from "./TradeDisplay.js";
 export function KageQuarters({
   playerID,
   playerSeatState,
@@ -63,6 +64,9 @@ export function KageQuarters({
   const [modalState, setModalState] = React.useState("closed");
   const [modalHeader, setModalHeader] = React.useState(null);
   const [modalText, setModalText] = React.useState(null);
+  const {
+    openModal
+  } = useModal();
   const ChangePolicy = () => {
     if (modalState == "confirm_policy") {
       apiFetch(villageAPI, {
@@ -197,30 +201,24 @@ export function KageQuarters({
     }
   };
   const OfferTrade = () => {
-    if (modalState == "confirm_offer_trade") {
-      apiFetch(villageAPI, {
-        request: 'CreateProposal',
-        type: 'offer_trade',
-        target_village_id: strategicDisplayRight.village.village_id,
-        offered_resources: offeredResources,
-        offered_regions: offeredRegions,
-        requested_resources: requestedResources,
-        requested_regions: requestedRegions
-      }).then(response => {
-        if (response.errors.length) {
-          handleErrors(response.errors);
-          return;
-        }
-        setProposalDataState(response.data.proposalData);
-        setModalText(response.data.response_message);
-        setModalHeader("Confirmation");
-        setModalState("response_message");
-      });
-    } else {
-      setModalState("confirm_offer_trade");
-      setModalText(null);
-      setModalHeader("Trade resources and regions");
-    }
+    apiFetch(villageAPI, {
+      request: 'CreateProposal',
+      type: 'offer_trade',
+      target_village_id: strategicDisplayRight.village.village_id,
+      offered_resources: offeredResources,
+      offered_regions: offeredRegions,
+      requested_resources: requestedResources,
+      requested_regions: requestedRegions
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      setProposalDataState(response.data.proposalData);
+      setModalText(response.data.response_message);
+      setModalHeader("Confirmation");
+      setModalState("response_message");
+    });
   };
   const EnactProposal = () => {
     if (modalState == "confirm_enact_proposal") {
@@ -309,11 +307,6 @@ export function KageQuarters({
       setCurrentProposal(response.data.proposalData[currentProposalKey]);
     });
   };
-  const ViewTrade = () => {
-    setModalState("view_trade");
-    setModalText(null);
-    setModalHeader("View trade offer");
-  };
   React.useEffect(() => {
     if (proposalDataState.length && currentProposal === null) {
       setCurrentProposal(proposalDataState[0]);
@@ -383,54 +376,7 @@ export function KageQuarters({
   }, "Confirm"), /*#__PURE__*/React.createElement("div", {
     className: "modal_cancel_button",
     onClick: () => setModalState("closed")
-  }, "cancel")), modalState == "confirm_offer_trade" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    class: "schedule_challenge_subtext_wrapper",
-    style: {
-      marginBottom: "20px",
-      marginTop: "-10px"
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    class: "schedule_challenge_subtext"
-  }, "Each village can offer up to 25000 resources of each resource type per trade."), /*#__PURE__*/React.createElement("span", {
-    class: "schedule_challenge_subtext"
-  }, "Trades have a cooldown of 24 hours.")), TradeDisplay({
-    viewOnly: false,
-    offeringVillageResources: resourceDataState,
-    offeringVillageRegions: strategicDisplayLeft.regions,
-    offeredResources: offeredResources,
-    setOfferedResources: setOfferedResources,
-    offeredRegions: offeredRegions,
-    setOfferedRegions: setOfferedRegions,
-    targetVillageResources: null,
-    targetVillageRegions: strategicDisplayRight.regions,
-    requestedResources: requestedResources,
-    setRequestedResources: setRequestedResources,
-    requestedRegions: requestedRegions,
-    setRequestedRegions: setRequestedRegions
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "modal_confirm_button",
-    onClick: () => OfferTrade()
-  }, "confirm"), /*#__PURE__*/React.createElement("div", {
-    className: "modal_cancel_button",
-    onClick: () => setModalState("closed")
-  }, "cancel")), modalState == "view_trade" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(TradeDisplay, {
-    viewOnly: true,
-    offeringVillageResources: null,
-    offeringVillageRegions: null,
-    offeredResources: currentProposal.trade_data.offered_resources,
-    setOfferedResources: null,
-    offeredRegions: currentProposal.trade_data.offered_regions,
-    setOfferedRegions: null,
-    targetVillageResources: null,
-    targetVillageRegions: null,
-    requestedResources: currentProposal.trade_data.requested_resources,
-    setRequestedResources: null,
-    requestedRegions: currentProposal.trade_data.requested_regions,
-    setRequestedRegions: null
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "modal_cancel_button",
-    onClick: () => setModalState("closed")
-  }, "close")), modalState == "response_message" && /*#__PURE__*/React.createElement("div", {
+  }, "cancel")), modalState == "response_message" && /*#__PURE__*/React.createElement("div", {
     className: "modal_close_button",
     onClick: () => setModalState("closed")
   }, "close"))), /*#__PURE__*/React.createElement("div", {
@@ -553,7 +499,27 @@ export function KageQuarters({
     onClick: () => CancelProposal()
   }, "cancel proposal")), currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade") && /*#__PURE__*/React.createElement("div", {
     className: "trade_view_button_wrapper alliance",
-    onClick: () => ViewTrade()
+    onClick: () => openModal({
+      header: 'View trade offer',
+      text: '',
+      ContentComponent: TradeDisplay,
+      componentProps: {
+        viewOnly: true,
+        offeringVillageResources: resourceDataState,
+        offeringVillageRegions: strategicDisplayLeft.regions,
+        offeredResources: offeredResources,
+        setOfferedResources: setOfferedResources,
+        offeredRegions: offeredRegions,
+        setOfferedRegions: setOfferedRegions,
+        targetVillageResources: null,
+        targetVillageRegions: strategicDisplayRight.regions,
+        requestedResources: requestedResources,
+        setRequestedResources: setRequestedResources,
+        requestedRegions: requestedRegions,
+        setRequestedRegions: setRequestedRegions
+      },
+      onConfirm: null
+    })
   }, /*#__PURE__*/React.createElement("div", {
     className: "trade_view_button_inner"
   }, /*#__PURE__*/React.createElement("img", {
@@ -581,7 +547,27 @@ export function KageQuarters({
     onClick: () => SubmitVote(1)
   }, "vote in favor")), currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade") && /*#__PURE__*/React.createElement("div", {
     className: "trade_view_button_wrapper alliance",
-    onClick: () => ViewTrade()
+    onClick: () => openModal({
+      header: 'View trade offer',
+      text: '',
+      ContentComponent: TradeDisplay,
+      componentProps: {
+        viewOnly: true,
+        offeringVillageResources: resourceDataState,
+        offeringVillageRegions: strategicDisplayLeft.regions,
+        offeredResources: offeredResources,
+        setOfferedResources: setOfferedResources,
+        offeredRegions: offeredRegions,
+        setOfferedRegions: setOfferedRegions,
+        targetVillageResources: null,
+        targetVillageRegions: strategicDisplayRight.regions,
+        requestedResources: requestedResources,
+        setRequestedResources: setRequestedResources,
+        requestedRegions: requestedRegions,
+        setRequestedRegions: setRequestedRegions
+      },
+      onConfirm: null
+    })
   }, /*#__PURE__*/React.createElement("div", {
     className: "trade_view_button_inner"
   }, /*#__PURE__*/React.createElement("img", {
@@ -598,7 +584,27 @@ export function KageQuarters({
     className: "proposal_yes_button disabled"
   }, "vote in favor")), currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade") && /*#__PURE__*/React.createElement("div", {
     className: "trade_view_button_wrapper alliance",
-    onClick: () => ViewTrade()
+    onClick: () => openModal({
+      header: 'View trade offer',
+      text: '',
+      ContentComponent: TradeDisplay,
+      componentProps: {
+        viewOnly: true,
+        offeringVillageResources: resourceDataState,
+        offeringVillageRegions: strategicDisplayLeft.regions,
+        offeredResources: offeredResources,
+        setOfferedResources: setOfferedResources,
+        offeredRegions: offeredRegions,
+        setOfferedRegions: setOfferedRegions,
+        targetVillageResources: null,
+        targetVillageRegions: strategicDisplayRight.regions,
+        requestedResources: requestedResources,
+        setRequestedResources: setRequestedResources,
+        requestedRegions: requestedRegions,
+        setRequestedRegions: setRequestedRegions
+      },
+      onConfirm: null
+    })
   }, /*#__PURE__*/React.createElement("div", {
     className: "trade_view_button_inner"
   }, /*#__PURE__*/React.createElement("img", {
@@ -612,10 +618,35 @@ export function KageQuarters({
     className: "proposal_cancel_vote_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button",
-    onClick: () => CancelVote()
+    onClick: () => openModal({
+      header: 'Confirmation',
+      text: null,
+      ContentComponent: null,
+      onConfirm: () => CancelVote()
+    })
   }, "change vote")), currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade") && /*#__PURE__*/React.createElement("div", {
     className: "trade_view_button_wrapper alliance",
-    onClick: () => ViewTrade()
+    onClick: () => openModal({
+      header: 'View trade offer',
+      text: '',
+      ContentComponent: TradeDisplay,
+      componentProps: {
+        viewOnly: true,
+        offeringVillageResources: resourceDataState,
+        offeringVillageRegions: strategicDisplayLeft.regions,
+        offeredResources: offeredResources,
+        setOfferedResources: setOfferedResources,
+        offeredRegions: offeredRegions,
+        setOfferedRegions: setOfferedRegions,
+        targetVillageResources: null,
+        targetVillageRegions: strategicDisplayRight.regions,
+        requestedResources: requestedResources,
+        setRequestedResources: setRequestedResources,
+        requestedRegions: requestedRegions,
+        setRequestedRegions: setRequestedRegions
+      },
+      onConfirm: null
+    })
   }, /*#__PURE__*/React.createElement("div", {
     className: "trade_view_button_inner"
   }, /*#__PURE__*/React.createElement("img", {
@@ -632,7 +663,27 @@ export function KageQuarters({
     className: "proposal_cancel_vote_button disabled"
   }, "cancel vote")), currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade") && /*#__PURE__*/React.createElement("div", {
     className: "trade_view_button_wrapper alliance",
-    onClick: () => ViewTrade()
+    onClick: () => openModal({
+      header: 'View trade offer',
+      text: '',
+      ContentComponent: TradeDisplay,
+      componentProps: {
+        viewOnly: true,
+        offeringVillageResources: resourceDataState,
+        offeringVillageRegions: strategicDisplayLeft.regions,
+        offeredResources: offeredResources,
+        setOfferedResources: setOfferedResources,
+        offeredRegions: offeredRegions,
+        setOfferedRegions: setOfferedRegions,
+        targetVillageResources: null,
+        targetVillageRegions: strategicDisplayRight.regions,
+        requestedResources: requestedResources,
+        setRequestedResources: setRequestedResources,
+        requestedRegions: requestedRegions,
+        setRequestedRegions: setRequestedRegions
+      },
+      onConfirm: null
+    })
   }, /*#__PURE__*/React.createElement("div", {
     className: "trade_view_button_inner"
   }, /*#__PURE__*/React.createElement("img", {
@@ -928,7 +979,27 @@ export function KageQuarters({
     className: "strategic_info_navigation_diplomacy_buttons"
   }, strategicDisplayLeft.allies.find(ally => ally == strategicDisplayRight.village.name) && /*#__PURE__*/React.createElement("div", {
     className: "diplomacy_action_button_wrapper alliance",
-    onClick: () => OfferTrade()
+    onClick: () => openModal({
+      header: 'View trade offer',
+      text: '',
+      ContentComponent: TradeDisplay,
+      componentProps: {
+        viewOnly: false,
+        offeringVillageResources: resourceDataState,
+        offeringVillageRegions: strategicDisplayLeft.regions,
+        offeredResources: offeredResources,
+        setOfferedResources: setOfferedResources,
+        offeredRegions: offeredRegions,
+        setOfferedRegions: setOfferedRegions,
+        targetVillageResources: null,
+        targetVillageRegions: strategicDisplayRight.regions,
+        requestedResources: requestedResources,
+        setRequestedResources: setRequestedResources,
+        requestedRegions: requestedRegions,
+        setRequestedRegions: setRequestedRegions
+      },
+      onConfirm: () => OfferTrade()
+    })
   }, /*#__PURE__*/React.createElement("div", {
     className: "diplomacy_action_button_inner"
   }, /*#__PURE__*/React.createElement("img", {
@@ -938,222 +1009,6 @@ export function KageQuarters({
     strategicInfoData: strategicDisplayRight,
     getPolicyDisplayData: getPolicyDisplayData
   }))))));
-  function TradeDisplay({
-    viewOnly,
-    offeringVillageResources,
-    offeringVillageRegions,
-    offeredResources,
-    setOfferedResources,
-    offeredRegions,
-    setOfferedRegions,
-    targetVillageResources,
-    targetVillageRegions,
-    requestedResources,
-    setRequestedResources,
-    requestedRegions,
-    setRequestedRegions
-  }) {
-    const toggleOfferedRegion = regionId => {
-      setOfferedRegions(current => {
-        // Check if the region is already selected
-        if (current.includes(regionId)) {
-          // If it is, filter it out (unselect it)
-          return current.filter(id => id !== regionId);
-        } else {
-          // Otherwise, add it to the selected regions
-          return [...current, regionId];
-        }
-      });
-    };
-    const toggleRequestedRegion = regionId => {
-      setRequestedRegions(current => {
-        // Check if the region is already selected
-        if (current.includes(regionId)) {
-          // If it is, filter it out (unselect it)
-          return current.filter(id => id !== regionId);
-        } else {
-          // Otherwise, add it to the selected regions
-          return [...current, regionId];
-        }
-      });
-    };
-    const handleOfferedResourcesChange = (resourceName, value) => {
-      setOfferedResources(currentResources => currentResources.map(resource => resource.resource_name === resourceName ? {
-        ...resource,
-        count: value
-      } : resource));
-    };
-    const handleRequestedResourcesChange = (resourceName, value) => {
-      setRequestedResources(currentResources => currentResources.map(resource => resource.resource_name === resourceName ? {
-        ...resource,
-        count: value
-      } : resource));
-    };
-    return viewOnly ? /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_container"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_offer_container"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "header"
-    }, "Offered Resources"), /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_resources"
-    }, offeredResources.map((resource, index) => {
-      const total = offeringVillageResources ? offeringVillageResources.find(total => total.resource_id === resource.resource_id).count : null;
-      return /*#__PURE__*/React.createElement("div", {
-        key: resource.resource_id,
-        className: "trade_display_resource_wrapper"
-      }, /*#__PURE__*/React.createElement("input", {
-        type: "text",
-        min: "0",
-        max: total ? total : 25000,
-        step: "100",
-        placeholder: "0",
-        className: "trade_display_resource_input",
-        value: resource.count,
-        style: {
-          userSelect: "none"
-        },
-        readOnly: true
-      }), /*#__PURE__*/React.createElement("div", {
-        className: "trade_display_resource_name"
-      }, resource.resource_name), total ? /*#__PURE__*/React.createElement("div", {
-        className: "trade_display_resource_total"
-      }, total) : /*#__PURE__*/React.createElement("div", {
-        className: "trade_display_resource_total"
-      }, "???"));
-    })), /*#__PURE__*/React.createElement("div", {
-      className: "header"
-    }, "Offered Regions"), /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_regions"
-    }, offeredRegions.filter(region => region.region_id > 5).map((region, index) => /*#__PURE__*/React.createElement("div", {
-      key: region.name,
-      className: "trade_display_region_wrapper"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_region_name"
-    }, region.name))))), /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_request_container"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "header"
-    }, "Requested Resources"), /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_resources"
-    }, requestedResources.map((resource, index) => {
-      const total = targetVillageResources ? targetVillageResources.find(total => total.resource_id === resource.resource_id).count : null;
-      return /*#__PURE__*/React.createElement("div", {
-        key: resource.resource_id,
-        className: "trade_display_resource_wrapper"
-      }, /*#__PURE__*/React.createElement("input", {
-        type: "text",
-        min: "0",
-        max: total ? total : 25000,
-        step: "100",
-        placeholder: "0",
-        className: "trade_display_resource_input",
-        value: resource.count,
-        onChange: e => handleRequestedResourcesChange(resource.resource_name, parseInt(e.target.value)),
-        style: {
-          userSelect: "none"
-        },
-        readOnly: true
-      }), /*#__PURE__*/React.createElement("div", {
-        className: "trade_display_resource_name"
-      }, resource.resource_name), total ? /*#__PURE__*/React.createElement("div", {
-        className: "trade_display_resource_total"
-      }, total) : /*#__PURE__*/React.createElement("div", {
-        className: "trade_display_resource_total"
-      }, "???"));
-    })), /*#__PURE__*/React.createElement("div", {
-      className: "header"
-    }, "Requested Regions"), /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_regions"
-    }, requestedRegions.filter(region => region.region_id > 5).map((region, index) => /*#__PURE__*/React.createElement("div", {
-      key: region.name,
-      className: "trade_display_region_wrapper"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_region_name"
-    }, region.name)))))) : /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_container"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_offer_container"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "header"
-    }, "Offer Resources"), /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_resources"
-    }, offeredResources.map((resource, index) => {
-      const total = offeringVillageResources ? offeringVillageResources.find(total => total.resource_id === resource.resource_id).count : null;
-      return /*#__PURE__*/React.createElement("div", {
-        key: resource.resource_id,
-        className: "trade_display_resource_wrapper"
-      }, /*#__PURE__*/React.createElement("input", {
-        type: "number",
-        min: "0",
-        max: total ? total : 25000,
-        step: "100",
-        placeholder: "0",
-        className: "trade_display_resource_input",
-        value: resource.count,
-        onChange: e => handleOfferedResourcesChange(resource.resource_name, parseInt(e.target.value))
-      }), /*#__PURE__*/React.createElement("div", {
-        className: "trade_display_resource_name"
-      }, resource.resource_name), total ? /*#__PURE__*/React.createElement("div", {
-        className: "trade_display_resource_total"
-      }, total) : /*#__PURE__*/React.createElement("div", {
-        className: "trade_display_resource_total"
-      }, "???"));
-    })), /*#__PURE__*/React.createElement("div", {
-      className: "header"
-    }, "Offer Regions"), /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_regions"
-    }, offeringVillageRegions.filter(region => region.region_id > 5).map((region, index) => /*#__PURE__*/React.createElement("div", {
-      key: region.name,
-      className: "trade_display_region_wrapper"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_region_name"
-    }, region.name), /*#__PURE__*/React.createElement("input", {
-      type: "checkbox",
-      checked: offeredRegions.includes(region.region_id),
-      onChange: () => toggleOfferedRegion(region.region_id)
-    }))))), /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_request_container"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "header"
-    }, "Request Resources"), /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_resources"
-    }, requestedResources.map((resource, index) => {
-      const total = targetVillageResources ? targetVillageResources.find(total => total.resource_id === resource.resource_id).count : null;
-      return /*#__PURE__*/React.createElement("div", {
-        key: resource.resource_id,
-        className: "trade_display_resource_wrapper"
-      }, /*#__PURE__*/React.createElement("input", {
-        type: "number",
-        min: "0",
-        max: total ? total : 25000,
-        step: "100",
-        placeholder: "0",
-        className: "trade_display_resource_input",
-        value: resource.count,
-        onChange: e => handleRequestedResourcesChange(resource.resource_name, parseInt(e.target.value))
-      }), /*#__PURE__*/React.createElement("div", {
-        className: "trade_display_resource_name"
-      }, resource.resource_name), total ? /*#__PURE__*/React.createElement("div", {
-        className: "trade_display_resource_total"
-      }, total) : /*#__PURE__*/React.createElement("div", {
-        className: "trade_display_resource_total"
-      }, "???"));
-    })), /*#__PURE__*/React.createElement("div", {
-      className: "header"
-    }, "Request Regions"), /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_regions"
-    }, targetVillageRegions.filter(region => region.region_id > 5).map((region, index) => /*#__PURE__*/React.createElement("div", {
-      key: region.name,
-      className: "trade_display_region_wrapper"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "trade_display_region_name"
-    }, region.name), /*#__PURE__*/React.createElement("input", {
-      type: "checkbox",
-      checked: requestedRegions.includes(region.region_id),
-      onChange: () => toggleRequestedRegion(region.region_id)
-    }))))));
-  }
   function cyclePolicy(direction) {
     var newPolicyID;
     switch (direction) {

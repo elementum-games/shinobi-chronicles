@@ -3,6 +3,7 @@ export function Modal({
   header,
   text,
   ContentComponent,
+  componentProps,
   onConfirm,
   onClose
 }) {
@@ -16,7 +17,7 @@ export function Modal({
     className: "modal_text"
   }, text), ContentComponent && /*#__PURE__*/React.createElement("div", {
     className: "modal_content"
-  }, /*#__PURE__*/React.createElement(ContentComponent, null)), onConfirm && /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(ContentComponent, componentProps)), onConfirm && /*#__PURE__*/React.createElement("div", {
     className: "modal_confirm_button",
     onClick: () => onConfirm()
   }, "confirm"), /*#__PURE__*/React.createElement("div", {
