@@ -11,12 +11,13 @@ export const ModalProvider = ({ children }) => {
         ContentComponent: null,
     });
 
-    const openModal = ({ header, text, ContentComponent, onConfirm }) => {
+    const openModal = ({ header, text, ContentComponent, componentProps, onConfirm }) => {
         setModalProps({
             isOpen: true,
             header,
             text,
             ContentComponent,
+            componentProps,
             onConfirm,
         });
     };
