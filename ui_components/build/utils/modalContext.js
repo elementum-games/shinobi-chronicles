@@ -15,6 +15,7 @@ export const ModalProvider = ({
     header,
     text,
     ContentComponent,
+    componentProps,
     onConfirm
   }) => {
     setModalProps({
@@ -22,6 +23,7 @@ export const ModalProvider = ({
       header,
       text,
       ContentComponent,
+      componentProps,
       onConfirm
     });
   };
