@@ -1,6 +1,0 @@
--view student stats/progress
-
- Ability to display
-the sensei's "specialization". Such as
-ninjutsu or taijutsu, taijutsu and genjutsu, etc. Possibly
-being a medic etc if team roles are devved
