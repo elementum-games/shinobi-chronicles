@@ -1670,7 +1670,7 @@ class BattleManager {
         switch($fighter_jutsu->jutsu_type) {
             case Jutsu::TYPE_TAIJUTSU:
                 // get speed stat total
-                $evasion_stat_amount = $fighter->speed + $fighter->speed_boost;
+                $evasion_stat_amount = $fighter->speed + $fighter->speed_boost + $fighter->cast_speed + $fighter->cast_speed_boost;
                 // determine base evasion against opponent
                 $evasion_stat_amount *= BattleManager::SPEED_DAMAGE_REDUCTION_RATIO / max($target_stat_total, 1);
                 // apply all boosts/nerfs to evasion
@@ -1680,7 +1680,7 @@ class BattleManager {
             case Jutsu::TYPE_GENJUTSU:
             case Jutsu::TYPE_NINJUTSU:
                 // get speed stat total
-                $evasion_stat_amount = $fighter->cast_speed + $fighter->cast_speed_boost;
+                $evasion_stat_amount = $fighter->speed + $fighter->speed_boost + $fighter->cast_speed + $fighter->cast_speed_boost;
                 // determine base evasion against opponent
                 $evasion_stat_amount *= BattleManager::SPEED_DAMAGE_REDUCTION_RATIO / max($target_stat_total, 1);
                 // apply all boosts/nerfs to evasion
