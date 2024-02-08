@@ -16,6 +16,11 @@ class BattleLogV2 {
     /** @var FighterActionLog[] - Map of combat_id => FighterActionLog */
     public array $fighter_action_logs;
 
+    /** @var array Map of fighter combat_id => health */
+    public array $fighter_health = [];
+
+    public string $raw_active_effects;
+
     public string $content;
 
     /**
@@ -26,6 +31,8 @@ class BattleLogV2 {
      * @param string $turn_phase
      * @param string $content
      * @param array  $fighter_action_logs
+     * @param array  $fighter_health
+     * @param string $raw_active_effects
      */
     public function __construct(
         System $system,
@@ -33,7 +40,9 @@ class BattleLogV2 {
         int $turn_number,
         string $turn_phase,
         string $content,
-        array $fighter_action_logs
+        array $fighter_action_logs,
+        array $fighter_health,
+        string $raw_active_effects
     ) {
         $this->system = $system;
         $this->battle_id = $battle_id;
@@ -41,6 +50,8 @@ class BattleLogV2 {
         $this->turn_phase = $turn_phase;
         $this->content = $content;
         $this->fighter_action_logs = $fighter_action_logs;
+        $this->fighter_health = $fighter_health;
+        $this->raw_active_effects = $raw_active_effects;
     }
 
     public function addFighterActionDescription(Fighter $fighter, string $action_description): void {
@@ -164,16 +175,24 @@ class BattleLogV2 {
                     }, $action_log['effect_hits']),
                     new_effect_announcements: $action_log['new_effect_announcements']
                 );
-            }, $fighter_action_logs)
+            }, $fighter_action_logs),
+            fighter_health: json_decode($raw_data['fighter_health'], true),
+            raw_active_effects: $raw_data['active_effects'],
         );
     }
 
     /**
      * @param System      $system
      * @param BattleLogV2 $log
+     * @param array       $fighter_health
+     * @param string       $raw_active_effects
+     * @throws DatabaseDeadlockException
      */
     public static function addOrUpdateTurnLog(
-        System $system, BattleLogV2 $log
+        System $system,
+        BattleLogV2 $log,
+        array $fighter_health,
+        string $raw_active_effects
     ): void {
         $clean_content = $system->db->clean($log->content);
 
@@ -185,10 +204,14 @@ class BattleLogV2 {
                     `turn_number`='{$log->turn_number}',
                     `turn_phase`='{$log->turn_phase}',
                     `content`='{$clean_content}',
-                    `fighter_action_logs`='{$fighter_action_logs_json}'
+                    `fighter_action_logs`='{$fighter_action_logs_json}',
+                    `fighter_health` = '" . json_encode($fighter_health) . "',
+                    `active_effects` = '" . json_encode($raw_active_effects) . "'
                 ON DUPLICATE KEY UPDATE
                     `content`='{$clean_content}',
-                    `fighter_action_logs`='{$fighter_action_logs_json}'
+                    `fighter_action_logs`='{$fighter_action_logs_json}',
+                    `fighter_health` = '" . json_encode($fighter_health) . "',
+                    `active_effects` = '" . json_encode($raw_active_effects) . "'
             "
         );
     }

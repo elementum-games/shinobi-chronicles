@@ -265,7 +265,7 @@ $rank_names = RankManager::fetchNames($system);
                 var jutsuEffect = jutsuElement.data('jutsu_effect');
                 var hideJutsu = true;
 
-                // Tag filters
+                // Tag filters (TODO: migrate these to use constants from backend)
                 if ($("#jutsu_filter_damage").is(':checked')) {
                     if (jutsuEffect.includes('Residual') || jutsuEffect.includes('None') || jutsuEffect.includes('Piercing') || jutsuEffect.includes('Recoil') || jutsuEffect.includes('Reflect') || jutsuEffect.includes('Immolate')) {
                         hideJutsu = false;

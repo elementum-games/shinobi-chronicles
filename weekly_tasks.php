@@ -9,6 +9,6 @@ if(php_sapi_name() !== "cli") {
 require_once __DIR__ . "/classes/System.php";
 require_once __DIR__ . "/classes/Clan.php";
 
-$system = new System();
+$system = System::initialize();
 
 

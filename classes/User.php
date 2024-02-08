@@ -93,6 +93,8 @@ class User extends Fighter {
     const PVP_IMMUNITY_SECONDS = 120;
     const SPECIAL_MISSION_STEALTH_BONUS = 1;
 
+    const POST_FIGHT_CONSUMABLE_HEAL_REDUCTION_MS = 2500;
+
     public static int $jutsu_train_gain = 5;
 
     public System $system;
@@ -1003,17 +1005,15 @@ class User extends Fighter {
     }
 
     public function setForbiddenSealFromDb(string $forbidden_seal_db, bool $remote_view) {
-        if(!$forbidden_seal_db) {
-            $this->forbidden_seal = new ForbiddenSeal($this->system, 0, 0);
-        }
-        else {
-            // Prep seal data from DB
-            $forbidden_seal = json_decode($forbidden_seal_db, true);
+        $FS_data = $forbidden_seal_db
+            ? json_decode($forbidden_seal_db, associative: true)
+            : ['level' => 0, 'time' => 0];
 
-            // Set seal data
-            $this->forbidden_seal = new ForbiddenSeal($this->system, $forbidden_seal['level'], $forbidden_seal['time']);
-        }
-
+        $this->forbidden_seal = ForbiddenSeal::fromDb(
+            system: $this->system,
+            seal_level: $FS_data['level'],
+            seal_end_time: $FS_data['time']
+        );
         $this->forbidden_seal_loaded = true;
 
         // Check if seal is expired & remove if it is
@@ -1022,7 +1022,6 @@ class User extends Fighter {
         }
 
         // Load benefits
-        $this->forbidden_seal->setBenefits();
         if(!$remote_view && isset($this->reputation) && !$this->reputation->bonus_pve_loaded) {
             $this->reputation->setBonusPveRep($this->forbidden_seal->bonus_pve_reputation);
         }
@@ -1135,21 +1134,8 @@ class User extends Fighter {
                 while($jutsu_data = $this->system->db->fetch($result)) {
                     $jutsu_id = $jutsu_data['jutsu_id'];
 
-                    // Scale event jutsu
-                    if ($jutsu_data['purchase_type'] == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
-                        if ($this->rank_num == 3) {
-                            $jutsu_data['rank'] = 3;
-                            $jutsu_data['use_cost'] *= 2;
-                            $jutsu_data['power'] *= Jutsu::CHUUNIN_SCALE_MULTIPLIER;
-                        }
-                        else if ($this->rank_num == 4) {
-                            $jutsu_data['rank'] = 4;
-                            $jutsu_data['use_cost'] *= 3;
-                            $jutsu_data['power'] *= Jutsu::JONIN_SCALE_MULTIPLIER;
-                        }
-                    }
-
                     $jutsu = Jutsu::fromArray($jutsu_id, $jutsu_data);
+                    $jutsu->applyRankScaling($this->rank_num);
 
                     if($player_jutsu[$jutsu_id]['level'] == 0) {
                         $this->jutsu_scrolls[$jutsu_id] = $jutsu;
@@ -1769,7 +1755,6 @@ class User extends Fighter {
         $this->setPremiumCredits($this->premium_credits - $amount, $description);
     }
 
-
     /* function moteToVillage()
         moves user to village */
     public function moveToVillage() {
@@ -2047,7 +2032,7 @@ class User extends Fighter {
     public function getAvatarSize(): int {
         //Give staff members premium avatar size if they do not have seal
         if($this->staff_level && $this->forbidden_seal->level == 0) {
-            return ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['avatar_size'];
+            return ForbiddenSeal::AVATAR_SIZES[ForbiddenSeal::$STAFF_SEAL_LEVEL];
         }
         elseif($this->forbidden_seal->level != 0) {
             return $this->forbidden_seal->avatar_size;
@@ -2081,13 +2066,11 @@ class User extends Fighter {
      */
     public function getNameColors(): array
     {
-        $return = [
-            'black' => 'normalUser'
-        ];
+        $return = [];
 
         if($this->forbidden_seal->level != 0 || $this->isHeadAdmin()) {
-            if($this->isHeadAdmin()) {
-                $return = array_merge($return, ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['name_colors']);
+            if($this->isHeadAdmin() && $this->forbidden_seal->level == 0) {
+                $return = array_merge($return, ForbiddenSeal::getSealLevelNameColors(ForbiddenSeal::$STAFF_SEAL_LEVEL));
             }
             else {
                 $return = array_merge($return, $this->forbidden_seal->name_colors);
@@ -2137,6 +2120,26 @@ class User extends Fighter {
             break;
         }
         return floor($max_size / $divisor) . $suffix;
+    }
+
+    public function consumableHealReductionMsLeft(): int {
+        $time_since_last_fight = System::currentTimeMs() - $this->last_pvp_ms;
+        return User::POST_FIGHT_CONSUMABLE_HEAL_REDUCTION_MS - $time_since_last_fight;
+    }
+
+    public function maxConsumableHealAmountPercent(): int {
+        if($this->battle_id) {
+            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT;
+        }
+        if($this->consumableHealReductionMsLeft() > 0) {
+            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT;
+        }
+
+        return 100;
+    }
+
+    public function maxConsumableHealAmount(): int {
+        return $this->max_health * ($this->maxConsumableHealAmountPercent() / 100);
     }
 
     public function expForNextLevel(?int $extra_levels = 0): float|int {
@@ -2368,7 +2371,7 @@ class User extends Fighter {
 
             'register_date' => time(),
             'verify_key' => $verification_code,
-            'user_verified' => 1, // TEMP FIX
+            'user_verified' => 0,
             'layout' => System::DEFAULT_LAYOUT,
             'avatar_link' => mt_rand(1, 100) > 50
                 ? './images/default_avatar_v2_blue.png'

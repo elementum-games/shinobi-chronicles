@@ -233,7 +233,7 @@ class NPC extends Fighter {
                 } else {
                     $shop_jutsu->setLevel($jutsu_level, 0);
                 }
-                $this->jutsu[] = $shop_jutsu;
+                $this->jutsu[$shop_jutsu->id] = $shop_jutsu;
                 // this is important so battle logic treats all NPC jutsu as equipped jutsu
                 $this->equipped_jutsu[] = [
                     'id' => $shop_jutsu->id,
@@ -279,7 +279,7 @@ class NPC extends Fighter {
         $jutsuTypes = ['ninjutsu', 'taijutsu'];
         $aiType = rand(0, 1);
         $result = $this->system->db->query(
-            "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu`
+            "SELECT `name`, `battle_text`, `power`, `cooldown`, `jutsu_type` FROM `jutsu`
                     WHERE `rank` = '{$this->rank}' AND `jutsu_type` = '{$jutsuTypes[$aiType]}'
                     AND `purchase_type` != '1' AND `purchase_type` != '3' LIMIT 1"
         );
@@ -295,10 +295,10 @@ class NPC extends Fighter {
                 $moveArr[$type] = $data;
             }
             $this->jutsu[] = $this->initJutsu(
-                count($this->jutsu),
-                $moveArr['jutsu_type'],
-                $moveArr['power'],
-                $moveArr['battle_text']
+                id: count($this->jutsu),
+                jutsu_type: $moveArr['jutsu_type'],
+                power: $moveArr['power'],
+                battle_text: $moveArr['battle_text']
             );
         }
     }
@@ -376,7 +376,22 @@ class NPC extends Fighter {
         }
     }
 
-    public function initJutsu(int $id, $jutsu_type, string $name, float $power, int $cooldown, string $battle_text, string $use_type = Jutsu::USE_TYPE_MELEE, string $effect = "none", int $effect_amount = 0, int $effect_length = 0, string $effect2 = "none", int $effect2_amount = 0, int $effect2_length = 0, string $element = Jutsu::ELEMENT_NONE): Jutsu {
+    public function initJutsu(
+        int $id,
+        $jutsu_type,
+        string $name,
+        float $power,
+        int $cooldown,
+        string $battle_text,
+        string $use_type = Jutsu::USE_TYPE_MELEE,
+        string $effect = "none",
+        int $effect_amount = 0,
+        int $effect_length = 0,
+        string $effect2 = "none",
+        int $effect2_amount = 0,
+        int $effect2_length = 0,
+        string $element = Jutsu::ELEMENT_NONE
+    ): Jutsu {
         $battle_text_alt = str_replace(
             ['[player]', '[opponent]'],
             ['[playerX]', '[opponentX]'],

@@ -22,7 +22,7 @@ $passive_boosts = [
     'regen',
 ];
 
-$jutsu_constraints = require 'admin/constraints/jutsu.php';
+$jutsu_constraints = require __DIR__ . '/jutsu.php';
 
 $constraints = [
     'name' => [

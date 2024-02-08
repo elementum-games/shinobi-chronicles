@@ -18,7 +18,7 @@ class Battle {
     const MAX_TURN_LENGTH = 40;
     const PREP_LENGTH = 20;
 
-    const MAX_PRE_FIGHT_HEAL_PERCENT = 95;
+    const MAX_PRE_FIGHT_HEAL_PERCENT = 100;
 
     const TEAM1 = 'T1';
     const TEAM2 = 'T2';
@@ -315,100 +315,11 @@ class Battle {
         if($this->player2 instanceof User && $this->player2->id != $this->player->id) {
             $this->player2->loadData(User::UPDATE_NOTHING, true);
         }
-        if ($this->battle_type == Battle::TYPE_CHALLENGE) {
-		    if (true) {
-			    $tier_difference = $this->player1->reputation->rank - $this->player2->reputation->rank;
-			    if ($tier_difference > 0) {
-				    $this->player1->reputation_defense_boost = Battle::REPUTATION_DAMAGE_RESISTANCE_BOOST * abs($tier_difference);
-			    }
-                else if ($tier_difference < 0) {
-                    $this->player2->reputation_defense_boost = Battle::REPUTATION_DAMAGE_RESISTANCE_BOOST * abs($tier_difference);
-                }
-		    }
-	    }
+
         $this->player1->last_damage_taken = $this->player1_last_damage_taken;
         $this->player2->last_damage_taken = $this->player2_last_damage_taken;
 
         $this->fetchPlayerInventories();
-
-        $this->player1->applyBloodlineBoosts();
-        $this->player2->applyBloodlineBoosts();
-
-        // Setup bloodline defense bonus
-        if (!empty($this->player1->bloodline_defense_boosts)) {
-            foreach ($this->player1->bloodline_defense_boosts as $id => $boost) {
-                $boost_type = explode('_', $boost['effect'])[0];
-                if ($boost_type != 'damage') {
-                    continue;
-                }
-                $this->player1->resist_boost += $boost['effect_amount'] / $this->player2->getBaseStatTotal();
-            }
-        }
-        if (!empty($this->player2->bloodline_defense_boosts)) {
-            foreach ($this->player2->bloodline_defense_boosts as $id => $boost) {
-                $boost_type = explode('_', $boost['effect'])[0];
-                if ($boost_type != 'damage') {
-                    continue;
-                }
-                $this->player2->resist_boost += $boost['effect_amount'] / $this->player1->getBaseStatTotal();
-            }
-        }
-
-        // Weaken jutsu that do not match player's primary jutsu type, or are not equipped
-        $player1_primary_jutsu_type = $this->player1->getPrimaryJutsuType();
-        $player2_primary_jutsu_type = $this->player2->getPrimaryJutsuType();
-
-        $player1_equipped_jutsu_ids = array_flip(
-            array_map(function($equipped_jutsu) {
-                return $equipped_jutsu['id'];
-            }, $this->player1->equipped_jutsu)
-        );
-        $player2_equipped_jutsu_ids = array_flip(
-            array_map(function ($equipped_jutsu) {
-                return $equipped_jutsu['id'];
-            }, $this->player2->equipped_jutsu)
-        );
-
-        foreach ($this->player1->jutsu as $jutsu) {
-            if ($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player1_equipped_jutsu_ids[$jutsu->id])) {
-                $jutsu->power *= 0.75;
-                foreach($jutsu->effects as $effect) {
-                    $effect->display_effect_amount *= 0.75;
-                    $effect->effect_amount *= 0.75;
-                }
-            }
-
-            if ($jutsu->rank == 1) continue;
-
-            if ($jutsu->jutsu_type != $player1_primary_jutsu_type) {
-                $jutsu->power *= 0.5;
-                foreach($jutsu->effects as $effect) {
-                    $effect->display_effect_amount *= 0.5;
-                    $effect->effect_amount *= 0.5;
-                }
-            }
-        }
-        foreach ($this->player2->jutsu as $jutsu) {
-            if ($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player2_equipped_jutsu_ids[$jutsu->id])) {
-                $jutsu->power *= 0.75;
-                foreach ($jutsu->effects as $effect) {
-                    $effect->display_effect_amount *= 0.75;
-                    $effect->effect_amount *= 0.75;
-                }
-            }
-
-            if ($jutsu->rank == 1) continue;
-
-            if (!$this->player2 instanceof NPC) {
-                if ($jutsu->jutsu_type != $player2_primary_jutsu_type) {
-                    $jutsu->power *= 0.5;
-                    foreach ($jutsu->effects as $effect) {
-                        $effect->display_effect_amount *= 0.5;
-                        $effect->effect_amount *= 0.5;
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -559,7 +470,6 @@ class Battle {
 
         // for each jutsu:
         // - check if has linked jutsu
-        // - check if used last turn
         // - add linked jutsu if not exists
         foreach ($this->player1->jutsu as $jutsu) {
             if ($jutsu->linked_jutsu_id > 0) {
@@ -582,7 +492,7 @@ class Battle {
             if ($jutsu->linked_jutsu_id > 0 && $this->player2 instanceof User) {
                 $id = "J" . $jutsu->id . ":T2:U:" . $this->player2->user_id;
                 if (isset($this->jutsu_cooldowns[$id]) && $this->jutsu_cooldowns[$id] > 0) {
-                    if (!isset($this->player1->jutsu[$jutsu->linked_jutsu_id])) {
+                    if (!isset($this->player2->jutsu[$jutsu->linked_jutsu_id])) {
                         $linked_jutsu = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` = {$jutsu->linked_jutsu_id}");
                         $linked_jutsu = $this->system->db->fetch($linked_jutsu);
                         $this->player2->jutsu[$jutsu->linked_jutsu_id] = Jutsu::fromArray($jutsu->linked_jutsu_id, $linked_jutsu);

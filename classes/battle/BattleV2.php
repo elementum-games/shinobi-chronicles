@@ -18,7 +18,7 @@ class BattleV2 {
     const TURN_LENGTH = 40;
     const PREP_LENGTH = 20;
 
-    const MAX_PRE_FIGHT_HEAL_PERCENT = 85;
+    const MAX_PRE_FIGHT_HEAL_PERCENT = 100;
 
     const TEAM1 = 'T1';
     const TEAM2 = 'T2';
@@ -231,7 +231,9 @@ class BattleV2 {
                 turn_number: $battle->turn_count,
                 turn_phase: $battle->turn_type,
                 content: $battle_id,
-                fighter_action_logs: []
+                fighter_action_logs: [],
+                fighter_health: $battle->fighter_health,
+                raw_active_effects: $battle->raw_active_effects,
             );
         }
 
@@ -380,7 +382,7 @@ class BattleV2 {
                 `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
 
                 `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
-                `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
+                `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "',
 
                 `round_count` = {$this->round_count},
                 `team1_wins` = {$this->team1_wins},
@@ -388,7 +390,12 @@ class BattleV2 {
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
         );
 
-        BattleLogV2::addOrUpdateTurnLog($this->system, $this->current_turn_log);
+        BattleLogV2::addOrUpdateTurnLog(
+            $this->system,
+            $this->current_turn_log,
+            $this->fighter_health,
+            $this->raw_active_effects
+        );
 
         $this->system->db->query("COMMIT;");
     }
@@ -441,5 +448,4 @@ class BattleV2 {
     public function getLastTurnLog(): ?BattleLogV2 {
         return $this->log[$this->turn_count - 1] ?? null;
     }
-
 }

@@ -78,7 +78,7 @@ function Header({ links, navigationAPIData, timeZone, updateMaintenance, scOpen 
             let minutes = Math.floor(timeRemaining / 60);
             timeRemaining -= minutes * 60;
             if(minutes < 10) {
-                minutes = "0" + minutes + ":";
+                minutes = "0" + minutes;
             }
             returnString += minutes + ":";
         }

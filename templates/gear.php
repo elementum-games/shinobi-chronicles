@@ -115,6 +115,12 @@
             </td>
         <td class='fullwidth' style='text-align:center;'>
             <div style='display: flex; gap: 10px; align-items: center; justify-content: center; flex-direction: column'>
+                <?php if($player->consumableHealReductionMsLeft() > 0): ?>
+                    <span style='font-style:italic;'>
+                        Healing limited to <?= $player->maxConsumableHealAmountPercent() ?>% max health for
+                        <?= round($player->consumableHealReductionMsLeft() / 1000, 1) ?> more seconds
+                    </span>
+                <?php endif; ?>
                 <?php foreach($player->items as $id => $item): ?>
                     <?php if($item->use_type != Item::USE_TYPE_CONSUMABLE) continue; ?>
                     <?php if($item->quantity <= 0) continue; ?>
@@ -123,7 +129,9 @@
                         <span class='button' style='min-width:8em; margin: 0'><?= $item->name ?><br />
                             <span style='font-weight:normal;'>Amount: <?= $item->quantity ?></span><br/>
                             <?php if($item->effect == 'heal'): ?>
-                                <span style='font-weight:normal;'>(Heal <?= $item->effect_amount ?>% HP)</span>
+                                <span style='font-weight:normal;'>
+                                    (Heal <?= $item->effect_amount ?>% HP)
+                                </span>
                             <?php endif; ?>
                         </span>
                     </a>

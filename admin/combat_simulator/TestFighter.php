@@ -9,6 +9,24 @@ class TestFighter extends Fighter {
     public string $gender = 'Non-binary';
     public int $total_stats;
 
+    public function activeEffectsFromFormData(array $active_effects): array {
+        $effects = [];
+
+        foreach($active_effects as $active_effect) {
+            if($active_effect['effect'] == 'none') continue;
+
+            $effects[] = new BattleEffect(
+                user: $this->combat_id,
+                target: $this->combat_id,
+                turns: 1,
+                effect: $active_effect['effect'],
+                effect_amount: $active_effect['amount']
+            );
+        }
+
+        return $effects;
+    }
+
     public function getAvatarSize(): int {
         return 125;
     }
@@ -50,9 +68,52 @@ class TestFighter extends Fighter {
         return true;
     }
 
+    public function addJutsu(Jutsu $jutsu): void {
+        $jutsu->setLevel(100, 0);
+        $this->jutsu[$jutsu->id] = $jutsu;
+        $this->equipped_jutsu[] = [
+            'id' => $jutsu->id,
+            'type' => $jutsu->jutsu_type,
+        ];
+    }
+
+    public function addJutsuFromFormData(array $form_data): Jutsu {
+        $id = count($this->jutsu) + 1;
+        $jutsu = new Jutsu(
+            id: $id,
+            name: $this->name . 'j' . $id,
+            rank: $this->rank,
+            jutsu_type: $form_data['type'],
+            base_power: $form_data['power'],
+            range: 1,
+            effect_1: $form_data['effect'],
+            base_effect_amount_1: (int)$form_data['effect_amount'],
+            effect_length_1: (int)$form_data['effect_length'],
+            effect_2: $form_data['effect2'],
+            base_effect_amount_2: (int)$form_data['effect2_amount'],
+            effect_length_2: (int)$form_data['effect2_length'],
+            description: 'no',
+            battle_text: 'nope',
+            cooldown: 0,
+            use_type: Jutsu::USE_TYPE_PROJECTILE,
+            target_type: Jutsu::TARGET_TYPE_TILE,
+            use_cost: 0,
+            purchase_cost: 0,
+            purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
+            parent_jutsu: 0,
+            element: $form_data['element'],
+            hand_seals: 0
+        );
+
+        $this->addJutsu($jutsu);
+
+        return $jutsu;
+    }
+
     public static function fromFormData(System $system, RankManager $rankManager, array $fighter_data, string $name): TestFighter {
         $fighter = new TestFighter();
-        $fighter->rank = 3;
+        $fighter->id = 1;
+        $fighter->rank = 4;
         $fighter->health = 1000000;
         $fighter->max_health = 1000000;
         $fighter->name = $name;
@@ -63,8 +124,8 @@ class TestFighter extends Fighter {
         $fighter->bloodline_skill = (int)$fighter_data['bloodline_skill'];
         $fighter->speed = (int)$fighter_data['speed'];
         $fighter->cast_speed = (int)$fighter_data['cast_speed'];
-        $fighter->intelligence = 10;
-        $fighter->willpower = 10;
+        $fighter->intelligence = 0;
+        $fighter->willpower = 0;
         $fighter->setTotalStats();
 
         $fighter_bloodline_boosts = [];
@@ -103,8 +164,10 @@ class TestFighter extends Fighter {
                 stats_max_level: $rankManager->statsForRankAndLevel($rank->id, $rank->max_level),
                 regen_rate: $fighter->regen_rate
             );
-            $fighter->applyBloodlineBoosts();
         }
+
+        $fighter->jutsu = [];
+        $fighter->equipped_jutsu = [];
 
         return $fighter;
     }

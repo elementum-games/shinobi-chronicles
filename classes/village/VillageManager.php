@@ -347,25 +347,72 @@ class VillageManager {
     }
 
     /**
-     * @return bool
+     * @return string
      */
     public static function resign(System $system, User $player): string
     {
+        $message = '';
         $time = time();
         $player_seat = $player->village_seat;
+        $player_seat_id = $player_seat->seat_id;
+        $player_seat_type = $player_seat->seat_type;
+        // get challenger if set
+        $first_challenger = null;
+        if (isset($player_seat_id)) {
+            $challenge_result = $system->db->query("SELECT * FROM `challenge_requests`
+                WHERE `seat_id` = {$player_seat_id}
+                AND `end_time` IS NULL
+                ORDER BY `created_time` ASC LIMIT 1
+            ");
+            $challenge_result = $system->db->fetch($challenge_result);
+            if ($system->db->last_num_rows > 0) {
+                $first_challenger = User::loadFromId($system, $challenge_result['challenger_id']);
+                $first_challenger->loadData(User::UPDATE_NOTHING);
+            }
+        }
         // clear active challenges
         self::cancelUserChallenges($system, $player->user_id);
         // clear active votes
         $system->db->query("DELETE `vote_logs` FROM `vote_logs` INNER JOIN `proposals` on `vote_logs`.`proposal_id` = `proposals`.`proposal_id` WHERE `vote_logs`.`user_id` = {$player->user_id} AND `proposals`.`end_time` IS NULL");
+        // exit seat
         $result = $system->db->query("UPDATE `village_seats` SET `seat_end` = {$time} WHERE `seat_end` IS NULL AND `user_id` = {$player->user_id}");
         if ($player_seat->seat_type == "kage") {
             $result = $system->db->query("UPDATE `villages` SET `leader` = 0 WHERE `village_id` = {$player->village->village_id}");
         }
         if ($system->db->last_affected_rows > 0) {
             $player->village_seat = self::getPlayerSeat($system, $player);
-            return "You have resigned from your position!";
+            $message = "You have resigned from your position!";
         } else {
-            return "No village seat found!";
+            $message = "No village seat found!";
+        }
+        // if active challenges to your seat, auto win for the challenger
+        if (isset($first_challenger)) {
+            // claim seat for challenger
+            self::claimSeat($system, $first_challenger, $player_seat_type);
+        }
+        return $message;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function exitSeat(System $system, User $player): bool {
+        $time = time();
+        $player_seat = $player->village_seat;
+        // clear active challenges
+        self::cancelUserChallenges($system, $player->user_id);
+        // clear active votes
+        $system->db->query("DELETE `vote_logs` FROM `vote_logs` INNER JOIN `proposals` on `vote_logs`.`proposal_id` = `proposals`.`proposal_id` WHERE `vote_logs`.`user_id` = {$player->user_id} AND `proposals`.`end_time` IS NULL");
+        // exit seat
+        $result = $system->db->query("UPDATE `village_seats` SET `seat_end` = {$time} WHERE `seat_end` IS NULL AND `user_id` = {$player->user_id}");
+        if ($player_seat->seat_type == "kage") {
+            $result = $system->db->query("UPDATE `villages` SET `leader` = 0 WHERE `village_id` = {$player->village->village_id}");
+        }
+        if ($system->db->last_affected_rows > 0) {
+            $player->village_seat = self::getPlayerSeat($system, $player);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -959,7 +1006,7 @@ class VillageManager {
                 // verify challenger meets requirements
                 self::checkSeatRequirements($system, $challenger, $seat_result['seat_type']);
                 // remove seat holder from seat
-                self::resign($system, $seat_holder);
+                self::exitSeat($system, $seat_holder);
                 // claim seat for challenger
                 self::claimSeat($system, $challenger, $seat_result['seat_type']);
                 break;
@@ -1639,7 +1686,7 @@ class VillageManager {
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
-                return "Sent trade offer to " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                $message = "Sent trade offer to " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
                 break;
             case self::PROPOSAL_TYPE_ACCEPT_TRADE:
                 // check at war
@@ -1659,7 +1706,7 @@ class VillageManager {
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
-                return "Accepted trade offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                $message = "Accepted trade offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
                 break;
             default:
                 return "Invalid proposal type.";
@@ -1667,12 +1714,42 @@ class VillageManager {
         }
         // process reputation change
         $rep_adjustment = 0;
+        $total_negative_votes = 0;
+        $total_positive_votes = 0;
+        $rep_loss_from_positive_votes = 0;
+        $rep_loss_from_positive_votes_modifier = 0;
         foreach ($votes as $vote) {
-            if ($vote['rep_adjustment'] != 0) {
-                $rep_adjustment += $vote['rep_adjustment'];
+            if ($vote['rep_adjustment'] < 0) {
+                $total_negative_votes++;
+            }
+            if ($vote['rep_adjustment'] > 0) {
+                $total_positive_votes++;
+            }
+        }
+        // e.g. 1 negative vote, 2 positive votes, 0 net rep_adjustment, -500 for the negative voter, -250 for each positive voter
+        if ($total_negative_votes > 0) {
+            $rep_adjustment = self::VOTE_BOOST_COST * $total_negative_votes * -1;
+            if ($total_positive_votes > 0) {
+                $rep_adjustment += $total_positive_votes * self::VOTE_BOOST_COST;
+                $rep_adjustment = min($rep_adjustment, 0);
+                $rep_loss_from_positive_votes_modifier = min($total_negative_votes / $total_positive_votes, 1);
+                $rep_loss_from_positive_votes = self::VOTE_BOOST_COST * $rep_loss_from_positive_votes_modifier;
+            }
+        }
+        foreach ($votes as $vote) {
+            if ($vote['rep_adjustment'] > 0 && $rep_loss_from_positive_votes > 0) {
                 $user = User::loadFromId($system, $vote['user_id']);
                 $user->loadData();
-                $user->reputation->subtractRep($vote['rep_adjustment'], UserReputation::ACTIVITY_TYPE_UNCAPPED);
+                $user->reputation->subtractRep($rep_loss_from_positive_votes, UserReputation::ACTIVITY_TYPE_UNCAPPED);
+                $system->db->query("UPDATE `vote_logs` SET `rep_adjustment` = {$rep_loss_from_positive_votes} WHERE `vote_id` = {$vote['vote_id']}");
+                $user->updateData();
+            } else if ($vote['rep_adjustment'] > 0 && $rep_loss_from_positive_votes == 0) {
+                $system->db->query("UPDATE `vote_logs` SET `rep_adjustment` = {$rep_loss_from_positive_votes} WHERE `vote_id` = {$vote['vote_id']}");
+            }
+            if ($vote['rep_adjustment'] < 0) {
+                $user = User::loadFromId($system, $vote['user_id']);
+                $user->loadData();
+                $user->reputation->subtractRep(self::VOTE_BOOST_COST, UserReputation::ACTIVITY_TYPE_UNCAPPED);
                 $user->updateData();
             }
         }
@@ -1682,7 +1759,7 @@ class VillageManager {
             $message .= "\n You have gained {$rep_adjustment} Reputation!";
             $player->updateData();
         } else if ($rep_adjustment < 0) {
-            $player->reputation->subtractRep($rep_adjustment, UserReputation::ACTIVITY_TYPE_UNCAPPED);
+            $player->reputation->subtractRep(abs($rep_adjustment), UserReputation::ACTIVITY_TYPE_UNCAPPED);
             $message .= "\n You have lost {$rep_adjustment} Reputation!";
             $player->updateData();
         }
@@ -2280,7 +2357,7 @@ class VillageManager {
                 expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_PROPOSAL * 86400),
                 alert: false,
             );
-            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_MULTIPLE);
+            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
         }
     }
 

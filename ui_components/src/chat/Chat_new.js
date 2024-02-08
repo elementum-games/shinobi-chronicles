@@ -56,9 +56,9 @@ function Chat({
 
     if(banInfo.isBanned) {
         return <ChatBanInfo
-            banName={banInfo.name}
-            banDescription={banInfo.description}
-            banTimeRemaining={banInfo.timeRemaining}
+            banName={banInfo.banName}
+            banDescription={banInfo.banDescription}
+            banTimeRemaining={banInfo.banTimeRemaining}
         />;
     }
 
@@ -190,7 +190,7 @@ function ChatBanInfo({ banName, banDescription, banTimeRemaining }) {
                 </tr>
                 <tr>
                     <td style={{textAlign: "center"}}>
-                        {banDescription}
+                        {banDescription}<br />
                         {banTimeRemaining != null && <span><b>Time Remaining:</b> {banTimeRemaining}</span>}
                         <br/>
                         Visit the <a href="/support.php">Support Center</a> to appeal this.

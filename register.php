@@ -2,7 +2,7 @@
 session_start();
 
 require_once("classes/_autoload.php");
-$system = new System();
+$system = System::initialize();
 
 if(isset($_SESSION['user_id'])) {
     header("Location: {$system->router->base_url}}");
