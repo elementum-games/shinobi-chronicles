@@ -46,166 +46,139 @@ export function KageQuarters({
         { resource_id: 3, resource_name: "wealth", count: 0 }
     ]);
     const [requestedRegions, setRequestedRegions] = React.useState([]);
-    const [modalState, setModalState] = React.useState("closed");
-    const [modalHeader, setModalHeader] = React.useState(null);
-    const [modalText, setModalText] = React.useState(null);
     const { openModal } = useModal();
     const ChangePolicy = () => {
-        if (modalState == "confirm_policy") {
-            apiFetch(
-                villageAPI,
-                {
-                    request: 'CreateProposal',
-                    type: 'policy',
-                    policy_id: displayPolicyID,
-                }
-            ).then((response) => {
-                if (response.errors.length) {
-                    handleErrors(response.errors);
-                    return;
-                }
-                setProposalDataState(response.data.proposalData);
-                setModalHeader("Confirmation");
-                setModalText(response.data.response_message);
-                setModalState("response_message");
+        apiFetch(
+            villageAPI,
+            {
+                request: 'CreateProposal',
+                type: 'policy',
+                policy_id: displayPolicyID,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setProposalDataState(response.data.proposalData);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
             });
-        }
-        else {
-            setModalState("confirm_policy");
-            setModalHeader("Confirmation");
-            setModalText("Are you sure you want to change policies? You will be unable to select a new policy for 3 days.");
-        }
+        });
     }
     const DeclareWar = () => {
-        if (modalState == "confirm_declare_war") {
-            apiFetch(
-                villageAPI,
-                {
-                    request: 'CreateProposal',
-                    type: 'declare_war',
-                    target_village_id: strategicDisplayRight.village.village_id,
-                }
-            ).then((response) => {
-                if (response.errors.length) {
-                    handleErrors(response.errors);
-                    return;
-                }
-                setProposalDataState(response.data.proposalData);
-                setModalText(response.data.response_message);
-                setModalHeader("Confirmation");
-                setModalState("response_message");
+        apiFetch(
+            villageAPI,
+            {
+                request: 'CreateProposal',
+                type: 'declare_war',
+                target_village_id: strategicDisplayRight.village.village_id,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setProposalDataState(response.data.proposalData);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
             });
-        }
-        else {
-            setModalState("confirm_declare_war");
-            setModalText("Are you sure you declare war with " + strategicDisplayRight.village.name + "?");
-            setModalHeader("Confirmation");
-        }
+        });
     }
     const OfferPeace = () => {
-        if (modalState == "confirm_offer_peace") {
-            apiFetch(
-                villageAPI,
-                {
-                    request: 'CreateProposal',
-                    type: 'offer_peace',
-                    target_village_id: strategicDisplayRight.village.village_id,
-                }
-            ).then((response) => {
-                if (response.errors.length) {
-                    handleErrors(response.errors);
-                    return;
-                }
-                setProposalDataState(response.data.proposalData);
-                setModalText(response.data.response_message);
-                setModalHeader("Confirmation");
-                setModalState("response_message");
+        apiFetch(
+            villageAPI,
+            {
+                request: 'CreateProposal',
+                type: 'offer_peace',
+                target_village_id: strategicDisplayRight.village.village_id,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setProposalDataState(response.data.proposalData);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
             });
-        }
-        else {
-            setModalState("confirm_offer_peace");
-            setModalText("Are you sure you want to offer peace with " + strategicDisplayRight.village.name + "?");
-            setModalHeader("Confirmation");
-        }
+        });
     }
     const OfferAlliance = () => {
-        if (modalState == "confirm_form_alliance") {
-            apiFetch(
-                villageAPI,
-                {
-                    request: 'CreateProposal',
-                    type: 'offer_alliance',
-                    target_village_id: strategicDisplayRight.village.village_id,
-                }
-            ).then((response) => {
-                if (response.errors.length) {
-                    handleErrors(response.errors);
-                    return;
-                }
-                setProposalDataState(response.data.proposalData);
-                setModalText(response.data.response_message);
-                setModalHeader("Confirmation");
-                setModalState("response_message");
+        apiFetch(
+            villageAPI,
+            {
+                request: 'CreateProposal',
+                type: 'offer_alliance',
+                target_village_id: strategicDisplayRight.village.village_id,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setProposalDataState(response.data.proposalData);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
             });
-        }
-        else {
-            setModalState("confirm_form_alliance");
-            setModalText("Are you sure you want to form an alliance with " + strategicDisplayRight.village.name + "?\nYou can be a member of only one Alliance at any given time.");
-            setModalHeader("Confirmation");
-        }
+        });
     }
     const BreakAlliance = () => {
-        if (modalState == "confirm_break_alliance") {
-            apiFetch(
-                villageAPI,
-                {
-                    request: 'CreateProposal',
-                    type: 'break_alliance',
-                    target_village_id: strategicDisplayRight.village.village_id,
-                }
-            ).then((response) => {
-                if (response.errors.length) {
-                    handleErrors(response.errors);
-                    return;
-                }
-                setProposalDataState(response.data.proposalData);
-                setModalText(response.data.response_message);
-                setModalHeader("Confirmation");
-                setModalState("response_message");
+        apiFetch(
+            villageAPI,
+            {
+                request: 'CreateProposal',
+                type: 'break_alliance',
+                target_village_id: strategicDisplayRight.village.village_id,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setProposalDataState(response.data.proposalData);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
             });
-        }
-        else {
-            setModalState("confirm_break_alliance");
-            setModalText("Are you sure you want break an alliance with " + strategicDisplayRight.village.name + "?");
-            setModalHeader("Confirmation");
-        }
+        });
     }
     const CancelProposal = () => {
-        if (modalState == "confirm_cancel_proposal") {
-            apiFetch(
-                villageAPI,
-                {
-                    request: 'CancelProposal',
-                    proposal_id: currentProposal.proposal_id,
-                }
-            ).then((response) => {
-                if (response.errors.length) {
-                    handleErrors(response.errors);
-                    return;
-                }
-                setProposalDataState(response.data.proposalData);
-                setCurrentProposal(null);
-                setCurrentProposalKey(null);
-                setModalText(response.data.response_message);
-                setModalHeader("Confirmation");
-                setModalState("response_message");
+        apiFetch(
+            villageAPI,
+            {
+                request: 'CancelProposal',
+                proposal_id: currentProposal.proposal_id,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setProposalDataState(response.data.proposalData);
+            setCurrentProposal(null);
+            setCurrentProposalKey(null);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
             });
-        }
-        else {
-            setModalState("confirm_cancel_proposal");
-            setModalText("Are you sure you want to cancel this proposal?");
-            setModalHeader("Confirmation");
-        }
+        });
     }
     const OfferTrade = () => {
         apiFetch(
@@ -225,95 +198,86 @@ export function KageQuarters({
                 return;
             }
             setProposalDataState(response.data.proposalData);
-            setModalText(response.data.response_message);
-            setModalHeader("Confirmation");
-            setModalState("response_message");
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
+            });
         });
     }
     const EnactProposal = () => {
-        if (modalState == "confirm_enact_proposal") {
-            apiFetch(
-                villageAPI,
-                {
-                    request: 'EnactProposal',
-                    proposal_id: currentProposal.proposal_id,
-                }
-            ).then((response) => {
-                if (response.errors.length) {
-                    handleErrors(response.errors);
-                    return;
-                }
-                setProposalDataState(response.data.proposalData);
-                setCurrentProposal(null);
-                setCurrentProposalKey(null);
-                setPolicyDataState(response.data.policyData);
-                setDisplayPolicyID(response.data.policyData.policy_id);
-                setPolicyDisplay(getPolicyDisplayData(response.data.policyData.policy_id));
-                setStrategicDataState(response.data.strategicData);
-                setStrategicDisplayLeft(response.data.strategicData.find(item => item.village.name == villageName));
-                setStrategicDisplayRight(response.data.strategicData.find(item => item.village.name == strategicDisplayRight.village.name));
-                setModalText(response.data.response_message);
-                setModalHeader("Confirmation");
-                setModalState("response_message");
+        apiFetch(
+            villageAPI,
+            {
+                request: 'EnactProposal',
+                proposal_id: currentProposal.proposal_id,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setProposalDataState(response.data.proposalData);
+            setCurrentProposal(null);
+            setCurrentProposalKey(null);
+            setPolicyDataState(response.data.policyData);
+            setDisplayPolicyID(response.data.policyData.policy_id);
+            setPolicyDisplay(getPolicyDisplayData(response.data.policyData.policy_id));
+            setStrategicDataState(response.data.strategicData);
+            setStrategicDisplayLeft(response.data.strategicData.find(item => item.village.name == villageName));
+            setStrategicDisplayRight(response.data.strategicData.find(item => item.village.name == strategicDisplayRight.village.name));
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
             });
-        }
-        else {
-            setModalState("confirm_enact_proposal");
-            setModalText("Are you sure you want to enact this proposal?");
-            setModalHeader("Confirmation");
-        }
+        });
     }
     const BoostVote = () => {
-        if (modalState == "confirm_boost_vote") {
-            apiFetch(
-                villageAPI,
-                {
-                    request: 'BoostVote',
-                    proposal_id: currentProposal.proposal_id,
-                }
-            ).then((response) => {
-                if (response.errors.length) {
-                    handleErrors(response.errors);
-                    return;
-                }
-                setProposalDataState(response.data.proposalData);
-                setCurrentProposal(response.data.proposalData[currentProposalKey]);
-                setModalText(response.data.response_message);
-                setModalHeader("Confirmation");
-                setModalState("response_message");
+        apiFetch(
+            villageAPI,
+            {
+                request: 'BoostVote',
+                proposal_id: currentProposal.proposal_id,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setProposalDataState(response.data.proposalData);
+            setCurrentProposal(response.data.proposalData[currentProposalKey]);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
             });
-        }
-        else {
-            setModalState("confirm_boost_vote");
-            setModalText("When a vote Against is boosted:\n The Kage will lose 500 Reputation when the proposal is enacted.\n\nWhen a vote In Favor is boosted:\nTotal Reputation loss from Against votes will be reduced by 500.\n\nBoosting a vote will cost 500 Reputation when the proposal is passed.\n\nHowever, a boosted vote In Favor will only cost Reputation if there is a boosted vote Against. If there are more boosted votes In Favor than Against, the cost will be split between between votes In Favor.");
-            setModalHeader("Confirmation");
-        }
+        });
     }
     const CancelVote = () => {
-        if (modalState == "confirm_cancel_vote") {
-            apiFetch(
-                villageAPI,
-                {
-                    request: 'CancelVote',
-                    proposal_id: currentProposal.proposal_id,
-                }
-            ).then((response) => {
-                if (response.errors.length) {
-                    handleErrors(response.errors);
-                    return;
-                }
-                setProposalDataState(response.data.proposalData);
-                setCurrentProposal(response.data.proposalData[currentProposalKey]);
-                setModalText(response.data.response_message);
-                setModalHeader("Confirmation");
-                setModalState("response_message");
+        apiFetch(
+            villageAPI,
+            {
+                request: 'CancelVote',
+                proposal_id: currentProposal.proposal_id,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setProposalDataState(response.data.proposalData);
+            setCurrentProposal(response.data.proposalData[currentProposalKey]);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
             });
-        }
-        else {
-            setModalState("confirm_cancel_vote");
-            setModalText("Are you sure you wish to cancel your vote for this proposal?");
-            setModalHeader("Confirmation");
-        }
+        });
     }
     const SubmitVote = (vote) => {
         apiFetch(
@@ -341,72 +305,6 @@ export function KageQuarters({
     }, [proposalDataState]);
     return (
         <>
-            {modalState !== "closed" &&
-                <>
-                    <div className="modal_backdrop"></div>
-                    <div className="modal">
-                        <div className="modal_header">{modalHeader}</div>
-                        <div className="modal_text">{modalText}</div>
-                        {modalState == "confirm_policy" &&
-                            <>
-                                <div className="modal_confirm_button" onClick={() => ChangePolicy()}>Confirm</div>
-                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
-                            </>
-                        }
-                        {modalState == "confirm_cancel_proposal" &&
-                            <>
-                                <div className="modal_confirm_button" onClick={() => CancelProposal()}>Confirm</div>
-                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
-                            </>
-                        }
-                        {modalState == "confirm_enact_proposal" &&
-                            <>
-                                <div className="modal_confirm_button" onClick={() => EnactProposal()}>Confirm</div>
-                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
-                            </>
-                        }
-                        {modalState == "confirm_boost_vote" &&
-                            <>
-                                <div className="modal_confirm_button" onClick={() => BoostVote()}>Confirm</div>
-                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
-                            </>
-                        }
-                        {modalState == "confirm_cancel_vote" &&
-                            <>
-                                <div className="modal_confirm_button" onClick={() => CancelVote()}>Confirm</div>
-                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
-                            </>
-                        }
-                        {modalState == "confirm_declare_war" &&
-                            <>
-                                <div className="modal_confirm_button" onClick={() => DeclareWar()}>Confirm</div>
-                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
-                            </>
-                        }
-                        {modalState == "confirm_offer_peace" &&
-                            <>
-                                <div className="modal_confirm_button" onClick={() => OfferPeace()}>Confirm</div>
-                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
-                            </>
-                        }
-                        {modalState == "confirm_form_alliance" &&
-                            <>
-                                <div className="modal_confirm_button" onClick={() => OfferAlliance()}>Confirm</div>
-                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
-                            </>
-                        }
-                        {modalState == "confirm_break_alliance" &&
-                            <>
-                                <div className="modal_confirm_button" onClick={() => BreakAlliance()}>Confirm</div>
-                                <div className="modal_cancel_button" onClick={() => setModalState("closed")}>cancel</div>
-                            </>
-                        }
-                        {modalState == "response_message" &&
-                            <div className="modal_close_button" onClick={() => setModalState("closed")}>close</div>
-                        }
-                    </div>
-                </>
-            }
             <div className="kq_container">
                 <div className="row first">
                     <div className="column first">
@@ -489,7 +387,12 @@ export function KageQuarters({
                                     {playerSeatState.seat_type == "kage" &&
                                         <>
                                             <div className="proposal_cancel_button_wrapper">
-                                                <div className={currentProposal ? "proposal_cancel_button" : "proposal_cancel_button disabled"} onClick={() => CancelProposal()}>cancel proposal</div>
+                                            <div className={currentProposal ? "proposal_cancel_button" : "proposal_cancel_button disabled"} onClick={() => openModal({
+                                                header: 'Confirmation',
+                                                text: "Are you sure you want to cancel this proposal?",
+                                                ContentComponent: null,
+                                                onConfirm: () => CancelProposal(),
+                                            })}>cancel proposal</div>
                                             </div>
                                             {(currentProposal && (currentProposal.type == "offer_trade" || currentProposal.type == "accept_trade")) &&
                                                 <div className="trade_view_button_wrapper alliance"
@@ -524,7 +427,12 @@ export function KageQuarters({
                                             <div className="proposal_enact_button_wrapper">
                                                 <div className={(currentProposal && (currentProposal.enact_time_remaining !== null ||
                                                     currentProposal.votes.length == seatDataState.filter(seat => seat.seat_type == "elder" && seat.seat_id != null).length
-                                                )) ? "proposal_enact_button" : "proposal_enact_button disabled"} onClick={() => EnactProposal()}>enact proposal</div>
+                                            )) ? "proposal_enact_button" : "proposal_enact_button disabled"} onClick={() => openModal({
+                                                header: 'Confirmation',
+                                                text: 'Are you sure you want to enact this proposal?',
+                                                ContentComponent: null,
+                                                onConfirm: () => EnactProposal(),
+                                            })}>enact proposal</div>
                                                 {/*proposalRepAdjustment > 0 &&
                                                 <div className="rep_change positive">REPUATION GAIN: +{proposalRepAdjustment}</div>
                                             */}
@@ -672,7 +580,12 @@ export function KageQuarters({
                                                     }
                                                     {(currentProposal.votes.find(vote => vote.user_id == playerID).rep_adjustment == 0) &&
                                                         <div className="proposal_boost_vote_button_wrapper">
-                                                            <div className="proposal_boost_vote_button" onClick={() => BoostVote()}>boost vote</div>
+                                                    <div className="proposal_boost_vote_button" onClick={() => openModal({
+                                                        header: 'Confirmation',
+                                                        text: "When a vote Against is boosted:\n The Kage will lose 500 Reputation when the proposal is enacted.\n\nWhen a vote In Favor is boosted:\nTotal Reputation loss from Against votes will be reduced by 500.\n\nBoosting a vote will cost 500 Reputation when the proposal is passed.\n\nHowever, a boosted vote In Favor will only cost Reputation if there is a boosted vote Against. If there are more boosted votes In Favor than Against, the cost will be split between between votes In Favor.",
+                                                        ContentComponent: null,
+                                                        onConfirm: () => BoostVote(),
+                                                    })}>boost vote</div>
                                                         </div>
                                                     }
                                                 </>
@@ -798,7 +711,12 @@ export function KageQuarters({
                                 ))}
                             </div>
                             {displayPolicyID != policyDataState.policy_id &&
-                                <div className={playerSeatState.seat_type == "kage" ? "village_policy_change_button" : "village_policy_change_button disabled"} onClick={() => ChangePolicy()}>change policy</div>
+                                <div className={playerSeatState.seat_type == "kage" ? "village_policy_change_button" : "village_policy_change_button disabled"} onClick={() => openModal({
+                                    header: 'Confirmation',
+                                    text: "Are you sure you want to change policies? You will be unable to select a new policy for 3 days.",
+                                    ContentComponent: null,
+                                    onConfirm: () => ChangePolicy(),
+                                })}>change policy</div>
                             }
                             <div className="village_policy_main_container">
                                 <div className="village_policy_main_inner">
@@ -866,24 +784,44 @@ export function KageQuarters({
                             <div className="strategic_info_navigation">
                                 <div className="strategic_info_navigation_diplomacy_buttons">
                                     {strategicDisplayLeft.enemies.find(enemy => enemy == strategicDisplayRight.village.name) ?
-                                        <div className="diplomacy_action_button_wrapper war cancel" onClick={() => OfferPeace()}>
+                                        <div className="diplomacy_action_button_wrapper war cancel" onClick={() => openModal({
+                                            header: 'Confirmation',
+                                            text: "Are you sure you want to offer peace with " + strategicDisplayRight.village.name + "?",
+                                            ContentComponent: null,
+                                            onConfirm: () => OfferPeace(),
+                                        })}>
                                             <div className="diplomacy_action_button_inner">
                                             </div>
                                         </div>
                                         :
-                                        <div className="diplomacy_action_button_wrapper war" onClick={() => DeclareWar()}>
+                                        <div className="diplomacy_action_button_wrapper war" onClick={() => openModal({
+                                            header: 'Confirmation',
+                                            text: "Are you sure you declare war with " + strategicDisplayRight.village.name + "?",
+                                            ContentComponent: null,
+                                            onConfirm: () => DeclareWar(),
+                                        })}>
                                             <div className="diplomacy_action_button_inner">
                                                 <img src="/images/icons/war.png" className="diplomacy_action_button_icon" />
                                             </div>
                                         </div>
                                     }
                                     {strategicDisplayLeft.allies.find(ally => ally == strategicDisplayRight.village.name) ?
-                                        <div className="diplomacy_action_button_wrapper alliance cancel" onClick={() => BreakAlliance()}>
+                                        <div className="diplomacy_action_button_wrapper alliance cancel" onClick={() => openModal({
+                                            header: 'Confirmation',
+                                            text: "Are you sure you want break an alliance with " + strategicDisplayRight.village.name + "?",
+                                            ContentComponent: null,
+                                            onConfirm: () => BreakAlliance(),
+                                        })}>
                                             <div className="diplomacy_action_button_inner">
                                             </div>
                                         </div>
                                         :
-                                        <div className="diplomacy_action_button_wrapper alliance" onClick={() => OfferAlliance()}>
+                                        <div className="diplomacy_action_button_wrapper alliance" onClick={() => openModal({
+                                            header: 'Confirmation',
+                                            text: "Are you sure you want to form an alliance with " + strategicDisplayRight.village.name + "?\nYou can be a member of only one Alliance at any given time.",
+                                            ContentComponent: null,
+                                            onConfirm: () => OfferAlliance(),
+                                        })}>
                                             <div className="diplomacy_action_button_inner">
                                                 <img src="/images/icons/ally.png" className="diplomacy_action_button_icon" />
                                             </div>
