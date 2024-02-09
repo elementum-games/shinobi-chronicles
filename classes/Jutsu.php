@@ -49,6 +49,7 @@ class Jutsu {
     const GENJUTSU_ATTACK_POWER_MODIFIER = 0.55;*/
 
     public static array $elements = [
+        self::ELEMENT_NONE,
         self::ELEMENT_FIRE,
         self::ELEMENT_EARTH,
         self::ELEMENT_WIND,
