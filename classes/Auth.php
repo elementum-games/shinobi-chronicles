@@ -30,8 +30,6 @@ class Auth {
         return $user;
     }
 
-    public static function 
-
     public static function processLogin(System $system, string $user_name, string $password): void {
         try {
             // These are dependent, inclusive check premitted
