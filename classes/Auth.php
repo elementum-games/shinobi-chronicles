@@ -75,16 +75,14 @@ class Auth {
             }
             // Additional failed login check
             else if($user_data['failed_logins'] >= User::FULL_LOCK && time() - $user_data['last_login_attempt'] <= User::FULL_LOCK_CD) {
-                if(time() - $user_data['last_login_attempt'] <= User::FULL_LOCK_CD) {
-                    // Already had at least on malicious attempt logged, no need to do further system logs
-                    // Continue to update login attepmt time for new locations
-                    if(!in_array($_SERVER['REMOTE_ADDR'], [$user_data['current_ip'], $user_data['last_ip']])) {
-                        $system->db->query("UPDATE `users`
-                            SET `last_login_attempt`='" . time() . "'
-                        WHERE `user_id`='{$user_data['user_id']} LIMIT 1");
-                    }
-                    throw new RuntimeException("Account has been locked, please try again in a few minutes!");
+                // Already had at least on malicious attempt logged, no need to do further system logs
+                // Continue to update login attepmt time for new locations
+                if(!in_array($_SERVER['REMOTE_ADDR'], [$user_data['current_ip'], $user_data['last_ip']])) {
+                    $system->db->query("UPDATE `users`
+                        SET `last_login_attempt`='" . time() . "'
+                    WHERE `user_id`='{$user_data['user_id']} LIMIT 1");
                 }
+                throw new RuntimeException("Account has been locked, please try again in a few minutes!");
             }
             
             // Continue processing login
