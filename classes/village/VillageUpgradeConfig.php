@@ -1854,14 +1854,14 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => [
-            WarManager::RESOURCE_MATERIALS => 1200,
-            WarManager::RESOURCE_FOOD => 1200,
-            WarManager::RESOURCE_WEALTH => 1200,
+            WarManager::RESOURCE_MATERIALS => 4,
+            WarManager::RESOURCE_FOOD => 4,
+            WarManager::RESOURCE_WEALTH => 4,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => [
-            WarManager::RESOURCE_MATERIALS => 6000,
-            WarManager::RESOURCE_FOOD => 6000,
-            WarManager::RESOURCE_WEALTH => 6000,
+            WarManager::RESOURCE_MATERIALS => 6,
+            WarManager::RESOURCE_FOOD => 6,
+            WarManager::RESOURCE_WEALTH => 6,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => [
             WarManager::RESOURCE_MATERIALS => 10,

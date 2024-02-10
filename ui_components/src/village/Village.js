@@ -27,6 +27,7 @@ function Village({
     playerWarLogData,
     warRecordData,
     kageRecords,
+    buildingUpgradeData,
 }) {
     const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
     const [policyDataState, setPolicyDataState] = React.useState(policyData);
@@ -37,6 +38,7 @@ function Village({
     const [proposalDataState, setProposalDataState] = React.useState(proposalData);
     const [strategicDataState, setStrategicDataState] = React.useState(strategicData);
     const [challengeDataState, setChallengeDataState] = React.useState(challengeData);
+    const [buildingUpgradeDataState, setBuildingUpgradeDataState] = React.useState(buildingUpgradeData);
     const [villageTab, setVillageTab] = React.useState("villageHQ");
 
     function handleErrors(errors) {
@@ -229,6 +231,11 @@ function Village({
             }
             {villageTab == "villageUpgrades" &&
                 <VillageUpgrades
+                playerID={playerID}
+                playerSeatState={playerSeatState}
+                villageAPI={villageAPI}
+                buildingUpgradeDataState={buildingUpgradeDataState}
+                setBuildingUpgradeDataState={setBuildingUpgradeDataState}
                 />
             }
         </ModalProvider>

@@ -218,4 +218,296 @@ class VillageBuildingConfig {
             3 => 75,
         ],
     ];
+
+    /* upgrade set keys */
+    const UPGRADE_SET_KEY_RESEARCH = 'RESEARCH';
+    const UPGRADE_SET_KEY_RESEARCH_SUBSIDIES = 'RESEARCH_SUBSIDIES';
+    const UPGRADE_SET_KEY_ADMINISTRATION = 'ADMINISTRATION';
+    const UPGRADE_SET_KEY_POWER_PROJECTION = 'POWER_PROJECTION';
+    const UPGRADE_SET_KEY_EDUCATION_SUBSIDIES = 'EDUCATION_SUBSIDIES';
+    const UPGRADE_SET_KEY_TRAINING_GROUNDS = 'TRAINING_GROUNDS';
+    const UPGRADE_SET_KEY_MEDICAL_SUBSIDIES = 'MEDICAL_SUBSIDIES';
+    const UPGRADE_SET_KEY_HERBICULTURE = 'HERBICULTURE';
+    const UPGRADE_SET_KEY_MILITARY_SUBSIDIES = 'MILITARY_SUBSIDIES';
+    const UPGRADE_SET_KEY_ASSAULT_TRAINING = 'ASSAULT_TRAINING';
+    const UPGRADE_SET_KEY_SALTED_EARTH = 'SALTED_EARTH';
+    const UPGRADE_SET_KEY_UNDERWORLD_CONNECTIONS = 'UNDERWORLD_CONNECTIONS';
+    const UPGRADE_SET_KEY_GUERRILLA_WARFARE = 'GUERRILLA_WARFARE';
+    const UPGRADE_SET_KEY_SELECTIVE_RECRUITMENT = 'SELECTIVE_RECRUITMENT';
+    const UPGRADE_SET_KEY_CONSTRUCTION = 'CONSTRUCTION';
+    const UPGRADE_SET_KEY_ENGINEERING_SUBSIDIES = 'ENGINEERING_SUBSIDIES';
+    const UPGRADE_SET_KEY_RAPID_DEPLOYMENT = 'RAPID_DEPLOYMENT';
+    const UPGRADE_SET_KEY_ENGINEERING_CORPS = 'ENGINEERING_CORPS';
+    const UPGRADE_SET_KEY_FORTIFICATIONS = 'FORTIFICATIONS';
+    const UPGRADE_SET_KEY_BULK_SUPPLIERS = 'BULK_SUPPLIERS';
+    const UPGRADE_SET_KEY_FARMERS_MARKET = 'FARMERS_MARKET';
+    const UPGRADE_SET_KEY_MERCHANTS_GUILD = 'MERCHANTS_GUILD';
+    const UPGRADE_SET_KEY_WAREHOUSES = 'WAREHOUSES';
+    const UPGRADE_SET_KEY_ANCESTRAL_LEGACY = 'ANCESTRAL_LEGACY';
+    const UPGRADE_SET_KEY_FORTUNES_BOUNTY = 'FORTUNES_BOUNTY';
+    const UPGRADE_SET_KEY_NEW_RECIPE = 'NEW_RECIPE';
+    const UPGRADE_SET_KEY_QUALITY_INGREDIENTS = 'QUALITY_INGREDIENTS';
+    const UPGRADE_SET_KEY_SHINOBI_DISCOUNT = 'SHINOBI_DISCOUNT';
+    const UPGRADE_SET_KEY_INSPIRED_ITAMAE = 'LUCK_IN_LEFTOVERS';
+
+    /* upgrade sets for each building, indexed by building ID */
+    const BUILDING_UPGRADE_SETS = [
+        self::BUILDING_VILLAGE_HQ => [
+            self::UPGRADE_SET_KEY_RESEARCH,
+            self::UPGRADE_SET_KEY_RESEARCH_SUBSIDIES,
+            self::UPGRADE_SET_KEY_ADMINISTRATION,
+            self::UPGRADE_SET_KEY_POWER_PROJECTION,
+        ],
+        self::BUILDING_ACADEMY => [
+            self::UPGRADE_SET_KEY_EDUCATION_SUBSIDIES,
+            self::UPGRADE_SET_KEY_TRAINING_GROUNDS,
+        ],
+        self::BUILDING_HOSPITAL => [
+            self::UPGRADE_SET_KEY_MEDICAL_SUBSIDIES,
+            self::UPGRADE_SET_KEY_HERBICULTURE,
+        ],
+        self::BUILDING_ANBU_HQ => [
+            self::UPGRADE_SET_KEY_MILITARY_SUBSIDIES,
+            self::UPGRADE_SET_KEY_ASSAULT_TRAINING,
+            self::UPGRADE_SET_KEY_SALTED_EARTH,
+            self::UPGRADE_SET_KEY_UNDERWORLD_CONNECTIONS,
+            self::UPGRADE_SET_KEY_GUERRILLA_WARFARE,
+            self::UPGRADE_SET_KEY_SELECTIVE_RECRUITMENT,
+        ],
+        self::BUILDING_WORKSHOP => [
+            self::UPGRADE_SET_KEY_CONSTRUCTION,
+            self::UPGRADE_SET_KEY_ENGINEERING_SUBSIDIES,
+            self::UPGRADE_SET_KEY_RAPID_DEPLOYMENT,
+            self::UPGRADE_SET_KEY_ENGINEERING_CORPS,
+            self::UPGRADE_SET_KEY_FORTIFICATIONS,
+        ],
+        self::BUILDING_MARKET => [
+            self::UPGRADE_SET_KEY_BULK_SUPPLIERS,
+            self::UPGRADE_SET_KEY_FARMERS_MARKET,
+            self::UPGRADE_SET_KEY_MERCHANTS_GUILD,
+            self::UPGRADE_SET_KEY_WAREHOUSES,
+        ],
+        self::BUILDING_SHRINE => [
+            self::UPGRADE_SET_KEY_ANCESTRAL_LEGACY,
+            self::UPGRADE_SET_KEY_FORTUNES_BOUNTY,
+        ],
+        self::BUILDING_RAMEN_STAND => [
+            self::UPGRADE_SET_KEY_NEW_RECIPE,
+            self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS,
+            self::UPGRADE_SET_KEY_SHINOBI_DISCOUNT,
+            self::UPGRADE_SET_KEY_INSPIRED_ITAMAE,
+        ],
+    ];
+
+    /* upgrade set names, indexed by upgrade set key */
+    const UPGRADE_SET_NAMES = [
+        self::UPGRADE_SET_KEY_RESEARCH => 'Research',
+        self::UPGRADE_SET_KEY_RESEARCH_SUBSIDIES => 'Research Subsidies',
+        self::UPGRADE_SET_KEY_ADMINISTRATION => 'Administration',
+        self::UPGRADE_SET_KEY_POWER_PROJECTION => 'Power Projection',
+        self::UPGRADE_SET_KEY_EDUCATION_SUBSIDIES => 'Education Subsidies',
+        self::UPGRADE_SET_KEY_TRAINING_GROUNDS => 'Training Grounds',
+        self::UPGRADE_SET_KEY_MEDICAL_SUBSIDIES => 'Medical Subsidies',
+        self::UPGRADE_SET_KEY_HERBICULTURE => 'Herbiculture',
+        self::UPGRADE_SET_KEY_MILITARY_SUBSIDIES => 'Military Subsidies',
+        self::UPGRADE_SET_KEY_ASSAULT_TRAINING => 'Assault Training',
+        self::UPGRADE_SET_KEY_SALTED_EARTH => 'Salted Earth',
+        self::UPGRADE_SET_KEY_UNDERWORLD_CONNECTIONS => 'Underworld Connections',
+        self::UPGRADE_SET_KEY_GUERRILLA_WARFARE => 'Guerrilla Warfare',
+        self::UPGRADE_SET_KEY_SELECTIVE_RECRUITMENT => 'Selective Recruitment',
+        self::UPGRADE_SET_KEY_CONSTRUCTION => 'Construction',
+        self::UPGRADE_SET_KEY_ENGINEERING_SUBSIDIES => 'Engineering Subsidies',
+        self::UPGRADE_SET_KEY_RAPID_DEPLOYMENT => 'Rapid Deployment',
+        self::UPGRADE_SET_KEY_ENGINEERING_CORPS => 'Engineering Corps',
+        self::UPGRADE_SET_KEY_FORTIFICATIONS => 'Fortifications',
+        self::UPGRADE_SET_KEY_BULK_SUPPLIERS => 'Bulk Suppliers',
+        self::UPGRADE_SET_KEY_FARMERS_MARKET => 'Farmers Market',
+        self::UPGRADE_SET_KEY_MERCHANTS_GUILD => 'Merchants Guild',
+        self::UPGRADE_SET_KEY_WAREHOUSES => 'Warehouses',
+        self::UPGRADE_SET_KEY_ANCESTRAL_LEGACY => 'Ancestral Legacy',
+        self::UPGRADE_SET_KEY_FORTUNES_BOUNTY => 'Fortune\'s Bounty',
+        self::UPGRADE_SET_KEY_NEW_RECIPE => 'New Recipe',
+        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => 'Quality Ingredients',
+        self::UPGRADE_SET_KEY_SHINOBI_DISCOUNT => 'Shinobi Discount',
+        self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => 'Inspired Itamae',
+    ];
+
+    /* upgrade set descriptions, indexed by upgrade set key */
+    const UPGRADE_SET_DESCRIPTIONS = [
+        self::UPGRADE_SET_KEY_RESEARCH => "Enables researching higher tier Upgrades.",
+        self::UPGRADE_SET_KEY_RESEARCH_SUBSIDIES => "Increases overall Research Speed.",
+        self::UPGRADE_SET_KEY_ADMINISTRATION => "Decreases upkeep from active Upgrades.",
+        self::UPGRADE_SET_KEY_POWER_PROJECTION => "Increases the baseline and maximum Stability.",
+        self::UPGRADE_SET_KEY_EDUCATION_SUBSIDIES => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I],
+        self::UPGRADE_SET_KEY_TRAINING_GROUNDS => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I],
+        self::UPGRADE_SET_KEY_MEDICAL_SUBSIDIES => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I],
+        self::UPGRADE_SET_KEY_HERBICULTURE => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I],
+        self::UPGRADE_SET_KEY_MILITARY_SUBSIDIES => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I],
+        self::UPGRADE_SET_KEY_ASSAULT_TRAINING => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I],
+        self::UPGRADE_SET_KEY_SALTED_EARTH => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I],
+        self::UPGRADE_SET_KEY_UNDERWORLD_CONNECTIONS => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I],
+        self::UPGRADE_SET_KEY_GUERRILLA_WARFARE => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I],
+        self::UPGRADE_SET_KEY_SELECTIVE_RECRUITMENT => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I],
+        self::UPGRADE_SET_KEY_CONSTRUCTION => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I],
+        self::UPGRADE_SET_KEY_ENGINEERING_SUBSIDIES => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I],
+        self::UPGRADE_SET_KEY_RAPID_DEPLOYMENT => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I],
+        self::UPGRADE_SET_KEY_ENGINEERING_CORPS => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I],
+        self::UPGRADE_SET_KEY_FORTIFICATIONS => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I],
+        self::UPGRADE_SET_KEY_BULK_SUPPLIERS => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I],
+        self::UPGRADE_SET_KEY_FARMERS_MARKET => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I],
+        self::UPGRADE_SET_KEY_MERCHANTS_GUILD => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I],
+        self::UPGRADE_SET_KEY_WAREHOUSES => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I],
+        self::UPGRADE_SET_KEY_ANCESTRAL_LEGACY => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I],
+        self::UPGRADE_SET_KEY_FORTUNES_BOUNTY => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I],
+        self::UPGRADE_SET_KEY_NEW_RECIPE => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I],
+        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I],
+        self::UPGRADE_SET_KEY_SHINOBI_DISCOUNT => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I],
+        self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I],
+    ];
+    
+    /* upgrade set upgrades, indexed by upgrade set key */
+    const UPGRADE_SET_UPGRADES = [
+        self::UPGRADE_SET_KEY_RESEARCH => [
+            VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I,
+            VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II,
+            VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III,
+        ],
+        self::UPGRADE_SET_KEY_RESEARCH_SUBSIDIES => [
+            VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I,
+            VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_II,
+            VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_III,
+        ],
+        self::UPGRADE_SET_KEY_ADMINISTRATION => [
+            VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I,
+            VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II,
+            VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III,
+        ],
+        self::UPGRADE_SET_KEY_POWER_PROJECTION => [
+            VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I,
+            VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II,
+            VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III,
+        ],
+        self::UPGRADE_SET_KEY_EDUCATION_SUBSIDIES => [
+            VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I,
+            VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II,
+            VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III,
+        ],
+        self::UPGRADE_SET_KEY_TRAINING_GROUNDS => [
+            VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I,
+            VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II,
+            VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III,
+        ],
+        self::UPGRADE_SET_KEY_MEDICAL_SUBSIDIES => [
+            VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I,
+            VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II,
+            VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III,
+        ],
+        self::UPGRADE_SET_KEY_HERBICULTURE => [
+            VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_I,
+            VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_II,
+            VillageUpgradeConfig::UPGRADE_KEY_HERBICULTURE_III,
+        ],
+        self::UPGRADE_SET_KEY_MILITARY_SUBSIDIES => [
+            VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_I,
+            VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_II,
+            VillageUpgradeConfig::UPGRADE_KEY_MILITARY_SUBSIDIES_III,
+        ],
+        self::UPGRADE_SET_KEY_ASSAULT_TRAINING => [
+            VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_I,
+            VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_II,
+            VillageUpgradeConfig::UPGRADE_KEY_ASSAULT_TRAINING_III,
+        ],
+        self::UPGRADE_SET_KEY_SALTED_EARTH => [
+            VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_I,
+            VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_II,
+            VillageUpgradeConfig::UPGRADE_KEY_SALTED_EARTH_III,
+        ],
+        self::UPGRADE_SET_KEY_UNDERWORLD_CONNECTIONS => [
+            VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I,
+            VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II,
+            VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III,
+        ],
+        self::UPGRADE_SET_KEY_GUERRILLA_WARFARE => [
+            VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I,
+            VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II,
+            VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III,
+        ],
+        self::UPGRADE_SET_KEY_SELECTIVE_RECRUITMENT => [
+            VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I,
+            VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II,
+            VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III,
+        ],
+        self::UPGRADE_SET_KEY_CONSTRUCTION => [
+            VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I,
+            VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II,
+            VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III,
+        ],
+        self::UPGRADE_SET_KEY_ENGINEERING_SUBSIDIES => [
+            VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I,
+            VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_II,
+            VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_III,
+        ],
+        self::UPGRADE_SET_KEY_RAPID_DEPLOYMENT => [
+            VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_I,
+            VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_II,
+            VillageUpgradeConfig::UPGRADE_KEY_RAPID_DEPLOYMENT_III,
+        ],
+        self::UPGRADE_SET_KEY_ENGINEERING_CORPS => [
+            VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I,
+            VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II,
+            VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III,
+        ],
+        self::UPGRADE_SET_KEY_FORTIFICATIONS => [
+            VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I,
+            VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II,
+            VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III,
+        ],
+        self::UPGRADE_SET_KEY_BULK_SUPPLIERS => [
+            VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I,
+            VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II,
+            VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III,
+        ],
+        self::UPGRADE_SET_KEY_FARMERS_MARKET => [
+            VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I,
+            VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II,
+            VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III,
+        ],
+        self::UPGRADE_SET_KEY_MERCHANTS_GUILD => [
+            VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I,
+            VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II,
+            VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III,
+        ],
+        self::UPGRADE_SET_KEY_WAREHOUSES => [
+            VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I,
+            VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II,
+        ],
+        self::UPGRADE_SET_KEY_ANCESTRAL_LEGACY => [
+            VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I,
+            VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II,
+            VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III,
+        ],
+        self::UPGRADE_SET_KEY_FORTUNES_BOUNTY => [
+            VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I,
+            VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II,
+            VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III,
+        ],
+        self::UPGRADE_SET_KEY_NEW_RECIPE => [
+            VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I,
+        ],
+        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => [
+            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I,
+            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II,
+            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III,
+        ],
+        self::UPGRADE_SET_KEY_SHINOBI_DISCOUNT => [
+            VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I,
+            VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II,
+            VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III,
+        ],
+        self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => [
+            VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I,
+            VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I,
+            VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II,
+        ],
+    ];
 }

@@ -6,8 +6,7 @@
 ?>
 
 <link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/village/Village.css") ?>" />
-<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/village/WarTable.css") ?>" />
-<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/utils/modal.css") ?>" />
+<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/village/VillageUpgrades.css") ?>" />
 <div id="villageReactContainer"></div>
 <script type="module" src="<?= $system->getReactFile("village/Village") ?>"></script>
 <!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->
@@ -31,9 +30,9 @@
                 proposalData: <?= json_encode(VillageApiPresenter::proposalDataResponse($system, $player)) ?>,
                 strategicData: <?= json_encode(VillageApiPresenter::strategicDataResponse($system)) ?>,
                 challengeData: <?= json_encode(VillageApiPresenter::challengeDataResponse($system, $player)) ?>,
-                playerWarLogData: <?= json_encode(VillageApiPresenter::playerWarLogDataResponse($system, $player)) ?>,
-                warRecordData: <?= json_encode(VillageApiPresenter::warRecordDataResponse($system, $player)) ?>,
+                warLogData: <?= json_encode(VillageApiPresenter::warLogDataResponse($system, $player)) ?>,
                 kageRecords: <?= json_encode(VillageApiPresenter::kageRecordResponse($system, $player)) ?>,
+                buildingUpgradeData: <?= json_encode(VillageApiPresenter::buildingUpgradeDataResponse($system, $player)) ?>,
             }),
             villageContainer
         );
