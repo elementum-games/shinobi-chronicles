@@ -62,13 +62,13 @@ class Auth {
             }
 
             // Check failed logins - New location
-            if($user_data['failed_logins'] >= User::PARTIAL_LOCK && ($_SERVER['REMOTE_ADD'] != $user_data['current_ip'] || $_SERVER['REMOTE_ADD'] != $user_data['last_ip'])) {
+            if($user_data['failed_logins'] >= User::PARTIAL_LOCK && ($_SERVER['REMOTE_ADDR'] != $user_data['current_ip'] || $_SERVER['REMOTE_ADDR'] != $user_data['last_ip'])) {
                 // Failed login during CD period - log attempt and block error
                 if(time() - $user_data['last_login_attempt'] <= User::PARTIAL_LOCK_CD) {
                     $system->log(
                         'malicious_lockout',
                         $user_data['user_id'],
-                        "IP addres {$_SERVER['REMOTE_ADD']} failed login on account {$user_data['user_name']} not matching previous IPs {$user_data['current_ip']} or {$user_data['last_ip']}."
+                        "IP addres {$_SERVER['REMOTE_ADDR']} failed login on account {$user_data['user_name']} not matching previous IPs {$user_data['current_ip']} or {$user_data['last_ip']}."
                     );
                     throw new RuntimeException("Account has been locked, please try again in a few minutes!");
                 }
@@ -78,7 +78,7 @@ class Auth {
                 if(time() - $user_data['last_login_attempt'] <= User::FULL_LOCK_CD) {
                     // Already had at least on malicious attempt logged, no need to do further system logs
                     // Continue to update login attepmt time for new locations
-                    if(!in_array($_SERVER['REMOTE_ADD'], [$user_data['current_ip'], $user_data['last_ip']])) {
+                    if(!in_array($_SERVER['REMOTE_ADDR'], [$user_data['current_ip'], $user_data['last_ip']])) {
                         $system->db->query("UPDATE `users`
                             SET `last_login_attempt`='" . time() . "'
                         WHERE `user_id`='{$user_data['user_id']} LIMIT 1");
