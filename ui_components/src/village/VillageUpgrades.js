@@ -84,6 +84,9 @@ export function VillageUpgrades({
             </div>
         ))
     );
+    const remainder = selectedBuilding !== null ? selectedBuilding.upgrade_sets.length % 3 : 0;
+    const fillerDivsNeeded = remainder === 0 ? 0 : 3 - remainder;
+    console.log(fillerDivsNeeded);
     return (
         <div className="upgradespage_container">
             <svg height="0" width="0">
@@ -164,7 +167,12 @@ export function VillageUpgrades({
                                             </div>
                                         }
                                     </div>
-                                ))}
+                                )).concat(
+                                    Array.from({ length: fillerDivsNeeded }).map((_, fillerIndex) => (
+                                        <div key={`filler-${fillerIndex}`} className="upgrade_set_item filler">
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
                     )}
