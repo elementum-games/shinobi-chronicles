@@ -79,6 +79,9 @@ export function VillageUpgrades({
   }, /*#__PURE__*/React.createElement("div", {
     className: "upgrade_tier"
   }, romanize(index + 1))))));
+  const remainder = selectedBuilding !== null ? selectedBuilding.upgrade_sets.length % 3 : 0;
+  const fillerDivsNeeded = remainder === 0 ? 0 : 3 - remainder;
+  console.log(fillerDivsNeeded);
   return /*#__PURE__*/React.createElement("div", {
     className: "upgradespage_container"
   }, /*#__PURE__*/React.createElement("svg", {
@@ -150,5 +153,10 @@ export function VillageUpgrades({
     className: "upgrade_set_description"
   }, hoveredUpgrade.name, /*#__PURE__*/React.createElement("br", null), hoveredUpgrade.description) : /*#__PURE__*/React.createElement("div", {
     className: "upgrade_set_description"
-  }, upgrade_set.description))))))));
+  }, upgrade_set.description))).concat(Array.from({
+    length: fillerDivsNeeded
+  }).map((_, fillerIndex) => /*#__PURE__*/React.createElement("div", {
+    key: `filler-${fillerIndex}`,
+    className: "upgrade_set_item filler"
+  }))))))));
 }
