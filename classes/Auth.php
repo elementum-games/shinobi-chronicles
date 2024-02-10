@@ -62,7 +62,7 @@ class Auth {
             }
 
             // Check failed logins - New location
-            if($user_data['failed_logins'] >= User::PARTIAL_LOCK && ($_SERVER['REMOTE_ADDR'] != $user_data['current_ip'] || $_SERVER['REMOTE_ADDR'] != $user_data['last_ip'])) {
+            if($user_data['failed_logins'] >= User::PARTIAL_LOCK && ($_SERVER['REMOTE_ADDR'] != $user_data['current_ip'] && $_SERVER['REMOTE_ADDR'] != $user_data['last_ip'])) {
                 // Failed login during CD period - log attempt and block error
                 if(time() - $user_data['last_login_attempt'] <= User::PARTIAL_LOCK_CD) {
                     $system->log(
