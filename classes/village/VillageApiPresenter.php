@@ -177,4 +177,60 @@ class VillageApiPresenter {
             array_values(VillageManager::getKageRecord($system, $player->village->village_id))
         );
     }
+    public static function buildingUpgradeDataResponse(System $system, User $player): array {
+        $buildings = VillageUpgradeManager::getBuildingUpgradesForDisplay($system, $player->village);
+        return array_map(
+            function ($villageBuildingDto) {
+                return [
+                    "id" => $villageBuildingDto->id,
+                    "key" => $villageBuildingDto->key,
+                    "village_id" => $villageBuildingDto->village_id,
+                    "tier" => $villageBuildingDto->tier,
+                    "health" => $villageBuildingDto->health,
+                    "status" => $villageBuildingDto->status,
+                    "construction_progress" => $villageBuildingDto->construction_progress,
+                    "construction_progress_required" => $villageBuildingDto->construction_progress_required,
+                    "name" => $villageBuildingDto->name,
+                    "materials_construction_cost" => $villageBuildingDto->materials_construction_cost,
+                    "food_construction_cost" => $villageBuildingDto->food_construction_cost,
+                    "wealth_construction_cost" => $villageBuildingDto->wealth_construction_cost,
+                    "construction_time" => $villageBuildingDto->construction_time,
+                    "upgrade_sets" => array_map(
+                        function ($villageUpgradeSetDto) {
+                            return [
+                                "key" => $villageUpgradeSetDto->key,
+                                "name" => $villageUpgradeSetDto->name,
+                                "description" => $villageUpgradeSetDto->description,
+                                "upgrades" => array_map(
+                                    function ($villageUpgradeDto) {
+                                        return [
+                                            "id" => $villageUpgradeDto->id,
+                                            "key" => $villageUpgradeDto->key,
+                                            "village_id" => $villageUpgradeDto->village_id,
+                                            "status" => $villageUpgradeDto->status,
+                                            "research_progress" => $villageUpgradeDto->research_progress,
+                                            "research_progress_required" => $villageUpgradeDto->research_progress_required,
+                                            "name" => $villageUpgradeDto->name,
+                                            "description" => $villageUpgradeDto->description,
+                                            "materials_research_cost" => $villageUpgradeDto->materials_research_cost,
+                                            "food_research_cost" => $villageUpgradeDto->food_research_cost,
+                                            "wealth_research_cost" => $villageUpgradeDto->wealth_research_cost,
+                                            "research_time" => $villageUpgradeDto->research_time,
+                                            "food_upkeep" => $villageUpgradeDto->food_upkeep,
+                                            "materials_upkeep" => $villageUpgradeDto->materials_upkeep,
+                                            "wealth_upkeep" => $villageUpgradeDto->wealth_upkeep,
+                                            "requirements_met" => $villageUpgradeDto->requirements_met,
+                                        ];
+                                    },
+                                    $villageUpgradeSetDto->upgrades
+                                ),
+                            ];
+                        },
+                        $villageBuildingDto->upgrade_sets
+                    ),
+                ];
+            },
+            array_values($buildings)
+        );
+    }
 }

@@ -24,7 +24,8 @@ function Village({
   strategicData,
   challengeData,
   warLogData,
-  kageRecords
+  kageRecords,
+  buildingUpgradeData
 }) {
   const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
   const [policyDataState, setPolicyDataState] = React.useState(policyData);
@@ -35,6 +36,7 @@ function Village({
   const [proposalDataState, setProposalDataState] = React.useState(proposalData);
   const [strategicDataState, setStrategicDataState] = React.useState(strategicData);
   const [challengeDataState, setChallengeDataState] = React.useState(challengeData);
+  const [buildingUpgradeDataState, setBuildingUpgradeDataState] = React.useState(buildingUpgradeData);
   const [villageTab, setVillageTab] = React.useState("villageHQ");
   function handleErrors(errors) {
     console.warn(errors);
@@ -219,6 +221,12 @@ function Village({
     villageAPI: villageAPI,
     handleErrors: handleErrors,
     getVillageIcon: getVillageIcon
-  }), villageTab == "villageUpgrades" && /*#__PURE__*/React.createElement(VillageUpgrades, null));
+  }), villageTab == "villageUpgrades" && /*#__PURE__*/React.createElement(VillageUpgrades, {
+    playerID: playerID,
+    playerSeatState: playerSeatState,
+    villageAPI: villageAPI,
+    buildingUpgradeDataState: buildingUpgradeDataState,
+    setBuildingUpgradeDataState: setBuildingUpgradeDataState
+  }));
 }
 window.Village = Village;
