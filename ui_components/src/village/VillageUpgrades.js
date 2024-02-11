@@ -1,12 +1,18 @@
 import { apiFetch } from "../utils/network.js";
+import { useModal } from '../utils/modalContext.js';
 
 export function VillageUpgrades({
+    villageAPI,
     buildingUpgradeDataState,
     setBuildingUpgradeDataState,
 }) {
     const [selectedBuilding, setSelectedBuilding] = React.useState(null);
-    //const [selectedUpgrade, setSelectedUpgrade] = React.useState(null);
+    const [selectedUpgrade, setSelectedUpgrade] = React.useState(null);
     const [hoveredUpgrade, setHoveredUpgrade] = React.useState(null);
+    const { openModal } = useModal();
+    function handleErrors(errors) {
+        console.warn(errors);
+    }
     const getBuildingUpkeepString = (building) => {
         let materials_cost = 0;
         let food_cost = 0;
@@ -68,6 +74,90 @@ export function VillageUpgrades({
                 return "I";
         }
     }
+    const BeginConstruction = () => {
+        apiFetch(
+            villageAPI,
+            {
+                request: 'BeginConstruction',
+                building_key: selectedBuilding.key,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
+            });
+        });
+    }
+    const CancelConstruction = () => {
+        apiFetch(
+            villageAPI,
+            {
+                request: 'CancelConstruction',
+                building_key: selectedBuilding.key,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
+            });
+        });
+    }
+    const BeginResearch = () => {
+        apiFetch(
+            villageAPI,
+            {
+                request: 'BeginResearch',
+                upgrade_key: selectedUpgrade.key,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
+            });
+        });
+    }
+    const CancelResearch = () => {
+        apiFetch(
+            villageAPI,
+            {
+                request: 'CancelResearch',
+                upgrade_key: selectedUpgrade.key,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
+            });
+        });
+    }
     const renderUpgradeItems = (upgrade_set) => (
         upgrade_set.upgrades.map((upgrade, index) => (
             <div
@@ -86,7 +176,6 @@ export function VillageUpgrades({
     );
     const remainder = selectedBuilding !== null ? selectedBuilding.upgrade_sets.length % 3 : 0;
     const fillerDivsNeeded = remainder === 0 ? 0 : 3 - remainder;
-    console.log(fillerDivsNeeded);
     return (
         <div className="upgradespage_container">
             <svg height="0" width="0">
@@ -130,14 +219,24 @@ export function VillageUpgrades({
                         <div className="building_buttons_container">
                             {selectedBuilding.status != "upgrading" &&
                                 <>
-                                    <div className="construction_begin_button">upgrade {selectedBuilding.name}</div>
+                                <div className="construction_begin_button" onClick={() => openModal({
+                                    header: 'Confirmation',
+                                    text: "sometext?",
+                                    ContentComponent: null,
+                                    onConfirm: () => BeginConstruction(),
+                                })}>upgrade {selectedBuilding.name}</div>
                                     <div className="construction_cancel_button disabled">cancel construction</div>
                                 </>
                             }
                             {selectedBuilding.status == "upgrading" &&
                                 <>
                                     <div className="construction_begin_button disabled">upgrade {selectedBuilding.name}</div>
-                                    <div className="construction_cancel_button">cancel construction</div>
+                                <div className="construction_cancel_button" onClick={() => openModal({
+                                    header: 'Confirmation',
+                                    text: "sometext?",
+                                    ContentComponent: null,
+                                    onConfirm: () => CancelConstruction(),
+                                })}>cancel construction</div>
                                 </>
                             }
                         </div>
