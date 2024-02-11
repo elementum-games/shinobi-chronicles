@@ -10,6 +10,7 @@ class VillageBuildingDto {
         public string $status = VillageBuildingConfig::BUILDING_STATUS_DEFAULT,
         public ?int $construction_progress = null,
         public ?int $construction_progress_required = null,
+        public ?int $construction_progress_last_updated = null,
         // display-only properties
         public string $name = "",
         public ?int $materials_construction_cost = null,

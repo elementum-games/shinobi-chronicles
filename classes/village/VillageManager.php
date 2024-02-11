@@ -26,9 +26,11 @@ class VillageManager {
 
     const RESOURCE_LOG_PRODUCTION = 1;
     const RESOURCE_LOG_COLLECTION = 2;
-    const RESOURCE_LOG_EXPENSE = 3;
+    const RESOURCE_LOG_UPKEEP = 3;
     const RESOURCE_LOG_TRADE_GAIN = 4;
     const RESOURCE_LOG_TRADE_LOSS = 5;
+    const RESOURCE_LOG_CONSTRUCTION_COST = 6;
+    const RESOURCE_LOG_RESEARCH_COST = 7;
 
     const MIN_KAGE_CLAIM_TIER = 5;
     const MIN_KAGE_CHALLENGE_TIER = 5;
@@ -555,7 +557,7 @@ class VillageManager {
             $result = $system->db->fetch($result);
             $resource_history[$resource_id]['lost'] = (int) $result['lost_loot_count'];
             // get upkeep - WIP
-            $result = $system->db->query("SELECT SUM(`quantity`) as 'spent' FROM `resource_logs` WHERE `resource_id` = {$resource_id} AND `village_id` = {$village_id} AND `type` = " . self::RESOURCE_LOG_EXPENSE . " AND `time` > {$time}");
+            $result = $system->db->query("SELECT SUM(`quantity`) as 'spent' FROM `resource_logs` WHERE `resource_id` = {$resource_id} AND `village_id` = {$village_id} AND `type` = " . self::RESOURCE_LOG_UPKEEP . " AND `time` > {$time}");
             $result = $system->db->fetch($result);
             $resource_history[$resource_id]['spent'] = (int) $result['spent'];
         }

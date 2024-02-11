@@ -21,6 +21,7 @@ final class VillageUpgradeMigration extends AbstractMigration
             `status` VARCHAR(50) NOT NULL DEFAULT 'default',
             `construction_progress` INT(11) NULL DEFAULT NULL,
             `construction_progress_required` INT(11) NULL DEFAULT NULL,
+            `construction_progress_last_updated` INT(11) NULL DEFAULT NULL,
             PRIMARY KEY (`id`));
 
             -- Create table village_upgrades
@@ -29,8 +30,10 @@ final class VillageUpgradeMigration extends AbstractMigration
             `key` VARCHAR(50) NOT NULL,
             `village_id` INT(11) NOT NULL,
             `status` VARCHAR(50) NOT NULL DEFAULT 'locked',
+            `last_activated` INT(11) NOT NULL DEFAULT '0',
             `research_progress` INT(11) NULL DEFAULT NULL,
             `research_progress_required` INT(11) NULL DEFAULT NULL,
+            `research_progress_last_updated` INT(11) NULL DEFAULT NULL,
             PRIMARY KEY (`id`));
 
             -- Alter table region_locations
@@ -64,7 +67,7 @@ final class VillageUpgradeMigration extends AbstractMigration
             ALTER TABLE `region_locations` ADD `rebellion_active` TINYINT(1) NOT NULL DEFAULT '0';
 
             -- Alter table region_locations
-            ALTER TABLE `region_locations` ADD `background_image` VARCHAR(100) NOT NULL; 
+            ALTER TABLE `region_locations` ADD `background_image` VARCHAR(100) NOT NULL;
 
             -- Use occupying_village_id as source of truth for region_locations
             UPDATE region_locations
@@ -142,7 +145,7 @@ final class VillageUpgradeMigration extends AbstractMigration
             UPDATE region_locations SET name = 'Ōkaiyō Castle' WHERE `region_location_id` = 46;
             UPDATE region_locations SET name = 'Kiriyama Castle' WHERE `region_location_id` = 40;
             UPDATE region_locations SET name = 'Mikadzuki Castle' WHERE `region_location_id` = 53;
-");
+        ");
     }
 
     /**
