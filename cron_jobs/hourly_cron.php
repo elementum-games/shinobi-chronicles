@@ -135,6 +135,31 @@ function hourlyCron(System $system, $debug = true): void
             }
         }
     }
+    // apply resource decay
+    $decay_rate = (VillageManager::EXCESS_RESOURCE_DECAY_PER_DAY / 24) / 100;
+    foreach ($villages as $village) {
+        $total_resources = 0;
+        // calculate total resources
+        foreach ($village->resources as $resource_id => $resource_count) {
+            $total_resources += $resource_count;
+        }
+        // calculate excess resources and apply decay propotionally to each resource
+        $excess_resources = $total_resources - $village->resource_capacity;
+        if ($excess_resources > 0) {
+            foreach ($village->resources as $resource_id => $resource_count) {
+                // calculate proportion of total resources
+                $proportion = $resource_count / $total_resources;
+                // apply decay based on proportion
+                $decay = $excess_resources * $decay_rate * $proportion;
+                // subtract resource decay
+                $village->subtractResource($resource_id, $decay);
+                // log decay
+                $queries[] = "INSERT INTO `resource_logs`
+                    (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                    VALUES ({$village->village_id}, {$resource_id}, " . VillageManager::RESOURCE_LOG_DECAY . ", " . $decay . ", " . time() . ")";
+            }
+        }
+    }
     // apply base production
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);

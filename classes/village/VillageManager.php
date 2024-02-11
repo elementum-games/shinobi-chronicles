@@ -31,6 +31,7 @@ class VillageManager {
     const RESOURCE_LOG_TRADE_LOSS = 5;
     const RESOURCE_LOG_CONSTRUCTION_COST = 6;
     const RESOURCE_LOG_RESEARCH_COST = 7;
+    const RESOURCE_LOG_DECAY = 8;
 
     const MIN_KAGE_CLAIM_TIER = 5;
     const MIN_KAGE_CHALLENGE_TIER = 5;
@@ -78,6 +79,9 @@ class VillageManager {
 
     const MAX_TRADE_RESOURCE_TYPE = 25000;
     const TRADE_COOLDOWN_DAYS = 1;
+
+    const MAX_RESOURCE_CAPACITY = 50000;
+    const EXCESS_RESOURCE_DECAY_PER_DAY = 2; // 2% per day, 2/24% per hour
 
     public static function getLocation(System $system, string $village_id): ?TravelCoords {
         $result = $system->db->query(

@@ -37,6 +37,7 @@ class Village {
     public array $active_upgrade_effects = [];
     public float $construction_speed = 1; // corresponds to 1 per second
     public float $research_speed = 1; // corresponds to 1 per second
+    public int $resource_capacity = VillageManager::MAX_RESOURCE_CAPACITY;
 
     // to-do: we should restructure how village data is being saved
     // player village should reference the village ID and this constructor should get row by ID
@@ -60,6 +61,7 @@ class Village {
             $this->active_upgrade_effects = VillageUpgradeManager::initializeEffectsForVillage($this->system, $this->upgrades);
             $this->construction_speed += $this->policy->construction_speed + $this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED];
             $this->research_speed += $this->policy->research_speed + $this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED];
+            $this->resource_capacity += $this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY];
         }
         // updated legacy constructor logic
         else {

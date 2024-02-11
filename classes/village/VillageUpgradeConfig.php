@@ -2131,7 +2131,7 @@ class VillageUpgradeConfig {
             VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 100
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 100000
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 200000
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => [
             VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 500000

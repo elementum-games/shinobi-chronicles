@@ -126,6 +126,22 @@ export function VillageUpgrades({
                                 </div>
                         ))}
                     </div>
+                    {selectedBuilding && (
+                        <div className="building_buttons_container">
+                            {selectedBuilding.status != "upgrading" &&
+                                <>
+                                    <div className="construction_begin_button">upgrade {selectedBuilding.name}</div>
+                                    <div className="construction_cancel_button disabled">cancel construction</div>
+                                </>
+                            }
+                            {selectedBuilding.status == "upgrading" &&
+                                <>
+                                    <div className="construction_begin_button disabled">upgrade {selectedBuilding.name}</div>
+                                    <div className="construction_cancel_button">cancel construction</div>
+                                </>
+                            }
+                        </div>
+                    )}
                     {selectedBuilding && ( 
                         <div className="upgrades_container">
                             <div className="building_details">
