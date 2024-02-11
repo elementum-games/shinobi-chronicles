@@ -1,11 +1,19 @@
 import { apiFetch } from "../utils/network.js";
+import { useModal } from '../utils/modalContext.js';
 export function VillageUpgrades({
+  villageAPI,
   buildingUpgradeDataState,
   setBuildingUpgradeDataState
 }) {
   const [selectedBuilding, setSelectedBuilding] = React.useState(null);
-  //const [selectedUpgrade, setSelectedUpgrade] = React.useState(null);
+  const [selectedUpgrade, setSelectedUpgrade] = React.useState(null);
   const [hoveredUpgrade, setHoveredUpgrade] = React.useState(null);
+  const {
+    openModal
+  } = useModal();
+  function handleErrors(errors) {
+    console.warn(errors);
+  }
   const getBuildingUpkeepString = building => {
     let materials_cost = 0;
     let food_cost = 0;
@@ -67,6 +75,78 @@ export function VillageUpgrades({
         return "I";
     }
   }
+  const BeginConstruction = () => {
+    apiFetch(villageAPI, {
+      request: 'BeginConstruction',
+      building_key: selectedBuilding.key
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+      openModal({
+        header: 'Confirmation',
+        text: response.data.response_message,
+        ContentComponent: null,
+        onConfirm: null
+      });
+    });
+  };
+  const CancelConstruction = () => {
+    apiFetch(villageAPI, {
+      request: 'CancelConstruction',
+      building_key: selectedBuilding.key
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+      openModal({
+        header: 'Confirmation',
+        text: response.data.response_message,
+        ContentComponent: null,
+        onConfirm: null
+      });
+    });
+  };
+  const BeginResearch = () => {
+    apiFetch(villageAPI, {
+      request: 'BeginResearch',
+      upgrade_key: selectedUpgrade.key
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+      openModal({
+        header: 'Confirmation',
+        text: response.data.response_message,
+        ContentComponent: null,
+        onConfirm: null
+      });
+    });
+  };
+  const CancelResearch = () => {
+    apiFetch(villageAPI, {
+      request: 'CancelResearch',
+      upgrade_key: selectedUpgrade.key
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+      openModal({
+        header: 'Confirmation',
+        text: response.data.response_message,
+        ContentComponent: null,
+        onConfirm: null
+      });
+    });
+  };
   const renderUpgradeItems = upgrade_set => upgrade_set.upgrades.map((upgrade, index) => /*#__PURE__*/React.createElement("div", {
     key: upgrade.key,
     className: `upgrade_item ${upgrade.requirements_met && upgrade.status === "locked" ? "available" : upgrade.status}`,
@@ -81,7 +161,6 @@ export function VillageUpgrades({
   }, romanize(index + 1))))));
   const remainder = selectedBuilding !== null ? selectedBuilding.upgrade_sets.length % 3 : 0;
   const fillerDivsNeeded = remainder === 0 ? 0 : 3 - remainder;
-  console.log(fillerDivsNeeded);
   return /*#__PURE__*/React.createElement("div", {
     className: "upgradespage_container"
   }, /*#__PURE__*/React.createElement("svg", {
@@ -135,13 +214,25 @@ export function VillageUpgrades({
   }, building.tier == 0 && "Basic " + building.name, building.tier > 0 && "Tier " + building.tier + " " + building.name))))), selectedBuilding && /*#__PURE__*/React.createElement("div", {
     className: "building_buttons_container"
   }, selectedBuilding.status != "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    className: "construction_begin_button"
+    className: "construction_begin_button",
+    onClick: () => openModal({
+      header: 'Confirmation',
+      text: "sometext?",
+      ContentComponent: null,
+      onConfirm: () => BeginConstruction()
+    })
   }, "upgrade ", selectedBuilding.name), /*#__PURE__*/React.createElement("div", {
     className: "construction_cancel_button disabled"
   }, "cancel construction")), selectedBuilding.status == "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "construction_begin_button disabled"
   }, "upgrade ", selectedBuilding.name), /*#__PURE__*/React.createElement("div", {
-    className: "construction_cancel_button"
+    className: "construction_cancel_button",
+    onClick: () => openModal({
+      header: 'Confirmation',
+      text: "sometext?",
+      ContentComponent: null,
+      onConfirm: () => CancelConstruction()
+    })
   }, "cancel construction"))), selectedBuilding && /*#__PURE__*/React.createElement("div", {
     className: "upgrades_container"
   }, /*#__PURE__*/React.createElement("div", {
