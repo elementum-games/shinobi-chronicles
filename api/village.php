@@ -183,6 +183,39 @@ try {
                 'warRecordData' => VillageApiPresenter::warRecordDataResponse($system, $player, $page_number),
             ];
             break;
+        // TODO: ALL OF THE BELOW MUST BE LOCKED BEHIND PROPOSALS AND CHECK USER PERMISSIONS
+        case 'BeginConstruction':
+            $building_key = $system->db->clean($_POST['building_key']);
+            $message = VillageUpgradeManager::beginConstruction($system, $player->village, $building_key);
+            $VillageAPIResponse->response = [
+                'buildingUpgradeData' => VillageApiPresenter::buildingUpgradeDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'CancelConstruction':
+            $building_key = $system->db->clean($_POST['building_key']);
+            $message = VillageUpgradeManager::cancelConstruction($system, $player->village, $building_key);
+            $VillageAPIResponse->response = [
+                'buildingUpgradeData' => VillageApiPresenter::buildingUpgradeDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'BeginResearch':
+            $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+            $message = VillageUpgradeManager::beginResearch($system, $player->village, $upgrade_key);
+            $VillageAPIResponse->response = [
+                'buildingUpgradeData' => VillageApiPresenter::buildingUpgradeDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'CancelResearch':
+            $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+            $message = VillageUpgradeManager::cancelResearch($system, $player->village, $upgrade_key);
+            $VillageAPIResponse->response = [
+                'buildingUpgradeData' => VillageApiPresenter::buildingUpgradeDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
     }
