@@ -28,6 +28,7 @@ class VillageUpgradeManager {
                 status: $building['status'],
                 construction_progress: $building['construction_progress'],
                 construction_progress_required: $building['construction_progress_required'],
+                construction_progress_last_updated: $building['construction_progress_last_updated'],
             );
         }
         return $buildings;
@@ -52,6 +53,7 @@ class VillageUpgradeManager {
                 status: $upgrade['status'],
                 research_progress: $upgrade['research_progress'],
                 research_progress_required: $upgrade['research_progress_required'],
+                research_progress_last_updated: $upgrade['research_progress_last_updated'],
             );
         }
         return $upgrades;
@@ -122,6 +124,11 @@ class VillageUpgradeManager {
         return $effects;
     }
 
+    /**
+     * @param System $system 
+     * @param Village $village 
+     * @return array<VillageBuildingDto>
+     */
     public static function getBuildingUpgradesForDisplay(System $system, Village $village): array {
         foreach ($village->buildings as $building) {
             $building->name = VillageBuildingConfig::BUILDING_NAMES[$building->key];
@@ -162,6 +169,11 @@ class VillageUpgradeManager {
         return $village->buildings;
     }
 
+    /**
+     * @param System $system 
+     * @param Village $village 
+     * @return array<VillageUpgradeDto>
+     */
     public static function checkUpgradeRequirementsMet(Village $village, string $upgrade_key): bool {
         if (isset(VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key])) {
             $requirements = VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key];
@@ -183,27 +195,147 @@ class VillageUpgradeManager {
         return true;
     }
 
-    public static function beginConstruction(System $system, Village $village, $building_id): void {
-
+    /**
+     * @param Village $village 
+     * @param string $upgrade_key 
+     * @return bool
+     */
+    public static function checkConstructionRequirementsMet(Village $village, string $building_key, int $tier): bool {
+        // check if constuction is enabled for this tier
+        switch ($tier) {
+            case 1:
+                if (!$village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T1_ENABLED]) {
+                    return false;
+                }
+                break;
+            case 2:
+                if (!$village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T2_ENABLED]) {
+                    return false;
+                }
+                break;
+            case 3:
+                if (!$village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T3_ENABLED]) {
+                    return false;
+                }
+                break;
+            default:
+                return false;
+        }
+        // check if the previous tier is built
+        if ($tier > 1 && $village->buildings[$building_key]->tier < $tier - 1) {
+            return false;
+        }
+        return true;
     }
 
-    public static function cancelConstruction(System $system, Village $village, $building_id): void {
-
+    /**
+     * @param System $system 
+     * @param Village $village 
+     * @param string $building_id 
+     * @return string
+     */
+    public static function beginConstruction(System $system, Village $village, $building_id): string {
+        // get construction costs and time
+        $materials_cost = VillageBuildingConfig::BUILDING_CONSTRUCTION_COST[$building_id][$village->buildings[$building_id]->tier + 1][WarManager::RESOURCE_MATERIALS];
+        $food_cost = VillageBuildingConfig::BUILDING_CONSTRUCTION_COST[$building_id][$village->buildings[$building_id]->tier + 1][WarManager::RESOURCE_FOOD];
+        $wealth_cost = VillageBuildingConfig::BUILDING_CONSTRUCTION_COST[$building_id][$village->buildings[$building_id]->tier + 1][WarManager::RESOURCE_WEALTH];
+        $progress_required = VillageBuildingConfig::BUILDING_CONSTRUCTION_TIME[$building_id][$village->buildings[$building_id]->tier + 1] * 86400;
+        // check if requirements met
+        if (!VillageUpgradeManager::checkConstructionRequirementsMet($village, $building_id, $village->buildings[$building_id]->tier + 1)) {
+            return "Construction requirements not met!";
+        }
+        // check if the village has enough resources
+        if ($village->materials < $materials_cost || $village->food < $food_cost || $village->wealth < $wealth_cost) {
+            return "Not enough resources!";
+        }
+        // check if another building is already under construction
+        foreach ($village->buildings as $building) {
+            if ($building->status == VillageBuildingConfig::BUILDING_STATUS_UPGRADING) {
+                return "Another building is already under construction!";
+            }
+        }
+        // update village resources
+        $village->subtractResource(WarManager::RESOURCE_MATERIALS, $materials_cost);
+        $village->subtractResource(WarManager::RESOURCE_FOOD, $food_cost);
+        $village->subtractResource(WarManager::RESOURCE_WEALTH, $wealth_cost);
+        $village->updateResources();
+        // log expenditure in resource_logs table
+        $system->db->query("INSERT INTO `resource_logs`(`village_id`, `resource_id`, `type`, `quantity`, `time`) VALUES ({$village->village_id}, " . WarManager::RESOURCE_MATERIALS . ", " . VillageManager::RESOURCE_LOG_CONSTRUCTION_COST . ", {$materials_cost}, " . time() . ")");
+        $system->db->query("INSERT INTO `resource_logs`(`village_id`, `resource_id`, `type`, `quantity`, `time`) VALUES ({$village->village_id}, " . WarManager::RESOURCE_FOOD . ", " . VillageManager::RESOURCE_LOG_CONSTRUCTION_COST . ", {$food_cost}, " . time() . ")");
+        $system->db->query("INSERT INTO `resource_logs`(`village_id`, `resource_id`, `type`, `quantity`, `time`) VALUES ({$village->village_id}, " . WarManager::RESOURCE_WEALTH . ", " . VillageManager::RESOURCE_LOG_CONSTRUCTION_COST . ", {$wealth_cost}, " . time() . ")");
+        // update building data
+        $building->construction_progress = 0;
+        $building->construction_progress_required = $progress_required;
+        $building->construction_progress_last_updated = time();
+        $building->status = VillageBuildingConfig::BUILDING_STATUS_UPGRADING;
+        $system->db->query("UPDATE `village_buildings` SET `construction_progress` = 0, `construction_progress_required` = {$progress_required}, `construction_progress_last_updated` = " . time() . ", `status` = " . VillageBuildingConfig::BUILDING_STATUS_UPGRADING . " WHERE `id` = {$building->id}");
+        return "Construction started for " . VillageBuildingConfig::BUILDING_NAMES[$building_id] . "!";
     }
 
-    public static function beginResearch(System $system, Village $village, $upgrade_id): void {
-
+    public static function cancelConstruction(System $system, Village $village, $building_id): string {
+        // check if the building is under construction
+        if ($village->buildings[$building_id]->status != VillageBuildingConfig::BUILDING_STATUS_UPGRADING) {
+            return "Building is not under construction!";
+        }
+        // stop construction but maintain progress
+        $building->status = VillageBuildingConfig::BUILDING_STATUS_DEFAULT;
+        $building->progress_last_updated = time();
+        $system->db->query("UPDATE `village_buildings` SET `status` = " . VillageBuildingConfig::BUILDING_STATUS_DEFAULT . ", `progress_last_updated` = " . time() . " WHERE `id` = {$building->id}");
+        return "Construction cancelled for " . VillageBuildingConfig::BUILDING_NAMES[$building_id] . "!";
     }
 
-    public static function checkConstructionRequirements(System $system, Village $village): bool {
-
+    /**
+     * @param Village $village 
+     * @param string $upgrade_id 
+     * @return bool
+     */
+    public static function beginResearch(System $system, Village $village, $upgrade_id): string {
+        // get research costs and time
+        $materials_cost = VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$upgrade_id][WarManager::RESOURCE_MATERIALS];
+        $food_cost = VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$upgrade_id][WarManager::RESOURCE_FOOD];
+        $wealth_cost = VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$upgrade_id][WarManager::RESOURCE_WEALTH];
+        $progress_required = VillageUpgradeConfig::UPGRADE_RESEARCH_TIME[$upgrade_id] * 86400;
+        // check if requirements met
+        if (!VillageUpgradeManager::checkResearchRequirements($village, $upgrade_id)) {
+            return "Research requirements not met!";
+        }
+        // check if village has enough resources
+        if ($village->materials < $materials_cost || $village->food < $food_cost || $village->wealth < $wealth_cost) {
+            return "Not enough resources!";
+        }
+        // check if another upgrade is already under research
+        foreach ($village->upgrades as $upgrade) {
+            if ($upgrade->status == VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING) {
+                return "Another upgrade is already under research!";
+            }
+        }
+        // update village resources
+        $village->subtractResource(WarManager::RESOURCE_MATERIALS, $materials_cost);
+        $village->subtractResource(WarManager::RESOURCE_FOOD, $food_cost);
+        $village->subtractResource(WarManager::RESOURCE_WEALTH, $wealth_cost);
+        $village->updateResources();
+        // log expenditure in resource_logs table
+        $system->db->query("INSERT INTO `resource_logs`(`village_id`, `resource_id`, `type`, `quantity`, `time`) VALUES ({$village->village_id}, " . WarManager::RESOURCE_MATERIALS . ", " . VillageManager::RESOURCE_LOG_RESEARCH_COST . ", {$materials_cost}, " . time() . ")");
+        $system->db->query("INSERT INTO `resource_logs`(`village_id`, `resource_id`, `type`, `quantity`, `time`) VALUES ({$village->village_id}, " . WarManager::RESOURCE_FOOD . ", " . VillageManager::RESOURCE_LOG_RESEARCH_COST . ", {$food_cost}, " . time() . ")");
+        $system->db->query("INSERT INTO `resource_logs`(`village_id`, `resource_id`, `type`, `quantity`, `time`) VALUES ({$village->village_id}, " . WarManager::RESOURCE_WEALTH . ", " . VillageManager::RESOURCE_LOG_RESEARCH_COST . ", {$wealth_cost}, " . time() . ")");
+        // update upgrade data
+        $upgrade->research_progress = 0;
+        $upgrade->research_progress_required = $progress_required;
+        $upgrade->research_progress_last_updated = time();
+        $upgrade->status = VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING;
+        $system->db->query("UPDATE `village_upgrades` SET `research_progress` = 0, `research_progress_required` = {$progress_required}, `research_progress_last_updated` = " . time() . ", `status` = " . VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING . " WHERE `id` = {$upgrade->id}");
+        return "Research started for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_id] . "!";
     }
 
-    public static function checkResearchRequirements(System $system, Village $village): bool {
-
-    }
-
-    public static function checkToggleRequirements(System $system, Village $village): bool {
-
+    public static function cancelResearch(System $system, Village $village, $upgrade_id): string {
+        // check if the upgrade is under research
+        if ($village->upgrades[$upgrade_id]->status != VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING) {
+            return "Upgrade is not under research!";
+        }
+        // stop research but maintain progress
+        $upgrade->status = VillageUpgradeConfig::UPGRADE_STATUS_LOCKED;
+        $upgrade->research_progress_last_updated = time();
+        $system->db->query("UPDATE `village_upgrades` SET `status` = " . VillageUpgradeConfig::UPGRADE_STATUS_LOCKED . ", `research_progress_last_updated` = " . time() . " WHERE `id` = {$upgrade->id}");
+        return "Research cancelled for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_id] . "!";
     }
 }
