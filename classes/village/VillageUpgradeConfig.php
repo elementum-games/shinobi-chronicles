@@ -90,9 +90,9 @@ class VillageUpgradeConfig {
     const UPGRADE_KEY_QUALITY_INGREDIENTS_I = 'QUALITY_INGREDIENTS_I';
     const UPGRADE_KEY_QUALITY_INGREDIENTS_II = 'QUALITY_INGREDIENTS_II';
     const UPGRADE_KEY_QUALITY_INGREDIENTS_III = 'QUALITY_INGREDIENTS_III';
-    const UPGRADE_KEY_SHINOBI_DISCOUNT_I = 'SHINOBI_DISCOUNT_I';
-    const UPGRADE_KEY_SHINOBI_DISCOUNT_II = 'SHINOBI_DISCOUNT_II';
-    const UPGRADE_KEY_SHINOBI_DISCOUNT_III = 'SHINOBI_DISCOUNT_III';
+    const UPGRADE_KEY_NINJA_FRIENDLY_RATES_I = 'NINJA_FRIENDLY_RATES_I';
+    const UPGRADE_KEY_NINJA_FRIENDLY_RATES_II = 'NINJA_FRIENDLY_RATES_II';
+    const UPGRADE_KEY_NINJA_FRIENDLY_RATES_III = 'NINJA_FRIENDLY_RATES_III';
     const UPGRADE_KEY_INSPIRED_ITAMAE_I = 'INSPIRED_ITAMAE_I';
     const UPGRADE_KEY_LUCK_IN_LEFTOVERS_I = 'LUCK_IN_LEFTOVERS_I';
     const UPGRADE_KEY_LUCK_IN_LEFTOVERS_II = 'LUCK_IN_LEFTOVERS_II';
@@ -221,9 +221,9 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => 'Quality Ingredients I',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => 'Quality Ingredients II',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => 'Quality Ingredients III',
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => 'Shinobi Discount I',
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => 'Shinobi Discount II',
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => 'Shinobi Discount III',
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => 'Ninja Friendly Rates I',
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => 'Ninja Friendly Rates II',
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => 'Ninja Friendly Rates III',
         VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 'Inspired Itamae I',
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => 'Luck In Leftovers I',
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => 'Luck In Leftovers II',
@@ -247,9 +247,9 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I => '3% increased Training speed',
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II => '3% increased Training speed',
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III => '3% increased Training speed',
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I => '+3% chance for double experience gains from battle',
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II => '+3% chance for double experience gains from battle',
-        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III => '+3% chance for double experience gains from battle',
+        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_I => '+3% chance for double XP gains from battle',
+        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_II => '+3% chance for double XP gains from battle',
+        VillageUpgradeConfig::UPGRADE_KEY_TRAINING_GROUNDS_III => '+3% chance for double XP gains from battle',
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_I => '5% increased village regen',
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_II => '5% increased village regen',
         VillageUpgradeConfig::UPGRADE_KEY_MEDICAL_SUBSIDIES_III => '5% increased village regen',
@@ -310,9 +310,9 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => '+5 minutes to ramen buff duration',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => '+5 minutes to ramen duration',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => '+5 minutes to ramen duration',
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => '5% decreased ramen cost',
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => '5% decreased ramen cost',
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => '5% decreased ramen cost',
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => '5% decreased ramen cost',
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => '5% decreased ramen cost',
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => '5% decreased ramen cost',
         VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 'Allows Mystery Ramen to appear (5%)',
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => '+5% chance for Mystery Ramen to appear',
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => '+5% chance for Mystery Ramen to appear',
@@ -715,17 +715,17 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_FOOD => 60000,
             WarManager::RESOURCE_WEALTH => 15000,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => [
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => [
             WarManager::RESOURCE_MATERIALS => 600,
             WarManager::RESOURCE_FOOD => 1200,
             WarManager::RESOURCE_WEALTH => 1800,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => [
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => [
             WarManager::RESOURCE_MATERIALS => 3000,
             WarManager::RESOURCE_FOOD => 6000,
             WarManager::RESOURCE_WEALTH => 9000,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => [
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => [
             WarManager::RESOURCE_MATERIALS => 15000,
             WarManager::RESOURCE_FOOD => 30000,
             WarManager::RESOURCE_WEALTH => 45000,
@@ -828,9 +828,9 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => 1,
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => 5,
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => 25,
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => 1,
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => 5,
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => 25,
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => 5,
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => 25,
         VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 1,
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => 5,
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => 25,
@@ -1443,27 +1443,27 @@ class VillageUpgradeConfig {
                 VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II
             ],
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => [
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
                 VillageBuildingConfig::BUILDING_RAMEN_STAND => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => [
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
                 VillageBuildingConfig::BUILDING_RAMEN_STAND => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I
+                VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I
             ],
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => [
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
                 VillageBuildingConfig::BUILDING_RAMEN_STAND => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II
+                VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
@@ -1888,17 +1888,17 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_FOOD => 20,
             WarManager::RESOURCE_WEALTH => 5,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => [
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => [
             WarManager::RESOURCE_MATERIALS => 2,
             WarManager::RESOURCE_FOOD => 4,
             WarManager::RESOURCE_WEALTH => 6,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => [
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => [
             WarManager::RESOURCE_MATERIALS => 3,
             WarManager::RESOURCE_FOOD => 6,
             WarManager::RESOURCE_WEALTH => 9,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => [
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => [
             WarManager::RESOURCE_MATERIALS => 5,
             WarManager::RESOURCE_FOOD => 10,
             WarManager::RESOURCE_WEALTH => 15,
@@ -2166,13 +2166,13 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => [
             VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION => 5
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_I => [
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => [
             VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST => 5
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_II => [
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => [
             VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST => 5
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_SHINOBI_DISCOUNT_III => [
+        VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => [
             VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [

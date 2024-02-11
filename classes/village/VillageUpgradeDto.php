@@ -8,6 +8,7 @@ class VillageUpgradeDto {
         public string $status = VillageUpgradeConfig::UPGRADE_STATUS_LOCKED,
         public ?int $research_progress = null,
         public ?int $research_progress_required = null,
+        public ?int $research_progress_last_updated = null,
         // display-only properties
         public string $name = "",
         public string $description = "",

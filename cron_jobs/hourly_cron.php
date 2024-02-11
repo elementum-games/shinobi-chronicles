@@ -2,14 +2,16 @@
 session_start();
 
 /**
- * Region Cron Job
+ * Hourly Cron Job
  **
  *  This should be processed every hour.
  *
- *  Region Cron does the following:
- *      Collects home region resources
- *      Increases resource count of each region by production rate (25)
- *      Increases/Decreases region_location defense value by 1 toward baseline
+ *  Hourly Cron does the following:
+ *      Calculates research and construction progress
+ *      Applies base production for each village
+ *      Increases resource count of each region by production rate
+ *      Increases/Decreases region_location stability value toward baseline
+ *      Increases/Decreases region_location defense value toward baseline
  *      Applies region_location regen, bonus for castles based on local village health
  *      Creates resource logs
  */
@@ -44,14 +46,14 @@ if (isset($_SESSION['user_id'])) {
                 if (!isset($_POST['confirm']) || $_POST['confirm'] !== $production_key) {
                     echo "WARNING PRODUCTION ENVIRONMENT! Confirm you would like to run this adhoc on <b>PRODUCTION ENVIRONMENT</b>!!!<br />
                 To confirm, type the following (case sensitive): $production_key<br />
-                <form action='{$system->router->base_url}/cron_jobs/region_cron.php?run_script=true' method='post'>
+                <form action='{$system->router->base_url}/cron_jobs/hourly_cron.php?run_script=true' method='post'>
                     <input type='text' name='confirm' /><input type='submit' value='Run Script' />
                 </form>";
                 } else {
-                    hourlyRegion($system, $debug);
+                    hourlyCron($system, $debug);
                     $player->staff_manager->staffLog(
                         StaffManager::STAFF_LOG_ADMIN,
-                        "{$player->user_name}({$player->user_id}) manually ran region cron."
+                        "{$player->user_name}({$player->user_id}) manually ran hourly cron."
                     );
                 }
             } else {
@@ -59,14 +61,14 @@ if (isset($_SESSION['user_id'])) {
                 if (isset($_GET['debug'])) {
                     $debug = $system->db->clean($_GET['debug']);
                 }
-                hourlyRegion($system, $debug);
+                hourlyCron($system, $debug);
                 $player->staff_manager->staffLog(
                     StaffManager::STAFF_LOG_ADMIN,
-                    "{$player->user_name}({$player->user_id}) manually ran region cron."
+                    "{$player->user_name}({$player->user_id}) manually ran hourly cron."
                 );
             }
         } else {
-            echo "You can run the region cron script Adhoc. This is not reversible.<br><a href='{$system->router->base_url}/cron_jobs/region_cron.php?run_script=true'>Run</a><br><a href='{$system->router->base_url}/cron_jobs/region_cron.php?run_script=true&debug=true'>Debug</a>";
+            echo "You can run the hourly cron script Adhoc. This is not reversible.<br><a href='{$system->router->base_url}/cron_jobs/hourly_cron.php?run_script=true'>Run</a><br><a href='{$system->router->base_url}/cron_jobs/hourly_cron.php?run_script=true&debug=true'>Debug</a>";
         }
     }
 } else {
@@ -79,14 +81,14 @@ if (isset($_SESSION['user_id'])) {
     }
 
     if ($run_ok) {
-        hourlyRegion($system, debug: false);
-        $system->log('cron', 'Hourly Region', "Regions have been processed.");
+        hourlyCron($system, debug: false);
+        $system->log('cron', 'Hourly Cron', "Regions have been processed.");
     } else {
         $system->log('cron', 'Invalid access', "Attempted access by " . $_SERVER['REMOTE_ADDR']);
     }
 }
 
-function hourlyRegion(System $system, $debug = true): void
+function hourlyCron(System $system, $debug = true): void
 {
     // get regions
     $region_result = $system->db->query("SELECT * FROM `regions`");
@@ -97,6 +99,42 @@ function hourlyRegion(System $system, $debug = true): void
     $village_result = $system->db->query("SELECT * FROM `villages`");
     $village_result = $system->db->fetch_all($village_result);
     $villages = [];
+    foreach ($village_result as $village) {
+        $villages[$village['village_id']] = new Village($system, village_row: $village);
+    }
+    // handle research and construction
+    foreach ($villages as $village) {
+        foreach ($village->upgrades as $upgrade) {
+            if ($upgrade->status == VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING) {
+                $upgrade->research_progress += (time() - $upgrade->research_progress_last_updated) * $village->research_speed;
+                $upgrade->research_progress_last_updated = time();
+                if ($upgrade->research_progress > $upgrade->research_progress_required) {
+                    // if upgrade has no upkeep, set to unlocked (permanent)
+                    if (VillageUpgradeConfig::UPGRADE_UPKEEP[$upgrade->key][WarManager::RESOURCE_MATERIALS] == 0 && VillageUpgradeConfig::UPGRADE_UPKEEP[$upgrade->key][WarManager::RESOURCE_FOOD] == 0 && VillageUpgradeConfig::UPGRADE_UPKEEP[$upgrade->key][WarManager::RESOURCE_WEALTH] == 0) {
+                        $upgrade->status = VillageUpgradeConfig::UPGRADE_STATUS_UNLOCKED;
+                    } else {
+                        $upgrade->status = VillageUpgradeConfig::UPGRADE_STATUS_INACTIVE;
+                    }
+                    $queries[] = "UPDATE `village_upgrades` SET `status` = '{$upgrade->status}', `research_progress` = {$upgrade->research_progress}, `research_progress_last_updated` = {$upgrade->reasearch_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `upgrade_id` = {$upgrade->upgrade_id}";
+                } else {
+                    $queries[] = "UPDATE `village_upgrades` SET `research_progress` = {$upgrade->research_progress}, `research_progress_last_updated` = {$upgrade->reasearch_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `upgrade_id` = {$upgrade->upgrade_id}";
+                }
+            }
+        }
+        foreach ($village->buildings as $building) {
+            if ($building->status == VillageBuildingConfig::BUILDING_STATUS_UPGRADING) {
+                $building->construction_progress += (time() - $building->construction_progress_last_updated) * $village->construction_speed;
+                $building->construction_progress_last_updated = time();
+                if ($building->construction_progress > $building->construction_progress_required) {
+                    $building->status = VillageBuildingConfig::BUILDING_STATUS_DEFAULT;
+                    $building->tier += 1;
+                    $queries[] = "UPDATE `village_buildings` SET `status` = '{$building->status}', `construction_progress` = {$building->construction_progress}, `construction_progress_last_updated` = {$building->construction_progress_last_updated}, `tier` = {$building->tier} WHERE `village_id` = {$village->village_id} AND `building_id` = {$building->building_id}";
+                } else {
+                    $queries[] = "UPDATE `village_buildings` SET `construction_progress` = {$building->construction_progress}, `construction_progress_last_updated` = {$building->construction_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `building_id` = {$building->building_id}";
+                }
+            }
+        }
+    }
     // apply base production
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);
