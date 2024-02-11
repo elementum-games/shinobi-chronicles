@@ -38,7 +38,7 @@ chain of command; any problems with a moderator go to a head moderator FIRST bef
   Violation of this rule will result in removal of content and a minimum 1-day ban, depending on severity.<br />
   <b>*</b> This is not an exhaustive list. Other forms of descrimination may fall into this criteria on a case-by-case scenario.
 </div>
-
+<br />
 <h3>Offensive language</h3>
 <div>
 	Using offensive language is against the rules. All users are encouraged to avoid using language that would offend others in public 
