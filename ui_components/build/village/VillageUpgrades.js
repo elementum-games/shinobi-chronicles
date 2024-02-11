@@ -133,6 +133,16 @@ export function VillageUpgrades({
   }, /*#__PURE__*/React.createElement("div", {
     className: "building_name"
   }, building.tier == 0 && "Basic " + building.name, building.tier > 0 && "Tier " + building.tier + " " + building.name))))), selectedBuilding && /*#__PURE__*/React.createElement("div", {
+    className: "building_buttons_container"
+  }, selectedBuilding.status != "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "construction_begin_button"
+  }, "upgrade ", selectedBuilding.name), /*#__PURE__*/React.createElement("div", {
+    className: "construction_cancel_button disabled"
+  }, "cancel construction")), selectedBuilding.status == "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "construction_begin_button disabled"
+  }, "upgrade ", selectedBuilding.name), /*#__PURE__*/React.createElement("div", {
+    className: "construction_cancel_button"
+  }, "cancel construction"))), selectedBuilding && /*#__PURE__*/React.createElement("div", {
     className: "upgrades_container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "building_details"

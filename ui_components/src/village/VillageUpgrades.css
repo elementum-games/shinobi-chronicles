@@ -187,3 +187,46 @@
     padding: 4px;
     margin: -1px;
 }
+.building_buttons_container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+    gap: 30px;
+}
+.construction_begin_button {
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    width: 150px;
+    height: 25px;
+    background: linear-gradient(to bottom, #3b4176 50%, #2f345e 50%);
+    line-height: 20px;
+    font-variant: small-caps;
+    text-align: center;
+    color: #ccc1af;
+    cursor: pointer;
+    user-select: none;
+    text-transform: lowercase;
+}
+.construction_cancel_button {
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    width: 150px;
+    height: 25px;
+    background: linear-gradient(to bottom, #6f3043 50%, #622231 50%);
+    line-height: 20px;
+    font-variant: small-caps;
+    text-align: center;
+    color: #f3c4bc;
+    cursor: pointer;
+    user-select: none;
+}
+    .construction_begin_button:hover, .construction_cancel_button:hover {
+        color: white;
+    }
+    .construction_begin_button.disabled, .construction_cancel_button.disabled {
+        opacity: 30%;
+        pointer-events: none;
+    }
+        .construction_begin_button.disabled:hover, .construction_cancel_button.disabled:hover {
+            color: #ccc1af;
+            cursor: default;
+        }

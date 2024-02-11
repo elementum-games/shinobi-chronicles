@@ -253,7 +253,6 @@ class VillageBuildingConfig {
     /* upgrade sets for each building, indexed by building ID */
     const BUILDING_UPGRADE_SETS = [
         self::BUILDING_VILLAGE_HQ => [
-            self::UPGRADE_SET_KEY_RESEARCH,
             self::UPGRADE_SET_KEY_RESEARCH_SUBSIDIES,
             self::UPGRADE_SET_KEY_ADMINISTRATION,
             self::UPGRADE_SET_KEY_POWER_PROJECTION,
@@ -275,7 +274,6 @@ class VillageBuildingConfig {
             self::UPGRADE_SET_KEY_SELECTIVE_RECRUITMENT,
         ],
         self::BUILDING_WORKSHOP => [
-            self::UPGRADE_SET_KEY_CONSTRUCTION,
             self::UPGRADE_SET_KEY_ENGINEERING_SUBSIDIES,
             self::UPGRADE_SET_KEY_RAPID_DEPLOYMENT,
             self::UPGRADE_SET_KEY_ENGINEERING_CORPS,

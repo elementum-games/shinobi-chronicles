@@ -7,6 +7,8 @@ require_once __DIR__ . "/VillageBuildingConfig.php";
 require_once __DIR__ . "/VillageUpgradeConfig.php";
 
 class VillageUpgradeManager {
+    const UPGRADE_TOGGLE_COOLDOWN_DAYS = 3;
+
     /**
      * @param System  $system
      * @param int $village_id
@@ -175,15 +177,22 @@ class VillageUpgradeManager {
      * @return array<VillageUpgradeDto>
      */
     public static function checkUpgradeRequirementsMet(Village $village, string $upgrade_key): bool {
+        $effective_tier = 0;
         if (isset(VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key])) {
             $requirements = VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key];
+            // check if the village has the required buildings
             if (isset($requirements[VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS])) {
                 foreach ($requirements[VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS] as $building_key => $tier) {
                     if ($village->buildings[$building_key]->tier < $tier) {
                         return false;
                     }
+                    // use highest building tier as the effective tier for the upgrade
+                    if ($tier > $effective_tier) {
+                        $effective_tier = $tier;
+                    }
                 }
             }
+            // check if the village has the required upgrades
             if (isset($requirements[VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES])) {
                 foreach ($requirements[VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES] as $required_upgrade_key) {
                     if ($village->upgrades[$required_upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
@@ -191,6 +200,10 @@ class VillageUpgradeManager {
                     }
                 }
             }
+        }
+        // check if village HQ is at least the same tier as the effective tier for the upgrade
+        if ($village->buildings[VillageBuildingConfig::BUILDING_VILLAGE_HQ]->tier < $effective_tier) {
+            return false;
         }
         return true;
     }
@@ -201,25 +214,9 @@ class VillageUpgradeManager {
      * @return bool
      */
     public static function checkConstructionRequirementsMet(Village $village, string $building_key, int $tier): bool {
-        // check if constuction is enabled for this tier
-        switch ($tier) {
-            case 1:
-                if (!$village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T1_ENABLED]) {
-                    return false;
-                }
-                break;
-            case 2:
-                if (!$village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T2_ENABLED]) {
-                    return false;
-                }
-                break;
-            case 3:
-                if (!$village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T3_ENABLED]) {
-                    return false;
-                }
-                break;
-            default:
-                return false;
+        // if not workshop, check that workshop is at least equal to the tier
+        if ($building_key != VillageBuildingConfig::BUILDING_WORKSHOP && $village->buildings[VillageBuildingConfig::BUILDING_WORKSHOP]->tier < $tier) {
+            return false;
         }
         // check if the previous tier is built
         if ($tier > 1 && $village->buildings[$building_key]->tier < $tier - 1) {
