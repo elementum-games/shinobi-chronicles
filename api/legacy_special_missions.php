@@ -27,7 +27,7 @@ $special_mission = new SpecialMission($system, $player, $mission_id);
 
 $time_gap_ms = SpecialMission::EVENT_DURATION_MS;
 $target_update = $special_mission->returnLastUpdateMs() + $time_gap_ms;
-if (floor(microtime(true) * 1000) >= $target_update && $player->special_mission) {
+if (System::currentTimeMs() >= $target_update && $player->special_mission) {
     $special_mission->nextEvent();
 }
 

@@ -798,8 +798,7 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
         return true;
     }
 
-    public static function startMission($system, $player, $difficulty): SpecialMission {
-
+    public static function startMission($system, User $player, $difficulty): SpecialMission {
         if ($player->special_mission != 0) {
             throw new RuntimeException('You cannot start multiple missions!');
         }
@@ -812,26 +811,32 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
             throw new RuntimeException('Must be in village to begin a Special Mission!');
         }
 
+        // Clean up old special missions
+        $system->db->query("DELETE FROM `special_missions` WHERE `user_id`={$player->user_id} AND `start_time` < " . (time() - 3600));
+
         $timestamp = time();
 
         $log = [
             0 => [
-            'event' => self::$event_names['start']['event'],
-            'timestamp_ms' => floor(microtime(true) * 1000),
-            'description' => self::$event_names['start']['text']
+                'event' => self::$event_names['start']['event'],
+                'timestamp_ms' => floor(microtime(true) * 1000),
+                'description' => self::$event_names['start']['text']
             ]
         ];
         $log_encode = json_encode($log);
 
-        $sql = "INSERT INTO `special_missions` (`user_id`, `start_time`, `log`, `difficulty`)
-                VALUES ('{$player->user_id}', '{$timestamp}', '$log_encode', '{$difficulty}')";
-        $result = $system->db->query($sql);
+
+        $result = $system->db->query("
+            INSERT INTO `special_missions` 
+                (`user_id`, `start_time`, `log`, `difficulty`)
+            VALUES 
+                ('{$player->user_id}', '{$timestamp}', '$log_encode', '{$difficulty}')
+        ");
 
         $mission_id = $system->db->last_insert_id;
         $player->special_mission = $mission_id;
 
-        return (new SpecialMission($system, $player, $mission_id));
-
+        return new SpecialMission($system, $player, $mission_id);
     }
 
 }
