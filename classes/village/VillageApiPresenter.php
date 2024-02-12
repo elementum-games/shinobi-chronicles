@@ -195,6 +195,8 @@ class VillageApiPresenter {
                     "food_construction_cost" => $villageBuildingDto->food_construction_cost,
                     "wealth_construction_cost" => $villageBuildingDto->wealth_construction_cost,
                     "construction_time" => $villageBuildingDto->construction_time,
+                    "construction_time_remaining" => $villageBuildingDto->construction_time_remaining,
+                    "requirements_met" => $villageBuildingDto->requirements_met,
                     "upgrade_sets" => array_map(
                         function ($villageUpgradeSetDto) {
                             return [
@@ -215,7 +217,8 @@ class VillageApiPresenter {
                                             "materials_research_cost" => $villageUpgradeDto->materials_research_cost,
                                             "food_research_cost" => $villageUpgradeDto->food_research_cost,
                                             "wealth_research_cost" => $villageUpgradeDto->wealth_research_cost,
-                                            "research_time" => $villageUpgradeDto->research_time,
+                                            "research_time" => $villageUpgradeDto->research_time, 
+                                            "research_time_remaining" => $villageUpgradeDto->research_time_remaining,
                                             "food_upkeep" => $villageUpgradeDto->food_upkeep,
                                             "materials_upkeep" => $villageUpgradeDto->materials_upkeep,
                                             "wealth_upkeep" => $villageUpgradeDto->wealth_upkeep,

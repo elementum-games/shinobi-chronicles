@@ -115,9 +115,9 @@ function hourlyCron(System $system, $debug = true): void
                     } else {
                         $upgrade->status = VillageUpgradeConfig::UPGRADE_STATUS_INACTIVE;
                     }
-                    $queries[] = "UPDATE `village_upgrades` SET `status` = '{$upgrade->status}', `research_progress` = {$upgrade->research_progress}, `research_progress_last_updated` = {$upgrade->reasearch_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `upgrade_id` = {$upgrade->upgrade_id}";
+                    $queries[] = "UPDATE `village_upgrades` SET `status` = '{$upgrade->status}', `research_progress` = {$upgrade->research_progress}, `research_progress_last_updated` = {$upgrade->reasearch_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$upgrade->id}";
                 } else {
-                    $queries[] = "UPDATE `village_upgrades` SET `research_progress` = {$upgrade->research_progress}, `research_progress_last_updated` = {$upgrade->reasearch_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `upgrade_id` = {$upgrade->upgrade_id}";
+                    $queries[] = "UPDATE `village_upgrades` SET `research_progress` = {$upgrade->research_progress}, `research_progress_last_updated` = {$upgrade->reasearch_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$upgrade->id}";
                 }
             }
         }
@@ -128,9 +128,9 @@ function hourlyCron(System $system, $debug = true): void
                 if ($building->construction_progress > $building->construction_progress_required) {
                     $building->status = VillageBuildingConfig::BUILDING_STATUS_DEFAULT;
                     $building->tier += 1;
-                    $queries[] = "UPDATE `village_buildings` SET `status` = '{$building->status}', `construction_progress` = {$building->construction_progress}, `construction_progress_last_updated` = {$building->construction_progress_last_updated}, `tier` = {$building->tier} WHERE `village_id` = {$village->village_id} AND `building_id` = {$building->building_id}";
+                    $queries[] = "UPDATE `village_buildings` SET `status` = '{$building->status}', `construction_progress` = {$building->construction_progress}, `construction_progress_last_updated` = {$building->construction_progress_last_updated}, `tier` = {$building->tier} WHERE `village_id` = {$village->village_id} AND `id` = {$building->id}";
                 } else {
-                    $queries[] = "UPDATE `village_buildings` SET `construction_progress` = {$building->construction_progress}, `construction_progress_last_updated` = {$building->construction_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `building_id` = {$building->building_id}";
+                    $queries[] = "UPDATE `village_buildings` SET `construction_progress` = {$building->construction_progress}, `construction_progress_last_updated` = {$building->construction_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$building->id}";
                 }
             }
         }
@@ -343,7 +343,7 @@ function hourlyCron(System $system, $debug = true): void
     } else {
         echo "Script running...<br>";
         foreach ($queries as $query) {
-            $system->db->query("LOCK TABLES `region_locations` WRITE, `villages` WRITE, `resource_logs` WRITE;");
+            $system->db->query("LOCK TABLES `region_locations` WRITE, `villages` WRITE, `resource_logs` WRITE, `village_buildings` WRITE, `village_upgrades` WRITE;");
             $system->db->query($query);
             $system->db->query("UNLOCK TABLES;");
         }

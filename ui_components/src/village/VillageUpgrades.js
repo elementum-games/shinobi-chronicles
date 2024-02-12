@@ -2,6 +2,7 @@ import { apiFetch } from "../utils/network.js";
 import { useModal } from '../utils/modalContext.js';
 
 export function VillageUpgrades({
+    playerSeatState,
     villageAPI,
     buildingUpgradeDataState,
     setBuildingUpgradeDataState,
@@ -87,6 +88,7 @@ export function VillageUpgrades({
                 return;
             }
             setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+            setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
             openModal({
                 header: 'Confirmation',
                 text: response.data.response_message,
@@ -108,6 +110,7 @@ export function VillageUpgrades({
                 return;
             }
             setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+            setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
             openModal({
                 header: 'Confirmation',
                 text: response.data.response_message,
@@ -129,6 +132,8 @@ export function VillageUpgrades({
                 return;
             }
             setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+            setSelectedUpgrade(null);
+            setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
             openModal({
                 header: 'Confirmation',
                 text: response.data.response_message,
@@ -150,6 +155,8 @@ export function VillageUpgrades({
                 return;
             }
             setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+            setSelectedUpgrade(null);
+            setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
             openModal({
                 header: 'Confirmation',
                 text: response.data.response_message,
@@ -166,7 +173,7 @@ export function VillageUpgrades({
                 onMouseEnter={() => setHoveredUpgrade(upgrade)}
                 onMouseLeave={() => setHoveredUpgrade(null)}
             >
-                <div className="upgrade_item_wrapper">
+                <div className="upgrade_item_wrapper" onClick={() => setSelectedUpgrade(upgrade)}>
                     <div className="upgrade_item_inner">
                         <div className="upgrade_tier">{romanize(index + 1)}</div>
                     </div>
@@ -174,6 +181,10 @@ export function VillageUpgrades({
             </div>
         ))
     );
+    const buildingClickHandler = (building) => {
+        setSelectedUpgrade(null);
+        setSelectedBuilding(building);
+    };
     const remainder = selectedBuilding !== null ? selectedBuilding.upgrade_sets.length % 3 : 0;
     const fillerDivsNeeded = remainder === 0 ? 0 : 3 - remainder;
     return (
@@ -200,8 +211,19 @@ export function VillageUpgrades({
                     <div className="buildings_container">
                         {buildingUpgradeDataState
                             .map((building, index) => (
-                                <div key={building.key} className="building_item" onClick={() => setSelectedBuilding(building)}>
-                                    <div className="building_item_inner" style={{background: "url(/images/building_backgrounds/placeholderbuilding.jpg)"}}></div>
+                                <div key={building.key} className="building_item" onClick={() => buildingClickHandler(building)}>
+                                    <div className="building_item_inner" style={{ background: "url(/images/building_backgrounds/placeholderbuilding.jpg)" }}>
+                                        {building.status === "upgrading" &&
+                                            <>
+                                                <div className="construction_overlay"></div>
+                                                <div className="construction_progress_overlay" style={{ height: `${(building.construction_progress / building.construction_progress_required) * 100}%` }}></div>
+                                                <div className="construction_progress_text_container">
+                                                    <div className="construction_progress_label">UNDER CONSTRUCTION</div>
+                                                    <div className="construction_progress_text">{building.construction_time_remaining}</div>
+                                                </div>
+                                            </>
+                                        }
+                                    </div>
                                     <div className="building_nameplate">
                                         <div className="building_name">
                                             {building.tier == 0 &&
@@ -215,30 +237,125 @@ export function VillageUpgrades({
                                 </div>
                         ))}
                     </div>
-                    {selectedBuilding && (
-                        <div className="building_buttons_container">
-                            {selectedBuilding.status != "upgrading" &&
-                                <>
-                                <div className="construction_begin_button" onClick={() => openModal({
-                                    header: 'Confirmation',
-                                    text: "sometext?",
-                                    ContentComponent: null,
-                                    onConfirm: () => BeginConstruction(),
-                                })}>upgrade {selectedBuilding.name}</div>
-                                    <div className="construction_cancel_button disabled">cancel construction</div>
-                                </>
+                    {(selectedBuilding && !selectedUpgrade) && (
+                        <div className="building_construction_container">
+                            <div className="building_visual" style={{ marginBottom: "20px" }}>
+                                <div className="building_visual_inner" style={{ background: "url(/images/building_backgrounds/placeholderbuilding.jpg)" }}>
+                                    {selectedBuilding.status === "upgrading" &&
+                                        <>
+                                        <div className="construction_overlay"></div>
+                                        <div className="construction_progress_overlay" style={{ height: `${(selectedBuilding.construction_progress / selectedBuilding.construction_progress_required) * 100}%` }}></div>
+                                            <div className="construction_progress_text_container">
+                                                <div className="construction_progress_label">UNDER CONSTRUCTION</div>
+                                                <div className="construction_progress_text">{selectedBuilding.construction_time_remaining}</div>
+                                            </div>
+                                        </>
+                                    }
+                                </div>
+                                <div className="building_nameplate">
+                                    <div className="building_name">
+                                        {selectedBuilding.tier == 0 &&
+                                            "Basic " + selectedBuilding.name
+                                        }
+                                        {selectedBuilding.tier > 0 &&
+                                            "Tier " + selectedBuilding.tier + " " + selectedBuilding.name
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="upgrade_requirement_line">
+                                <span style={{fontSize: "10px", lineHeight: "16px"}}>upgrade cost: </span>
+                                <img src="/images/icons/materials.png" alt="materials" style={{height: "16px"}} />
+                                <span style={{ color: "#e98b99"}}>{selectedBuilding.materials_construction_cost}</span>
+                                <img src="/images/icons/food.png" alt="food" style={{ height: "16px"}} />                                                                                                                                                                         
+                                <span style={{ color: "#e98b99" }}>{selectedBuilding.food_construction_cost}</span>
+                                <img src="/images/icons/wealth.png" alt="wealth" style={{ height: "16px"}} />
+                                <span style={{ color: "#e98b99" }}>{selectedBuilding.wealth_construction_cost}</span>
+                            </div>
+                            <div className="upgrade_requirement_line">
+                                <span style={{fontSize: "10px", lineHeight: "16px"}}>construction time: </span>
+                                <img src="images/v2/icons/timer.png" alt="materials" style={{ height: "16px" }} />
+                                <span>{selectedBuilding.construction_time} {selectedBuilding.construction_time > 1 ? " days" : " day"}</span>
+                            </div>
+                            <div className="building_buttons_container">
+                                {(!!selectedBuilding.requirements_met && selectedBuilding.status === "default" && playerSeatState.seat_type === "kage") &&
+                                    <>
+                                        <div className="construction_begin_button" onClick={() => openModal({
+                                            header: 'Confirmation',
+                                            text: "sometext?",
+                                            ContentComponent: null,
+                                            onConfirm: () => BeginConstruction(),
+                                        })}>upgrade {selectedBuilding.name}</div>
+                                    </>
+                                }
+                                {(selectedBuilding.status === "upgrading" && playerSeatState.seat_type === "kage") &&
+                                    <>
+                                        <div className="construction_cancel_button" onClick={() => openModal({
+                                            header: 'Confirmation',
+                                            text: "sometext?",
+                                            ContentComponent: null,
+                                            onConfirm: () => CancelConstruction(),
+                                        })}>cancel construction</div>
+                                    </>
+                                }
+                            </div>
+                        </div> 
+                    )}
+                    {selectedUpgrade && (
+                        <div className="upgrade_research_container">
+                            {selectedUpgrade.status === "researching" &&
+                                <div className="research_progress_text_container">
+                                    <div className="research_progress_label">RESEARCH IN PROGRESS</div>
+                                    <div className="research_progress_text">{selectedUpgrade.research_time_remaining}</div>
+                                </div>
                             }
-                            {selectedBuilding.status == "upgrading" &&
-                                <>
-                                    <div className="construction_begin_button disabled">upgrade {selectedBuilding.name}</div>
-                                <div className="construction_cancel_button" onClick={() => openModal({
-                                    header: 'Confirmation',
-                                    text: "sometext?",
-                                    ContentComponent: null,
-                                    onConfirm: () => CancelConstruction(),
-                                })}>cancel construction</div>
-                                </>
-                            }
+                            <div className="upgrade_name">{selectedUpgrade.name}</div>
+                            <div className="upgrade_description">{selectedUpgrade.description}</div>
+                            <div className="upgrade_requirement_line">
+                                <span style={{ fontSize: "10px", lineHeight: "16px" }}>research cost: </span>
+                                <img src="/images/icons/materials.png" alt="materials" style={{ height: "16px"}} />
+                                <span style={{ color: "#e98b99" }}>{selectedUpgrade.materials_research_cost}</span>
+                                <img src="/images/icons/food.png" alt="food" style={{ height: "16px"}} />
+                                <span style={{ color: "#e98b99" }}>{selectedUpgrade.food_research_cost}</span>
+                                <img src="/images/icons/wealth.png" alt="wealth" style={{ height: "16px"}} />
+                                <span style={{ color: "#e98b99" }}>{selectedUpgrade.wealth_research_cost}</span>
+                            </div>
+                            <div className="upgrade_requirement_line">
+                                <span style={{ fontSize: "10px", lineHeight: "16px" }}>daily upkeep: </span>
+                                <img src="/images/icons/materials.png" alt="materials" style={{ height: "16px"}} />
+                                <span style={{ color: "#e98b99" }}>{selectedUpgrade.materials_upkeep * 24}</span>
+                                <img src="/images/icons/food.png" alt="food" style={{ height: "16px"}} />
+                                <span style={{ color: "#e98b99" }}>{selectedUpgrade.food_upkeep * 24}</span>
+                                <img src="/images/icons/wealth.png" alt="wealth" style={{ height: "16px"}} />
+                                <span style={{ color: "#e98b99" }}>{selectedUpgrade.wealth_upkeep * 24}</span>
+                            </div>
+                            <div className="upgrade_requirement_line">
+                                <span style={{ fontSize: "10px", lineHeight: "16px" }}>research time: </span>
+                                <img src="images/v2/icons/timer.png" alt="materials" style={{ height: "16px" }} />
+                                <span>{selectedUpgrade.research_time} {selectedUpgrade.research_time > 1 ? " days" : " day"}</span>
+                            </div>
+                            <div className="upgrade_buttons_container">
+                                {(!!selectedUpgrade.requirements_met && selectedUpgrade.status === "locked" && playerSeatState.seat_type === "kage") &&
+                                    <>
+                                        <div className="research_begin_button" onClick={() => openModal({
+                                            header: 'Confirmation',
+                                            text: "sometext?",
+                                            ContentComponent: null,
+                                            onConfirm: () => BeginResearch(),
+                                        })}>begin research</div>
+                                    </>
+                                }
+                                {(selectedUpgrade.status === "researching" && playerSeatState.seat_type === "kage") &&
+                                    <>
+                                        <div className="research_cancel_button" onClick={() => openModal({
+                                            header: 'Confirmation',
+                                            text: "sometext?",
+                                            ContentComponent: null,
+                                            onConfirm: () => CancelResearch(),
+                                        })}>cancel research</div>
+                                    </>
+                                }
+                            </div>
                         </div>
                     )}
                     {selectedBuilding && ( 

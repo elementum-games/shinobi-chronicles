@@ -16,6 +16,7 @@ class VillageUpgradeDto {
         public ?int $food_research_cost = null,
         public ?int $wealth_research_cost = null,
         public ?int $research_time = null,
+        public ?string $research_time_remaining = null,
         public ?int $materials_upkeep = null,
         public ?int $food_upkeep = null,
         public ?int $wealth_upkeep = null,

@@ -16,7 +16,7 @@
     align-items: center;
     margin-bottom: 30px;
 }
-.building_item {
+.building_item, .building_visual {
     width: 280px;
     height: 108px;
     background-color: #25232d;
@@ -25,14 +25,17 @@
     justify-content: center;
     position: relative;
 }
-.building_item_inner {
+.building_item_inner, .building_visual_inner {
     outline: 1px solid #84714f;
     border: 1px solid #4e4535;
     width: 276px;
     height: 104px;
+    position: relative;
+    user-select: none;
 }
     .building_item_inner:hover {
         filter: url("#building_hover");
+        cursor: pointer;
     }
 .building_nameplate {
     position: absolute;
@@ -47,7 +50,7 @@
     align-items: center;
     justify-content: center;
 }
-.building_item .building_name {
+.building_item .building_name, .building_visual .building_name {
     text-transform: uppercase;
     font-size: 11px;
     font-weight: bold;
@@ -104,14 +107,14 @@
     flex-direction: column;
     height: 120px;
 }
-.upgrade_set_name {
+.upgrade_set_name, .upgrade_name {
     font-size: 11px;
     font-weight: bold;
     font-family: var(--font-primary);
     color: var(--font-color-1);
     text-transform: uppercase;
 }
-.upgrade_set_description {
+.upgrade_set_description, .upgrade_description {
     font-size: 12px;
     color: #daceb7;
     height: 32px;
@@ -131,6 +134,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
 .upgrade_item_wrapper {
     background: #141317;
@@ -183,18 +187,45 @@
     .upgrade_item.available .upgrade_item_inner {
         background: linear-gradient(to bottom, #475084 0%, #31396d 100%);
     }
+.upgrade_item.researching {
+    background: linear-gradient(to bottom, #38a774 0%, #2a5e3c 100%)
+}
+    .upgrade_item.researching .upgrade_item_inner {
+        background: linear-gradient(to bottom, #38a774 0%, #2a5e3c 100%)
+    }
 .upgrade_item:hover {
     padding: 4px;
     margin: -1px;
 }
-.building_buttons_container {
+.building_construction_container, .upgrade_research_container {
+    background-color: #141317;
+    outline: 1px solid #1d1b26;
+    outline-offset: 1px;
+    border: 1px solid #4e4535;
+    margin-left: auto;
+    margin-right: auto;
+    display: inline-flex;
+    position: relative;
+    transform: translateX(-50%);
+    left: 50%;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    box-sizing: border-box;
+    padding: 10px;
+    width: 400px;
+    height: 250px;
+    flex-direction: column;
+}
+.building_buttons_container, .upgrade_buttons_container {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 30px;
     gap: 30px;
+    position: absolute;
+    bottom: -12px;
 }
-.construction_begin_button {
+.construction_begin_button, .research_begin_button {
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
     width: 150px;
     height: 25px;
@@ -207,7 +238,7 @@
     user-select: none;
     text-transform: lowercase;
 }
-.construction_cancel_button {
+.construction_cancel_button, .research_cancel_button {
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
     width: 150px;
     height: 25px;
@@ -219,14 +250,86 @@
     cursor: pointer;
     user-select: none;
 }
-    .construction_begin_button:hover, .construction_cancel_button:hover {
+    .construction_begin_button:hover, .construction_cancel_button:hover, .research_begin_button:hover, .research_cancel_button:hover {
         color: white;
     }
-    .construction_begin_button.disabled, .construction_cancel_button.disabled {
+    .construction_begin_button.disabled, .construction_cancel_button.disabled, .research_begin_button.disabled, .research_cancel_button.disabled {
         opacity: 30%;
         pointer-events: none;
     }
-        .construction_begin_button.disabled:hover, .construction_cancel_button.disabled:hover {
+        .construction_begin_button.disabled:hover, .construction_cancel_button.disabled:hover, .research_begin_button.disabled:hover, .research_cancel_button.disabled:hover {
             color: #ccc1af;
             cursor: default;
         }
+.upgrade_requirement_line {
+    text-transform: uppercase;
+    color: #c0c7dc;
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: bold;
+    height: 20px;
+    display: flex;
+    gap: 5px;
+}
+.construction_overlay {
+    height: 100%;
+    width: 100%;
+    background: rgba(80, 80, 80, 0.7);
+}
+.construction_progress_overlay {
+    width: 100%;
+    background: rgba(0, 256, 0, 0.2);
+    position: absolute;
+    bottom: 0;
+}
+.construction_progress_text_container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 100%;
+}
+.construction_progress_label {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--construction-progress-label-color, #eee1c8);
+    text-transform: uppercase;
+    text-shadow: 0 0 3px #000;
+    text-align: center;
+}
+.construction_progress_text {
+    font-size: 12px;
+    color: var(--construction-progress-label-text, white);
+    text-transform: uppercase;
+    text-shadow: 0 0 3px #000;
+    text-align: center;
+    font-weight: bold;
+}
+.research_progress_text_container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 100%;
+}
+.research_progress_label {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--research-progress-label-color, #eee1c8);
+    text-transform: uppercase;
+    text-align: center;
+}
+.research_progress_text {
+    font-size: 12px;
+    color: var(--research-progress-label-text, white);
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
