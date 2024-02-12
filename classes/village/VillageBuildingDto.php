@@ -17,6 +17,8 @@ class VillageBuildingDto {
         public ?int $food_construction_cost = null,
         public ?int $wealth_construction_cost = null,
         public ?int $construction_time = null,
+        public ?string $construction_time_remaining = null,
+        public ?int $requirements_met = null,
         public array $upgrade_sets = [],
     ) {}
 }

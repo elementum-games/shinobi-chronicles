@@ -12,10 +12,10 @@ class VillageBuildingConfig {
     /* indentifiers for each building */
     const BUILDING_VILLAGE_HQ = 'VILLAGE_HQ';
     const BUILDING_WORKSHOP = 'WORKSHOP';
+    const BUILDING_MARKET = 'MARKET';
     const BUILDING_ACADEMY = 'ACADEMY';
     const BUILDING_HOSPITAL = 'HOSPITAL';
     const BUILDING_ANBU_HQ = 'ANBU_HQ';
-    const BUILDING_MARKET = 'MARKET';
     const BUILDING_SHRINE = 'SHRINE';
     const BUILDING_RAMEN_STAND = 'RAMEN_STAND';
 
@@ -362,7 +362,7 @@ class VillageBuildingConfig {
         self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES => "Decreases cost of ramen.",
         self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => "Increases chance of Mystery Ramen appearing.",
     ];
-    
+
     /* upgrade set upgrades, indexed by upgrade set key */
     const UPGRADE_SET_UPGRADES = [
         self::UPGRADE_SET_KEY_RESEARCH => [

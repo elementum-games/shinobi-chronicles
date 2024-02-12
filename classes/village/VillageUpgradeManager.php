@@ -138,6 +138,8 @@ class VillageUpgradeManager {
             $building->food_construction_cost = VillageBuildingConfig::BUILDING_CONSTRUCTION_COST[$building->key][$building->tier + 1][WarManager::RESOURCE_FOOD];
             $building->wealth_construction_cost = VillageBuildingConfig::BUILDING_CONSTRUCTION_COST[$building->key][$building->tier + 1][WarManager::RESOURCE_WEALTH];
             $building->construction_time = VillageBuildingConfig::BUILDING_CONSTRUCTION_TIME[$building->key][$building->tier + 1];
+            $building->construction_time_remaining = System::TimeRemaining($building->construction_progress_required - $building->construction_progress, format: "long", include_seconds: false, include_minutes: false);
+            $building->requirements_met = VillageUpgradeManager::checkConstructionRequirementsMet($village, $building->key, $building->tier + 1);
             foreach (VillageBuildingConfig::BUILDING_UPGRADE_SETS[$building->key] as $upgrade_set_key) {
                 $upgrade_set = new VillageUpgradeSetDto(
                     key: $upgrade_set_key,
@@ -158,10 +160,11 @@ class VillageUpgradeManager {
                         food_research_cost: VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$upgrade_key][WarManager::RESOURCE_FOOD],
                         wealth_research_cost: VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$upgrade_key][WarManager::RESOURCE_WEALTH],
                         research_time: VillageUpgradeConfig::UPGRADE_RESEARCH_TIME[$upgrade_key],
+                        research_time_remaining: isset($village->upgrades[$upgrade_key]->research_progress_last_updated) ? System::TimeRemaining($village->upgrades[$upgrade_key]->research_progress_required - $village->upgrades[$upgrade_key]->research_progress, format: "long", include_seconds: false, include_minutes: false) : null,
                         food_upkeep: VillageUpgradeConfig::UPGRADE_UPKEEP[$upgrade_key][WarManager::RESOURCE_FOOD],
                         materials_upkeep: VillageUpgradeConfig::UPGRADE_UPKEEP[$upgrade_key][WarManager::RESOURCE_MATERIALS],
                         wealth_upkeep: VillageUpgradeConfig::UPGRADE_UPKEEP[$upgrade_key][WarManager::RESOURCE_WEALTH],
-                        requirements_met: VillageUpgradeManager::checkUpgradeRequirementsMet($village, $upgrade_key),
+                        requirements_met: VillageUpgradeManager::checkResearchRequirementsMet($village, $upgrade_key),
                     );
                     $upgrade_set->upgrades[] = $upgrade;
                 }
@@ -176,7 +179,7 @@ class VillageUpgradeManager {
      * @param Village $village
      * @return array<VillageUpgradeDto>
      */
-    public static function checkUpgradeRequirementsMet(Village $village, string $upgrade_key): bool {
+    public static function checkResearchRequirementsMet(Village $village, string $upgrade_key): bool {
         $effective_tier = 0;
         if (isset(VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key])) {
             $requirements = VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key];
@@ -248,7 +251,7 @@ class VillageUpgradeManager {
             }
         }
         // check if has previous progress
-        if (empty($village->buildings[$building_key]->construction_progress)) {
+        if (isset($village->buildings[$building_key]->construction_progress)) {
             // check if the village has enough resources
             if ($village->resources[WarManager::RESOURCE_MATERIALS] < $materials_cost || $village->resources[WarManager::RESOURCE_FOOD] < $food_cost || $village->resources[WarManager::RESOURCE_WEALTH] < $wealth_cost) {
                 return "Not enough resources!";
@@ -264,12 +267,23 @@ class VillageUpgradeManager {
             $system->db->query("INSERT INTO `resource_logs`(`village_id`, `resource_id`, `type`, `quantity`, `time`) VALUES ({$village->village_id}, " . WarManager::RESOURCE_WEALTH . ", " . VillageManager::RESOURCE_LOG_CONSTRUCTION_COST . ", {$wealth_cost}, " . time() . ")");
         }
         // update building data
-        $village->buildings[$building_key]->construction_progress = 0;
-        $village->buildings[$building_key]->construction_progress_required = $progress_required;
-        $village->buildings[$building_key]->construction_progress_last_updated = time();
-        $village->buildings[$building_key]->status = VillageBuildingConfig::BUILDING_STATUS_UPGRADING;
-        $system->db->query("UPDATE `village_buildings` SET `construction_progress` = 0, `construction_progress_required` = {$progress_required}, `construction_progress_last_updated` = " . time() . ", `status` = " . VillageBuildingConfig::BUILDING_STATUS_UPGRADING . " WHERE `id` = {$village->buildings[$building_key]->id}");
-        return "Construction started for " . VillageBuildingConfig::BUILDING_NAMES[$building_key] . "!";
+        if (isset($village->buildings[$building_key]->construction_progress)) {
+            $village->buildings[$building_key]->construction_progress_required = $progress_required;
+            $village->buildings[$building_key]->construction_progress_last_updated = time();
+            $village->buildings[$building_key]->status = VillageBuildingConfig::BUILDING_STATUS_UPGRADING;
+            $system->db->query("UPDATE `village_buildings` SET `construction_progress_required` = {$progress_required}, `construction_progress_last_updated` = " . time() . ", `status` = '" . VillageBuildingConfig::BUILDING_STATUS_UPGRADING . "' WHERE `id` = {$village->buildings[$building_key]->id}");
+            return "Construction resumed for " . VillageBuildingConfig::BUILDING_NAMES[$building_key] . "!";
+        } else {
+            $village->buildings[$building_key]->construction_progress = 0;
+            $village->buildings[$building_key]->construction_progress_required = $progress_required;
+            $village->buildings[$building_key]->construction_progress_last_updated = time();
+            $village->buildings[$building_key]->status = VillageBuildingConfig::BUILDING_STATUS_UPGRADING;
+            $system->db->query("INSERT INTO `village_buildings`
+                (`village_id`, `key`, `tier`, `health`, `status`, `construction_progress`, `construction_progress_required`, `construction_progress_last_updated`)
+                VALUES ({$village->village_id}, '{$building_key}', 0, 0, '" . VillageBuildingConfig::BUILDING_STATUS_DEFAULT . "', 0, {$progress_required}, " . time() . ")
+            ");
+            return "Construction started for " . VillageBuildingConfig::BUILDING_NAMES[$building_key] . "!";
+        }
     }
 
     public static function cancelConstruction(System $system, Village $village, $building_id): string {
@@ -278,9 +292,9 @@ class VillageUpgradeManager {
             return "Building is not under construction!";
         }
         // stop construction but maintain progress
-        $building->status = VillageBuildingConfig::BUILDING_STATUS_DEFAULT;
-        $building->progress_last_updated = time();
-        $system->db->query("UPDATE `village_buildings` SET `status` = " . VillageBuildingConfig::BUILDING_STATUS_DEFAULT . ", `progress_last_updated` = " . time() . " WHERE `id` = {$building->id}");
+        $village->buildings[$building_id]->status = VillageBuildingConfig::BUILDING_STATUS_DEFAULT;
+        $village->buildings[$building_id]->progress_last_updated = time();
+        $system->db->query("UPDATE `village_buildings` SET `status` = '" . VillageBuildingConfig::BUILDING_STATUS_DEFAULT . "', `construction_progress_last_updated` = " . time() . " WHERE `id` = {$village->buildings[$building_id]->id}");
         return "Construction cancelled for " . VillageBuildingConfig::BUILDING_NAMES[$building_id] . "!";
     }
 
@@ -296,7 +310,7 @@ class VillageUpgradeManager {
         $wealth_cost = VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$upgrade_key][WarManager::RESOURCE_WEALTH];
         $progress_required = VillageUpgradeConfig::UPGRADE_RESEARCH_TIME[$upgrade_key] * 86400;
         // check if requirements met
-        if (!VillageUpgradeManager::checkResearchRequirements($village, $upgrade_key)) {
+        if (!VillageUpgradeManager::checkResearchRequirementsMet($village, $upgrade_key)) {
             return "Research requirements not met!";
         }
         // check if another upgrade is already under research
@@ -306,7 +320,7 @@ class VillageUpgradeManager {
             }
         }
         // check if has previous progress
-        if (empty($village->upgrades[$upgrade_key]->research_progress)) {
+        if (!isset($village->upgrades[$upgrade_key]->research_progress)) {
             // check if village has enough resources
             if ($village->resources[WarManager::RESOURCE_MATERIALS] < $materials_cost || $village->resources[WarManager::RESOURCE_FOOD] < $food_cost || $village->resources[WarManager::RESOURCE_WEALTH] < $wealth_cost) {
                 return "Not enough resources!";
@@ -322,15 +336,23 @@ class VillageUpgradeManager {
             $system->db->query("INSERT INTO `resource_logs`(`village_id`, `resource_id`, `type`, `quantity`, `time`) VALUES ({$village->village_id}, " . WarManager::RESOURCE_WEALTH . ", " . VillageManager::RESOURCE_LOG_RESEARCH_COST . ", {$wealth_cost}, " . time() . ")");
         }
         // update upgrade data
-        $upgrade->research_progress = 0;
-        $upgrade->research_progress_required = $progress_required;
-        $upgrade->research_progress_last_updated = time();
-        $upgrade->status = VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING;
-        $system->db->query("INSERT INTO `village_upgrades`
-            (`village_id`, `key`, `status`, `research_progress`, `research_progress_required`, `research_progress_last_updated`)
-            VALUES ({$village->village_id}, '{$upgrade_key}', " . VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING . ", 0, {$progress_required}, " . time() . ")
-        ");
-        return "Research started for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
+        if (isset($village->upgrades[$upgrade_key]->research_progress)) {
+            $village->upgrades[$upgrade_key]->research_progress_required = $progress_required;
+            $village->upgrades[$upgrade_key]->research_progress_last_updated = time();
+            $village->upgrades[$upgrade_key]->status = VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING;
+            $system->db->query("UPDATE `village_upgrades` SET `research_progress_required` = {$progress_required}, `research_progress_last_updated` = " . time() . ", `status` = '" . VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING . "' WHERE `id` = {$village->upgrades[$upgrade_key]->id}");
+            return "Research resumed for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
+        } else {
+            $village->upgrades[$upgrade_key]->research_progress = 0;
+            $village->upgrades[$upgrade_key]->research_progress_required = $progress_required;
+            $village->upgrades[$upgrade_key]->research_progress_last_updated = time();
+            $village->upgrades[$upgrade_key]->status = VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING;
+            $system->db->query("INSERT INTO `village_upgrades`
+                (`village_id`, `key`, `status`, `research_progress`, `research_progress_required`, `research_progress_last_updated`)
+                VALUES ({$village->village_id}, '{$upgrade_key}', '" . VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING . "', 0, {$progress_required}, " . time() . ")
+            ");
+            return "Research started for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
+        }
     }
 
     public static function cancelResearch(System $system, Village $village, $upgrade_key): string {
@@ -341,7 +363,7 @@ class VillageUpgradeManager {
         // stop research but maintain progress
         $village->upgrades[$upgrade_key]->status = VillageUpgradeConfig::UPGRADE_STATUS_LOCKED;
         $village->upgrades[$upgrade_key]->research_progress_last_updated = time();
-        $system->db->query("UPDATE `village_upgrades` SET `status` = " . VillageUpgradeConfig::UPGRADE_STATUS_LOCKED . ", `research_progress_last_updated` = " . time() . " WHERE `id` = {$village->upgrades[$upgrade_key]->id}");
+        $system->db->query("UPDATE `village_upgrades` SET `status` = '" . VillageUpgradeConfig::UPGRADE_STATUS_LOCKED . "', `research_progress_last_updated` = " . time() . " WHERE `id` = {$village->upgrades[$upgrade_key]->id}");
         return "Research cancelled for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
     }
 }
