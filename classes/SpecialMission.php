@@ -406,9 +406,7 @@ class SpecialMission {
         if(SpecialMission::isMovingEvent($new_event)) {
             $event_text = "You moved to {$move_to_x}.{$move_to_y}";
 
-            $this->logNewEvent($new_event, $event_text);
-
-            /*$latest_log_index = array_key_first($this->log);
+            $latest_log_index = array_key_first($this->log);
             if(SpecialMission::isMovingEvent($this->log[$latest_log_index]['event'])) {
                 $this->log[$latest_log_index] = [
                     'event' => $new_event,
@@ -419,7 +417,7 @@ class SpecialMission {
             else {
                 $this->logNewEvent($new_event, "You set out towards the next location at {$this->target->x}.{$this->target->y}");
                 $this->logNewEvent($new_event, $event_text);
-            }*/
+            }
         }
         else {
             $this->logNewEvent($new_event, self::$event_names[$new_event]['text']);
