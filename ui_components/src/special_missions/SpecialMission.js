@@ -1,6 +1,5 @@
 // @flow
 
-import { apiFetch } from "../utils/network.js";
 
 type MissionData = {|
     +progress: number,
@@ -27,7 +26,7 @@ function SpecialMission({
     specialMissionId,
     initialMissionData,
 }: Props) {
-    if(specialMissionId !== 0) {
+    if(specialMissionId !== 0 && initialMissionData != null) {
         return <ActiveSpecialMission
             missionId={specialMissionId}
             selfLink={selfLink}
@@ -86,56 +85,69 @@ function ActiveSpecialMission({
     selfLink,
     missionEventDurationMs
 }) {
-    const apiUrl = `api/legacy_special_missions.php?mission_id=${missionId}`;
     const serverRefreshIntervalMs = missionEventDurationMs + 125;
 
     const [mission, setMission] = React.useState(initialMissionData);
     const [missionComplete, setMissionComplete] = React.useState(false);
 
-    let refreshIntervalIdRef = React.useRef(null);
-    function stopRefresh() {
-        if(refreshIntervalIdRef.current == null) return;
+    const workerRef = React.useRef(null);
 
-        clearInterval(refreshIntervalIdRef.current);
-        refreshIntervalIdRef.current = null;
+    function startRefresh() {
+        if(workerRef.current == null) {
+            console.error("No worker active!");
+        }
+
+        console.log('starting refresh');
+
+        workerRef.current.onmessage = function(message) {
+            console.log('Component received message from worker ', message);
+            handleDataReceived(message.data);
+        };
+
+        workerRef.current.postMessage({
+            refreshActive: true,
+            missionId: missionId,
+            refreshIntervalMs: serverRefreshIntervalMs
+        });
+    }
+    function stopRefresh() {
+        if(workerRef.current == null) return;
+        workerRef.current.postMessage({
+            refreshActive: false
+        });
     }
 
-    function getMissionData() {
-        apiFetch(apiUrl)
-            .then(data => {
-                if(data.systemMessage) {
-                    console.log(data.systemMessage);
-                }
-                if(data.mission == null) {
-                    console.log("Not on a special mission!");
-                    stopRefresh();
-                    return true;
-                }
 
-                if(data.mission.progress >= 100) {
-                    data.mission.progress = 100;
-                }
-                if(data.missionComplete) {
-                    setMissionComplete(true);
-                    stopRefresh();
-                }
+    function handleDataReceived(data) {
+        if(data.systemMessage) {
+            console.log(data.systemMessage);
+        }
+        if(data.mission == null) {
+            console.log("Not on a special mission!");
+            stopRefresh();
+            return true;
+        }
 
-                setMission(data.mission);
-            })
-            .catch(err => {
-                console.error(err);
-            });
+        if(data.mission.progress >= 100) {
+            data.mission.progress = 100;
+        }
+        if(data.missionComplete) {
+            setMissionComplete(true);
+            stopRefresh();
+        }
+
+        setMission(data.mission);
     }
 
     React.useEffect(() => {
-        refreshIntervalIdRef.current = setInterval(getMissionData, serverRefreshIntervalMs);
+        workerRef.current = new Worker("ui_components/build/special_missions/specialMissionWorker.js");
 
-        return stopRefresh;
-    }, [])
+        startRefresh();
 
-    if(mission == null) {
-        return null;
-    }
+        return () => {
+            workerRef.current.terminate();
+        };
+    }, []);
 
     let missionStatus = 'In Progress';
     switch(mission.log[0].event) {
