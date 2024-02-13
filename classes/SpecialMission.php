@@ -851,11 +851,11 @@ class SpecialMission {
     }
 
     // Cancel the mission
-    public static function cancelMission($system, $player, $mission_id) {
+    public static function cancelMission(System $system, User $player, int $mission_id): bool {
         $timestamp = time();
         $system->db->query("UPDATE `special_missions`
             SET `status`=" . self::STATUS_FAILED . ", `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
-        $player->special_mission = 0;
+        $player->special_mission_id = 0;
         $player->updateData();
         return true;
     }
