@@ -41,7 +41,7 @@ class WarLogManager {
     const WAR_LOG_TYPE_VILLAGE = "village";
 
     const WAR_LOGS_PER_PAGE = 10;
-    const WAR_RECORDS_PER_PAGE = 10;
+    const WAR_RECORDS_PER_PAGE = 5;
 
     public static function logAction(System $system, User $player, int $value, string $type, int $target_village_id) {
         // use null relation_id to track overall
@@ -268,7 +268,6 @@ class WarLogManager {
                     'relation_id' => $relation_data['relation_id'],
                 ];
             }
-            $war_log_result['village_name'] = VillageManager::VILLAGE_NAMES[$war_log_result['village_id']];
             $attacker_war_log = new WarLogDto($war_log_result, self::WAR_LOG_TYPE_VILLAGE);
             self::calculateWarScore($attacker_war_log);
             $query = $system->db->query("SELECT * FROM `village_war_logs` WHERE `relation_id` = {$relation_data['relation_id']} AND `village_id` = {$relation_data['village2_id']} LIMIT 1");
@@ -281,13 +280,12 @@ class WarLogManager {
                     'relation_id' => $relation_data['relation_id'],
                 ];
             }
-            $war_log_result['village_name'] = VillageManager::VILLAGE_NAMES[$war_log_result['village_id']];
             $defender_war_log = new WarLogDto($war_log_result, self::WAR_LOG_TYPE_VILLAGE);
             self::calculateWarScore($defender_war_log);
             $war_records[] = new WarRecordDto($relation, $attacker_war_log, $defender_war_log, WarManager::getVictoryPercentRequired($system, $relation));
         }
         // pagination
-        $war_records = array_slice($war_records, ($page_number - 1) * self::WAR_RECORDS_PER_PAGE, self::WAR_RECORDS_PER_PAGE);
+        $war_records = array_slice($war_records, ($page_number - 1) * self::WAR_LOGS_PER_PAGE, self::WAR_LOGS_PER_PAGE);
         return $war_records;
     }
 

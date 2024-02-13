@@ -172,13 +172,13 @@ try {
             ];
             break;
         case 'GetGlobalWarLeaderboard':
-            $page_number = (int) $_POST['page_number'];
+            $page_number = (int)$_POST['page_number'];
             $VillageAPIResponse->response = [
                 'warLogData' => VillageApiPresenter::playerWarLogDataResponse($system, $player, $page_number),
             ];
             break;
         case 'GetWarRecords':
-            $page_number = (int) $_POST['page_number'];
+            $page_number = (int)$_POST['page_number'];
             $VillageAPIResponse->response = [
                 'warRecordData' => VillageApiPresenter::warRecordDataResponse($system, $player, $page_number),
             ];
