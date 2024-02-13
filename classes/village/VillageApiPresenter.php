@@ -161,8 +161,7 @@ class VillageApiPresenter {
             "player_war_log" => $player_war_log
         ];
     }
-    public static function warRecordDataResponse(System $system, User $player, int $page_number = 1): array
-    {
+    public static function warRecordDataResponse(System $system, User $player, int $page_number = 1): array {
         $war_records = array_map(
             function (WarRecordDto $warRecordDto) {
                 return [
@@ -295,7 +294,7 @@ class VillageApiPresenter {
                                             "materials_research_cost" => $villageUpgradeDto->materials_research_cost,
                                             "food_research_cost" => $villageUpgradeDto->food_research_cost,
                                             "wealth_research_cost" => $villageUpgradeDto->wealth_research_cost,
-                                            "research_time" => $villageUpgradeDto->research_time, 
+                                            "research_time" => $villageUpgradeDto->research_time,
                                             "research_time_remaining" => $villageUpgradeDto->research_time_remaining,
                                             "food_upkeep" => $villageUpgradeDto->food_upkeep,
                                             "materials_upkeep" => $villageUpgradeDto->materials_upkeep,

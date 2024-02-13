@@ -23,7 +23,8 @@ function Village({
   proposalData,
   strategicData,
   challengeData,
-  warLogData,
+  playerWarLogData,
+  warRecordData,
   kageRecords,
   buildingUpgradeData
 }) {
@@ -217,7 +218,8 @@ function Village({
     StrategicInfoItem: StrategicInfoItem,
     getPolicyDisplayData: getPolicyDisplayData
   }), villageTab == "warTable" && /*#__PURE__*/React.createElement(WarTable, {
-    warLogData: warLogData,
+    playerWarLogData: playerWarLogData,
+    warRecordData: warRecordData,
     villageAPI: villageAPI,
     handleErrors: handleErrors,
     getVillageIcon: getVillageIcon

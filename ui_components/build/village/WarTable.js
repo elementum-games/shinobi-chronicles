@@ -1,14 +1,33 @@
 import { apiFetch } from "../utils/network.js";
 import { ModalProvider } from "../utils/modalContext.js";
 export function WarTable({
-  warLogData,
+  playerWarLogData,
+  warRecordData,
   villageAPI,
   handleErrors,
   getVillageIcon
 }) {
-  const [playerWarLog, setPlayerWarLog] = React.useState(warLogData.player_war_log);
-  const [globalLeaderboardWarLogs, setGlobalLeaderboardWarLogs] = React.useState(warLogData.global_leaderboard_war_logs);
+  const [playerWarLog, setPlayerWarLog] = React.useState(playerWarLogData.player_war_log);
+  const [globalLeaderboardWarLogs, setGlobalLeaderboardWarLogs] = React.useState(playerWarLogData.global_leaderboard_war_logs);
   const [globalLeaderboardPageNumber, setGlobalLeaderboardPageNumber] = React.useState(1);
+  const [warRecords, setWarRecords] = React.useState(warRecordData.war_records);
+  const [warRecordPageNumber, setWarRecordPageNumber] = React.useState(1);
+  function getVillageBanner(village_id) {
+    switch (village_id) {
+      case 1:
+        return '/images/v2/decorations/strategic_banners/stratbannerstone.jpg';
+      case 2:
+        return '/images/v2/decorations/strategic_banners/stratbannercloud.jpg';
+      case 3:
+        return '/images/v2/decorations/strategic_banners/stratbannerleaf.jpg';
+      case 4:
+        return '/images/v2/decorations/strategic_banners/stratbannersand.jpg';
+      case 5:
+        return '/images/v2/decorations/strategic_banners/stratbannermist.jpg';
+      default:
+        return null;
+    }
+  }
   function WarLogHeader() {
     return /*#__PURE__*/React.createElement("div", {
       className: "warlog_label_row"
@@ -36,7 +55,7 @@ export function WarTable({
       className: "warlog_chart_label"
     }));
   }
-  function WarLog({
+  function PlayerWarLog({
     log,
     index,
     animate,
@@ -152,6 +171,87 @@ export function WarTable({
       fill: "#d64866"
     })), /*#__PURE__*/React.createElement("div", null, "Battle score (", Math.round(log.battle_score / Math.max(log.war_score, 1) * 100), "%)"))))));
   }
+  function WarRecord({
+    record,
+    index,
+    getVillageIcon,
+    getVillageBanner
+  }) {
+    const is_active = record.village_relation.relation_end ? false : true;
+    const renderScoreBar = () => {
+      const total_score = record.attacker_war_log.war_score + record.defender_war_log.war_score;
+      const attacker_score_percentage = Math.round(record.attacker_war_log.war_score / total_score * 100);
+      return /*#__PURE__*/React.createElement("div", {
+        className: "war_record_score_bar"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "war_record_score_bar_attacker",
+        style: {
+          width: attacker_score_percentage + "%"
+        }
+      }), /*#__PURE__*/React.createElement("div", {
+        className: "war_record_score_bar_defender",
+        style: {
+          width: 100 - attacker_score_percentage + "%"
+        }
+      }), /*#__PURE__*/React.createElement("svg", {
+        class: "war_record_score_divider",
+        viewBox: "0 0 200 200",
+        width: "7",
+        height: "7",
+        style: {
+          paddingBottom: "1px",
+          left: attacker_score_percentage - 1 + "%"
+        }
+      }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
+        id: "war_record_score_divider_gradient"
+      }, /*#__PURE__*/React.createElement("stop", {
+        "stop-color": "#f8de97",
+        offset: "0%"
+      }), /*#__PURE__*/React.createElement("stop", {
+        "stop-color": "#bfa458",
+        offset: "100%"
+      }))), /*#__PURE__*/React.createElement("polygon", {
+        points: "0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0",
+        fill: "url(#war_record_score_divider_gradient)",
+        stroke: "#4d401c",
+        strokeWidth: "20"
+      })));
+    };
+    return /*#__PURE__*/React.createElement("div", {
+      key: index,
+      className: "war_record",
+      style: {
+        background: `linear-gradient(to right, transparent 0%, #17161b 30%, #17161b 70%, transparent 100%), url('${getVillageBanner(record.village_relation.village1_id)}'), url('${getVillageBanner(record.village_relation.village2_id)}')`,
+        backgroundPosition: "center, -20% center, 115% center",
+        backgroundSize: "cover, auto, auto",
+        backgroundRepeat: "no-repeat"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "war_record_village left"
+    }, /*#__PURE__*/React.createElement("div", {
+      class: "war_record_village_inner"
+    }, /*#__PURE__*/React.createElement("img", {
+      src: getVillageIcon(record.village_relation.village1_id)
+    }))), /*#__PURE__*/React.createElement("div", {
+      className: "war_record_details_container"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "war_record_relation_name" + (is_active ? " active" : " inactive")
+    }, record.village_relation.relation_name), /*#__PURE__*/React.createElement("div", {
+      className: "war_record_label_row"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "war_record_score left" + (is_active ? " active" : " inactive")
+    }, record.attacker_war_log.war_score), /*#__PURE__*/React.createElement("div", {
+      className: "war_record_status" + (is_active ? " active" : " inactive")
+    }, record.village_relation.relation_end ? /*#__PURE__*/React.createElement(React.Fragment, null, record.village_relation.relation_start + " - " + record.village_relation.relation_end) : /*#__PURE__*/React.createElement(React.Fragment, null, "war active")), /*#__PURE__*/React.createElement("div", {
+      className: "war_record_score right" + (is_active ? " active" : " inactive")
+    }, record.defender_war_log.war_score)), renderScoreBar()), /*#__PURE__*/React.createElement("div", {
+      className: "war_record_village right"
+    }, /*#__PURE__*/React.createElement("div", {
+      class: "war_record_village_inner"
+    }, /*#__PURE__*/React.createElement("img", {
+      src: getVillageIcon(record.village_relation.village2_id)
+    }))));
+  }
   const GlobalLeaderboardNextPage = page_number => {
     apiFetch(villageAPI, {
       request: 'GetGlobalWarLeaderboard',
@@ -194,7 +294,7 @@ export function WarTable({
     className: "header"
   }, "your war score"), /*#__PURE__*/React.createElement("div", {
     className: "player_warlog_container"
-  }, /*#__PURE__*/React.createElement(WarLogHeader, null), /*#__PURE__*/React.createElement(WarLog, {
+  }, /*#__PURE__*/React.createElement(WarLogHeader, null), /*#__PURE__*/React.createElement(PlayerWarLog, {
     log: playerWarLog,
     index: 0,
     animate: false,
@@ -231,7 +331,7 @@ export function WarTable({
     className: "warlog_resources_label"
   }, "resources"), /*#__PURE__*/React.createElement("div", {
     className: "warlog_chart_label"
-  })), globalLeaderboardWarLogs.map((log, index) => /*#__PURE__*/React.createElement(WarLog, {
+  })), globalLeaderboardWarLogs.map((log, index) => /*#__PURE__*/React.createElement(PlayerWarLog, {
     log: log,
     index: index,
     animate: true,
@@ -284,5 +384,18 @@ export function WarTable({
     y2: "1",
     stroke: "#4e4535",
     strokeWidth: "1"
-  })))))));
+  })))))), /*#__PURE__*/React.createElement("div", {
+    className: "row third"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "column first"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "war records"), /*#__PURE__*/React.createElement("div", {
+    className: "war_records_container"
+  }, warRecords.map((record, index) => /*#__PURE__*/React.createElement(WarRecord, {
+    record: record,
+    index: index,
+    getVillageIcon: getVillageIcon,
+    getVillageBanner: getVillageBanner
+  }))))));
 }

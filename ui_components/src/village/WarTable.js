@@ -2,15 +2,33 @@ import { apiFetch } from "../utils/network.js";
 import { ModalProvider } from "../utils/modalContext.js";
 
 export function WarTable({
-    warLogData,
+    playerWarLogData,
+    warRecordData,
     villageAPI,
     handleErrors,
     getVillageIcon
 }) {
-    const [playerWarLog, setPlayerWarLog] = React.useState(warLogData.player_war_log);
-    const [globalLeaderboardWarLogs, setGlobalLeaderboardWarLogs] = React.useState(warLogData.global_leaderboard_war_logs);
+    const [playerWarLog, setPlayerWarLog] = React.useState(playerWarLogData.player_war_log);
+    const [globalLeaderboardWarLogs, setGlobalLeaderboardWarLogs] = React.useState(playerWarLogData.global_leaderboard_war_logs);
     const [globalLeaderboardPageNumber, setGlobalLeaderboardPageNumber] = React.useState(1);
-
+    const [warRecords, setWarRecords] = React.useState(warRecordData.war_records);
+    const [warRecordPageNumber, setWarRecordPageNumber] = React.useState(1);
+    function getVillageBanner(village_id) {
+        switch (village_id) {
+            case 1:
+                return '/images/v2/decorations/strategic_banners/stratbannerstone.jpg';
+            case 2:
+                return '/images/v2/decorations/strategic_banners/stratbannercloud.jpg';
+            case 3:
+                return '/images/v2/decorations/strategic_banners/stratbannerleaf.jpg';
+            case 4:
+                return '/images/v2/decorations/strategic_banners/stratbannersand.jpg';
+            case 5:
+                return '/images/v2/decorations/strategic_banners/stratbannermist.jpg';
+            default:
+                return null;
+        }
+    }
     function WarLogHeader() {
         return (
             <div className="warlog_label_row">
@@ -28,7 +46,7 @@ export function WarTable({
             </div>
         );
     }
-    function WarLog({ log, index, animate, getVillageIcon }) {
+    function PlayerWarLog({ log, index, animate, getVillageIcon }) {
         const scoreData = [
             { name: 'Objective Score', score: log.objective_score },
             { name: 'Resource Score', score: log.resource_score },
@@ -106,6 +124,76 @@ export function WarTable({
         );
     }
 
+    function WarRecord({ record, index, getVillageIcon, getVillageBanner }) {
+        const is_active = record.village_relation.relation_end ? false : true;
+        const renderScoreBar = () => {
+            const total_score = record.attacker_war_log.war_score + record.defender_war_log.war_score;
+            const attacker_score_percentage = Math.round((record.attacker_war_log.war_score / total_score) * 100);
+            return (
+                <div className="war_record_score_bar">
+                    <div className="war_record_score_bar_attacker"
+                        style={{
+                            width: attacker_score_percentage + "%",
+                        }}>
+                    </div>
+                    <div className="war_record_score_bar_defender"
+                        style={{
+                            width: (100 - attacker_score_percentage) + "%",
+                        }}>
+                    </div>
+                    <svg class="war_record_score_divider" viewBox="0 0 200 200" width="7" height="7" style={{paddingBottom: "1px", left: (attacker_score_percentage - 1) + "%" }} >
+                        <defs>
+                            <linearGradient id="war_record_score_divider_gradient">
+                                <stop stop-color="#f8de97" offset="0%" />
+                                <stop stop-color="#bfa458" offset="100%" />
+                            </linearGradient>
+                        </defs>
+                        <polygon points="0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0" fill="url(#war_record_score_divider_gradient)" stroke="#4d401c" strokeWidth="20"></polygon>
+                    </svg>
+                </div>
+            );
+        }
+        return (
+            <div key={index} className="war_record"
+                style={{
+                    background: `linear-gradient(to right, transparent 0%, #17161b 30%, #17161b 70%, transparent 100%), url('${getVillageBanner(record.village_relation.village1_id)}'), url('${getVillageBanner(record.village_relation.village2_id)}')`,
+                    backgroundPosition: "center, -20% center, 115% center",
+                    backgroundSize: "cover, auto, auto",
+                    backgroundRepeat: "no-repeat"
+                }}>
+                <div className="war_record_village left">
+                    <div class="war_record_village_inner">
+                        <img src={getVillageIcon(record.village_relation.village1_id)} />
+                    </div>
+                </div>
+                <div className="war_record_details_container">
+                    <div className={"war_record_relation_name" + (is_active ? " active" : " inactive")}>{record.village_relation.relation_name}</div>
+                    <div className="war_record_label_row">
+                        <div className={"war_record_score left" + (is_active ? " active" : " inactive")}>{record.attacker_war_log.war_score}</div>
+                        <div className={"war_record_status" + (is_active ?  " active" : " inactive")}>
+                            {record.village_relation.relation_end ?
+                                <>
+                                    {record.village_relation.relation_start + " - " + record.village_relation.relation_end} 
+                                </>
+                                :
+                                <>
+                                    {"war active"}
+                                </>
+                            }
+                        </div>
+                        <div className={"war_record_score right" + (is_active ? " active" : " inactive")}>{record.defender_war_log.war_score}</div>
+                    </div>
+                    {renderScoreBar()}
+                </div>
+                <div className="war_record_village right">
+                    <div class="war_record_village_inner">
+                        <img src={getVillageIcon(record.village_relation.village2_id)} />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     const GlobalLeaderboardNextPage = (page_number) => {
         apiFetch(
             villageAPI,
@@ -152,7 +240,7 @@ export function WarTable({
                     <div className="header">your war score</div>
                     <div className="player_warlog_container">
                         <WarLogHeader />
-                        <WarLog log={playerWarLog} index={0} animate={false} getVillageIcon={getVillageIcon} />
+                        <PlayerWarLog log={playerWarLog} index={0} animate={false} getVillageIcon={getVillageIcon} />
                     </div>
                 </div>
             </div>
@@ -175,7 +263,7 @@ export function WarTable({
                         </div>
                         {globalLeaderboardWarLogs
                             .map((log, index) => (
-                                <WarLog log={log} index={index} animate={true} getVillageIcon={getVillageIcon} />
+                                <PlayerWarLog log={log} index={index} animate={true} getVillageIcon={getVillageIcon} />
                             ))}
                     </div>
                     <div className="global_leaderboard_navigation">
@@ -190,6 +278,17 @@ export function WarTable({
                             <a className="global_leaderboard_pagination" onClick={() => GlobalLeaderboardNextPage(globalLeaderboardPageNumber + 1)}>{"Next >>"}</a>
                         </div>
                         <div className="global_leaderboard_navigation_divider_right"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
+                    </div>
+                </div>
+            </div>
+            <div className="row third">
+                <div className="column first">
+                    <div className="header">war records</div>
+                    <div className="war_records_container">
+                        {warRecords
+                            .map((record, index) => (
+                                <WarRecord record={record} index={index} getVillageIcon={getVillageIcon} getVillageBanner={getVillageBanner} />
+                            ))}
                     </div>
                 </div>
             </div>

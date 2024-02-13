@@ -222,11 +222,9 @@ function Village({
                 <WarTable
                 playerWarLogData={playerWarLogData}
                 warRecordData={warRecordData}
-                strategicDataState={strategicDataState}
                 villageAPI={villageAPI}
                 handleErrors={handleErrors}
                 getVillageIcon={getVillageIcon}
-                getPolicyDisplayData={getPolicyDisplayData}
                 />
             }
             {villageTab == "villageUpgrades" &&
