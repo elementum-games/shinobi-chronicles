@@ -301,30 +301,28 @@ class SpecialMission {
         }
     }
 
-
     // Plays the next event in the mission
     public function nextEvent() {
         $last_event = $this->returnLatestLog();
 
         $new_event = null;
+        $move_to_x = $this->player->location->x;
+        $move_to_y = $this->player->location->y;
 
         // Check if the user is in battle
         if ($this->player->battle_id) {
             $new_event = self::EVENT_COMPLETE_FAIL;
             $event_text = self::$event_names[$new_event]['text'];
         }
-
         else {
             // Check if the user is in the target square
             if ($this->target->x == $this->player->location->x && $this->target->y == $this->player->location->y) {
                 $new_event = self::EVENT_BATTLE;
-                $event_text = self::$event_names[$new_event]['text'];
             }
 
             // check if the user lost the battle, fail the mission
             if ($last_event['event'] == self::EVENT_BATTLE_LOSE) {
                 $new_event = self::EVENT_COMPLETE_FAIL;
-                $event_text = self::$event_names[$new_event]['text'];
             }
 
             // check if the user has enough progress to complete mission and is back home
@@ -333,13 +331,11 @@ class SpecialMission {
                 && $this->player->location->y == self::$target_villages[$this->player->village->name]['y']
             ) {
                 $new_event = self::EVENT_COMPLETE_SUCCESS;
-                $event_text = self::$event_names[$new_event]['text'];
             }
 
             // check what direction the user has to travel
             $villages = TravelManager::fetchVillageLocationsByCoordsStr($this->system);
-            $move_to_x = $this->player->location->x;
-            $move_to_y = $this->player->location->y;
+
             if ($this->player->location->x != $this->target->x) {
                 if ($this->target->x > $this->player->location->x) {
                     $move_to_x = $this->player->location->x + 1;
@@ -367,7 +363,6 @@ class SpecialMission {
                 }
 
                 $new_event = self::EVENT_MOVE_X;
-                $event_text = self::$event_names[$new_event]['text'] . $move_to_x . '.' . $move_to_y;
 
             } else if ($this->player->location->y != $this->target->y) {
                 if ($this->target->y > $this->player->location->y) {
@@ -396,19 +391,34 @@ class SpecialMission {
                 }
 
                 $new_event = self::EVENT_MOVE_Y;
-                $event_text = self::$event_names[$new_event]['text'] . $move_to_x . '.' . $move_to_y;
             }
 
             // check if the mission is complete
             if ($this->progress >= 100 && $this->target->target_village != $this->player->village->name) {
                 $new_event = self::EVENT_HOME;
-                $event_text = self::$event_names[$new_event]['text'];
             }
         }
 
-
         // Log the event
-        $this->logNewEvent($new_event, $event_text);
+        if(SpecialMission::isMovingEvent($new_event)) {
+            $event_text = "You moved to {$move_to_x}.{$move_to_y}";
+
+            $latest_log_index = array_key_first($this->log);
+            if(SpecialMission::isMovingEvent($this->log[$latest_log_index]['event'])) {
+                $this->log[$latest_log_index] = [
+                    'event' => $new_event,
+                    'timestamp_ms' => System::currentTimeMs(),
+                    'description' => $event_text,
+                ];
+            }
+            else {
+                $this->logNewEvent($new_event, "You set out towards the next location at {$this->target->x}.{$this->target->y}");
+                $this->logNewEvent($new_event, $event_text);
+            }
+        }
+        else {
+            $this->logNewEvent($new_event, self::$event_names[$new_event]['text']);
+        }
 
         // Play Events
         switch($new_event) {
@@ -454,8 +464,8 @@ class SpecialMission {
                     message: "Special Mission failed",
                     user_id: $this->player->user_id,
                     created: time(),
-                    expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION * 86400),
                     alert: true,
+                    expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION * 86400),
                 );
                 NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
                 break;
@@ -549,9 +559,7 @@ class SpecialMission {
                 continue;
             }
 
-            if($this->system->isDevEnvironment()) {
-                $battle_text .= "[br]Used {$jutsu->name} [lv {$jutsu->level}]";
-            }
+            $battle_text .= "[br] - Used {$jutsu->name} (level {$jutsu->level})";
 
             $original_level = $jutsu->level;
 
@@ -568,14 +576,6 @@ class SpecialMission {
             }
         }
 
-        /*
-         * <b>Fatal error</b>:  Uncaught Error: Cannot use object of type Jutsu as array in /mnt/c/projects/shinobi-chronicles/classes/SpecialMission.php:638
-Stack trace:
-#0 [internal function]: SpecialMission-&gt;{closure}()
-#1 /mnt/c/projects/shinobi-chronicles/classes/SpecialMission.php(638): array_map()
-
-         */
-
         $health_lost += $extra_health_lost;
         if($extra_health_lost > 0) {
             if($this->pickJutsuToUse() == null) {
@@ -589,11 +589,7 @@ Stack trace:
         $this->player->updateInventory();
 
         // Gains for mission progress, basic stuff at the moment.
-        // 20% variance up/down from base on intel gains. Averages to 105% base
-
         $intel_gained = self::$difficulties[$this->difficulty]['intel_gain'];
-        //$intel_gained *= 0.8 + (mt_rand(1, 4) / 10);
-        //$intel_gained = floor($intel_gained);
 
         $yen_gain = self::$difficulties[$this->difficulty]['yen_per_battle'] * $this->player->rank_num;
         $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
@@ -616,9 +612,7 @@ Stack trace:
             // Damage HP
             $this->player->health -= $health_lost;
             $this->player_health -= $health_lost;
-            if($this->system->isDevEnvironment()) {
-                $battle_text .= "[br]You lost {$health_lost} health";
-            }
+            $battle_text .= "[br]You lost {$health_lost} health";
 
             // Yen Gain
             $this->player->addMoney($yen_gain, "Special mission encounter");
@@ -628,7 +622,7 @@ Stack trace:
             $this->generateTarget();
 
             // Modify the event text
-            $battle_text .= "[br]You collected &#165;{$yen_gain}!";
+            $battle_text .= "[br][br]You collected &#165;{$yen_gain}!";
         }
 
         return ([$battle_result, $battle_text]);
@@ -696,7 +690,7 @@ Stack trace:
     public function logNewEvent($new_event, $event_text): bool {
         $log_entry = [
             'event' => $new_event,
-            'timestamp_ms' => floor(microtime(true) * 1000),
+            'timestamp_ms' => System::currentTimeMs(),
             'description' => $event_text
         ];
         array_unshift($this->log, $log_entry);
@@ -830,7 +824,21 @@ Stack trace:
         $damage_multiplier += (self::MAX_DAMAGE_MULTIPLIER - 1) * ($inverse_stats_percent / 100);
 
         $hp_lost_percent = $base_hp_lost_percent * $damage_multiplier;
-        return floor(($hp_lost_percent / 100) * $this->player->max_health);
+        $nominal_health_lost = $this->player->max_health * ($hp_lost_percent / 100);
+
+        return floor(
+            ($nominal_health_lost * mt_rand(95, 105)) / 100
+        );
+    }
+
+    protected static function isMovingEvent(string $event): bool {
+        switch($event) {
+            case self::EVENT_MOVE_Y:
+            case self::EVENT_MOVE_X:
+                return true;
+            default:
+                return false;
+        }
     }
 
     // Cancel the mission
