@@ -22,7 +22,7 @@ function arena(): bool {
         $system->printMessage();
         return false;
     }
-    if ($player->special_mission > 0) {
+    if ($player->special_mission_id > 0) {
         $system->message("You cannot access this page while in a special mission!");
         $system->printMessage();
         return false;

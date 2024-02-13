@@ -115,7 +115,7 @@ return $routes = [
         challenge_lock_ok: false,
     ),
     15 => new Route(
-        file_name: 'specialmissions.php',
+        file_name: 'special_missions.php',
         title: 'Special Missions',
         function_name: 'specialMissions',
         menu: Route::MENU_ACTIVITY,

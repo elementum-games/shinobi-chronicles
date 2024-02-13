@@ -67,27 +67,27 @@ class NotificationAPIManager {
                     }
                     break;
                 case NotificationManager::NOTIFICATION_SPECIALMISSION:
-                    if ($this->player->special_mission == 0) {
+                    if ($this->player->special_mission_id == 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
-                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("specialmissions"));
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("special_missions"));
                     }
                     break;
                 case NotificationManager::NOTIFICATION_SPECIALMISSION_COMPLETE:
-                    if ($this->player->special_mission != 0) {
+                    if ($this->player->special_mission_id != 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
-                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("specialmissions"));
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("special_missions"));
                     }
                     break;
                 case NotificationManager::NOTIFICATION_SPECIALMISSION_FAILED:
-                    if ($this->player->special_mission != 0) {
+                    if ($this->player->special_mission_id != 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
-                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("specialmissions"));
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("special_missions"));
                     }
                     break;
                 case NotificationManager::NOTIFICATION_MISSION:

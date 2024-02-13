@@ -82,7 +82,7 @@
     width: 25px;
     height: 25px;
 
-    background: url('../images/special_missions/helath.png') center center;
+    background: url('../../../images/special_missions/helath.png') center center;
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
@@ -239,7 +239,7 @@ a#spec_miss_cancel::after {
     transform: translateY(-50%);
     right: 0;
 
-    background: url('../images/special_missions/cancel-off.png');
+    background: url('../../../images/special_missions/cancel-off.png');
     background-position: center center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -250,7 +250,7 @@ a#spec_miss_cancel:hover {
 }
 
 a#spec_miss_cancel:hover::after {
-    background: url('../images/special_missions/cancel-on.png');
+    background: url('../../../images/special_missions/cancel-on.png');
     background-position: center center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -262,14 +262,14 @@ a#spec_miss_cancel:hover::after {
 }
 
 .spec_miss_event_move_x::after {
-    background: url('../images/special_missions/move_x.png');
+    background: url('../../../images/special_missions/move_x.png');
     background-size: 90% 90%;
     background-position: center center;
     background-repeat: no-repeat;
 }
 
 .spec_miss_event_move_y::after {
-    background: url('../images/special_missions/move_y.png');
+    background: url('../../../images/special_missions/move_y.png');
     background-position: center center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -280,7 +280,7 @@ a#spec_miss_cancel:hover::after {
 }
 
 .spec_miss_event_battle::after {
-    background: url('../images/special_missions/battle.png');
+    background: url('../../../images/special_missions/battle.png');
     background-size: 90% 90%;
     background-position: center center;
     background-repeat: no-repeat;
@@ -291,7 +291,7 @@ a#spec_miss_cancel:hover::after {
 }
 
 .spec_miss_event_battle_win::after {
-    background: url('../images/special_missions/battle_win.png');
+    background: url('../../../images/special_missions/battle_win.png');
     background-size: 100% 100%;
     background-position: center center;
     background-repeat: no-repeat;
@@ -302,7 +302,7 @@ a#spec_miss_cancel:hover::after {
 }
 
 .spec_miss_event_battle_lose::after {
-    background: url('../images/special_missions/battle_lost.png');
+    background: url('../../../images/special_missions/battle_lost.png');
     background-size: 100% 100%;
     background-position: center center;
     background-repeat: no-repeat;
@@ -313,7 +313,7 @@ a#spec_miss_cancel:hover::after {
 }
 
 .spec_miss_event_mission_home::after {
-    background: url('../images/special_missions/mission_home.png');
+    background: url('../../../images/special_missions/mission_home.png');
     background-size: 100% 100%;
     background-position: center center;
     background-repeat: no-repeat;
@@ -324,7 +324,7 @@ a#spec_miss_cancel:hover::after {
 }
 
 .spec_miss_event_mission_complete::after {
-    background: url('../images/special_missions/mission_success.png');
+    background: url('../../../images/special_missions/mission_success.png');
     background-size: 100% 100%;
     background-position: center center;
     background-repeat: no-repeat;
@@ -335,7 +335,7 @@ a#spec_miss_cancel:hover::after {
 }
 
 .spec_miss_event_mission_failed::after {
-    background: url('../images/special_missions/mission_failed.png');
+    background: url('../../../images/special_missions/mission_failed.png');
     background-size: 100% 100%;
     background-position: center center;
     background-repeat: no-repeat;
@@ -346,7 +346,7 @@ a#spec_miss_cancel:hover::after {
 }
 
 .spec_miss_event_mission_reward::after {
-    background: url('../images/special_missions/mission_reward.png');
+    background: url('../../../images/special_missions/mission_reward.png');
     background-size: 100% 100%;
     background-position: center center;
     background-repeat: no-repeat;
@@ -357,7 +357,7 @@ a#spec_miss_cancel:hover::after {
 }
 
 .spec_miss_event_start::after {
-    background: url('../images/special_missions/start.png');
+    background: url('../../../images/special_missions/start.png');
     background-size: 100% 100%;
     background-position: center center;
     background-repeat: no-repeat;

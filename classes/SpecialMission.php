@@ -142,6 +142,10 @@ class SpecialMission {
     const SPY_TARGET_CLOUD = 'Cloud';
     const SPY_TARGET_MIST = 'Mist';
 
+    const STATUS_ACTIVE = 0;
+    const STATUS_COMPLETED = 1;
+    const STATUS_FAILED = 2;
+
     public static array $valid_targets = [
         SpecialMission::SPY_TARGET_LEAF => [
             SpecialMission::SPY_TARGET_LEAF => true,
@@ -235,17 +239,16 @@ class SpecialMission {
     /**
      * @throws DatabaseDeadlockException
      */
-    public function __construct(System $system, User $player, $mission_id) {
+    public function __construct(System $system, User $player, int $mission_id) {
         $this->system = $system;
         $this->player = $player;
         $this->mission_id = $mission_id;
-        // Override if player special mission set
-        if ($this->player->special_mission) {
-            $this->mission_id = $this->player->special_mission;
-        }
 
         // GET MISSION DATA
-        $result = $this->system->db->query("SELECT * FROM `special_missions` WHERE `mission_id`={$this->mission_id}");
+        $result = $this->system->db->query("SELECT * FROM `special_missions` 
+            WHERE `mission_id`={$this->mission_id}
+            AND `user_id`={$this->player->user_id}
+        ");
         // Return if the mission doesn't exist
         if ($this->system->db->last_num_rows == 0) {
             return false;
@@ -403,7 +406,9 @@ class SpecialMission {
         if(SpecialMission::isMovingEvent($new_event)) {
             $event_text = "You moved to {$move_to_x}.{$move_to_y}";
 
-            $latest_log_index = array_key_first($this->log);
+            $this->logNewEvent($new_event, $event_text);
+
+            /*$latest_log_index = array_key_first($this->log);
             if(SpecialMission::isMovingEvent($this->log[$latest_log_index]['event'])) {
                 $this->log[$latest_log_index] = [
                     'event' => $new_event,
@@ -414,7 +419,7 @@ class SpecialMission {
             else {
                 $this->logNewEvent($new_event, "You set out towards the next location at {$this->target->x}.{$this->target->y}");
                 $this->logNewEvent($new_event, $event_text);
-            }
+            }*/
         }
         else {
             $this->logNewEvent($new_event, self::$event_names[$new_event]['text']);
@@ -492,11 +497,11 @@ class SpecialMission {
             $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
             $yen_gain = floor($yen_gain);
 
-            $this->status = 1;
+            $this->status = self::STATUS_COMPLETED;
             $this->end_time = time();
             $this->player->addMoney($yen_gain, "Special mission");
             $this->reward += $yen_gain;
-            $this->player->special_mission = 0;
+            $this->player->special_mission_id = 0;
 
             $reward_text = self::$event_names[self::EVENT_COMPLETE_REWARD]['text'] . $yen_gain . '!';
 
@@ -677,12 +682,12 @@ class SpecialMission {
     // Fails the mission
     public function failMission(): bool {
         $this->end_time = time();
-        $this->status = 2;
+        $this->status = self::STATUS_FAILED;
         if (!$this->player->battle_id) {
             $this->player->location->x = self::$target_villages[$this->player->village->name]['x'];
             $this->player->location->y = self::$target_villages[$this->player->village->name]['y'];
         }
-        $this->player->special_mission = 0;
+        $this->player->special_mission_id = 0;
         return true;
     }
 
@@ -844,15 +849,15 @@ class SpecialMission {
     // Cancel the mission
     public static function cancelMission($system, $player, $mission_id) {
         $timestamp = time();
-        $result = $system->db->query("UPDATE `special_missions`
-SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
+        $system->db->query("UPDATE `special_missions`
+            SET `status`=" . self::STATUS_FAILED . ", `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
         $player->special_mission = 0;
         $player->updateData();
         return true;
     }
 
     public static function startMission($system, User $player, $difficulty): SpecialMission {
-        if ($player->special_mission != 0) {
+        if ($player->special_mission_id != 0) {
             throw new RuntimeException('You cannot start multiple missions!');
         }
 
@@ -887,7 +892,7 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
         ");
 
         $mission_id = $system->db->last_insert_id;
-        $player->special_mission = $mission_id;
+        $player->special_mission_id = $mission_id;
 
         return new SpecialMission($system, $player, $mission_id);
     }

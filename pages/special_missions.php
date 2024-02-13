@@ -2,18 +2,21 @@
 
 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
 
+/**
+ * @throws DatabaseDeadlockException
+ */
 function specialMissions() {
     global $system;
     global $player;
-	global $self_link;
-	$self_id = 15;
+
+    $special_mission = null;
 
     // Start new Special Mission
-    if (isset($_GET['start']) && !$player->special_mission) {
+    if (isset($_GET['start']) && !$player->special_mission_id) {
         try {
             $difficulty = $system->db->clean($_GET['start']);
             $special_mission = SpecialMission::startMission($system, $player, $difficulty);
-            $player->special_mission = $special_mission->mission_id;
+            $player->special_mission_id = $special_mission->mission_id;
 
             $player->log(User::LOG_SPECIAL_MISSION, "{$difficulty} $difficulty");
 
@@ -32,8 +35,12 @@ function specialMissions() {
     }
 
     // cancel the mission
-    if (isset($_GET['cancelmission']) && $player->special_mission) {
-        $special_mission = SpecialMission::cancelMission($system, $player, $player->special_mission);
+    if (isset($_GET['cancelmission']) && $player->special_mission_id) {
+        SpecialMission::cancelMission($system, $player, $player->special_mission_id);
+    }
+
+    if($player->special_mission_id && $special_mission == null) {
+        $special_mission = new SpecialMission($system, $player, $player->special_mission_id);
     }
 
     $system->printMessage();
