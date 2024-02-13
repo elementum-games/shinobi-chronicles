@@ -537,33 +537,20 @@ class SpecialMission {
         // Use Jutsu
         $this->player->getInventory();
 
-        $has_equipped_jutsu = count($this->player->equipped_jutsu) > 0;
-        $has_bloodline_jutsu = $this->player->bloodline && count($this->player->bloodline->jutsu) > 0;
-        $equipped_jutsu_chance = 100 - self::BLOODLINE_JUTSU_CHANCE;
         $extra_health_lost = 0; // if you can't use any jutsu, consumes double the HP cost
 
         $health_per_jutsu = $health_lost / self::JUTSU_USES_PER_FIGHT;
         $failed_jutsu_extra_health_lost = $health_per_jutsu * (self::FAILED_JUTSU_DAMAGE_PERCENT / 100);
 
         for($i = 0; $i < self::JUTSU_USES_PER_FIGHT; $i++) {
-            if($has_equipped_jutsu && (
-                mt_rand(1, 100) < $equipped_jutsu_chance || !$has_bloodline_jutsu
-            )) {
-                $jutsu_key = array_rand($this->player->equipped_jutsu);
-                $jutsu_id = $this->player->equipped_jutsu[$jutsu_key]['id'];
-                $jutsu = $this->player->jutsu[$jutsu_id] ?? null;
-            }
-            else if($has_bloodline_jutsu) {
-                $jutsu_key = array_rand($this->player->bloodline->jutsu);
-                $jutsu = $this->player->bloodline->jutsu[$jutsu_key];
-            }
-            else {
-                $jutsu = null;
-            }
-
+            $jutsu = $this->pickJutsuToUse();
             if($jutsu == null) {
                 $extra_health_lost += $failed_jutsu_extra_health_lost;
                 continue;
+            }
+
+            if($this->system->isDevEnvironment()) {
+                $battle_text .= "[br]Used {$jutsu->name} [lv {$jutsu->level}]";
             }
 
             $original_level = $jutsu->level;
@@ -581,12 +568,22 @@ class SpecialMission {
             }
         }
 
+        /*
+         * <b>Fatal error</b>:  Uncaught Error: Cannot use object of type Jutsu as array in /mnt/c/projects/shinobi-chronicles/classes/SpecialMission.php:638
+Stack trace:
+#0 [internal function]: SpecialMission-&gt;{closure}()
+#1 /mnt/c/projects/shinobi-chronicles/classes/SpecialMission.php(638): array_map()
+
+         */
+
         $health_lost += $extra_health_lost;
-        if($extra_health_lost > 0 && ($has_equipped_jutsu || $has_bloodline_jutsu)) {
-            $battle_text .= "[br]You ran out of chakra/stamina mid fight, and were wounded as you fought with only basic taijutsu.";
-        }
-        else if($extra_health_lost > 0) {
-            $battle_text .= "[br]You did not have any jutsu prepared, and were wounded as you fought with only basic taijutsu.";
+        if($extra_health_lost > 0) {
+            if($this->pickJutsuToUse() == null) {
+                $battle_text .= "[br]You did not have any jutsu prepared, and were wounded as you fought with only basic taijutsu.";
+            }
+            else {
+                $battle_text .= "[br]You ran out of chakra/stamina mid fight, and were wounded as you fought with only basic taijutsu.";
+            }
         }
 
         $this->player->updateInventory();
@@ -635,6 +632,52 @@ class SpecialMission {
         }
 
         return ([$battle_result, $battle_text]);
+    }
+
+    protected function pickJutsuToUse(): ?Jutsu {
+        $has_equipped_jutsu = count($this->player->equipped_jutsu) > 0;
+        $has_bloodline_jutsu = $this->player->bloodline && count($this->player->bloodline->jutsu) > 0;
+
+        $equipped_jutsu_ids = array_map(function($ej){ return $ej['id']; }, $this->player->equipped_jutsu);
+        $uncapped_jutsu_ids = array_filter($equipped_jutsu_ids, function($jutsu_id) {
+            return $this->player->hasJutsu($jutsu_id) && $this->player->jutsu[$jutsu_id]->level < 100;
+        });
+
+        $bloodline_jutsu_ids = array_map(function($bj){ return $bj->id; }, $this->player->bloodline?->jutsu ?? []);
+        $uncapped_bl_jutsu_ids = array_filter($bloodline_jutsu_ids, function($jutsu_id) {
+            return $this->player->bloodline->jutsu[$jutsu_id]->level < 100;
+        });
+
+        $use_bloodline_jutsu = $has_bloodline_jutsu && mt_rand(1, 100) <= self::BLOODLINE_JUTSU_CHANCE;
+
+        // First, try uncapped BL jutsu (if BL roll has been triggered)
+        if($use_bloodline_jutsu && count($uncapped_bl_jutsu_ids) > 0) {
+            $jutsu_key = array_rand($uncapped_bl_jutsu_ids);
+            $jutsu_id = $uncapped_bl_jutsu_ids[$jutsu_key];
+            $jutsu = $this->player->bloodline->jutsu[$jutsu_id];
+        }
+        // Then uncapped equipped jutsu
+        else if(count($uncapped_jutsu_ids) > 0) {
+            $jutsu_key = array_rand($uncapped_jutsu_ids);
+            $jutsu_id = $uncapped_jutsu_ids[$jutsu_key];
+            $jutsu = $this->player->jutsu[$jutsu_id] ?? null;
+        }
+        // Then capped BL jutsu (if BL roll has been triggered)
+        else if($use_bloodline_jutsu) {
+            $jutsu_id = array_rand($this->player->bloodline->jutsu);
+            $jutsu = $this->player->bloodline->jutsu[$jutsu_id];
+        }
+        // Then uncapped equipped jutsu
+        else if($has_equipped_jutsu) {
+            $jutsu_key = array_rand($this->player->equipped_jutsu);
+            $jutsu_id = $this->player->equipped_jutsu[$jutsu_key]['id'];
+            $jutsu = $this->player->jutsu[$jutsu_id] ?? null;
+        }
+        else {
+            $jutsu = null;
+        }
+
+        return $jutsu;
     }
 
     // Fails the mission

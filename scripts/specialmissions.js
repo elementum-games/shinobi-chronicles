@@ -42,8 +42,8 @@ let startTime = 0;
 var mission_id = 0;
 var apiUrl = `api/legacy_special_missions.php?mission_id=${encodeURIComponent(mission_id)}`;
 
-// Mission event cooldown + 100ms to help prevent network variance causing premature refreshes
-const serverRefreshIntervalMs = (missionEventDurationMs || 3000) + 100;
+// Mission event cooldown + 125ms to help prevent network variance causing premature refreshes
+const serverRefreshIntervalMs = (missionEventDurationMs || 3000) + 125;
 
 // Ping server to progress mission on cooldown
 let queryInterval = setInterval(() => getMissionData(), serverRefreshIntervalMs);
