@@ -15,7 +15,11 @@
     width: 90%;
     height: 45px;
     border: 1px solid #17161b;
+    cursor: pointer;
 }
+    .war_record:hover {
+        filter: url("#war_record_hover");
+    }
 .war_record_details_container {
     display: flex;
     flex-direction: column;
@@ -133,3 +137,113 @@
     .war_record_village.right .war_record_village_inner {
         background: #194932;
     }
+.village_warlog_container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    margin-top: -15px;
+}
+.village_warlog {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 420px;
+    height: 420px;
+    margin-top: 20px;
+    background: var(--village-warlog-background, #141317);
+}
+.village_warlog_header {
+    display: flex;
+    justify-content: center;
+    height: 55px;
+    box-sizing: border-box;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 95%
+}
+.village_warlog_header_name {
+    font-size: 20px;
+    font-family: var(--font-secondary);
+    color: #c7b070;
+    font-weight: bold;
+    font-variant: small-caps;
+    line-height: 30px;
+    padding-left: 10px;
+}
+.village_warlog_header_policy {
+    color: #b6bdd0;
+    font-size: 10px;
+    text-transform: uppercase;
+    line-height: 40px;
+    padding-left: 10px;
+}
+.village_warlog_header_war_score {
+    font-style: italic;
+    font-weight: bold;
+    font-size: 16px;
+    margin-left: auto;
+    padding-right: 40px;
+    text-align: right;
+    line-height: 30px;
+}
+    .village_warlog_header_war_score.attacker {
+        color: #ffcdcd;
+        text-shadow: 0 0 1px #ac3b3b, 0 0 2px #ac3b3b, 0 0 4px #ac3b3b;
+    }
+    .village_warlog_header_war_score.defender {
+        color: #a3ffc3;
+        text-shadow: 0 0 1px #006827, 0 0 2px #006827, 0 0 4px #006827;
+    }
+.village_warlog_chart_row {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 200px;
+    border-top: 1px solid #302c26;
+    border-bottom: 1px solid #302c26;
+    flex-direction: row;
+    gap: 40px;
+    width: 90%;
+}
+.village_warlog_chart_breakdown {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 25px;
+    width: 100%;
+    height: 100%;
+}
+.village_warlog_chart_breakdown_row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-variant: small-caps;
+}
+.village_warlog_details {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 20px;
+    box-sizing: border-box;
+    padding: 20px;
+    text-align: center;
+}
+.village_warlog_details_item {
+    flex-basis: 25%;
+}
+.village_warlog_details_label {
+    font-size: 12px;
+    font-weight: bold;
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+    color: var(--font-color-1);
+}
+.village_warlog_details_value {
+    color: var(--village-font-color-1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
