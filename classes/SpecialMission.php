@@ -406,17 +406,23 @@ class SpecialMission {
         if(SpecialMission::isMovingEvent($new_event)) {
             $event_text = "You moved to {$move_to_x}.{$move_to_y}";
 
-            $latest_log_index = array_key_first($this->log);
-            if(SpecialMission::isMovingEvent($this->log[$latest_log_index]['event'])) {
-                $this->log[$latest_log_index] = [
-                    'event' => $new_event,
-                    'timestamp_ms' => System::currentTimeMs(),
-                    'description' => $event_text,
-                ];
+            // Temporarily doing one-move-per-log on dev environment for network performance benchmarking
+            if($this->system->isDevEnvironment()) {
+                $this->logNewEvent($new_event, $event_text);
             }
             else {
-                $this->logNewEvent($new_event, "You set out towards the next location at {$this->target->x}.{$this->target->y}");
-                $this->logNewEvent($new_event, $event_text);
+                $latest_log_index = array_key_first($this->log);
+                if(SpecialMission::isMovingEvent($this->log[$latest_log_index]['event'])) {
+                    $this->log[$latest_log_index] = [
+                        'event' => $new_event,
+                        'timestamp_ms' => System::currentTimeMs(),
+                        'description' => $event_text,
+                    ];
+                }
+                else {
+                    $this->logNewEvent($new_event, "You set out towards the next location at {$this->target->x}.{$this->target->y}");
+                    $this->logNewEvent($new_event, $event_text);
+                }
             }
         }
         else {
