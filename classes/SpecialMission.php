@@ -14,6 +14,10 @@ class SpecialMission {
     // Number of jutsu to use per fight, picked at random from equipped and bloodline jutsu
     const JUTSU_USES_PER_FIGHT = 3;
     const JUTSU_COST_DISCOUNT_PERCENT = 25;
+
+    // % of Extra damage taken if a jutsu is failed (no jutsu equipped, or out of pools)
+    const FAILED_JUTSU_DAMAGE_PERCENT = 100;
+
     // % chance to use a bloodline jutsu instead of an equipped jutsu
     const BLOODLINE_JUTSU_CHANCE = 25;
 
@@ -34,26 +38,33 @@ class SpecialMission {
             'yen_per_battle' => 8,
             'yen_per_mission' => 70,
             'stats_per_mission' => 2,
-            'hp_lost_percent' => 2.5, // 22.5% => 67.5% lost
-            'intel_gain' => 12, // 9 fights
+            // 22.5% => 67.5% lost
+            'hp_lost_percent' => 2.5,
+            // 9 fights
+            'intel_gain' => 12,
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_EASY],
             'battles_per_region' => 3, // 3 regions
         ],
         SpecialMission::DIFFICULTY_NORMAL => [
-            'yen_per_battle' => 10, // 10 * 11 = 110
+            // 10 * 11 = 110
+            'yen_per_battle' => 10,
             'yen_per_mission' => 110,
             'stats_per_mission' => 4,
-            'hp_lost_percent' => 2.5, // 30% => 90% lost
+            // 2.9: 34.8% => 104.4% lost
+            'hp_lost_percent' => 2.9,
             'intel_gain' => 9, // 12 fights
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_NORMAL],
             'battles_per_region' => 4, // 3 regions
         ],
         SpecialMission::DIFFICULTY_HARD => [
-            'yen_per_battle' => 12, // 12 * 12.5 = 150
+            // 12 * 12.5 = 150
+            'yen_per_battle' => 12,
             'yen_per_mission' => 150,
             'stats_per_mission' => 6,
-            'hp_lost_percent' => 3.5, // 52.5% => 157.5% lost
-            'intel_gain' => 7, // 15 fights
+            // 3: 45% => 135%
+            'hp_lost_percent' => 3,
+            // 15 fights
+            'intel_gain' => 7,
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_HARD],
             'battles_per_region' => 5, // 3 regions
         ],
@@ -61,7 +72,8 @@ class SpecialMission {
             'yen_per_battle' => 14, // 20 * 14.28 = 285
             'yen_per_mission' => 200,
             'stats_per_mission' => 8,
-            'hp_lost_percent' => 4.5, // 76.5% => 229.5% lost
+            // 3.9: 66.3% => 198.9% lost
+            'hp_lost_percent' => 3.9,
             'intel_gain' => 6, // 17 fights
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_NIGHTMARE],
             'battles_per_region' => 6, // 3 regions
@@ -530,7 +542,8 @@ class SpecialMission {
         $equipped_jutsu_chance = 100 - self::BLOODLINE_JUTSU_CHANCE;
         $extra_health_lost = 0; // if you can't use any jutsu, consumes double the HP cost
 
-        $failed_jutsu_extra_health_lost = ($health_lost / self::JUTSU_USES_PER_FIGHT) / 2;
+        $health_per_jutsu = $health_lost / self::JUTSU_USES_PER_FIGHT;
+        $failed_jutsu_extra_health_lost = $health_per_jutsu * (self::FAILED_JUTSU_DAMAGE_PERCENT / 100);
 
         for($i = 0; $i < self::JUTSU_USES_PER_FIGHT; $i++) {
             if($has_equipped_jutsu && (
@@ -759,7 +772,7 @@ class SpecialMission {
             $stats_percent = self::BASE_STAT_CAP_PERCENT;
         }
         $adjusted_stats_percent = (
-            ($stats_percent - self::BASE_STAT_CAP_PERCENT - 1) /
+            ($stats_percent - self::BASE_STAT_CAP_PERCENT) /
             (100 - self::BASE_STAT_CAP_PERCENT)
         ) * 100;
         $inverse_stats_percent = 100 - $adjusted_stats_percent;
