@@ -220,9 +220,11 @@ function Village({
   }), villageTab == "warTable" && /*#__PURE__*/React.createElement(WarTable, {
     playerWarLogData: playerWarLogData,
     warRecordData: warRecordData,
+    strategicDataState: strategicDataState,
     villageAPI: villageAPI,
     handleErrors: handleErrors,
-    getVillageIcon: getVillageIcon
+    getVillageIcon: getVillageIcon,
+    getPolicyDisplayData: getPolicyDisplayData
   }), villageTab == "villageUpgrades" && /*#__PURE__*/React.createElement(VillageUpgrades, {
     playerID: playerID,
     playerSeatState: playerSeatState,
