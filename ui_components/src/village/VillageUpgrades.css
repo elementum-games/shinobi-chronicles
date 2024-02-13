@@ -19,7 +19,7 @@
 .building_item, .building_visual {
     width: 280px;
     height: 108px;
-    background-color: #25232d;
+    background-color: var(--building-item-background, #25232d);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -56,7 +56,7 @@
     font-weight: bold;
 }
 .upgrades_container {
-    background-color: #141317;
+    background-color: var(--upgrades-container-background, #141317);
     outline: 1px solid #1d1b26;
     outline-offset: 1px;
     border: 1px solid #4e4535;
@@ -80,7 +80,7 @@
 }
 .building_upkeep {
     text-transform: uppercase;
-    color: #c0c7dc;
+    color: var(--building-upkeep-text-color, #c0c7dc);
     font-size: 10px;
     line-height: 16px;
 }
@@ -116,7 +116,7 @@
 }
 .upgrade_set_description, .upgrade_description {
     font-size: 12px;
-    color: #daceb7;
+    color: var(--upgrade-description-text-color, #daceb7);
     height: 32px;
     text-align: center;
 }
@@ -198,7 +198,7 @@
     margin: -1px;
 }
 .building_construction_container, .upgrade_research_container {
-    background-color: #141317;
+    background-color: var(--construction-research-container-background, #141317);
     outline: 1px solid #1d1b26;
     outline-offset: 1px;
     border: 1px solid #4e4535;

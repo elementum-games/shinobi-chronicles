@@ -24,7 +24,8 @@ function Village({
     proposalData,
     strategicData,
     challengeData,
-    warLogData,
+    playerWarLogData,
+    warRecordData,
     kageRecords,
     buildingUpgradeData,
 }) {
@@ -219,7 +220,8 @@ function Village({
             }
             {villageTab == "warTable" &&
                 <WarTable
-                warLogData={warLogData}
+                playerWarLogData={playerWarLogData}
+                warRecordData={warRecordData}
                 villageAPI={villageAPI}
                 handleErrors={handleErrors}
                 getVillageIcon={getVillageIcon}

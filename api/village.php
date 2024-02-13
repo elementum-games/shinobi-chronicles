@@ -174,7 +174,13 @@ try {
         case 'GetGlobalWarLeaderboard':
             $page_number = (int)$_POST['page_number'];
             $VillageAPIResponse->response = [
-                'warLogData' => VillageApiPresenter::warLogDataResponse($system, $player, $page_number),
+                'warLogData' => VillageApiPresenter::playerWarLogDataResponse($system, $player, $page_number),
+            ];
+            break;
+        case 'GetWarRecords':
+            $page_number = (int)$_POST['page_number'];
+            $VillageAPIResponse->response = [
+                'warRecordData' => VillageApiPresenter::warRecordDataResponse($system, $player, $page_number),
             ];
             break;
         // TODO: ALL OF THE BELOW MUST BE LOCKED BEHIND PROPOSALS AND CHECK USER PERMISSIONS

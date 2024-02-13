@@ -2264,10 +2264,10 @@ class VillageManager {
                     $relation_name = "Neutral";
                     break;
                 case VillageRelation::RELATION_ALLIANCE:
-                    $relation_name = VillageManager::VILLAGE_NAMES[$initiator_village_id] . "-" . VillageManager::VILLAGE_NAMES[$recipient_village_id] . " Alliance";
+                    $relation_name = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " - " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . " Alliance";
                     break;
                 case VillageRelation::RELATION_WAR:
-                    $relation_name = VillageManager::VILLAGE_NAMES[$initiator_village_id] . "-" . VillageManager::VILLAGE_NAMES[$recipient_village_id] . " War";
+                    $relation_name = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " - " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . " War";
                     break;
                 default:
                     break;
