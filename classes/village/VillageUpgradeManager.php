@@ -27,6 +27,8 @@ class VillageUpgradeManager {
                 village_id: $building['village_id'],
                 tier: $building['tier'],
                 health: $building['health'],
+                max_health: VillageBuildingConfig::BUILDING_MAX_HEALTH[$building['key']][$building['tier']],
+                defense: $building['defense'],
                 status: $building['status'],
                 construction_progress: $building['construction_progress'],
                 construction_progress_required: $building['construction_progress_required'],
@@ -278,10 +280,7 @@ class VillageUpgradeManager {
             $village->buildings[$building_key]->construction_progress_required = $progress_required;
             $village->buildings[$building_key]->construction_progress_last_updated = time();
             $village->buildings[$building_key]->status = VillageBuildingConfig::BUILDING_STATUS_UPGRADING;
-            $system->db->query("INSERT INTO `village_buildings`
-                (`village_id`, `key`, `tier`, `health`, `status`, `construction_progress`, `construction_progress_required`, `construction_progress_last_updated`)
-                VALUES ({$village->village_id}, '{$building_key}', 0, 0, '" . VillageBuildingConfig::BUILDING_STATUS_DEFAULT . "', 0, {$progress_required}, " . time() . ")
-            ");
+            $system->db->query("UPDATE `village_buildings` SET `construction_progress` = 0, `construction_progress_required` = {$progress_required}, `construction_progress_last_updated` = " . time() . ", `status` = '" . VillageBuildingConfig::BUILDING_STATUS_UPGRADING . "' WHERE `id` = {$village->buildings[$building_key]->id}");
             return "Construction started for " . VillageBuildingConfig::BUILDING_NAMES[$building_key] . "!";
         }
     }

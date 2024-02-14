@@ -17,12 +17,14 @@ final class VillageUpgradeMigration extends AbstractMigration
             `key` VARCHAR(50) NOT NULL,
             `village_id` INT(11) NOT NULL ,
             `tier` INT(11) NOT NULL DEFAULT '0',
-            `health` INT(11) NOT NULL DEFAULT '0',
+            `health` INT(11) NOT NULL DEFAULT '125000',
+            `defense` INT(11) NOT NULL DEFAULT '100',
             `status` VARCHAR(50) NOT NULL DEFAULT 'default',
             `construction_progress` INT(11) NULL DEFAULT NULL,
             `construction_progress_required` INT(11) NULL DEFAULT NULL,
             `construction_progress_last_updated` INT(11) NULL DEFAULT NULL,
-            PRIMARY KEY (`id`));
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `unique_key_village_id` (`key`, `village_id`));
 
             -- Create table village_upgrades
             CREATE TABLE `village_upgrades`
@@ -34,7 +36,8 @@ final class VillageUpgradeMigration extends AbstractMigration
             `research_progress` INT(11) NULL DEFAULT NULL,
             `research_progress_required` INT(11) NULL DEFAULT NULL,
             `research_progress_last_updated` INT(11) NULL DEFAULT NULL,
-            PRIMARY KEY (`id`));
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `unique_key_village_id` (`key`, `village_id`));
 
             -- Alter table region_locations
             ALTER TABLE `region_locations` ADD `stability` INT(11) DEFAULT 0;
@@ -116,18 +119,6 @@ final class VillageUpgradeMigration extends AbstractMigration
             INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('ANBU_HQ', '5', '0');
             INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('SHRINE', '5', '0');
             INSERT INTO `village_buildings` (`key`, `village_id`, `tier`) VALUES ('RAMEN_STAND', '5', '0');
-
-            -- Fill village_upgrades default
-            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('RESEARCH_I', '1', 'active');
-            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('CONSTRUCTION_I', '1', 'active');
-            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('RESEARCH_I', '2', 'active');
-            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('CONSTRUCTION_I', '2', 'active');
-            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('RESEARCH_I', '3', 'active');
-            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('CONSTRUCTION_I', '3', 'active');
-            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('RESEARCH_I', '4', 'active');
-            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('CONSTRUCTION_I', '4', 'active');
-            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('RESEARCH_I', '5', 'active');
-            INSERT INTO `village_upgrades` (`key`, `village_id`, `status`) VALUES ('CONSTRUCTION_I', '5', 'active');
 
             -- Update region_location names
             UPDATE region_locations SET name = 'Ishiyama Castle' WHERE `region_location_id` = 16;
