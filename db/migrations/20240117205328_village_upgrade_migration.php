@@ -42,6 +42,8 @@ final class VillageUpgradeMigration extends AbstractMigration
             -- Alter table region_locations
             ALTER TABLE `region_locations` ADD `stability` INT(11) DEFAULT 0;
             ALTER TABLE `region_locations` CHANGE `id` `region_location_id` INT(11) NOT NULL AUTO_INCREMENT;
+            ALTER TABLE `region_locations` ADD `rebellion_active` TINYINT(1) NOT NULL DEFAULT '0';
+            ALTER TABLE `region_locations` ADD `background_image` VARCHAR(100) NOT NULL;
 
             -- Rename table operations
             RENAME TABLE `operations` TO `war_actions`;
@@ -65,12 +67,6 @@ final class VillageUpgradeMigration extends AbstractMigration
             -- Alter table village_war_logs
             ALTER TABLE `village_war_logs` ADD `stability_gained` INT(11) NOT NULL DEFAULT '0';
             ALTER TABLE `village_war_logs` ADD `stability_reduced` INT(11) NOT NULL DEFAULT '0';
-
-            -- Alter table region_locations
-            ALTER TABLE `region_locations` ADD `rebellion_active` TINYINT(1) NOT NULL DEFAULT '0';
-
-            -- Alter table region_locations
-            ALTER TABLE `region_locations` ADD `background_image` VARCHAR(100) NOT NULL;
 
             -- Use occupying_village_id as source of truth for region_locations
             UPDATE region_locations
@@ -153,6 +149,7 @@ final class VillageUpgradeMigration extends AbstractMigration
 
             -- Update columns on region_locations
             ALTER TABLE `region_locations` DROP `stability`;
+            ALTER TABLE `region_locations` DROP `background_image`;
             ALTER TABLE `region_locations` CHANGE `region_location_id` `id` INT(11) NOT NULL AUTO_INCREMENT;
 
             -- Rename column operation_id
