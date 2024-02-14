@@ -35,9 +35,6 @@ export function VillageUpgrades({
         }
       });
     });
-    return_string += materials_cost + " materials, ";
-    return_string += food_cost + " food, ";
-    return_string += wealth_cost + " wealth ";
     return {
       materials: materials_cost,
       food: food_cost,
@@ -153,6 +150,8 @@ export function VillageUpgrades({
     setSelectedBuilding(building);
   };
   const renderBuildingDetails = () => {
+    const upkeep = getBuildingUpkeep(selectedBuilding);
+    const construction_progress_percent = selectedBuilding.construction_progress / selectedBuilding.construction_progress_required * 100;
     return /*#__PURE__*/React.createElement("div", {
       className: "building_details"
     }, /*#__PURE__*/React.createElement("div", {
@@ -165,19 +164,70 @@ export function VillageUpgrades({
     })), /*#__PURE__*/React.createElement("div", {
       className: "building_details_contents"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "building_details_contents_row",
-      style: {
-        flex: 1
-      }
+      className: "building_details_info_row"
     }, /*#__PURE__*/React.createElement("div", {
       className: "building_info"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "building_info_header_row"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "building_info_name"
+    }, selectedBuilding.tier == 0 && "Basic " + selectedBuilding.name, selectedBuilding.tier > 0 && "Tier " + selectedBuilding.tier + " " + selectedBuilding.name), /*#__PURE__*/React.createElement("div", {
+      className: "building_info_phrase"
+    }, selectedBuilding.phrase)), /*#__PURE__*/React.createElement("div", {
+      className: "building_info_health_row"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "building_info_health_bar"
     }), /*#__PURE__*/React.createElement("div", {
+      className: "building_info_health_label_row"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "building_info_health_label"
+    }, "building health"), /*#__PURE__*/React.createElement("div", {
+      className: "building_info_health_values"
+    }, selectedBuilding.health, " / ", selectedBuilding.max_health), /*#__PURE__*/React.createElement("div", {
+      className: "building_info_defense"
+    }, "defense ", selectedBuilding.defense))), /*#__PURE__*/React.createElement("div", {
+      className: "building_info_description"
+    }, selectedBuilding.description)), /*#__PURE__*/React.createElement("div", {
       className: "building_upkeep"
-    })), /*#__PURE__*/React.createElement("div", {
-      className: "building_details_contents_row",
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "building_upkeep_cost_column"
+    }, /*#__PURE__*/React.createElement("span", {
       style: {
-        flex: 0
+        color: "#e98b99"
       }
+    }, upkeep.materials), /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: "#e98b99"
+      }
+    }, upkeep.food), /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: "#e98b99"
+      }
+    }, upkeep.wealth)), /*#__PURE__*/React.createElement("div", {
+      className: "building_upkeep_label_column"
+    }, /*#__PURE__*/React.createElement("img", {
+      src: "/images/icons/materials.png",
+      alt: "materials",
+      style: {
+        maxHeight: "20px"
+      }
+    }), /*#__PURE__*/React.createElement("img", {
+      src: "/images/icons/food.png",
+      alt: "food",
+      style: {
+        maxHeight: "19px",
+        width: "15px"
+      }
+    }), /*#__PURE__*/React.createElement("img", {
+      src: "/images/icons/wealth.png",
+      alt: "wealth",
+      style: {
+        maxHeight: "20px"
+      }
+    })), /*#__PURE__*/React.createElement("div", {
+      className: "building_upkeep_label"
+    }, "upkeep/day"))), /*#__PURE__*/React.createElement("div", {
+      className: "building_details_controls_row"
     }, /*#__PURE__*/React.createElement("div", {
       className: "building_controls_container"
     }, /*#__PURE__*/React.createElement("div", {
@@ -185,8 +235,13 @@ export function VillageUpgrades({
     }, "upgrade to next tier"), /*#__PURE__*/React.createElement("div", {
       className: "building_controls"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "building_upgrade_requirements"
-    }, /*#__PURE__*/React.createElement("span", {
+      className: "building_upgrade_requirements",
+      style: {
+        background: selectedBuilding.status === "upgrading" ? `linear-gradient(to right, #362a4c 0%, #4c1f2f ${(100 - construction_progress_percent) / 2}%, #2d1d25 ${100 - construction_progress_percent}%, transparent ${(100 - construction_progress_percent) / 2}%, #2d1d25 ${100 - construction_progress_percent}%, transparent ${construction_progress_percent}%` : ""
+      }
+    }, selectedBuilding.tier == 3 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", null, "No upgrades available")), selectedBuilding.status === "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+      className: "construction_progress_text"
+    }, selectedBuilding.construction_time_remaining)), selectedBuilding.tier < 3 && selectedBuilding.status !== "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
       style: {
         fontSize: "10px",
         lineHeight: "16px"
@@ -227,7 +282,7 @@ export function VillageUpgrades({
       style: {
         height: "16px"
       }
-    }), /*#__PURE__*/React.createElement("span", null, selectedBuilding.construction_time, " ", selectedBuilding.construction_time > 1 ? " days" : " day")), /*#__PURE__*/React.createElement("div", {
+    }), /*#__PURE__*/React.createElement("span", null, selectedBuilding.construction_time, " ", selectedBuilding.construction_time > 1 ? " days" : " day"))), /*#__PURE__*/React.createElement("div", {
       className: "building_buttons_container"
     }, selectedBuilding.status === "default" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, !!selectedBuilding.requirements_met && current_materials > selectedBuilding.materials_construction_cost && current_food > selectedBuilding.food_construction_cost && current_wealth > selectedBuilding.wealth_construction_cost ? /*#__PURE__*/React.createElement("div", {
       className: "construction_begin_button",

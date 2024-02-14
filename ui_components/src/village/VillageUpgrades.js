@@ -35,9 +35,6 @@ export function VillageUpgrades({
                 }
             });
         });
-        return_string += materials_cost + " materials, ";
-        return_string += food_cost + " food, ";
-        return_string += wealth_cost + " wealth ";
         return {
             materials: materials_cost,
             food: food_cost,
@@ -165,32 +162,82 @@ export function VillageUpgrades({
         setSelectedBuilding(building);
     };
     const renderBuildingDetails = () => {
+        const upkeep = getBuildingUpkeep(selectedBuilding);
+        const construction_progress_percent = (selectedBuilding.construction_progress / selectedBuilding.construction_progress_required) * 100;
         return (
             <div className="building_details">
                 <div className="building_visual">
                     <div className="building_visual_inner" style={{ background: "url(/images/building_backgrounds/placeholderbuilding.jpg)" }}></div>
                 </div>
                 <div className="building_details_contents">
-                    <div className="building_details_contents_row" style={{flex: 1}}>
+                    <div className="building_details_info_row">
                         <div className="building_info">
+                            <div className="building_info_header_row">
+                                <div className="building_info_name">
+                                    {selectedBuilding.tier == 0 &&
+                                        "Basic " + selectedBuilding.name
+                                    }
+                                    {selectedBuilding.tier > 0 &&
+                                        "Tier " + selectedBuilding.tier + " " + selectedBuilding.name
+                                    }
+                                </div>
+                                <div className="building_info_phrase">
+                                    {selectedBuilding.phrase}
+                                </div>
+                            </div>
+                            <div className="building_info_health_row">
+                                <div className="building_info_health_bar">
+                                </div>
+                                <div className="building_info_health_label_row">
+                                    <div className="building_info_health_label">building health</div>
+                                    <div className="building_info_health_values">{selectedBuilding.health} / {selectedBuilding.max_health}</div>
+                                    <div className="building_info_defense">defense {selectedBuilding.defense}</div>
+                                </div>
+                            </div>
+                            <div className="building_info_description">{selectedBuilding.description}</div>
                         </div>
                         <div className="building_upkeep">
+                            <div className="building_upkeep_cost_column">
+                                <span style={{ color: "#e98b99" }}>{upkeep.materials}</span>
+                                <span style={{ color: "#e98b99" }}>{upkeep.food}</span>
+                                <span style={{ color: "#e98b99" }}>{upkeep.wealth}</span>
+                            </div>
+                            <div className="building_upkeep_label_column">
+                                <img src="/images/icons/materials.png" alt="materials" style={{ maxHeight: "20px" }} />
+                                <img src="/images/icons/food.png" alt="food" style={{ maxHeight: "19px", width: "15px" }} />
+                                <img src="/images/icons/wealth.png" alt="wealth" style={{ maxHeight: "20px" }} />
+                            </div>
+                            <div className="building_upkeep_label">upkeep/day</div>
                         </div>
                     </div>
-                    <div className="building_details_contents_row" style={{flex: 0}}>
+                    <div className="building_details_controls_row">
                         <div className="building_controls_container">
                             <div className="building_controls_label">upgrade to next tier</div>
                             <div className="building_controls">
-                                <div className="building_upgrade_requirements">
-                                    <span style={{ fontSize: "10px", lineHeight: "16px" }}>upgrade cost: </span>
-                                    <img src="/images/icons/materials.png" alt="materials" style={{ height: "16px" }} />
-                                    <span style={{ color: (current_materials > selectedBuilding.materials_construction_cost ? "#96eeaf" : "#e98b99") }}>{selectedBuilding.materials_construction_cost}</span>
-                                    <img src="/images/icons/food.png" alt="food" style={{ height: "16px" }} />
-                                    <span style={{ color: (current_food > selectedBuilding.food_construction_cost ? "#96eeaf" : "#e98b99") }}>{selectedBuilding.food_construction_cost}</span>
-                                    <img src="/images/icons/wealth.png" alt="wealth" style={{ height: "16px" }} />
-                                    <span style={{ color: (current_wealth > selectedBuilding.wealth_construction_cost ? "#96eeaf" : "#e98b99") }}>{selectedBuilding.wealth_construction_cost}</span>
-                                    <img src="images/v2/icons/timer.png" alt="materials" style={{ height: "16px" }} />
-                                    <span>{selectedBuilding.construction_time} {selectedBuilding.construction_time > 1 ? " days" : " day"}</span>
+                                <div className="building_upgrade_requirements" style={{ background: (selectedBuilding.status === "upgrading" ? `linear-gradient(to right, #362a4c 0%, #4c1f2f ${(100 - construction_progress_percent) / 2}%, #2d1d25 ${(100 - construction_progress_percent)}%, transparent ${(100 - construction_progress_percent) / 2}%, #2d1d25 ${(100 - construction_progress_percent)}%, transparent ${construction_progress_percent}%` : "") }}>
+                                    {selectedBuilding.tier == 3 &&
+                                        <>
+                                            <span>No upgrades available</span>
+                                        </>
+                                    }
+                                    {selectedBuilding.status === "upgrading" &&
+                                        <>
+                                            <div className="construction_progress_text">{selectedBuilding.construction_time_remaining}</div>
+                                        </>
+                                    }
+                                    {(selectedBuilding.tier < 3 && selectedBuilding.status !== "upgrading") &&
+                                        <>                                   
+                                            <span style={{ fontSize: "10px", lineHeight: "16px" }}>upgrade cost: </span>
+                                            <img src="/images/icons/materials.png" alt="materials" style={{ height: "16px" }} />
+                                            <span style={{ color: (current_materials > selectedBuilding.materials_construction_cost ? "#96eeaf" : "#e98b99") }}>{selectedBuilding.materials_construction_cost}</span>
+                                            <img src="/images/icons/food.png" alt="food" style={{ height: "16px" }} />
+                                            <span style={{ color: (current_food > selectedBuilding.food_construction_cost ? "#96eeaf" : "#e98b99") }}>{selectedBuilding.food_construction_cost}</span>
+                                            <img src="/images/icons/wealth.png" alt="wealth" style={{ height: "16px" }} />
+                                            <span style={{ color: (current_wealth > selectedBuilding.wealth_construction_cost ? "#96eeaf" : "#e98b99") }}>{selectedBuilding.wealth_construction_cost}</span>
+                                            <img src="images/v2/icons/timer.png" alt="materials" style={{ height: "16px" }} />
+                                            <span>{selectedBuilding.construction_time} {selectedBuilding.construction_time > 1 ? " days" : " day"}</span>
+                                        </>
+                                    }
                                 </div>
                                 <div className="building_buttons_container">
                                     {(selectedBuilding.status === "default" && playerSeatState.seat_type === "kage") &&
