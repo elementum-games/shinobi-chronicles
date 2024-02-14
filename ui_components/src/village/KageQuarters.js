@@ -745,15 +745,6 @@ export function KageQuarters({
                                 </div>
                             </div>
                             <div className="village_policy_penalty_container">
-                                {policyDisplay.resources.map((resource, index) => (
-                                    <div key={index} className="policy_resource_item">
-                                        <svg width="16" height="16" viewBox="0 0 100 100">
-                                            <polygon points="25,20 50,45 25,70 0,45" fill="#414b8c" />
-                                            <polygon points="25,0 50,25 25,50 0,25" fill="#5964a6" />
-                                        </svg>
-                                        <div className="policy_resource_text">{resource}</div>
-                                    </div>
-                                ))}
                                 {policyDisplay.penalties.map((penalty, index) => (
                                     <div key={index} className="policy_penalty_item">
                                         <svg width="16" height="16" viewBox="0 0 100 100">

@@ -1,13 +1,13 @@
 import { apiFetch } from "../utils/network.js";
 import { ModalProvider } from "../utils/modalContext.js";
 export function WarTable({
-  playerWarLogData,
+  warLogData,
   villageAPI,
   handleErrors,
   getVillageIcon
 }) {
-  const [playerWarLog, setPlayerWarLog] = React.useState(playerWarLogData.player_war_log);
-  const [globalLeaderboardWarLogs, setGlobalLeaderboardWarLogs] = React.useState(playerWarLogData.global_leaderboard_war_logs);
+  const [playerWarLog, setPlayerWarLog] = React.useState(warLogData.player_war_log);
+  const [globalLeaderboardWarLogs, setGlobalLeaderboardWarLogs] = React.useState(warLogData.global_leaderboard_war_logs);
   const [globalLeaderboardPageNumber, setGlobalLeaderboardPageNumber] = React.useState(1);
   function getVillageBanner(village_id) {
     switch (village_id) {
