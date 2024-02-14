@@ -35,6 +35,82 @@ class VillageBuildingConfig {
     const BUILDING_REQUIREMENT_BUILDINGS = "BUILDINGS";
     const BUILDING_REQUIREMENT_UPGRADES = "UPGRADES";
 
+    /* building healthed indexed by building ID, then tier */
+    const BUILDING_MAX_HEALTH = [
+        self::BUILDING_VILLAGE_HQ => [
+            0 => 125000,
+            1 => 250000,
+            2 => 500000,
+            3 => 750000,
+        ],
+        self::BUILDING_WORKSHOP => [
+            0 => 125000,
+            1 => 250000,
+            2 => 500000,
+            3 => 750000,
+        ],
+        self::BUILDING_ACADEMY => [
+            0 => 125000,
+            1 => 250000,
+            2 => 500000,
+            3 => 750000,
+        ],
+        self::BUILDING_HOSPITAL => [
+            0 => 125000,
+            1 => 250000,
+            2 => 500000,
+            3 => 750000,
+        ],
+        self::BUILDING_ANBU_HQ => [
+            0 => 125000,
+            1 => 250000,
+            2 => 500000,
+            3 => 750000,
+        ],
+        self::BUILDING_MARKET => [
+            0 => 125000,
+            1 => 250000,
+            2 => 500000,
+            3 => 750000,
+        ],
+        self::BUILDING_SHRINE => [
+            0 => 125000,
+            1 => 250000,
+            2 => 500000,
+            3 => 750000,
+        ],
+        self::BUILDING_RAMEN_STAND => [
+            0 => 125000,
+            1 => 250000,
+            2 => 500000,
+            3 => 750000,
+        ],
+    ];
+
+    /* building description indexed by building ID */
+    const BUILDING_DESCRIPTIONS = [
+        self::BUILDING_VILLAGE_HQ => "The central hub of the village, where all other buildings are managed.",
+        self::BUILDING_WORKSHOP => "The workshop is where all the village's tools and equipment are made.",
+        self::BUILDING_ACADEMY => "The academy is where the village's shinobi are trained.",
+        self::BUILDING_HOSPITAL => "The hospital is where the village's injured shinobi are treated.",
+        self::BUILDING_ANBU_HQ => "The ANBU HQ is where the village's elite shinobi are trained and managed.",
+        self::BUILDING_MARKET => "The market is where the village's resources are traded.",
+        self::BUILDING_SHRINE => "The shrine is where the village's spiritual needs are met.",
+        self::BUILDING_RAMEN_STAND => "The ramen stand is where the village's shinobi go to eat.",
+    ];
+
+    /* building poetic phrase indexed by building ID */
+    const BUILDING_PHRASE = [
+        self::BUILDING_VILLAGE_HQ => "The heart of the village.",
+        self::BUILDING_WORKSHOP => "The hands of the village.",
+        self::BUILDING_ACADEMY => "The mind of the village.",
+        self::BUILDING_HOSPITAL => "The soul of the village.",
+        self::BUILDING_ANBU_HQ => "The shadow of the village.",
+        self::BUILDING_MARKET => "The lifeblood of the village.",
+        self::BUILDING_SHRINE => "The spirit of the village.",
+        self::BUILDING_RAMEN_STAND => "The belly of the village.",
+    ];
+
     /* construction cost indexed by building ID, then tier, then resource type */
     const BUILDING_CONSTRUCTION_COST = [
         self::BUILDING_VILLAGE_HQ => [
