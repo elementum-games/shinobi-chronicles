@@ -910,8 +910,8 @@ class SpecialMission {
             throw new RuntimeException('Must be in village to begin a Special Mission!');
         }
 
-        // Clean up old special missions
-        $system->db->query("DELETE FROM `special_missions` WHERE `user_id`={$player->user_id} AND `start_time` < " . (time() - 3600));
+        // Clean up old special missions (>6 hours)
+        $system->db->query("DELETE FROM `special_missions` WHERE `user_id`={$player->user_id} AND `start_time` < " . (time() - 21600));
 
         $timestamp = time();
 
