@@ -23,7 +23,7 @@ function Village({
     proposalData,
     strategicData,
     challengeData,
-    playerWarLogData,
+    warLogData,
     kageRecords,
 }) {
     const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
@@ -92,9 +92,8 @@ function Village({
                 data.name = "From the Ashes";
                 data.phrase = "bonds forged, courage shared.";
                 data.description = "In unity, find the strength to overcome.\nOne village, one heart, one fight.";
-                data.bonuses = ["25% increased Caravan speed", "15% increased Construction speed", "15% increased Research speed", "50% reduced cost for village transfers"];
-                data.resources = ["+70 Materials production / hour", "+100 Food production / hour", "+40 Wealth production / hour"];
-                data.penalties = ["Cannot declare War"];
+                data.bonuses = ["25% increased Caravan speed", "+25 base resource production", "+5% training speed", "50% reduced cost for village transfers"];
+                data.penalties = ["-30 Materials/hour", "-50 Food/hour", "-20 Wealth/hour", "Cannot declare War"];
                 data.glowClass = "growth_glow";
                 break;
             case 2:
@@ -102,9 +101,8 @@ function Village({
                 data.name = "Eye of the Storm";
                 data.phrase = "half truths, all lies.";
                 data.description = "Become informants dealing in truths and lies.\nDeceive, divide and destroy.";
-                data.bonuses = ["25% increased Infiltrate speed", "+1 Defense/Stability reduction from Infiltrate", "+1 Stability reduction from Infiltrate", "+1 Stealth"];
-                data.resources = ["+70 Materials production / hour", "+40 Food production / hour", "+100 Wealth production / hour"];
-                data.penalties = [];
+                data.bonuses = ["25% increased Infiltrate speed", "+1 Defense reduction from Infiltrate", "+1 Stealth", "+10 Loot Capacity"];
+                data.penalties = ["-25 Materials/hour", "-25 Food/hour", "-50 Wealth/hour"];
                 data.glowClass = "espionage_glow";
                 break;
             case 3:
@@ -112,9 +110,8 @@ function Village({
                 data.name = "Fortress of Solitude";
                 data.phrase = "vigilant minds, enduring hearts.";
                 data.description = "Show the might of will unyielding.\nPrepare, preserve, prevail.";
-                data.bonuses = ["25% increased Reinforce speed", "+1 Defense gain from Reinforce", "+1 Stability gain from Reinforce", "+1 Scouting"];
-                data.resources = ["+100 Materials production / hour", "+70 Food production / hour", "+40 Wealth production / hour"];
-                data.penalties = [];
+                data.bonuses = ["25% increased Reinforce speed", "+1 Defense gain from Reinforce", "+1 Scouting", "Increased Patrol strength"];
+                data.penalties = ["-45 Materials/hour", "-30 Food/hour", "-25 Wealth/hour"];
                 data.glowClass = "defense_glow";
                 break;
             case 4:
@@ -122,9 +119,8 @@ function Village({
                 data.name = "Forged in Flames";
                 data.phrase = "blades sharp, minds sharper.";
                 data.description = "Lead your village on the path of a warmonger.\nFeel no fear, no hesitation, no doubt.";
-                data.bonuses = ["25% increased Raid speed", "+1 Defense reduction from Raid", "+1 Stability reduction from Raid", "+1 Village Point from PvP"];
-                data.resources = ["+70 Materials production / hour", "+70 Food production / hour", "+70 Wealth production / hour"];
-                data.penalties = ["Cannot form Alliances"];
+                data.bonuses = ["25% increased Raid speed", "+1 Defense reduction from Raid", "+1 Village Point from PvP", "Faster Patrol respawn"];
+                data.penalties = ["-30 Materials/hour", "-40 Food/hour", "-30 Wealth/hour", "Cannot form Alliances"];
                 data.glowClass = "war_glow";
                 break;
             case 5:
@@ -148,7 +144,7 @@ function Village({
                 <div className="nav_button" onClick={() => setVillageTab("villageHQ")}>village hq</div>
                 <div className="nav_button" onClick={() => setVillageTab("worldInfo")}>world info</div>
                 <div className="nav_button" onClick={() => setVillageTab("warTable")}>war table</div>
-                <div className="nav_button" onClick={() => setVillageTab("villageUpgrades")}>upgrades</div>
+                <div className="nav_button disabled">members & teams</div>
                 <div className={playerSeatState.seat_id != null ? "nav_button" : "nav_button disabled"} onClick={() => setVillageTab("kageQuarters")}>kage's quarters</div>
             </div>
             {villageTab == "villageHQ" &&
@@ -216,8 +212,7 @@ function Village({
             }
             {villageTab == "warTable" &&
                 <WarTable
-                playerWarLogData={playerWarLogData}
-                strategicDataState={strategicDataState}
+                warLogData={warLogData}
                 villageAPI={villageAPI}
                 handleErrors={handleErrors}
                 getVillageIcon={getVillageIcon}
