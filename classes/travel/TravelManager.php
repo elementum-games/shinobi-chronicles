@@ -1118,7 +1118,7 @@ class TravelManager {
             if ($distance <= self::DISPLAY_RADIUS) {
                 switch ($obj['type']) {
                     case "castle":
-                        $default_image = "/images/map/icons/castles/Castle3.png";
+                        $default_image = "/images/map/icons/castle.png";
                         $objectives[] = new RegionObjective(
                             id: $obj['region_location_id'],
                             name: $obj['name'],
@@ -1159,7 +1159,7 @@ class TravelManager {
                         );
                     case "village":
                         if ($distance <= $this->user->scout_range) {
-                            $default_image = "/images/map/icons/Untitled3.png";
+                            $default_image = "/images/map/icons/village.png";
                             $objectives[] = new RegionObjective(
                                 id: $obj['region_location_id'],
                                 name: $obj['name'],

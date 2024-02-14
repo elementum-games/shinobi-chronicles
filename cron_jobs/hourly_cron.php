@@ -128,6 +128,8 @@ function hourlyCron(System $system, $debug = true): void
                 if ($building->construction_progress > $building->construction_progress_required) {
                     $building->status = VillageBuildingConfig::BUILDING_STATUS_DEFAULT;
                     $building->tier += 1;
+                    $building->construction_progress = 0;
+                    $building->health = VillageBuildingConfig::BUILDING_MAX_HEALTH[$building->key][$building->tier];
                     $queries[] = "UPDATE `village_buildings` SET `status` = '{$building->status}', `construction_progress` = {$building->construction_progress}, `construction_progress_last_updated` = {$building->construction_progress_last_updated}, `tier` = {$building->tier} WHERE `village_id` = {$village->village_id} AND `id` = {$building->id}";
                 } else {
                     $queries[] = "UPDATE `village_buildings` SET `construction_progress` = {$building->construction_progress}, `construction_progress_last_updated` = {$building->construction_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$building->id}";

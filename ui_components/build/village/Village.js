@@ -228,9 +228,12 @@ function Village({
   }), villageTab == "villageUpgrades" && /*#__PURE__*/React.createElement(VillageUpgrades, {
     playerID: playerID,
     playerSeatState: playerSeatState,
+    villageName: villageName,
     villageAPI: villageAPI,
     buildingUpgradeDataState: buildingUpgradeDataState,
-    setBuildingUpgradeDataState: setBuildingUpgradeDataState
+    setBuildingUpgradeDataState: setBuildingUpgradeDataState,
+    resourceDataState: resourceDataState,
+    setResourceDataState: setResourceDataState
   }));
 }
 window.Village = Village;

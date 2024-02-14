@@ -233,9 +233,12 @@ function Village({
                 <VillageUpgrades
                 playerID={playerID}
                 playerSeatState={playerSeatState}
+                villageName={villageName}
                 villageAPI={villageAPI}
                 buildingUpgradeDataState={buildingUpgradeDataState}
                 setBuildingUpgradeDataState={setBuildingUpgradeDataState}
+                resourceDataState={resourceDataState}
+                setResourceDataState={setResourceDataState}
                 />
             }
         </ModalProvider>
