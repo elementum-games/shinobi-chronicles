@@ -155,12 +155,12 @@ final class VillageUpgradeMigration extends AbstractMigration
             ALTER TABLE `region_locations` DROP `stability`;
             ALTER TABLE `region_locations` CHANGE `region_location_id` `id` INT(11) NOT NULL AUTO_INCREMENT;
 
-            -- Rename table war_actions
-            RENAME TABLE `war_actions` TO `operations`;
-
             -- Rename column operation_id
             ALTER TABLE `war_actions` CHANGE `war_action_id` `operation_id` INT(11) NOT NULL AUTO_INCREMENT;
             ALTER TABLE `war_actions` DROP PRIMARY KEY, ADD PRIMARY KEY (`operation_id`);
+
+            -- Rename table war_actions
+            RENAME TABLE `war_actions` TO `operations`;
 
             -- Rename column war_action_id
             ALTER TABLE `users` CHANGE `war_action_id` `operation` INT(11) NOT NULL DEFAULT '0';
