@@ -40,7 +40,11 @@ function specialMissions() {
     }
 
     if($player->special_mission_id && $special_mission == null) {
-        $special_mission = new SpecialMission($system, $player, $player->special_mission_id);
+        $special_mission = SpecialMission::load($system, $player, $player->special_mission_id);
+        if($special_mission == null) {
+            $player->special_mission_id = 0;
+            $player->updateData();
+        }
     }
 
     $system->printMessage();

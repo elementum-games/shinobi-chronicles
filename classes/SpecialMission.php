@@ -221,9 +221,9 @@ class SpecialMission {
     private System $system;
 
     public int $mission_id;
-    private string $difficulty;
 
     public int $status;
+    private string $difficulty;
 
     public int $start_time;
     public int $end_time;
@@ -239,33 +239,32 @@ class SpecialMission {
     /**
      * @throws DatabaseDeadlockException
      */
-    public function __construct(System $system, User $player, int $mission_id) {
+    public function __construct(
+        System $system,
+        User $player,
+        int $mission_id,
+         int $status,
+         string $difficulty,
+         int $start_time,
+         int $end_time,
+         int $progress,
+        array $log,
+        int $reward,
+        ?SpecialMissionTarget $target
+    ) {
         $this->system = $system;
         $this->player = $player;
         $this->mission_id = $mission_id;
 
-        // GET MISSION DATA
-        $result = $this->system->db->query("SELECT * FROM `special_missions` 
-            WHERE `mission_id`={$this->mission_id}
-            AND `user_id`={$this->player->user_id}
-        ");
-        // Return if the mission doesn't exist
-        if ($this->system->db->last_num_rows == 0) {
-            return false;
-        }
+        $this->status = $status;
+        $this->difficulty = $difficulty;
+        $this->start_time = $start_time;
+        $this->end_time = $end_time;
+        $this->progress = $progress;
+        $this->log = $log;
+        $this->reward = $reward;
 
-        $mission_data = $this->system->db->fetch($result);
-
-        $this->status = $mission_data['status'];
-        $this->difficulty = $mission_data['difficulty'];
-        $this->start_time = $mission_data['start_time'];
-        $this->end_time = $mission_data['end_time'];
-        $this->progress = $mission_data['progress'];
-        $this->log = json_decode($mission_data['log'], true);
-        $this->reward = $mission_data['reward'];
-
-        $target_data = json_decode($mission_data['target'], true);
-        $this->target = $target_data ? SpecialMissionTarget::fromArray($target_data) : null;
+        $this->target = $target;
 
         $this->player_health = $this->player->health;
         $this->player_max_health = $this->player->max_health;
@@ -850,6 +849,41 @@ class SpecialMission {
         }
     }
 
+    /**
+     * @throws DatabaseDeadlockException
+     */
+    public static function load(System $system, User $player, int $mission_id): ?SpecialMission {
+        // GET MISSION DATA
+        $result = $system->db->query("SELECT * FROM `special_missions` 
+            WHERE `mission_id`={$mission_id}
+            AND `user_id`={$player->user_id}
+        ");
+
+        // Return if the mission doesn't exist
+        if ($system->db->last_num_rows == 0) {
+            return null;
+        }
+
+        $mission_data = $system->db->fetch($result);
+
+        $target_data = json_decode($mission_data['target'], true);
+        $target = $target_data ? SpecialMissionTarget::fromArray($target_data) : null;
+
+        return new SpecialMission(
+            system: $system,
+            player: $player,
+            mission_id: $mission_id,
+            status: $mission_data['status'],
+            difficulty: $mission_data['difficulty'],
+            start_time: $mission_data['start_time'],
+            end_time: $mission_data['end_time'],
+            progress: $mission_data['progress'],
+            log: json_decode($mission_data['log'], true),
+            reward: $mission_data['reward'],
+            target: $target
+        );
+    }
+
     // Cancel the mission
     public static function cancelMission(System $system, User $player, int $mission_id): bool {
         $timestamp = time();
@@ -860,6 +894,9 @@ class SpecialMission {
         return true;
     }
 
+    /**
+     * @throws DatabaseDeadlockException
+     */
     public static function startMission($system, User $player, $difficulty): SpecialMission {
         if ($player->special_mission_id != 0) {
             throw new RuntimeException('You cannot start multiple missions!');
@@ -898,7 +935,7 @@ class SpecialMission {
         $mission_id = $system->db->last_insert_id;
         $player->special_mission_id = $mission_id;
 
-        return new SpecialMission($system, $player, $mission_id);
+        return SpecialMission::load($system, $player, $mission_id);
     }
 
 }
