@@ -6,6 +6,7 @@
 ?>
 
 <link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/village/Village.css") ?>" />
+<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/utils/modal.css") ?>" />
 <div id="villageReactContainer"></div>
 <script type="module" src="<?= $system->getReactFile("village/Village") ?>"></script>
 <!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->
