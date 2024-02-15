@@ -283,7 +283,7 @@ class WarLogManager {
             $war_records[] = new WarRecordDto($relation, $attacker_war_log, $defender_war_log);
         }
         // pagination
-        $war_records = array_slice($war_records, ($page_number - 1) * self::WAR_LOGS_PER_PAGE, self::WAR_LOGS_PER_PAGE);
+        $war_records = array_slice($war_records, ($page_number - 1) * self::WAR_RECORDS_PER_PAGE, self::WAR_RECORDS_PER_PAGE);
         return $war_records;
     }
 
