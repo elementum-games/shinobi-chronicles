@@ -164,10 +164,68 @@ export function VillageUpgrades({
     const renderBuildingDetails = () => {
         const upkeep = getBuildingUpkeep(selectedBuilding);
         const construction_progress_percent = (selectedBuilding.construction_progress / selectedBuilding.construction_progress_required) * 100;
+        const renderHealthBar = () => {
+            const percentage = (selectedBuilding.health / selectedBuilding.max_health) * 100;
+            let barColor;
+            let strokeColor = '#2b2c2c';
+            if (percentage > 50) {
+                barColor = '#00b044';
+            } else if (percentage > 25) {
+                barColor = 'yellow';
+            } else {
+                barColor = 'red';
+            }
+            return (
+                <div className='building_health_bar'>
+                    <svg width="325" height="9">
+                        <g transform="skewX(-25)">
+                            <rect x="5" y="0" width="50" height="5" style={{ fill: strokeColor, stroke: strokeColor, strokeWidth: '0' }} />
+                        </g>
+                        <g transform="skewX(-25)">
+                            <rect x="5" y="0" width={percentage * 3.2} height="5" style={{ fill: barColor, stroke: strokeColor, strokeWidth: '0' }} />
+                        </g>
+                        <g transform="skewX(-25)">
+                            <rect x="5" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="15" y="0" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="25" y="0" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="35" y="0" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="45" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="55" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="65" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="75" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="85" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="95" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="105" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="115" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="125" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="135" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="145" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="155" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="165" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="175" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="185" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="195" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="205" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="215" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="225" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="235" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="245" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="255" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="265" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="275" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="285" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="295" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="305" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="315" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                        </g>
+                    </svg>
+                </div>
+            );
+        }
         return (
             <div className="building_details">
                 <div className="building_visual">
-                    <div className="building_visual_inner" style={{ background: "url(/images/building_backgrounds/placeholderbuilding.jpg)" }}></div>
+                    <div className="building_visual_inner" style={{ background: `url(${selectedBuilding.background_image}) center` }}></div>
                 </div>
                 <div className="building_details_contents">
                     <div className="building_details_info_row">
@@ -187,6 +245,7 @@ export function VillageUpgrades({
                             </div>
                             <div className="building_info_health_row">
                                 <div className="building_info_health_bar">
+                                    {renderHealthBar()}
                                 </div>
                                 <div className="building_info_health_label_row">
                                     <div className="building_info_health_label">building health</div>
@@ -227,7 +286,7 @@ export function VillageUpgrades({
                                     }
                                     {(selectedBuilding.tier < 3 && selectedBuilding.status !== "upgrading") &&
                                         <>                                   
-                                            <span style={{ fontSize: "10px", lineHeight: "16px" }}>upgrade cost: </span>
+                                            {/*<span style={{ fontSize: "10px", lineHeight: "16px" }}>upgrade cost: </span>*/}
                                             <img src="/images/icons/materials.png" alt="materials" style={{ height: "16px" }} />
                                             <span style={{ color: (current_materials > selectedBuilding.materials_construction_cost ? "#96eeaf" : "#e98b99") }}>{selectedBuilding.materials_construction_cost}</span>
                                             <img src="/images/icons/food.png" alt="food" style={{ height: "16px" }} />
@@ -431,7 +490,7 @@ export function VillageUpgrades({
                         {buildingUpgradeDataState
                             .map((building, index) => (
                                 <div key={building.key} className="building_item" onClick={() => buildingClickHandler(building)}>
-                                    <div className="building_item_inner" style={{ background: "url(/images/building_backgrounds/placeholderbuilding.jpg)" }}>
+                                    <div className="building_item_inner" style={{ background: `url(${building.background_image}) center` }}>
                                         {building.status === "upgrading" &&
                                             <>
                                                 <div className="construction_overlay"></div>
