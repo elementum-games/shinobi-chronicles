@@ -273,7 +273,8 @@ export function VillageUpgrades({
                         <div className="building_controls_container">
                             <div className="building_controls_label">upgrade to next tier</div>
                             <div className="building_controls">
-                                <div className="building_upgrade_requirements" style={{ background: (selectedBuilding.status === "upgrading" ? `linear-gradient(to right, #362a4c 0%, #4c1f2f ${(100 - construction_progress_percent) / 2}%, #2d1d25 ${(100 - construction_progress_percent)}%, transparent ${(100 - construction_progress_percent) / 2}%, #2d1d25 ${(100 - construction_progress_percent)}%, transparent ${construction_progress_percent}%` : "") }}>
+                                <div className="building_upgrade_requirements" style={{
+                                    background: (selectedBuilding.status === "upgrading" ? `linear-gradient(to right, #362a4c 0%, #4c1f2f ${(construction_progress_percent / 2)}%, #2d1d25 ${construction_progress_percent}%, transparent ${construction_progress_percent}%` : "") }}>
                                     {selectedBuilding.tier == 3 &&
                                         <>
                                             <span>No upgrades available</span>

@@ -659,7 +659,7 @@ export function VillageUpgrades({
     }, /*#__PURE__*/React.createElement("div", {
       className: "building_upgrade_requirements",
       style: {
-        background: selectedBuilding.status === "upgrading" ? `linear-gradient(to right, #362a4c 0%, #4c1f2f ${(100 - construction_progress_percent) / 2}%, #2d1d25 ${100 - construction_progress_percent}%, transparent ${(100 - construction_progress_percent) / 2}%, #2d1d25 ${100 - construction_progress_percent}%, transparent ${construction_progress_percent}%` : ""
+        background: selectedBuilding.status === "upgrading" ? `linear-gradient(to right, #362a4c 0%, #4c1f2f ${construction_progress_percent / 2}%, #2d1d25 ${construction_progress_percent}%, transparent ${construction_progress_percent}%` : ""
       }
     }, selectedBuilding.tier == 3 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", null, "No upgrades available")), selectedBuilding.status === "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "construction_progress_text"
