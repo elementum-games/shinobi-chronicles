@@ -152,6 +152,428 @@ export function VillageUpgrades({
   const renderBuildingDetails = () => {
     const upkeep = getBuildingUpkeep(selectedBuilding);
     const construction_progress_percent = selectedBuilding.construction_progress / selectedBuilding.construction_progress_required * 100;
+    const renderHealthBar = () => {
+      const percentage = selectedBuilding.health / selectedBuilding.max_health * 100;
+      let barColor;
+      let strokeColor = '#2b2c2c';
+      if (percentage > 50) {
+        barColor = '#00b044';
+      } else if (percentage > 25) {
+        barColor = 'yellow';
+      } else {
+        barColor = 'red';
+      }
+      return /*#__PURE__*/React.createElement("div", {
+        className: "building_health_bar"
+      }, /*#__PURE__*/React.createElement("svg", {
+        width: "325",
+        height: "9"
+      }, /*#__PURE__*/React.createElement("g", {
+        transform: "skewX(-25)"
+      }, /*#__PURE__*/React.createElement("rect", {
+        x: "5",
+        y: "0",
+        width: "50",
+        height: "5",
+        style: {
+          fill: strokeColor,
+          stroke: strokeColor,
+          strokeWidth: '0'
+        }
+      })), /*#__PURE__*/React.createElement("g", {
+        transform: "skewX(-25)"
+      }, /*#__PURE__*/React.createElement("rect", {
+        x: "5",
+        y: "0",
+        width: percentage * 3.2,
+        height: "5",
+        style: {
+          fill: barColor,
+          stroke: strokeColor,
+          strokeWidth: '0'
+        }
+      })), /*#__PURE__*/React.createElement("g", {
+        transform: "skewX(-25)"
+      }, /*#__PURE__*/React.createElement("rect", {
+        x: "5",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "15",
+        y: "0",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "25",
+        y: "0",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "35",
+        y: "0",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "45",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "55",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "65",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "75",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "85",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "95",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "105",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "115",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "125",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "135",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "145",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "155",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "165",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "175",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "185",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "195",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "205",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "215",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "225",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "235",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "245",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "255",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "265",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "275",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "285",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "295",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "305",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }), /*#__PURE__*/React.createElement("rect", {
+        x: "315",
+        y: "0",
+        rx: "2",
+        ry: "2",
+        width: "10",
+        height: "5",
+        style: {
+          fill: 'transparent',
+          stroke: strokeColor,
+          strokeWidth: '2'
+        }
+      }))));
+    };
     return /*#__PURE__*/React.createElement("div", {
       className: "building_details"
     }, /*#__PURE__*/React.createElement("div", {
@@ -159,7 +581,7 @@ export function VillageUpgrades({
     }, /*#__PURE__*/React.createElement("div", {
       className: "building_visual_inner",
       style: {
-        background: "url(/images/building_backgrounds/placeholderbuilding.jpg)"
+        background: `url(${selectedBuilding.background_image}) center`
       }
     })), /*#__PURE__*/React.createElement("div", {
       className: "building_details_contents"
@@ -177,7 +599,7 @@ export function VillageUpgrades({
       className: "building_info_health_row"
     }, /*#__PURE__*/React.createElement("div", {
       className: "building_info_health_bar"
-    }), /*#__PURE__*/React.createElement("div", {
+    }, renderHealthBar()), /*#__PURE__*/React.createElement("div", {
       className: "building_info_health_label_row"
     }, /*#__PURE__*/React.createElement("div", {
       className: "building_info_health_label"
@@ -241,12 +663,7 @@ export function VillageUpgrades({
       }
     }, selectedBuilding.tier == 3 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", null, "No upgrades available")), selectedBuilding.status === "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "construction_progress_text"
-    }, selectedBuilding.construction_time_remaining)), selectedBuilding.tier < 3 && selectedBuilding.status !== "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: "10px",
-        lineHeight: "16px"
-      }
-    }, "upgrade cost: "), /*#__PURE__*/React.createElement("img", {
+    }, selectedBuilding.construction_time_remaining)), selectedBuilding.tier < 3 && selectedBuilding.status !== "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
       src: "/images/icons/materials.png",
       alt: "materials",
       style: {
@@ -516,7 +933,7 @@ export function VillageUpgrades({
   }, /*#__PURE__*/React.createElement("div", {
     className: "building_item_inner",
     style: {
-      background: "url(/images/building_backgrounds/placeholderbuilding.jpg)"
+      background: `url(${building.background_image}) center`
     }
   }, building.status === "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "construction_overlay"

@@ -13,7 +13,6 @@ class VillageBuilding {
         public ?int $construction_progress = null,
         public ?int $construction_progress_required = null,
         public ?int $construction_progress_last_updated = null,
-        public bool $construction_boosted = false,
         private VillageBuildingConfigData $config_data,
     ) {}
     public function getName(): string {
