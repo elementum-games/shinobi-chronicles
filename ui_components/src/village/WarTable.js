@@ -429,7 +429,7 @@ export function WarTable({
                     </div>
                 </div>
             </div>
-            <div className="row third" style={{display: none}}>
+            <div className="row third" style={{display: "none"}}>
                 <div className="column first">
                     <svg height="0" width="0">
                         <defs>

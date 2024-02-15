@@ -586,7 +586,7 @@ export function WarTable({
   })))))), /*#__PURE__*/React.createElement("div", {
     className: "row third",
     style: {
-      display: none
+      display: "none"
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "column first"
