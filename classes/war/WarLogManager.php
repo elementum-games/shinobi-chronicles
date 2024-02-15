@@ -40,7 +40,7 @@ class WarLogManager {
     const WAR_LOG_TYPE_VILLAGE = "village";
 
     const WAR_LOGS_PER_PAGE = 10;
-    const WAR_RECORDS_PER_PAGE = 5;
+    const WAR_RECORDS_PER_PAGE = 10;
 
     public static function logAction(System $system, User $player, int $value, string $type, int $target_village_id) {
         // use null relation_id to track overall
@@ -286,7 +286,7 @@ class WarLogManager {
             $war_records[] = new WarRecordDto($relation, $attacker_war_log, $defender_war_log);
         }
         // pagination
-        $war_records = array_slice($war_records, ($page_number - 1) * self::WAR_LOGS_PER_PAGE, self::WAR_LOGS_PER_PAGE);
+        $war_records = array_slice($war_records, ($page_number - 1) * self::WAR_RECORDS_PER_PAGE, self::WAR_RECORDS_PER_PAGE);
         return $war_records;
     }
 
