@@ -23,7 +23,8 @@ function Village({
     proposalData,
     strategicData,
     challengeData,
-    warLogData,
+    playerWarLogData,
+    warRecordData,
     kageRecords,
 }) {
     const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
@@ -212,10 +213,13 @@ function Village({
             }
             {villageTab == "warTable" &&
                 <WarTable
-                warLogData={warLogData}
+                playerWarLogData={playerWarLogData}
+                warRecordData={warRecordData}
+                strategicDataState={strategicDataState}
                 villageAPI={villageAPI}
                 handleErrors={handleErrors}
                 getVillageIcon={getVillageIcon}
+                getPolicyDisplayData={getPolicyDisplayData}
                 />
             }
         </ModalProvider>
