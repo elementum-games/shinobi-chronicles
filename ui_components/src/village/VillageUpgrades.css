@@ -34,7 +34,15 @@
     justify-content: center;
     position: relative;
 }
-.building_item_inner, .building_visual_inner {
+.building_visual_inner {
+    outline: 1px solid #84714f;
+    border: 1px solid #4e4535;
+    width: 276px;
+    height: 172px;
+    position: relative;
+    user-select: none;
+}
+.building_item_inner {
     outline: 1px solid #84714f;
     border: 1px solid #4e4535;
     width: 276px;
@@ -76,7 +84,9 @@
 .building_details_contents {
     height: 100%;
     box-sizing: border-box;
-    padding: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
     flex-basis: 66%;
     display: flex;
     flex-direction: column;
@@ -228,31 +238,48 @@
 }
 .building_info_header_row {
     display: flex;
-    gap: 5px;
+    gap: 10px;
 }
 .building_info_name {
     font-size: 16px;
     font-weight: bold;
-    font-family: var(--font-primary);
-    font-variant: var(--font-primary-variant);
+    font-family: var(--font-secondary);
     color: var(--font-color-1);
+    text-transform: uppercase;
 }
 .building_info_phrase {
     font-style: italic;
     color: #9498a9;
     text-transform: uppercase;
-    font-size: 11px;
+    font-size: 10px;
+    line-height: 25px;
+    font-weight: bold;
 }
 .building_info_health_row {
+    width: 310px;
     display: flex;
-    gap: 5px;
+    flex-direction: column;
     color: #c0c7dc;
+}
+.building_info_health_bar {
+    margin-left: -5px;
+}
+.building_info_health_label_row {
+    text-transform: uppercase;
+    display: flex;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: bold;
+    margin-top: -4px;
 }
 .building_info_defense {
     margin-left: auto;
 }
 .building_info_description {
-    color: var(--building-info-description-text-color, #daceb7);
+    color: var(--village-text-color-1);
+    width: 330px;
+    font-size: 12px;
+    margin-top: 5px;
 }
 .building_upkeep {
     flex-shrink: 0;
@@ -315,8 +342,10 @@
 .building_buttons_container {
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: flex-end;
     flex: 1;
+    gap: 30px;
+    margin-right: -3px;
 }
 .upgrade_buttons_container {
 
@@ -364,7 +393,7 @@
     font-weight: bold;
     height: 35px;
     display: flex;
-    gap: 5px;
+    gap: 10px;
     width: 325px;
     border: 1px solid var(--building-upgrade-requirements-border, #231f1e);
     border-radius: 7px;

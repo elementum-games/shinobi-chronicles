@@ -9,7 +9,7 @@ class VillageBuildingConfig {
     const BUILDING_STATUS_DISABLED = 'disabled'; // used when disabled, currently unused
     const BUILDING_STATUS_REPAIRING = 'repairing'; // used when repairing damage, currently unused
 
-    /* indentifiers for each building */
+    /* keys for each building */
     const BUILDING_VILLAGE_HQ = 'VILLAGE_HQ';
     const BUILDING_WORKSHOP = 'WORKSHOP';
     const BUILDING_MARKET = 'MARKET';
@@ -18,6 +18,18 @@ class VillageBuildingConfig {
     const BUILDING_ANBU_HQ = 'ANBU_HQ';
     const BUILDING_SHRINE = 'SHRINE';
     const BUILDING_RAMEN_STAND = 'RAMEN_STAND';
+
+    /* Used for auto population */
+    const BUILDING_KEYS = [
+        self::BUILDING_VILLAGE_HQ,
+        self::BUILDING_WORKSHOP,
+        self::BUILDING_MARKET,
+        self::BUILDING_ACADEMY,
+        self::BUILDING_HOSPITAL,
+        self::BUILDING_ANBU_HQ,
+        self::BUILDING_SHRINE,
+        self::BUILDING_RAMEN_STAND,
+    ];
 
     /* names for each building */
     const BUILDING_NAMES = [
@@ -35,7 +47,7 @@ class VillageBuildingConfig {
     const BUILDING_REQUIREMENT_BUILDINGS = "BUILDINGS";
     const BUILDING_REQUIREMENT_UPGRADES = "UPGRADES";
 
-    /* building healthed indexed by building ID, then tier */
+    /* building healthed indexed by building key, then tier */
     const BUILDING_MAX_HEALTH = [
         self::BUILDING_VILLAGE_HQ => [
             0 => 125000,
@@ -87,31 +99,43 @@ class VillageBuildingConfig {
         ],
     ];
 
-    /* building description indexed by building ID */
-    const BUILDING_DESCRIPTIONS = [
+    /* building image indexed by building key */
+    const BUILDING_BACKGROUND_IMAGE = [
+        self::BUILDING_VILLAGE_HQ => 'images/building_backgrounds/Villagehq.jpg',
+        self::BUILDING_WORKSHOP => 'images/building_backgrounds/Workshop.jpg',
+        self::BUILDING_ACADEMY => 'images/building_backgrounds/Academy.jpg',
+        self::BUILDING_HOSPITAL => 'images/building_backgrounds/Hospital.jpg',
+        self::BUILDING_ANBU_HQ => 'images/building_backgrounds/Anbuhq.jpg',
+        self::BUILDING_MARKET => 'images/building_backgrounds/Markets.jpg',
+        self::BUILDING_SHRINE => 'images/building_backgrounds/Shrine.jpg',
+        self::BUILDING_RAMEN_STAND => 'images/building_backgrounds/Ramenstand.jpg',
+    ];
+
+    /* building description indexed by building key */
+    const BUILDING_DESCRIPTION = [
         self::BUILDING_VILLAGE_HQ => "The central hub of the village, where all other buildings are managed.",
         self::BUILDING_WORKSHOP => "The workshop is where all the village's tools and equipment are made.",
         self::BUILDING_ACADEMY => "The academy is where the village's shinobi are trained.",
         self::BUILDING_HOSPITAL => "The hospital is where the village's injured shinobi are treated.",
         self::BUILDING_ANBU_HQ => "The ANBU HQ is where the village's elite shinobi are trained and managed.",
-        self::BUILDING_MARKET => "The market is where the village's resources are traded.",
+        self::BUILDING_MARKET => "The market handles resources and goods distribution as well as monetary matters.",
         self::BUILDING_SHRINE => "The shrine is where the village's spiritual needs are met.",
         self::BUILDING_RAMEN_STAND => "The ramen stand is where the village's shinobi go to eat.",
     ];
 
-    /* building poetic phrase indexed by building ID */
+    /* building poetic phrase indexed by building key */
     const BUILDING_PHRASE = [
         self::BUILDING_VILLAGE_HQ => "The heart of the village.",
         self::BUILDING_WORKSHOP => "The hands of the village.",
         self::BUILDING_ACADEMY => "The mind of the village.",
         self::BUILDING_HOSPITAL => "The soul of the village.",
         self::BUILDING_ANBU_HQ => "The shadow of the village.",
-        self::BUILDING_MARKET => "The lifeblood of the village.",
+        self::BUILDING_MARKET => "Where coin flows, fortune follows.",
         self::BUILDING_SHRINE => "The spirit of the village.",
         self::BUILDING_RAMEN_STAND => "The belly of the village.",
     ];
 
-    /* construction cost indexed by building ID, then tier, then resource type */
+    /* construction cost indexed by building key, then tier, then resource type */
     const BUILDING_CONSTRUCTION_COST = [
         self::BUILDING_VILLAGE_HQ => [
             1 => [
@@ -251,7 +275,7 @@ class VillageBuildingConfig {
         ],
     ];
 
-    /* construction time indexed by building ID, then tier */
+    /* construction time indexed by building key, then tier */
     const BUILDING_CONSTRUCTION_TIME = [
         self::BUILDING_VILLAGE_HQ => [
             1 => 3,
@@ -326,7 +350,7 @@ class VillageBuildingConfig {
     const UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES = 'SHINOBI_DISCOUNT';
     const UPGRADE_SET_KEY_INSPIRED_ITAMAE = 'LUCK_IN_LEFTOVERS';
 
-    /* upgrade sets for each building, indexed by building ID */
+    /* upgrade sets for each building, indexed by building key */
     const BUILDING_UPGRADE_SETS = [
         self::BUILDING_VILLAGE_HQ => [
             self::UPGRADE_SET_KEY_RESEARCH_SUBSIDIES,

@@ -5,23 +5,70 @@ require_once __DIR__ . "/VillageUpgradeDto.php";
 require_once __DIR__ . "/VillageUpgradeSetDto.php";
 require_once __DIR__ . "/VillageBuildingConfig.php";
 require_once __DIR__ . "/VillageUpgradeConfig.php";
+require_once __DIR__ . "/VillageBuilding.php";
+require_once __DIR__ . "/VillageUpgrade.php";
+require_once __DIR__ . "/VillageBuildingConfigData.php";
+require_once __DIR__ . "/VillageUpgradeConfigData.php";
 
 class VillageUpgradeManager {
     const UPGRADE_TOGGLE_COOLDOWN_DAYS = 3;
 
+    public static $UPGRADE_CONFIGS = array();
+    public static $BUILDING_CONFIGS = array();
+
+    public static function initialize() {
+        if (self::$UPGRADE_CONFIGS) {
+            return;
+        }
+        $upgrade_array = [];
+        foreach (VillageUpgradeConfig::UPGRADE_KEYS as $key) {
+            $upgrade_array[$key] = new VillageUpgradeConfigData(
+                key: $key,
+                name: VillageUpgradeConfig::UPGRADE_NAMES[$key],
+                description: VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[$key],
+                materials_research_cost: VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$key][WarManager::RESOURCE_MATERIALS],
+                food_research_cost: VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$key][WarManager::RESOURCE_FOOD],
+                wealth_research_cost: VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$key][WarManager::RESOURCE_WEALTH],
+                research_time: VillageUpgradeConfig::UPGRADE_RESEARCH_TIME[$key],
+                materials_upkeep: VillageUpgradeConfig::UPGRADE_UPKEEP[$key][WarManager::RESOURCE_MATERIALS],
+                food_upkeep: VillageUpgradeConfig::UPGRADE_UPKEEP[$key][WarManager::RESOURCE_FOOD],
+                wealth_upkeep: VillageUpgradeConfig::UPGRADE_UPKEEP[$key][WarManager::RESOURCE_WEALTH],
+                research_requirements: VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$key],
+                effects: VillageUpgradeConfig::UPGRADE_EFFECTS[$key],
+            );
+        }
+        self::$UPGRADE_CONFIGS = $upgrade_array;
+        $building_array = [];
+        foreach (VillageBuildingConfig::BUILDING_KEYS as $key) {
+            $building_array[$key] = new VillageBuildingConfigData(
+                key: $key,
+                name: VillageBuildingConfig::BUILDING_NAMES[$key],
+                description: VillageBuildingConfig::BUILDING_DESCRIPTION[$key],
+                phrase: VillageBuildingConfig::BUILDING_PHRASE[$key],
+                background_image: VillageBuildingConfig::BUILDING_BACKGROUND_IMAGE[$key],
+                max_healths: VillageBuildingConfig::BUILDING_MAX_HEALTH[$key],
+                construction_costs: VillageBuildingConfig::BUILDING_CONSTRUCTION_COST[$key],
+                construction_times: VillageBuildingConfig::BUILDING_CONSTRUCTION_TIME[$key],
+                upgrade_sets: VillageBuildingConfig::BUILDING_UPGRADE_SETS[$key],
+            );
+        }
+        self::$BUILDING_CONFIGS = $building_array;
+    }
+
     /**
      * @param System  $system
      * @param int $village_id
-     * @return VillageBuildingDto[]
+     * @return VillageBuilding[]
      */
     public static function getBuildingsForVillage(System $system, int $village_id): array {
+        self::initialize();
         $buildings = [];
         $query = $system->db->query("
             SELECT * FROM `village_buildings` WHERE `village_id` = {$village_id}
         ");
         $building_data = $system->db->fetch_all($query);
         foreach ($building_data as $building) {
-            $buildings[$building['key']] = new VillageBuildingDto(
+            $buildings[$building['key']] = new VillageBuilding(
                 id: $building['id'],
                 key: $building['key'],
                 village_id: $building['village_id'],
@@ -33,6 +80,7 @@ class VillageUpgradeManager {
                 construction_progress: $building['construction_progress'],
                 construction_progress_required: $building['construction_progress_required'],
                 construction_progress_last_updated: $building['construction_progress_last_updated'],
+                config_data: self::$BUILDING_CONFIGS[$building['key']],
             );
         }
         return $buildings;
@@ -41,16 +89,17 @@ class VillageUpgradeManager {
     /**
      * @param System  $system
      * @param int $village_id
-     * @return VillageUpgradeDto[]
+     * @return VillageUpgrade[]
      */
     public static function getUpgradesForVillage(System $system, int $village_id): array {
+        self::initialize();
         $upgrades = [];
         $query = $system->db->query("
             SELECT * FROM `village_upgrades` WHERE `village_id` = {$village_id}
         ");
         $upgrade_data = $system->db->fetch_all($query);
         foreach ($upgrade_data as $upgrade) {
-            $upgrades[$upgrade['key']] = new VillageUpgradeDto(
+            $upgrades[$upgrade['key']] = new VillageUpgrade(
                 id: $upgrade['id'],
                 key: $upgrade['key'],
                 village_id: $upgrade['village_id'],
@@ -58,6 +107,7 @@ class VillageUpgradeManager {
                 research_progress: $upgrade['research_progress'],
                 research_progress_required: $upgrade['research_progress_required'],
                 research_progress_last_updated: $upgrade['research_progress_last_updated'],
+                config_data: self::$UPGRADE_CONFIGS[$upgrade['key']],
             );
         }
         return $upgrades;
@@ -65,63 +115,21 @@ class VillageUpgradeManager {
 
     /**
      * @param System  $system
-     * @param VillageUpgradeDto[] $upgrades
+     * @param VillageUpgrade[] $upgrades
      * @return array
      */
     public static function initializeEffectsForVillage(System $system, array $upgrades): array {
+        self::initialize();
         // initialize array with defaults
-        $effects = [
-            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T1_ENABLED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T2_ENABLED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T3_ENABLED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T1_ENABLED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T2_ENABLED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T3_ENABLED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_UPGRADE_UPKEEP => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_TRAINING_SPEED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_XP_CHANCE => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_VILLAGE_REGEN => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_HEAL_ITEM_COST => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_WAR_ACTION_COST => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_SPEED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAID_DAMAGE => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_INFILTRATE_SPEED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY_REDUCTION => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_MAX_STABILITY_REDUCTION => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_SPEED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_HEAL => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_TOWN_HP => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_BLOODLINE_CHANCE => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_SET_ONE => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_ENABLED => 0,
-            VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_CHANCE => 0,
-        ];
+        $effects = [];
+        foreach (VillageUpgradeConfig::UPGRADE_EFFECTS_LIST as $key) {
+            $effects[$key] = 0;
+        }
         // go through all active upgrades and add effects to array
         foreach ($upgrades as $upgrade) {
             if ($upgrade->status == VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
-                $upgrade_effects = VillageUpgradeConfig::UPGRADE_EFFECTS[$upgrade->key];
-                foreach ($upgrade_effects as $key => $value) {
-                    if (isset($effects[$key])) {
-                        $effects[$key] += $value;
-                    } else {
-                        $effects[$key] = $value;
-                    }
+                foreach ($upgrade->getEffects() as $key => $value) {
+                    $effects[$key] += $value;
                 }
             }
         }
@@ -134,54 +142,80 @@ class VillageUpgradeManager {
      * @return array<VillageBuildingDto>
      */
     public static function getBuildingUpgradesForDisplay(System $system, Village $village): array {
+        self::initialize();
+        $buildingDtos = [];
         foreach ($village->buildings as $building) {
-            $building->name = VillageBuildingConfig::BUILDING_NAMES[$building->key];
-            $building->materials_construction_cost = VillageBuildingConfig::BUILDING_CONSTRUCTION_COST[$building->key][$building->tier + 1][WarManager::RESOURCE_MATERIALS];
-            $building->food_construction_cost = VillageBuildingConfig::BUILDING_CONSTRUCTION_COST[$building->key][$building->tier + 1][WarManager::RESOURCE_FOOD];
-            $building->wealth_construction_cost = VillageBuildingConfig::BUILDING_CONSTRUCTION_COST[$building->key][$building->tier + 1][WarManager::RESOURCE_WEALTH];
-            $building->construction_time = VillageBuildingConfig::BUILDING_CONSTRUCTION_TIME[$building->key][$building->tier + 1];
-            $building->construction_time_remaining = System::TimeRemaining($building->construction_progress_required - $building->construction_progress, format: "long", include_seconds: false, include_minutes: false);
-            $building->requirements_met = VillageUpgradeManager::checkConstructionRequirementsMet($village, $building->key, $building->tier + 1);
-            foreach (VillageBuildingConfig::BUILDING_UPGRADE_SETS[$building->key] as $upgrade_set_key) {
-                $upgrade_set = new VillageUpgradeSetDto(
+            $upgrade_sets = [];
+            foreach ($building->getUpgradeSets() as $upgrade_set_key) {
+                $upgrades = [];
+                foreach (VillageBuildingConfig::UPGRADE_SET_UPGRADES[$upgrade_set_key] as $upgrade_key) {
+                    $upgrade_config_data = VillageUpgradeManager::$UPGRADE_CONFIGS[$upgrade_key];
+                    $upgrade = $village->upgrades[$upgrade_key] ?? null;
+                    $upgrades[] = new VillageUpgradeDto(
+                        id: $upgrade ? $upgrade->key : null,
+                        key: $upgrade_key,
+                        village_id: $village->village_id,
+                        status: $upgrade ? $upgrade->status : VillageUpgradeConfig::UPGRADE_STATUS_LOCKED,
+                        research_progress: $upgrade ? $upgrade->research_progress : null,
+                        research_progress_required: $upgrade ? $upgrade->research_progress_required : null,
+                        research_progress_last_updated: $upgrade ? $upgrade->research_progress_last_updated : null,
+                        research_time_remaining: $upgrade ? System::TimeRemaining($upgrade->research_progress_required - $upgrade->research_progress, format: "long", include_seconds: false, include_minutes: false) : '',
+                        name: $upgrade_config_data->getName(),
+                        description: $upgrade_config_data->getDescription(),
+                        materials_research_cost: $upgrade_config_data->getResearchCostMaterials(),
+                        food_research_cost: $upgrade_config_data->getResearchCostFood(),
+                        wealth_research_cost: $upgrade_config_data->getResearchCostWealth(),
+                        research_time: $upgrade_config_data->getResearchTime(),
+                        materials_upkeep: $upgrade_config_data->getUpkeepMaterials(),
+                        food_upkeep: $upgrade_config_data->getUpkeepFood(),
+                        wealth_upkeep: $upgrade_config_data->getUpkeepWealth(),
+                        research_requirements: $upgrade_config_data->getResearchRequirements(),
+                        effects: $upgrade_config_data->getEffects(),
+                        requirements_met: VillageUpgradeManager::checkResearchRequirementsMet($village, $upgrade_key),
+                    );
+                }
+                $upgrade_sets[] = new VillageUpgradeSetDto(
                     key: $upgrade_set_key,
                     name: VillageBuildingConfig::UPGRADE_SET_NAMES[$upgrade_set_key],
                     description: VillageBuildingConfig::UPGRADE_SET_DESCRIPTIONS[$upgrade_set_key],
+                    upgrades: $upgrades,
                 );
-                foreach (VillageBuildingConfig::UPGRADE_SET_UPGRADES[$upgrade_set_key] as $upgrade_key) {
-                    $upgrade = new VillageUpgradeDto(
-                        id: $village->upgrades[$upgrade_key]->id ?? null,
-                        key: $upgrade_key,
-                        village_id: $village->village_id,
-                        status: $village->upgrades[$upgrade_key]->status ?? VillageUpgradeConfig::UPGRADE_STATUS_LOCKED,
-                        research_progress: $village->upgrades[$upgrade_key]->research_progress ?? null,
-                        research_progress_required: $village->upgrades[$upgrade_key]->research_progress_required ?? null,
-                        name: VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key],
-                        description: VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[$upgrade_key],
-                        materials_research_cost: VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$upgrade_key][WarManager::RESOURCE_MATERIALS],
-                        food_research_cost: VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$upgrade_key][WarManager::RESOURCE_FOOD],
-                        wealth_research_cost: VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$upgrade_key][WarManager::RESOURCE_WEALTH],
-                        research_time: VillageUpgradeConfig::UPGRADE_RESEARCH_TIME[$upgrade_key],
-                        research_time_remaining: isset($village->upgrades[$upgrade_key]->research_progress_last_updated) ? System::TimeRemaining($village->upgrades[$upgrade_key]->research_progress_required - $village->upgrades[$upgrade_key]->research_progress, format: "long", include_seconds: false, include_minutes: false) : null,
-                        food_upkeep: VillageUpgradeConfig::UPGRADE_UPKEEP[$upgrade_key][WarManager::RESOURCE_FOOD],
-                        materials_upkeep: VillageUpgradeConfig::UPGRADE_UPKEEP[$upgrade_key][WarManager::RESOURCE_MATERIALS],
-                        wealth_upkeep: VillageUpgradeConfig::UPGRADE_UPKEEP[$upgrade_key][WarManager::RESOURCE_WEALTH],
-                        requirements_met: VillageUpgradeManager::checkResearchRequirementsMet($village, $upgrade_key),
-                    );
-                    $upgrade_set->upgrades[] = $upgrade;
-                }
-                $building->upgrade_sets[] = $upgrade_set;
             }
+            $buildingDtos[] = new VillageBuildingDto(
+                id: $building->id,
+                key: $building->key,
+                village_id: $building->village_id,
+                tier: $building->tier,
+                health: $building->health,
+                max_health: $building->max_health,
+                defense: $building->defense,
+                status: $building->status,
+                construction_progress: $building->construction_progress,
+                construction_progress_required: $building->construction_progress_required,
+                construction_progress_last_updated: $building->construction_progress_last_updated,
+                name: $building->getName(),
+                description: $building->getDescription(),
+                phrase: $building->getPhrase(),
+                background_image: $building->getBackgroundImage(),
+                materials_construction_cost: $building->getConstructionCostMaterials($building->tier),
+                food_construction_cost: $building->getConstructionCostFood($building->tier),
+                wealth_construction_cost: $building->getConstructionCostWealth($building->tier),
+                construction_time: $building->getConstructionTime($building->tier),
+                construction_time_remaining: System::TimeRemaining($building->construction_progress_required - $building->construction_progress, format: "long", include_seconds: false, include_minutes: false),
+                upgrade_sets: $upgrade_sets,
+                requirements_met: VillageUpgradeManager::checkConstructionRequirementsMet($village, $building->key, $building->tier + 1),
+            );
         }
-        return $village->buildings;
+        return $buildingDtos;
     }
 
     /**
      * @param System $system
      * @param Village $village
-     * @return array<VillageUpgradeDto>
+     * @return array<VillageUpgrade>
      */
     public static function checkResearchRequirementsMet(Village $village, string $upgrade_key): bool {
+        self::initialize();
         $effective_tier = 0;
         if (isset(VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key])) {
             $requirements = VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key];
@@ -219,6 +253,7 @@ class VillageUpgradeManager {
      * @return bool
      */
     public static function checkConstructionRequirementsMet(Village $village, string $building_key, int $tier): bool {
+        self::initialize();
         // if not workshop, check that workshop is at least equal to the tier
         if ($building_key != VillageBuildingConfig::BUILDING_WORKSHOP && $village->buildings[VillageBuildingConfig::BUILDING_WORKSHOP]->tier < $tier) {
             return false;
@@ -237,6 +272,7 @@ class VillageUpgradeManager {
      * @return string
      */
     public static function beginConstruction(System $system, Village $village, $building_key): string {
+        self::initialize();
         // get construction costs and time
         $materials_cost = VillageBuildingConfig::BUILDING_CONSTRUCTION_COST[$building_key][$village->buildings[$building_key]->tier + 1][WarManager::RESOURCE_MATERIALS];
         $food_cost = VillageBuildingConfig::BUILDING_CONSTRUCTION_COST[$building_key][$village->buildings[$building_key]->tier + 1][WarManager::RESOURCE_FOOD];
@@ -286,6 +322,7 @@ class VillageUpgradeManager {
     }
 
     public static function cancelConstruction(System $system, Village $village, $building_id): string {
+        self::initialize();
         // check if the building is under construction
         if ($village->buildings[$building_id]->status != VillageBuildingConfig::BUILDING_STATUS_UPGRADING) {
             return "Building is not under construction!";
@@ -303,6 +340,7 @@ class VillageUpgradeManager {
      * @return bool
      */
     public static function beginResearch(System $system, Village $village, $upgrade_key): string {
+        self::initialize();
         // get research costs and time
         $materials_cost = VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$upgrade_key][WarManager::RESOURCE_MATERIALS];
         $food_cost = VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$upgrade_key][WarManager::RESOURCE_FOOD];
@@ -355,6 +393,7 @@ class VillageUpgradeManager {
     }
 
     public static function cancelResearch(System $system, Village $village, $upgrade_key): string {
+        self::initialize();
         // check if the upgrade is under research
         if ($village->upgrades[$upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING) {
             return "Upgrade is not under research!";

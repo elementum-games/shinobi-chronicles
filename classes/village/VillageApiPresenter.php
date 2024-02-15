@@ -272,6 +272,7 @@ class VillageApiPresenter {
                     "name" => $villageBuildingDto->name,
                     "description" => $villageBuildingDto->description,
                     "phrase" => $villageBuildingDto->phrase,
+                    "background_image" => $villageBuildingDto->background_image,
                     "materials_construction_cost" => $villageBuildingDto->materials_construction_cost,
                     "food_construction_cost" => $villageBuildingDto->food_construction_cost,
                     "wealth_construction_cost" => $villageBuildingDto->wealth_construction_cost,
@@ -314,7 +315,7 @@ class VillageApiPresenter {
                     ),
                 ];
             },
-            array_values($buildings)
+            $buildings
         );
     }
 }

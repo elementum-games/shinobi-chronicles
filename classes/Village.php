@@ -27,11 +27,11 @@ class Village {
     public int $policy_id = 0;
     public VillagePolicy $policy;
     /**
-     * @var VillageBuildingDto[]
+     * @var VillageBuilding[]
      */
     public array $buildings = [];
     /**
-     * @var VillageUpgradeDto[]
+     * @var VillageUpgrade[]
      */
     public array $upgrades = [];
     public array $active_upgrade_effects = [];
