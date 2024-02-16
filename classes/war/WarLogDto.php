@@ -30,8 +30,6 @@ class WarLogDto {
     public int $objective_score = 0;
     public int $resource_score = 0;
     public int $battle_score = 0;
-    public int $stability_gained = 0;
-    public int $stability_reduced = 0;
 
     public function __construct(array $row, string $log_type) {
         $this->log_id = $row['log_id'];

@@ -162,80 +162,25 @@ class VillageApiPresenter {
         ];
     }
     public static function warRecordDataResponse(System $system, User $player, int $page_number = 1): array {
-        $war_records = array_map(
-            function (WarRecordDto $warRecordDto) {
-                return [
-                    "village_relation" => [
-                        "relation_id" => $warRecordDto->village_relation->relation_id,
-                        "village1_id" => $warRecordDto->village_relation->village1_id,
-                        "village2_id" => $warRecordDto->village_relation->village2_id,
-                        "relation_type" => VillageRelation::RELATION_LABEL[$warRecordDto->village_relation->relation_type],
-                        "relation_name" => $warRecordDto->village_relation->relation_name,
-                        "relation_start" => date("n/j/Y", $warRecordDto->village_relation->relation_start),
-                        "relation_end" => $warRecordDto->village_relation->relation_end ? date("n/j/Y", $warRecordDto->village_relation->relation_end) : null,
-                    ],
-                    "attacker_war_log" => [
-                        "log_id" => $warRecordDto->attacker_war_log->log_id,
-                        "log_type" => $warRecordDto->attacker_war_log->log_type,
-                        "village_id" => $warRecordDto->attacker_war_log->village_id,
-                        "village_name" => $warRecordDto->attacker_war_log->village_name,
-                        "relation_id" => $warRecordDto->attacker_war_log->relation_id,
-                        "infiltrate_count" => $warRecordDto->attacker_war_log->infiltrate_count,
-                        "reinforce_count" => $warRecordDto->attacker_war_log->reinforce_count,
-                        "raid_count" => $warRecordDto->attacker_war_log->raid_count,
-                        "loot_count" => $warRecordDto->attacker_war_log->loot_count,
-                        "damage_dealt" => $warRecordDto->attacker_war_log->damage_dealt,
-                        "damage_healed" => $warRecordDto->attacker_war_log->damage_healed,
-                        "defense_gained" => $warRecordDto->attacker_war_log->defense_gained,
-                        "defense_reduced" => $warRecordDto->attacker_war_log->defense_reduced,
-                        "resources_stolen" => $warRecordDto->attacker_war_log->resources_stolen,
-                        "resources_claimed" => $warRecordDto->attacker_war_log->resources_claimed,
-                        "patrols_defeated" => $warRecordDto->attacker_war_log->patrols_defeated,
-                        "regions_captured" => $warRecordDto->attacker_war_log->regions_captured,
-                        "villages_captured" => $warRecordDto->attacker_war_log->villages_captured,
-                        "pvp_wins" => $warRecordDto->attacker_war_log->pvp_wins,
-                        "points_gained" => $warRecordDto->attacker_war_log->points_gained,
-                        "stability_gained" => $warRecordDto->attacker_war_log->stability_gained,
-                        "stability_reduced" => $warRecordDto->attacker_war_log->stability_reduced,
-                        "war_score" => $warRecordDto->attacker_war_log->war_score,
-                        "objective_score" => $warRecordDto->attacker_war_log->objective_score,
-                        "resource_score" => $warRecordDto->attacker_war_log->resource_score,
-                        "battle_score" => $warRecordDto->attacker_war_log->battle_score,
-                    ],
-                    "defender_war_log" => [
-                        "log_id" => $warRecordDto->defender_war_log->log_id,
-                        "log_type" => $warRecordDto->defender_war_log->log_type,
-                        "village_id" => $warRecordDto->defender_war_log->village_id,
-                        "village_name" => $warRecordDto->defender_war_log->village_name,
-                        "relation_id" => $warRecordDto->defender_war_log->relation_id,
-                        "infiltrate_count" => $warRecordDto->defender_war_log->infiltrate_count,
-                        "reinforce_count" => $warRecordDto->defender_war_log->reinforce_count,
-                        "raid_count" => $warRecordDto->defender_war_log->raid_count,
-                        "loot_count" => $warRecordDto->defender_war_log->loot_count,
-                        "damage_dealt" => $warRecordDto->defender_war_log->damage_dealt,
-                        "damage_healed" => $warRecordDto->defender_war_log->damage_healed,
-                        "defense_gained" => $warRecordDto->defender_war_log->defense_gained,
-                        "defense_reduced" => $warRecordDto->defender_war_log->defense_reduced,
-                        "resources_stolen" => $warRecordDto->defender_war_log->resources_stolen,
-                        "resources_claimed" => $warRecordDto->defender_war_log->resources_claimed,
-                        "patrols_defeated" => $warRecordDto->defender_war_log->patrols_defeated,
-                        "regions_captured" => $warRecordDto->defender_war_log->regions_captured,
-                        "villages_captured" => $warRecordDto->defender_war_log->villages_captured,
-                        "pvp_wins" => $warRecordDto->defender_war_log->pvp_wins,
-                        "points_gained" => $warRecordDto->defender_war_log->points_gained,
-                        "stability_gained" => $warRecordDto->defender_war_log->stability_gained,
-                        "stability_reduced" => $warRecordDto->defender_war_log->stability_reduced,
-                        "war_score" => $warRecordDto->defender_war_log->war_score,
-                        "objective_score" => $warRecordDto->defender_war_log->objective_score,
-                        "resource_score" => $warRecordDto->defender_war_log->resource_score,
-                        "battle_score" => $warRecordDto->defender_war_log->battle_score,
-                    ],
-                ];
-            },
-            WarLogManager::getWarRecords($system, page_number: $page_number)
-        );
         return [
-            "war_records" => $war_records
+            "war_records" => array_map(
+                function (WarRecordDto $warRecordDto) {
+                    return [
+                        "village_relation" => [
+                            "relation_id" => $warRecordDto->village_relation->relation_id,
+                            "village1_id" => $warRecordDto->village_relation->village1_id,
+                            "village2_id" => $warRecordDto->village_relation->village2_id,
+                            "relation_type" => VillageRelation::RELATION_LABEL[$warRecordDto->village_relation->relation_type],
+                            "relation_name" => $warRecordDto->village_relation->relation_name,
+                            "relation_start" => date("n/j/Y", $warRecordDto->village_relation->relation_start),
+                            "relation_end" => $warRecordDto->village_relation->relation_end ? date("n/j/Y", $warRecordDto->village_relation->relation_end) : null,
+                        ],
+                        "attacker_war_log" => VillageApiPresenter::warLogResponse($warRecordDto->attacker_war_log),
+                        "defender_war_log" => VillageApiPresenter::warLogResponse($warRecordDto->defender_war_log),
+                    ];
+                },
+                WarLogManager::getWarRecords($system, $page_number)
+            )
         ];
     }
     public static function kageRecordResponse(System $system, User $player): array
@@ -317,5 +262,36 @@ class VillageApiPresenter {
             },
             $buildings
         );
+    }
+    public static function warLogResponse (WarLogDto $war_log): array {
+        return [
+            "log_id" => $war_log->log_id,
+            "log_type" => $war_log->log_type,
+            "user_id" => $war_log->user_id,
+            "user_name" => $war_log->user_name,
+            "village_id" => $war_log->village_id,
+            "village_name" => $war_log->village_name,
+            "relation_id" => $war_log->relation_id,
+            "rank" => $war_log->rank,
+            "infiltrate_count" => $war_log->infiltrate_count,
+            "reinforce_count" => $war_log->reinforce_count,
+            "raid_count" => $war_log->raid_count,
+            "loot_count" => $war_log->loot_count,
+            "damage_dealt" => $war_log->damage_dealt,
+            "damage_healed" => $war_log->damage_healed,
+            "defense_gained" => $war_log->defense_gained,
+            "defense_reduced" => $war_log->defense_reduced,
+            "resources_stolen" => $war_log->resources_stolen,
+            "resources_claimed" => $war_log->resources_claimed,
+            "patrols_defeated" => $war_log->patrols_defeated,
+            "regions_captured" => $war_log->regions_captured,
+            "villages_captured" => $war_log->villages_captured,
+            "pvp_wins" => $war_log->pvp_wins,
+            "points_gained" => $war_log->points_gained,
+            "war_score" => $war_log->war_score,
+            "objective_score" => $war_log->objective_score,
+            "resource_score" => $war_log->resource_score,
+            "battle_score" => $war_log->battle_score,
+        ];
     }
 }

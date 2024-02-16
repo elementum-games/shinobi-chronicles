@@ -31,6 +31,275 @@ export function WarTable({
         return null;
     }
   }
+  const GlobalLeaderboardNextPage = page_number => {
+    apiFetch(villageAPI, {
+      request: 'GetGlobalWarLeaderboard',
+      page_number: page_number
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      if (response.data.warLogData.global_leaderboard_war_logs.length == 0) {
+        return;
+      } else {
+        setGlobalLeaderboardPageNumber(page_number);
+        setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
+      }
+    });
+  };
+  const GlobalLeaderboardPreviousPage = page_number => {
+    if (page_number > 0) {
+      apiFetch(villageAPI, {
+        request: 'GetGlobalWarLeaderboard',
+        page_number: page_number
+      }).then(response => {
+        if (response.errors.length) {
+          handleErrors(response.errors);
+          return;
+        }
+        setGlobalLeaderboardPageNumber(page_number);
+        setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
+      });
+    }
+  };
+  const WarRecordsNextPage = page_number => {
+    apiFetch(villageAPI, {
+      request: 'GetWarRecords',
+      page_number: page_number
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      if (response.data.warRecordData.war_records.length == 0) {
+        return;
+      } else {
+        setWarRecordsPageNumber(page_number);
+        setWarRecords(response.data.warRecordData.war_records);
+      }
+    });
+  };
+  const WarRecordsPreviousPage = page_number => {
+    if (page_number > 0) {
+      apiFetch(villageAPI, {
+        request: 'GetWarRecords',
+        page_number: page_number
+      }).then(response => {
+        if (response.errors.length) {
+          handleErrors(response.errors);
+          return;
+        }
+        setWarRecordsPageNumber(page_number);
+        setWarRecords(response.data.warRecordData.war_records);
+      });
+    }
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "wartable_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row first"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "column first"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "your war score"), /*#__PURE__*/React.createElement("div", {
+    className: "player_warlog_container"
+  }, /*#__PURE__*/React.createElement(WarLogHeader, null), /*#__PURE__*/React.createElement(PlayerWarLog, {
+    log: playerWarLog,
+    index: 0,
+    animate: false,
+    getVillageIcon: getVillageIcon
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "row second"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "column first"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "global war score"), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "warlog_label_row"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "warlog_username_label"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_war_score_label"
+  }, "war score"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_pvp_wins_label"
+  }, "pvp wins"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_raid_label"
+  }, "raid"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_reinforce_label"
+  }, "reinforce"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_infiltrate_label"
+  }, "infiltrate"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_defense_label"
+  }, "def"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_captures_label"
+  }, "captures"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_patrols_label"
+  }, "patrols"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_resources_label"
+  }, "resources"), /*#__PURE__*/React.createElement("div", {
+    className: "warlog_chart_label"
+  })), globalLeaderboardWarLogs.map((log, index) => /*#__PURE__*/React.createElement(PlayerWarLog, {
+    log: log,
+    index: index,
+    animate: true,
+    getVillageIcon: getVillageIcon
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_navigation"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_navigation_divider_left"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_pagination_wrapper"
+  }, globalLeaderboardPageNumber > 1 && /*#__PURE__*/React.createElement("a", {
+    className: "global_leaderboard_pagination",
+    onClick: () => GlobalLeaderboardPreviousPage(globalLeaderboardPageNumber - 1)
+  }, "<< Prev")), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_navigation_divider_middle"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_pagination_wrapper"
+  }, /*#__PURE__*/React.createElement("a", {
+    className: "global_leaderboard_pagination",
+    onClick: () => GlobalLeaderboardNextPage(globalLeaderboardPageNumber + 1)
+  }, "Next >>")), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_navigation_divider_right"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  })))))), /*#__PURE__*/React.createElement("div", {
+    className: "row third"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "column first"
+  }, /*#__PURE__*/React.createElement("svg", {
+    height: "0",
+    width: "0"
+  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("filter", {
+    id: "war_record_hover"
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    in: "SourceAlpha",
+    stdDeviation: "2",
+    result: "blur"
+  }), /*#__PURE__*/React.createElement("feFlood", {
+    floodColor: "white",
+    result: "floodColor"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "blur",
+    result: "opacityAdjustedBlur"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
+    type: "linear",
+    slope: "1"
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "floodColor",
+    in2: "opacityAdjustedBlur",
+    operator: "in",
+    result: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "coloredBlur"
+  }), /*#__PURE__*/React.createElement("feMergeNode", {
+    in: "SourceGraphic"
+  }))))), /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "war records"), /*#__PURE__*/React.createElement("div", {
+    className: "war_records_container"
+  }, warRecords.map((record, index) => /*#__PURE__*/React.createElement(WarRecord, {
+    record: record,
+    index: index,
+    getVillageIcon: getVillageIcon,
+    getVillageBanner: getVillageBanner
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_navigation"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_navigation_divider_left"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_pagination_wrapper"
+  }, warRecordsPageNumber > 1 && /*#__PURE__*/React.createElement("a", {
+    className: "global_leaderboard_pagination",
+    onClick: () => WarRecordsPreviousPage(warRecordsPageNumber - 1)
+  }, "<< Prev")), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_navigation_divider_middle"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_pagination_wrapper"
+  }, /*#__PURE__*/React.createElement("a", {
+    className: "global_leaderboard_pagination",
+    onClick: () => WarRecordsNextPage(warRecordsPageNumber + 1)
+  }, "Next >>")), /*#__PURE__*/React.createElement("div", {
+    className: "global_leaderboard_navigation_divider_right"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  })))), selectedWarRecord && /*#__PURE__*/React.createElement("div", {
+    className: "village_warlog_container"
+  }, /*#__PURE__*/React.createElement(VillageWarLog, {
+    log: selectedWarRecord.attacker_war_log,
+    getVillageIcon: getVillageIcon,
+    animate: true,
+    is_attacker: true,
+    getPolicyDisplayData: getPolicyDisplayData,
+    strategicDataState: strategicDataState
+  }), /*#__PURE__*/React.createElement(VillageWarLog, {
+    log: selectedWarRecord.defender_war_log,
+    getVillageIcon: getVillageIcon,
+    animate: true,
+    is_attacker: false,
+    getPolicyDisplayData: getPolicyDisplayData,
+    strategicDataState: strategicDataState
+  })))));
   function WarLogHeader() {
     return /*#__PURE__*/React.createElement("div", {
       className: "warlog_label_row"
@@ -419,273 +688,4 @@ export function WarTable({
       className: "village_warlog_details_value"
     }, log.resources_stolen))));
   }
-  const GlobalLeaderboardNextPage = page_number => {
-    apiFetch(villageAPI, {
-      request: 'GetGlobalWarLeaderboard',
-      page_number: page_number
-    }).then(response => {
-      if (response.errors.length) {
-        handleErrors(response.errors);
-        return;
-      }
-      if (response.data.warLogData.global_leaderboard_war_logs.length == 0) {
-        return;
-      } else {
-        setGlobalLeaderboardPageNumber(page_number);
-        setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
-      }
-    });
-  };
-  const GlobalLeaderboardPreviousPage = page_number => {
-    if (page_number > 0) {
-      apiFetch(villageAPI, {
-        request: 'GetGlobalWarLeaderboard',
-        page_number: page_number
-      }).then(response => {
-        if (response.errors.length) {
-          handleErrors(response.errors);
-          return;
-        }
-        setGlobalLeaderboardPageNumber(page_number);
-        setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
-      });
-    }
-  };
-  const WarRecordsNextPage = page_number => {
-    apiFetch(villageAPI, {
-      request: 'GetWarRecords',
-      page_number: page_number
-    }).then(response => {
-      if (response.errors.length) {
-        handleErrors(response.errors);
-        return;
-      }
-      if (response.data.warRecordData.war_records.length == 0) {
-        return;
-      } else {
-        setWarRecordsPageNumber(page_number);
-        setWarRecords(response.data.warRecordData.war_records);
-      }
-    });
-  };
-  const WarRecordsPreviousPage = page_number => {
-    if (page_number > 0) {
-      apiFetch(villageAPI, {
-        request: 'GetWarRecords',
-        page_number: page_number
-      }).then(response => {
-        if (response.errors.length) {
-          handleErrors(response.errors);
-          return;
-        }
-        setWarRecordsPageNumber(page_number);
-        setWarRecords(response.data.warRecordData.war_records);
-      });
-    }
-  };
-  return /*#__PURE__*/React.createElement("div", {
-    className: "wartable_container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "row first"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "column first"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "header"
-  }, "your war score"), /*#__PURE__*/React.createElement("div", {
-    className: "player_warlog_container"
-  }, /*#__PURE__*/React.createElement(WarLogHeader, null), /*#__PURE__*/React.createElement(PlayerWarLog, {
-    log: playerWarLog,
-    index: 0,
-    animate: false,
-    getVillageIcon: getVillageIcon
-  })))), /*#__PURE__*/React.createElement("div", {
-    className: "row second"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "column first"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "header"
-  }, "global war score"), /*#__PURE__*/React.createElement("div", {
-    className: "global_leaderboard_container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "warlog_label_row"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "warlog_username_label"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "warlog_war_score_label"
-  }, "war score"), /*#__PURE__*/React.createElement("div", {
-    className: "warlog_pvp_wins_label"
-  }, "pvp wins"), /*#__PURE__*/React.createElement("div", {
-    className: "warlog_raid_label"
-  }, "raid"), /*#__PURE__*/React.createElement("div", {
-    className: "warlog_reinforce_label"
-  }, "reinforce"), /*#__PURE__*/React.createElement("div", {
-    className: "warlog_infiltrate_label"
-  }, "infiltrate"), /*#__PURE__*/React.createElement("div", {
-    className: "warlog_defense_label"
-  }, "def"), /*#__PURE__*/React.createElement("div", {
-    className: "warlog_captures_label"
-  }, "captures"), /*#__PURE__*/React.createElement("div", {
-    className: "warlog_patrols_label"
-  }, "patrols"), /*#__PURE__*/React.createElement("div", {
-    className: "warlog_resources_label"
-  }, "resources"), /*#__PURE__*/React.createElement("div", {
-    className: "warlog_chart_label"
-  })), globalLeaderboardWarLogs.map((log, index) => /*#__PURE__*/React.createElement(PlayerWarLog, {
-    log: log,
-    index: index,
-    animate: true,
-    getVillageIcon: getVillageIcon
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "global_leaderboard_navigation"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "global_leaderboard_navigation_divider_left"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "100%",
-    height: "2"
-  }, /*#__PURE__*/React.createElement("line", {
-    x1: "0%",
-    y1: "1",
-    x2: "100%",
-    y2: "1",
-    stroke: "#4e4535",
-    strokeWidth: "1"
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "global_leaderboard_pagination_wrapper"
-  }, globalLeaderboardPageNumber > 1 && /*#__PURE__*/React.createElement("a", {
-    className: "global_leaderboard_pagination",
-    onClick: () => GlobalLeaderboardPreviousPage(globalLeaderboardPageNumber - 1)
-  }, "<< Prev")), /*#__PURE__*/React.createElement("div", {
-    className: "global_leaderboard_navigation_divider_middle"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "100%",
-    height: "2"
-  }, /*#__PURE__*/React.createElement("line", {
-    x1: "0%",
-    y1: "1",
-    x2: "100%",
-    y2: "1",
-    stroke: "#4e4535",
-    strokeWidth: "1"
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "global_leaderboard_pagination_wrapper"
-  }, /*#__PURE__*/React.createElement("a", {
-    className: "global_leaderboard_pagination",
-    onClick: () => GlobalLeaderboardNextPage(globalLeaderboardPageNumber + 1)
-  }, "Next >>")), /*#__PURE__*/React.createElement("div", {
-    className: "global_leaderboard_navigation_divider_right"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "100%",
-    height: "2"
-  }, /*#__PURE__*/React.createElement("line", {
-    x1: "0%",
-    y1: "1",
-    x2: "100%",
-    y2: "1",
-    stroke: "#4e4535",
-    strokeWidth: "1"
-  })))))), /*#__PURE__*/React.createElement("div", {
-    className: "row third"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "column first"
-  }, /*#__PURE__*/React.createElement("svg", {
-    height: "0",
-    width: "0"
-  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("filter", {
-    id: "war_record_hover"
-  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
-    in: "SourceAlpha",
-    stdDeviation: "2",
-    result: "blur"
-  }), /*#__PURE__*/React.createElement("feFlood", {
-    floodColor: "white",
-    result: "floodColor"
-  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
-    in: "blur",
-    result: "opacityAdjustedBlur"
-  }, /*#__PURE__*/React.createElement("feFuncA", {
-    type: "linear",
-    slope: "1"
-  })), /*#__PURE__*/React.createElement("feComposite", {
-    in: "floodColor",
-    in2: "opacityAdjustedBlur",
-    operator: "in",
-    result: "coloredBlur"
-  }), /*#__PURE__*/React.createElement("feMerge", null, /*#__PURE__*/React.createElement("feMergeNode", {
-    in: "coloredBlur"
-  }), /*#__PURE__*/React.createElement("feMergeNode", {
-    in: "SourceGraphic"
-  }))))), /*#__PURE__*/React.createElement("div", {
-    className: "header"
-  }, "war records"), /*#__PURE__*/React.createElement("div", {
-    className: "war_records_container"
-  }, warRecords.map((record, index) => /*#__PURE__*/React.createElement(WarRecord, {
-    record: record,
-    index: index,
-    getVillageIcon: getVillageIcon,
-    getVillageBanner: getVillageBanner
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "global_leaderboard_navigation"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "global_leaderboard_navigation_divider_left"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "100%",
-    height: "2"
-  }, /*#__PURE__*/React.createElement("line", {
-    x1: "0%",
-    y1: "1",
-    x2: "100%",
-    y2: "1",
-    stroke: "#4e4535",
-    strokeWidth: "1"
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "global_leaderboard_pagination_wrapper"
-  }, warRecordsPageNumber > 1 && /*#__PURE__*/React.createElement("a", {
-    className: "global_leaderboard_pagination",
-    onClick: () => WarRecordsPreviousPage(warRecordsPageNumber - 1)
-  }, "<< Prev")), /*#__PURE__*/React.createElement("div", {
-    className: "global_leaderboard_navigation_divider_middle"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "100%",
-    height: "2"
-  }, /*#__PURE__*/React.createElement("line", {
-    x1: "0%",
-    y1: "1",
-    x2: "100%",
-    y2: "1",
-    stroke: "#4e4535",
-    strokeWidth: "1"
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "global_leaderboard_pagination_wrapper"
-  }, /*#__PURE__*/React.createElement("a", {
-    className: "global_leaderboard_pagination",
-    onClick: () => WarRecordsNextPage(warRecordsPageNumber + 1)
-  }, "Next >>")), /*#__PURE__*/React.createElement("div", {
-    className: "global_leaderboard_navigation_divider_right"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "100%",
-    height: "2"
-  }, /*#__PURE__*/React.createElement("line", {
-    x1: "0%",
-    y1: "1",
-    x2: "100%",
-    y2: "1",
-    stroke: "#4e4535",
-    strokeWidth: "1"
-  })))), selectedWarRecord && /*#__PURE__*/React.createElement("div", {
-    className: "village_warlog_container"
-  }, /*#__PURE__*/React.createElement(VillageWarLog, {
-    log: selectedWarRecord.attacker_war_log,
-    getVillageIcon: getVillageIcon,
-    animate: true,
-    is_attacker: true,
-    getPolicyDisplayData: getPolicyDisplayData,
-    strategicDataState: strategicDataState
-  }), /*#__PURE__*/React.createElement(VillageWarLog, {
-    log: selectedWarRecord.defender_war_log,
-    getVillageIcon: getVillageIcon,
-    animate: true,
-    is_attacker: false,
-    getPolicyDisplayData: getPolicyDisplayData,
-    strategicDataState: strategicDataState
-  })))));
 }
