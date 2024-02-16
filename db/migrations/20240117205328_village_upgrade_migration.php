@@ -32,7 +32,6 @@ final class VillageUpgradeMigration extends AbstractMigration
             `key` VARCHAR(50) NOT NULL,
             `village_id` INT(11) NOT NULL,
             `status` VARCHAR(50) NOT NULL DEFAULT 'locked',
-            `last_activated` INT(11) NOT NULL DEFAULT '0',
             `research_progress` INT(11) NULL DEFAULT NULL,
             `research_progress_required` INT(11) NULL DEFAULT NULL,
             `research_progress_last_updated` INT(11) NULL DEFAULT NULL,
