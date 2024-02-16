@@ -146,33 +146,29 @@ class StaffManager {
     public function getBannedUsers():array {
         $return = [];
         $result = $this->system->db->query(
-            "SELECT `user_id`, `user_name`, `ban_data` FROM `users` WHERE `ban_data` != null OR `ban_data` != ''"
+            "SELECT `user_id`, `user_name`, `ban_data` FROM `users` WHERE `ban_data` IS NOT NULL AND `ban_data` != ''"
         );
         if($this->system->db->last_num_rows) {
             while($user = $this->system->db->fetch($result)) {
-                $ban_string = '';
                 $ban_data = json_decode($user['ban_data'], true);
-                $count = 0;
-                $size = sizeof($ban_data);
-                foreach($ban_data as $name => $ban_end) {
-                    $count++;
-                    $ban_string .= "<b>" . ucwords($name) . ':</b>';
-                    if($ban_end == self::PERM_BAN_VALUE) {
-                        $ban_string .= " <em>Permanent</em>";
-                    }
-                    else {
-                        $ban_string .= " ({$this->system->time_remaining($ban_end-time())})";
-                    }
-                    if($count%2 == 0 && $count != $size) {
-                        $ban_string .= ", <br />";
-                    }
-                    else {
-                        if($count != $size) {
-                            $ban_string .= ", ";
-                        }
-                    }
+                if($ban_data == null) {
+                    continue;
                 }
-                $user['ban_string'] = $ban_string;
+
+                $ban_displays = [];
+
+                foreach($ban_data as $name => $ban_end) {
+                    $display = "<b>" . ucwords($name) . ':</b>';
+                    if($ban_end == self::PERM_BAN_VALUE) {
+                        $display .= " <em>Permanent</em>";
+                    }
+                    else {
+                        $display .= " ({$this->system->time_remaining($ban_end->time())})";
+                    }
+
+                    $ban_displays[] = $display;
+                }
+                $user['ban_string'] = implode(", <br />", $ban_displays);
                 $return[] = $user;
             }
         }
