@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . '/WarLogDto.php';
-require_once __DIR__ . '/../Village/VillageRelation.php';
+require_once __DIR__ . '/../village/VillageRelation.php';
 require_once __DIR__ . '/WarRecordDto.php';
 
 class WarLogManager {
