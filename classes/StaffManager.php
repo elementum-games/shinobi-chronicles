@@ -9,6 +9,7 @@ class StaffManager {
     public string $user_name;
 
     const MINUTES_PER_DAY = 1440;
+    const MINUTES_PER_MONTH = self::MINUTES_PER_DAY * 30;
     const DATE_FORMAT = 'm/d/y H:i:s';
     const PERM_BAN_VALUE = -1;
     const OW_MIN = 10;
@@ -35,13 +36,13 @@ class StaffManager {
         '3_day' => 3 * self::MINUTES_PER_DAY,
         '1_week' => 7 * self::MINUTES_PER_DAY,
         '2_week' => 14 * self::MINUTES_PER_DAY,
-        '1_month' => 30 * self::MINUTES_PER_DAY,
-        '3_month' => 90 * self::MINUTES_PER_DAY,
+        '1_month' => self::MINUTES_PER_MONTH,
+        '3_month' => 3 * self::MINUTES_PER_MONTH,
     ];
 
     public static array $hm_ban_lengths = [
-        '6_month' => 180 * self::MINUTES_PER_DAY,
-        '1_year' => 365 * self::MINUTES_PER_DAY,
+        '6_month' => 6 * self::MINUTES_PER_MONTH,
+        '1_year' => 12 * self::MINUTES_PER_MONTH,
     ];
 
     public static $admin_ban_lengths = [
@@ -529,7 +530,7 @@ class StaffManager {
         }
 
         //Create new ban data for storage
-        if($ban_data == null || empty($ban_data)) {
+        if(empty($ban_data)) {
             $ban_data = json_encode(array(
                 $ban_type => $ban_expire
             ));

@@ -697,35 +697,41 @@ function modPanel() {
                 }
 
                 // Validate day to month
-                $start_day = $_POST['start_day'];
-                $end_day = $_POST['end_day'];
+                $start_year = (int) $_POST['start_year'];
+                $start_month = $system->db->clean($_POST['start_month']);
+                $start_day = (int) $_POST['start_day'];
 
-                if($_POST['start_month'] == 'Feb') {
+                $end_year = (int) $_POST['end_year'];
+                $end_month = $system->db->clean($_POST['end_month']);
+                $end_day = (int) $_POST['end_day'];
+
+                if($start_month == 'Feb') {
                     $max_days = 28;
-                    if((($_POST['start_year'] % 4) == 0) && ((($_POST['start_year'] % 100) != 0) || (($_POST['start_year'] %400) == 0))) {
+                    if((($start_year % 4) == 0) && ((($start_year % 100) != 0) || (($start_year %400) == 0))) {
                         $max_days = 29;
                     }
                     $start_day = min($start_day, $max_days);
                 }
-                if($_POST['end_month'] == 'Feb') {
+                if($end_month == 'Feb') {
                     $max_days = 28;
-                    if((($_POST['end_year'] % 4) == 0) && ((($_POST['end_year'] % 100) != 0) || (($_POST['end_year'] %400) == 0))) {
+                    if((($end_year % 4) == 0) && ((($end_year % 100) != 0) || (($end_year %400) == 0))) {
                         $max_days = 29;
                     }
                     $start_day = min($start_day, $max_days);
                 }
-                if(in_array($_POST['start_month'], ['Apr', 'Jun', 'Sep', 'Nov'])) {
+
+                if(in_array($start_month, ['Apr', 'Jun', 'Sep', 'Nov'])) {
                     $start_day = min($start_day, 30);
                 }
-                if(in_array($_POST['end_month'], ['Apr', 'Jun', 'Sep', 'Nov'])) {
+                if(in_array($end_month, ['Apr', 'Jun', 'Sep', 'Nov'])) {
                     $end_day = min($end_day, 30);
                 }
 
                 // Start from beginning of day these must be reported in GMT as logs are processed as such
-                $start_string = $_POST['start_month'] . ' ' . $start_day . ' ' . $_POST['start_year'] . ' 00:00:00';
+                $start_string = $start_month . ' ' . $start_day . ' ' . $start_year . ' 00:00:00';
                 $start_time = new DateTimeImmutable($start_string, new DateTimeZone('Europe/London'));
                 // End just prior to midnight these must be reported in GMT as logs are processed as such
-                $end_string = $_POST['end_month'] . ' ' . $end_day . ' ' . $_POST['end_year'] . ' 23:59:59';
+                $end_string = $end_month . ' ' . $end_day . ' ' . $end_year . ' 23:59:59';
                 $end_time = new DateTimeImmutable($end_string, new DateTimeZone('Europe/London'));
 
                 // Set stamps for queries

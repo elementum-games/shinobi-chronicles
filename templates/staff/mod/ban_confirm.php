@@ -15,7 +15,7 @@
             <?php if($ban_length == StaffManager::PERM_BAN_VALUE): ?>
                 Issue permanent <?=ucwords($ban_type)?> Ban?
             <?php elseif($ban_length >= StaffManager::MINUTES_PER_DAY * 30): ?>
-				<?=ucwords($ban_type)?> Ban <?=$user_data['user_name']?> for <?=($ban_length / (30 * StaffManager::MINUTES_PER_DAY))?> month(s)?<br />
+				<?=ucwords($ban_type)?> Ban <?=$user_data['user_name']?> for <?=($ban_length / (StaffManager::MINUTES_PER_MONTH))?> month(s)?<br />
             <?php elseif($ban_length >= StaffManager::MINUTES_PER_DAY): ?>
                 <?=ucwords($ban_type)?> Ban <?=$user_data['user_name']?> for <?=$ban_length / StaffManager::MINUTES_PER_DAY ?> day(s)?<br />
             <?php else: ?>
