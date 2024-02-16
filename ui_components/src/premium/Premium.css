@@ -1,0 +1,31 @@
+.navigation_row {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+.nav_button {
+    width: 130px;
+    height: 30px;
+    background: linear-gradient(to bottom, #3b4176 50%, #2f345e 50%);
+    line-height: 25px;
+    font-variant: small-caps;
+    text-align: center;
+    color: #ccc1af;
+    cursor: pointer;
+    user-select: none;
+    font-size: 14px;
+}
+.nav_button:hover {
+    color: white;
+    background: linear-gradient(to bottom, #6f3043 50%, #622231 50%);
+}
+.nav_button.disabled {
+    opacity: 30%;
+    pointer-events: none;
+}
+.nav_button.disabled:hover {
+    color: #ccc1af;
+    background: linear-gradient(to bottom, #3b4176 50%, #2f345e 50%);
+    cursor: default;
+}
