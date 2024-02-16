@@ -11,7 +11,7 @@ require_once __DIR__ . "/VillageBuildingConfigData.php";
 require_once __DIR__ . "/VillageUpgradeConfigData.php";
 
 class VillageUpgradeManager {
-    const UPGRADE_TOGGLE_COOLDOWN_DAYS = 3;
+    const UPGRADE_ACTIVATION_TIME_DAYS = 3; // time in days to activate an upgrade
 
     public static $UPGRADE_CONFIGS = array();
     public static $BUILDING_CONFIGS = array();
@@ -152,7 +152,7 @@ class VillageUpgradeManager {
                     $upgrade_config_data = VillageUpgradeManager::$UPGRADE_CONFIGS[$upgrade_key];
                     $upgrade = $village->upgrades[$upgrade_key] ?? null;
                     $upgrades[] = new VillageUpgradeDto(
-                        id: $upgrade ? $upgrade->key : null,
+                        id: $upgrade ? $upgrade->id : null,
                         key: $upgrade_key,
                         village_id: $village->village_id,
                         status: $upgrade ? $upgrade->status : VillageUpgradeConfig::UPGRADE_STATUS_LOCKED,
@@ -162,10 +162,10 @@ class VillageUpgradeManager {
                         research_time_remaining: $upgrade ? System::TimeRemaining($upgrade->research_progress_required - $upgrade->research_progress, format: "long", include_seconds: false, include_minutes: false) : '',
                         name: $upgrade_config_data->getName(),
                         description: $upgrade_config_data->getDescription(),
-                        materials_research_cost: $upgrade_config_data->getResearchCostMaterials(),
-                        food_research_cost: $upgrade_config_data->getResearchCostFood(),
-                        wealth_research_cost: $upgrade_config_data->getResearchCostWealth(),
-                        research_time: $upgrade_config_data->getResearchTime(),
+                        materials_research_cost: ($upgrade && $upgrade->research_progress !== null) ? 0 : $upgrade_config_data->getResearchCostMaterials(),
+                        food_research_cost: ($upgrade && $upgrade->research_progress !== null) ? 0 : $upgrade_config_data->getResearchCostFood(),
+                        wealth_research_cost: ($upgrade && $upgrade->research_progress !== null) ? 0 : $upgrade_config_data->getResearchCostWealth(),
+                        research_time: ($upgrade && $upgrade->research_progress !== null) ? round($upgrade_config_data->getResearchTime() * (($upgrade->research_progress_required - $upgrade->research_progress) / $upgrade->research_progress_required)) : $upgrade_config_data->getResearchTime(),
                         materials_upkeep: $upgrade_config_data->getUpkeepMaterials(),
                         food_upkeep: $upgrade_config_data->getUpkeepFood(),
                         wealth_upkeep: $upgrade_config_data->getUpkeepWealth(),
@@ -197,10 +197,10 @@ class VillageUpgradeManager {
                 description: $building->getDescription(),
                 phrase: $building->getPhrase(),
                 background_image: $building->getBackgroundImage(),
-                materials_construction_cost: $building->getConstructionCostMaterials($building->tier),
-                food_construction_cost: $building->getConstructionCostFood($building->tier),
-                wealth_construction_cost: $building->getConstructionCostWealth($building->tier),
-                construction_time: $building->getConstructionTime($building->tier),
+                materials_construction_cost: $building->construction_progress != null ? 0 : $building->getConstructionCostMaterials($building->tier + 1),
+                food_construction_cost: $building->construction_progress != null ? 0 : $building->getConstructionCostFood($building->tier + 1),
+                wealth_construction_cost: $building->construction_progress != null ? 0 : $building->getConstructionCostWealth($building->tier + 1),
+                construction_time: $building->construction_progress != null ? round($building->getConstructionTime($building->tier + 1) * (($building->construction_progress_required - $building->construction_progress) / $building->construction_progress_required)) : $building->getConstructionTime($building->tier + 1),
                 construction_time_remaining: System::TimeRemaining($building->construction_progress_required - $building->construction_progress, format: "long", include_seconds: false, include_minutes: false),
                 upgrade_sets: $upgrade_sets,
                 requirements_met: VillageUpgradeManager::checkConstructionRequirementsMet($village, $building->key, $building->tier + 1),
@@ -234,7 +234,7 @@ class VillageUpgradeManager {
             // check if the village has the required upgrades
             if (isset($requirements[VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES])) {
                 foreach ($requirements[VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES] as $required_upgrade_key) {
-                    if ($village->upgrades[$required_upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
+                    if (!isset($village->upgrades[$required_upgrade_key]) || $village->upgrades[$required_upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
                         return false;
                     }
                 }
@@ -380,14 +380,22 @@ class VillageUpgradeManager {
             $system->db->query("UPDATE `village_upgrades` SET `research_progress_required` = {$progress_required}, `research_progress_last_updated` = " . time() . ", `status` = '" . VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING . "' WHERE `id` = {$village->upgrades[$upgrade_key]->id}");
             return "Research resumed for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
         } else {
-            $village->upgrades[$upgrade_key]->research_progress = 0;
-            $village->upgrades[$upgrade_key]->research_progress_required = $progress_required;
-            $village->upgrades[$upgrade_key]->research_progress_last_updated = time();
-            $village->upgrades[$upgrade_key]->status = VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING;
             $system->db->query("INSERT INTO `village_upgrades`
                 (`village_id`, `key`, `status`, `research_progress`, `research_progress_required`, `research_progress_last_updated`)
                 VALUES ({$village->village_id}, '{$upgrade_key}', '" . VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING . "', 0, {$progress_required}, " . time() . ")
             ");
+            $upgrade_id = $system->db->last_insert_id;
+            $new_upgrade = new VillageUpgrade(
+                id: $upgrade_id,
+                key: $upgrade_key,
+                village_id: $village->village_id,
+                status: VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING,
+                research_progress: 0,
+                research_progress_required: $progress_required,
+                research_progress_last_updated: time(),
+                config_data: self::$UPGRADE_CONFIGS[$upgrade_key],
+            );
+            $village->upgrades[$upgrade_key] = $new_upgrade;
             return "Research started for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
         }
     }
@@ -403,5 +411,103 @@ class VillageUpgradeManager {
         $village->upgrades[$upgrade_key]->research_progress_last_updated = time();
         $system->db->query("UPDATE `village_upgrades` SET `status` = '" . VillageUpgradeConfig::UPGRADE_STATUS_LOCKED . "', `research_progress_last_updated` = " . time() . " WHERE `id` = {$village->upgrades[$upgrade_key]->id}");
         return "Research cancelled for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
+    }
+
+    public static function activateUpgrade(System $system, Village $village, $upgrade_key): string {
+        self::initialize();
+        // check if upgrade is inactive
+        if (!isset($village->upgrades[$upgrade_key]) || $village->upgrades[$upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_INACTIVE) {
+            return "Invalid upgrade selection.";
+        }
+        // check if activation requirements are met
+        if (!VillageUpgradeManager::checkActivationRequirements($system, $village, $upgrade_key)) {
+            return "Activation requirements not met!";
+        }
+        $village->upgrades[$upgrade_key]->status = VillageUpgradeConfig::UPGRADE_STATUS_ACTIVATING;
+        $village->upgrades[$upgrade_key]->research_progress = 0;
+        $village->upgrades[$upgrade_key]->research_progress_required = VillageUpgradeManager::UPGRADE_ACTIVATION_TIME_DAYS * 86400;
+        $village->upgrades[$upgrade_key]->research_progress_last_updated = time();
+        $system->db->query("UPDATE `village_upgrades` SET `status` = '" . VillageUpgradeConfig::UPGRADE_STATUS_ACTIVATING . "', `research_progress` = 0, `research_progress_required` = " . VillageUpgradeManager::UPGRADE_ACTIVATION_TIME_DAYS * 86400 . ", `research_progress_last_updated` = " . time() . " WHERE `id` = {$village->upgrades[$upgrade_key]->id}");
+        return "Activation started for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
+    }
+
+    public static function cancelActivation(System $system, Village $village, $upgrade_key): string {
+        self::initialize();
+        // check if the upgrade is under activation
+        if ($village->upgrades[$upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_ACTIVATING) {
+            return "Upgrade is not under activation!";
+        }
+        // stop activation but maintain progress
+        $village->upgrades[$upgrade_key]->status = VillageUpgradeConfig::UPGRADE_STATUS_INACTIVE;
+        $village->upgrades[$upgrade_key]->research_progress = null;
+        $village->upgrades[$upgrade_key]->research_progress_required = null;
+        $village->upgrades[$upgrade_key]->research_progress_last_updated = time();
+        $system->db->query("UPDATE `village_upgrades` SET `status` = '" . VillageUpgradeConfig::UPGRADE_STATUS_INACTIVE . "', `research_progress` = NULL, `research_progress_required` = NULL, `research_progress_last_updated` = " . time() . " WHERE `id` = {$village->upgrades[$upgrade_key]->id}");
+        return "Activation cancelled for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
+    }
+
+    public static function deactivateUpgrade(System $system, Village $village, $upgrade_key): string {
+        self::initialize();
+        // check if upgrade is active
+        if (!isset($village->upgrades[$upgrade_key]) || $village->upgrades[$upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
+            return "Invalid upgrade selection.";
+        }
+        // check if deactivation requirements are met
+        if (!VillageUpgradeManager::checkDeactivationRequirements($system, $village, $upgrade_key)) {
+            return "Deactivation requirements not met!";
+        }
+        $village->upgrades[$upgrade_key]->status = VillageUpgradeConfig::UPGRADE_STATUS_INACTIVE;
+        $system->db->query("UPDATE `village_upgrades` SET `status` = '" . VillageUpgradeConfig::UPGRADE_STATUS_INACTIVE . "' WHERE `id` = {$village->upgrades[$upgrade_key]->id}");
+        return "Upgrade deactivated for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
+    }
+
+    public static function checkActivationRequirements(System $system, Village $village, $upgrade_key): bool {
+        self::initialize();
+        // check upgrade exists and is inactive
+        if (!isset($village->upgrades[$upgrade_key]) || $village->upgrades[$upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_INACTIVE) {
+            return false;
+        }
+        // check if the village has the required buildings
+        if (isset(VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key][VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS])) {
+            foreach (VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key][VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS] as $building_key => $tier) {
+                if ($village->buildings[$building_key]->tier < $tier) {
+                    return false;
+                }
+            }
+        }
+        // check if the village has the required upgrades and that those upgrades are also active
+        if (isset(VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key][VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES])) {
+            foreach (VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key][VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES] as $required_upgrade_key) {
+                if (!isset($village->upgrades[$required_upgrade_key]) || $village->upgrades[$required_upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
+                    return false;
+                }
+                if ($village->upgrades[$required_upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
+                    return false;
+                }
+            }
+        }
+        // check if village HQ is at least the same tier as the effective tier for the upgrade
+        if ($village->buildings[VillageBuildingConfig::BUILDING_VILLAGE_HQ]->tier < $tier) {
+            return false;
+        }
+        return true;
+    }
+
+    public static function checkDeactivationRequirements(System $system, Village $village, $upgrade_key): bool {
+        self::initialize();
+        // check upgrade exists and is active
+        if (!isset($village->upgrades[$upgrade_key]) || $village->upgrades[$upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
+            return false;
+        }
+        // loop through all upgrades and check if the upgrade is a requirement for any other active upgrade
+        foreach ($village->upgrades as $upgrade) {
+            if ($upgrade->status == VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
+                if (isset($upgrade->getResearchRequirements()[VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES])) {
+                    if (in_array($upgrade_key, $upgrade->getResearchRequirements()[VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES])) {
+                        return false;
+                    }
+                }
+            }
+        }
     }
 }

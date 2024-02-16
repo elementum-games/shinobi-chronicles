@@ -28,7 +28,7 @@ export function VillageUpgrades({
         let return_string = "upkeep cost / day: ";
         building.upgrade_sets.forEach((upgrade_set) => {
             upgrade_set.upgrades.forEach((upgrade) => {
-                if (upgrade.status == "active") {
+                if (upgrade.status == "active" || upgrade.status == "activating") {
                     materials_cost += upgrade.materials_upkeep;
                     food_cost += upgrade.food_upkeep;
                     wealth_cost += upgrade.wealth_upkeep;
@@ -139,6 +139,75 @@ export function VillageUpgrades({
             villageAPI,
             {
                 request: 'CancelResearch',
+                upgrade_key: selectedUpgrade.key,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+            setSelectedUpgrade(null);
+            setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
+            });
+        });
+    }
+    const ActivateUpgrade = () => {
+        apiFetch(
+            villageAPI,
+            {
+                request: 'ActivateUpgrade',
+                upgrade_key: selectedUpgrade.key,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+            setSelectedUpgrade(null);
+            setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
+            });
+        });
+    }
+    const DeactivateUpgrade = () => {
+        apiFetch(
+            villageAPI,
+            {
+                request: 'DeactivateUpgrade',
+                upgrade_key: selectedUpgrade.key,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+            setSelectedUpgrade(null);
+            setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
+            });
+        });
+    }
+    const CancelActivation = () => {
+        apiFetch(
+            villageAPI,
+            {
+                request: 'CancelActivation',
                 upgrade_key: selectedUpgrade.key,
             }
         ).then((response) => {
@@ -273,8 +342,7 @@ export function VillageUpgrades({
                         <div className="building_controls_container">
                             <div className="building_controls_label">upgrade to next tier</div>
                             <div className="building_controls">
-                                <div className="building_upgrade_requirements" style={{
-                                    background: (selectedBuilding.status === "upgrading" ? `linear-gradient(to right, #362a4c 0%, #4c1f2f ${(construction_progress_percent / 2)}%, #2d1d25 ${construction_progress_percent}%, transparent ${construction_progress_percent}%` : "") }}>
+                                <div className="building_upgrade_requirements" style={{background: (selectedBuilding.status === "upgrading" ? `linear-gradient(to right, #362a4c 0%, #4c1f2f ${(construction_progress_percent / 2)}%, #2d1d25 ${construction_progress_percent}%, transparent ${construction_progress_percent}%` : "") }}>
                                     {selectedBuilding.tier == 3 &&
                                         <>
                                             <span>No upgrades available</span>
@@ -295,7 +363,7 @@ export function VillageUpgrades({
                                             <img src="/images/icons/wealth.png" alt="wealth" style={{ height: "16px" }} />
                                             <span style={{ color: (current_wealth > selectedBuilding.wealth_construction_cost ? "#96eeaf" : "#e98b99") }}>{selectedBuilding.wealth_construction_cost}</span>
                                             <img src="images/v2/icons/timer.png" alt="materials" style={{ height: "16px" }} />
-                                            <span>{selectedBuilding.construction_time} {selectedBuilding.construction_time > 1 ? " days" : " day"}</span>
+                                        <span>{selectedBuilding.construction_time} {(selectedBuilding.construction_time > 1 || selectedBuilding.construction_time == 0) ? " days" : " day"}</span>
                                         </>
                                     }
                                 </div>
@@ -309,9 +377,9 @@ export function VillageUpgrades({
                                                 text: "sometext?",
                                                 ContentComponent: null,
                                                 onConfirm: () => BeginConstruction(),
-                                            })}>upgrade</div>
+                                            })}>build</div>
                                             :
-                                            <div className="construction_begin_button disabled">upgrade</div>
+                                            <div className="construction_begin_button disabled">build</div>
                                         }
                                         </>
                                     }
@@ -366,58 +434,113 @@ export function VillageUpgrades({
             ))
         )
         const renderUpgradeDetails = () => {
+            const research_progress_percent = (selectedUpgrade.research_progress / selectedUpgrade.research_progress_required) * 100;
             return (
                 <div className="upgrade_details_container">
-                    {selectedUpgrade.status === "researching" &&
-                        <div className="research_progress_text_container">
-                            <div className="research_progress_label">RESEARCH IN PROGRESS</div>
-                            <div className="research_progress_text">{selectedUpgrade.research_time_remaining}</div>
-                        </div>
-                    }
                     <div className="upgrade_name">{selectedUpgrade.name}</div>
                     <div className="upgrade_description">{selectedUpgrade.description}</div>
-                    <div className="upgrade_requirement_line">
-                        <span style={{ fontSize: "10px", lineHeight: "16px" }}>research cost: </span>
-                        <img src="/images/icons/materials.png" alt="materials" style={{ height: "16px" }} />
-                        <span style={{ color: "#e98b99" }}>{selectedUpgrade.materials_research_cost}</span>
-                        <img src="/images/icons/food.png" alt="food" style={{ height: "16px" }} />
-                        <span style={{ color: "#e98b99" }}>{selectedUpgrade.food_research_cost}</span>
-                        <img src="/images/icons/wealth.png" alt="wealth" style={{ height: "16px" }} />
-                        <span style={{ color: "#e98b99" }}>{selectedUpgrade.wealth_research_cost}</span>
-                    </div>
-                    <div className="upgrade_requirement_line">
-                        <span style={{ fontSize: "10px", lineHeight: "16px" }}>daily upkeep: </span>
-                        <img src="/images/icons/materials.png" alt="materials" style={{ height: "16px" }} />
-                        <span style={{ color: "#e98b99" }}>{selectedUpgrade.materials_upkeep * 24}</span>
-                        <img src="/images/icons/food.png" alt="food" style={{ height: "16px" }} />
-                        <span style={{ color: "#e98b99" }}>{selectedUpgrade.food_upkeep * 24}</span>
-                        <img src="/images/icons/wealth.png" alt="wealth" style={{ height: "16px" }} />
-                        <span style={{ color: "#e98b99" }}>{selectedUpgrade.wealth_upkeep * 24}</span>
-                    </div>
-                    <div className="upgrade_requirement_line">
-                        <span style={{ fontSize: "10px", lineHeight: "16px" }}>research time: </span>
-                        <img src="images/v2/icons/timer.png" alt="materials" style={{ height: "16px" }} />
-                        <span>{selectedUpgrade.research_time} {selectedUpgrade.research_time > 1 ? " days" : " day"}</span>
-                    </div>
-                    <div className="upgrade_buttons_container">
-                        {(!!selectedUpgrade.requirements_met && selectedUpgrade.status === "locked" && playerSeatState.seat_type === "kage") &&
+                    <div className="upgrade_controls_container">
+                        <div className="upgrade_buttons_container">
+                            {(!!selectedUpgrade.requirements_met && selectedUpgrade.status === "locked" && playerSeatState.seat_type === "kage") &&
+                                <>
+                                    <div className="research_begin_button" onClick={() => openModal({
+                                        header: 'Confirmation',
+                                        text: "sometext?",
+                                        ContentComponent: null,
+                                        onConfirm: () => BeginResearch(),
+                                    })}>research</div>
+                                </>
+                            }
+                            {(!(!!selectedUpgrade.requirements_met) && selectedUpgrade.status === "locked" && playerSeatState.seat_type === "kage") &&
+                                <>
+                                    <div className="research_begin_button disabled">research</div>
+                                </>
+                            }
+                            {(selectedUpgrade.status === "researching" && playerSeatState.seat_type === "kage") &&
+                                <>
+                                    <div className="research_cancel_button" onClick={() => openModal({
+                                        header: 'Confirmation',
+                                        text: "sometext?",
+                                        ContentComponent: null,
+                                        onConfirm: () => CancelResearch(),
+                                    })}>cancel</div>
+                                </>
+                            }
+                            {(selectedUpgrade.status === "inactive" && playerSeatState.seat_type === "kage") &&
+                                <>
+                                    <div className="upgrade_toggle_on_button" onClick={() => openModal({
+                                        header: 'Confirmation',
+                                        text: "sometext?",
+                                        ContentComponent: null,
+                                        onConfirm: () => ActivateUpgrade(),
+                                    })}>activate</div>
+                                </>
+                            }
+                            {(selectedUpgrade.status === "active" && playerSeatState.seat_type === "kage") &&
+                                <>
+                                    <div className="upgrade_toggle_off_button" onClick={() => openModal({
+                                        header: 'Confirmation',
+                                        text: "sometext?",
+                                        ContentComponent: null,
+                                        onConfirm: () => DeactivateUpgrade(),
+                                    })}>deactivate</div>
+                                </>
+                            }
+                            {(selectedUpgrade.status === "activating" && playerSeatState.seat_type === "kage") &&
+                                <>
+                                    <div className="upgrade_toggle_off_button" onClick={() => openModal({
+                                        header: 'Confirmation',
+                                        text: "sometext?",
+                                        ContentComponent: null,
+                                        onConfirm: () => CancelActivation(),
+                                    })}>cancel</div>
+                                </>
+                            }
+                        </div>
+                        {selectedUpgrade.status === "locked" && 
                             <>
-                                <div className="research_begin_button" onClick={() => openModal({
-                                    header: 'Confirmation',
-                                    text: "sometext?",
-                                    ContentComponent: null,
-                                    onConfirm: () => BeginResearch(),
-                                })}>begin research</div>
+                                <div className="upgrade_controls_label">research cost</div>
+                                <div className="upgrade_research_requirements">
+                                    <img src="/images/icons/materials.png" alt="materials" style={{ height: "16px" }} />
+                                    <span style={{ color: (current_materials > selectedUpgrade.materials_research_cost ? "#96eeaf" : "#e98b99") }}>{selectedUpgrade.materials_research_cost}</span>
+                                    <img src="/images/icons/food.png" alt="food" style={{ height: "16px" }} />
+                                    <span style={{ color: (current_food > selectedUpgrade.food_research_cost ? "#96eeaf" : "#e98b99") }}>{selectedUpgrade.food_research_cost}</span>
+                                    <img src="/images/icons/wealth.png" alt="wealth" style={{ height: "16px" }} />
+                                    <span style={{ color: (current_wealth > selectedUpgrade.wealth_research_cost ? "#96eeaf" : "#e98b99") }}>{selectedUpgrade.wealth_research_cost}</span>
+                                    <img src="images/v2/icons/timer.png" alt="materials" style={{ height: "16px" }} />
+                                    <span>{selectedUpgrade.research_time} {(selectedUpgrade.research_time > 1 || selectedUpgrade.research_time == 0) ? " days" : " day"}</span>
+                                </div>
                             </>
                         }
-                        {(selectedUpgrade.status === "researching" && playerSeatState.seat_type === "kage") &&
+                        {selectedUpgrade.status === "researching" && 
                             <>
-                                <div className="research_cancel_button" onClick={() => openModal({
-                                    header: 'Confirmation',
-                                    text: "sometext?",
-                                    ContentComponent: null,
-                                    onConfirm: () => CancelResearch(),
-                                })}>cancel research</div>
+                                <div className="upgrade_controls_label">researching</div>
+                                    <div className="upgrade_research_requirements" style={{ background: `linear-gradient(to right, #362a4c 0%, #4c1f2f ${(research_progress_percent / 2)}%, #2d1d25 ${research_progress_percent}%, transparent ${research_progress_percent}%` }}>
+                                    <div className="research_progress_text">{selectedUpgrade.research_time_remaining}</div>
+                                </div>
+                            </>
+                        }
+                        {selectedUpgrade.status === "activating" &&
+                            <>
+                                <div className="upgrade_controls_label">activating</div>
+                                    <div className="upgrade_research_requirements" style={{ background: `linear-gradient(to right, #362a4c 0%, #4c1f2f ${(research_progress_percent / 2)}%, #2d1d25 ${research_progress_percent}%, transparent ${research_progress_percent}%` }}>
+                                    <div className="research_progress_text">{selectedUpgrade.research_time_remaining}</div>
+                                </div>
+                            </>
+                        }
+                        {(selectedUpgrade.status == "active" || selectedUpgrade.status == "unlocked" || selectedUpgrade.status == "inactive") &&
+                            <>
+                                <div className="upgrade_controls_label">upkeep cost</div>
+                                <div className="upgrade_research_requirements">
+                                    <img src="/images/icons/materials.png" alt="materials" style={{ height: "16px" }} />
+                                    <span style={{ color: "#e98b99" }}>{selectedUpgrade.materials_upkeep}</span>
+                                    <img src="/images/icons/food.png" alt="food" style={{ height: "16px" }} />
+                                    <span style={{ color: "#e98b99" }}>{selectedUpgrade.food_upkeep}</span>
+                                    <img src="/images/icons/wealth.png" alt="wealth" style={{ height: "16px" }} />
+                                    <span style={{ color: "#e98b99" }}>{selectedUpgrade.wealth_upkeep}</span>
+                                    <img src="images/v2/icons/timer.png" alt="materials" style={{ height: "16px" }} />
+                                    <span>upkeep/hour</span>
+                                </div>
                             </>
                         }
                     </div>

@@ -9,6 +9,7 @@ class VillageUpgradeConfig {
     const UPGRADE_STATUS_UNLOCKED = 'unlocked'; // state for unlocked, permanent upgrades
     const UPGRADE_STATUS_INACTIVE = 'inactive'; // state for unlocked, toggled OFF upgrades
     const UPGRADE_STATUS_ACTIVE = 'active'; // stat for unlocked, toggle ON upgrades
+    const UPGRADE_STATUS_ACTIVATING = 'activating'; // used when toggling ON
 
     /* keys used for individual upgrade identifiers */
     const UPGRADE_KEY_TEST = 'TEST';

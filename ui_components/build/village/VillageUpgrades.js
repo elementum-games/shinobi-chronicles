@@ -28,7 +28,7 @@ export function VillageUpgrades({
     let return_string = "upkeep cost / day: ";
     building.upgrade_sets.forEach(upgrade_set => {
       upgrade_set.upgrades.forEach(upgrade => {
-        if (upgrade.status == "active") {
+        if (upgrade.status == "active" || upgrade.status == "activating") {
           materials_cost += upgrade.materials_upkeep;
           food_cost += upgrade.food_upkeep;
           wealth_cost += upgrade.wealth_upkeep;
@@ -128,6 +128,66 @@ export function VillageUpgrades({
   const CancelResearch = () => {
     apiFetch(villageAPI, {
       request: 'CancelResearch',
+      upgrade_key: selectedUpgrade.key
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+      setSelectedUpgrade(null);
+      setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
+      openModal({
+        header: 'Confirmation',
+        text: response.data.response_message,
+        ContentComponent: null,
+        onConfirm: null
+      });
+    });
+  };
+  const ActivateUpgrade = () => {
+    apiFetch(villageAPI, {
+      request: 'ActivateUpgrade',
+      upgrade_key: selectedUpgrade.key
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+      setSelectedUpgrade(null);
+      setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
+      openModal({
+        header: 'Confirmation',
+        text: response.data.response_message,
+        ContentComponent: null,
+        onConfirm: null
+      });
+    });
+  };
+  const DeactivateUpgrade = () => {
+    apiFetch(villageAPI, {
+      request: 'DeactivateUpgrade',
+      upgrade_key: selectedUpgrade.key
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+      setSelectedUpgrade(null);
+      setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
+      openModal({
+        header: 'Confirmation',
+        text: response.data.response_message,
+        ContentComponent: null,
+        onConfirm: null
+      });
+    });
+  };
+  const CancelActivation = () => {
+    apiFetch(villageAPI, {
+      request: 'CancelActivation',
       upgrade_key: selectedUpgrade.key
     }).then(response => {
       if (response.errors.length) {
@@ -699,7 +759,7 @@ export function VillageUpgrades({
       style: {
         height: "16px"
       }
-    }), /*#__PURE__*/React.createElement("span", null, selectedBuilding.construction_time, " ", selectedBuilding.construction_time > 1 ? " days" : " day"))), /*#__PURE__*/React.createElement("div", {
+    }), /*#__PURE__*/React.createElement("span", null, selectedBuilding.construction_time, " ", selectedBuilding.construction_time > 1 || selectedBuilding.construction_time == 0 ? " days" : " day"))), /*#__PURE__*/React.createElement("div", {
       className: "building_buttons_container"
     }, selectedBuilding.status === "default" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, !!selectedBuilding.requirements_met && current_materials > selectedBuilding.materials_construction_cost && current_food > selectedBuilding.food_construction_cost && current_wealth > selectedBuilding.wealth_construction_cost ? /*#__PURE__*/React.createElement("div", {
       className: "construction_begin_button",
@@ -709,9 +769,9 @@ export function VillageUpgrades({
         ContentComponent: null,
         onConfirm: () => BeginConstruction()
       })
-    }, "upgrade") : /*#__PURE__*/React.createElement("div", {
+    }, "build") : /*#__PURE__*/React.createElement("div", {
       className: "construction_begin_button disabled"
-    }, "upgrade")), selectedBuilding.status === "upgrading" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    }, "build")), selectedBuilding.status === "upgrading" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "construction_cancel_button",
       onClick: () => openModal({
         header: 'Confirmation',
@@ -746,106 +806,16 @@ export function VillageUpgrades({
       className: "upgrade_tier"
     }, romanize(index + 1))))));
     const renderUpgradeDetails = () => {
+      const research_progress_percent = selectedUpgrade.research_progress / selectedUpgrade.research_progress_required * 100;
       return /*#__PURE__*/React.createElement("div", {
         className: "upgrade_details_container"
-      }, selectedUpgrade.status === "researching" && /*#__PURE__*/React.createElement("div", {
-        className: "research_progress_text_container"
       }, /*#__PURE__*/React.createElement("div", {
-        className: "research_progress_label"
-      }, "RESEARCH IN PROGRESS"), /*#__PURE__*/React.createElement("div", {
-        className: "research_progress_text"
-      }, selectedUpgrade.research_time_remaining)), /*#__PURE__*/React.createElement("div", {
         className: "upgrade_name"
       }, selectedUpgrade.name), /*#__PURE__*/React.createElement("div", {
         className: "upgrade_description"
       }, selectedUpgrade.description), /*#__PURE__*/React.createElement("div", {
-        className: "upgrade_requirement_line"
-      }, /*#__PURE__*/React.createElement("span", {
-        style: {
-          fontSize: "10px",
-          lineHeight: "16px"
-        }
-      }, "research cost: "), /*#__PURE__*/React.createElement("img", {
-        src: "/images/icons/materials.png",
-        alt: "materials",
-        style: {
-          height: "16px"
-        }
-      }), /*#__PURE__*/React.createElement("span", {
-        style: {
-          color: "#e98b99"
-        }
-      }, selectedUpgrade.materials_research_cost), /*#__PURE__*/React.createElement("img", {
-        src: "/images/icons/food.png",
-        alt: "food",
-        style: {
-          height: "16px"
-        }
-      }), /*#__PURE__*/React.createElement("span", {
-        style: {
-          color: "#e98b99"
-        }
-      }, selectedUpgrade.food_research_cost), /*#__PURE__*/React.createElement("img", {
-        src: "/images/icons/wealth.png",
-        alt: "wealth",
-        style: {
-          height: "16px"
-        }
-      }), /*#__PURE__*/React.createElement("span", {
-        style: {
-          color: "#e98b99"
-        }
-      }, selectedUpgrade.wealth_research_cost)), /*#__PURE__*/React.createElement("div", {
-        className: "upgrade_requirement_line"
-      }, /*#__PURE__*/React.createElement("span", {
-        style: {
-          fontSize: "10px",
-          lineHeight: "16px"
-        }
-      }, "daily upkeep: "), /*#__PURE__*/React.createElement("img", {
-        src: "/images/icons/materials.png",
-        alt: "materials",
-        style: {
-          height: "16px"
-        }
-      }), /*#__PURE__*/React.createElement("span", {
-        style: {
-          color: "#e98b99"
-        }
-      }, selectedUpgrade.materials_upkeep * 24), /*#__PURE__*/React.createElement("img", {
-        src: "/images/icons/food.png",
-        alt: "food",
-        style: {
-          height: "16px"
-        }
-      }), /*#__PURE__*/React.createElement("span", {
-        style: {
-          color: "#e98b99"
-        }
-      }, selectedUpgrade.food_upkeep * 24), /*#__PURE__*/React.createElement("img", {
-        src: "/images/icons/wealth.png",
-        alt: "wealth",
-        style: {
-          height: "16px"
-        }
-      }), /*#__PURE__*/React.createElement("span", {
-        style: {
-          color: "#e98b99"
-        }
-      }, selectedUpgrade.wealth_upkeep * 24)), /*#__PURE__*/React.createElement("div", {
-        className: "upgrade_requirement_line"
-      }, /*#__PURE__*/React.createElement("span", {
-        style: {
-          fontSize: "10px",
-          lineHeight: "16px"
-        }
-      }, "research time: "), /*#__PURE__*/React.createElement("img", {
-        src: "images/v2/icons/timer.png",
-        alt: "materials",
-        style: {
-          height: "16px"
-        }
-      }), /*#__PURE__*/React.createElement("span", null, selectedUpgrade.research_time, " ", selectedUpgrade.research_time > 1 ? " days" : " day")), /*#__PURE__*/React.createElement("div", {
+        className: "upgrade_controls_container"
+      }, /*#__PURE__*/React.createElement("div", {
         className: "upgrade_buttons_container"
       }, !!selectedUpgrade.requirements_met && selectedUpgrade.status === "locked" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
         className: "research_begin_button",
@@ -855,7 +825,9 @@ export function VillageUpgrades({
           ContentComponent: null,
           onConfirm: () => BeginResearch()
         })
-      }, "begin research")), selectedUpgrade.status === "researching" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+      }, "research")), !!!selectedUpgrade.requirements_met && selectedUpgrade.status === "locked" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+        className: "research_begin_button disabled"
+      }, "research")), selectedUpgrade.status === "researching" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
         className: "research_cancel_button",
         onClick: () => openModal({
           header: 'Confirmation',
@@ -863,7 +835,129 @@ export function VillageUpgrades({
           ContentComponent: null,
           onConfirm: () => CancelResearch()
         })
-      }, "cancel research"))));
+      }, "cancel")), selectedUpgrade.status === "inactive" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+        className: "upgrade_toggle_on_button",
+        onClick: () => openModal({
+          header: 'Confirmation',
+          text: "sometext?",
+          ContentComponent: null,
+          onConfirm: () => ActivateUpgrade()
+        })
+      }, "activate")), selectedUpgrade.status === "active" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+        className: "upgrade_toggle_off_button",
+        onClick: () => openModal({
+          header: 'Confirmation',
+          text: "sometext?",
+          ContentComponent: null,
+          onConfirm: () => DeactivateUpgrade()
+        })
+      }, "deactivate")), selectedUpgrade.status === "activating" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+        className: "upgrade_toggle_off_button",
+        onClick: () => openModal({
+          header: 'Confirmation',
+          text: "sometext?",
+          ContentComponent: null,
+          onConfirm: () => CancelActivation()
+        })
+      }, "cancel"))), selectedUpgrade.status === "locked" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+        className: "upgrade_controls_label"
+      }, "research cost"), /*#__PURE__*/React.createElement("div", {
+        className: "upgrade_research_requirements"
+      }, /*#__PURE__*/React.createElement("img", {
+        src: "/images/icons/materials.png",
+        alt: "materials",
+        style: {
+          height: "16px"
+        }
+      }), /*#__PURE__*/React.createElement("span", {
+        style: {
+          color: current_materials > selectedUpgrade.materials_research_cost ? "#96eeaf" : "#e98b99"
+        }
+      }, selectedUpgrade.materials_research_cost), /*#__PURE__*/React.createElement("img", {
+        src: "/images/icons/food.png",
+        alt: "food",
+        style: {
+          height: "16px"
+        }
+      }), /*#__PURE__*/React.createElement("span", {
+        style: {
+          color: current_food > selectedUpgrade.food_research_cost ? "#96eeaf" : "#e98b99"
+        }
+      }, selectedUpgrade.food_research_cost), /*#__PURE__*/React.createElement("img", {
+        src: "/images/icons/wealth.png",
+        alt: "wealth",
+        style: {
+          height: "16px"
+        }
+      }), /*#__PURE__*/React.createElement("span", {
+        style: {
+          color: current_wealth > selectedUpgrade.wealth_research_cost ? "#96eeaf" : "#e98b99"
+        }
+      }, selectedUpgrade.wealth_research_cost), /*#__PURE__*/React.createElement("img", {
+        src: "images/v2/icons/timer.png",
+        alt: "materials",
+        style: {
+          height: "16px"
+        }
+      }), /*#__PURE__*/React.createElement("span", null, selectedUpgrade.research_time, " ", selectedUpgrade.research_time > 1 || selectedUpgrade.research_time == 0 ? " days" : " day"))), selectedUpgrade.status === "researching" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+        className: "upgrade_controls_label"
+      }, "researching"), /*#__PURE__*/React.createElement("div", {
+        className: "upgrade_research_requirements",
+        style: {
+          background: `linear-gradient(to right, #362a4c 0%, #4c1f2f ${research_progress_percent / 2}%, #2d1d25 ${research_progress_percent}%, transparent ${research_progress_percent}%`
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "research_progress_text"
+      }, selectedUpgrade.research_time_remaining))), selectedUpgrade.status === "activating" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+        className: "upgrade_controls_label"
+      }, "activating"), /*#__PURE__*/React.createElement("div", {
+        className: "upgrade_research_requirements",
+        style: {
+          background: `linear-gradient(to right, #362a4c 0%, #4c1f2f ${research_progress_percent / 2}%, #2d1d25 ${research_progress_percent}%, transparent ${research_progress_percent}%`
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "research_progress_text"
+      }, selectedUpgrade.research_time_remaining))), (selectedUpgrade.status == "active" || selectedUpgrade.status == "unlocked" || selectedUpgrade.status == "inactive") && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+        className: "upgrade_controls_label"
+      }, "upkeep cost"), /*#__PURE__*/React.createElement("div", {
+        className: "upgrade_research_requirements"
+      }, /*#__PURE__*/React.createElement("img", {
+        src: "/images/icons/materials.png",
+        alt: "materials",
+        style: {
+          height: "16px"
+        }
+      }), /*#__PURE__*/React.createElement("span", {
+        style: {
+          color: "#e98b99"
+        }
+      }, selectedUpgrade.materials_upkeep), /*#__PURE__*/React.createElement("img", {
+        src: "/images/icons/food.png",
+        alt: "food",
+        style: {
+          height: "16px"
+        }
+      }), /*#__PURE__*/React.createElement("span", {
+        style: {
+          color: "#e98b99"
+        }
+      }, selectedUpgrade.food_upkeep), /*#__PURE__*/React.createElement("img", {
+        src: "/images/icons/wealth.png",
+        alt: "wealth",
+        style: {
+          height: "16px"
+        }
+      }), /*#__PURE__*/React.createElement("span", {
+        style: {
+          color: "#e98b99"
+        }
+      }, selectedUpgrade.wealth_upkeep), /*#__PURE__*/React.createElement("img", {
+        src: "images/v2/icons/timer.png",
+        alt: "materials",
+        style: {
+          height: "16px"
+        }
+      }), /*#__PURE__*/React.createElement("span", null, "upkeep/hour")))));
     };
     return /*#__PURE__*/React.createElement("div", {
       className: "upgrades_container"
