@@ -24,8 +24,8 @@ class NearbyPlayers {
         }
 
         $result = $system->db->query(
-            "SELECT `user_id`, `user_name`, `rank`, `village`, `exp`, `location`, `battle_id`, `stealth` FROM `users` 
-		WHERE `last_active` > UNIX_TIMESTAMP() - 120 ORDER BY `exp` DESC LIMIT $min, $users_per_page"
+            "SELECT `user_id`, `user_name`, `rank`, `village`, `exp`, `location`, `battle_id`, `stealth` FROM `users`
+		WHERE `last_active` > UNIX_TIMESTAMP() - " . TravelManager::INACTIVE_SECONDS . " ORDER BY `exp` DESC"
         );
         $users = [];
         while($row = $system->db->fetch($result)) {
@@ -79,7 +79,7 @@ class NearbyPlayers {
 					<img src='./images/village_icons/" . strtolower($user['village']) . ".png' style='max-height:18px;max-width:18px;' />
 				<span style='font-weight:bold;color:" . ($user['village'] == $player->village->name ? '#00C000;' : '#C00000;') .
                     "'>" . $user['village'] . "</span></td>
-					
+
 				<td style='width:17%;text-align:center;'>" . $user['location']->displayString() . "</td>
 				<td style='width:18%;text-align:center;'>";
                 // Attack/spar link

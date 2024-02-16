@@ -393,7 +393,7 @@ class Operation {
                             }
                         }
                     }
-                } 
+                }
                 else if ($location_target['health'] <= 0 && $location_target['type'] == 'village') {
                     WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_VILLAGES_CAPTURED, $this->target_village);
                     // occupy village and set HP/defense
@@ -433,6 +433,10 @@ class Operation {
             if ($rep_gain > 0) {
                 $message .= "\nGained " . $rep_gain . " village reputation!";
             }
+        }
+        // Daily Task
+        if ($this->user->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_WAR)) {
+            $this->user->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_WAR, UserReputation::OPERATION_GAINS[$this->type]);
         }
         // Add stats
         $stat_to_gain = $this->user->getTrainingStatForArena();

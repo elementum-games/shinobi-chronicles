@@ -11,10 +11,7 @@
  * @var array $register_pre_fill
  */
 
-if (isset($player)) {
-    $NewsManager = new NewsManager($system, $player);
-}
-else $NewsManager = new NewsManager($system);
+$NewsManager = new NewsManager($system, $player ?? null);
 
 ?>
 
@@ -27,20 +24,22 @@ else $NewsManager = new NewsManager($system);
     window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(Home, {
-                homeLinks: <?= json_encode($home_links) ?>,
+                homeLinks: <?= json_encode($system->homeVars['links']) ?>,
                 isLoggedIn: "<?= isset($player) ?>",
                 isAdmin: "<?= isset($player) ? $player->hasAdminPanel() : false ?>",
                 version: "<?= System::VERSION_NAME ?>",
                 versionNumber: "<?= System::VERSION_NUMBER ?>",
-                initialView: "<?= $initial_home_view ?>",
-                loginURL: "<?= $system->router->base_url ?>",
-                registerURL: "<?= $system->router->base_url ?>",
-                loginErrorText: "<?= $login_error_text ?>",
-                registerErrorText: "<?= $register_error_text ?>",
-                resetErrorText: "<?= $reset_error_text ?>",
-                loginMessageText: "<?= $login_message_text ?>",
-                registerPreFill: <?= json_encode($register_pre_fill) ?>,
+                initialView: "<?= $system->homeVars['view'] ?>",
+                loginURL: "<?= $system->homeVars['links']['login_url'] ?>",
+                registerURL: "<?= $system->homeVars['links']['register_url'] ?>",
+                loginErrorText: "<?= $system->homeVars['errors']['login'] ?>",
+                registerErrorText: "<?= $system->homeVars['errors']['register'] ?>",
+                resetErrorText: "<?= $system->homeVars['errors']['reset'] ?>",
+                loginMessageText: "<?= $system->homeVars['messages']['login'] ?>",
+                registerPreFill: <?= json_encode($system->homeVars['register_prefill']) ?>,
                 initialNewsPosts: <?= json_encode(NewsAPIPresenter::newsPostResponse($NewsManager, $system)) ?>,
+                scOpen: <?= (int) $system->SC_OPEN ?>,
+                reopenTimeWindow: "<?= $system->getMaintenenceEndTime() ?>",
             }),
             homeContainer
         );

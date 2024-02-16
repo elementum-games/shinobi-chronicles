@@ -32,7 +32,7 @@
             <td style="text-align: center;">
                 Are you certain you wish to cancel your training?<br />
                 <?php if(!$player->reputation->benefits[UserReputation::BENEFIT_PARTIAL_TRAINING_GAINS]): ?>
-                    You will not gain any of your potential <?= (!empty($system->event) && $system->event instanceof DoubleExpEvent) ? $player->trainingManager->train_gain * DoubleExpEvent::exp_modifier : $player->trainingManager->train_gain ?> gains.
+                    You will not gain any of your potential <?= (!empty($system->event) && $system->event->exp_gain_multiplier > 1) ? $player->trainingManager->train_gain * $system->event->exp_gain_multiplier : $player->trainingManager->train_gain ?> gains.
                 <?php else: ?>
                     <?= $partial_gain ?>
                 <?php endif ?>

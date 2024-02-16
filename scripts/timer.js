@@ -22,7 +22,6 @@ function countdownTimer(time, element_id, append_remaining_string = true) {
 	}
 }
 
-
 function timeRemaining(time_remaining, format, include_days, include_seconds) {
 	if(!format) {
 		format = 'short';
@@ -97,7 +96,6 @@ function timeRemaining(time_remaining, format, include_days, include_seconds) {
 	}
 	return string;
 }
-
 
 function currentTimeStringUTC(offset, target) {
 	let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

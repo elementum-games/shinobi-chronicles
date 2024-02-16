@@ -610,6 +610,15 @@ p {
 #content .pink, #content a.pink:hover {
 	color: #E030C0;
 }
+/* Orange */
+a.chat_user_name.orange, a.orange:hover, a.orange:visited, span.orange {
+	color: #ffa500 !important;
+}
+/* Silver */
+a.chat_user_name.platinum, a.platinum:hover, a.platinum:visited, span.platinum {
+	color: #c6c6d2 !important;
+	text-shadow: 1px 1px rgba(0, 0, 0, 0.5);
+}
 #content .red, #content a.red:hover {
 	color: #CF4020;
 }

@@ -126,19 +126,35 @@
         <?php endforeach; ?>
     </select><br />
 
-    <label for="effect" style="margin-top:10px;">Effect:</label>
+    <label for="effect" style="margin-top:10px;">Effect 1:</label>
     <select name="<?= $fieldName("effect") ?>">
         <?php foreach($jutsu_constraints['effect']['options'] as $option): ?>
-            <option value="<?= $option ?>" <?= ($option == $existing_jutsu?->effect ? "selected" : "") ?>>
+            <option value="<?= $option ?>" <?= ($option == $existing_jutsu?->effects[0]?->effect ? "selected" : "") ?>>
                 <?= System::unSlug($option) ?>
             </option>
         <?php endforeach; ?>
     </select><br />
     <label for="effect_amount">Effect Amount:</label>
-    <input type="number" name="<?= $fieldName("effect_amount") ?>" value="<?= $existing_jutsu->effect_amount ?? 0 ?>" min="0"><br />
+    <input type="number" name="<?= $fieldName("effect_amount") ?>" value="<?= $existing_jutsu?->effects[0]->effect_amount ?? 0 ?>" min="0" /><br />
     <label for="effect_length">Effect Length:</label>
-    <input type="number" name="<?= $fieldName("effect_length") ?>" value="<?= $existing_jutsu->effect_length ?? 0 ?>" min="0" max="10"><br />
+    <input type="number" name="<?= $fieldName("effect_length") ?>" value="<?= $existing_jutsu?->effects[0]->effect_length ?? 0 ?>" min="0" max="10" /><br />
 
+    <label for="effect2" style="margin-top:10px;">Effect 2:</label>
+    <select name="<?= $fieldName("effect2") ?>">
+        <?php foreach ($jutsu_constraints['effect']['options'] as $option): ?>
+            <option value="<?= $option ?>" <?= ($option == $existing_jutsu?->effects[1]?->effect ? "selected" : "") ?>>
+                <?= System::unSlug($option) ?>
+            </option>
+        <?php endforeach; ?>
+    </select><br />
+    <label for="effect2_amount">Effect Amount:</label>
+    <input type="number" name="<?= $fieldName("effect2_amount") ?>" value="<?= $existing_jutsu?->effects[1]->effect_amount ?? 0 ?>" min="0" /><br />
+    <label for="effect2_length">Effect Length:</label>
+    <input type="number" name="<?= $fieldName("effect2_length") ?>" value="<?= $existing_jutsu?->effects[1]->effect_length ?? 0 ?>" min="0" max="10" /><br />
+
+    <br /><label for="linked_jutsu_id">Linked Jutsu ID:</label>
+    <input type="number" name="<?= $fieldName("linked_jutsu_id") ?>" value="<?= $existing_jutsu?->linked_jutsu_id ?? 0 ?>" min="0" /><br />
+    
     <?php if(!$disable_hand_seals): ?>
         <?php $hand_seal_options = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; ?>
         <label style='margin-top: 10px;'>Hand Seals:</label>
@@ -149,7 +165,7 @@
                 $hand_seals = [];
                 if($existing_jutsu != null && $existing_jutsu->jutsu_type != Jutsu::TYPE_TAIJUTSU) {
                     $hand_seals = explode("-", $existing_jutsu->hand_seals);
-                    $hand_seals = array_map('intval', $hand_seals);
+                    $hand_seals = array_map(intval(...), $hand_seals);
                 }
             ?>
             const initialHandSeals = <?= json_encode($hand_seals) ?>;

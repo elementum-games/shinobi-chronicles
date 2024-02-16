@@ -2,9 +2,11 @@
 
 require_once __DIR__ . '/../ReportManager.php';
 require_once __DIR__ . '/ChatPostDto.php';
+require_once __DIR__ . '/../notification/BlockedNotificationManager.php';
 
 class ChatManager {
-    const MAX_POST_LENGTH = 350;
+    const MAX_POST_LENGTH = 300;
+    const POST_LENGTH_BUFFER = 50;
     const MAX_POSTS_PER_PAGE = 15;
 
     public function __construct(
@@ -16,9 +18,9 @@ class ChatManager {
      * @throws RuntimeException
      */
     public function loadPosts(?int $current_page_post_id = null): array {
-        $result = $this->system->db->query(
-            "SELECT MAX(`post_id`) as `latest_post_id`, MIN(`post_id`) as `first_post_id` FROM `chat`"
-        );
+        $query = "SELECT MAX(`post_id`) as `latest_post_id`, MIN(`post_id`) as `first_post_id` FROM `chat`";
+
+        $result = $this->system->db->query($query);
         if($this->system->db->last_num_rows) {
             $bookend_posts = $this->system->db->fetch($result);
             $latest_post_id = $bookend_posts['latest_post_id'];
@@ -63,62 +65,99 @@ class ChatManager {
      */
     private function fetchPosts(?int $starting_post_id = null, int $max_posts = self::MAX_POSTS_PER_PAGE, bool $is_quote = false): array {
         if($starting_post_id != null) {
-            $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id ORDER BY `post_id` DESC LIMIT $max_posts";
+            $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id AND `deleted`=0";
         }
         else {
-            $query = "SELECT * FROM `chat` ORDER BY `post_id` DESC LIMIT $max_posts";
+            $query = "SELECT * FROM `chat` WHERE `deleted` = 0";
         }
+
+        $blocked_user_ids = $this->player->blacklist->blockedUserIds(exclude_staff: true);
+        if(count($blocked_user_ids) > 0) {
+            $query .= " AND `user_id` NOT IN (" . implode(",", $blocked_user_ids) . ")";
+        }
+
+        $query .= " ORDER BY `post_id` DESC LIMIT $max_posts";
+
         $result = $this->system->db->query($query);
+        $result = $this->system->db->fetch_all($result);
 
-        $posts = [];
-        while($row = $this->system->db->fetch($result)) {
-            $post = ChatPostDto::fromDb($row);
-
-            //Skip post if user blacklisted
-            $blacklisted = false;
-            foreach($this->player->blacklist as $id => $blacklist) {
-                if($post->user_name == $blacklist[$id]['user_name']) {
-                    $blacklisted = true;
-                    break;
+        // Get user IDs from posts
+        $user_ids = [];
+        $user_data_by_id = [];
+        $user_data_by_name = [];
+        foreach ($result as $row) {
+            // If user_id is set (newer post) add to list for batch
+            if ($row['user_id'] > 0) {
+                if (!in_array($row['user_id'], $user_ids)) {
+                    $user_ids[] = (int)$row['user_id'];
                 }
             }
+            // If user_id is not set (older post) get data for that user based on user_name
+            else {
+                $user_data_result = $this->system->db->query("
+                    SELECT `users`.`user_id`, `users`.`staff_level`, `users`.`premium_credits_purchased`, `users`.`chat_effect`, `users`.`avatar_link`,
+                    `user_settings`.`avatar_style`, `user_settings`.`avatar_frame`
+                    FROM `users`
+                    LEFT JOIN `user_settings` ON `users`.`user_id` = `user_settings`.`user_id`
+                    WHERE `users`.`user_name` = '{$this->system->db->clean($row['user_name'])}'
+                ");
+                $user_data_result = $this->system->db->fetch($user_data_result);
+                // only add data to array if user match found
+                if ($this->system->db->last_num_rows > 0) {
+                    // if custom setting is not set
+                    if (!isset($user_data_result['avatar_style'])) {
+                        $user_data_result['avatar_style'] = "avy_round";
+                    }
+                    // if custom setting is not set
+                    if (!isset($user_data_result['avatar_frame'])) {
+                        $user_data_result['avatar_frame'] = "avy_frame_default";
+                    }
+                    $user_data_by_name[$row['user_name']] = $user_data_result;
+                }
+            }
+        }
+        // Get batch user data
+        if (count($user_ids) > 0) {
+            $user_data_result = $this->system->db->query("
+                SELECT `users`.`user_id`, `users`.`staff_level`, `users`.`premium_credits_purchased`, `users`.`chat_effect`, `users`.`avatar_link`,
+                `user_settings`.`avatar_style`, `user_settings`.`avatar_frame`
+                FROM `users`
+                LEFT JOIN `user_settings` ON `users`.`user_id` = `user_settings`.`user_id`
+                WHERE `users`.`user_id` IN (" . implode(', ', $user_ids) . ")
+            ");
+            $user_data_result = $this->system->db->fetch_all($user_data_result);
+            foreach ($user_data_result as $row) {
+                // if custom setting is not set
+                if (!isset($row['avatar_style'])) {
+                    $row['avatar_style'] = "avy_round";
+                }
+                // if custom setting is not set
+                if (!isset($row['avatar_frame'])) {
+                    $row['avatar_frame'] = "avy_frame_default";
+                }
+                $user_data_by_id[$row['user_id']] = $row;
+            }
+        }
+
+        $posts = [];
+        foreach ($result as $row) {
+            $post = ChatPostDto::fromDb($row);
 
             //Base data
             $post->avatar = './images/default_avatar.png';
 
             //Fetch user data
-            $user_data = false;
-            $user_result = $this->system->db->query(
-                "SELECT `user_id`, `staff_level`, `premium_credits_purchased`, `chat_effect`, `avatar_link` FROM `users`
-                WHERE `user_name` = '{$this->system->db->clean($post->user_name)}'"
-            );
-            if($this->system->db->last_num_rows) {
-                $user_data = $this->system->db->fetch($user_result);
-                $settings_result = $this->system->db->query(
-                    "SELECT `avatar_style`, `avatar_frame` from `user_settings` where `user_id` = '{$user_data['user_id']}'"
-                );
-                if ($this->system->db->last_num_rows) {
-                    $settings_data = $this->system->db->fetch($settings_result);
-                    $user_data['avatar_style'] = $settings_data['avatar_style'];
-                    $user_data['avatar_frame'] = $settings_data['avatar_frame'];
-                } else {
-                    $user_data['avatar_style'] = "avy_round";
-                    $user_data['avatar_frame'] = "avy_frame_default";
-                }
-                //If blacklisted block content, only if blacklisted user is not currently a staff member
-                if($blacklisted && $user_data['staff_level'] == StaffManager::STAFF_NONE) {
-                    continue;
-                }
+            $user_data = null;
+            if (isset($user_data_by_id[$post->user_id])) {
+                $user_data = $user_data_by_id[$post->user_id];
             }
-            else {
-                if($blacklisted) {
-                    continue;
-                }
+            else if (isset($user_data_by_name[$post->user_name])) {
+                $user_data = $user_data_by_name[$post->user_name];
             }
 
             //Format posts
             $post->user_link_class_names = ["userLink"];
-            if($user_data) {
+            if(!empty($user_data)) {
                 if($user_data['premium_credits_purchased'] && $user_data['chat_effect'] == 'sparkles') {
                     $post->user_link_class_names[] = "premiumUser";
                 }
@@ -174,7 +213,7 @@ class ChatManager {
                             break;
                         }
                         // only display formatted mention if user exists
-                        if(!User::findByName($this->system, str_replace("\\", "", $match), true)) {
+                        if(!User::userExists($this->system, str_replace("\\", "", $match))) {
                             continue;
                         }
                         // format each mention
@@ -184,7 +223,6 @@ class ChatManager {
                     }
                 }
             }
-
             // Handle Quotes
             $pattern = "/\[quote:\d+\]/";
             $has_quote = preg_match_all($pattern, $post->message, $matches);
@@ -211,7 +249,8 @@ class ChatManager {
                                 $post->message = preg_replace("/" . preg_quote($match, '/') . '/', $formatted_quote, $post->message, 1);
                             }
                             else {
-                                $post->message = str_replace($matches[0], "<i>(removed)</i>", $post->message);
+                                // Just remove quote tags for deleted posts/blacklisted users
+                                $post->message = str_replace($matches[0], "", $post->message);
                             }
                         }
                     }
@@ -220,7 +259,6 @@ class ChatManager {
                     $post->message = str_replace($matches[0], "(...)", $post->message);
                 }
             }
-
 
             $posts[] = $post;
         }
@@ -236,7 +274,7 @@ class ChatManager {
         try {
             $result = $this->system->db->query(
                 "SELECT `message` FROM `chat`
-                     WHERE `user_name` = '{$this->player->user_name}' ORDER BY  `post_id` DESC LIMIT 1"
+                     WHERE `user_id` = '{$this->player->user_id}' ORDER BY  `post_id` DESC LIMIT 1"
             );
             if($this->system->db->last_num_rows) {
                 $post = $this->system->db->fetch($result);
@@ -247,7 +285,8 @@ class ChatManager {
             if($message_length < 3) {
                 throw new RuntimeException("Message is too short!");
             }
-            if($message_length > $chat_max_post_length) {
+            // 50 character buffer
+            if($message_length > $chat_max_post_length + self::POST_LENGTH_BUFFER) {
                 throw new RuntimeException("Message is too long!");
             }
             //Failsafe, prevent posting if ban
@@ -274,17 +313,22 @@ class ChatManager {
             }
 
             $sql = "INSERT INTO `chat`
-                    (`user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES
-                           ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
+                    (`user_id`, `user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES
+                           (%s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
             $this->system->db->query(
                 sprintf(
-                    $sql, $this->player->user_name, $message, $title, $this->player->village->name, $staff_level, $user_color, time(), 0
+                    $sql, $this->player->user_id, $this->player->user_name, $message, $title, $this->player->village->name, $staff_level, $user_color, time(), 0
                 )
             );
             $new_post_id = $this->system->db->last_insert_id;
             if($this->system->db->last_affected_rows) {
                 $this->system->message("Message posted!");
             }
+
+            // Master notification array
+            $notification_blocks = [];
+            // Master bl array
+            $master_bl = [];
 
             // Handle Quotes
             $pattern = "/\[quote:\d+\]/";
@@ -304,12 +348,34 @@ class ChatManager {
                             continue;
                         }
                         $result = $this->system->db->query(
-                            "SELECT `user_id` FROM `users` WHERE `user_name`='{$quote[0]->user_name}' LIMIT 1"
+                            "SELECT `user_id`, `blocked_notifications` FROM `users` WHERE `user_name`='{$quote[0]->user_name}' LIMIT 1"
                         );
 			            if($this->system->db->last_num_rows == 0) {
 				            throw new RuntimeException("User does not exist!");
 			            }
 			            $result = $this->system->db->fetch($result);
+
+                        // Load notification blocker
+                        if(!isset($notification_blocks[$result['user_id']])) {
+                            $notification_blocks[$result['user_id']] =
+                                BlockedNotificationManager::fromDb(
+                                    system: $this->system,
+                                    blocked_notifications_string: $result['blocked_notifications']
+                            );
+                        }
+                        // Notification blocked
+                        if($notification_blocks[$result['user_id']]->notificationBlocked(NotificationManager::NOTIFICATION_CHAT)) {
+                            continue;
+                        }
+
+                        // Blacklist user
+                        if(!isset($master_bl[$result['user_id']])) {
+                            $master_bl[$result['user_id']] = Blacklist::fromDb(system: $this->system, user_id: $result['user_id']);
+                        }
+                        if($master_bl[$result['user_id']]->userBlocked($this->player->user_id)) {
+                            continue;
+                        }
+
                         require_once __DIR__ . '/../notification/NotificationManager.php';
                         $new_notification = new ChatNotificationDto(
                             type: "chat",
@@ -348,12 +414,34 @@ class ChatManager {
 
                 foreach($mentioned_users as $mentioned_user) {
                     $result = $this->system->db->query(
-                        "SELECT `user_id` FROM `users` WHERE `user_name`='{$mentioned_user}' LIMIT 1"
+                        "SELECT `user_id`, `blocked_notifications` FROM `users` WHERE `user_name`='{$mentioned_user}' LIMIT 1"
                     );
                     if ($this->system->db->last_num_rows == 0) {
                         throw new RuntimeException("User does not exist!");
                     }
                     $result = $this->system->db->fetch($result);
+
+                    //Blocked notifs
+                    if(!isset($notification_blocks[$result['user_id']])) {
+                        $notification_blocks[$result['user_id']] =
+                            BlockedNotificationManager::fromDb(
+                                system: $this->system,
+                                blocked_notifications_string: $result['blocked_notifications']
+                            );
+                    }
+
+                    if($notification_blocks[$result['user_id']]->notificationBlocked(NotificationManager::NOTIFICATION_CHAT)) {
+                        continue;
+                    }
+
+                    // Blacklist user
+                    if(!isset($master_bl[$result['user_id']])) {
+                        $master_bl[$result['user_id']] = Blacklist::fromDb(system: $this->system, user_id: $result['user_id']);
+                    }
+                    if($master_bl[$result['user_id']]->userBlocked($this->player->user_id)) {
+                        continue;
+                    }
+
                     require_once __DIR__ . '/../notification/NotificationManager.php';
                     $new_notification = new ChatNotificationDto(
                         type: "chat",
@@ -383,7 +471,10 @@ class ChatManager {
      * @throws RuntimeException
      */
     public function deletePost(int $post_id): array {
-        $this->system->db->query("DELETE FROM `chat` WHERE `post_id` = $post_id LIMIT 1");
+        $this->system->db->query("UPDATE `chat` SET `deleted`=1 WHERE `post_id`=$post_id LIMIT 1");
+        $this->player->staff_manager->staffLog(StaffManager::STAFF_LOG_MOD,
+    "{$this->player->user_name}({$this->player->user_id}) deleted post_id: $post_id"
+        );
 
         if($this->system->db->last_affected_rows == 0) {
             throw new RuntimeException("Error deleting post!");
@@ -402,7 +493,7 @@ class ChatManager {
         // Validate post and submit to DB
         //Increase chat length limit for seal users & staff members
         if($this->player->staff_level && $this->player->forbidden_seal->level == 0) {
-            $chat_max_post_length = ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['chat_post_size'];
+            $chat_max_post_length = ForbiddenSeal::CHAT_POST_SIZES[ForbiddenSeal::$STAFF_SEAL_LEVEL];
         }
         if($this->player->forbidden_seal->level != 0) {
             $chat_max_post_length = $this->player->forbidden_seal->chat_post_size;

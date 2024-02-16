@@ -18,7 +18,7 @@ class BattleV2 {
     const TURN_LENGTH = 40;
     const PREP_LENGTH = 20;
 
-    const MAX_PRE_FIGHT_HEAL_PERCENT = 85;
+    const MAX_PRE_FIGHT_HEAL_PERCENT = 100;
 
     const TEAM1 = 'T1';
     const TEAM2 = 'T2';
@@ -76,16 +76,27 @@ class BattleV2 {
 
     public ?int $patrol_id;
 
+    public int $player1_last_damage_taken;
+    public int $player2_last_damage_taken;
+
+    public string $battle_background_link;
+
+    public int $rounds = 1;
+    public int $round_count = 1;
+    public int $team1_wins;
+    public int $team2_wins;
+
     /**
-     * @param System  $system
-     * @param Fighter $player1
-     * @param Fighter $player2
-     * @param int     $battle_type
+     * @param System   $system
+     * @param Fighter  $player1
+     * @param Fighter  $player2
+     * @param int      $battle_type
+     * @param int|null $patrol_id
      * @return int
-     * @throws RuntimeException
+     * @throws DatabaseDeadlockException
      */
     public static function start(
-        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null
+        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null, string $battle_background_link = '', int $rounds = 1
     ): int {
         $json_empty_array = '[]';
 
@@ -129,9 +140,11 @@ class BattleV2 {
                 `active_genjutsu` = '" . $json_empty_array . "',
                 `jutsu_cooldowns` = '" . $json_empty_array . "',
                 `fighter_jutsu_used` = '" . $json_empty_array . "',
-                `patrol_id` = '" . $patrol_id . "',
-                "
-        );
+                `is_retreat` = '" . (int) false . "',
+                `patrol_id` = " . (!empty($patrol_id) ? $patrol_id : "NULL") . ",
+                `battle_background_link` = '{$battle_background_link}',
+                `rounds` = '{$rounds}'
+        ");
         $battle_id = $system->db->last_insert_id;
 
         if($player1 instanceof User) {
@@ -218,12 +231,21 @@ class BattleV2 {
                 turn_number: $battle->turn_count,
                 turn_phase: $battle->turn_type,
                 content: $battle_id,
-                fighter_action_logs: []
+                fighter_action_logs: [],
+                fighter_health: $battle->fighter_health,
+                raw_active_effects: $battle->raw_active_effects,
             );
         }
 
         $battle->current_turn_log = $current_turn_log;
         $battle->log[$battle->turn_count] = $battle->current_turn_log;
+
+        $battle->battle_background_link = empty($battle_data['battle_background_link']) ? '' : $battle_data['battle_background_link'];
+
+        $battle->rounds = $battle_data['rounds'];
+        $battle->round_count = $battle_data['round_count'];
+        $battle->team1_wins = $battle_data['team1_wins'];
+        $battle->team2_wins = $battle_data['team2_wins'];
 
         return $battle;
     }
@@ -360,11 +382,20 @@ class BattleV2 {
                 `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
 
                 `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
-                `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
+                `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "',
+
+                `round_count` = {$this->round_count},
+                `team1_wins` = {$this->team1_wins},
+                `team2_wins` = {$this->team2_wins}
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
         );
 
-        BattleLogV2::addOrUpdateTurnLog($this->system, $this->current_turn_log);
+        BattleLogV2::addOrUpdateTurnLog(
+            $this->system,
+            $this->current_turn_log,
+            $this->fighter_health,
+            $this->raw_active_effects
+        );
 
         $this->system->db->query("COMMIT;");
     }
@@ -417,5 +448,4 @@ class BattleV2 {
     public function getLastTurnLog(): ?BattleLogV2 {
         return $this->log[$this->turn_count - 1] ?? null;
     }
-
 }

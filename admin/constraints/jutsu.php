@@ -1,28 +1,6 @@
 <?php
 /* Jutsu */
-$jutsu_effects = [
-    'none',
-    'release_genjutsu',
-    'residual_damage',
-    'ninjutsu_boost',
-    'taijutsu_boost',
-    'genjutsu_boost',
-    'ninjutsu_resist',
-    'taijutsu_resist',
-    'genjutsu_resist',
-    'speed_boost',
-    'cast_speed_boost',
-    'intelligence_boost',
-    'willpower_boost',
-    'ninjutsu_nerf',
-    'taijutsu_nerf',
-    'genjutsu_nerf',
-    'cast_speed_nerf',
-    'speed_nerf',
-    'endurance_nerf',
-    'intelligence_nerf',
-    'willpower_nerf',
-];
+$jutsu_effects = require __DIR__ . '/jutsu_effects.php';
 
 $ranks = [];
 for($x = 1; $x <= System::SC_MAX_RANK; $x++) {
@@ -120,6 +98,7 @@ return [
             Jutsu::PURCHASE_TYPE_PURCHASABLE => 'purchasable',
             Jutsu::PURCHASE_TYPE_NON_PURCHASABLE => 'non-purchasable',
             Jutsu::PURCHASE_TYPE_EVENT_SHOP => 'event',
+            Jutsu::PURCHASE_TYPE_LINKED => 'linked',
         ],
     ],
     'effect' => [
@@ -132,6 +111,23 @@ return [
         'input_type' => 'text',
     ],
     'effect_length' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
+    ],
+    'effect2' => [
+        'data_type' => 'string',
+        'input_type' => 'select',
+        'options' => $jutsu_effects,
+    ],
+    'effect2_amount' => [
+        'data_type' => 'float',
+        'input_type' => 'text',
+    ],
+    'effect2_length' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
+    ],
+    'linked_jutsu_id' => [
         'data_type' => 'int',
         'input_type' => 'text',
     ],

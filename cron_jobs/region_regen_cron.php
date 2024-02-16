@@ -13,9 +13,10 @@ session_start();
 require_once __DIR__ . '/../classes/System.php';
 require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
+require_once __DIR__ . '/../classes/inbox/Inbox.php';
 require_once __DIR__ . '/../classes/war/WarManager.php';
 
-$system = new System();
+$system = System::initialize(load_layout: false);
 $system->db->connect();
 
 if (!$system->db->con) {

@@ -8,7 +8,7 @@ class SenseiManager {
         14 => ['boost_primary' => 12, 'boost_secondary' => 6],
     ];
 
-    public static array $exam_answers = ['1a', '2c', '3c', '4c', '5b', '6b'];
+    public static array $exam_answers = ['1a', '2c', '3c', '4b', '5a', '6c'];
 
     const LESSON_COST_PER_MINUTE = 60;
 
@@ -104,7 +104,7 @@ class SenseiManager {
         $result = $system->db->fetch($sensei_table_result);
         $sensei = array(
             'sensei_id' => $sensei_id,
-            'students' => json_decode($result['students']),
+            'students' => json_decode($result['students'], true),
             'recruitment_message' => $result['recruitment_message'],
             'graduated' => $result['graduated_count'],
             'student_message' => $result['student_message'],
@@ -269,7 +269,9 @@ class SenseiManager {
         $db_modified = false;
         $student_result = $system->db->query("SELECT `students` FROM `sensei` WHERE `sensei_id` = '{$sensei_id}'");
         $result = $system->db->fetch($student_result);
-        $students = json_decode($result['students']);
+
+        // Array must be unique, prevents duplicate student id bug
+        $students = array_unique(json_decode($result['students'], true));
         if (count($students) < 3) {
             $system->db->query(
                 "INSERT INTO `student_applications` (`sensei_id`, `student_id`)
@@ -287,7 +289,7 @@ class SenseiManager {
         $db_modified = false;
         $student_result = $system->db->query("SELECT `students` FROM `sensei` WHERE `sensei_id` = '{$sensei_id}'");
         $result = $system->db->fetch($student_result);
-        $students = json_decode($result['students']);
+        $students = array_unique(json_decode($result['students'], true));
         if (count($students) < 3) {
             array_push($students, $student_id);
             $student_count = count($students);
@@ -449,11 +451,12 @@ class SenseiManager {
     public static function hasSlot(int $sensei_id, System $system): bool {
         $slot_result = $system->db->query("SELECT `students`, `temp_students` FROM `sensei` WHERE `sensei_id` = '{$sensei_id}'");
         $result = $system->db->fetch($slot_result);
-        $students = json_decode($result['students']);
+        // Patch: students array must be unique, prevents duplicate student bug
+        $students = array_unique(json_decode($result['students'], true));
         $temp_students = json_decode($result['temp_students'], true);
         $student_count = count($students) + count($temp_students);
 
-        return $student_count < 3 ? true : false;
+        return $student_count < 3;
     }
 
     public static function logLesson(int $sensei_id, int $temp_student_id, int $lesson_duration, array $temp_students, int $yen_gained, int $time_trained, System $system): bool {

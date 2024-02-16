@@ -48,6 +48,12 @@
         z-index: 1;
         height:200px;
     }
+
+    p.notificationDisableOption {
+        display: inline-block;
+        width: 150px;
+        text-align: left;
+    }
 </style>
 
 <div class='submenu'>
@@ -83,7 +89,7 @@
             <?php endif ?>
         </td>
     </tr>
-    <?php if ($system->isDevEnvironment()): ?> 
+    <?php if ($system->isDevEnvironment() && $system->enable_dev_only_features): ?>
     <tr><th colspan='2'>Player Card</th></tr>
     <tr>
         <td colspan="2">
@@ -101,9 +107,9 @@
                         <div class="player_card_title"></div>
                         <div class="player_card_rank"></div>
                         <div class="player_card_village"><?= $player->village->name ?></div>
-                        <div class="player_card_clan"><?= $player->clan->name ?></div>
-                        <div class="player_card_team"><?= $player->team->name ?></div>
-                        <div class="player_card_bloodline"><?= $player->bloodline->name ?></div>
+                        <div class="player_card_clan"><?= $player->clan?->name ?></div>
+                        <div class="player_card_team"><?= $player->team?->name ?></div>
+                        <div class="player_card_bloodline"><?= $player->bloodline?->name ?></div>
                     </div>
                 </div>
                 <div style="margin-left: 5px">
@@ -132,9 +138,12 @@
         </td>
     </tr>
     <?php endif; ?>
-    <tr><th colspan='2'>Password</th></tr>
     <tr>
-        <td colspan='2'>
+        <th>Password</th>
+        <th>Notification Settings</th>
+    </tr>
+    <tr>
+        <td>
             <form action='<?=$self_link?>' method='post'>
                 <div style="text-align: center">
                     <label for='current_password' style='width:150px;margin-bottom:5px;'>Current password:</label>
@@ -147,6 +156,34 @@
                 <p style='text-align:center;'>
                     <input type='submit' name='change_password' value='Change' />
                 </p>
+            </form>
+        </td>
+        <td style="text-align: center;">
+            <form action="<?=$self_link?>" method="post">
+                <b>General Notifications</b><br />
+                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_SPAR?>"
+                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_SPAR) ? "checked='checked'" : "")?> />Spar</p>
+                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_TEAM ?>"
+                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_TEAM) ? "checked='checked'" : "")?> />Team Invites</p><br />
+                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_MARRIAGE ?>"
+                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_MARRIAGE) ? "checked='checked'" : "")?> />Proposals</p>
+                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_EVENT ?>"
+                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_EVENT) ? "checked='checked'" : "")?> />Events</p><br />
+                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_CHAT ?>"
+                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_CHAT) ? "checked='checked'" : "")?> />Chat Mentions</p>
+                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_NEWS ?>"
+                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_NEWS) ? "checked='checked'" : "")?> />News</p><br />
+                <br />
+                <b>War-based Notifications</b><br />
+                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_CARAVAN ?>"
+                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_CARAVAN) ? "checked='checked'" : "")?> />Caravan</p>
+                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_RAID ?>"
+                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_RAID) ? "checked='checked'" : "")?> />Raid</p><br />
+                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_KAGE_CHANGE ?>"
+                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_KAGE_CHANGE) ? "checked='checked'" : "")?> />Kage Change</p>
+                <p class="notificationDisableOption"><input type="checkbox" name="<?= NotificationManager::NOTIFICATION_DIPLOMACY ?>"
+                        <?=(!$player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_DIPLOMACY) ? "checked='checked'" : "")?> />Diplomatic</p><br />
+                <input type="submit" style='margin-top: 5px' name="update_notifications" value="Update" />
             </form>
         </td>
     </tr>
@@ -175,7 +212,7 @@
                 <input type='submit' name='change_layout' value='Change' />
             </form>
             <span><i>Note: Legacy layouts may not be compatible with all pages</i></span>
-            <?php if($current_layout->usesV2Interface()): ?>
+            <?php if($system->layout->usesV2Interface()): ?>
             <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap">
                 <div>
                     <label>Avatar Style</label>
@@ -254,11 +291,7 @@
             </form>
         </td>
         <td style='text-align:center;'>
-            <?php if(!empty($player->blacklist)): ?>
-                <?=$list?>
-            <?php else: ?>
-                <p style="text-align: center;">No blocked users!</p>
-            <?php endif ?>
+            <?= $player->blacklist->generateSettingsList($self_link) ?>
             <br />
             <form action='<?=$self_link?>' method='post'>
                 <input type='text' name='blacklist_name' style='width:250px;margin-bottom:5px;' /> <br />

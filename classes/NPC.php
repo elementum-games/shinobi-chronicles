@@ -36,7 +36,17 @@ class NPC extends Fighter {
     public float $intelligence;
     public float $willpower;
 
+    public int $total_stats;
+
     public int $money;
+
+    public int $battle_iq = 0; // chance to use optimal jutsu over random
+    public bool $scaling = false; // whether AI will scale to the nearest possible level
+    public array $shop_jutsu_priority = []; // if set, AI will prioritize these jutsu on non-optimal roll
+    public string $difficulty_level = 'none'; // used for arena and patrol logic
+    public bool $arena_enabled = false; // used for arena logic
+    public bool $is_patrol = false; // used for patrol logic
+    public string $avatar_link = ''; // avatar link
 
     /** @var Jutsu[] */
     public array $jutsu = [];
@@ -46,6 +56,17 @@ class NPC extends Fighter {
     public $current_move;
 
     public int $staff_level = 0;
+
+    const DIFFICULTY_NONE = 'none';
+    const DIFFICULTY_EASY = 'easy';
+    const DIFFICULTY_NORMAL = 'normal';
+    const DIFFICULTY_HARD = 'hard';
+
+    const AI_COOLDOWNS = [
+        self::DIFFICULTY_EASY => 4,
+        self::DIFFICULTY_NORMAL => 60,
+        self::DIFFICULTY_HARD => 300
+    ];
 
     /**
      * NPC constructor.
@@ -70,11 +91,6 @@ class NPC extends Fighter {
 
         $this->name = $result['name'];
 
-        if(!isset($_SESSION['ai_logic'])) {
-            $_SESSION['ai_logic'] = array();
-            $_SESSION['ai_logic']['special_move_used'] = false;
-        }
-
         return true;
     }
 
@@ -82,7 +98,7 @@ class NPC extends Fighter {
      * Loads NPC data from the database into class members
      * @throws RuntimeException
      */
-    public function loadData() {
+    public function loadData(?User $player = null) {
         $result = $this->system->db->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
         $ai_data = $this->system->db->fetch($result);
 
@@ -91,17 +107,37 @@ class NPC extends Fighter {
 
         $this->rank = $ai_data['rank'];
         $this->level = $ai_data['level'];
+        $this->scaling = $ai_data['scaling'];
+        $this->difficulty_level = $ai_data['difficulty_level'];
+        $this->arena_enabled = $ai_data['arena_enabled'];
+        $this->is_patrol = $ai_data['is_patrol'];
+        $this->avatar_link = empty($ai_data['avatar_link']) ? '' : $ai_data['avatar_link'];
 
         $base_level = $this->rankManager->ranks[$this->rank]->base_level;
         $max_level = $this->rankManager->ranks[$this->rank]->max_level;
+        $stats_for_level = $this->rankManager->statsForRankAndLevel($this->rank, $this->level);
+        // if player is set we can apply AI scaling
+        if (isset($player) && $this->scaling) {
+            // scale to player level between the range from AI level and level cap of the rank (upward scaling)
+            $this->level = max(min($player->level, $max_level), $this->level);
+            $stats_for_level = $this->rankManager->statsForRankAndLevel($this->rank, $this->level);
+            // override stat total if same level as player
+            if ($this->level == $player->level) {
+                $stats_for_level = $player->getBaseStatTotal();
+            }
+        }
+        $this->total_stats = $stats_for_level;
+        // set jutsu level relative to base and max levels for the rank
+        $jutsu_level = ($this->level - $base_level) / ($max_level - $base_level) * 100;
+        // minimum 1, maximum twice the NPC level (e.g. lv1-20 at Academy, lv1-100 at Chuunin)
+        $jutsu_level = min(max(1, $jutsu_level), $max_level * 2);
         $this->rank_progress = round(($this->level - $base_level) / ($max_level - $base_level), 2);
 
         $this->max_health = $this->rankManager->healthForRankAndLevel($this->rank, $this->level) * $ai_data['max_health'];
         $this->health = $this->max_health;
 
-        $this->gender = "Male";
+        $this->gender = "None";
 
-        $stats_for_level = $this->rankManager->statsForRankAndLevel($this->rank, $this->level);
         $this->ninjutsu_skill = $stats_for_level * $ai_data['ninjutsu_skill'];
         $this->genjutsu_skill = $stats_for_level * $ai_data['genjutsu_skill'];
         $this->taijutsu_skill = $stats_for_level * $ai_data['taijutsu_skill'];
@@ -113,20 +149,28 @@ class NPC extends Fighter {
         $this->intelligence = $stats_for_level * $ai_data['intelligence'];
         $this->willpower = $stats_for_level * $ai_data['willpower'];
 
-        $attributes = array('cast_speed', 'speed', 'strength', 'intelligence', 'willpower');
+        /*$attributes = array('cast_speed', 'speed', 'strength', 'intelligence', 'willpower');
         foreach($attributes as $attribute) {
             if($this->{$attribute} <= 0) {
                 $this->{$attribute} = 1;
             }
-        }
+        }*/
 
         $this->money = $ai_data['money'];
+
+        $this->battle_iq = $ai_data['battle_iq'];
 
         $moves = json_decode($ai_data['moves'], true);
 
         foreach($moves as $move) {
             if (!isset ($move['use_type'])) {
                 $move['use_type'] = Jutsu::USE_TYPE_MELEE;
+            }
+            if (!isset($move['name'])) {
+                $move['name'] = '';
+            }
+            if (!isset($move['cooldown'])) {
+                $move['cooldown'] = 0;
             }
             if (!isset($move['effect'])) {
                 $move['effect'] = "none";
@@ -137,8 +181,20 @@ class NPC extends Fighter {
             if (!isset($move['effect_length'])) {
                 $move['effect_length'] = 0;
             }
-            $jutsu = $this->initJutsu(count($this->jutsu), $move['jutsu_type'], $move['power'], $move['battle_text'], $move['use_type'], $move['effect'], $move['effect_amount'], $move['effect_length']);
-
+            if (!isset($move['effect2'])) {
+                $move['effect2'] = "none";
+            }
+            if (!isset($move['effect2_amount'])) {
+                $move['effect2_amount'] = 0;
+            }
+            if (!isset($move['effect2_length'])) {
+                $move['effect2_length'] = 0;
+            }
+            if (!isset($move['element'])) {
+                $move['element'] = Jutsu::ELEMENT_NONE;
+            }
+            $jutsu = $this->initJutsu(count($this->jutsu), $move['jutsu_type'], $move['name'], $move['power'], $move['cooldown'], $move['battle_text'], $move['use_type'], $move['effect'], $move['effect_amount'], $move['effect_length'], $move['effect2'], $move['effect2_amount'], $move['effect2_length'], $move['element']);
+            $jutsu->setLevel($jutsu_level, 0);
             switch($jutsu->jutsu_type) {
                 case Jutsu::TYPE_NINJUTSU:
                     $jutsu->use_type = $jutsu->use_type != Jutsu::USE_TYPE_MELEE ? $jutsu->use_type : Jutsu::USE_TYPE_PROJECTILE;
@@ -148,24 +204,51 @@ class NPC extends Fighter {
                     break;
                 case Jutsu::TYPE_GENJUTSU:
                     $jutsu->use_type = $jutsu->use_type != Jutsu::USE_TYPE_MELEE ? $jutsu->use_type : Jutsu::USE_TYPE_PROJECTILE;
-                    $jutsu->effect = $jutsu->effect != "none" ? $jutsu->effect : 'residual_damage';
-                    $jutsu->effect_amount = $jutsu->effect_amount != 0 ? $jutsu->effect_amount : 30;
-                    $jutsu->effect_length = $jutsu->effect_length != 0 ? $jutsu->effect_length : 3;
                     break;
                 default:
                     throw new RuntimeException("Invalid jutsu type!");
             }
 
             $this->jutsu[] = $jutsu;
+            // this is important so battle logic treats all NPC jutsu as equipped jutsu
+            $this->equipped_jutsu[] = [
+                'id' => $jutsu->id,
+                'type' => $jutsu->jutsu_type
+            ];
         }
 
-        $this->loadDefaultJutsu();
+        // get array, safe formatting
+        if (!empty($ai_data['shop_jutsu_priority'])) {
+            $this->shop_jutsu_priority = array_map('intval', explode(",", str_replace(' ', '', $ai_data['shop_jutsu_priority'])));
+        }
+
+        // get shop jutsu
+        if (!empty($ai_data['shop_jutsu'])) {
+            $jutsu_result = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` IN (" . $ai_data['shop_jutsu'] . ")");
+            $jutsu_result = $this->system->db->fetch_all($jutsu_result);
+            foreach ($jutsu_result as $jutsu_data) {
+                $shop_jutsu = Jutsu::fromArray($jutsu_data['jutsu_id'], $jutsu_data);
+                if ($jutsu_data['rank'] < $this->rank) {
+                    $shop_jutsu->setLevel(100, 0);
+                } else {
+                    $shop_jutsu->setLevel($jutsu_level, 0);
+                }
+                $this->jutsu[$shop_jutsu->id] = $shop_jutsu;
+                // this is important so battle logic treats all NPC jutsu as equipped jutsu
+                $this->equipped_jutsu[] = [
+                    'id' => $shop_jutsu->id,
+                    'type' => $shop_jutsu->jutsu_type
+                ];
+            }
+        }
+
+        // $this->loadDefaultJutsu();
         // $this->loadRandomShopJutsu();
     }
 
     private function loadDefaultJutsu() {
         $result = $this->system->db->query(
-            "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu`
+            "SELECT `name`, `cooldown`, `battle_text`, `power`, `jutsu_type` FROM `jutsu`
                     WHERE `rank` <= '{$this->rank}'
                     AND `purchase_type`='" . Jutsu::PURCHASE_TYPE_DEFAULT . "'
                     ORDER BY `rank` DESC LIMIT 1"
@@ -175,7 +258,7 @@ class NPC extends Fighter {
             foreach($row as $type => $data) {
                 if($type == 'battle_text') {
                     $search = ['[player]', '[opponent]', '[gender]', '[gender2]'];
-                    $replace = ['opponent1', 'player1', 'he', 'his'];
+                    $replace = ['opponent1', 'player1', 'they', 'their'];
                     $data = str_replace($search, $replace, $data);
                     $data = str_replace(['player1', 'opponent1'], ['[player]', '[opponent]'], $data);
                 }
@@ -184,7 +267,9 @@ class NPC extends Fighter {
             $this->jutsu[] = $this->initJutsu(
                 count($this->jutsu),
                 $moveArr['jutsu_type'],
+                $moveArr['name'],
                 $moveArr['power'],
+                $moveArr['cooldown'],
                 $moveArr['battle_text']
             );
         }
@@ -194,7 +279,7 @@ class NPC extends Fighter {
         $jutsuTypes = ['ninjutsu', 'taijutsu'];
         $aiType = rand(0, 1);
         $result = $this->system->db->query(
-            "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu`
+            "SELECT `name`, `battle_text`, `power`, `cooldown`, `jutsu_type` FROM `jutsu`
                     WHERE `rank` = '{$this->rank}' AND `jutsu_type` = '{$jutsuTypes[$aiType]}'
                     AND `purchase_type` != '1' AND `purchase_type` != '3' LIMIT 1"
         );
@@ -203,40 +288,110 @@ class NPC extends Fighter {
             foreach($row as $type => $data) {
                 if($type == 'battle_text') {
                     $search = ['[player]', '[opponent]', '[gender]', '[gender2]'];
-                    $replace = ['opponent1', 'player1', 'he', 'his'];
+                    $replace = ['opponent1', 'player1', 'they', 'their'];
                     $data = str_replace($search, $replace, $data);
                     $data = str_replace(['player1', 'opponent1'], ['[player]', '[opponent]'], $data);
                 }
                 $moveArr[$type] = $data;
             }
             $this->jutsu[] = $this->initJutsu(
-                count($this->jutsu),
-                $moveArr['jutsu_type'],
-                $moveArr['power'],
-                $moveArr['battle_text']
+                id: count($this->jutsu),
+                jutsu_type: $moveArr['jutsu_type'],
+                power: $moveArr['power'],
+                battle_text: $moveArr['battle_text']
             );
         }
     }
 
-    public function chooseAttack(): Jutsu {
-        // if special move not used
-        if (!$_SESSION['ai_logic']['special_move_used'] && $this->jutsu[1]) {
-            $this->current_move =& $this->jutsu[0];
-            $_SESSION['ai_logic']['special_move_used'] = true;
-        }
-        // if only special move plus standard strike
-        else if (count($this->jutsu) == 2) {
-            $this->current_move =& $this->jutsu[1];
+    public function chooseAttack(BattleManager|BattleManagerV2 $battle): Jutsu {
+        // probability of choosing best move
+        $x = mt_rand(1, 100);
+        $choose_best = $this->battle_iq >= $x ? true : false;
+        if ($choose_best) {
+            // determine best move
+            $this->current_move = $this->chooseBestAttack($battle);
         }
         else {
-            $randMove = rand(1, (count($this->jutsu) - 2));
-            $this->current_move =& $this->jutsu[$randMove];
+            // pick random move, or use priority list
+            $this->current_move = $this->chooseRandomAttack($battle);
         }
-
         return $this->current_move;
     }
 
-    public function initJutsu(int $id, $jutsu_type, float $power, string $battle_text, string $use_type = Jutsu::USE_TYPE_MELEE, string $effect = "none", int $effect_amount = 0, int $effect_length = 0): Jutsu {
+    function chooseBestAttack(BattleManager|BattleManagerV2 $battle): Jutsu {
+        $best_damage = 0;
+        $best_jutsu = null;
+        // simulate each jutsu and determine best
+        foreach ($this->jutsu as $jutsu) {
+            $jutsu->setCombatId($this->combat_id);
+            // check jutsu cooldown
+            if (isset($battle->getCooldowns()[$jutsu->combat_id])) {
+                continue;
+            }
+            // get simulated result
+            $test_damage = $battle->simulateAIAttack($jutsu);
+            $result = $test_damage['player_simulated_damage_taken'] - $test_damage['ai_simulated_damage_taken'];
+            // debug
+            //echo $jutsu->name . ": " . $result . "<br>";
+            // if no other jutsu selected use this for basis of comparison
+            if (empty($best_jutsu)) {
+                $best_damage = $result;
+                $best_jutsu = $jutsu;
+            }
+            // if better than previous then best set as best
+            else if ($result > $best_damage) {
+                $best_damage = $result;
+                $best_jutsu = $jutsu;
+            }
+        }
+        return $best_jutsu;
+    }
+
+    function chooseRandomAttack(BattleManager|BattleManagerV2 $battle): Jutsu {
+        $random_jutsu = null;
+        $jutsu_list = array_keys($this->jutsu);
+        // if shop jutsu priority and not on cooldown use before random
+        foreach ($this->shop_jutsu_priority as $jutsu_id) {
+            foreach ($this->jutsu as $jutsu) {
+                $jutsu->setCombatId($this->combat_id);
+                if ($jutsu->id == $jutsu_id) {
+                    if (isset($battle->getCooldowns()[$jutsu->combat_id])) {
+                        continue;
+                    } else {
+                        return $jutsu;
+                    }
+                }
+            }
+        }
+        // randomize jutsu list and check until one without cooldown found
+        shuffle($jutsu_list);
+        foreach ($jutsu_list as $index) {
+            $jutsu = $this->jutsu[$index];
+            $jutsu->setCombatId($this->combat_id);
+            if (isset($battle->getCooldowns()[$jutsu->combat_id])) {
+                continue;
+            } else {
+                return $jutsu;
+            }
+        }
+    }
+
+    public function initJutsu(
+        int $id,
+        $jutsu_type,
+        string $name,
+        float $power,
+        int $cooldown,
+        string $battle_text,
+        string $use_type = Jutsu::USE_TYPE_MELEE,
+        string $effect = "none",
+        int $effect_amount = 0,
+        int $effect_length = 0,
+        string $effect2 = "none",
+        int $effect2_amount = 0,
+        int $effect2_length = 0,
+        string $element = Jutsu::ELEMENT_NONE
+    ): Jutsu {
         $battle_text_alt = str_replace(
             ['[player]', '[opponent]'],
             ['[playerX]', '[opponentX]'],
@@ -248,27 +403,29 @@ class NPC extends Fighter {
             ['[opponent]', '[player]'],
             $battle_text_alt
         );
-
         $jutsu = new Jutsu(
             id: $id,
-            name: 'Move ' . $id,
+            name: !empty($name) ? $name : 'Move ' . $id,
             rank: $this->rank,
             jutsu_type: $jutsu_type,
             base_power: $power,
             range: 2,
-            effect: $effect,
-            base_effect_amount: $effect_amount,
-            effect_length: $effect_length,
+            effect_1: $effect,
+            base_effect_amount_1: $effect_amount,
+            effect_length_1: $effect_length,
+            effect_2: $effect2,
+            base_effect_amount_2: $effect2_amount,
+            effect_length_2: $effect2_length,
             description: "N/A",
             battle_text: $battle_text_swapped,
-            cooldown: 0,
+            cooldown: $cooldown,
             use_type: $use_type,
             target_type: Jutsu::TARGET_TYPE_FIGHTER_ID,
             use_cost: $this->rank * 5,
             purchase_cost: $this->rank * 1000,
             purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
             parent_jutsu: 0,
-            element: Jutsu::ELEMENT_NONE,
+            element: $element,
             hand_seals: ''
         );
 
@@ -279,7 +436,7 @@ class NPC extends Fighter {
     }
 
     public function updateData() {
-        $_SESSION['ai_health'] = $this->health;
+        // no-op
     }
 
     public function getName(): string {
@@ -287,7 +444,7 @@ class NPC extends Fighter {
     }
 
     public function getAvatarSize(): int {
-        return 125;
+        return 200;
     }
 
     public function getInventory() {

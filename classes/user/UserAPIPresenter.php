@@ -53,6 +53,7 @@ class UserApiPresenter {
             'teamName' => $player->team?->name,
             'forbiddenSealName' => $player->forbidden_seal->name,
             'forbiddenSealTimeLeft' => $forbidden_seal_time_left,
+            'dailyTaskTimeLeft' => $player->daily_tasks->timeUntilReset(),
         ];
     }
 
@@ -177,7 +178,7 @@ class UserApiPresenter {
             'items' => array_map(function (Item $item){
                 return self::itemResponse($item);
             }, $player->items),
-            'equippedArmorIds' => $player->equipped_armor,
+            'equippedArmorIds' => $player->equipped_armor_ids,
             'equippedWeaponIds' => $player->equipped_weapon_ids,
         ];
     }

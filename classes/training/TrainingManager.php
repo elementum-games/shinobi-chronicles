@@ -252,6 +252,10 @@ class TrainingManager {
                     if ($clan_boost) {
                         $train_length *= 1 - ($clan_boost / 100);
                     }
+                    // Policy boost
+                    if ($this->policy->training_speed > 0) {
+                        $train_length = round($train_length * (100 / (100 + $this->policy->training_speed)));
+                    }
                     return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 case self::TRAIN_LEN_LONG:
                     $train_length = self::BASE_TRAIN_TIME * 4;
@@ -264,6 +268,10 @@ class TrainingManager {
                     // Clan boost
                     if ($clan_boost) {
                         $train_length *= 1 - ($clan_boost / 100);
+                    }
+                    // Policy boost
+                    if ($this->policy->training_speed > 0) {
+                        $train_length = round($train_length * (100 / (100 + $this->policy->training_speed)));
                     }
                     return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 case self::TRAIN_LEN_EXTENDED:
@@ -322,8 +330,8 @@ class TrainingManager {
 
     public function trainingDisplay() {
         $train_gain = $this->train_gain;
-        if (!empty($this->system->event) && $this->system->event instanceof DoubleExpEvent) {
-            $train_gain *= DoubleExpEvent::exp_modifier;
+        if (!empty($this->system->event) && $this->system->event->exp_gain_multiplier > 1) {
+            $train_gain *= $this->system->event->exp_gain_multiplier;
         }
         if(str_contains($this->train_type, 'jutsu:')) {
             return "You will gain " . User::$jutsu_train_gain . " jutsu levels once training is complete!";
@@ -344,5 +352,46 @@ class TrainingManager {
         $this->train_time = time() + $length;
         $this->train_time_remaining = $length;
         $this->train_gain = $amount;
+    }
+
+    /**
+     * @param string $difficulty_level
+     * @param int $rank
+     * @return int
+     */
+    public static function getAIStatGain(string $difficulty_level, int $rank): int
+    {
+        switch ($difficulty_level) {
+            case NPC::DIFFICULTY_NONE:
+                return 1;
+            case NPC::DIFFICULTY_EASY:
+                return 1;
+            case NPC::DIFFICULTY_NORMAL:
+                switch ($rank) {
+                    case 1:
+                    case 2:
+                        return 2;
+                    case 3:
+                    case 4:
+                        return 3;
+                    case 5:
+                        return 4;
+                }
+                return 2;
+            case NPC::DIFFICULTY_HARD:
+                switch ($rank) {
+                    case 1:
+                    case 2:
+                        return 4;
+                    case 3:
+                    case 4:
+                        return 6;
+                    case 5:
+                        return 8;
+                }
+                return 4;
+            default:
+                return 1;
+        }
     }
 }

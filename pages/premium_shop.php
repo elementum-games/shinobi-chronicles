@@ -20,12 +20,19 @@ function premiumShop(): void {
         try {
             $premiumShopManager->assertUserCanReset();
 
+            $confirmation_string = "Are you sure you want to reset your character?<br />
+                You will lose all your stats, bloodline, rank and clan. You will keep your money.";
+
+            if($player->stat_transfer_completion_time) {
+                $confirmation_string .= "<br />
+                Your active stat transfer will be cancelled and any AK and yen spent will be lost.";
+            }
+
             if (!isset($_POST['confirm_reset'])) {
                 renderPurchaseConfirmation(
                     purchase_type: "user_reset",
                     confirmation_type: "confirm_reset",
-                    confirmation_string: "Are you sure you want to reset your character? You will lose all your stats,
-                bloodline, rank and clan. You will keep your money.",
+                    confirmation_string: $confirmation_string,
                     form_action_link: $self_link,
                     form_submit_prompt: "Reset my Account",
                     additional_form_data: []
@@ -40,7 +47,7 @@ function premiumShop(): void {
                 );
                 return;
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     } else if (isset($_POST['name_change'])) {
@@ -67,7 +74,7 @@ function premiumShop(): void {
             } else {
                 $result = $premiumShopManager->changeUserName($new_name);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     } else if (isset($_POST['change_gender'])) {
@@ -92,7 +99,7 @@ function premiumShop(): void {
                 $result = $premiumShopManager->changeGender($new_gender);
                 $system->message($result->success_message);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     } else if (isset($_POST['stat_reset'])) {
@@ -122,7 +129,7 @@ function premiumShop(): void {
                 $player->exp -= $exp;
                 $system->message("You have reset your " . System::unSlug($stat) . " to $reset_amount.");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -189,7 +196,7 @@ function premiumShop(): void {
 
                 );
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -215,7 +222,7 @@ function premiumShop(): void {
 
                 $system->message("You have reset your AI wins and losses to 0.");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -241,7 +248,7 @@ function premiumShop(): void {
 
                 $system->message("You have reset your PvP wins and losses to 0.");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -313,6 +320,7 @@ function premiumShop(): void {
                     system: $system,
                     bloodline_id: $bloodline_id,
                     user_id: $player->user_id,
+                    player: $player,
                     display: false
                 );
 
@@ -332,7 +340,7 @@ function premiumShop(): void {
 
                 renderPurchaseComplete('New Bloodline!', $message);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     } else if (isset($_POST['purchase_bloodline_random'])) {
@@ -404,6 +412,7 @@ function premiumShop(): void {
                     system: $system,
                     bloodline_id: $bloodline_id,
                     user_id: $player->user_id,
+                    player: $player,
                     display: false
                 );
 
@@ -423,7 +432,7 @@ function premiumShop(): void {
 
                 renderPurchaseComplete('New Bloodline!', $message);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -459,8 +468,12 @@ function premiumShop(): void {
                 // Confirm change in seal... time will not be reimbursed
                 if (!isset($_POST['change_forbidden_seal'])) {
                     // Convert remaining premium time to days and calculate AK value
-                    $akCredit = $player->forbidden_seal->calcRemainingCredit();
-                    $new_seal = new ForbiddenSeal($system, $seal_level);
+                    $akCredit = $premiumShopManager->calcRemainingSealCredit($player->forbidden_seal->level, $player->forbidden_seal->seal_time_remaining);
+                    $new_seal = ForbiddenSeal::fromDb(
+                        system: $system,
+                        seal_level: $seal_level,
+                        seal_end_time: time() + ForbiddenSeal::SECONDS_IN_DAY
+                    );
 
                     // TEMPORARY SALE LOGIC
                     $remainingCredit = max(0, $akCredit - $ak_cost);
@@ -508,7 +521,7 @@ function premiumShop(): void {
                         of their {$player->forbidden_seal->name}.";
                     // Recalculate adjusted akCost
                     if ($player->forbidden_seal->level > 0) {
-                        $akCredit = $player->forbidden_seal->calcRemainingCredit();
+                        $akCredit = $premiumShopManager->calcRemainingSealCredit($player->forbidden_seal->level, $player->forbidden_seal->seal_time_remaining);
 
                         //TEMPORARY SALE LOGIC
                         if($premiumShopManager->tierThreeSaleActive() && $seal_level == 3) {
@@ -537,17 +550,16 @@ function premiumShop(): void {
                     . " for {$seal_length} days.");
 
                 //Load blank seal
-                $player->forbidden_seal = new ForbiddenSeal($system, 0, 0);
-                //Set new seal
-                $player->forbidden_seal->addSeal($seal_level, $seal_length);
-
-                //Load benefits for displaying market & storing in db
-                $player->forbidden_seal->setBenefits();
+                $player->forbidden_seal = ForbiddenSeal::fromDb(
+                    system: $system,
+                    seal_level: $seal_level,
+                    seal_end_time: time() + ($seal_length * ForbiddenSeal::SECONDS_IN_DAY)
+                );
                 $player->forbidden_seal_loaded = true;
 
                 $system->message("Seal infused!");
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
             $system->printMessage();
         }
@@ -581,10 +593,10 @@ function premiumShop(): void {
             //Confirm purchase
             if (!isset($_POST['confirm_chakra_element_change'])) {
                 $confirmation_string = "Are you sure you want to <b>forget the {$player->elements[$editing_element_index]} nature</b>
-                and any jutsus you have to <b>attune to the $new_element nature</b>?<br />
+                and <b>attune to the $new_element nature</b>?<br />
                 <br />
                 <b>(IMPORTANT: This is non-reversable once completed! If you want to return to your original element you
-                will have to pay another fee. You will forget any elemental jutsu you currently have of this nature.)</b>";
+                will have to pay another fee.)</b>";
 
                 renderPurchaseConfirmation(
                     purchase_type: 'change_element',
@@ -629,8 +641,8 @@ function premiumShop(): void {
                     break;
             }
             $target_village = new Village($system, $village);
-            if ($target_village->policy->free_transfer) {
-                $ak_cost = 0;
+            if ($target_village->policy->transfer_cost_reduction > 0) {
+                $ak_cost = floor($ak_cost * (1 - ($target_village->policy->transfer_cost_reduction / 100)));
             }
 
             if ($player->team) {
@@ -653,13 +665,14 @@ function premiumShop(): void {
                 }
             }
 
+            $rep_loss_percent = round(20 * (1 - ($target_village->policy->transfer_cost_reduction / 100)));
+
             if (!isset($_POST['confirm_village_change'])) {
                 $confirmation_string = "Are you sure you want to move from the {$player->village->name} village to the $village
                 village?"
                     . (!$player->clan->bloodline_only ? " You will be kicked out of your clan and placed in a random clan in the new village." : "")
-                    . "<br />You will lose 20% of your Reputation for all village changes after the first (you can not fall below Shinobi).<br />
-                <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village
-                you will have to pay a higher transfer fee)</b>";
+                    . (($player->village_changes > 0) ? "<br />You will lose {$rep_loss_percent}% of your Reputation for this village change (you can not fall below Shinobi)." : "")
+                    . "<br><b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village you will have to pay a higher transfer fee)</b>";
 
                 renderPurchaseConfirmation(
                     purchase_type: 'change_village',
@@ -699,7 +712,8 @@ function premiumShop(): void {
 
                 // Lose rep tier for subsequent village changes (5k minimum rep)
                 if ($player->village_changes > 0 && $player->reputation->rank >= 3) {
-                    $new_reputation = floor(max($player->village_rep * 0.8, UserReputation::$VillageRep[3]['min_rep']));
+                    $policy_reduction = $target_village->policy->transfer_cost_reduction / 100;
+                    $new_reputation = floor(max($player->village_rep * (1 - (0.2 * $policy_reduction)), UserReputation::$VillageRep[3]['min_rep']));
                     $player->village_rep = $new_reputation;
                 }
 
@@ -876,17 +890,29 @@ function premiumShop(): void {
     }
 
     //Load premium seals
-    $baseDisplay = new ForbiddenSeal($system, 0);
-    $baseDisplay->setBenefits();
+    $baseDisplay = ForbiddenSeal::fromDb(
+        system: $system,
+        seal_level: 0,
+        seal_end_time: null
+    );
 
-    $twinSeal = new ForbiddenSeal($system, 1);
-    $twinSeal->setBenefits();
+    $twinSeal = ForbiddenSeal::fromDb(
+        system: $system,
+        seal_level: 1,
+        seal_end_time: null
+    );
 
-    $fourDragonSeal = new ForbiddenSeal($system, 2);
-    $fourDragonSeal->setBenefits();
+    $fourDragonSeal = ForbiddenSeal::fromDb(
+        system: $system,
+        seal_level: 2,
+        seal_end_time: null
+    );
 
-    $eightDeitiesSeal = new ForbiddenSeal($system, 3);
-    $eightDeitiesSeal->setBenefits();
+    $eightDeitiesSeal = ForbiddenSeal::fromDb(
+        system: $system,
+        seal_level: 3,
+        seal_end_time: null
+    );
 
     require "templates/premium/premium.php";
 }

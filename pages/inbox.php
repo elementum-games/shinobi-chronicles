@@ -44,7 +44,7 @@ function LoadConvoList(System $system, User $player): InboxAPIResponse {
 		}
 		
 		$response->response_data = Inbox::allConvosForUser($system, $player->user_id);
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -103,7 +103,7 @@ function ViewConvo(System $system, User $player, int|string $convo_id): InboxAPI
 		// get convo data
 		$response->response_data = $inbox->getConversation($convo_id);
 	
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -141,9 +141,8 @@ function SendMessage(System $system, User $player, int|string $convo_id, string 
             return $response;
         }
 		// Check if the message is too thicc
-        $max_message_length = Inbox::MAX_MESSAGE_LENGTH;
         if($player->staff_level && $player->forbidden_seal->level == 0) {
-            $max_message_length = ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['pm_size'];
+            $max_message_length = ForbiddenSeal::INBOX_MESSAGE_SIZE[ForbiddenSeal::$STAFF_SEAL_LEVEL];
         }
         else {
             $max_message_length = $player->forbidden_seal->pm_size;
@@ -162,7 +161,7 @@ function SendMessage(System $system, User $player, int|string $convo_id, string 
 
         //Disallow sending 1-to-1 messages if blacklisted
         if(sizeof($inbox->getConvoMembers($convo_id)) == 2) {
-            if(Inbox::checkBlacklist($inbox->getConvoMembers($convo_id))) {
+            if(Inbox::checkBlacklist($system, $inbox->getConvoMembers($convo_id))) {
                 $response->errors[] = "Blacklist is active!";
                 return $response;
             }
@@ -183,7 +182,7 @@ function SendMessage(System $system, User $player, int|string $convo_id, string 
 			return $response;
 		}
 		
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -230,7 +229,7 @@ function ChangeTitle(System $system, User $player, int|string $convo_id, string 
 		// change title
 		$response->response_data[] = Inbox::updateTitle($system, $convo_id, $new_title);
 
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -283,7 +282,7 @@ function AddPlayer(System $system, User $player, int|string $convo_id, string $n
 		// get the blacklist for the new member
 		$convo_members[] = $new_user_data;
 		// check each members blacklist
-		if (Inbox::checkBlacklist($convo_members)) {
+		if (Inbox::checkBlacklist($system, $convo_members)) {
 			$response->errors[] = 'Blacklist active';
 			return $response;
 		}
@@ -309,7 +308,7 @@ function AddPlayer(System $system, User $player, int|string $convo_id, string $n
 			$response->errors[] = 'Fatal error adding player';
 		}
 
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -390,7 +389,7 @@ function RemovePlayer(System $system, User $player, int|string $convo_id, $remov
 			return $response;
 		}
 
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -440,7 +439,7 @@ function LeaveConversation(System $system, User $player, int|string $convo_id): 
 			$response->errors[] = 'Fatal error leaving the conversation';
 		}
 
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -499,7 +498,7 @@ function CreateNewConvo(System $system, User $player, string $members, ?string $
 		}
 
 		// check all blacklists
-		if (Inbox::checkBlacklist($all_player_data)) {
+		if (Inbox::checkBlacklist($system, $all_player_data)) {
 			$response->errors[] = 'Blacklist is active';
 			return $response;
 		}
@@ -538,7 +537,7 @@ function CreateNewConvo(System $system, User $player, string $members, ?string $
 			return $response;
 		}		
 		
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -596,7 +595,7 @@ function CheckForNewMessages(System $system, User $player, int|string $convo_id,
 			Inbox::updateLastViewedForUser($system, $convo_id, $player->user_id);
 		}
 
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -641,7 +640,7 @@ function LoadNextPage(System $system, User $player, int|string $convo_id, int $o
             message_id: $oldest_message_id
         );
 		
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 
@@ -684,7 +683,7 @@ function ToggleMute(System $system, User $player, int|string $convo_id): InboxAP
 			$response->errors[] = 'Error toggling mute status.';
 		}
 
-	} catch (Exception $e) {
+	} catch (RuntimeException $e) {
 		$response->errors[] = $e->getMessage();
 	}
 

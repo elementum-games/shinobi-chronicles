@@ -32,8 +32,8 @@ class Bloodline {
 
     public string $description;
 
-    protected ?string $raw_passive_boosts;
-    protected ?string $raw_combat_boosts;
+    public array $base_passive_boosts;
+    public array $base_combat_boosts;
 
     public array $passive_boosts = [];
     public array $combat_boosts = [];
@@ -43,63 +43,46 @@ class Bloodline {
     /** @var Jutsu[] */
     public array $jutsu;
 
-    public function __construct(array $bloodline_data) {
-        $this->bloodline_id = $bloodline_data['bloodline_id'];
-        // $this->id = 'BL' . $this->user_id;
+    /**
+     * @param int              $id
+     * @param string           $name
+     * @param int              $rank
+     * @param int              $clan_id
+     * @param string           $village_name
+     * @param BloodlineBoost[] $base_passive_boosts
+     * @param BloodlineBoost[] $base_combat_boosts
+     * @param Jutsu[]          $base_jutsu
+     * @param Jutsu[]          $jutsu
+     */
+    public function __construct(
+        int $id,
+        string $name,
+        int $rank,
+        int $clan_id,
+        string $village_name,
+        array $base_passive_boosts,
+        array $base_combat_boosts,
+        array $base_jutsu,
+        array $jutsu
+    ) {
+        $this->bloodline_id = $id;
 
-        $this->name = $bloodline_data['name'];
-        $this->rank = $bloodline_data['rank'];
+        $this->name = $name;
+        $this->rank = $rank;
 
-        $this->clan_id = $bloodline_data['clan_id'];
-        $this->village = $bloodline_data['village'];
+        $this->clan_id = $clan_id;
+        $this->village = $village_name;
 
-        $this->raw_passive_boosts = $bloodline_data['passive_boosts'];
-        $this->raw_combat_boosts = $bloodline_data['combat_boosts'];
+        $this->base_jutsu = $base_jutsu;
+        $this->jutsu = $jutsu;
 
-        $this->base_jutsu = [];
-        $this->jutsu = [];
-        $jutsu_data = $bloodline_data['jutsu'];
-        if($jutsu_data) {
-            $jutsu_arr = json_decode($bloodline_data['jutsu'], true);
-            foreach($jutsu_arr as $id => $j) {
-                $this->base_jutsu[$id] = new Jutsu(
-                    id: $id,
-                    name: $j['name'],
-                    rank: $j['rank'],
-                    jutsu_type: $j['jutsu_type'],
-                    base_power: $j['power'],
-                    range: 2,
-                    effect: $j['effect'],
-                    base_effect_amount: $j['effect_amount'] ?? 0,
-                    effect_length: $j['effect_length'] ?? 0,
-                    description: $j['description'],
-                    battle_text: $j['battle_text'],
-                    cooldown: $j['cooldown'] ?? 0,
-                    use_type: $j['use_type'],
-                    target_type: $j['target_type'] ?? Jutsu::TARGET_TYPE_FIGHTER_ID,
-                    use_cost: $j['use_cost'],
-                    purchase_cost: $j['purchase_cost'],
-                    purchase_type: Jutsu::PURCHASE_TYPE_BLOODLINE,
-                    parent_jutsu: $j['parent_jutsu'] ?? 0,
-                    element: $j['element'],
-                    hand_seals: $j['hand_seals'] ?? ""
-                );
-                $this->base_jutsu[$id]->is_bloodline = true;
-            }
-
-            $this->jutsu = $this->base_jutsu;
-        }
-
-        if($this->raw_passive_boosts) {
-            $this->passive_boosts = json_decode($this->raw_passive_boosts, true);
-        }
-        if($this->raw_combat_boosts) {
-            $this->combat_boosts = json_decode($this->raw_combat_boosts, true);
-        }
+        $this->base_passive_boosts = $base_passive_boosts;
+        $this->base_combat_boosts = $base_combat_boosts;
     }
 
     /**
      * @throws RuntimeException
+     * @throws DatabaseDeadlockException
      */
     public static function loadFromId(System $system, int $bloodline_id, ?int $user_id = null): Bloodline {
         if(!$bloodline_id) {
@@ -112,7 +95,7 @@ class Bloodline {
         }
         $bloodline_data = $system->db->fetch($result);
 
-        $bloodline = new Bloodline($bloodline_data);
+        $bloodline = Bloodline::fromArray($bloodline_data);
 
         // Load user-related BL data if relevant
         if($user_id) {
@@ -121,7 +104,7 @@ class Bloodline {
                 throw new RuntimeException("Invalid user bloodline data!");
             }
 
-            $user_bloodline = mysqli_fetch_assoc($result);
+            $user_bloodline = $system->db->fetch($result);
             $bloodline->name = $user_bloodline['name'];
 
             if($user_bloodline['jutsu']) {
@@ -137,6 +120,8 @@ class Bloodline {
                         $bloodline->jutsu[$id]->setLevel($uj['level'], $uj['exp']);
                     }
                 }
+
+                ksort($bloodline->jutsu);
             }
             else {
                 $bloodline->jutsu = array();
@@ -145,35 +130,111 @@ class Bloodline {
 
         return $bloodline;
     }
+    
+    public static function fromArray(array $bloodline_data): Bloodline {
+        $bloodline_id = $bloodline_data['bloodline_id'];
+
+        $name = $bloodline_data['name'];
+        $rank = $bloodline_data['rank'];
+
+        $clan_id = $bloodline_data['clan_id'];
+        $village_name = $bloodline_data['village'];
+
+        $raw_passive_boosts = $bloodline_data['passive_boosts'];
+        $raw_combat_boosts = $bloodline_data['combat_boosts'];
+
+        $base_jutsu = [];
+        $jutsu = [];
+        $jutsu_data = $bloodline_data['jutsu'];
+        if($jutsu_data) {
+            $jutsu_arr = json_decode($bloodline_data['jutsu'], true);
+            foreach($jutsu_arr as $id => $j) {
+                $base_jutsu[$id] = new Jutsu(
+                    id: $id,
+                    name: $j['name'],
+                    rank: $j['rank'],
+                    jutsu_type: $j['jutsu_type'],
+                    base_power: $j['power'],
+                    range: 2,
+                    effect_1: $j['effect'],
+                    base_effect_amount_1: $j['effect_amount'] ?? 0,
+                    effect_length_1: $j['effect_length'] ?? 0,
+                    effect_2: $j['effect2'] ?? 'none',
+                    base_effect_amount_2: $j['effect2_amount'] ?? 0,
+                    effect_length_2: $j['effect2_length'] ?? 0,
+                    description: $j['description'],
+                    battle_text: $j['battle_text'],
+                    cooldown: $j['cooldown'] ?? 0,
+                    use_type: $j['use_type'],
+                    target_type: $j['target_type'] ?? Jutsu::TARGET_TYPE_FIGHTER_ID,
+                    use_cost: $j['use_cost'],
+                    purchase_cost: $j['purchase_cost'],
+                    purchase_type: Jutsu::PURCHASE_TYPE_BLOODLINE,
+                    parent_jutsu: $j['parent_jutsu'] ?? 0,
+                    element: $j['element'],
+                    hand_seals: $j['hand_seals'] ?? "",
+                    linked_jutsu_id: $j['linked_jutsu_id'] ?? 0,
+                );
+                $base_jutsu[$id]->is_bloodline = true;
+            }
+
+            $jutsu = $base_jutsu;
+        }
+
+        $base_passive_boosts = [];
+        $base_combat_boosts = [];
+        if($raw_passive_boosts) {
+            $base_passive_boosts = array_map(
+                BloodlineBoost::fromArray(...),
+                json_decode($raw_passive_boosts, true)
+            );
+        }
+        if($raw_combat_boosts) {
+            $base_combat_boosts = array_map(
+                BloodlineBoost::fromArray(...),
+                json_decode($raw_combat_boosts, true)
+            );
+        }
+
+        return new Bloodline(
+            id: $bloodline_id,
+            name: $name,
+            rank: $rank,
+            clan_id: $clan_id,
+            village_name: $village_name,
+            base_passive_boosts: $base_passive_boosts,
+            base_combat_boosts: $base_combat_boosts,
+            base_jutsu: $base_jutsu,
+            jutsu: $jutsu
+        );
+    }
 
     public function setBoostAmounts(
         int $user_rank,
         int $ninjutsu_skill, int $taijutsu_skill, int $genjutsu_skill, int $bloodline_skill,
-        int $base_stats, int $total_stats, int $stats_max_level,
+        int $base_stats,
+        int $total_stats,
+        int $stats_max_level,
         int $regen_rate
     ): void {
         $ratios = [
             'offense_boost' => 0.02,
-            'defense_boost' => 0.045,
+            'defense_boost' => 0.095,
             'speed_boost' => 0.08,
             'mental_boost' => 0.1,
-            'heal' => 0.036,
+            'heal' => 0.095,
             'regen' => 0.15,
         ];
-        $bloodline_skill += self::BASE_BLOODLINE_SKILL;
+        $bloodline_skill += $bloodline_skill < 100 ? self::BASE_BLOODLINE_SKILL : 0;
 
-        if($this->raw_passive_boosts) {
-            $this->passive_boosts = json_decode($this->raw_passive_boosts, true);
-        }
-        if($this->raw_combat_boosts) {
-            $this->combat_boosts = json_decode($this->raw_combat_boosts, true);
-        }
+        $this->passive_boosts = $this->base_passive_boosts;
+        $this->combat_boosts = $this->base_combat_boosts;
 
         // Each ratio operates on assumption of 5 BLP
-        foreach($this->passive_boosts as $id => $boost) {
-            $boost_power = round($boost['power'] / 5, 1);
+        foreach($this->base_passive_boosts as $id => $boost) {
+            $boost_power = round($boost->power / 5, 1);
 
-            switch($boost['effect']) {
+            switch($boost->effect) {
                 case 'regen':
                     $regen_multiplier = ($bloodline_skill / $stats_max_level);
                     if($regen_multiplier > 1) {
@@ -181,8 +242,8 @@ class Bloodline {
                     }
                     $regen_multiplier *= $ratios['regen'];
 
-                    $this->passive_boosts[$id]['power'] = round($boost_power * $regen_multiplier, 2);
-                    $this->passive_boosts[$id]['effect_amount'] = ceil($this->passive_boosts[$id]['power'] * $regen_rate);
+                    $this->passive_boosts[$id]->power = round($boost_power * $regen_multiplier, 2);
+                    $this->passive_boosts[$id]->effect_amount = ceil($this->passive_boosts[$id]->power * $regen_rate);
                     break;
 
                 case 'scout_range':
@@ -192,7 +253,7 @@ class Bloodline {
                         if($user_rank > 3 && $bloodline_skill > 750) {
                             $boost_amount = 1;
                         }
-                        $this->passive_boosts[$id]['progress'] = round($bloodline_skill / ($base_stats * 0.4), 2) * 100;
+                        $this->passive_boosts[$id]->progress = round($bloodline_skill / ($base_stats * 0.4), 2) * 100;
                     }
                     else {
                         $boost_amount = 1;
@@ -203,57 +264,61 @@ class Bloodline {
                             $boost_amount += 1;
                         }
                         else {
-                            $this->passive_boosts[$id]['progress'] = round($extra_boost, 2) * 100;
+                            $this->passive_boosts[$id]->progress = round($extra_boost, 2) * 100;
                         }*/
 
                     }
-                    $this->passive_boosts[$id]['effect_amount'] = $boost_amount;
+                    $this->passive_boosts[$id]->effect_amount = $boost_amount;
 
                     break;
             }
         }
 
-        foreach($this->combat_boosts as $id => $boost) {
-            $boost_power = $boost['power'] / 5;
+        foreach($this->base_combat_boosts as $id => $boost) {
+            $boost_power = $boost->power / 5;
 
-            switch($boost['effect']) {
+            switch($boost->effect) {
                 case 'ninjutsu_boost':
-                    $this->combat_boosts[$id]['power'] =
-                        round($boost_power * $this->offenseToBloodlineRatio($ninjutsu_skill, $bloodline_skill) * $ratios['offense_boost'], Bloodline::BOOST_POWER_PRECISION);
+                    $this->combat_boosts[$id]->power =
+                        round(
+                            $boost_power * $this->offenseToBloodlineRatio($ninjutsu_skill, $bloodline_skill) * $ratios['offense_boost'],
+                            Bloodline::BOOST_POWER_PRECISION
+                        );
                     break;
                 case 'genjutsu_boost':
-                    $this->combat_boosts[$id]['power'] =
+                    $this->combat_boosts[$id]->power =
                         round($boost_power * $this->offenseToBloodlineRatio($genjutsu_skill, $bloodline_skill) * $ratios['offense_boost'], Bloodline::BOOST_POWER_PRECISION);
                     break;
                 case 'taijutsu_boost':
-                    $this->combat_boosts[$id]['power'] =
+                    $this->combat_boosts[$id]->power =
                         round($boost_power * $this->offenseToBloodlineRatio($taijutsu_skill, $bloodline_skill) * $ratios['offense_boost'], Bloodline::BOOST_POWER_PRECISION);
                     break;
 
                 case 'ninjutsu_resist':
                 case 'genjutsu_resist':
                 case 'taijutsu_resist':
-                    $this->combat_boosts[$id]['power'] =
+                case 'damage_resist':
+                    $this->combat_boosts[$id]->power =
                         round($boost_power * $ratios['defense_boost'], Bloodline::BOOST_POWER_PRECISION);
                     break;
 
                 case 'speed_boost':
                 case 'cast_speed_boost':
-                    $this->combat_boosts[$id]['power'] = round($boost_power * $ratios['speed_boost'], Bloodline::BOOST_POWER_PRECISION);
+                    $this->combat_boosts[$id]->power = round($boost_power * $ratios['speed_boost'], Bloodline::BOOST_POWER_PRECISION);
                     break;
 
                 case 'intelligence_boost':
                 case 'willpower_boost':
-                    $this->combat_boosts[$id]['power'] = round($boost_power * $ratios['mental_boost'], Bloodline::BOOST_POWER_PRECISION);
+                    $this->combat_boosts[$id]->power = round($boost_power * $ratios['mental_boost'], Bloodline::BOOST_POWER_PRECISION);
                     break;
 
                 case 'heal':
-                    $this->combat_boosts[$id]['power'] =
+                    $this->combat_boosts[$id]->power =
                         round($boost_power * $ratios['heal'], Bloodline::BOOST_POWER_PRECISION);
                     break;
             }
 
-            $this->combat_boosts[$id]['effect_amount'] = round($this->combat_boosts[$id]['power'] * $bloodline_skill, Bloodline::BOOST_POWER_PRECISION);
+            $this->combat_boosts[$id]->effect_amount = round($this->combat_boosts[$id]->power * $bloodline_skill, Bloodline::BOOST_POWER_PRECISION);
         }
     }
 
@@ -268,9 +333,6 @@ class Bloodline {
 
         $ratio_max = 1.0;
         $ratio_min = 0.75;
-
-        // Adjust to use invested skill only
-        $bloodline_skill -= self::BASE_BLOODLINE_SKILL;
 
         // Handle case with no skill investment
         if ($bloodline_skill <= 0) {
@@ -290,6 +352,25 @@ class Bloodline {
         return $offense_to_bloodline;
     }
 
+    public function getPrimaryJutsuType(): string {
+        foreach($this->combat_boosts as $combat_boost) {
+            switch($combat_boost->effect) {
+                case 'ninjutsu_boost':
+                    return 'ninjutsu';
+                case 'taijutsu_boost':
+                    return 'taijutsu';
+                case 'genjutsu_boost':
+                    return 'genjutsu';
+                default:
+                    return 'ninjutsu';
+                    break;
+            }
+        }
+
+        // No boosts, default to nin
+        return 'ninjutsu';
+    }
+
     /**
      * @param System $system
      * @param int    $bloodline_id
@@ -298,7 +379,7 @@ class Bloodline {
      * @return bool
      * @throws RuntimeException
      */
-    public static function giveBloodline(System $system, int $bloodline_id, int $user_id, bool $display = true): bool {
+    public static function giveBloodline(System $system, int $bloodline_id, int $user_id, ?User $player = null, bool $display = true): bool {
         $result = $system->db->query("SELECT * FROM `bloodlines` WHERE `bloodline_id` = '$bloodline_id' LIMIT 1");
         if($system->db->last_num_rows == 0) {
             throw new RuntimeException("Invalid bloodline!");
@@ -429,8 +510,7 @@ class Bloodline {
 			WHERE `user_id`='$user_id' LIMIT 1";
 
             $system->db->query($query);
-            if($user_id == $_SESSION['user_id']) {
-                global $player;
+            if($player != null) {
                 $player->bloodline_id = $bloodline_id;
                 $player->bloodline_name = $bloodline['name'];
                 $player->exp = $new_exp;
@@ -445,5 +525,21 @@ class Bloodline {
             $system->printMessage();
         }
         return true;
+    }
+}
+
+class BloodlineBoost {
+    public function __construct(
+        public float $power,
+        public string $effect,
+        public float $effect_amount = 0,
+        public int $progress = 0
+    ) {}
+
+    public static function fromArray(array $data): BloodlineBoost {
+        return new BloodlineBoost(
+            power: $data['power'],
+            effect: $data['effect']
+        );
     }
 }

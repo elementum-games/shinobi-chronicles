@@ -33,6 +33,15 @@ class TravelManager {
     const GRID_POSITIVE_Y = 9;
     const GRID_NEGATIVE_Y = 8;
 
+    const LOCATION_TYPE_DEFAULT = 'LOCATION_TYPE_DEFAULT';
+    const LOCATION_TYPE_HOME_VILLAGE = 'LOCATION_TYPE_HOME_VILLAGE';
+    const LOCATION_TYPE_ALLY_VILLAGE = 'LOCATION_TYPE_ALLY_VILLAGE';
+    const LOCATION_TYPE_ENEMY_VILLAGE = 'LOCATION_TYPE_ENEMY_VILLAGE';
+    const LOCATION_TYPE_COLOSSEUM = 'LOCATION_TYPE_COLOSSEUM';
+    const LOCATION_TYPE_ABYSS = 'LOCATION_TYPE_ABYSS';
+    const LOCATION_TYPE_TOWN = 'LOCATION_TYPE_TOWN';
+    const LOCATION_TYPE_CASTLE = 'LOCATION_TYPE_CASTLE';
+
     /**
      * @var TravelCoords[]
      */
@@ -56,6 +65,42 @@ class TravelManager {
         $count = (int)$system->db->fetch($result)['count'];
 
         return $count >= 1;
+    }
+
+    public static function getPlayerLocationType(System $system, User $user): string {
+        $query = $system->db->query("SELECT `villages`.`village_id`, `maps_locations`.`location_id`, `maps_locations`.`name` FROM `maps_locations`
+            LEFT JOIN `villages`
+            ON `villages`.`map_location_id` = `maps_locations`.`location_id`
+            WHERE `map_id` = {$user->location->map_id}
+            AND `x` = {$user->location->x}
+            AND `y` = {$user->location->y}
+        ");
+        $result = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            switch ($result['name']) {
+                case "Ayakashi's Abyss":
+                    return TravelManager::LOCATION_TYPE_ABYSS;
+                case "Underground Colosseum":
+                    return TravelManager::LOCATION_TYPE_COLOSSEUM;
+                case "Stone":
+                case "Cloud":
+                case "Leaf":
+                case "Sand":
+                case "Mist":
+                    if ($user->village->map_location_id == $result['location_id']) {
+                        return TravelManager::LOCATION_TYPE_HOME_VILLAGE;
+                    } else if ($user->village->isAlly($result['village_id'])) {
+                        return TravelManager::LOCATION_TYPE_ALLY_VILLAGE;
+                    } else {
+                        return TravelManager::LOCATION_TYPE_ENEMY_VILLAGE;
+                    }
+                default:
+                    return TravelManager::LOCATION_TYPE_DEFAULT;
+            }
+        } else {
+            return TravelManager::LOCATION_TYPE_DEFAULT;
+        }
+        // to-do check town, castle types
     }
 
     public function updateFilter(string $filter, string $filter_value): bool {
@@ -118,13 +163,15 @@ class TravelManager {
         }
 
         // check if the user is in a special mission
-        if ($this->user->special_mission) {
+        if ($this->user->special_mission_id) {
             throw new InvalidMovementException('You are currently in a Special Mission and cannot travel!');
         }
 
         // check if the user is in an active operation
         if ($this->user->operation) {
-            throw new InvalidMovementException('You are currently in an active Operation and cannot travel!');
+            $operation = $this->warManager->getOperationById($this->user->operation);
+            $message = "You are currently " . Operation::OPERATION_TYPE_DESCRIPTOR[$operation->type] . " and cannot travel!";
+            throw new InvalidMovementException($message);
         }
 
         // check if the user is in a combat mission fail it
@@ -147,25 +194,29 @@ class TravelManager {
     public function movePlayer($direction): bool {
         $new_coords = Travel::getNewMovementValues($direction, $this->user->location);
         $ignore_coord_restrictions = $this->user->isHeadAdmin();
+        try {
+            if (!$this->checkRestrictions()) {
+                throw new InvalidMovementException('Unable to move!');
+            }
 
-        if (!$this->checkRestrictions()) {
-            throw new InvalidMovementException('Unable to move!');
-        }
+            // check if the coords exceed the map dimensions
+            if (($new_coords->x > $this->map_data['end_x']
+                || $new_coords->y > $this->map_data['end_y']
+                || $new_coords->x < 1
+                || $new_coords->y < 1)
+                && !$ignore_coord_restrictions) {
+                throw new InvalidMovementException('You cannot move past this point!');
+            }
 
-        // check if the coords exceed the map dimensions
-        if (($new_coords->x > $this->map_data['end_x']
-            || $new_coords->y > $this->map_data['end_y']
-            || $new_coords->x < 1
-            || $new_coords->y < 1)
-            && !$ignore_coord_restrictions) {
-            throw new InvalidMovementException('You cannot move past this point!');
-        }
-
-        // check if the user is trying to move to a village that is not theirs
-        if (TravelManager::locationIsInVillage($this->system, $new_coords)
-            && !$new_coords->equals($this->user->village_location)
-            && !$ignore_coord_restrictions) {
-            throw new InvalidMovementException('You cannot enter another village!');
+            // check if the user is trying to move to a village that is not theirs
+            if (TravelManager::locationIsInVillage($this->system, $new_coords)
+                && !$new_coords->equals($this->user->village_location)
+                && !$ignore_coord_restrictions) {
+                throw new InvalidMovementException('You cannot enter another village!');
+            }
+        } catch (InvalidMovementException $e) {
+            $this->setTravelMessage($e->getMessage());
+            return false;
         }
 
         // check if the user is entering their own village or out of it
@@ -187,29 +238,36 @@ class TravelManager {
 
     /**
      * @throws RuntimeException
+     * @throws DatabaseDeadlockException
      */
     public function enterPortal($portal_id): bool {
         $ignore_travel_restrictions = $this->user->isHeadAdmin();
 
         // portal data
         $portal_data = Travel::getPortalData($this->system, $portal_id);
-        if (empty($portal_data)) {
-            throw new InvalidMovementException('You cannot enter here!');
-        }
-        if (!$this->checkRestrictions()) {
-            throw new InvalidMovementException('Unable to move!');
-        }
 
-        // check if the player is at the correct entrance
-        if (!$this->user->location->equals(new TravelCoords($portal_data['entrance_x'], $portal_data['entrance_y'], $portal_data['from_id']))
-            && !$ignore_travel_restrictions) {
-            throw new InvalidMovementException('You cannot enter here!');
-        }
+        try {
+            if (empty($portal_data)) {
+                throw new InvalidMovementException('You cannot enter here!');
+            }
+            if (!$this->checkRestrictions()) {
+                throw new InvalidMovementException('Unable to move!');
+            }
 
-        // check if the player is in a faction that allows this portal
-        $portal_whitelist = array_map('trim', explode(',', $portal_data['whitelist']));
-        if (!in_array($this->user->village->name, $portal_whitelist) && !$ignore_travel_restrictions) {
-            throw new InvalidMovementException('You are unable to enter here!');
+            // check if the player is at the correct entrance
+            if (!$this->user->location->equals(new TravelCoords($portal_data['entrance_x'], $portal_data['entrance_y'], $portal_data['from_id']))
+                && !$ignore_travel_restrictions) {
+                throw new InvalidMovementException('You cannot enter here!');
+            }
+
+            // check if the player is in a faction that allows this portal
+            $portal_whitelist = array_map('trim', explode(',', $portal_data['whitelist']));
+            if (!in_array($this->user->village->name, $portal_whitelist) && !$ignore_travel_restrictions) {
+                throw new InvalidMovementException('You are unable to enter here!');
+            }
+        } catch (InvalidMovementException $e) {
+            $this->setTravelMessage($e->getMessage());
+            return false;
         }
 
         // update the player data
@@ -223,6 +281,8 @@ class TravelManager {
 
     /**
      * @return NearbyPlayerDto[]
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function fetchNearbyPlayers(): array {
@@ -496,6 +556,7 @@ class TravelManager {
 
     /**
      * @return MapLocation[]
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function fetchCurrentMapLocations(): array {
@@ -560,6 +621,7 @@ class TravelManager {
 
     /**
      * @return array|null
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function fetchCurrentLocationPortal(): ?array {
@@ -585,6 +647,8 @@ class TravelManager {
 
     /**
      * @throws RuntimeException
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function attackPlayer(string $target_attack_id): bool {
@@ -600,74 +664,85 @@ class TravelManager {
         $user = User::loadFromId($this->system, $target_user_id);
         $user->loadData(User::UPDATE_NOTHING, true);
 
-        // check if the location forbids pvp
-        if ($this->user->current_location->location_id && $this->user->current_location->pvp_allowed == 0) {
-            throw new RuntimeException("You cannot fight at this location!");
-        }
+        try {
+            // check if the location forbids pvp
+            if ($this->user->current_location->location_id && $this->user->current_location->pvp_allowed == 0) {
+                throw new RuntimeException("You cannot fight at this location!");
+            }
 
-        if ($user->village->name == $this->user->village->name) {
-            throw new RuntimeException("You cannot attack people from your own village!");
-        }
+            if ($user->village->name == $this->user->village->name) {
+                throw new RuntimeException("You cannot attack people from your own village!");
+            }
 
-        if ($user->rank_num < 3) {
-            throw new RuntimeException("You cannot attack people below Chuunin rank!");
-        }
-        if ($this->user->rank_num < 3) {
-            throw new RuntimeException("You cannot attack people Chuunin rank and higher!");
-        }
+            if ($user->rank_num < 3) {
+                throw new RuntimeException("You cannot attack people below Chuunin rank!");
+            }
+            if ($this->user->rank_num < 3) {
+                throw new RuntimeException("You cannot attack people Chuunin rank and higher!");
+            }
 
-        // bypass rank restruction if target taking war action or carrying loot
-        if ($user->rank_num !== $this->user->rank_num) {
-            if ($user->operation == 0) {
-                $loot_count = 0;
-                $loot_result = $this->system->db->query("SELECT COUNT(*) as `count` FROM `loot` WHERE `user_id` = {$user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL LIMIT 1");
-                if ($this->system->db->last_num_rows > 0) {
-                    $loot_result = $this->system->db->fetch($loot_result);
-                    $loot_count = $loot_result['count'];
-                }
-                if ($loot_count == 0) {
-                    throw new RuntimeException("You can only attack people of the same rank!");
+            // bypass rank restruction if target taking war action or carrying loot
+            if ($user->rank_num !== $this->user->rank_num) {
+                if ($user->operation == 0) {
+                    $loot_count = 0;
+                    $loot_result = $this->system->db->query("SELECT COUNT(*) as `count` FROM `loot` WHERE `user_id` = {$user->user_id} AND `claimed_village_id` IS NULL AND `battle_id` IS NULL LIMIT 1");
+                    if ($this->system->db->last_num_rows > 0) {
+                        $loot_result = $this->system->db->fetch($loot_result);
+                        $loot_count = $loot_result['count'];
+                    }
+                    if ($loot_count == 0) {
+                        throw new RuntimeException("You can only attack people of the same rank!");
+                    }
                 }
             }
+
+            if (!$user->location->equals($this->user->location)) {
+                throw new RuntimeException("Target is not at your location!");
+            }
+            if ($user->battle_id) {
+                throw new RuntimeException("Target is in battle!");
+            }
+            if ($user->last_active < time() - 120) {
+                throw new RuntimeException("Target is inactive/offline!");
+            }
+            /*
+            if ($this->user->pvp_immunity_ms > System::currentTimeMs()) {
+                throw new RuntimeException("You were defeated within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
+                    ceil(($this->user->pvp_immunity_ms - System::currentTimeMs()) / 1000) . " more seconds.");
+            }*/
+            if ($this->user->last_death_ms > System::currentTimeMs() - (User::PVP_IMMUNITY_SECONDS * 1000)) {
+                throw new RuntimeException("You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
+                    ceil((($this->user->last_death_ms + (User::PVP_IMMUNITY_SECONDS * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+            }
+            if ($user->pvp_immunity_ms > System::currentTimeMs()) {
+                throw new RuntimeException("Target has died recently and immune to being attacked.");
+                }
+                /*
+                if ($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
+                    throw new RuntimeException("Target has died within the last minute, please wait " .
+                        ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+                }*/
+            if ($this->user->operation > 0) {
+                $operation = $this->warManager->getOperationById($this->user->operation);
+                $message = "You cannot attack while " . Operation::OPERATION_TYPE_DESCRIPTOR[$operation->type] . "!";
+                throw new RuntimeException($message);
+            }
+            if ($this->dbFetchIsProtectedByAlly($user) && $this->user->rank_num >= 4) {
+                throw new RuntimeException("Target is protected by a higher rank ally! Attack them first.");
+            }
+        } catch (RuntimeException $e) {
+            $this->setTravelMessage($e->getMessage());
+            return false;
         }
 
-        if (!$user->location->equals($this->user->location)) {
-            throw new RuntimeException("Target is not at your location!");
+        $battle_background = TravelManager::getLocationBattleBackgroundLink($this->system, $this->user->location);
+        if (empty($battle_background)) {
+            $battle_background = $this->user->region->battle_background_link;
         }
-        if ($user->battle_id) {
-            throw new RuntimeException("Target is in battle!");
-        }
-        if ($user->last_active < time() - 120) {
-            throw new RuntimeException("Target is inactive/offline!");
-        }
-        /*
-        if ($this->user->pvp_immunity_ms > System::currentTimeMs()) {
-            throw new RuntimeException("You were defeated within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
-                ceil(($this->user->pvp_immunity_ms - System::currentTimeMs()) / 1000) . " more seconds.");
-        }*/
-        if ($this->user->last_death_ms > System::currentTimeMs() - (User::PVP_IMMUNITY_SECONDS * 1000)) {
-            throw new RuntimeException("You died within the last " . User::PVP_IMMUNITY_SECONDS . "s, please wait " .
-                ceil((($this->user->last_death_ms + (User::PVP_IMMUNITY_SECONDS * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
-        }
-        if ($user->pvp_immunity_ms > System::currentTimeMs()) {
-            throw new RuntimeException("Target has died recently and immune to being attacked.");
-        }
-        /*
-        if ($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
-            throw new RuntimeException("Target has died within the last minute, please wait " .
-                ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
-        }*/
-        if ($this->user->operation > 0) {
-            throw new RuntimeException("You are currently in an operation!");
-        }
-        if ($this->dbFetchIsProtectedByAlly($user) && $this->user->rank_num >= 4) {
-            throw new RuntimeException("Target is protected by a higher rank ally! Attack them first.");
-        }
-
         if ($this->system->USE_NEW_BATTLES) {
-            BattleV2::start($this->system, $this->user, $user, Battle::TYPE_FIGHT);
+            BattleV2::start($this->system, $this->user, $user, Battle::TYPE_FIGHT, battle_background_link: $battle_background);
         } else {
-            Battle::start($this->system, $this->user, $user, Battle::TYPE_FIGHT);
+            Battle::start($this->system, $this->user, $user, Battle::TYPE_FIGHT, battle_background_link: $battle_background);
         }
         return true;
     }
@@ -700,6 +775,7 @@ class TravelManager {
      *
      * @param User $user
      * @return bool
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function dbFetchIsProtectedByAlly(User $user): bool {
@@ -725,6 +801,7 @@ class TravelManager {
 
     /**
      * @return array village names, keyed by travel coords str
+     * @throws DatabaseDeadlockException
      */
     public static function fetchVillageLocationsByCoordsStr(System $system): array {
         $village_locations = [];
@@ -755,6 +832,7 @@ class TravelManager {
 
     /**
      * @return Region[]
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function getRegions(User $player): array {
@@ -808,6 +886,7 @@ class TravelManager {
 
     /**
      * @return TravelCoords
+     * @throws DatabaseDeadlockException
      */
     public function getColosseumCoords(): TravelCoords {
         $result = $this->system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
@@ -817,6 +896,9 @@ class TravelManager {
 
     /**
      * @return Patrol[]
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function fetchNearbyPatrols(): array {
@@ -872,6 +954,8 @@ class TravelManager {
 
     /**
      * @return MapObjective[]
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function fetchMapObjectives(): array
@@ -1015,6 +1099,7 @@ class TravelManager {
 
     /**
      * @return RegionObjective[]
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function fetchRegionObjectives(): array
@@ -1107,6 +1192,7 @@ class TravelManager {
 
     /**
      * @return string
+     * @throws DatabaseDeadlockException
      */
     function getPlayerBattleUrl(): ?string {
         $link = null;
@@ -1143,6 +1229,9 @@ class TravelManager {
 
     /**
      * @return bool
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     function beginOperation($operation_type): bool {
@@ -1187,7 +1276,7 @@ class TravelManager {
                 LIMIT 1
             ");
             if ($this->system->db->last_num_rows == 0) {
-                throw new RuntimeException("No operation target found!");
+                throw new RuntimeException("No valid target found!");
             }
             $target = $this->system->db->fetch($target);
             $this->warManager->beginOperation($operation_type, $target['id']);
@@ -1218,7 +1307,7 @@ class TravelManager {
             try {
                 $message = $this->warManager->processOperation($this->user->operation);
             } catch (RuntimeException $e) {
-                $message = "Operation cancelled";
+                //$message = "Operation cancelled";
                 if ($this->system->isDevEnvironment()) {
                     $message .= ": " . $e->getMessage();
                 }
@@ -1255,6 +1344,7 @@ class TravelManager {
 
     /**
      * @return int
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     function getPlayerLootCount(): int {
@@ -1265,5 +1355,23 @@ class TravelManager {
             $loot_count = $loot_result['count'];
         }
         return $loot_count;
+    }
+
+    /**
+     * @return string
+     * @param System $system
+     * @param TravelCoords $location
+     */
+    public static function getLocationBattleBackgroundLink(System $system, TravelCoords $location): string {
+        $result = $system->db->query(
+            "SELECT `battle_background_link` FROM `maps_locations`
+            WHERE `x`='{$location->x}' AND `y`='{$location->y}' AND `map_id`='{$location->map_id}' LIMIT 1"
+        );
+        $result = $system->db->fetch($result);
+        if (isset($result['battle_background_link'])) {
+            return $result['battle_background_link'];
+        } else {
+            return '';
+        }
     }
 }

@@ -249,6 +249,7 @@
 
     function statAllocateCostDisplay() {
         let ak_cost = 0, yen_cost = 0;
+        let is_dev = <?= $system->isDevEnvironment() ? '1' : '0'; ?>;
 
         const transferAmount = parseInt(transferAmountEl.value);
         const transferSpeed = transferSpeedEl.value;
@@ -279,6 +280,12 @@
         }
         time = Math.floor(time);
 
+        if (is_dev) {
+            ak_cost = 0;
+            yen_cost = 0;
+            time = 0;
+        }
+
         statCostEl.innerHTML = `${ak_cost} AK / ${yen_cost} yen / ${time} minutes`;
     }
 
@@ -298,9 +305,8 @@
                 A gift offering of <?= $premiumShopManager->costs['element_change'] ?> Ancient Kunai is required.
                 <br/>
                 <br/>
-                <b>(IMPORTANT: This is non-reversable once completed<br />If you want to return to your original element you
-                    will have to pay another fee.<br />You will forget any elemental jutsu you currently have of this
-                    nature.)</b><br />
+                <b>(IMPORTANT: This is non-reversible once completed<br />If you want to return to your original element you
+                    will have to pay another fee.)</b><br />
 
                 <br/>Choose your element to reattune:
                 <br/>
@@ -314,11 +320,8 @@
                     Choose your element to attune to:<br/>
                     <select name='new_element'>
                         <?php foreach(Jutsu::$elements as $new_element): ?>
-                            <?php
-                            if(in_array($new_element, $player->elements)) {
-                                continue;
-                            }
-                            ?>
+                            <?php if($new_element == Jutsu::ELEMENT_NONE) continue; ?>
+                            <?php if(in_array($new_element, $player->elements)) continue; ?>
                             <option value='<?= $new_element ?>'><?= $new_element ?></option>
                         <?php endforeach; ?>
                     </select><br/>
@@ -374,8 +377,8 @@
                 own village.
                 However to get the other village to accept you, you must offer them <?= $premiumShopManager->costs['village_change'] ?>
                 Ancient Kunai.<br/>
-                <p>Villages with "From the Ashes" policy may be transferred to at no cost.</p>
-                <p>You will lose 1 Reputation tier for all village changes after the first (you can not fall below Shinobi).</p>
+                <p>You will lose 20% of your Reputation for all village changes after the first (you can not fall below Shinobi).</p>
+                <p>Villages with "From the Ashes" policy reduce the Reputation and Ancient Kunai cost to transfer by 50%.</p>
                 <br/>
                 <b>(IMPORTANT: This is non-reversable once completed<br />If you want to return to your original village you
                     will have to pay

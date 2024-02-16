@@ -13,11 +13,12 @@ class Battle {
     const TYPE_AI_RANKUP = 6;
     const TYPE_AI_WAR = 7;
 
-    const TURN_LENGTH = 15;
+    const TURN_LENGTH = 20;
     const INITIAL_TURN_LENGTH = 40;
+    const MAX_TURN_LENGTH = 40;
     const PREP_LENGTH = 20;
 
-    const MAX_PRE_FIGHT_HEAL_PERCENT = 85;
+    const MAX_PRE_FIGHT_HEAL_PERCENT = 100;
 
     const TEAM1 = 'T1';
     const TEAM2 = 'T2';
@@ -28,7 +29,7 @@ class Battle {
     const MIN_DEBUFF_RATIO = 0.1;
     const MAX_DIFFUSE_PERCENT = 0.75;
 
-    const REPUTATION_DAMAGE_RESISTANCE_BOOST = 15;
+    const REPUTATION_DAMAGE_RESISTANCE_BOOST = 5;
 
     private System $system;
 
@@ -75,6 +76,16 @@ class Battle {
 
     public ?int $patrol_id;
 
+    public int $player1_last_damage_taken;
+    public int $player2_last_damage_taken;
+
+    public string $battle_background_link;
+
+    public int $rounds = 1;
+    public int $round_count = 0;
+    public int $team1_wins;
+    public int $team2_wins;
+
     /**
      * @param System  $system
      * @param Fighter $player1
@@ -84,7 +95,7 @@ class Battle {
      * @throws RuntimeException
      */
     public static function start(
-        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null
+        System $system, Fighter $player1, Fighter $player2, int $battle_type, ?int $patrol_id = null, string $battle_background_link = '', int $rounds = 1
     ) {
         $json_empty_array = '[]';
 
@@ -128,7 +139,9 @@ class Battle {
                 `jutsu_cooldowns` = '" . $json_empty_array . "',
                 `fighter_jutsu_used` = '" . $json_empty_array . "',
                 `is_retreat` = '" . (int)false . "',
-                `patrol_id` = " . (!empty($patrol_id) ? $patrol_id : "NULL") . "
+                `patrol_id` = " . (!empty($patrol_id) ? $patrol_id : "NULL") . ",
+                `battle_background_link` = '{$battle_background_link}',
+                `rounds` = {$rounds}
         ");
         $battle_id = $system->db->last_insert_id;
 
@@ -249,6 +262,16 @@ class Battle {
         else {
             $this->battle_text = '';
         }
+
+        $this->player1_last_damage_taken = $battle['player1_last_damage_taken'];
+        $this->player2_last_damage_taken = $battle['player2_last_damage_taken'];
+
+        $this->battle_background_link = empty($battle['battle_background_link']) ? '' : $battle['battle_background_link'];
+
+        $this->rounds = $battle['rounds'];
+        $this->round_count = $battle['round_count'];
+        $this->team1_wins = $battle['team1_wins'];
+        $this->team2_wins = $battle['team2_wins'];
     }
 
     /**
@@ -266,11 +289,23 @@ class Battle {
         $this->player2->combat_id = Battle::combatId(Battle::TEAM2, $this->player2);
 
         if($this->player1 instanceof NPC) {
-            $this->player1->loadData();
+            // if opponent is player, pass to constructor for AI scaling
+            if ($this->player2 instanceof User) {
+                $this->player1->loadData($this->player2);
+            }
+            else {
+                $this->player1->loadData();
+            }
             $this->player1->health = $this->fighter_health[$this->player1->combat_id];
         }
         if($this->player2 instanceof NPC) {
-            $this->player2->loadData();
+            // if opponent is player, pass to constructor for AI scaling
+            if ($this->player1 instanceof User) {
+                $this->player2->loadData($this->player1);
+            }
+            else {
+                $this->player2->loadData();
+            }
             $this->player2->health = $this->fighter_health[$this->player2->combat_id];
         }
 
@@ -280,23 +315,11 @@ class Battle {
         if($this->player2 instanceof User && $this->player2->id != $this->player->id) {
             $this->player2->loadData(User::UPDATE_NOTHING, true);
         }
-        if ($this->battle_type == Battle::TYPE_CHALLENGE) {
-		    if (true) {
-			    $tier_difference = $this->player1->reputation->rank - $this->player2->reputation->rank;
-			    if ($tier_difference > 0) {
-				    $this->player1->reputation_defense_boost = Battle::REPUTATION_DAMAGE_RESISTANCE_BOOST * abs($tier_difference);
-			    }
-                else if ($tier_difference < 0) {
-                    $this->player2->reputation_defense_boost = Battle::REPUTATION_DAMAGE_RESISTANCE_BOOST * abs($tier_difference);
-                }
-		    }
-	    }
 
-        $this->player1->getInventory();
-        $this->player2->getInventory();
+        $this->player1->last_damage_taken = $this->player1_last_damage_taken;
+        $this->player2->last_damage_taken = $this->player2_last_damage_taken;
 
-        $this->player1->applyBloodlineBoosts();
-        $this->player2->applyBloodlineBoosts();
+        $this->fetchPlayerInventories();
     }
 
     /**
@@ -330,7 +353,7 @@ class Battle {
     }
 
     public function isPreparationPhase(): bool {
-        return $this->prepTimeRemaining() > 0 && in_array($this->battle_type, [Battle::TYPE_FIGHT]);
+        return $this->prepTimeRemaining() > 0 && in_array($this->battle_type, [Battle::TYPE_FIGHT, Battle::TYPE_CHALLENGE]);
     }
 
     /**
@@ -359,6 +382,10 @@ class Battle {
         }
     }
 
+    public static function calcTimeRemaining($turn_time, $player_time): int {
+        return $player_time - (time() - $turn_time);
+    }
+
     public function prepTimeRemaining(): int {
         return Battle::PREP_LENGTH - (time() - $this->start_time);
     }
@@ -370,14 +397,14 @@ class Battle {
                 if ($min) {
                     $this->player1_time = self::TURN_LENGTH;
                 } else {
-                    $this->player1_time = min(max(($this->player1_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::INITIAL_TURN_LENGTH);
+                    $this->player1_time = min(max(($this->player1_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::MAX_TURN_LENGTH);
                 }
                 break;
             case $this->player2_id:
                 if ($min) {
                     $this->player2_time = self::TURN_LENGTH;
                 } else {
-                    $this->player2_time = min(max(($this->player2_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::INITIAL_TURN_LENGTH);
+                    $this->player2_time = min(max(($this->player2_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::MAX_TURN_LENGTH);
                 }
                 break;
             default:
@@ -390,6 +417,7 @@ class Battle {
         $is_retreat = (int)$this->is_retreat;
         $this->system->db->query(
             "UPDATE `battles` SET
+            `start_time` = {$this->start_time},
             `turn_time` = {$this->turn_time},
             `turn_count` = {$this->turn_count},
             `winner` = '{$this->winner}',
@@ -407,16 +435,75 @@ class Battle {
             `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
 
             `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
-            `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
+            `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "',
+
+            `player1_last_damage_taken` = {$this->player1->last_damage_taken},
+            `player2_last_damage_taken` = {$this->player2->last_damage_taken},
+
+            `round_count` = {$this->round_count},
+            `team1_wins` = {$this->team1_wins},
+            `team2_wins` = {$this->team2_wins}
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
         );
 
-        BattleLog::addOrUpdateTurnLog($this->system, $this->battle_id, $this->turn_count, $this->battle_text);
+        $fighter_health = $this->fighter_health;
+        $fighter_health[$this->player1->combat_id] = [
+           'current' => $this->fighter_health[$this->player1->combat_id],
+           'max' => $this->player1->max_health,
+         ];
+         $fighter_health[$this->player2->combat_id] = [
+           'current' => $this->fighter_health[$this->player2->combat_id],
+           'max' => $this->player2->max_health,
+         ];
+        BattleLog::addOrUpdateTurnLog($this->system, $this->battle_id, $this->turn_count, $this->battle_text, $fighter_health, $this->raw_active_effects, $this->round_count);
 
         $this->system->db->query("COMMIT;");
     }
 
     public static function combatId(string $team, Fighter $fighter): string {
         return $team . ':' . $fighter->id;
+    }
+
+    public function fetchPlayerInventories() {
+        $this->player1->getInventory();
+        $this->player2->getInventory();
+
+        // for each jutsu:
+        // - check if has linked jutsu
+        // - add linked jutsu if not exists
+        foreach ($this->player1->jutsu as $jutsu) {
+            if ($jutsu->linked_jutsu_id > 0) {
+                $id = "J" . $jutsu->id . ":T1:U:" . $this->player1->user_id;
+                if (isset($this->jutsu_cooldowns[$id]) && $this->jutsu_cooldowns[$id] > 0) {
+                    if (!isset($this->player1->jutsu[$jutsu->linked_jutsu_id])) {
+                        $linked_jutsu = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` = {$jutsu->linked_jutsu_id}");
+                        $linked_jutsu = $this->system->db->fetch($linked_jutsu);
+                        $this->player1->jutsu[$jutsu->linked_jutsu_id] = Jutsu::fromArray($jutsu->linked_jutsu_id, $linked_jutsu);
+                        $this->player1->jutsu[$jutsu->linked_jutsu_id]->setLevel($jutsu->level, 0);
+                        end($this->player1->equipped_jutsu);
+                        $last_array_key = key($this->player1->equipped_jutsu);
+                        $this->player1->equipped_jutsu[$last_array_key + 1]['id'] = $jutsu->linked_jutsu_id;
+                        $this->player1->equipped_jutsu[$last_array_key + 1]['type'] = $jutsu->jutsu_type;
+                    }
+                }
+            }
+        }
+        foreach ($this->player2->jutsu as $jutsu) {
+            if ($jutsu->linked_jutsu_id > 0 && $this->player2 instanceof User) {
+                $id = "J" . $jutsu->id . ":T2:U:" . $this->player2->user_id;
+                if (isset($this->jutsu_cooldowns[$id]) && $this->jutsu_cooldowns[$id] > 0) {
+                    if (!isset($this->player2->jutsu[$jutsu->linked_jutsu_id])) {
+                        $linked_jutsu = $this->system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id` = {$jutsu->linked_jutsu_id}");
+                        $linked_jutsu = $this->system->db->fetch($linked_jutsu);
+                        $this->player2->jutsu[$jutsu->linked_jutsu_id] = Jutsu::fromArray($jutsu->linked_jutsu_id, $linked_jutsu);
+                        $this->player2->jutsu[$jutsu->linked_jutsu_id]->setLevel($jutsu->level, 0);
+                        end($this->player2->equipped_jutsu);
+                        $last_array_key = key($this->player2->equipped_jutsu);
+                        $this->player2->equipped_jutsu[$last_array_key + 1]['id'] = $jutsu->linked_jutsu_id;
+                        $this->player2->equipped_jutsu[$last_array_key + 1]['type'] = $jutsu->jutsu_type;
+                    }
+                }
+            }
+        }
     }
 }

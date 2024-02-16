@@ -124,7 +124,7 @@ function members(): void {
 			}
 			echo "</table>";
 		}
-		catch (Exception $e) {
+		catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();
@@ -183,7 +183,7 @@ function members(): void {
             require 'templates/view_user_profile.php';
 
 			$display_list = false;
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();
@@ -203,38 +203,40 @@ function members(): void {
 
 		$query_custom = '';
 		$view = 'highest_exp';
+		//EXP
 		if(isset($_GET['view']) && $_GET['view'] == 'highest_exp') {
 			$query_custom = " WHERE `staff_level` < " . User::STAFF_ADMINISTRATOR.
-                " ORDER BY `exp` DESC, ABS(`village_rep`) DESC";
+                " ORDER BY `exp` DESC, ABS(`village_rep`) DESC, `user_name` ASC";
 			$view = 'highest_exp';
 		}
+		//PVP
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_pvp') {
 			$query_custom = " WHERE `staff_level` < " . User::STAFF_ADMINISTRATOR .
-                " ORDER BY `pvp_wins` DESC";
+                " ORDER BY `pvp_wins` DESC, `user_name` ASC";
 			$view = 'highest_pvp';
 		}
         //Reputation
         else if(isset($_GET['view']) && $_GET['view'] == 'highest_rep') {
             $query_custom = " WHERE `staff_level` < " . StaffManager::STAFF_ADMINISTRATOR .
-                " ORDER BY ABS(`village_rep`) DESC";
+                " ORDER BY ABS(`village_rep`) DESC, `user_name` ASC";
             $view = 'highest_rep';
         }
 		//Teams
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_teams') {
 			$query_custom = " WHERE `staff_level` < " . User::STAFF_ADMINISTRATOR .
-                " ORDER BY `pvp_wins` DESC";
+                " ORDER BY `pvp_wins` DESC, `user_name` ASC";
 			$view = 'highest_teams';
 		}
-		else if(isset($_GET['view']) && $_GET['view'] == 'online_users') {
-			$query_custom = "WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds ORDER BY `level` DESC";
+		//Online Users
+		 else if(isset($_GET['view']) && $_GET['view'] == 'online_users') {
+			$query_custom = "WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds ORDER BY `level` DESC, `user_name` ASC";
 			$view = 'online_users';
             $results_per_page = 20;
-		}
+		} 
 		else {
-            $query_custom = " WHERE `staff_level` < " . User::STAFF_ADMINISTRATOR .
-                " ORDER BY `exp` DESC, ABS(`village_rep`) DESC";
-			$view = 'highest_exp';
-
+			$query_custom = "WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds ORDER BY `level` DESC, `user_name` ASC";
+			$view = 'online_users';
+            $results_per_page = 20;
 		}
 
 		// Pagination
@@ -479,12 +481,12 @@ function renderMemberSubmenu() {
 
     $submenu_links = [
         [
-            'link' => $system->router->links['members'] . "&view=highest_exp",
-            'title' => 'Highest Exp',
-        ],
-        [
             'link' => $system->router->links['members'] . "&view=online_users",
             'title' => 'Online Users',
+        ],
+        [
+            'link' => $system->router->links['members'] . "&view=highest_exp",
+            'title' => 'Highest Exp',
         ],
         $submenu_links[] = [
             'link' => $system->router->links['members'] . "&view=highest_pvp",

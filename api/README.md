@@ -6,7 +6,7 @@ Generally speaking these files are responsible for their own auth with the stand
 # Begin standard auth
 require "../classes/_autoload.php";
 
-$system = new System();
+$system = System::initialize();
 
 try {
     $player = Auth::getUserFromSession($system);

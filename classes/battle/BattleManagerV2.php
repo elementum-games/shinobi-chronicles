@@ -437,6 +437,17 @@ class BattleManagerV2 {
         }
     }
 
+    public function getCooldowns(): array {
+        return $this->battle->jutsu_cooldowns;
+    }
+
+    public function simulateAIAttack(Jutsu $ai_jutsu): array {
+        return [
+            'ai_simulated_damage_taken' => 100,
+            'player_simulated_damage_taken' => 100,
+        ];
+    }
+
     // PRIVATE API - TURN LIFECYCLE
 
     /**
@@ -619,7 +630,7 @@ class BattleManagerV2 {
                 if($item_id && $this->player->hasItem($item_id)) {
                     $item = $this->player->items[$item_id];
 
-                    $max_health = $this->player->max_health * (BattleV2::MAX_PRE_FIGHT_HEAL_PERCENT / 100);
+                    $max_health = $this->player->maxConsumableHealAmount();
 
                     if($this->player->health >= $max_health) {
                         throw new RuntimeException("You can't heal any further!");
@@ -756,7 +767,7 @@ class BattleManagerV2 {
      */
     #[Trace]
     protected function chooseNPCAttackAction(NPC $npc, Fighter $target): FighterAttackAction {
-        $jutsu = $npc->chooseAttack();
+        $jutsu = $npc->chooseAttack($this);
         $jutsu->setCombatId($npc->combat_id);
 
         // $fighter_id_target = new AttackFighterIdTarget($this->player->combat_id);

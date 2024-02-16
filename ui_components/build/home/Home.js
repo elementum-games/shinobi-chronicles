@@ -14,7 +14,9 @@ function Home({
   resetErrorText,
   loginMessageText,
   registerPreFill,
-  initialNewsPosts
+  initialNewsPosts,
+  scOpen,
+  reopenTimeWindow
 }) {
   const newsRef = React.useRef(null);
   const contactRef = React.useRef(null);
@@ -31,7 +33,9 @@ function Home({
     registerPreFill: registerPreFill,
     newsRef: newsRef,
     contactRef: contactRef,
-    AshBackground: AshBackground
+    AshBackground: AshBackground,
+    scOpen: scOpen,
+    reopenTimeWindow: reopenTimeWindow
   }), /*#__PURE__*/React.createElement("div", {
     ref: newsRef,
     id: "news_container",
@@ -75,7 +79,9 @@ function MainBannerSection({
   registerPreFill,
   newsRef,
   contactRef,
-  AshBackground
+  AshBackground,
+  scOpen,
+  reopenTimeWindow
 }) {
   const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset" ? "reset" : "login");
   const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
@@ -136,7 +142,11 @@ function MainBannerSection({
     src: "/images/v2/decorations/homepagelogo.png"
   }), /*#__PURE__*/React.createElement("div", {
     className: "title_version"
-  }, version)), activeModal, /*#__PURE__*/React.createElement(AshBackground, null), /*#__PURE__*/React.createElement("div", {
+  }, version)), !scOpen && /*#__PURE__*/React.createElement("div", {
+    className: "sc_maintenance_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "sc_maintenance_message"
+  }, "Shinobi Chronicles is currently closed for maintenance.", /*#__PURE__*/React.createElement("br", null), "Check back in ", reopenTimeWindow, ".")), activeModal, /*#__PURE__*/React.createElement(AshBackground, null), /*#__PURE__*/React.createElement("div", {
     className: "login_container",
     style: activeModal != null ? {
       visibility: "hidden"

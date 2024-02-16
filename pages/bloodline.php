@@ -47,11 +47,15 @@ function bloodline() {
 			}
 			$player->bloodline->jutsu[$jutsu_id] = $base_bloodline->jutsu[$jutsu_id];
 			$player->bloodline->jutsu[$jutsu_id]->id = $jutsu_id;
-			$player->bloodline->jutsu[$jutsu_id]->level = 1;
+            if ($system->isDevEnvironment()) {
+                $player->bloodline->jutsu[$jutsu_id]->level = 100;
+            } else {
+                $player->bloodline->jutsu[$jutsu_id]->level = 1;
+            }
 			$player->bloodline->jutsu[$jutsu_id]->exp = 0;
 			$player->updateInventory();
 			$system->message("Learned " . $base_bloodline->jutsu[$jutsu_id]->name . "!");
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();
@@ -69,7 +73,7 @@ function bloodline() {
 	$bloodline_ranks = array(4 => 'Lesser', 3 => 'Common', 2 => 'Elite', 1 => 'Legendary', 5 => 'Admin');
 	echo "<label style='width: 8.8em;font-weight:bold;'>Name:</label>" . $player->bloodline->name . "<br />
 		<label style='width: 8.8em;font-weight:bold;'>Rank:</label>" . $bloodline_ranks[$player->bloodline->rank] . "<br />
-		<label style='width: 8.8em;font-weight:bold;'>Bloodline skill:</label>" . $player->bloodline_skill . " (+100 Base)<br />";
+		<label style='width: 8.8em;font-weight:bold;'>Bloodline skill:</label>" . $player->bloodline_skill . "<br />";
 	echo "<br />";
 
 
@@ -102,16 +106,19 @@ function bloodline() {
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] extra Genjutsu offense</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>Boost gradually  decreases to 75% strength as Bloodline Skill exceeds Genjutsu skill</span>"
 		),
 		'heal' => array(
-			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] per turn</span>"
+            'text' => "[BL_SKILL] * [RATIO] / [AMOUNT2] (stat total) -> <span class='amount'>[AMOUNT]% damage recovery</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>(assuming opponent of equal total stats)</span>"
 		),
 		'ninjutsu_resist' => array(
-			'text' => "[BL_SKILL] * [RATIO] * [0.7] -> <span class='amount'>[AMOUNT] less Ninjutsu damage taken</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] less Ninjutsu damage taken</span>"
 		),
 		'genjutsu_resist' => array(
-			'text' => "[BL_SKILL] * [RATIO] * [0.7] -> <span class='amount'>[AMOUNT] less Genjutsu damage taken</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] less Genjutsu damage taken</span>"
 		),
 		'taijutsu_resist' => array(
-			'text' => "[BL_SKILL] * [RATIO] * [0.7] -> <span class='amount'>[AMOUNT] less Taijutsu damage taken</span>"
+			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'>[AMOUNT] less Taijutsu damage taken</span>"
+		),
+		'damage_resist' => array(
+			'text' => "[BL_SKILL] * [RATIO] / [AMOUNT2] (stat total) -> <span class='amount'>[AMOUNT]% less damage taken</span><br><span style='padding-left: 15px; font-size: smaller; font-style: italic'>(assuming opponent of equal total stats)</span>"
 		),
 		'speed_boost' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra Speed</span>"
@@ -129,7 +136,7 @@ function bloodline() {
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra willpower</span>"
 		)
 	);
-	$bloodline_skill = 100 + $player->bloodline_skill;
+	$bloodline_skill = $player->bloodline_skill < 100 ? 100 : $player->bloodline_skill;
 
 	echo "
 	<style>
@@ -137,28 +144,28 @@ function bloodline() {
 		color:#00C000;
 	}
 	</style>";
-	$search_array = array('[BL_SKILL]', '[RATIO]', '[AMOUNT]', '[PERCENTAGE]');
+	$search_array = array('[BL_SKILL]', '[RATIO]', '[AMOUNT]', '[PERCENTAGE]', '[AMOUNT2]');
 	if($player->bloodline->passive_boosts) {
 		echo "
 		<label style='font-weight:bold;'>Passive boosts</label>
 		<br />
 		<div style='margin-left:2em;margin-top:7px;'>";
 		foreach($player->bloodline->passive_boosts as $boost) {
-			$replace_array = array($bloodline_skill, $boost['power'], $boost['effect_amount']);
-			if(isset($boosts[$boost['effect']]['ratio_multiplier'])) {
-				$replace_array[1] *= $boosts[$boost['effect']]['ratio_multiplier'];
+			$replace_array = array($bloodline_skill, $boost->power, $boost->effect_amount);
+			if(isset($boosts[$boost->effect]['ratio_multiplier'])) {
+				$replace_array[1] *= $boosts[$boost->effect]['ratio_multiplier'];
 			}
-			if(isset($boosts[$boost['effect']]['amount_multiplier'])) {
-				$replace_array[2] *= $boosts[$boost['effect']]['amount_multiplier'];
+			if(isset($boosts[$boost->effect]['amount_multiplier'])) {
+				$replace_array[2] *= $boosts[$boost->effect]['amount_multiplier'];
 			}
-			echo "<label style='width:9em;'>" . ucwords(str_replace('_', ' ', $boost['effect'])) . ":</label>" .
-				str_replace($search_array, $replace_array, $boosts[$boost['effect']]['text']);
+			echo "<label style='width:9em;'>" . System::unSlug($boost->effect) . ":</label>" .
+				str_replace($search_array, $replace_array, $boosts[$boost->effect]['text']);
 			// Extra text
-			switch($boost['effect']) {
+			switch($boost->effect) {
 				case 'scout_range':
 				case 'stealth':
-					if(isset($boost['progress'])) {
-						echo " (" . $boost['progress'] . "/100% to next square)";
+					if(isset($boost->progress)) {
+						echo " (" . $boost->progress . "/100% to next square)";
 					}
 					break;
 				default:
@@ -173,31 +180,31 @@ function bloodline() {
 		<br />
 		<div style='margin-left:2em;margin-top:7px;'>";
 		foreach($player->bloodline->combat_boosts as $boost) {
-			$replace_array = array($bloodline_skill, $boost['power'], $boost['effect_amount'], 0);
+			$replace_array = array($bloodline_skill, $boost->power, $boost->effect_amount, 0);
 
-			if(isset($boosts[$boost['effect']]['ratio_multiplier'])) {
-				$replace_array[1] *= $boosts[$boost['effect']]['ratio_multiplier'];
+			if(isset($boosts[$boost->effect]['ratio_multiplier'])) {
+				$replace_array[1] *= $boosts[$boost->effect]['ratio_multiplier'];
 			}
-			if(isset($boosts[$boost['effect']]['amount_multiplier'])) {
-				$replace_array[2] *= $boosts[$boost['effect']]['amount_multiplier'];
+			if(isset($boosts[$boost->effect]['amount_multiplier'])) {
+				$replace_array[2] *= $boosts[$boost->effect]['amount_multiplier'];
 			}
 
-			switch($boost['effect']) {
+			switch($boost->effect) {
 				case 'ninjutsu_boost':
                     $player_offense = Fighter::BASE_OFFENSE + ($player->ninjutsu_skill * Fighter::SKILL_OFFENSE_RATIO);
-					$replace_array[3] = round($boost['effect_amount'] / $player_offense, 0) * 100;
+					$replace_array[3] = round($boost->effect_amount / $player_offense, 0) * 100;
                     $replace_array[2] *= 10;
 					$replace_array[1] *= 10;
 					break;
 				case 'taijutsu_boost':
                     $player_offense = Fighter::BASE_OFFENSE + ($player->taijutsu_skill * Fighter::SKILL_OFFENSE_RATIO);
-                    $replace_array[3] = round($boost['effect_amount'] / $player_offense, 0) * 100;
+                    $replace_array[3] = round($boost->effect_amount / $player_offense, 0) * 100;
                     $replace_array[2] *= 10;
 					$replace_array[1] *= 10;
 					break;
 				case 'genjutsu_boost':
                     $player_offense = Fighter::BASE_OFFENSE + ($player->genjutsu_skill * Fighter::SKILL_OFFENSE_RATIO);
-                    $replace_array[3] = round($boost['effect_amount'] / $player_offense, 0) * 100;
+                    $replace_array[3] = round($boost->effect_amount / $player_offense, 0) * 100;
                     $replace_array[2] *= 10;
 					$replace_array[1] *= 10;
 					break;
@@ -205,17 +212,25 @@ function bloodline() {
                 case 'genjutsu_resist':
                 case 'ninjutsu_resist':
 					$replace_array[2] = round(
-                        ($boost['effect_amount'] * Fighter::BLOODLINE_DEFENSE_MULTIPLIER) / Fighter::BASE_DEFENSE,
+                        ($boost->effect_amount * Fighter::BLOODLINE_DEFENSE_MULTIPLIER) / Fighter::BASE_DEFENSE,
                         0
                     );
-					break;
+                    break;
+				case 'damage_resist':
+                    $replace_array[2] = round(($replace_array[2] / $player->total_stats) * 100, 0);
+                    $replace_array[4] = $player->total_stats;
+                    break;
+                case 'heal':
+                    $replace_array[2] = round(($replace_array[2] / $player->total_stats) * 100, 0);
+                    $replace_array[4] = $player->total_stats;
+                    break;
             }
 
             $replace_array[1] = round($replace_array[1], 3);
             $replace_array[2] = round($replace_array[2], 0);
 
-			echo "<label style='width:9em;'>" . ucwords(str_replace('_', ' ', $boost['effect'])) . ":</label>" .
-				str_replace($search_array, $replace_array, $boosts[$boost['effect']]['text']) . "<br />";
+			echo "<label style='width:9em;'>" . ucwords(str_replace('_', ' ', $boost->effect)) . ":</label>" .
+				str_replace($search_array, $replace_array, $boosts[$boost->effect]['text']) . "<br />";
 		}
 		echo "</div><br />";
 	}
@@ -233,10 +248,12 @@ function bloodline() {
 			if($jutsu->cooldown) {
 				echo "<label style='width:6.5em;'>Cooldown:</label>" . $jutsu->cooldown . " turn(s)<br />";
 			}
-			if($jutsu->effect) {
-				echo "<label style='width:6.5em;'>Effect:</label>" .
-					System::unSlug($jutsu->effect) . ' (' . round($jutsu->effect_amount, 0) . '%) ' . ' - ' . $jutsu->effect_length . " turns<br />";
-			}
+            foreach ($jutsu->effects as $effect) {
+                if ($effect->effect && $effect->effect != 'none') {
+                    echo "<label style='width:6.5em;'>Effect:</label>" .
+                        System::unSlug($effect->effect) . ' (' . round($effect->effect_amount, 0) . '%) ' . ' - ' . $effect->effect_length . " turns<br />";
+                }
+            }
 			echo "<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type) . "<br />
 			<label style='width:6.5em;'>Power:</label>" . round($jutsu->power, 1) . "<br />
 

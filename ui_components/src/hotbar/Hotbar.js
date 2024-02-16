@@ -127,9 +127,9 @@ function Hotbar({ links, userAPIData }) {
                                 </form>
                             </div>
                         }
-                        {(quickType == "specialmissions") &&
+                        {(quickType == "special_missions") &&
                             <div>
-                                <form id="hb_quick_form" ref={quickFormRef} action={link_data.specialmissions} method="get">
+                                <form id="hb_quick_form" ref={quickFormRef} action={link_data.special_missions} method="get">
                                     <input id="hb_quick_submit" onClick={quickSubmitOnClick} form="hb_quick_form" className={"hb_button button-bar_large t-hover"} type="button" value="SPECIAL" />
                                 </form>
                             </div>
@@ -150,7 +150,7 @@ function Hotbar({ links, userAPIData }) {
                                 <option data-state="training" value={link_data.training.slice(link_data.training.indexOf('=') + 1)}>Training</option>
                                 <option data-state="arena" value={link_data.arena.slice(link_data.training.indexOf('=') + 1)}>Arena</option>
                                 <option data-state="missions" value={link_data.mission.slice(link_data.training.indexOf('=') + 1)}>Missions</option>
-                                <option data-state="specialmissions" value={link_data.specialmissions.slice(link_data.training.indexOf('=') + 1)}>Special Missions</option>
+                                <option data-state="special_missions" value={link_data.special_missions.slice(link_data.training.indexOf('=') + 1)}>Special Missions</option>
                                 <option data-state="ramen" value={link_data.healingShop.slice(link_data.training.indexOf('=') + 1)}>Ramen</option>
                             </select>
                         </div>
@@ -204,9 +204,9 @@ function Hotbar({ links, userAPIData }) {
                                 </select>
                             </div>
                         }
-                        {(quickType == "specialmissions") &&
+                        {(quickType == "special_missions") &&
                             <div>
-                                <select name="start" form="hb_quick_form" id="hb_specialmissions_select" className="hb_quick_select">
+                                <select name="start" form="hb_quick_form" id="hb_special_missions_select" className="hb_quick_select">
                                     <option value="easy">Easy</option>
                                     <option value="normal">Normal</option>
                                     <option value="hard">Hard</option>

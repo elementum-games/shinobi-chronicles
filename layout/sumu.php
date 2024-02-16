@@ -31,7 +31,9 @@ HTML;
 	<title>Shinobi Chronicles RPG</title>
 
 	<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/geisha/geisha.css")}' />
+	<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/common.css")}' />
 	<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/sumu/sumu.css")}' />
+	<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/sumu/sumu_legacy.css")}' />
 	<link rel="icon" href="images/icons/favicon.ico" type="image/x-icon" />
 	<script type='text/javascript' src='./scripts/jquery-2.1.0.min.js'></script>
 	<script type='text/javascript' src="./scripts/jquery-ui.js"></script>

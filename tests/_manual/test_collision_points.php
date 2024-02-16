@@ -6,7 +6,7 @@ use SC\TestUtils\CollisionScenario;
 
 function runSimulation(): void {
     try {
-        $system = new System();
+        $system = System::initialize();
 
         $leftAttackUser = new User($system, 123);
         $leftAttackUser->combat_id = BattleV2::combatId(BattleV2::TEAM1, $leftAttackUser);

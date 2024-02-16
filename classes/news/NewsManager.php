@@ -2,6 +2,7 @@
 
 require __DIR__ . '/NewsPostDto.php';
 require_once __DIR__ . "/../notification/NotificationManager.php";
+require_once __DIR__ . '/../notification/BlockedNotificationManager.php';
 
 class NewsManager {
     private System $system;
@@ -40,10 +41,20 @@ class NewsManager {
                     VALUES ('{$this->player->user_name}', '{$newsPost->title}', '{$newsPost->message}', '{$time}', '{$tags}', '{$newsPost->version}')");
                 // get users to notify
                 $active_threshold = time() - (NotificationManager::ACTIVE_PLAYER_DAYS_LAST_ACTIVE * 86400);
-                $user_ids = $this->system->db->query("SELECT `user_id` FROM `users` WHERE `last_login` > {$active_threshold}");
+                $user_ids = $this->system->db->query("SELECT `user_id`, `blocked_notifications` FROM `users` WHERE `last_login` > {$active_threshold}");
                 $user_ids = $this->system->db->fetch_all($user_ids);
                 // create notifications
                 foreach ($user_ids as $user) {
+                    // Blocked notification
+                    $blockedNotifManager = BlockedNotificationManager::fromDb(
+                        system: $this->system,
+                        blocked_notifications_string: $user['blocked_notifications']
+                    );
+                    if($blockedNotifManager->notificationBlocked(NotificationManager::NOTIFICATION_NEWS)) {
+                        continue;
+                    }
+
+                    // Send notification
                     $new_notification = new NotificationDto(
                         type: NotificationManager::NOTIFICATION_NEWS,
                         message: "View update notes: {$newsPost->title}",

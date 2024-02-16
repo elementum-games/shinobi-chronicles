@@ -23,7 +23,7 @@ $UserAPIManager = new UserAPIManager($system, $player);
                     training: "<?= $system->router->links['training'] ?>",
                     arena: "<?= $system->router->links['arena'] ?>",
                     mission: "<?= $system->router->links['mission'] ?>",
-                    specialmissions: "<?= $system->router->links['specialmissions'] ?>",
+                    special_missions: "<?= $system->router->links['special_missions'] ?>",
                     healingShop: "<?= $system->router->links['healingShop'] ?>",
                     base_url: "<?= $system->router->base_url ?>"
                 },

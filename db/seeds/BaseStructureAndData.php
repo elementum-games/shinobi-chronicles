@@ -932,6 +932,11 @@ values  (1, 'Leaf', 'Kobayashi', 1, '', 0, 0, 0, 0, 0, '0', './images/default_av
             (5, 'Mist', '16.10', 0, 0);"
         );
 
+        // System Storage
+    $this->execute(
+        "INSERT INTO `system_storage` (`global_message`, `time`) VALUES ('', '" . time() . "');"
+    );
+
         $this->execute("COMMIT;");
     }
 }

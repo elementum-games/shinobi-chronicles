@@ -52,20 +52,16 @@ function marriage() {
                 throw new RuntimeException("{$user_to_marry['user_name']} has a pending marriage!");
             }
 
-            // Blacklist check
-            $blacklist = $system->db->query(
-                "SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='{$user_to_marry['user_id']}' LIMIT 1"
+            // Blacklist checks
+            $user_to_marry_blacklist = new Blacklist(
+                system: $system,
+                user_id: $user_to_marry['user_id']
             );
-            if($system->db->last_num_rows != 0){
-                $blacklist = $system->db->fetch($blacklist);
-                $blacklist = json_decode($blacklist['blocked_ids'], true);
-
-                if(array_key_exists($player->user_id, $blacklist)) {
-                    throw new RuntimeException("{$user_to_marry['user_name']} has chosen not to receive marriage proposals!");
-                }
+            if($user_to_marry_blacklist->userBlocked($player->user_id)) {
+                throw new RuntimeException("{$user_to_marry['user_name']} has chosen not to receive marriage proposals!");
             }
 
-            if(array_key_exists($user_to_marry['user_id'], $player->blacklist)) {
+            if($player->blacklist->userBlocked($user_to_marry['user_id'])) {
                 throw new RuntimeException("You cannot send proposals to users on your blacklist!");
             }
 
@@ -84,7 +80,7 @@ function marriage() {
             else {
                 $system->message("Error proposing!");
             }
-        }catch (Exception $e) {
+        }catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -127,7 +123,7 @@ function marriage() {
             $player->updateData();
 
             $system->message("You got hitched!");
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -233,7 +229,7 @@ function marriage() {
             $player->spouse_name = '';
             $player->marriage_time = 0;
             $player->updateData();
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }

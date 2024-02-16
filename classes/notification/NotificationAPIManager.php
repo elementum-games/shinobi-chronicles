@@ -67,27 +67,27 @@ class NotificationAPIManager {
                     }
                     break;
                 case NotificationManager::NOTIFICATION_SPECIALMISSION:
-                    if ($this->player->special_mission == 0) {
+                    if ($this->player->special_mission_id == 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
-                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("specialmissions"));
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("special_missions"));
                     }
                     break;
                 case NotificationManager::NOTIFICATION_SPECIALMISSION_COMPLETE:
-                    if ($this->player->special_mission != 0) {
+                    if ($this->player->special_mission_id != 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
-                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("specialmissions"));
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("special_missions"));
                     }
                     break;
                 case NotificationManager::NOTIFICATION_SPECIALMISSION_FAILED:
-                    if ($this->player->special_mission != 0) {
+                    if ($this->player->special_mission_id != 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
-                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("specialmissions"));
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("special_missions"));
                     }
                     break;
                 case NotificationManager::NOTIFICATION_MISSION:
@@ -242,6 +242,14 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->base_url . "?home&view=news");
                     }
                     break;
+                case NotificationManager::NOTIFICATION_DAILY_TASK:
+                    if (false) {
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
+                    } else {
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("profile"));
+                    }
+                    break;
                 default:
                     break;
             }
@@ -258,12 +266,15 @@ class NotificationAPIManager {
         //Battle
         if ($this->player->battle_id > 0) {
             $result = $this->system->db->query(
-                "SELECT `battle_type` FROM `battles` WHERE `battle_id`='{$this->player->battle_id}' LIMIT 1"
+                "SELECT `battle_type`, `winner` FROM `battles` WHERE `battle_id`='{$this->player->battle_id}' LIMIT 1"
             );
             if ($this->system->db->last_num_rows == 0) {
                 $this->player->battle_id = 0;
             } else {
                 $result = $this->system->db->fetch($result);
+                if ($result['winner'] == 'STOP') {
+                    $this->player->battle_id = 0;
+                }
                 $link = null;
                 switch ($result['battle_type']) {
                     case Battle::TYPE_AI_ARENA:
@@ -334,7 +345,7 @@ class NotificationAPIManager {
             );
         }
         //New spar
-        if ($this->player->challenge) {
+        if ($this->player->challenge && !$this->player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_SPAR)) {
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('spar'),
                 type: NotificationManager::NOTIFICATION_CHALLENGE,
@@ -345,7 +356,7 @@ class NotificationAPIManager {
             );
         }
         //Team invite
-        if ($this->player->team_invite) {
+        if ($this->player->team_invite && !$this->player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_TEAM)) {
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('team'),
                 type: NotificationManager::NOTIFICATION_TEAM,
@@ -356,7 +367,7 @@ class NotificationAPIManager {
             );
         }
         //Proposal
-        if ($this->player->spouse < 0) {
+        if ($this->player->spouse < 0 && !$this->player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_MARRIAGE)) {
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('marriage'),
                 type: NotificationManager::NOTIFICATION_MARRIAGE,
@@ -380,7 +391,7 @@ class NotificationAPIManager {
             }
         }
         //Event
-        if (isset($this->system->event)) {
+        if (isset($this->system->event) && !$this->player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_EVENT)) {
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('event'),
                 type: NotificationManager::NOTIFICATION_EVENT,
@@ -394,43 +405,78 @@ class NotificationAPIManager {
         //War Notifs
         if ($this->player->rank_num > 2) {
             //Caravan
-            $time = time();
-            $result = $this->system->db->query("SELECT `caravans`.*, `regions`.`name` as 'region_name' FROM `caravans` INNER JOIN `regions` on `caravans`.`region_id` = `regions`.`region_id` WHERE `start_time` < {$time}");
-            $result = $this->system->db->fetch_all($result);
-            foreach ($result as $row) {
-                // if travel time is set then only display if active
-                if (!empty($row['travel_time'])) {
-                    if ($row['travel_time'] + ($row['start_time'] * 1000) + Patrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
-                        $notifications[] = new NotificationDto(
-                            action_url: $this->system->router->getUrl('travel'),
-                            type: NotificationManager::NOTIFICATION_CARAVAN,
-                            message: "{$row['name']} is active near {$row['region_name']}",
-                            user_id: $this->player->user_id,
-                            created: time(),
-                            alert: false,
-                        );
+            if(!$this->player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_CARAVAN)) {
+                $time = time();
+                $result = $this->system->db->query("SELECT `caravans`.*, `regions`.`name` as 'region_name' FROM `caravans` INNER JOIN `regions` on `caravans`.`region_id` = `regions`.`region_id` WHERE `start_time` < {$time}");
+                $result = $this->system->db->fetch_all($result);
+                foreach ($result as $row) {
+                    // if travel time is set then only display if active
+                    if (!empty($row['travel_time'])) {
+                        if ($row['travel_time'] + ($row['start_time'] * 1000) + Patrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
+                            $notifications[] = new NotificationDto(
+                                action_url: $this->system->router->getUrl('travel'),
+                                type: NotificationManager::NOTIFICATION_CARAVAN,
+                                message: "{$row['name']} is active near {$row['region_name']}",
+                                user_id: $this->player->user_id,
+                                created: time(),
+                                alert: false,
+                            );
+                        }
                     }
+                }
+
+                if($this->system->isDevEnvironment() && $this->system->testNotifications['caravan']) {
+                    $notifications[] = new NotificationDto(
+                        action_url: $this->system->router->getUrl('travel'),
+                        type: NotificationManager::NOTIFICATION_CARAVAN,
+                        message: "Test is active near no where!",
+                        user_id: $this->player->user_id,
+                        created: time(),
+                        alert: false,
+                    );
                 }
             }
 
             //Raid
-            $active_raid_targets = WarManager::getPlayerAttackOrDefendRaidTargets(
-                $this->system,
-                $this->player
-            );
-            foreach($active_raid_targets as $raid_target) {
-                $notifications[] = new NotificationDto(
-                    action_url: $this->system->router->getUrl('travel'),
-                    type: $raid_target->is_ally_location
-                        ? NotificationManager::NOTIFICATION_RAID_ENEMY
-                        : NotificationManager::NOTIFICATION_RAID_ALLY,
-                    message: $raid_target->is_ally_location
-                        ? "{$raid_target->name} is under attack at {$raid_target->location->displayString()}!"
-                        : "An ally is attacking {$raid_target->name} at {$raid_target->location->displayString()}!",
-                    user_id: $this->player->user_id,
-                    created: time(),
-                    alert: false,
+            if(!$this->player->blocked_notifications->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_RAID)) {
+                $active_raid_targets = WarManager::getPlayerAttackOrDefendRaidTargets(
+                    $this->system,
+                    $this->player
                 );
+                foreach ($active_raid_targets as $raid_target) {
+                    $notifications[] = new NotificationDto(
+                        action_url: $this->system->router->getUrl('travel'),
+                        type: $raid_target->is_ally_location
+                            ? NotificationManager::NOTIFICATION_RAID_ENEMY
+                            : NotificationManager::NOTIFICATION_RAID_ALLY,
+                        message: $raid_target->is_ally_location
+                            ? "{$raid_target->name} is under attack at {$raid_target->location->displayString()}!"
+                            : "An ally is attacking {$raid_target->name} at {$raid_target->location->displayString()}!",
+                        user_id: $this->player->user_id,
+                        created: time(),
+                        alert: false,
+                    );
+                }
+
+                if($this->system->isDevEnvironment() && $this->system->testNotifications['raid']) {
+                    $notifications[] = new NotificationDto(
+                        action_url: $this->system->router->getUrl('travel'),
+                        type: NotificationManager::NOTIFICATION_RAID_ENEMY,
+                        message: "Test is under attack at no where!",
+                        user_id: $this->player->user_id,
+                        created: time(),
+                        alert: false,
+                    );
+
+                    $notifications[] = new NotificationDto(
+                        action_url: $this->system->router->getUrl('travel'),
+                        type: NotificationManager::NOTIFICATION_RAID_ALLY,
+                        message: "An ally is attacking test at no where!",
+                        user_id: $this->player->user_id,
+                        created: time(),
+                        alert: false,
+                    );
+                }
             }
         }
 

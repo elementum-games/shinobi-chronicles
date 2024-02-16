@@ -26,7 +26,7 @@
 }
 
 .topbar_notifications_container_left {
-
+    gap: 5px;
 }
 
 .topbar_notification_wrapper {
@@ -35,6 +35,24 @@
 }
 
 .topbar_notification_wrapper_training::after {
+    content: "Training: " attr(data-time);
+    position: absolute;
+    transform: translate(10px, 5px);
+    z-index: 1000;
+    background-color: var(--notification-background-color);
+    border-color: var(--notification-background-border);
+    color: var(--font-color-6);
+    font-family: var(--font-secondary);
+    font-size: 12px;
+    font-style: italic;
+    border-width: 1.75px;
+    border-style: solid;
+    padding: 5px;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.topbar_notification_wrapper_training:hover::after {
     content: attr(data-content) ": " attr(data-time);
     position: absolute;
     transform: translate(10px, 5px);

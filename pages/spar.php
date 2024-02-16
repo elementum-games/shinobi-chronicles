@@ -80,8 +80,8 @@ function spar() {
 
 			$system->db->query("UPDATE `users` SET `challenge`='$player->user_id' WHERE `user_id`='$challenge' LIMIT 1");
 			$system->message("Challenge sent!");
-			$system->printMessage();
-		} catch (Exception $e) {
+            $system->printMessage();
+		} catch (RuntimeException $e) {
 			$system->message($e->getMessage());
 			$system->printMessage();
 
@@ -116,17 +116,24 @@ function spar() {
 			}
 
             $player->challenge = 0;
-            if($system->USE_NEW_BATTLES) {
-                BattleV2::start($system, $player, $user, Battle::TYPE_SPAR);
+            $battle_background = TravelManager::getLocationBattleBackgroundLink($system, $player->location);
+            if (TravelManager::locationIsInVillage($system, $player->location)) {
+                $battle_background = 'images/battle_backgrounds/Spar.jpg';
+            }
+            if (empty($battle_background)) {
+                $battle_background = $player->region->battle_background_link;
+            }
+            if ($system->USE_NEW_BATTLES) {
+                BattleV2::start($system, $player, $user, Battle::TYPE_SPAR, battle_background_link: $battle_background);
             }
             else {
-                Battle::start($system, $player, $user, Battle::TYPE_SPAR);
+                Battle::start($system, $player, $user, Battle::TYPE_SPAR, battle_background_link: $battle_background);
             }
 
 			$system->message("You have accepted the challenge!<br />
 				<a class='link' href='$self_link'>To Battle</a>");
 			$system->printMessage();
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$player->challenge = 0;
 
 			$system->message($e->getMessage());
@@ -217,32 +224,37 @@ function processSparFightEnd(BattleManager $battle, User $player, System $system
 
     $reputation_eligible = isReputationEligible($battle, $player, $system);
 
-    if($battle->isPlayerWinner()) {
-		$result = "You win!";
+    if ($battle->isPlayerWinner()) {
+        $result = "You win!";
         if ($reputation_eligible) {
-            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_WIN, UserReputation::ACTIVITY_TYPE_PVE);
-            $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
-            $result .= "<br>You have gained $rep_gain village reputation!";
+            $rep_gain = $player->reputation->handleSpar($player, $battle->opponent, UserReputation::SPAR_REP_WIN);
+            if ($rep_gain > 0) {
+                $result .= "<br>Fellow Shinobi learned from your battle, gaining you $rep_gain village reputation.";
+            }
+            // Daily Task
+            if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVP)) {
+                $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, UserReputation::SPAR_REP_WIN);
+            }
         }
         return $result;
     }
     else if($battle->isOpponentWinner()) {
         $player->health = 5;
         $result = "You lose.";
-        if ($reputation_eligible) {
-            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_LOSS, UserReputation::ACTIVITY_TYPE_PVE);
-            $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
-            $result .= "<br>You have gained $rep_gain village reputation!";
-        }
         return $result;
     }
     else if($battle->isDraw()) {
         $player->health = 5;
         $result = "You both knocked each other out.";
         if ($reputation_eligible) {
-            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_DRAW, UserReputation::ACTIVITY_TYPE_PVE);
-            $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
-            $result .= "<br>You have gained $rep_gain village reputation!";
+            $rep_gain = $player->reputation->handleSpar($player, $battle->opponent, UserReputation::SPAR_REP_DRAW);
+            if ($rep_gain > 0) {
+                $result .= "<br>Fellow Shinobi learned from your battle, gaining you $rep_gain village reputation.";
+            }
+            // Daily Task
+            if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVP)) {
+                $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, UserReputation::SPAR_REP_DRAW);
+            }
         }
         return $result;
     }
@@ -273,7 +285,7 @@ function sparFightAPI(System $system, User $player): BattlePageAPIResponse {
            $response->battle_result = processSparFightEnd($battle, $player, $system);
         }
     }
-    catch (Exception $e) {
+    catch (RuntimeException $e) {
         $response->errors[] = $e->getMessage();
     }
 
@@ -285,11 +297,6 @@ function isReputationEligible(BattleManager $battle, User $player, System $syste
     $travelManager = new TravelManager($system, $player);
     $arena_coords = $travelManager->getColosseumCoords();
     if (!$player->location->equals($arena_coords) && !$player->location->equals($player->village_location)) {
-        return false;
-    }
-
-	// if rep timer available
-    if (!$player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
         return false;
     }
 

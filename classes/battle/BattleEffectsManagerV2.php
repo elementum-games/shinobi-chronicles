@@ -178,10 +178,10 @@ class BattleEffectsManagerV2 {
         $this->applyArmorEffects($player1);
         $this->applyArmorEffects($player2);
     }
-    
+
     public function applyArmorEffects(Fighter $fighter) {
-        if(!empty($fighter->equipped_armor)) {
-            foreach($fighter->equipped_armor as $item_id) {
+        if(!empty($fighter->equipped_armor_ids)) {
+            foreach($fighter->equipped_armor_ids as $item_id) {
                 if($fighter->hasItem($item_id)) {
                     $effect = new BattleEffect(
                         user: $fighter->combat_id,
@@ -332,10 +332,10 @@ class BattleEffectsManagerV2 {
         $this->applyBloodlineActiveBoosts($player1);
         $this->applyBloodlineActiveBoosts($player2);
     }
-    
+
     public function applyBloodlineActiveBoosts(Fighter $fighter): void {
         if(!empty($fighter->bloodline->combat_boosts)) {
-            foreach($fighter->bloodline->combat_boosts as $id=>$effect) {
+            foreach($fighter->bloodline->combat_boosts as $id=>$boost) {
                 $this->applyActiveEffect(
                     $fighter,
                     $fighter,
@@ -343,8 +343,8 @@ class BattleEffectsManagerV2 {
                         user: $fighter->combat_id,
                         target: $fighter->combat_id,
                         turns: 1,
-                        effect: $effect['effect'],
-                        effect_amount: $effect['effect_amount'],
+                        effect: $boost->effect,
+                        effect_amount: $boost->effect_amount,
                         damage_type: Jutsu::TYPE_TAIJUTSU
                     )
                 );
@@ -369,6 +369,7 @@ class BattleEffectsManagerV2 {
                 description: $target->getName() . " takes $damage residual damage"
             ));
 
+            $target->last_damage_taken += $damage;
             $target->health -= $damage;
             if($target->health < 0) {
                 $target->health = 0;

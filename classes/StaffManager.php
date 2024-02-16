@@ -259,10 +259,19 @@ class StaffManager {
         );
     }
 
-    public function getCurrencyLogs(int $character_id, $offset = 0, $limit = 100, ?string $currency_type = null): array {
+    public function getCurrencyLogs(
+        int $character_id,
+        $offset = 0,
+        $limit = 100,
+        ?string $currency_type = null,
+        ?string $transaction_description_prefix = null
+    ): array {
         $query = "SELECT * FROM `currency_logs` WHERE `character_id`={$character_id}";
         if($currency_type != null) {
             $query .= " AND `currency_type`='{$currency_type}'";
+        }
+        if($transaction_description_prefix != null) {
+            $query .= " AND `transaction_description` LIKE '{$transaction_description_prefix}%'";
         }
         $query .= " ORDER BY `id` DESC LIMIT $limit OFFSET $offset";
 
@@ -273,10 +282,19 @@ class StaffManager {
         return [];
     }
 
-    public function countCurrencyLogs(int $character_id, $offset = 0, $limit = 100, ?string $currency_type = null): int {
+    public function countCurrencyLogs(
+        int $character_id,
+        $offset = 0,
+        $limit = 100,
+        ?string $currency_type = null,
+        ?string $transaction_description_prefix = null
+    ): int {
         $query = "SELECT COUNT(*) as `count` FROM `currency_logs` WHERE `character_id`={$character_id}";
         if($currency_type != null) {
             $query .= " AND `currency_type`='{$currency_type}'";
+        }
+        if($transaction_description_prefix != null) {
+            $query .= " AND `transaction_description` LIKE '{$transaction_description_prefix}%'";
         }
         $query .= " ORDER BY `id` DESC LIMIT $limit OFFSET $offset";
 
@@ -654,23 +672,23 @@ class StaffManager {
     }
 
     /** ADMIN PANEL METHODS **/
-    public function getAdminPanelPerms($type): array {
+    public function getAdminPanelPerms(string $type, bool $permission_check = false): array {
         switch($type) {
             // Keep create content and edit content in line with each other
             case 'create_content':
-                if($this->isContentAdmin()) {
+                if($this->isContentAdmin() || $permission_check) {
                     $tools = ['create_ai', 'create_jutsu', 'create_item', 'create_bloodline', 'create_mission', 'create_clan'];
                 }
                 return $tools ?? array();
             case 'edit_content':
-                if($this->isContentAdmin()) {
+                if($this->isContentAdmin() || $permission_check) {
                     $tools = ['edit_ai', 'edit_jutsu', 'edit_item', 'edit_bloodline', 'edit_mission', 'edit_clan'];
                 }
                 return $tools ?? array();
             case 'misc_tools':
-                if($this->isUserAdmin()) {
+                if($this->isUserAdmin() || $permission_check) {
                     $tools = ['create_rank', 'edit_user', 'activate_user', 'stat_cut', 'staff_payments', 'give_bloodline',
-                        'edit_rank', 'edit_team', 'delete_user', 'dev_tools', 'manual_transaction', 'logs'];
+                        'edit_rank', 'edit_team', 'delete_user', 'dev_tools', 'manual_transaction', 'logs', 'reset_password', 'server_maint'];
                 }
                 return $tools ?? array();
             default:
@@ -751,5 +769,9 @@ class StaffManager {
 
     public function hasAdminPanel(): bool {
         return $this->isContentAdmin() || $this->isUserAdmin() || $this->isHeadAdmin();
+    }
+
+    public static function hasServerMaintAccess(int $staff_level): bool {
+        return in_array($staff_level, [self::STAFF_CONTENT_ADMIN, self::STAFF_ADMINISTRATOR, self::STAFF_HEAD_ADMINISTRATOR]);
     }
 }

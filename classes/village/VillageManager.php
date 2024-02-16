@@ -5,6 +5,7 @@ require_once __DIR__ . "/VillageProposalDto.php";
 require_once __DIR__ . "/VillageStrategicInfoDto.php";
 require_once __DIR__ . "/ChallengeRequestDto.php";
 require_once __DIR__ . "/../notification/NotificationManager.php";
+require_once __DIR__ . '/../notification/BlockedNotificationManager.php';
 
 class VillageManager {
     const KAGE_NAMES = [
@@ -25,6 +26,8 @@ class VillageManager {
     const RESOURCE_LOG_PRODUCTION = 1;
     const RESOURCE_LOG_COLLECTION = 2;
     const RESOURCE_LOG_EXPENSE = 3;
+    const RESOURCE_LOG_TRADE_GAIN = 4;
+    const RESOURCE_LOG_TRADE_LOSS = 5;
 
     const MIN_KAGE_CLAIM_TIER = 5;
     const MIN_KAGE_CHALLENGE_TIER = 5;
@@ -41,7 +44,7 @@ class VillageManager {
 
     const VOTE_NO = 0;
     const VOTE_YES = 1;
-    const VOTE_BOOST_COST = 250;
+    const VOTE_BOOST_COST = 500;
 
     const PROPOSAL_TYPE_CHANGE_POLICY = "change_policy";
     const PROPOSAL_TYPE_DECLARE_WAR = "declare_war";
@@ -51,6 +54,8 @@ class VillageManager {
     const PROPOSAL_TYPE_ACCEPT_ALLIANCE = "accept_alliance";
     const PROPOSAL_TYPE_ACCEPT_PEACE = "accept_peace";
     const PROPOSAL_TYPE_BREAK_ALLIANCE = "break_alliance";
+    const PROPOSAL_TYPE_OFFER_TRADE = "offer_trade";
+    const PROPOSAL_TYPE_ACCEPT_TRADE = "accept_trade";
 
     const CHALLENGE_EXPIRE_DAYS = 1;
     const CHALLENGE_MIN_DELAY_HOURS = 12;
@@ -61,7 +66,10 @@ class VillageManager {
     const CHALLENGE_SCHEDULE_TIME_HOURS = 24;
 
     const FORCE_PEACE_MINIMUM_DURATION_DAYS = 7;
-    const WAR_COOLDOWN_DAYS = 3;
+    const WAR_COOLDOWN_DAYS = 1;
+
+    const MAX_TRADE_RESOURCE_TYPE = 25000;
+    const TRADE_COOLDOWN_DAYS = 1;
 
     public static function getLocation(System $system, string $village_id): ?TravelCoords {
         $result = $system->db->query(
@@ -190,11 +198,14 @@ class VillageManager {
     /**
      * @return array
      */
-    public static function getVillagePoints(System $system, string $village_id): int
+    public static function getVillagePoints(System $system, string $village_id): array
     {
-        $points_result = $system->db->query("SELECT `points` FROM `villages` WHERE `village_id` = {$village_id}");
+        $return_arr = [];
+        $points_result = $system->db->query("SELECT `points`, `monthly_points` FROM `villages` WHERE `village_id` = {$village_id}");
         $points_result = $system->db->fetch($points_result);
-        return $points_result['points'];
+        $return_arr['points'] = $points_result['points'];
+        $return_arr['monthly_points'] = $points_result['monthly_points'];
+        return $return_arr;
     }
 
     /**
@@ -267,10 +278,15 @@ class VillageManager {
                 $player->village_seat = self::getPlayerSeat($system, $player);
                 // create notifiction
                 $active_threshold = time() - (NotificationManager::ACTIVE_PLAYER_DAYS_LAST_ACTIVE * 86400);
-                $user_ids = $system->db->query("SELECT `user_id` FROM `users` WHERE `village` = '{$player->village->name}' AND `last_login` > {$active_threshold}");
+                $user_ids = $system->db->query("SELECT `user_id`, `blocked_notifications` FROM `users` WHERE `village` = '{$player->village->name}' AND `last_login` > {$active_threshold}");
                 $user_ids = $system->db->fetch_all($user_ids);
                 $notification_message = $reclaim ? $player->user_name . " has reclaimed the title of " . $seat_title . "!" : $player->user_name . " has claimed the title of " . $seat_title . "!";
                 foreach ($user_ids as $user) {
+                    $blockedNotifManager = BlockedNotificationManager::fromDb(system: $system, blocked_notifications_string: $user['blocked_notifications']);
+                    if($blockedNotifManager->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_KAGE_CHANGE)) {
+                        continue;
+                    }
+
                     $new_notification = new NotificationDto(
                         type: NotificationManager::NOTIFICATION_KAGE_CHANGE,
                         message: $notification_message,
@@ -294,7 +310,7 @@ class VillageManager {
                 }
                 // check requirements
                 if (!self::checkSeatRequirements($system, $player, $seat_type)) {
-                    return "You do not meet the requirements!\nJonin Rank, " . UserReputation::nameByRepRank(self::MIN_ELDER_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_ELDER_CLAIM_TIER]['min_rep'] . " Reputation";
+                    return "You do not meet the requirements!\nChuunin Rank, " . UserReputation::nameByRepRank(self::MIN_ELDER_CLAIM_TIER) . " - " . UserReputation::$VillageRep[self::MIN_ELDER_CLAIM_TIER]['min_rep'] . " Reputation";
                 }
                 // check if recently left this seat
                 $result = $system->db->query("SELECT * FROM `village_seats` WHERE `village_id` = {$player->village->village_id} AND `seat_type` = '{$seat_type}' AND `user_id` = {$player->user_id} AND `seat_end` IS NOT NULL ORDER BY `seat_end` DESC LIMIT 1");
@@ -331,25 +347,72 @@ class VillageManager {
     }
 
     /**
-     * @return bool
+     * @return string
      */
     public static function resign(System $system, User $player): string
     {
+        $message = '';
         $time = time();
         $player_seat = $player->village_seat;
+        $player_seat_id = $player_seat->seat_id;
+        $player_seat_type = $player_seat->seat_type;
+        // get challenger if set
+        $first_challenger = null;
+        if (isset($player_seat_id)) {
+            $challenge_result = $system->db->query("SELECT * FROM `challenge_requests`
+                WHERE `seat_id` = {$player_seat_id}
+                AND `end_time` IS NULL
+                ORDER BY `created_time` ASC LIMIT 1
+            ");
+            $challenge_result = $system->db->fetch($challenge_result);
+            if ($system->db->last_num_rows > 0) {
+                $first_challenger = User::loadFromId($system, $challenge_result['challenger_id']);
+                $first_challenger->loadData(User::UPDATE_NOTHING);
+            }
+        }
         // clear active challenges
         self::cancelUserChallenges($system, $player->user_id);
         // clear active votes
         $system->db->query("DELETE `vote_logs` FROM `vote_logs` INNER JOIN `proposals` on `vote_logs`.`proposal_id` = `proposals`.`proposal_id` WHERE `vote_logs`.`user_id` = {$player->user_id} AND `proposals`.`end_time` IS NULL");
+        // exit seat
         $result = $system->db->query("UPDATE `village_seats` SET `seat_end` = {$time} WHERE `seat_end` IS NULL AND `user_id` = {$player->user_id}");
         if ($player_seat->seat_type == "kage") {
             $result = $system->db->query("UPDATE `villages` SET `leader` = 0 WHERE `village_id` = {$player->village->village_id}");
         }
         if ($system->db->last_affected_rows > 0) {
             $player->village_seat = self::getPlayerSeat($system, $player);
-            return "You have resigned from your position!";
+            $message = "You have resigned from your position!";
         } else {
-            return "No village seat found!";
+            $message = "No village seat found!";
+        }
+        // if active challenges to your seat, auto win for the challenger
+        if (isset($first_challenger)) {
+            // claim seat for challenger
+            self::claimSeat($system, $first_challenger, $player_seat_type);
+        }
+        return $message;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function exitSeat(System $system, User $player): bool {
+        $time = time();
+        $player_seat = $player->village_seat;
+        // clear active challenges
+        self::cancelUserChallenges($system, $player->user_id);
+        // clear active votes
+        $system->db->query("DELETE `vote_logs` FROM `vote_logs` INNER JOIN `proposals` on `vote_logs`.`proposal_id` = `proposals`.`proposal_id` WHERE `vote_logs`.`user_id` = {$player->user_id} AND `proposals`.`end_time` IS NULL");
+        // exit seat
+        $result = $system->db->query("UPDATE `village_seats` SET `seat_end` = {$time} WHERE `seat_end` IS NULL AND `user_id` = {$player->user_id}");
+        if ($player_seat->seat_type == "kage") {
+            $result = $system->db->query("UPDATE `villages` SET `leader` = 0 WHERE `village_id` = {$player->village->village_id}");
+        }
+        if ($system->db->last_affected_rows > 0) {
+            $player->village_seat = self::getPlayerSeat($system, $player);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -361,25 +424,43 @@ class VillageManager {
         $seat_result = $system->db->query("SELECT `village_seats`.*, `users`.`user_name`, `users`.`avatar_link` FROM `village_seats`
             INNER JOIN `users` on `village_seats`.`user_id` = `users`.`user_id`
             WHERE `seat_end` IS NULL AND `village_id` = {$village_id} ORDER BY `seat_start` ASC");
-		$seat_result = $system->db->fetch_all($seat_result);
+        $seat_result = $system->db->fetch_all($seat_result);
         $elder_count = 0;
         $has_kage = false;
         foreach ($seat_result as $seat) {
             switch ($seat['seat_type']) {
                 case 'kage':
                     $has_kage = true;
-                    $seats[] = new VillageSeatDto(
-                        seat_key: 'kage',
-                        seat_id: $seat['seat_id'],
-                        user_id: $seat['user_id'],
-                        village_id: $seat['village_id'],
-                        seat_type: $seat['seat_type'],
-                        seat_title: $seat['seat_title'],
-                        seat_start: $seat['seat_start'],
-                        user_name: $seat['user_name'],
-                        avatar_link: $seat['avatar_link'],
-                        is_provisional: $seat['is_provisional']
-                    );
+                    $provisional_days_remaining = "";
+                    if ($seat['is_provisional']) {
+                        $provisional_days_remaining = System::timeRemaining(time() - $seat['seat_start'], format: 'days');
+                        $seats[] = new VillageSeatDto(
+                            seat_key: 'kage',
+                            seat_id: $seat['seat_id'],
+                            user_id: $seat['user_id'],
+                            village_id: $seat['village_id'],
+                            seat_type: $seat['seat_type'],
+                            seat_title: $seat['seat_title'],
+                            seat_start: $seat['seat_start'],
+                            user_name: $seat['user_name'],
+                            avatar_link: $seat['avatar_link'],
+                            is_provisional: $seat['is_provisional'],
+                            provisional_days_label: $provisional_days_remaining,
+                        );
+                    } else {
+                        $seats[] = new VillageSeatDto(
+                            seat_key: 'kage',
+                            seat_id: $seat['seat_id'],
+                            user_id: $seat['user_id'],
+                            village_id: $seat['village_id'],
+                            seat_type: $seat['seat_type'],
+                            seat_title: $seat['seat_title'],
+                            seat_start: $seat['seat_start'],
+                            user_name: $seat['user_name'],
+                            avatar_link: $seat['avatar_link'],
+                            is_provisional: $seat['is_provisional'],
+                        );
+                    }
                     break;
                 case 'elder':
                     $elder_count++;
@@ -632,8 +713,13 @@ class VillageManager {
         if ($system->db->last_num_rows > 0) {
             return "You can only have one challenge request in progress at a time.";
         }
-        // check challenge cooldown
-        $last_challenge = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
+
+        // check challenge cooldown, ignoring cancelled challenges (complete, but winner is not null)
+        $last_challenge = $system->db->query(
+            "SELECT * FROM `challenge_requests`
+                WHERE `challenger_id` = {$player->user_id}
+                AND `winner` IS NOT NULL
+                ORDER BY `start_time` DESC LIMIT 1");
         $last_challenge = $system->db->fetch($last_challenge);
         if ($system->db->last_num_rows > 0) {
             $cooldown_remaining = ($last_challenge['created_time'] + (self::CHALLENGE_COOLDOWN_DAYS * 86400)) - time();
@@ -644,18 +730,23 @@ class VillageManager {
                 return $message;
             }
         }
+
         // get seat holder
         $seat_result = $system->db->query("SELECT * FROM `village_seats` WHERE `seat_id` = {$seat_id} AND `village_id` = {$player->village->village_id} AND `seat_end` IS NULL LIMIT 1");
         $seat_result = $system->db->fetch($seat_result);
         if ($system->db->last_num_rows == 0) {
             return "Invalid challenge target.";
         }
+
         // if elder, check if other seat available
-        $elder_count = $system->db->query("SELECT count(*) as `elder_count` FROM `village_seats` WHERE `seat_type` = 'elder' AND `village_id` = {$player->village->village_id} AND `seat_end` IS NULL");
-        $elder_count = $system->db->fetch($elder_count);
-        if (isset($elder_count['elder_count']) && $elder_count['elder_count'] < 3) {
-            return "Cannot challenge Elder with open seat available for claim.";
+        if($seat_result['seat_type'] == 'elder') {
+            $elder_count = $system->db->query("SELECT count(*) as `elder_count` FROM `village_seats` WHERE `seat_type` = 'elder' AND `village_id` = {$player->village->village_id} AND `seat_end` IS NULL");
+            $elder_count = $system->db->fetch($elder_count);
+            if (isset($elder_count['elder_count']) && $elder_count['elder_count'] < 3) {
+                return "Cannot challenge Elder with open seat available for claim.";
+            }
         }
+
         // check if already has seat
         if (isset($player->village_seat->seat_id) && $seat_result['seat_type'] != 'kage') {
             return "Invalid challenge target.";
@@ -677,7 +768,8 @@ class VillageManager {
         // create challenge
         $time = time();
         $selected_times = json_encode($selected_times);
-        $system->db->query("INSERT INTO `challenge_requests` (`challenger_id`, `seat_holder_id`, `seat_id`, `created_time`, `selected_times`) VALUES ({$player->user_id}, {$seat_result['user_id']}, {$seat_id}, {$time}, '{$selected_times}')");
+        $system->db->query("INSERT INTO `challenge_requests` (`challenger_id`, `seat_holder_id`, `seat_id`, `created_time`, `selected_times`)
+            VALUES ({$player->user_id}, {$seat_result['user_id']}, {$seat_id}, {$time}, '{$selected_times}')");
         // create notification
         $new_notification = new NotificationDto(
             type: NotificationManager::NOTIFICATION_CHALLENGE_PENDING,
@@ -686,15 +778,20 @@ class VillageManager {
             created: time(),
             alert: false,
         );
-        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_MULTIPLE);
+        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
         return "Challenge submitted!";
     }
 
     /**
+     * Forfeits a challenge. Note this is different from cancelling a challenge (e.g. due to seat claim) as it sets
+     * the challenge as if the seat holder fought and won. This preserves the challenge cooldown if the challenger
+     * tries to make another challenge.
+     *
+     * @param System $system
+     * @param User   $player
      * @return string
      */
-    public static function cancelChallenge(System $system, User $player): string
-    {
+    public static function forfeitChallenge(System $system, User $player): string {
         // verify challenge target is valid
         $challenge_result = $system->db->query("SELECT * FROM `challenge_requests` WHERE `challenger_id` = {$player->user_id} AND `end_time` IS NULL LIMIT 1");
         $challenge_result = $system->db->fetch($challenge_result);
@@ -703,7 +800,7 @@ class VillageManager {
         }
         $time = time();
         $system->db->query("UPDATE `challenge_requests` SET `winner` = 'seat_holder', `end_time` = {$time} WHERE `request_id` = {$challenge_result['request_id']}");
-        return "Challenge canceled.";
+        return "Challenge forfeited.";
     }
 
     /**
@@ -794,9 +891,38 @@ class VillageManager {
         }
     }
 
-    public static function cancelUserChallenges(System $system, int $user_id) {
+    /**
+     * Cancels active challenges. Note that winner is not set, in order to represent that this challenge was not completed
+     * and not trigger the new challenge cooldown.
+     *
+     * @param System $system
+     * @param int    $user_id
+     * @return void
+     */
+    public static function cancelUserChallenges(System $system, int $user_id): void
+    {
         $time = time();
-        $system->db->query("UPDATE `challenge_requests` SET `end_time` = {$time} WHERE `end_time` IS NULL AND (`seat_holder_id` = {$user_id} OR `challenger_id` = {$user_id})");
+        $system->db->query("
+            UPDATE `challenge_requests` SET `end_time` = {$time}
+            WHERE `end_time` IS NULL AND (`seat_holder_id` = {$user_id} OR `challenger_id` = {$user_id})
+        ");
+    }
+
+    /**
+     * Cancels active challenges created by the user. Note that winner is not set, in order to represent that this challenge was not completed
+     * and not trigger the new challenge cooldown.
+     *
+     * @param System $system
+     * @param int    $user_id
+     * @return void
+     */
+    public static function cancelUserCreatedChallenges(System $system, int $user_id): string {
+        $time = time();
+        $system->db->query("
+            DELETE FROM `challenge_requests`
+            WHERE `end_time` IS NULL AND `challenger_id` = {$user_id}
+        ");
+        return "Pending challenges cancelled!";
     }
 
     public static function checkChallengeLock(System $system, User $player) {
@@ -825,10 +951,11 @@ class VillageManager {
                 $challenger = User::loadFromId($system, $challenge_result['challenger_id']);
                 $challenger->loadData(User::UPDATE_NOTHING);
             }
+            $challenge_background = 'images/battle_backgrounds/Spar.jpg';
             if ($system->USE_NEW_BATTLES) {
-                $battle_id = BattleV2::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE);
+                $battle_id = BattleV2::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE, battle_background_link: $challenge_background, rounds: 3);
             } else {
-                $battle_id = Battle::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE);
+                $battle_id = Battle::start($system, $challenger, $seat_holder, Battle::TYPE_CHALLENGE, battle_background_link: $challenge_background, rounds: 3);
             }
             $system->db->query("UPDATE `challenge_requests` SET `battle_id` = {$battle_id} WHERE `request_id` = {$player->locked_challenge}");
             return;
@@ -879,7 +1006,7 @@ class VillageManager {
                 // verify challenger meets requirements
                 self::checkSeatRequirements($system, $challenger, $seat_result['seat_type']);
                 // remove seat holder from seat
-                self::resign($system, $seat_holder);
+                self::exitSeat($system, $seat_holder);
                 // claim seat for challenger
                 self::claimSeat($system, $challenger, $seat_result['seat_type']);
                 break;
@@ -1027,8 +1154,32 @@ class VillageManager {
                     $proposal['enact_time_remaining'] = null;
                 }
             }
-            //get enact time
+            if (empty($proposal['trade_data'])) {
+                $trade_data = [];
+            } else {
+                $trade_data = json_decode($proposal['trade_data'], true);
+                $result = $system->db->query("SELECT `name`, `region_id` FROM `regions`");
+                $all_regions = $system->db->fetch_all($result);
 
+                $regions_lookup = [];
+                foreach ($all_regions as $region) {
+                    $regions_lookup[$region['region_id']] = $region['name'];
+                }
+
+                $trade_data['offered_regions'] = array_map(function ($region_id) use ($regions_lookup) {
+                    return [
+                        'region_id' => $region_id,
+                        'name' => $regions_lookup[$region_id]
+                    ];
+                }, $trade_data['offered_regions']);
+
+                $trade_data['requested_regions'] = array_map(function ($region_id) use ($regions_lookup) {
+                    return [
+                        'region_id' => $region_id,
+                        'name' => $regions_lookup[$region_id]
+                    ];
+                }, $trade_data['requested_regions']);
+            }
 
             $proposal_history[] = new VillageProposalDto(
                 proposal_id: $proposal['proposal_id'],
@@ -1043,6 +1194,7 @@ class VillageManager {
                 policy_id: $proposal['policy_id'],
                 vote_time_remaining: $proposal['vote_time_remaining'],
                 enact_time_remaining: $proposal['enact_time_remaining'],
+                trade_data: $trade_data,
                 votes: $proposal['votes'],
             );
             unset($proposal);
@@ -1284,7 +1436,7 @@ class VillageManager {
                 // policy restriction - check not in alliance
                 if (VillagePolicy::$POLICY_EFFECTS[$proposal['policy_id']][VillagePolicy::POLICY_RESTRICTION_ALLIANCE_ENABLED] == false) {
                     $relation_type = VillageRelation::RELATION_ALLIANCE;
-                    $system->db->query("SELECT COUNT(*) FROM `village_relations` WHERE `relation_end` IS NULL AND `relation_type` = {$relation_type} AND (`village1_id` = {$proposal['village_id']} OR `village2_id` = {$proposal['village_id']})");
+                    $system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NULL AND `relation_type` = {$relation_type} AND (`village1_id` = {$proposal['village_id']} OR `village2_id` = {$proposal['village_id']})");
                     if ($system->db->last_num_rows > 0) {
                         return "Cannot change policy to " . VillagePolicy::POLICY_NAMES[$proposal['policy_id']] . " while in an active alliance.";
                     }
@@ -1292,7 +1444,7 @@ class VillageManager {
                 // policy restriction - check not in offensive war, village1_id is always the initiating village
                 if (VillagePolicy::$POLICY_EFFECTS[$proposal['policy_id']][VillagePolicy::POLICY_RESTRICTION_WAR_ENABLED] == false) {
                     $relation_type = VillageRelation::RELATION_WAR;
-                    $system->db->query("SELECT COUNT(*) FROM `village_relations` WHERE `relation_end` IS NULL AND `relation_type` = {$relation_type} AND `village1_id` = {$proposal['village_id']}");
+                    $system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NULL AND `relation_type` = {$relation_type} AND `village1_id` = {$proposal['village_id']}");
                     if ($system->db->last_num_rows > 0) {
                         return "Cannot change policy to " . VillagePolicy::POLICY_NAMES[$proposal['policy_id']] . " while in an offensive war.";
                     }
@@ -1354,6 +1506,7 @@ class VillageManager {
                 self::setNewRelations($system, $proposal['village_id'], $proposal['target_village_id'], VillageRelation::RELATION_WAR, $proposal['type']);
                 // clear active proposals
                 self::clearDiplomaticProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
+                self::clearTradeProposals($system, $proposal['village_id'], $proposal['target_village_id'], $proposal['proposal_id']);
                 // update proposal
                 $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
                 $message = "Declared war on " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
@@ -1498,18 +1651,105 @@ class VillageManager {
                     SET `region_locations`.`occupying_village_id` = NULL
                     WHERE `regions`.`village` = {$proposal['village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['target_village_id']}");
                 break;
+            case self::PROPOSAL_TYPE_OFFER_TRADE:
+                // check is ally
+                if (!$player->village->isAlly($proposal['target_village_id'])) {
+                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    return "Villages must be allied in order to trade!";
+                }
+                // check trade cooldown
+                $proposal_type = self::PROPOSAL_TYPE_OFFER_TRADE;
+                $last_trade_offer = $system->db->query("SELECT * FROM `proposals` WHERE `type` = '{$proposal_type}'
+                AND (`village_id` = {$proposal['village_id']} OR `target_village_id` = {$proposal['village_id']})
+                AND (`village_id` = {$proposal['target_village_id']} OR `target_village_id` = {$proposal['target_village_id']})
+                ORDER BY `end_time` DESC LIMIT 1");
+                $last_trade_offer = $system->db->fetch($last_trade_offer);
+                if ($system->db->last_num_rows > 0 && isset($last_trade_offer['end_time'])) {
+                    $trade_cooldown = ($last_trade_offer['end_time'] + self::TRADE_COOLDOWN_DAYS * 86400) - time();
+                    if ($trade_cooldown > 0) {
+                        $message = "You must wait another " . $system->time_remaining($trade_cooldown) . " before offering another trade with this village!";
+                        return $message;
+                    }
+                }
+                // check has resources / regions
+                $trade_data = json_decode($proposal['trade_data'], true);
+                $is_valid_trade = self::checkTradeValid($system, $player->village->village_id, $proposal['target_village_id'], $trade_data['offered_resources'], $trade_data['offered_regions'], $trade_data['requested_resources'], $trade_data['requested_regions']);
+                if (!$is_valid_trade) {
+                    return "One or either village does not have the necessary items to complete the trade.";
+                }
+                // create new proposal for target village
+                $name = "Accept Trade: " . VillageManager::VILLAGE_NAMES[$player->village->village_id];
+                $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`, `trade_data`) VALUES ({$proposal['target_village_id']}, {$player->user_id}, {$time}, 'accept_trade', '{$name}', {$player->village->village_id}, '{$proposal['trade_data']}')");
+                // create notification
+                self::createProposalNotification($system, $proposal['target_village_id'], NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
+                // update proposal
+                $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                // create notification
+                self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
+                $message = "Sent trade offer to " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                break;
+            case self::PROPOSAL_TYPE_ACCEPT_TRADE:
+                // check at war
+                if ($player->village->isEnemy($proposal['target_village_id'])) {
+                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                    return "Villages must be at peace in order to trade!";
+                }
+                // check has resources / regions
+                $trade_data = json_decode($proposal['trade_data'], true);
+                $is_valid_trade = self::checkTradeValid($system, $proposal['target_village_id'], $player->village->village_id, $trade_data['offered_resources'], $trade_data['offered_regions'], $trade_data['requested_resources'], $trade_data['requested_regions']);
+                if (!$is_valid_trade) {
+                    return "One or either village does not have the necessary items to complete the trade.";
+                }
+                // handle region and resource change
+                self::handleTradeCompletion($system, $proposal['target_village_id'], $player->village->village_id, $trade_data['offered_resources'], $trade_data['offered_regions'], $trade_data['requested_resources'], $trade_data['requested_regions']);
+                // update proposal
+                $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
+                // create notification
+                self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
+                $message = "Accepted trade offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
+                break;
             default:
                 return "Invalid proposal type.";
                 break;
         }
         // process reputation change
         $rep_adjustment = 0;
+        $total_negative_votes = 0;
+        $total_positive_votes = 0;
+        $rep_loss_from_positive_votes = 0;
+        $rep_loss_from_positive_votes_modifier = 0;
         foreach ($votes as $vote) {
-            if ($vote['rep_adjustment'] != 0) {
-                $rep_adjustment += $vote['rep_adjustment'];
+            if ($vote['rep_adjustment'] < 0) {
+                $total_negative_votes++;
+            }
+            if ($vote['rep_adjustment'] > 0) {
+                $total_positive_votes++;
+            }
+        }
+        // e.g. 1 negative vote, 2 positive votes, 0 net rep_adjustment, -500 for the negative voter, -250 for each positive voter
+        if ($total_negative_votes > 0) {
+            $rep_adjustment = self::VOTE_BOOST_COST * $total_negative_votes * -1;
+            if ($total_positive_votes > 0) {
+                $rep_adjustment += $total_positive_votes * self::VOTE_BOOST_COST;
+                $rep_adjustment = min($rep_adjustment, 0);
+                $rep_loss_from_positive_votes_modifier = min($total_negative_votes / $total_positive_votes, 1);
+                $rep_loss_from_positive_votes = self::VOTE_BOOST_COST * $rep_loss_from_positive_votes_modifier;
+            }
+        }
+        foreach ($votes as $vote) {
+            if ($vote['rep_adjustment'] > 0 && $rep_loss_from_positive_votes > 0) {
                 $user = User::loadFromId($system, $vote['user_id']);
                 $user->loadData();
-                $user->reputation->subtractRep($vote['rep_adjustment'], UserReputation::ACTIVITY_TYPE_UNCAPPED);
+                $user->reputation->subtractRep($rep_loss_from_positive_votes, UserReputation::ACTIVITY_TYPE_UNCAPPED);
+                $system->db->query("UPDATE `vote_logs` SET `rep_adjustment` = {$rep_loss_from_positive_votes} WHERE `vote_id` = {$vote['vote_id']}");
+                $user->updateData();
+            } else if ($vote['rep_adjustment'] > 0 && $rep_loss_from_positive_votes == 0) {
+                $system->db->query("UPDATE `vote_logs` SET `rep_adjustment` = {$rep_loss_from_positive_votes} WHERE `vote_id` = {$vote['vote_id']}");
+            }
+            if ($vote['rep_adjustment'] < 0) {
+                $user = User::loadFromId($system, $vote['user_id']);
+                $user->loadData();
+                $user->reputation->subtractRep(self::VOTE_BOOST_COST, UserReputation::ACTIVITY_TYPE_UNCAPPED);
                 $user->updateData();
             }
         }
@@ -1519,7 +1759,7 @@ class VillageManager {
             $message .= "\n You have gained {$rep_adjustment} Reputation!";
             $player->updateData();
         } else if ($rep_adjustment < 0) {
-            $player->reputation->subtractRep($rep_adjustment, UserReputation::ACTIVITY_TYPE_UNCAPPED);
+            $player->reputation->subtractRep(abs($rep_adjustment), UserReputation::ACTIVITY_TYPE_UNCAPPED);
             $message .= "\n You have lost {$rep_adjustment} Reputation!";
             $player->updateData();
         }
@@ -1542,11 +1782,11 @@ class VillageManager {
             // get seat holders
             $seats = self::getVillageSeats($system, $i);
             // get regions
-            $regions = $system->db->query("SELECT `name` FROM `regions` WHERE `village` = {$i}");
+            $regions = $system->db->query("SELECT `name`, `region_id` FROM `regions` WHERE `village` = {$i}");
             $regions = $system->db->fetch_all($regions);
             // get supply points
             $supply_points = [];
-            $resource_counts = $system->db->query("SELECT `region_locations`.`resource_id`, COUNT(`region_locations`.`resource_id`) AS `supply_points` 
+            $resource_counts = $system->db->query("SELECT `region_locations`.`resource_id`, COUNT(`region_locations`.`resource_id`) AS `supply_points`
                 FROM `region_locations`
                 INNER JOIN `regions` ON `region_locations`.`region_id` = `regions`.`region_id`
                 WHERE (`regions`.`village` = {$i} AND `region_locations`.`occupying_village_id` IS NULL)
@@ -1826,12 +2066,184 @@ class VillageManager {
         return "Proposal created!";
     }
 
+     /**
+     * @return string
+     */
+    public static function createTradeProposal(System $system, User $player, int $target_village_id, array $offered_resources, array $offered_regions, array $requested_resources, array $requested_regions): string {
+        // check player permissions
+        $seat = $player->village_seat;
+        if ($seat->seat_type != "kage") {
+            return "You do not meet the seat requirements.";
+        }
+        // check not at war
+        if ($player->village->isEnemy($target_village_id)) {
+            return "Villages must be at peace in order to trade!";
+        }
+        // check no pending proposal of same type
+        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND (`type` = 'offer_trade' OR `type` = 'accept_trade') LIMIT 1");
+        if ($system->db->last_num_rows > 0) {
+            return "There is already a pending trade request.";
+        }
+        // check has resources / regions
+        $is_valid_trade = self::checkTradeValid($system, $player->village->village_id, $target_village_id, $offered_resources, $offered_regions, $requested_resources, $requested_regions);
+        if (!$is_valid_trade) {
+            return "One or either village does not have the necessary items to complete the trade.";
+        }
+        // check player cooldown on submit proposal
+        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
+        $last_proposal = $system->db->fetch($query);
+        if ($system->db->last_num_rows > 0) {
+            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
+                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
+                $time_remaining = $system->timeRemaining($seconds_remaining, 'long');
+                return "Cannot submit another proposal for " . $time_remaining . ".";
+            }
+        }
+        // check trade cooldown
+        $proposal_type = self::PROPOSAL_TYPE_OFFER_TRADE;
+        $last_trade_offer = $system->db->query("SELECT * FROM `proposals` WHERE `type` = '{$proposal_type}'
+                AND (`village_id` = {$player->village->village_id} OR `target_village_id` = {$player->village->village_id})
+                AND (`village_id` = {$target_village_id} OR `target_village_id` = {$target_village_id})
+                ORDER BY `end_time` DESC LIMIT 1");
+        $last_trade_offer = $system->db->fetch($last_trade_offer);
+        if ($system->db->last_num_rows > 0 && isset($last_trade_offer['end_time'])) {
+            $trade_cooldown = ($last_trade_offer['end_time'] + self::TRADE_COOLDOWN_DAYS * 86400) - time();
+            if ($trade_cooldown > 0) {
+                $message = "You must wait another " . $system->time_remaining($trade_cooldown) . " before offering another trade with this village!";
+                return $message;
+            }
+        }
+        // insert into DB
+        $trade_data = [
+            "offered_resources" => $offered_resources,
+            "offered_regions" => $offered_regions,
+            "requested_resources" => $requested_resources,
+            "requested_regions" => $requested_regions
+        ];
+        $trade_data = json_encode($trade_data);
+        $time = time();
+        $name = "Offer Trade: " . VillageManager::VILLAGE_NAMES[$target_village_id];
+        $type = self::PROPOSAL_TYPE_OFFER_TRADE;
+        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `target_village_id`, `trade_data`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$type}', '{$name}', {$target_village_id}, '{$trade_data}')");
+
+        // create notification
+        self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
+
+        return "Proposal created!";
+    }
+
+    private static function checkTradeValid(System $system, int $village1_id, int $village2_id, array $offered_resources, array $offered_regions, array $requested_resources, array $requested_regions): bool {
+        // get regions
+        $village1_regions = $system->db->query("SELECT `region_id` FROM `regions` WHERE `village` = {$village1_id}");
+        $village1_regions = $system->db->fetch_all($village1_regions);
+        $village2_regions = $system->db->query("SELECT `region_id` FROM `regions` WHERE `village` = {$village2_id}");
+        $village2_regions = $system->db->fetch_all($village2_regions);
+        // get resources
+        $village1_resources = self::getResources($system, $village1_id);
+        $village2_resources = self::getResources($system, $village2_id);
+        // check valid
+        foreach ($offered_resources as $resource) {
+            if ($resource['count'] > self::MAX_TRADE_RESOURCE_TYPE) {
+                return false;
+            }
+            $resource_id = $resource['resource_id'];
+            $required_count = $resource['count'];
+            if (!isset($village1_resources[$resource_id]) || $village1_resources[$resource_id] < $required_count) {
+                return false;
+            }
+        }
+        foreach ($requested_resources as $resource) {
+            if ($resource['count'] > self::MAX_TRADE_RESOURCE_TYPE) {
+                return false;
+            }
+            $resource_id = $resource['resource_id'];
+            $required_count = $resource['count'];
+            if (!isset($village2_resources[$resource_id]) || $village2_resources[$resource_id] < $required_count) {
+                return false;
+            }
+        }
+        $village_region_ids = array_column($village1_regions, 'region_id');
+        foreach ($offered_regions as $offered_region_id) {
+            if (!in_array($offered_region_id, $village_region_ids)) {
+                return false;
+            }
+        }
+        $village_region_ids = array_column($village2_regions, 'region_id');
+        foreach ($requested_regions as $requested_region_id) {
+            if (!in_array($requested_region_id, $village_region_ids)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static function handleTradeCompletion(System $system, int $village1_id, int $village2_id, array $offered_resources, array $offered_regions, array $requested_resources, array $requested_regions)
+    {
+        // update regions
+        foreach ($offered_regions as $region) {
+            $system->db->query("UPDATE `regions` SET `village` = {$village2_id} WHERE `region_id` = {$region}");
+            // update patrols, move back 5 minutes
+            $patrol_spawn = time() + (60 * 5);
+            $system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$village2_id} WHERE `region_id` = {$region}");
+            // update caravans, change only caravans that haven't spawned
+            $name = VillageManager::VILLAGE_NAMES[$village2_id] . " Caravan";
+            $time = time();
+            $system->db->query("UPDATE `caravans` SET `village_id` = {$village2_id}, `name` = '{$name}' WHERE `region_id` = {$region} AND `start_time` > {$time}");
+        }
+        foreach ($requested_regions as $region) {
+            $system->db->query("UPDATE `regions` SET `village` = {$village1_id} WHERE `region_id` = {$region}");
+            // update patrols, move back 5 minutes
+            $patrol_spawn = time() + (60 * 5);
+            $system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$village1_id} WHERE `region_id` = {$region}");
+            // update caravans, change only caravans that haven't spawned
+            $name = VillageManager::VILLAGE_NAMES[$village1_id] . " Caravan";
+            $time = time();
+            $system->db->query("UPDATE `caravans` SET `village_id` = {$village1_id}, `name` = '{$name}' WHERE `region_id` = {$region} AND `start_time` > {$time}");
+        }
+        // update resources
+        $villages_result = $system->db->query("SELECT * FROM `villages` WHERE `village_id` = {$village1_id} OR `village_id`={$village2_id} LIMIT 2");
+        $villages = $system->db->fetch_all($villages_result, 'village_id');
+        $village1 = new Village($system, village_row: $villages[$village1_id]);
+        $village2 = new Village($system, village_row: $villages[$village2_id]);
+        foreach ($offered_resources as $resource) {
+            $village1->subtractResource($resource['resource_id'], $resource['count']);
+            $system->db->query("INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village1->village_id}, {$resource['resource_id']}, " . VillageManager::RESOURCE_LOG_TRADE_LOSS . ", {$resource['count']}, " . time() . ")");
+            $village2->addResource($resource['resource_id'], $resource['count']);
+            $system->db->query("INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village2->village_id}, {$resource['resource_id']}, " . VillageManager::RESOURCE_LOG_TRADE_GAIN . ", {$resource['count']}, " . time() . ")");
+        }
+        foreach ($requested_resources as $resource) {
+            $village2->subtractResource($resource['resource_id'], $resource['count']);
+            $system->db->query("INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village2->village_id}, {$resource['resource_id']}, " . VillageManager::RESOURCE_LOG_TRADE_LOSS . ", {$resource['count']}, " . time() . ")");
+            $village1->addResource($resource['resource_id'], $resource['count']);
+            $system->db->query("INSERT INTO `resource_logs`
+                        (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+                        VALUES ({$village1->village_id}, {$resource['resource_id']}, " . VillageManager::RESOURCE_LOG_TRADE_GAIN . ", {$resource['count']}, " . time() . ")");
+        }
+        $village1->updateResources(true);
+        $village2->updateResources(true);
+    }
+
     private static function clearDiplomaticProposals(System $system, int $village1_id, int $village2_id, int $proposal_id) {
         $time = time();
         $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` =  'canceled' WHERE
             ((`village_id` = {$village1_id} OR `village_id` = {$village2_id})
             AND (`target_village_id` = {$village1_id} OR `target_village_id` = {$village2_id}))
-            AND `type` IN ('offer_alliance', 'offer_peace', 'accept_alliance', 'accept_peace', 'declare_war', 'break_alliance')
+            AND `type` IN ('offer_alliance', 'offer_peace', 'accept_alliance', 'accept_peace', 'declare_war', 'break_alliance', 'force_peace')
+            AND `proposal_id` != {$proposal_id}");
+    }
+    private static function clearTradeProposals(System $system, int $village1_id, int $village2_id, int $proposal_id)
+    {
+        $time = time();
+        $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` =  'canceled' WHERE
+            ((`village_id` = {$village1_id} OR `village_id` = {$village2_id})
+            AND (`target_village_id` = {$village1_id} OR `target_village_id` = {$village2_id}))
+            AND `type` IN ('offer_trade', 'accept_trade')
             AND `proposal_id` != {$proposal_id}");
     }
 
@@ -1864,15 +2276,15 @@ class VillageManager {
         $initator_village_name = self::VILLAGE_NAMES[$initiator_village_id];
         $recipient_village_name = self::VILLAGE_NAMES[$recipient_village_id];
         $active_threshold = time() - (NotificationManager::ACTIVE_PLAYER_DAYS_LAST_ACTIVE * 86400);
-        $user_ids = $system->db->query("SELECT `user_id` FROM `users` WHERE (`village` = '{$initator_village_name}' OR `village` = '{$recipient_village_name}') AND `last_login` > {$active_threshold}");
-        $user_ids = $system->db->fetch_all($user_ids);
+        $village_users_result = $system->db->query("SELECT `user_id`, `blocked_notifications` FROM `users` WHERE (`village` = '{$initator_village_name}' OR `village` = '{$recipient_village_name}') AND `last_login` > {$active_threshold}");
+        $village_users = $system->db->fetch_all($village_users_result);
         // create notifcations
         $message;
         $notification_type;
         switch ($proposal_type) {
             case self::PROPOSAL_TYPE_BREAK_ALLIANCE:
                 $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_END_ALLIANCE;
-                $message = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " has ended and Alliance with " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
+                $message = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " has ended an Alliance with " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . "!";
                 break;
             case self::PROPOSAL_TYPE_ACCEPT_PEACE:
                 $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_END_WAR;
@@ -1893,7 +2305,15 @@ class VillageManager {
             default:
                 break;
         }
-        foreach ($user_ids as $user) {
+        foreach ($village_users as $user) {
+            $blockedNotifManager = BlockedNotificationManager::fromDb(
+                system: $system,
+                blocked_notifications_string: $user['blocked_notifications']
+            );
+            if($blockedNotifManager->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_DIPLOMACY)) {
+                continue;
+            }
+
             $new_notification = new NotificationDto(
                 type: $notification_type,
                 message: $message,
@@ -1937,7 +2357,7 @@ class VillageManager {
                 expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_PROPOSAL * 86400),
                 alert: false,
             );
-            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_MULTIPLE);
+            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
         }
     }
 
@@ -1959,7 +2379,7 @@ class VillageManager {
                 return true;
                 break;
             case 'elder':
-                if ($player->rank_num < 4) {
+                if ($player->rank_num < 3) {
                     return false;
                 }
                 if ($is_challenge) {
@@ -1977,5 +2397,65 @@ class VillageManager {
                 return false;
                 break;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public static function getKageRecord(System $system, int $village_id): array
+    {
+        $timePerUser = [];
+        $kageRecords = [];
+        $result = $system->db->query("SELECT `village_seats`.*, `users`.`user_name`
+            FROM `village_seats`
+            INNER JOIN `users` ON `users`.`user_id` = `village_seats`.`user_id`
+            WHERE `village_id` = {$village_id}
+            AND `seat_type` = 'kage'
+            AND `is_provisional` = 0
+            ORDER BY `seat_start` ASC
+        ");
+        $result = $system->db->fetch_all($result);
+        if (count($result) > 0) {
+            foreach ($result as $row) {
+                $user_id = $row['user_id'];
+                $start = $row['seat_start'];
+                $end = !empty($row['seat_end']) ? $row['seat_end'] : time();
+
+                $time_held = $end - $start;
+
+                // Add to running total
+                if (isset($timePerUser[$user_id])) {
+                    $timePerUser[$user_id] += $time_held;
+                }
+                // Start running total
+                else {
+                    $timePerUser[$user_id] = $time_held;
+                }
+
+                // If not set, add to records
+                if (!isset($kageRecords[$user_id])) {
+                    $kageRecords[$user_id] = $row;
+                }
+                // Otherwise get newest end time
+                else {
+                    $kageRecords[$user_id]['seat_end'] = $end;
+                }
+            }
+
+            // Add total time to records
+            foreach ($timePerUser as $key => $value) {
+                $kageRecords[$key]['time_held'] = $value;
+            }
+        }
+
+        // Format
+        foreach ($kageRecords as &$record) {
+            $time_held = System::timeRemaining($record['time_held'], format: 'days', include_seconds: false);
+            $seat_start = date("M jS Y", $record['seat_start']);
+            $record['time_held'] = $time_held;
+            $record['seat_start'] = $seat_start;
+        }
+
+        return $kageRecords;
     }
 }

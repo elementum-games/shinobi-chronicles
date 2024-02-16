@@ -57,7 +57,8 @@ function sendMoney() {
                     "{$amount} yen - #{$player->user_id} ($player->user_name) to #{$recipient->user_id}"
                 );
 
-                if (empty($recipient->blacklist[$player->user_id])) {
+                // Adding yen threshold to block spam alerts
+                if(!$recipient->blacklist->userBlocked($player->user_id) && $amount > 500) {
                     $alert_message = $player->user_name . " has sent you &yen;$amount.";
                     Inbox::sendAlert($system, Inbox::ALERT_YEN_RECEIVED, $player->user_id, $recipient->user_id, $alert_message);
                 }
@@ -81,7 +82,7 @@ function sendMoney() {
                     "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient->user_id}"
                 );
 
-                if (empty($recipient->blacklist[$player->user_id])) {
+                if (!$recipient->blacklist->userBlocked($player->user_id)) {
                     $alert_message = $player->user_name . " has sent you $amount Ancient Kunai.";
                     Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $recipient->user_id, $alert_message);
                 }

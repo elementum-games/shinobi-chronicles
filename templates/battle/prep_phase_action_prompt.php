@@ -1,6 +1,7 @@
 <?php
 /**
  * @var string $self_link
+ * @var User $player
  */
 
 ?>
@@ -48,7 +49,7 @@ if(!empty($player->items)) {
 <tr><td>
     <p style='text-align:center;font-style:italic;'>
         (You can use healing items during prep phase, but cannot heal past
-        <?= Battle::MAX_PRE_FIGHT_HEAL_PERCENT ?>% of your max health)
+        <?= $player->maxConsumableHealAmountPercent() ?>% of your max health)
     </p>
     <?php if(count($heal_items) > 0): ?>
         <div id='items'>

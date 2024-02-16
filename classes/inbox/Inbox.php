@@ -118,16 +118,13 @@ class Inbox {
      * @return array|null
      */
     public static function getUserData(System $system, string $user_name): ?InboxUser {
-        $sql = "SELECT `users`.`user_id`,
-                `users`.`user_name`,
-                `users`.`avatar_link`,
-               `users`.`forbidden_seal`,
-               `users`.`staff_level`,
-               `blacklist`.`blocked_ids`
+        $sql = "SELECT `user_id`,
+                `user_name`,
+                `avatar_link`,
+               `forbidden_seal`,
+               `staff_level`
                 FROM `users`
-                INNER JOIN `blacklist`
-                ON `users`.`user_id`=`blacklist`.`user_id`
-                WHERE `users`.`user_name`='{$user_name}'";
+                WHERE `user_name`='{$user_name}'";
         $result = $system->db->query($sql);
         if (!$system->db->last_num_rows) {
             return null;
@@ -140,8 +137,7 @@ class Inbox {
             user_name: $data['user_name'],
             avatar_link: $data['avatar_link'],
             forbidden_seal: $data['forbidden_seal'] ? json_decode($data['forbidden_seal'], true) : null,
-            staff_level: $data['staff_level'],
-            blocked_ids: json_decode($data['blocked_ids'], true)
+            staff_level: $data['staff_level']
         );
     }
 
@@ -149,20 +145,27 @@ class Inbox {
      * @param InboxUser[] $convo_members
      * @return boolean
      */
-    public static function checkBlacklist(array $convo_members): bool {
+    public static function checkBlacklist(System $system, array $convo_members): bool {
         $user_ids = [];
+        // Temporary disable until rework
+        /*
         foreach($convo_members as $member) {
             $user_ids[$member->user_id] = $member->user_id;
         }
         foreach($convo_members as $member) {
-            if (empty($member->blocked_ids)) {
+            $blacklist = new Blacklist(
+                system: $system,
+                user_id: $member->user_id
+            );
+            if(!$blacklist->hasAnyUsersBlocked()) {
                 continue;
             }
-            $comparison = array_intersect_key($user_ids, $member->blocked_ids);
-            if ($comparison) {
-                return true;
+            foreach($user_ids as $id) {
+                if($blacklist->userBlocked($id)) {
+                    return true;
+                }
             }
-        }
+        }*/
         return false;
     }
 
@@ -288,7 +291,7 @@ class Inbox {
             $max_size = $forbidden_seal->inbox_size;
         } 
         elseif (is_array($forbidden_seal)) {
-            $max_size = ForbiddenSeal::$benefits[$forbidden_seal['level']]['inbox_size'];
+            $max_size = ForbiddenSeal::INBOX_SIZES[ForbiddenSeal::$STAFF_SEAL_LEVEL];
         }
         return $max_size;
     }
@@ -308,7 +311,7 @@ class Inbox {
      */
     public static function checkMaxMessageLength($forbidden_seal, $staff_level): int {
         if($staff_level) {
-            return ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['pm_size'];
+            return ForbiddenSeal::INBOX_MESSAGE_SIZE[ForbiddenSeal::$STAFF_SEAL_LEVEL];
         }
         elseif($forbidden_seal instanceof ForbiddenSeal) {
             return $forbidden_seal->pm_size;
@@ -372,12 +375,10 @@ class Inbox {
      * @return null|InboxUser[] $convo_members
      */
     public static function getConvoMembers(System $system, int|string $convo_id): ?array {
-        $sql = "SELECT `users`.`user_name`, `users`.`user_id`, `users`.`avatar_link`, `blacklist`.`blocked_ids`, `users`.`forbidden_seal`, `users`.`staff_level`
+        $sql = "SELECT `users`.`user_name`, `users`.`user_id`, `users`.`avatar_link`, `users`.`forbidden_seal`, `users`.`staff_level`
                 FROM `convos_users`
                 INNER JOIN `users`
                 ON `convos_users`.`user_id`=`users`.`user_id`
-                INNER JOIN `blacklist`
-                ON `blacklist`.`user_id`=`users`.`user_id`
                 WHERE `convos_users`.`convo_id`='{$convo_id}'";
         $result = $system->db->query($sql);
         if (!$system->db->last_num_rows) {
@@ -394,8 +395,7 @@ class Inbox {
                 forbidden_seal: $user_data['forbidden_seal']
                     ? json_decode($user_data['forbidden_seal'], true)
                     : null,
-                staff_level: $user_data['staff_level'],
-                blocked_ids: json_decode($user_data['blocked_ids'], true)
+                staff_level: $user_data['staff_level']
             );
         }, $users_data);
     }
@@ -466,6 +466,11 @@ class Inbox {
         }
         $all_message_data = $system->db->fetch_all($result);
         foreach($all_message_data as $message_data) {
+            // Blacklist!!
+            if($user->blacklist->userBlocked($message_data['sender_id'])) {
+                continue;
+            }
+
             $message_data['message'] = $system->html_parse(stripslashes($message_data['message']), false, true);
             $message_data['self_message'] = $message_data['sender_id'] == $user->user_id ? true : false;
             $new_message_array[] = $message_data;

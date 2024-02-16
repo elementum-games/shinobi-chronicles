@@ -464,8 +464,9 @@ function JutsuScroll({ jutsu_data, onClick }: JutsuScrollProps) {
                 <div className="jutsu_stats_container">
                     <div className="jutsu_power"><span style={{ fontWeight: "700" }}>POWER:</span> {jutsu_data.power}</div>
                     <div className="jutsu_cooldown"><span style={{ fontWeight: "700" }}>COOLDOWN:</span> {jutsu_data.cooldown} TURNS</div>
-                    <div className="jutsu_effect"><span style={{ fontWeight: "700" }}>EFFECT:</span> {jutsu_data.effect} ({jutsu_data.effectAmount}%)</div>
-                    <div className="jutsu_duration"><span style={{ fontWeight: "700" }}>DURATION:</span> {jutsu_data.effectDuration} TURNS</div>
+                    <div className="jutsu_effect"><span style={{ fontWeight: "700" }}>EFFECT:</span> {jutsu_data.effect} ({Math.round(jutsu_data.effectAmount * 1.2)}%)</div>
+                    <div className="jutsu_effect"><span style={{ fontWeight: "700" }}>EFFECT:</span> {jutsu_data.effect2} ({Math.round(jutsu_data.effectAmount2 * 1.2)}%)</div>
+                    {jutsu_data.effectDuration > 0 ? <div className="jutsu_duration"><span style={{ fontWeight: "700" }}>DURATION:</span> {jutsu_data.effectDuration} TURNS</div> : ""}
                 </div>
                 <div className="jutsu_scroll_divider_bottom"><svg width="100%" height="2"><line x1="0%" y1="1" x2="95%" y2="1" stroke="#77694e" strokeWidth="1"></line></svg></div>
                 <div className="jutsu_tags">

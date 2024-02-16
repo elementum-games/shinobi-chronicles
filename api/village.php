@@ -79,6 +79,14 @@ try {
                     $target_village_id = $system->db->clean($_POST['target_village_id']);
                     $message = VillageManager::createBreakAllianceProposal($system, $player, $target_village_id);
                     break;
+                case "offer_trade":
+                    $target_village_id = $system->db->clean($_POST['target_village_id']);
+                    $offered_resources = $_POST['offered_resources'];
+                    $offered_regions = isset($_POST['offered_regions']) ? $_POST['offered_regions'] : [];
+                    $requested_resources = $_POST['requested_resources'];
+                    $requested_regions = isset($_POST['requested_regions']) ? $_POST['requested_regions'] : [];
+                    $message = VillageManager::createTradeProposal($system, $player, $target_village_id, $offered_resources, $offered_regions, $requested_resources, $requested_regions);
+                    break;
                 default:
                     break;
             }
@@ -157,16 +165,22 @@ try {
             ];
             break;
         case 'CancelChallenge':
-            $message = VillageManager::cancelChallenge($system, $player);
+            $message = VillageManager::cancelUserCreatedChallenges($system, $player->user_id);
             $VillageAPIResponse->response = [
                 'response_message' => $message,
                 'challengeData' => VillageManager::getChallengeData($system, $player),
             ];
             break;
         case 'GetGlobalWarLeaderboard':
-            $page_number = (int)$_POST['page_number'];
+            $page_number = (int) $_POST['page_number'];
             $VillageAPIResponse->response = [
-                'warLogData' => VillageApiPresenter::warLogDataResponse($system, $player, $page_number),
+                'warLogData' => VillageApiPresenter::playerWarLogDataResponse($system, $player, $page_number),
+            ];
+            break;
+        case 'GetWarRecords':
+            $page_number = (int) $_POST['page_number'];
+            $VillageAPIResponse->response = [
+                'warRecordData' => VillageApiPresenter::warRecordDataResponse($system, $player, $page_number),
             ];
             break;
         default:
