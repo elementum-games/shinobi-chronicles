@@ -33,10 +33,8 @@ function PremiumPage({
         <ModalProvider>
             <MarketHeader
                 playerData={playerData}
-            />
-            <NavBar
-                handlePageChange={handlePageChange}
                 pages={[characterChanges, bloodlines, forbiddenSeal, purchaseAK]}
+                handlePageChange={handlePageChange}
             />
             {currentPage === characterChanges &&
                 <CharacterChanges />
@@ -54,14 +52,27 @@ function PremiumPage({
     );
 }
 
+type headerProps = {|
+    +playerData: PlayerDataType,
+    +pages: $ReadOnlyArray,
+    +handlePageChange: function
+|}
 function MarketHeader({
-    playerData
-}) {
+    playerData,
+    pages,
+    handlePageChange
+}: headerProps) {
     return(
-        <div>
-            Welcome to the ancient Market, where you can purchase premium features.<br />
-            <b>Your Ancient Kunai:</b> {playerData.premiumCredits}
-        </div>
+        <>
+            <NavBar
+                handlePageChange={handlePageChange}
+                pages={pages}
+            />
+            <div className="center">
+                Welcome to the ancient Market, where you can purchase premium features.<br />
+                <b>Your Ancient Kunai:</b> {playerData.premiumCredits}
+            </div>
+        </>
     )
 }
 function NavBar({
@@ -83,9 +94,7 @@ function NavBar({
 
 function CharacterChanges() {
     return(
-        <div>
-            Character Changes
-        </div>
+        <div className="header">Character Changes</div>
     );
 }
 

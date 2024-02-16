@@ -29,3 +29,7 @@
     background: linear-gradient(to bottom, #3b4176 50%, #2f345e 50%);
     cursor: default;
 }
+
+.center {
+    text-align: center;
+}

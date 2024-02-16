@@ -18,16 +18,22 @@ function PremiumPage({
     }
   }
   return /*#__PURE__*/React.createElement(ModalProvider, null, /*#__PURE__*/React.createElement(MarketHeader, {
-    playerData: playerData
-  }), /*#__PURE__*/React.createElement(NavBar, {
-    handlePageChange: handlePageChange,
-    pages: [characterChanges, bloodlines, forbiddenSeal, purchaseAK]
+    playerData: playerData,
+    pages: [characterChanges, bloodlines, forbiddenSeal, purchaseAK],
+    handlePageChange: handlePageChange
   }), currentPage === characterChanges && /*#__PURE__*/React.createElement(CharacterChanges, null), currentPage === bloodlines && /*#__PURE__*/React.createElement(Bloodlines, null), currentPage === forbiddenSeal && /*#__PURE__*/React.createElement(ForbiddenSeals, null), currentPage === purchaseAK && /*#__PURE__*/React.createElement(PurchaseAK, null));
 }
 function MarketHeader({
-  playerData
+  playerData,
+  pages,
+  handlePageChange
 }) {
-  return /*#__PURE__*/React.createElement("div", null, "Welcome to the ancient Market, where you can purchase premium features.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("b", null, "Your Ancient Kunai:"), " ", playerData.premiumCredits);
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(NavBar, {
+    handlePageChange: handlePageChange,
+    pages: pages
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "center"
+  }, "Welcome to the ancient Market, where you can purchase premium features.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("b", null, "Your Ancient Kunai:"), " ", playerData.premiumCredits));
 }
 function NavBar({
   handlePageChange,
@@ -44,7 +50,9 @@ function NavBar({
   }));
 }
 function CharacterChanges() {
-  return /*#__PURE__*/React.createElement("div", null, "Character Changes");
+  return /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "Character Changes");
 }
 function Bloodlines() {
   return /*#__PURE__*/React.createElement("div", null, "Bloodlines");
