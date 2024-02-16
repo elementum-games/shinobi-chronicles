@@ -22,7 +22,8 @@ function Village({
   proposalData,
   strategicData,
   challengeData,
-  warLogData,
+  playerWarLogData,
+  warRecordData,
   kageRecords
 }) {
   const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
@@ -209,10 +210,13 @@ function Village({
     StrategicInfoItem: StrategicInfoItem,
     getPolicyDisplayData: getPolicyDisplayData
   }), villageTab == "warTable" && /*#__PURE__*/React.createElement(WarTable, {
-    warLogData: warLogData,
+    playerWarLogData: playerWarLogData,
+    warRecordData: warRecordData,
+    strategicDataState: strategicDataState,
     villageAPI: villageAPI,
     handleErrors: handleErrors,
-    getVillageIcon: getVillageIcon
+    getVillageIcon: getVillageIcon,
+    getPolicyDisplayData: getPolicyDisplayData
   }));
 }
 window.Village = Village;
