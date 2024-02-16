@@ -99,7 +99,8 @@
 .upgrade_set_list {
     display: flex;
     align-items: flex-start;
-    padding: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     flex-wrap: wrap;
     box-sizing: border-box
 }
@@ -116,7 +117,7 @@
     justify-content: center;
     display: flex;
     flex-direction: column;
-    height: 120px;
+    height: 130px;
 }
 .upgrade_set_name, .upgrade_name {
     font-size: 11px;
@@ -187,10 +188,10 @@
         background: linear-gradient(to bottom, #aa5472 0%, #8c3855 100%);
     }
 .upgrade_item.active, .upgrade_item_unlocked {
-    background: linear-gradient(to bottom, #d4bd7e 0%, #9a8242 100%);
+    background: linear-gradient(to bottom, #38a774 0%, #2a5e3c 100%);
 }
     .upgrade_item.active .upgrade_item_inner, .upgrade_item_unlocked .upgrade_item_inner {
-        background: linear-gradient(to bottom, #d4bd7e 0%, #9a8242 100%);
+        background: linear-gradient(to bottom, #38a774 0%, #2a5e3c 100%);
     }
 .upgrade_item.available {
     background: linear-gradient(to bottom, #475084 0%, #31396d 100%);
@@ -198,11 +199,11 @@
     .upgrade_item.available .upgrade_item_inner {
         background: linear-gradient(to bottom, #475084 0%, #31396d 100%);
     }
-.upgrade_item.researching {
-    background: linear-gradient(to bottom, #38a774 0%, #2a5e3c 100%)
+.upgrade_item.researching, .upgrade_item.activating {
+    background: linear-gradient(to bottom, #d4bd7e 0%, #9a8242 100%);
 }
-    .upgrade_item.researching .upgrade_item_inner {
-        background: linear-gradient(to bottom, #38a774 0%, #2a5e3c 100%)
+    .upgrade_item.researching .upgrade_item_inner, .upgrade_item.activating .upgrade_item_inner {
+        background: linear-gradient(to bottom, #d4bd7e 0%, #9a8242 100%);
     }
 .upgrade_item:hover {
     padding: 4px;
@@ -213,6 +214,8 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    width: 100%;
+    height: 100%;
 }
 .building_details {
     display: flex;
@@ -328,16 +331,33 @@
     flex-direction: column;
     gap: 2px;
 }
+.upgrade_controls_container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    align-items: center;
+    margin-top: auto;
+}
 .building_controls {
     display: flex;
 }
-.building_controls_label {
+.building_controls_label, .upgrade_controls_label {
     font-size: 10px;
     font-weight: bold;
     font-family: var(--font-primary);
     color: var(--font-color-1);
     text-transform: uppercase;
     padding-left: 5px;
+}
+.upgrade_controls_label {
+    font-size: 10px;
+    font-weight: bold;
+    font-family: var(--font-primary);
+    color: var(--font-color-1);
+    text-transform: uppercase;
+    padding-left: 10px;
+    align-self: flex-start;
 }
 .building_buttons_container {
     display: flex;
@@ -348,12 +368,17 @@
     margin-right: -3px;
 }
 .upgrade_buttons_container {
-
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    width: 100%;
+    gap: 10px;
+    margin-bottom: -10px;
+    padding-right: 20px;
 }
-.construction_begin_button, .research_begin_button, .repair_begin_button, .construction_cancel_button, .research_cancel_button {
+.construction_begin_button, .research_begin_button, .repair_begin_button, .construction_cancel_button, .research_cancel_button, .upgrade_toggle_off_button, .upgrade_toggle_on_button {
     width: 80px;
     height: 25px;
-    background: #343d77;
     text-align: center;
     color: #ccc1af;
     cursor: pointer;
@@ -368,20 +393,20 @@
 .construction_begin_button, .research_begin_button {
     background: #343d77;
 }
-.repair_begin_button {
-    background: #35582d
+.repair_begin_button, .upgrade_toggle_on_button {
+    background: #35582d;
 }
-.construction_cancel_button, .research_cancel_button {
-    background: #6f3043
+.construction_cancel_button, .research_cancel_button, .upgrade_toggle_off_button {
+    background: #6f3043;
 }
-    .construction_begin_button:hover, .construction_cancel_button:hover, .research_begin_button:hover, .research_cancel_button:hover, .repair_begin_button:hover {
+    .construction_begin_button:hover, .construction_cancel_button:hover, .research_begin_button:hover, .research_cancel_button:hover, .repair_begin_button:hover, .upgrade_toggle_off_button:hover, .upgrade_toggle_on_button:hover {
         color: white;
     }
-    .construction_begin_button.disabled, .construction_cancel_button.disabled, .research_begin_button.disabled, .research_cancel_button.disabled, .repair_begin_button.disabled {
-        opacity: 30%;
-        pointer-events: none;
-    }
-        .construction_begin_button.disabled:hover, .construction_cancel_button.disabled:hover, .research_begin_button.disabled:hover, .research_cancel_button.disabled:hover, .repair_begin_button.disabled:hover {
+        .construction_begin_button.disabled, .construction_cancel_button.disabled, .research_begin_button.disabled, .research_cancel_button.disabled, .repair_begin_button.disabled, .upgrade_toggle_off_button:disabled, .upgrade_toggle_on_button:disabled {
+            opacity: 30%;
+            pointer-events: none;
+        }
+        .construction_begin_button.disabled:hover, .construction_cancel_button.disabled:hover, .research_begin_button.disabled:hover, .research_cancel_button.disabled:hover, .repair_begin_button.disabled:hover, .upgrade_toggle_off_button.disabled:hover, .upgrade_toggle_on_button.disabled:hover {
             color: #ccc1af;
             cursor: default;
         }
@@ -395,6 +420,21 @@
     display: flex;
     gap: 10px;
     width: 325px;
+    border: 1px solid var(--building-upgrade-requirements-border, #231f1e);
+    border-radius: 7px;
+    justify-content: center;
+    align-items: center;
+}
+.upgrade_research_requirements {
+    text-transform: uppercase;
+    color: #c0c7dc;
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: bold;
+    height: 35px;
+    display: flex;
+    gap: 7px;
+    width: 250px;
     border: 1px solid var(--building-upgrade-requirements-border, #231f1e);
     border-radius: 7px;
     justify-content: center;
@@ -431,34 +471,11 @@
     text-shadow: 0 0 3px #000;
     text-align: center;
 }
-.construction_progress_text {
+.construction_progress_text, .research_progress_text {
     font-size: 12px;
     color: var(--construction-progress-label-text, white);
     text-transform: uppercase;
     text-shadow: 0 0 3px #000;
     text-align: center;
     font-weight: bold;
-}
-.research_progress_text_container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    width: 100%;
-}
-.research_progress_label {
-    font-size: 14px;
-    font-weight: bold;
-    color: var(--research-progress-label-color, #eee1c8);
-    text-transform: uppercase;
-    text-align: center;
-}
-.research_progress_text {
-    font-size: 12px;
-    color: var(--research-progress-label-text, white);
-    text-transform: uppercase;
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 15px;
 }

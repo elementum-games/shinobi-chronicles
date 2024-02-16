@@ -39,11 +39,11 @@ class VillageManager {
     const MIN_ELDER_CHALLENGE_TIER = 4;
 
     // Set these to correct values for release
-    const PROPOSAL_VOTE_HOURS = 24; // 24
+    const PROPOSAL_VOTE_HOURS = 12; // 24
     const PROPOSAL_ENACT_HOURS = 24; // 24
     const PROPOSAL_COOLDOWN_HOURS = 1; // 1
     const KAGE_PROVISIONAL_DAYS = 7; // 7
-    const POLICY_CHANGE_COOLDOWN_DAYS = 3; // 3
+    const POLICY_CHANGE_COOLDOWN_DAYS = 7; // 3
     const SEAT_RECLAIM_COOLDOWN_HOURS = 24; // 24
 
     const VOTE_NO = 0;

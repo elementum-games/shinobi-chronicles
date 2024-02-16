@@ -216,6 +216,30 @@ try {
                 'response_message' => $message,
             ];
             break;
+        case 'ActivateUpgrade':
+            $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+            $message = VillageUpgradeManager::activateUpgrade($system, $player->village, $upgrade_key);
+            $VillageAPIResponse->response = [
+                'buildingUpgradeData' => VillageApiPresenter::buildingUpgradeDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'CancelActivation':
+            $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+            $message = VillageUpgradeManager::cancelActivation($system, $player->village, $upgrade_key);
+            $VillageAPIResponse->response = [
+                'buildingUpgradeData' => VillageApiPresenter::buildingUpgradeDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'DeactivateUpgrade':
+            $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+            $message = VillageUpgradeManager::deactivateUpgrade($system, $player->village, $upgrade_key);
+            $VillageAPIResponse->response = [
+                'buildingUpgradeData' => VillageApiPresenter::buildingUpgradeDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
     }

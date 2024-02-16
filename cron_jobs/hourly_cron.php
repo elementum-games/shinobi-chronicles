@@ -115,10 +115,21 @@ function hourlyCron(System $system, $debug = true): void
                     } else {
                         $upgrade->status = VillageUpgradeConfig::UPGRADE_STATUS_INACTIVE;
                     }
-                    $queries[] = "UPDATE `village_upgrades` SET `status` = '{$upgrade->status}', `research_progress` = {$upgrade->research_progress}, `research_progress_last_updated` = {$upgrade->reasearch_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$upgrade->id}";
+                    $queries[] = "UPDATE `village_upgrades` SET `status` = '{$upgrade->status}', `research_progress` = NULL, `research_progress_required` = NULL, `research_progress_last_updated` = {$upgrade->research_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$upgrade->id}";
                 } else {
-                    $queries[] = "UPDATE `village_upgrades` SET `research_progress` = {$upgrade->research_progress}, `research_progress_last_updated` = {$upgrade->reasearch_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$upgrade->id}";
+                    $queries[] = "UPDATE `village_upgrades` SET `research_progress` = {$upgrade->research_progress}, `research_progress_last_updated` = {$upgrade->research_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$upgrade->id}";
                 }
+            }
+            if ($upgrade->status == VillageUpgradeConfig::UPGRADE_STATUS_ACTIVATING) {
+                $upgrade->research_progress += (time() - $upgrade->research_progress_last_updated) * $village->research_speed;
+                $upgrade->research_progress_last_updated = time();
+                if ($upgrade->research_progress > $upgrade->research_progress_required) {
+                    $upgrade->status = VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE;
+                    $queries[] = "UPDATE `village_upgrades` SET `status` = '{$upgrade->status}', `research_progress` = NULL, `research_progress_required` = NULL, `research_progress_last_updated` = {$upgrade->research_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$upgrade->id}";
+                } else {
+                    $queries[] = "UPDATE `village_upgrades` SET `research_progress` = {$upgrade->research_progress}, `research_progress_last_updated` = {$upgrade->research_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$upgrade->id}";
+                }
+
             }
         }
         foreach ($village->buildings as $building) {
@@ -130,7 +141,7 @@ function hourlyCron(System $system, $debug = true): void
                     $building->tier += 1;
                     $building->construction_progress = 0;
                     $building->health = VillageBuildingConfig::BUILDING_MAX_HEALTH[$building->key][$building->tier];
-                    $queries[] = "UPDATE `village_buildings` SET `status` = '{$building->status}', `construction_progress` = {$building->construction_progress}, `construction_progress_last_updated` = {$building->construction_progress_last_updated}, `tier` = {$building->tier} WHERE `village_id` = {$village->village_id} AND `id` = {$building->id}";
+                    $queries[] = "UPDATE `village_buildings` SET `status` = '{$building->status}', `construction_progress` = NULL, `construction_progress_required` = NULL, `construction_progress_last_updated` = {$building->construction_progress_last_updated}, `tier` = {$building->tier} WHERE `village_id` = {$village->village_id} AND `id` = {$building->id}";
                 } else {
                     $queries[] = "UPDATE `village_buildings` SET `construction_progress` = {$building->construction_progress}, `construction_progress_last_updated` = {$building->construction_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$building->id}";
                 }
