@@ -57,7 +57,6 @@ final class VillageUpgradeMigration extends AbstractMigration
             -- Alter table proposals
             ALTER TABLE `proposals` ADD `building_key` VARCHAR(50) NULL;
             ALTER TABLE `proposals` ADD `upgrade_key` VARCHAR(50) NULL;
-            ALTER TABLE `proposals` ADD `upgrade_data` TEXT NULL;
 
             -- Alter table player_war_logs
             ALTER TABLE `player_war_logs` ADD `stability_gained` INT(11) NOT NULL DEFAULT '0';

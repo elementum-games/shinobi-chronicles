@@ -269,6 +269,7 @@ class VillageUpgradeManager {
      * @param System $system
      * @param Village $village
      * @param string $building_key
+     * @throws RuntimeException
      * @return string
      */
     public static function beginConstruction(System $system, Village $village, $building_key): string {
@@ -280,19 +281,19 @@ class VillageUpgradeManager {
         $progress_required = VillageBuildingConfig::BUILDING_CONSTRUCTION_TIME[$building_key][$village->buildings[$building_key]->tier + 1] * 86400;
         // check if requirements met
         if (!VillageUpgradeManager::checkConstructionRequirementsMet($village, $building_key, $village->buildings[$building_key]->tier + 1)) {
-            return "Construction requirements not met!";
+            throw new RuntimeException("Construction requirements not met!");
         }
         // check if another building is already under construction
         foreach ($village->buildings as $building) {
             if ($building->status == VillageBuildingConfig::BUILDING_STATUS_UPGRADING) {
-                return "Another building is already under construction!";
+                throw new RuntimeException("Another building is already under construction!");
             }
         }
         // check if has previous progress
-        if (isset($village->buildings[$building_key]->construction_progress)) {
+        if (!isset($village->buildings[$building_key]->construction_progress)) {
             // check if the village has enough resources
             if ($village->resources[WarManager::RESOURCE_MATERIALS] < $materials_cost || $village->resources[WarManager::RESOURCE_FOOD] < $food_cost || $village->resources[WarManager::RESOURCE_WEALTH] < $wealth_cost) {
-                return "Not enough resources!";
+                throw new RuntimeException("Not enough resources!");
             }
             // update village resources
             $village->subtractResource(WarManager::RESOURCE_MATERIALS, $materials_cost);
@@ -321,11 +322,18 @@ class VillageUpgradeManager {
         }
     }
 
+    /**
+     * @param System $system
+     * @param Village $village
+     * @param string $building_key
+     * @throws RuntimeException
+     * @return string
+     */
     public static function cancelConstruction(System $system, Village $village, $building_id): string {
         self::initialize();
         // check if the building is under construction
         if ($village->buildings[$building_id]->status != VillageBuildingConfig::BUILDING_STATUS_UPGRADING) {
-            return "Building is not under construction!";
+            throw new RuntimeException("Building is not under construction!");
         }
         // stop construction but maintain progress
         $village->buildings[$building_id]->status = VillageBuildingConfig::BUILDING_STATUS_DEFAULT;
@@ -337,6 +345,7 @@ class VillageUpgradeManager {
     /**
      * @param Village $village
      * @param string $upgrade_key
+     * @throws RuntimeException
      * @return bool
      */
     public static function beginResearch(System $system, Village $village, $upgrade_key): string {
@@ -348,19 +357,19 @@ class VillageUpgradeManager {
         $progress_required = VillageUpgradeConfig::UPGRADE_RESEARCH_TIME[$upgrade_key] * 86400;
         // check if requirements met
         if (!VillageUpgradeManager::checkResearchRequirementsMet($village, $upgrade_key)) {
-            return "Research requirements not met!";
+            throw new RuntimeException("Research requirements not met!");
         }
         // check if another upgrade is already under research
         foreach ($village->upgrades as $upgrade) {
             if ($upgrade->status == VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING) {
-                return "Another upgrade is already under research!";
+                throw new RuntimeException("Another upgrade is already under research!");
             }
         }
         // check if has previous progress
         if (!isset($village->upgrades[$upgrade_key]->research_progress)) {
             // check if village has enough resources
             if ($village->resources[WarManager::RESOURCE_MATERIALS] < $materials_cost || $village->resources[WarManager::RESOURCE_FOOD] < $food_cost || $village->resources[WarManager::RESOURCE_WEALTH] < $wealth_cost) {
-                return "Not enough resources!";
+                throw new RuntimeException("Not enough resources!");
             }
             // update village resources
             $village->subtractResource(WarManager::RESOURCE_MATERIALS, $materials_cost);
@@ -400,11 +409,18 @@ class VillageUpgradeManager {
         }
     }
 
+/**
+     * @param System $system
+     * @param Village $village
+     * @param string $upgrade_key
+     * @throws RuntimeException
+     * @return string
+     */
     public static function cancelResearch(System $system, Village $village, $upgrade_key): string {
         self::initialize();
         // check if the upgrade is under research
         if ($village->upgrades[$upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING) {
-            return "Upgrade is not under research!";
+            throw new RuntimeException("Upgrade is not under research!");
         }
         // stop research but maintain progress
         $village->upgrades[$upgrade_key]->status = VillageUpgradeConfig::UPGRADE_STATUS_LOCKED;
@@ -413,6 +429,12 @@ class VillageUpgradeManager {
         return "Research cancelled for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
     }
 
+    /**
+     * @param System $system
+     * @param Village $village
+     * @param string $upgrade_key
+     * @return string
+     */
     public static function activateUpgrade(System $system, Village $village, $upgrade_key): string {
         self::initialize();
         // check if upgrade is inactive
@@ -431,6 +453,12 @@ class VillageUpgradeManager {
         return "Activation started for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
     }
 
+    /**
+     * @param System $system
+     * @param Village $village
+     * @param string $upgrade_key
+     * @return string
+     */
     public static function cancelActivation(System $system, Village $village, $upgrade_key): string {
         self::initialize();
         // check if the upgrade is under activation
@@ -446,6 +474,12 @@ class VillageUpgradeManager {
         return "Activation cancelled for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
     }
 
+    /**
+     * @param System $system
+     * @param Village $village
+     * @param string $upgrade_key
+     * @return string
+     */
     public static function deactivateUpgrade(System $system, Village $village, $upgrade_key): string {
         self::initialize();
         // check if upgrade is active
@@ -461,6 +495,12 @@ class VillageUpgradeManager {
         return "Upgrade deactivated for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
     }
 
+    /**
+     * @param System $system
+     * @param Village $village
+     * @param string $upgrade_key
+     * @return bool
+     */
     public static function checkActivationRequirements(System $system, Village $village, $upgrade_key): bool {
         self::initialize();
         // check upgrade exists and is inactive
@@ -493,6 +533,12 @@ class VillageUpgradeManager {
         return true;
     }
 
+    /**
+     * @param System $system
+     * @param Village $village
+     * @param string $upgrade_key
+     * @return bool
+     */
     public static function checkDeactivationRequirements(System $system, Village $village, $upgrade_key): bool {
         self::initialize();
         // check upgrade exists and is active
@@ -509,5 +555,45 @@ class VillageUpgradeManager {
                 }
             }
         }
+        return true;
+    }
+
+    public static function getActiveUpkeepForBuilding(System $system, Village $village, $building_key): array {
+        self::initialize();
+        $upkeep = [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
+        ];
+        // get list of upgrade keys for the building based on upgrade sets
+        $upgrade_keys = [];
+        foreach (VillageBuildingConfig::BUILDING_UPGRADE_SETS[$building_key] as $upgrade_set_key) {
+            $upgrade_keys = array_merge($upgrade_keys, VillageBuildingConfig::UPGRADE_SET_UPGRADES[$upgrade_set_key]);
+        }
+        // for each upgrade, if upgrade exists and is active, add upkeep to array
+        foreach ($upgrade_keys as $upgrade_key) {
+            if (isset($village->upgrades[$upgrade_key]) && ($village->upgrades[$upgrade_key]->status == VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE || $village->upgrades[$upgrade_key]->status == VillageUpgradeConfig::UPGRADE_STATUS_ACTIVATING)) {
+                $upkeep[WarManager::RESOURCE_MATERIALS] += VillageUpgradeConfig::UPGRADE_UPKEEP[$upgrade_key][WarManager::RESOURCE_MATERIALS];
+                $upkeep[WarManager::RESOURCE_FOOD] += VillageUpgradeConfig::UPGRADE_UPKEEP[$upgrade_key][WarManager::RESOURCE_FOOD];
+                $upkeep[WarManager::RESOURCE_WEALTH] += VillageUpgradeConfig::UPGRADE_UPKEEP[$upgrade_key][WarManager::RESOURCE_WEALTH];
+            }
+        }
+        return $upkeep;
+    }
+
+    public static function getTotalUpkeepForVillage(System $system, Village $village): array {
+        self::initialize();
+        $upkeep = [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
+        ];
+        foreach ($village->buildings as $building) {
+            $building_upkeep = VillageUpgradeManager::getActiveUpkeepForBuilding($system, $village, $building->key);
+            $upkeep[WarManager::RESOURCE_MATERIALS] += $building_upkeep[WarManager::RESOURCE_MATERIALS];
+            $upkeep[WarManager::RESOURCE_FOOD] += $building_upkeep[WarManager::RESOURCE_FOOD];
+            $upkeep[WarManager::RESOURCE_WEALTH] += $building_upkeep[WarManager::RESOURCE_WEALTH];
+        }
+        return $upkeep;
     }
 }

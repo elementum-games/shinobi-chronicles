@@ -206,6 +206,8 @@ function Village({
     setProposalDataState: setProposalDataState,
     strategicDataState: strategicDataState,
     setStrategicDataState: setStrategicDataState,
+    buildingUpgradeDataState: buildingUpgradeDataState,
+    setBuildingUpgradeDataState: setBuildingUpgradeDataState,
     handleErrors: handleErrors,
     getKageKanji: getKageKanji,
     getVillageIcon: getVillageIcon,
@@ -233,7 +235,7 @@ function Village({
     buildingUpgradeDataState: buildingUpgradeDataState,
     setBuildingUpgradeDataState: setBuildingUpgradeDataState,
     resourceDataState: resourceDataState,
-    setResourceDataState: setResourceDataState
+    setProposalDataState: setProposalDataState
   }));
 }
 window.Village = Village;

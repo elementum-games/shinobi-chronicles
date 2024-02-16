@@ -19,6 +19,8 @@ export function KageQuarters({
   setProposalDataState,
   strategicDataState,
   setStrategicDataState,
+  buildingUpgradeDataState,
+  setBuildingUpgradeDataState,
   handleErrors,
   getKageKanji,
   getVillageIcon,
@@ -220,6 +222,8 @@ export function KageQuarters({
       setStrategicDataState(response.data.strategicData);
       setStrategicDisplayLeft(response.data.strategicData.find(item => item.village.name == villageName));
       setStrategicDisplayRight(response.data.strategicData.find(item => item.village.name == strategicDisplayRight.village.name));
+      setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+      setResourceDataState(response.data.resourceData);
       openModal({
         header: 'Confirmation',
         text: response.data.response_message,

@@ -88,8 +88,7 @@ if (isset($_SESSION['user_id'])) {
     }
 }
 
-function hourlyCron(System $system, $debug = true): void
-{
+function hourlyCron(System $system, $debug = true): void {
     // get regions
     $region_result = $system->db->query("SELECT * FROM `regions`");
     $region_result = $system->db->fetch_all($region_result);
@@ -148,6 +147,22 @@ function hourlyCron(System $system, $debug = true): void
             }
         }
     }
+    // apply upkeep from upgrades
+    foreach ($villages as $village) {
+        $upkeep = VillageUpgradeManager::getTotalUpkeepForVillage($system, $village);
+        $village->subtractResource(WarManager::RESOURCE_MATERIALS, $upkeep[WarManager::RESOURCE_MATERIALS]);
+        $village->subtractResource(WarManager::RESOURCE_FOOD, $upkeep[WarManager::RESOURCE_FOOD]);
+        $village->subtractResource(WarManager::RESOURCE_WEALTH, $upkeep[WarManager::RESOURCE_WEALTH]);
+        $queries[] = "INSERT INTO `resource_logs`
+            (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+            VALUES ({$village->village_id}, " . WarManager::RESOURCE_MATERIALS . ", " . VillageManager::RESOURCE_LOG_UPGRADE_UPKEEP . ", " . $upkeep[WarManager::RESOURCE_MATERIALS] . ", " . time() . ")";
+        $queries[] = "INSERT INTO `resource_logs`
+            (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+            VALUES ({$village->village_id}, " . WarManager::RESOURCE_FOOD . ", " . VillageManager::RESOURCE_LOG_UPGRADE_UPKEEP . ", " . $upkeep[WarManager::RESOURCE_FOOD] . ", " . time() . ")";
+        $queries[] = "INSERT INTO `resource_logs`
+            (`village_id`, `resource_id`, `type`, `quantity`, `time`)
+            VALUES ({$village->village_id}, " . WarManager::RESOURCE_WEALTH . ", " . VillageManager::RESOURCE_LOG_UPGRADE_UPKEEP . ", " . $upkeep[WarManager::RESOURCE_WEALTH] . ", " . time() . ")";
+    }
     // apply resource decay
     $decay_rate = (VillageManager::EXCESS_RESOURCE_DECAY_PER_DAY / 24) / 100;
     foreach ($villages as $village) {
@@ -163,7 +178,7 @@ function hourlyCron(System $system, $debug = true): void
                 // calculate proportion of total resources
                 $proportion = $resource_count / $total_resources;
                 // apply decay based on proportion
-                $decay = $excess_resources * $decay_rate * $proportion;
+                $decay = ceil($excess_resources * $decay_rate * $proportion);
                 // subtract resource decay
                 $village->subtractResource($resource_id, $decay);
                 // log decay

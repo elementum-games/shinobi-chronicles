@@ -8,7 +8,7 @@ export function VillageUpgrades({
     buildingUpgradeDataState,
     setBuildingUpgradeDataState,
     resourceDataState,
-    setResourceDataState,
+    setProposalDataState,
 }) {
     const [selectedBuilding, setSelectedBuilding] = React.useState(null);
     const [selectedUpgrade, setSelectedUpgrade] = React.useState(null);
@@ -71,7 +71,8 @@ export function VillageUpgrades({
         apiFetch(
             villageAPI,
             {
-                request: 'BeginConstruction',
+                request: 'CreateProposal',
+                type: 'begin_construction',
                 building_key: selectedBuilding.key,
             }
         ).then((response) => {
@@ -79,8 +80,7 @@ export function VillageUpgrades({
                 handleErrors(response.errors);
                 return;
             }
-            setBuildingUpgradeDataState(response.data.buildingUpgradeData);
-            setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
+            setProposalDataState(response.data.proposalData);
             openModal({
                 header: 'Confirmation',
                 text: response.data.response_message,
@@ -93,7 +93,8 @@ export function VillageUpgrades({
         apiFetch(
             villageAPI,
             {
-                request: 'CancelConstruction',
+                request: 'CreateProposal',
+                type: 'cancel_construction',
                 building_key: selectedBuilding.key,
             }
         ).then((response) => {
@@ -101,8 +102,7 @@ export function VillageUpgrades({
                 handleErrors(response.errors);
                 return;
             }
-            setBuildingUpgradeDataState(response.data.buildingUpgradeData);
-            setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
+            setProposalDataState(response.data.proposalData);
             openModal({
                 header: 'Confirmation',
                 text: response.data.response_message,
@@ -115,7 +115,8 @@ export function VillageUpgrades({
         apiFetch(
             villageAPI,
             {
-                request: 'BeginResearch',
+                request: 'CreateProposal',
+                type: 'begin_research',
                 upgrade_key: selectedUpgrade.key,
             }
         ).then((response) => {
@@ -123,9 +124,7 @@ export function VillageUpgrades({
                 handleErrors(response.errors);
                 return;
             }
-            setBuildingUpgradeDataState(response.data.buildingUpgradeData);
-            setSelectedUpgrade(null);
-            setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
+            setProposalDataState(response.data.proposalData);
             openModal({
                 header: 'Confirmation',
                 text: response.data.response_message,
@@ -138,7 +137,8 @@ export function VillageUpgrades({
         apiFetch(
             villageAPI,
             {
-                request: 'CancelResearch',
+                request: 'CreateProposal',
+                type: 'cancel_research',
                 upgrade_key: selectedUpgrade.key,
             }
         ).then((response) => {
@@ -146,9 +146,7 @@ export function VillageUpgrades({
                 handleErrors(response.errors);
                 return;
             }
-            setBuildingUpgradeDataState(response.data.buildingUpgradeData);
-            setSelectedUpgrade(null);
-            setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
+            setProposalDataState(response.data.proposalData);
             openModal({
                 header: 'Confirmation',
                 text: response.data.response_message,
