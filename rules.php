@@ -32,11 +32,11 @@ chain of command; any problems with a moderator go to a head moderator FIRST bef
 
 <br>
 
-<h3>Racism, Sexism, Sexual Orientation & Religious Discrimination</h3>
+<h3>Racism, Sexism, Sexual Orientation & Religion</h3>
 <div>
-  Exhibition (posts in chat, images, links, etc.) of racial, sexist, sexual orientation or religious discriminations<sup>1</sup> will not be tolerated.
-  Violation of this rule will result in removal of content and a minimum 1-day ban, depending on severity.<br />
-  <sup>1</sup>This is not an exhaustive list. Other forms of discrimination may fall into this criteria on a case-by-case scenario.
+    Posts that insult or put down a person, or group of people, on the basis of race, gender, sexual orientation, religion,
+    or other common means will not be tolerated. This includes linking to this type of content on another platform.<br />
+    <em>Note:</em> Violation of this rule will result in removal of the content and minimum of 1-day ban, depending on severity of the violation.
 </div>
 <br />
 <h3>Offensive language</h3>
