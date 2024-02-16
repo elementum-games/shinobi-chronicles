@@ -31,6 +31,23 @@
             </div>
         </td>
     </tr>
+    <tr><th style='width:50%;'>Promote user</th>
+        <th style='width:50%;'>Demote user</th>
+    </tr>
+    <tr>
+        <td style="text-align: center;">
+            <form action="<?=$self_link?>" method="post">
+                <input style="margin-top:5px; margin-bottom:5px;" type="text" name="name" /><br />
+                <input type="submit" name="promote_user" value="Promote" />
+            </form>
+        </td>
+        <td style="text-align: center;">
+            <form action="<?=$self_link?>" method="post">
+                <input style="margin-top:5px; margin-bottom:5px;" type="text" name="name" /><br />
+                <input type="submit" name="demote_user" value="Demote" />
+            </form>
+        </td>
+    </tr>
     <tr><th style='width:50%;'>Unban user</th>
         <th style='width:50%;'>Unban journal/avatar/profile song</th>
     </tr>

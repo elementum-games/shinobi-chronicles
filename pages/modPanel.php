@@ -369,6 +369,49 @@ function modPanel() {
 		}
 		$system->printMessage();
 	}
+    // Promote/Demote users
+    if(!empty($_POST['promote_user']) && $player->staff_manager->isHeadModerator()) {
+        try {
+            $user_name = $system->db->clean($_POST['name']);
+            $result = User::findByName($system, $user_name);
+
+            if(!$result) {
+                throw new RuntimeException("Invalid user!");
+            }
+
+            if($result->staff_level >= StaffManager::STAFF_MODERATOR) {
+                throw new RuntimeException("You can only promote normal users!");
+            }
+
+            $system->db->query("UPDATE `users` SET `staff_level`=" . StaffManager::STAFF_MODERATOR . " WHERE `user_id`={$result->user_id} LIMIT 1");
+            if($system->db->last_affected_rows) {
+                $system->message("{$result->user_name} has been promoted.");
+            }
+        } catch(RuntimeException $e) {
+            $system->message($e->getMessage());
+        }
+    }
+    if(!empty($_POST['demote_user']) && $player->staff_manager->isHeadModerator()) {
+        try {
+            $user_name = $system->db->clean($_POST['name']);
+            $result = User::findByName($system, $user_name);
+
+            if(!$result) {
+                throw new RuntimeException("Invalid user!");
+            }
+
+            if($result->staff_level >= StaffManager::STAFF_HEAD_MODERATOR || $result->staff_level < StaffManager::STAFF_MODERATOR) {
+                throw new RuntimeException("You can only demote moderators!");
+            }
+
+            $system->db->query("UPDATE `users` SET `staff_level`=" . StaffManager::STAFF_NONE . " WHERE `user_id`={$result->user_id} LIMIT 1");
+            if($system->db->last_affected_rows) {
+                $system->message("{$result->user_name} has been demoted.");
+            }
+        }catch (RuntimeException $e) {
+            $system->message($e->getMessage());
+        }
+    }
 	// HM actions
 	if($player->staff_manager->isHeadModerator()) {
         // Activate user [Hitori]
