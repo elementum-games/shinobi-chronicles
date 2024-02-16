@@ -8,6 +8,8 @@ class StaffManager {
     public int $user_id;
     public string $user_name;
 
+    const MINUTES_PER_DAY = 1440;
+    const MINUTES_PER_MONTH = self::MINUTES_PER_DAY * 30;
     const DATE_FORMAT = 'm/d/y H:i:s';
     const PERM_BAN_VALUE = -1;
     const OW_MIN = 10;
@@ -28,20 +30,23 @@ class StaffManager {
     ];
 
     public static array $ban_lengths = [
-        1 => '1 Day',
-        7 => '1 Week',
-        30 => '1 Month',
-        90 => '3 Months'
+        '30_minute' => 30,
+        '60_minute' => 60,
+        '1_day' => self::MINUTES_PER_DAY,
+        '3_day' => 3 * self::MINUTES_PER_DAY,
+        '1_week' => 7 * self::MINUTES_PER_DAY,
+        '2_week' => 14 * self::MINUTES_PER_DAY,
+        '1_month' => self::MINUTES_PER_MONTH,
+        '3_month' => 3 * self::MINUTES_PER_MONTH,
     ];
 
     public static array $hm_ban_lengths = [
-        180 => '6 Months',
-        365 => '1 Year'
+        '6_month' => 6 * self::MINUTES_PER_MONTH,
+        '1_year' => 12 * self::MINUTES_PER_MONTH,
     ];
 
     public static $admin_ban_lengths = [
-        545 => '1.5 Years',
-        self::PERM_BAN_VALUE => 'Permanent'
+        'permanent' => self::PERM_BAN_VALUE
     ];
 
     const VERDICT_UNHANDLED = 0;
@@ -252,9 +257,9 @@ class StaffManager {
     public function staffLog($type, $content) {
         $this->system->db->query(
             "INSERT INTO `staff_logs` 
-                (`time`, `type`, `content`) 
+                (`time`, `staff_id`, `type`, `content`) 
                 VALUES 
-                ('" . time() . "', '{$type}', '{$content}')
+                ('" . time() . "', {$this->user_id}, '{$type}', '{$content}')
             "
         );
     }
@@ -513,60 +518,77 @@ class StaffManager {
     }
 
     public function banUser($ban_type, $ban_length, $user_data) {
-        if($ban_length > 0 || $ban_length == self::PERM_BAN_VALUE) {
-            $ban_data = json_decode($user_data['ban_data'], true);
-            $ban_expire = ($ban_length == self::PERM_BAN_VALUE ? $ban_length : time() + ($ban_length * 86400));
-            $old_ban_remaining = false;
+        $ban_data = json_decode($user_data['ban_data'], true);
+        $old_ban_remaining = false;
 
-            //Create new ban data for storage
-            if($ban_data == null || empty($ban_data)) {
-                $ban_data = json_encode(array(
-                    $ban_type => $ban_expire
-                ));
-            }
-            //Update ban data for storage
-            else {
-                if(isset($ban_data[$ban_type]) && $ban_expire < $ban_data[$ban_type]) {
-                    $old_ban_remaining = $this->system->time_remaining(($ban_data[$ban_type]-time()));
-                }
-                $ban_data[$ban_type] = $ban_expire;
-                $ban_data = json_encode($ban_data);
-            }
-
-            $this->system->db->query(
-                "UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$user_data['user_id']}' LIMIT 1"
-            );
-            if($this->system->db->last_affected_rows) {
-                //Log action into staff logs
-                $staff_log = "{$this->user_name}({$this->user_id}) $ban_type ban to " .
-                "{$user_data['user_name']}({$user_data['user_id']})";
-                if($ban_length != -1) {
-                    $staff_log .= " for {$ban_length} day(s).";
-                }
-                else {
-                    $staff_log .= " permanently.";
-                }
-                if($old_ban_remaining != false) {
-                    $staff_log .= "<br />$old_ban_remaining => {$this->system->time_remaining($ban_length*86400)}";
-                }
-                $this->staffLog(self::STAFF_LOG_MOD, $staff_log);
-
-                //Add to user record
-                $record_string = "Received a ";
-                if($ban_length == self::PERM_BAN_VALUE) {
-                    $record_string .= "permanent ";
-                }
-                else {
-                    $record_string .= "{$ban_length} day ";
-                }
-                $record_string .= ucwords($ban_type) . " ban.";
-                $this->addRecord($user_data['user_id'], $user_data['user_name'], self::RECORD_BAN_ISSUED,
-                    $record_string, false);
-                return true;
-            }
-            return false;
+        if($ban_length == self::PERM_BAN_VALUE) {
+            $ban_expire = $ban_length;
+        }
+        else {
+            // Bans are reported in minutes, add second value to current time
+            $ban_expire = time() + ($ban_length * 60);
         }
 
+        //Create new ban data for storage
+        if(empty($ban_data)) {
+            $ban_data = json_encode(array(
+                $ban_type => $ban_expire
+            ));
+        }
+        //Update ban data for storage
+        else {
+            if(isset($ban_data[$ban_type]) && $ban_expire < $ban_data[$ban_type]) {
+                $old_ban_remaining = $this->system->time_remaining(($ban_data[$ban_type]-time()));
+            }
+            $ban_data[$ban_type] = $ban_expire;
+            $ban_data = json_encode($ban_data);
+        }
+
+        $this->system->db->query(
+            "UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$user_data['user_id']}' LIMIT 1"
+        );
+        if($this->system->db->last_affected_rows) {
+            //Log action into staff logs
+            $staff_log = "{$this->user_name}({$this->user_id}) issued $ban_type ban to " .
+            "{$user_data['user_name']}({$user_data['user_id']})";
+            if($ban_length > self::MINUTES_PER_DAY * 30) {
+                $staff_log .= " for " . ($ban_length / (self::MINUTES_PER_DAY * 30)) . " month(s).";
+            }
+            elseif($ban_length > self::MINUTES_PER_DAY) {
+                $staff_log .= " for " . ($ban_length / self::MINUTES_PER_DAY) . " day(s).";
+            }
+            elseif($ban_length > self::PERM_BAN_VALUE) {
+                $staff_log .= " for {$ban_length} minutes.";
+            }
+            else {
+                $staff_log .= " permanently.";
+            }
+            
+            /*if($old_ban_remaining != false) {
+                $staff_log .= "<br />$old_ban_remaining => {$this->system->time_remaining($ban_length*86400)}";
+            }*/
+
+            $this->staffLog(self::STAFF_LOG_MOD, $staff_log);
+
+            //Add to user record
+            $record_string = "Received a ";
+            if($ban_length > self::MINUTES_PER_DAY * 30) {
+                $record_string .= ($ban_length / (self::MINUTES_PER_DAY * 30)) . " month ";
+            }
+            elseif($ban_length > self::MINUTES_PER_DAY) {
+                $record_string .= ($ban_length / self::MINUTES_PER_DAY) . " day ";
+            }
+            elseif($ban_length > self::PERM_BAN_VALUE) {
+                $record_string .= " {$ban_length} minute ";
+            }
+            else {
+                $record_string .= " permanent ";
+            }
+            $record_string .= ucwords($ban_type) . " ban.";
+            $this->addRecord($user_data['user_id'], $user_data['user_name'], self::RECORD_BAN_ISSUED,
+                $record_string, false);
+            return true;
+        }
         return false;
     }
 

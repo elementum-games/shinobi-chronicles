@@ -36,20 +36,26 @@ function modPanel() {
 			if(!isset($_POST['ban_type'])) {
 				throw new RuntimeException("Invalid ban type!");
 			}
-			if(!isset($_POST['ban_length'])) {
+			if(!isset($_POST['ban_length_key'])) {
 				throw new RuntimeException("Invalid ban length!");
 			}
 			$user_name = $system->db->clean($_POST['user_name']);
 			$ban_type = $system->db->clean($_POST['ban_type']);
-			$ban_length = $system->db->clean($_POST['ban_length']);
+			$ban_length_key = $system->db->clean($_POST['ban_length_key']);
 
             //Check ban type
 			if(array_search($ban_type, StaffManager::$ban_menu_items) === false) {
 				throw new RuntimeException("Invalid ban type!");
 			}
             //Check ban length
-            if(!isset($ban_lengths[$ban_length])) {
+            if(!isset($ban_lengths[$ban_length_key])) {
                 throw new RuntimeException("Invalid ban length!");
+            }
+
+            $ban_length = $ban_lengths[$ban_length_key];
+
+            if($ban_length < StaffManager::MINUTES_PER_DAY && $ban_type == StaffManager::BAN_TYPE_GAME) {
+                throw new RuntimeException("This ban length is only valid for Chat and PM!");
             }
 
             $user_data = $player->staff_manager->getUserByName($user_name);
@@ -363,6 +369,49 @@ function modPanel() {
 		}
 		$system->printMessage();
 	}
+    // Promote/Demote users
+    if(!empty($_POST['promote_user']) && $player->staff_manager->isHeadModerator()) {
+        try {
+            $user_name = $system->db->clean($_POST['name']);
+            $result = User::findByName($system, $user_name);
+
+            if(!$result) {
+                throw new RuntimeException("Invalid user!");
+            }
+
+            if($result->staff_level >= StaffManager::STAFF_MODERATOR) {
+                throw new RuntimeException("You can only promote normal users!");
+            }
+
+            $system->db->query("UPDATE `users` SET `staff_level`=" . StaffManager::STAFF_MODERATOR . " WHERE `user_id`={$result->user_id} LIMIT 1");
+            if($system->db->last_affected_rows) {
+                $system->message("{$result->user_name} has been promoted.");
+            }
+        } catch(RuntimeException $e) {
+            $system->message($e->getMessage());
+        }
+    }
+    if(!empty($_POST['demote_user']) && $player->staff_manager->isHeadModerator()) {
+        try {
+            $user_name = $system->db->clean($_POST['name']);
+            $result = User::findByName($system, $user_name);
+
+            if(!$result) {
+                throw new RuntimeException("Invalid user!");
+            }
+
+            if($result->staff_level >= StaffManager::STAFF_HEAD_MODERATOR || $result->staff_level < StaffManager::STAFF_MODERATOR) {
+                throw new RuntimeException("You can only demote moderators!");
+            }
+
+            $system->db->query("UPDATE `users` SET `staff_level`=" . StaffManager::STAFF_NONE . " WHERE `user_id`={$result->user_id} LIMIT 1");
+            if($system->db->last_affected_rows) {
+                $system->message("{$result->user_name} has been demoted.");
+            }
+        }catch (RuntimeException $e) {
+            $system->message($e->getMessage());
+        }
+    }
 	// HM actions
 	if($player->staff_manager->isHeadModerator()) {
         // Activate user [Hitori]
@@ -671,6 +720,168 @@ function modPanel() {
 
         $logs = $player->staff_manager->getStaffLogs('staff_logs', StaffManager::STAFF_LOG_MOD, $offset, $limit);
         require_once 'templates/staff/mod/mod_logs.php';
+    }
+    //Mod stats
+    else if($view == 'mod_stats' && $player->staff_manager->isHeadModerator()) {
+        $display_menu = false;
+        $self_link = $system->router->getUrl('mod', ['view'=>'mod_stats']);
+        $PREVIOUS_MONTH = $system->SERVER_TIME;
+        $PREVIOUS_MONTH = $PREVIOUS_MONTH->modify('-30 days');
+        $min_year = (int) $system->SERVER_TIME->modify('-5years')->format('Y');
+        $max_year = (int) $system->SERVER_TIME->format('Y');
+        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        if(isset($_POST['load_stats'])) {
+            try {
+                $mod_staff = [];
+                $moderator_staff_levels = [StaffManager::STAFF_MODERATOR, StaffManager::STAFF_HEAD_MODERATOR, StaffManager::STAFF_ADMINISTRATOR, StaffManager::STAFF_HEAD_ADMINISTRATOR];
+                $mod_result = $system->db->query("SELECT `user_name`, `user_id` FROM `users` WHERE `staff_level` IN (" . implode(', ', $moderator_staff_levels) . ")");
+                if (!$system->db->last_num_rows) {
+                    echo "No staff m8.";
+                }
+
+                // Validate day to month
+                $start_year = (int) $_POST['start_year'];
+                $start_month = $system->db->clean($_POST['start_month']);
+                $start_day = (int) $_POST['start_day'];
+
+                $end_year = (int) $_POST['end_year'];
+                $end_month = $system->db->clean($_POST['end_month']);
+                $end_day = (int) $_POST['end_day'];
+
+                if($start_month == 'Feb') {
+                    $max_days = 28;
+                    if((($start_year % 4) == 0) && ((($start_year % 100) != 0) || (($start_year %400) == 0))) {
+                        $max_days = 29;
+                    }
+                    $start_day = min($start_day, $max_days);
+                }
+                if($end_month == 'Feb') {
+                    $max_days = 28;
+                    if((($end_year % 4) == 0) && ((($end_year % 100) != 0) || (($end_year %400) == 0))) {
+                        $max_days = 29;
+                    }
+                    $start_day = min($start_day, $max_days);
+                }
+
+                if(in_array($start_month, ['Apr', 'Jun', 'Sep', 'Nov'])) {
+                    $start_day = min($start_day, 30);
+                }
+                if(in_array($end_month, ['Apr', 'Jun', 'Sep', 'Nov'])) {
+                    $end_day = min($end_day, 30);
+                }
+
+                // Start from beginning of day these must be reported in GMT as logs are processed as such
+                $start_string = $start_month . ' ' . $start_day . ' ' . $start_year . ' 00:00:00';
+                $start_time = new DateTimeImmutable($start_string, new DateTimeZone('Europe/London'));
+                // End just prior to midnight these must be reported in GMT as logs are processed as such
+                $end_string = $end_month . ' ' . $end_day . ' ' . $end_year . ' 23:59:59';
+                $end_time = new DateTimeImmutable($end_string, new DateTimeZone('Europe/London'));
+
+                // Set stamps for queries
+                $start_time_stamp = $start_time->getTimestamp();
+                $end_time_stamp = $end_time->getTimestamp();
+
+                if ($end_time_stamp < $start_time_stamp) {
+                    throw new RuntimeException("End date must be after start date!");
+                }
+
+                $total_reports = (int)$system->db->fetch($system->db->query("SELECT COUNT(*) as `count` FROM `reports` WHERE `time` BETWEEN $start_time_stamp AND $end_time_stamp"))['count'];
+                $total_mod_actions = 0;
+                $total_chat_posts = 0;
+
+                while ($row = $system->db->fetch($mod_result)) {
+                    // Pull action data
+                    $staff_actions = $system->db->fetch(
+                        $system->db->query("
+                    SELECT
+                        (SELECT COUNT(*) FROM `chat` WHERE `user_id`='{$row['user_id']}' AND `time` BETWEEN $start_time_stamp AND $end_time_stamp) as post_count,
+                        (SELECT COUNT(*) FROM `reports` WHERE `moderator_id`='{$row['user_id']}' AND `time` BETWEEN $start_time_stamp AND $end_time_stamp) as report_count,
+                        (SELECT COUNT(*) FROM `staff_logs` WHERE `staff_id`='{$row['user_id']}' AND `time` BETWEEN $start_time_stamp AND $end_time_stamp) as action_count
+                ")
+                    );
+
+                    $total_mod_actions += (int)$staff_actions['action_count'];
+                    $total_chat_posts += (int)$staff_actions['post_count'];
+
+                    $mod_staff[$row['user_id']] = [
+                        'user_name' => $row['user_name'],
+                        'mod_actions' => $staff_actions['action_count'],
+                        'reports_handled' => $staff_actions['report_count'],
+                        'chat_posts' => $staff_actions['post_count'],
+                    ];
+                }
+
+                require 'templates/staff/mod/mod_stats.php';
+            } catch (RuntimeException $e) {
+                $system->message($e->getMessage());
+                $system->printMessage();
+                require 'templates/staff/mod/mod_stats_date_select.php';
+            }
+        }
+        else {
+            require 'templates/staff/mod/mod_stats_date_select.php';
+        }
+    }
+    else if($view == 'verbose_mod_log' && isset($_GET['mod_id']) && $player->staff_manager->isHeadModerator()) {
+        $user_id = (int)$_GET['mod_id'];
+
+        // Verbose log data to show
+        $days = (int)($_GET['days'] ?? 30);
+        $max_days = ($player->staff_manager->isHeadAdmin() ? 90 : 45);
+        $days = min($days, $max_days); // Limit maximum days, this is taxing!!
+        $staff_data = [
+            'action_log' => [],
+            'chat_posts' => [],
+            'reports_handled' => [],
+        ];
+
+        // Validate user & staff level
+        $result = $system->db->query("SELECT `user_name`, `user_id`, `staff_level` FROM `users` WHERE `user_id`=$user_id LIMIT 1");
+        if (!$system->db->last_num_rows) {
+            $system->message("Invalid user!");
+            $system->printMessage();
+            return false;
+        }
+
+        $record_user = $system->db->fetch($result);
+        if (!in_array($record_user['staff_level'], [StaffManager::STAFF_MODERATOR, StaffManager::STAFF_HEAD_MODERATOR, StaffManager::STAFF_ADMINISTRATOR, StaffManager::STAFF_HEAD_ADMINISTRATOR])) {
+            $system->message("Not a moderator!");
+            $system->printMessage();
+            return false;
+        }
+
+        // Set date range
+        $date = new DateTimeImmutable("now", new DateTimeZone('Europe/London'));
+        $date = $date->modify("-$days days");
+        $time_stamp = $date->getTimestamp();
+
+        // Query staff logs
+        $action_result = $system->db->query("SELECT * FROM `staff_logs` WHERE `staff_id`='{$record_user['user_id']}' AND `time` >= $time_stamp ORDER BY `log_id` DESC");
+        if ($system->db->last_num_rows) {
+            while ($row = $system->db->fetch($action_result)) {
+                $staff_data['action_log'][] = $row;
+            }
+        }
+
+        // Query chat logs
+        $chat_result = $system->db->query("SELECT * FROM `chat` WHERE `user_id`='{$record_user['user_id']}' AND `time` >= $time_stamp ORDER BY `post_id` DESC");
+        if($system->db->last_num_rows) {
+            while($row = $system->db->fetch($chat_result)) {
+                $staff_data['chat_posts'][] = $row;
+            }
+        }
+
+        // Query report logs
+        $report_result = $system->db->query("SELECT * FROM `reports` WHERE `moderator_id`='{$record_user['user_id']}' AND `time` >= $time_stamp ORDER BY `report_id` DESC");
+        if($system->db->last_num_rows) {
+            while($row = $system->db->fetch($report_result)) {
+                $staff_data['reports_handled'][] = $row;
+            }
+        }
+
+        require 'templates/staff/mod/verbose_mod_stats.php';
+        return true;
     }
     //Main menu display [Mod panel rework complete -Hitori]
 	else if($display_menu) {
