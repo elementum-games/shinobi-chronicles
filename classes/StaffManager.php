@@ -163,7 +163,7 @@ class StaffManager {
                         $display .= " <em>Permanent</em>";
                     }
                     else {
-                        $display .= " ({$this->system->time_remaining($ban_end->time())})";
+                        $display .= " ({$this->system->time_remaining($ban_end - time())})";
                     }
 
                     $ban_displays[] = $display;
