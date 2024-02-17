@@ -25,9 +25,9 @@ export function VillageHQ({
 }) {
   const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
   const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
-  const [selectedTimesUTC, setSelectedTimesUTC] = React.useState([]);
-  const [selectedTimeUTC, setSelectedTimeUTC] = React.useState(null);
-  const [challengeTarget, setChallengeTarget] = React.useState(null);
+  const selectedTimesUTC = React.useRef([]);
+  const selectedTimeUTC = React.useRef(null);
+  const challengeTarget = React.useRef(null);
   const {
     openModal
   } = useModal();
@@ -116,13 +116,13 @@ export function VillageHQ({
     }
   }, [challengeSubmittedFlag]);
   const Challenge = target_seat => {
-    setChallengeTarget(target_seat);
+    challengeTarget.current = target_seat;
     openModal({
       header: 'Submit Challenge',
       text: "Select times below that you are available to battle.",
       ContentComponent: TimeGrid,
       componentProps: {
-        setSelectedTimesUTC: setSelectedTimesUTC,
+        selectedTimesUTC: selectedTimesUTC,
         startHourUTC: luxon.DateTime.fromObject({
           hour: 0,
           zone: luxon.Settings.defaultZoneName
@@ -134,13 +134,12 @@ export function VillageHQ({
   const ConfirmSubmitChallenge = () => {
     setChallengeSubmittedFlag(false);
     if (selectedTimesUTC.length < 12) {
-      console.log(selectedTimesUTC);
       openModal({
         header: 'Submit Challenge',
         text: "You must select at least 12 slots.",
         ContentComponent: TimeGrid,
         componentProps: {
-          setSelectedTimesUTC: setSelectedTimesUTC,
+          selectedTimesUTC: selectedTimesUTC,
           startHourUTC: luxon.DateTime.fromObject({
             hour: 0,
             zone: luxon.Settings.defaultZoneName
@@ -151,8 +150,8 @@ export function VillageHQ({
     } else {
       apiFetch(villageAPI, {
         request: 'SubmitChallenge',
-        seat_id: challengeTarget.seat_id,
-        selected_times: selectedTimesUTC
+        seat_id: challengeTarget.current.seat_id,
+        selected_times: selectedTimesUTC.current
       }).then(response => {
         if (response.errors.length) {
           handleErrors(response.errors);
@@ -192,14 +191,14 @@ export function VillageHQ({
     }
   }, [challengeAcceptedFlag]);
   const AcceptChallenge = target_challenge => {
-    setChallengeTarget(target_challenge);
+    challengeTarget.current = target_challenge;
     openModal({
       header: 'Accept Challenge',
       text: "Select a time slot below to accept the challenge.",
-      ContentComponent: TimeGrid,
+      ContentComponent: TimeGridResponse,
       componentProps: {
-        availableTimesUTC: JSON.parse(challengeTarget.selected_times),
-        setSelectedTimeUTC: setSelectedTimeUTC,
+        availableTimesUTC: JSON.parse(challengeTarget.current.selected_times),
+        selectedTimeUTC: selectedTimeUTC,
         startHourUTC: luxon.DateTime.utc().minute === 0 ? luxon.DateTime.utc().hour + 12 : (luxon.DateTime.utc().hour + 13) % 24
       },
       onConfirm: () => setChallengeAcceptedFlag(true)
@@ -211,10 +210,10 @@ export function VillageHQ({
       openModal({
         header: 'Accept Challenge',
         text: "Please verify that you have selected a time slot for the challenge.",
-        ContentComponent: TimeGrid,
+        ContentComponent: TimeGridResponse,
         componentProps: {
-          availableTimesUTC: JSON.parse(challengeTarget.selected_times),
-          setSelectedTimeUTC: setSelectedTimeUTC,
+          availableTimesUTC: JSON.parse(challengeTarget.current.selected_times),
+          selectedTimeUTC: selectedTimeUTC,
           startHourUTC: luxon.DateTime.utc().minute === 0 ? luxon.DateTime.utc().hour + 12 : (luxon.DateTime.utc().hour + 13) % 24
         },
         onConfirm: () => setChallengeAcceptedFlag(true)
@@ -222,8 +221,8 @@ export function VillageHQ({
     } else {
       apiFetch(villageAPI, {
         request: 'AcceptChallenge',
-        challenge_id: challengeTarget.request_id,
-        time: selectedTimeUTC
+        challenge_id: challengeTarget.current.request_id,
+        time: selectedTimeUTC.current
       }).then(response => {
         if (response.errors.length) {
           handleErrors(response.errors);
@@ -242,7 +241,7 @@ export function VillageHQ({
   const LockChallenge = target_challenge => {
     apiFetch(villageAPI, {
       request: 'LockChallenge',
-      challenge_id: challengeTarget.request_id
+      challenge_id: target_challenge.request_id
     }).then(response => {
       if (response.errors.length) {
         handleErrors(response.errors);
@@ -257,9 +256,6 @@ export function VillageHQ({
       });
     });
   };
-  const CancelChallengeSchedule = () => {
-    setSelectedTimesUTC([]);
-  };
   const totalPopulation = populationData.reduce((acc, rank) => acc + rank.count, 0);
   const kage = seatDataState.find(seat => seat.seat_type === 'kage');
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ChallengeContainer, {
@@ -267,7 +263,8 @@ export function VillageHQ({
     challengeDataState: challengeDataState,
     CancelChallenge: CancelChallenge,
     AcceptChallenge: AcceptChallenge,
-    LockChallenge: LockChallenge
+    LockChallenge: LockChallenge,
+    openModal: openModal
   }), /*#__PURE__*/React.createElement("div", {
     className: "hq_container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -568,7 +565,8 @@ export const ChallengeContainer = ({
   challengeDataState,
   CancelChallenge,
   AcceptChallenge,
-  LockChallenge
+  LockChallenge,
+  openModal
 }) => {
   return /*#__PURE__*/React.createElement(React.Fragment, null, challengeDataState.length > 0 && /*#__PURE__*/React.createElement("div", {
     className: "challenge_container"
@@ -675,7 +673,7 @@ export const ChallengeContainer = ({
   }))));
 };
 export const TimeGrid = ({
-  setSelectedTimesUTC,
+  selectedTimesUTC,
   startHourUTC = 0
 }) => {
   const [selectedTimes, setSelectedTimes] = React.useState([]);
@@ -699,7 +697,7 @@ export const TimeGrid = ({
       newSelectedTimes = [...selectedTimes, formattedTime];
     }
     setSelectedTimes(newSelectedTimes);
-    setSelectedTimesUTC(convertSlotsToUTC(newSelectedTimes));
+    selectedTimesUTC.current = convertSlotsToUTC(newSelectedTimes);
   }
   ;
   function convertSlotsToUTC(times) {
@@ -736,7 +734,7 @@ export const TimeGrid = ({
 };
 export const TimeGridResponse = ({
   availableTimesUTC,
-  setSelectedTimeUTC,
+  selectedTimeUTC,
   startHourUTC = 0
 }) => {
   const [selectedTime, setSelectedTime] = React.useState(null);
@@ -756,10 +754,10 @@ export const TimeGridResponse = ({
     const formattedTimeUTC = time.toUTC().toFormat('HH:mm');
     if (selectedTime === formattedTimeLocal) {
       setSelectedTime(null);
-      setSelectedTimeUTC(null);
+      selectedTimeUTC.current = null;
     } else if (availableTimesUTC.includes(formattedTimeUTC)) {
       setSelectedTime(formattedTimeLocal);
-      setSelectedTimeUTC(formattedTimeUTC);
+      selectedTimeUTC.current = formattedTimeUTC;
     }
   }
   ;
