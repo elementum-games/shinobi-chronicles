@@ -218,13 +218,11 @@ class VillageUpgradeManager {
     }
 
     /**
-     * @param System $system
      * @param Village $village
      * @return array<VillageUpgrade>
      */
     public static function checkResearchRequirementsMet(Village $village, string $upgrade_key): bool {
         self::initialize();
-        $effective_tier = 0;
         if (isset(VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key])) {
             $requirements = VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key];
             // check if the village has the required buildings
@@ -233,23 +231,25 @@ class VillageUpgradeManager {
                     if ($village->buildings[$building_key]->tier < $tier) {
                         return false;
                     }
-                    // use highest building tier as the effective tier for the upgrade
-                    if ($tier > $effective_tier) {
-                        $effective_tier = $tier;
-                    }
                 }
             }
             // check if the village has the required upgrades
             if (isset($requirements[VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES])) {
                 foreach ($requirements[VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES] as $required_upgrade_key) {
-                    if (!isset($village->upgrades[$required_upgrade_key]) || $village->upgrades[$required_upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
+                    $valid_status = [
+                        VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE,
+                        VillageUpgradeConfig::UPGRADE_STATUS_ACTIVATING,
+                        VillageUpgradeConfig::UPGRADE_STATUS_UNLOCKED,
+                        VillageUpgradeConfig::UPGRADE_STATUS_INACTIVE
+                    ];
+                    if (!isset($village->upgrades[$required_upgrade_key]) || !in_array($village->upgrades[$required_upgrade_key]->status, $valid_status)) {
                         return false;
                     }
                 }
             }
         }
         // check if village HQ is at least the same tier as the effective tier for the upgrade
-        if ($village->buildings[VillageBuildingConfig::BUILDING_VILLAGE_HQ]->tier < $effective_tier) {
+        if ($village->buildings[VillageBuildingConfig::BUILDING_VILLAGE_HQ]->tier < VillageUpgradeManager::$UPGRADE_CONFIGS[$upgrade_key]->getTier()) {
             return false;
         }
         return true;
