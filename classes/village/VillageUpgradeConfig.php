@@ -102,14 +102,14 @@ class VillageUpgradeConfig {
     const UPGRADE_KEY_FORTUNES_BOUNTY_I = 'FORTUNES_BOUNTY_I';
     const UPGRADE_KEY_FORTUNES_BOUNTY_II = 'FORTUNES_BOUNTY_II';
     const UPGRADE_KEY_FORTUNES_BOUNTY_III = 'FORTUNES_BOUNTY_III';
-    const UPGRADE_KEY_NEW_RECIPE_I = 'NEW_RECIPE_I';
+    const UPGRADE_KEY_INSPIRED_ITAMAE_I = 'INSPIRED_ITAMAE_I';
     const UPGRADE_KEY_QUALITY_INGREDIENTS_I = 'QUALITY_INGREDIENTS_I';
     const UPGRADE_KEY_QUALITY_INGREDIENTS_II = 'QUALITY_INGREDIENTS_II';
     const UPGRADE_KEY_QUALITY_INGREDIENTS_III = 'QUALITY_INGREDIENTS_III';
     const UPGRADE_KEY_NINJA_FRIENDLY_RATES_I = 'NINJA_FRIENDLY_RATES_I';
     const UPGRADE_KEY_NINJA_FRIENDLY_RATES_II = 'NINJA_FRIENDLY_RATES_II';
     const UPGRADE_KEY_NINJA_FRIENDLY_RATES_III = 'NINJA_FRIENDLY_RATES_III';
-    const UPGRADE_KEY_INSPIRED_ITAMAE_I = 'INSPIRED_ITAMAE_I';
+    const UPGRADE_KEY_INSPIRED_ITAMAE_II = 'INSPIRED_ITAMAE_II';
     const UPGRADE_KEY_LUCK_IN_LEFTOVERS_I = 'LUCK_IN_LEFTOVERS_I';
     const UPGRADE_KEY_LUCK_IN_LEFTOVERS_II = 'LUCK_IN_LEFTOVERS_II';
 
@@ -190,14 +190,14 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I,
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II,
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III,
-        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I,
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I,
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II,
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I,
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II,
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III,
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I,
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II,
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III,
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I,
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I,
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II,
     ];
@@ -358,14 +358,14 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => 1,
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => 2,
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => 2,
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => 1,
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => 2,
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => 3,
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => 1,
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => 2,
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => 3,
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 1,
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => 2,
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => 3
     ];
@@ -447,14 +447,14 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => 'Fortunes Bounty I',
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => 'Fortunes Bounty II',
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => 'Fortunes Bounty III',
-        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => 'New Recipe I',
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 'Inspired Itamae I',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => 'Quality Ingredients I',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => 'Quality Ingredients II',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => 'Quality Ingredients III',
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => 'Ninja Friendly Rates I',
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => 'Ninja Friendly Rates II',
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => 'Ninja Friendly Rates III',
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 'Inspired Itamae I',
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => 'Inspired Itamae II',
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => 'Luck In Leftovers I',
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => 'Luck In Leftovers II',
     ];
@@ -536,14 +536,14 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => '+5% chance for double yen gains from battle',
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => '+5% chance for double yen gains from battle',
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => '+5% chance for double yen gains from battle',
-        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => 'Unlocks new ramen recipes',
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 'Unlocks new ramen recipes',
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => 'Allows Mystery Ramen to appear',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => '+5 minutes to ramen buff duration',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => '+5 minutes to ramen duration',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => '+5 minutes to ramen duration',
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => '5% decreased ramen cost',
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => '5% decreased ramen cost',
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => '5% decreased ramen cost',
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 'Allows Mystery Ramen to appear (5%)',
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => '+5% chance for Mystery Ramen to appear',
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => '+5% chance for Mystery Ramen to appear',
     ];
@@ -925,7 +925,12 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
             WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => [
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
+            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => [
             WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
             WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2,
             WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5,
@@ -959,11 +964,6 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 0.5,
             WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
             WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 1.5,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => [
             WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5,
@@ -1054,14 +1054,14 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => self::BASE_T1_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II => self::BASE_T2_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => self::BASE_T1_RESEARCH_TIME_DAYS,
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => self::BASE_T1_RESEARCH_TIME_DAYS,
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => self::BASE_T2_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => self::BASE_T1_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => self::BASE_T2_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => self::BASE_T3_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => self::BASE_T1_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => self::BASE_T2_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => self::BASE_T1_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => self::BASE_T2_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => self::BASE_T3_RESEARCH_TIME_DAYS,
     ];
@@ -1643,11 +1643,19 @@ class VillageUpgradeConfig {
                 VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II
             ],
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => [
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
                 VillageBuildingConfig::BUILDING_RAMEN_STAND => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+            ],
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => [
+            VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
+                VillageBuildingConfig::BUILDING_RAMEN_STAND => 2
+            ],
+            VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => [
@@ -1655,6 +1663,7 @@ class VillageUpgradeConfig {
                 VillageBuildingConfig::BUILDING_RAMEN_STAND => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => [
@@ -1696,19 +1705,12 @@ class VillageUpgradeConfig {
                 VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II
             ],
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
-            VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_RAMEN_STAND => 1
-            ],
-            VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-            ],
-        ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
                 VillageBuildingConfig::BUILDING_RAMEN_STAND => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
-                VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I
+                VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II => [
@@ -2098,7 +2100,12 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
             WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => [
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
+            WarManager::RESOURCE_MATERIALS => 0,
+            WarManager::RESOURCE_FOOD => 0,
+            WarManager::RESOURCE_WEALTH => 0,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => [
             WarManager::RESOURCE_MATERIALS => 0,
             WarManager::RESOURCE_FOOD => 0,
             WarManager::RESOURCE_WEALTH => 0,
@@ -2132,11 +2139,6 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST * 0.5,
             WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
             WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST * 2,
-        ],
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
-            WarManager::RESOURCE_MATERIALS => 0,
-            WarManager::RESOURCE_FOOD => 0,
-            WarManager::RESOURCE_WEALTH => 0,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => [
             WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST * 0.5,
@@ -2384,7 +2386,7 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III => [
             VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE => 5
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I => [
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
             VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_SET_ONE => 1
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => [
@@ -2405,7 +2407,7 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => [
             VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST => 5
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
+        VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => [
             VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_ENABLED => 1
         ],
         VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I => [

@@ -357,10 +357,10 @@ class VillageBuildingConfig {
     const UPGRADE_SET_KEY_WAREHOUSES = 'WAREHOUSES';
     const UPGRADE_SET_KEY_ANCESTRAL_LEGACY = 'ANCESTRAL_LEGACY';
     const UPGRADE_SET_KEY_FORTUNES_BOUNTY = 'FORTUNES_BOUNTY';
-    const UPGRADE_SET_KEY_NEW_RECIPE = 'NEW_RECIPE';
+    const UPGRADE_SET_KEY_INSPIRED_ITAMAE = 'INSPIRED ITAMAE';
+    const UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES = 'NINJA_FRIENDLY_RATES';
     const UPGRADE_SET_KEY_QUALITY_INGREDIENTS = 'QUALITY_INGREDIENTS';
-    const UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES = 'SHINOBI_DISCOUNT';
-    const UPGRADE_SET_KEY_INSPIRED_ITAMAE = 'LUCK_IN_LEFTOVERS';
+    const UPGRADE_SET_KEY_LUCK_IN_LEFTOVERS = 'LUCK_IN_LEFTOVERS';
 
     /* upgrade sets for each building, indexed by building key */
     const BUILDING_UPGRADE_SETS = [
@@ -402,10 +402,10 @@ class VillageBuildingConfig {
             self::UPGRADE_SET_KEY_FORTUNES_BOUNTY,
         ],
         self::BUILDING_RAMEN_STAND => [
-            self::UPGRADE_SET_KEY_NEW_RECIPE,
-            self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS,
-            self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES,
             self::UPGRADE_SET_KEY_INSPIRED_ITAMAE,
+            self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES,
+            self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS,
+            self::UPGRADE_SET_KEY_LUCK_IN_LEFTOVERS,
         ],
     ];
 
@@ -436,10 +436,10 @@ class VillageBuildingConfig {
         self::UPGRADE_SET_KEY_WAREHOUSES => 'Warehouses',
         self::UPGRADE_SET_KEY_ANCESTRAL_LEGACY => 'Ancestral Legacy',
         self::UPGRADE_SET_KEY_FORTUNES_BOUNTY => 'Fortune\'s Bounty',
-        self::UPGRADE_SET_KEY_NEW_RECIPE => 'New Recipe',
-        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => 'Quality Ingredients',
-        self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES => 'Ninja Friendly Rates',
         self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => 'Inspired Itamae',
+        self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES => 'Ninja Friendly Rates',
+        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => 'Quality Ingredients',
+        self::UPGRADE_SET_KEY_LUCK_IN_LEFTOVERS => 'Luck in Leftovers',
     ];
 
     /* upgrade set descriptions, indexed by upgrade set key */
@@ -469,10 +469,10 @@ class VillageBuildingConfig {
         self::UPGRADE_SET_KEY_WAREHOUSES => "Increases maximum resource capacity.",
         self::UPGRADE_SET_KEY_ANCESTRAL_LEGACY => "Increases chance of obtaining a bloodline.",
         self::UPGRADE_SET_KEY_FORTUNES_BOUNTY => "Chance for double yen gains from battle.",
-        self::UPGRADE_SET_KEY_NEW_RECIPE => "Unlocks new ramen recipes.",
-        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => "Increases duration of ramen buffs.",
+        self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => "Unlocks new ramen recipes.",
         self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES => "Decreases cost of ramen.",
-        self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => "Increases chance of Mystery Ramen appearing.",
+        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => "Increases duration of ramen buffs.",
+        self::UPGRADE_SET_KEY_LUCK_IN_LEFTOVERS => "Increases chance of Mystery Ramen appearing.",
     ];
 
     /* upgrade set upgrades, indexed by upgrade set key */
@@ -601,21 +601,21 @@ class VillageBuildingConfig {
             VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II,
             VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III,
         ],
-        self::UPGRADE_SET_KEY_NEW_RECIPE => [
-            VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I,
-        ],
-        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => [
-            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I,
-            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II,
-            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III,
+        self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => [
+            VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I,
+            VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II,
         ],
         self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES => [
             VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I,
             VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II,
             VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III,
         ],
-        self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => [
-            VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I,
+        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => [
+            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I,
+            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II,
+            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III,
+        ],
+        self::UPGRADE_SET_KEY_LUCK_IN_LEFTOVERS => [
             VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I,
             VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II,
         ],
