@@ -75,16 +75,16 @@ $RANK_NAMES = RankManager::fetchNames($system);
                 <?php if($jutsu->use_type == Jutsu::USE_TYPE_BARRIER): ?>
                     Barrier
                 <?php else: ?>
-                    <?= System::unSlug($jutsu->effects[0]->effect) ?><br />
+                    <?= System::unSlug($jutsu->effects[0]->effect) ?>
                     <?php if($jutsu->effects[0]->effect !== 'none'): ?>
                         (<?= $jutsu->effects[0]->effect_amount ?>% / <?= $jutsu->effects[0]->effect_length ?> turns)
                     <?php endif; ?>
                 <?php endif; ?>
             </td>
             <td>
-                <?= System::unSlug($jutsu->effects[1]->effect) ?><br />
+                <?= System::unSlug($jutsu->effects[1]->effect) ?>
                 <?php if ($jutsu->effects[1]->effect !== 'none'): ?>
-                    (<?= $jutsu->effects[1]->effect_amount ?>% / <?= $jutsu->effects[1]->effect_length ?> turns)
+                            (<?= $jutsu->effects[1]->effect_amount ?>% / <?= $jutsu->effects[1]->effect_length ?> turns)
                 <?php endif; ?>
             </td>
             <td><?= ucwords($jutsu->element) ?></td>
