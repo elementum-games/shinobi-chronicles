@@ -703,10 +703,14 @@ class StaffManager {
                     $tools = ['edit_ai', 'edit_jutsu', 'edit_item', 'edit_bloodline', 'edit_mission', 'edit_clan'];
                 }
                 return $tools ?? array();
+            case 'user_tools':
+                if($this->isUserAdmin() || $permission_check) {
+                    $tools = ['edit_user', 'activate_user', 'stat_cut', 'give_bloodline', 'delete_user', 'dev_tools', 'reset_password'];
+                }
+                return $tools ?? array();
             case 'misc_tools':
                 if($this->isUserAdmin() || $permission_check) {
-                    $tools = ['create_rank', 'edit_user', 'activate_user', 'stat_cut', 'staff_payments', 'give_bloodline',
-                        'edit_rank', 'edit_team', 'delete_user', 'dev_tools', 'manual_transaction', 'logs', 'reset_password', 'server_maint'];
+                    $tools = ['create_rank', 'edit_rank', 'staff_payments', 'manual_transaction', 'edit_team', 'logs', 'server_maint'];
                 }
                 return $tools ?? array();
             default:
