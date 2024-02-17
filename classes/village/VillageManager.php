@@ -2372,7 +2372,7 @@ class VillageManager {
     /**
      * @return string
      */
-    public static function createboostConstructionProposal(System $system, User $player, string $building_key): string {
+    public static function createBoostConstructionProposal(System $system, User $player, string $building_key): string {
         // check player permissions
         $seat = $player->village_seat;
         if ($seat->seat_type != "kage") {
