@@ -3,6 +3,7 @@
 require_once __DIR__ . '/WarLogDto.php';
 require_once __DIR__ . '/../village/VillageRelation.php';
 require_once __DIR__ . '/WarRecordDto.php';
+require_once __DIR__ . '/WarManager.php';
 
 class WarLogManager {
     const WAR_LOG_INFILTRATE = 'infiltrate_count';
@@ -283,7 +284,7 @@ class WarLogManager {
             $war_log_result['village_name'] = VillageManager::VILLAGE_NAMES[$war_log_result['village_id']];
             $defender_war_log = new WarLogDto($war_log_result, self::WAR_LOG_TYPE_VILLAGE);
             self::calculateWarScore($defender_war_log);
-            $war_records[] = new WarRecordDto($relation, $attacker_war_log, $defender_war_log);
+            $war_records[] = new WarRecordDto($relation, $attacker_war_log, $defender_war_log, WarManager::getVictoryPercentRequired($system, $relation));
         }
         // pagination
         $war_records = array_slice($war_records, ($page_number - 1) * self::WAR_RECORDS_PER_PAGE, self::WAR_RECORDS_PER_PAGE);

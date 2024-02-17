@@ -450,9 +450,15 @@ export function WarTable({
     getVillageBanner
   }) {
     const is_active = record.village_relation.relation_end ? false : true;
+    function calculateBarPercent() {
+      let victory_percent_required = record.victory_percent_required;
+      victory_percent_required = victory_percent_required / 100;
+      return 100 * (1 + victory_percent_required) / (2 + victory_percent_required);
+    }
     const renderScoreBar = () => {
       const total_score = record.attacker_war_log.war_score + record.defender_war_log.war_score;
       const attacker_score_percentage = Math.round(record.attacker_war_log.war_score / total_score * 100);
+      const victory_bar_percentage = calculateBarPercent();
       return /*#__PURE__*/React.createElement("div", {
         className: "war_record_score_bar"
       }, /*#__PURE__*/React.createElement("div", {
@@ -507,6 +513,34 @@ export function WarTable({
       }), /*#__PURE__*/React.createElement("feMergeNode", {
         in: "SourceGraphic"
       })))), /*#__PURE__*/React.createElement("polygon", {
+        points: "0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0",
+        fill: "url(#war_record_score_divider_gradient)",
+        stroke: "#4d401c",
+        strokeWidth: "20"
+      })), /*#__PURE__*/React.createElement("svg", {
+        className: "war_record_score_divider",
+        viewBox: "0 0 200 200",
+        width: "7",
+        height: "7",
+        style: {
+          paddingBottom: "1px",
+          left: victory_bar_percentage + "%"
+        }
+      }, /*#__PURE__*/React.createElement("polygon", {
+        points: "0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0",
+        fill: "url(#war_record_score_divider_gradient)",
+        stroke: "#4d401c",
+        strokeWidth: "20"
+      })), /*#__PURE__*/React.createElement("svg", {
+        className: "war_record_score_divider",
+        viewBox: "0 0 200 200",
+        width: "7",
+        height: "7",
+        style: {
+          paddingBottom: "1px",
+          left: 100 - victory_bar_percentage + "%"
+        }
+      }, /*#__PURE__*/React.createElement("polygon", {
         points: "0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0",
         fill: "url(#war_record_score_divider_gradient)",
         stroke: "#4d401c",

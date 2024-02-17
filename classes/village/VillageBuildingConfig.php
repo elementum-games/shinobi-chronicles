@@ -10,12 +10,12 @@ class VillageBuildingConfig {
     const BUILDING_STATUS_REPAIRING = 'repairing'; // used when repairing damage, currently unused
 
     /* base values used for upgrade configuration */
-    const BASE_T1_CONSTRUCTION_COST_TOTAL = 21600;
+    const BASE_T1_CONSTRUCTION_COST_TOTAL = 14400;
     const BASE_T2_CONSTRUCTION_COST_TOTAL = 108000;
     const BASE_T3_CONSTRUCTION_COST_TOTAL = 540000;
-    const BASE_T1_CONSTRUCTION_TIME_DAYS = 3;
-    const BASE_T2_CONSTRUCTION_TIME_DAYS = 15;
-    const BASE_T3_CONSTRUCTION_TIME_DAYS = 75;
+    const BASE_T1_CONSTRUCTION_TIME_DAYS = 4;
+    const BASE_T2_CONSTRUCTION_TIME_DAYS = 12;
+    const BASE_T3_CONSTRUCTION_TIME_DAYS = 36;
     const BASE_T0_MAX_HEALTH = 125000;
     const BASE_T1_MAX_HEALTH = 250000;
     const BASE_T2_MAX_HEALTH = 500000;
@@ -151,36 +151,36 @@ class VillageBuildingConfig {
     const BUILDING_CONSTRUCTION_COST = [
         self::BUILDING_VILLAGE_HQ => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.5,
-                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2,
-                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.5 * 1.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3 * 1.5,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.5,
-                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2,
-                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.5 * 1.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3 * 1.5,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.5,
-                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2,
-                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.5 * 1.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3 * 1.5,
             ],
         ],
         self::BUILDING_WORKSHOP => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.6,
-                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2,
-                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.6 * 1.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.6,
-                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2,
-                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.6 * 1.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.6,
-                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2,
-                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.6 * 1.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
             ],
         ],
         self::BUILDING_ACADEMY => [
@@ -253,36 +253,36 @@ class VillageBuildingConfig {
         ],
         self::BUILDING_SHRINE => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.4,
-                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3,
-                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.4 * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3 * 0.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3 * 0.5,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.4,
-                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3,
-                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.4 * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3 * 0.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3 * 0.5,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.4,
-                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3,
-                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.4 * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3 * 0.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3 * 0.5,
             ],
         ],
         self::BUILDING_RAMEN_STAND => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2,
-                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.6,
-                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2 * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.6 * 0.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2 * 0.5,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2,
-                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.6,
-                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2 * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.6 * 0.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2 * 0.5,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2,
-                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.6,
-                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2 * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.6 * 0.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2 * 0.5,
             ],
         ],
     ];
@@ -290,14 +290,14 @@ class VillageBuildingConfig {
     /* construction time indexed by building key, then tier */
     const BUILDING_CONSTRUCTION_TIME = [
         self::BUILDING_VILLAGE_HQ => [
-            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS,
-            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS,
-            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS,
+            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS * 1.5,
+            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS * 1.5,
+            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS * 1.5,
         ],
         self::BUILDING_WORKSHOP => [
-            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS,
-            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS,
-            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS,
+            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS * 1.5,
+            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS * 1.5,
+            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS * 1.5,
         ],
         self::BUILDING_ACADEMY => [
             1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS,
@@ -320,14 +320,14 @@ class VillageBuildingConfig {
             3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS,
         ],
         self::BUILDING_SHRINE => [
-            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS,
-            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS,
-            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS,
+            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS * 0.5,
+            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS * 0.5,
+            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS * 0.5,
         ],
         self::BUILDING_RAMEN_STAND => [
-            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS,
-            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS,
-            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS,
+            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS * 0.5,
+            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS * 0.5,
+            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS * 0.5,
         ],
     ];
 
