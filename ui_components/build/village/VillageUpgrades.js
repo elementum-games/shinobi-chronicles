@@ -879,7 +879,7 @@ export function VillageUpgrades({
       className: "upgrade_item_inner"
     }, /*#__PURE__*/React.createElement("div", {
       className: "upgrade_tier"
-    }, romanize(index + 1))))));
+    }, romanize(upgrade.tier))))));
     const renderUpgradeDetails = () => {
       const research_progress_percent = selectedUpgrade.research_progress / selectedUpgrade.research_progress_required * 100;
       return /*#__PURE__*/React.createElement("div", {

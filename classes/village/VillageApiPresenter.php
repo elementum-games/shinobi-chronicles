@@ -245,6 +245,7 @@ class VillageApiPresenter {
                                             "research_progress_last_updated" => $villageUpgradeDto->research_progress_last_updated,
                                             "research_boosted" => $villageUpgradeDto->research_boosted,
                                             "name" => $villageUpgradeDto->name,
+                                            "tier" => $villageUpgradeDto->tier,
                                             "description" => $villageUpgradeDto->description,
                                             "materials_research_cost" => $villageUpgradeDto->materials_research_cost,
                                             "food_research_cost" => $villageUpgradeDto->food_research_cost,

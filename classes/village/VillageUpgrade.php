@@ -15,6 +15,9 @@ class VillageUpgrade {
     public function getName(): string {
         return $this->config_data->getName();
     }
+    public function getTier(): int {
+        return $this->config_data->getTier();
+    }
     public function getDescription(): string {
         return $this->config_data->getDescription();
     }

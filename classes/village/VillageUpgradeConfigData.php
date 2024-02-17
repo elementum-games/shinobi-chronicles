@@ -5,6 +5,7 @@ class VillageUpgradeConfigData {
         private string $key,
         private string $name,
         private string $description,
+        private int $tier,
         private int $materials_research_cost,
         private int $food_research_cost,
         private int $wealth_research_cost,
@@ -23,6 +24,9 @@ class VillageUpgradeConfigData {
     }
     public function getDescription(): string {
         return $this->description;
+    }
+    public function getTier(): int {
+        return $this->tier;
     }
     public function getResearchTime(): int {
         return $this->research_time;
