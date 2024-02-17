@@ -12,6 +12,8 @@ require_once __DIR__ . "/VillageUpgradeConfigData.php";
 
 class VillageUpgradeManager {
     const UPGRADE_ACTIVATION_TIME_DAYS = 3; // time in days to activate an upgrade
+    const BOOST_CONSTRUCTION_POINT_COST_PER_HOUR = 5; // cost in points her hour saved
+    const BOOST_RESEARCH_POINT_COST_PER_HOUR = 5; // cost in points her hour saved
 
     public static $UPGRADE_CONFIGS = array();
     public static $BUILDING_CONFIGS = array();
@@ -80,6 +82,7 @@ class VillageUpgradeManager {
                 construction_progress: $building['construction_progress'],
                 construction_progress_required: $building['construction_progress_required'],
                 construction_progress_last_updated: $building['construction_progress_last_updated'],
+                construction_boosted: $building['construction_boosted'],
                 config_data: self::$BUILDING_CONFIGS[$building['key']],
             );
         }
@@ -107,6 +110,7 @@ class VillageUpgradeManager {
                 research_progress: $upgrade['research_progress'],
                 research_progress_required: $upgrade['research_progress_required'],
                 research_progress_last_updated: $upgrade['research_progress_last_updated'],
+                research_boosted: $upgrade['research_boosted'],
                 config_data: self::$UPGRADE_CONFIGS[$upgrade['key']],
             );
         }
@@ -159,6 +163,7 @@ class VillageUpgradeManager {
                         research_progress: $upgrade ? $upgrade->research_progress : null,
                         research_progress_required: $upgrade ? $upgrade->research_progress_required : null,
                         research_progress_last_updated: $upgrade ? $upgrade->research_progress_last_updated : null,
+                        research_boosted: $upgrade ? $upgrade->research_boosted : false,
                         research_time_remaining: $upgrade ? System::TimeRemaining($upgrade->research_progress_required - $upgrade->research_progress, format: "long", include_seconds: false, include_minutes: false) : '',
                         name: $upgrade_config_data->getName(),
                         description: $upgrade_config_data->getDescription(),
@@ -193,6 +198,7 @@ class VillageUpgradeManager {
                 construction_progress: $building->construction_progress,
                 construction_progress_required: $building->construction_progress_required,
                 construction_progress_last_updated: $building->construction_progress_last_updated,
+                construction_boosted: $building->construction_boosted,
                 name: $building->getName(),
                 description: $building->getDescription(),
                 phrase: $building->getPhrase(),
@@ -402,6 +408,7 @@ class VillageUpgradeManager {
                 research_progress: 0,
                 research_progress_required: $progress_required,
                 research_progress_last_updated: time(),
+                research_boosted: false,
                 config_data: self::$UPGRADE_CONFIGS[$upgrade_key],
             );
             $village->upgrades[$upgrade_key] = $new_upgrade;
@@ -595,5 +602,81 @@ class VillageUpgradeManager {
             $upkeep[WarManager::RESOURCE_WEALTH] += $building_upkeep[WarManager::RESOURCE_WEALTH];
         }
         return $upkeep;
+    }
+
+    /**
+     * @param System $system
+     * @param Village $village
+     * @param string $building_key
+     * @return int
+     */
+    public static function calcBoostConstructionCost(System $system, Village $village, $building_key): int {
+        self::initialize();
+        $remaining_construction_time = $village->buildings[$building_key]->construction_progress_required - $village->buildings[$building_key]->construction_progress;
+        return ceil(VillageUpgradeManager::BOOST_CONSTRUCTION_POINT_COST_PER_HOUR * ($remaining_construction_time / 3600 / 2));
+    }
+
+    public static function calcBoostResearchCost(System $system, Village $village, $upgrade_key): int {
+        self::initialize();
+        $remaining_research_time = $village->upgrades[$upgrade_key]->research_progress_required - $village->upgrades[$upgrade_key]->research_progress;
+        return ceil(VillageUpgradeManager::BOOST_RESEARCH_POINT_COST_PER_HOUR * ($remaining_research_time / 3600 / 2));
+    }
+
+    /**
+     * @param System $system
+     * @param Village $village
+     * @param string $building_key
+     * #throws RuntimeException
+     * @return string
+     */
+    public static function boostConstruction(System $system, Village $village, string $building_key): string {
+        self::initialize();
+        // check if the building is under construction
+        if ($village->buildings[$building_key]->status != VillageBuildingConfig::BUILDING_STATUS_UPGRADING) {
+            throw new RuntimeException("Building is not under construction!");
+        }
+        // check if the village has enough points
+        $points_cost = VillageUpgradeManager::calcBoostConstructionCost($system, $village, $building_key);
+        if ($village->points < $points_cost) {
+            throw new RuntimeException("Not enough points!");
+        }
+        // update village points
+        $village->subtractPoints($points_cost);
+        $village->updatePoints();
+        // update building data
+        $village->buildings[$building_key]->construction_boosted = true;
+        $village->buildings[$building_key]->construction_progress_last_updated = time();
+        // reduce remaining construction time required by 50%
+        $remaining_construction_time = $village->buildings[$building_key]->construction_progress_required - $village->buildings[$building_key]->construction_progress;
+        $village->buildings[$building_key]->construction_progress_required = $village->buildings[$building_key]->construction_progress + ($remaining_construction_time / 2);
+        // update village buildings table
+        $system->db->query("UPDATE `village_buildings` SET `construction_boosted` = 1, `construction_progress_last_updated` = " . time() . ", `construction_progress_required` = " . $village->buildings[$building_key]->construction_progress_required . " WHERE `id` = {$village->buildings[$building_key]->id}");
+        return "Construction boosted for " . VillageBuildingConfig::BUILDING_NAMES[$building_key] . "!";
+    }
+
+    public static function boostResearch(System $system, Village $village, string $upgrade_key): string {
+        self::initialize();
+        // check if the upgrade exists and is under research
+        if (isset($village->upgrades[$upgrade_key]) && $village->upgrades[$upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING) {
+            throw new RuntimeException("Upgrade is not under research!");
+        }
+        // check if the village has enough points
+        $points_cost = VillageUpgradeManager::calcBoostResearchCost($system, $village, $upgrade_key);
+        if ($village->points < $points_cost) {
+            throw new RuntimeException("Not enough points!");
+        }
+        // update village points
+        $village->subtractPoints($points_cost);
+        $village->updatePoints();
+        // log expenditure in resource_logs table
+        // update upgrade data
+        $village->upgrades[$upgrade_key]->research_boosted = true;
+        $village->upgrades[$upgrade_key]->research_progress_last_updated = time();
+        // reduce remaining research time required by 50%
+        $remaining_research_time = $village->upgrades[$upgrade_key]->research_progress_required - $village->upgrades[$upgrade_key]->research_progress;
+        $village->upgrades[$upgrade_key]->research_progress_required = $village->upgrades[$upgrade_key]->research_progress + ($remaining_research_time / 2);
+        // update village upgrades table
+        $system->db->query("UPDATE `village_upgrades` SET `research_boosted` = 1, `research_progress_last_updated` = " . time() . ", `research_progress_required` = " . $village->upgrades[$upgrade_key]->research_progress_required . " WHERE `id` = {$village->upgrades[$upgrade_key]->id}");
+        return "Research boosted for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
     }
 }

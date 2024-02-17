@@ -153,8 +153,8 @@ export function VillageUpgrades({
         return;
       }
       setBuildingUpgradeDataState(response.data.buildingUpgradeData);
-      setSelectedUpgrade(null);
       setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
+      setSelectedUpgrade(null);
       openModal({
         header: 'Confirmation',
         text: response.data.response_message,
@@ -173,8 +173,8 @@ export function VillageUpgrades({
         return;
       }
       setBuildingUpgradeDataState(response.data.buildingUpgradeData);
-      setSelectedUpgrade(null);
       setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
+      setSelectedUpgrade(null);
       openModal({
         header: 'Confirmation',
         text: response.data.response_message,
@@ -193,8 +193,80 @@ export function VillageUpgrades({
         return;
       }
       setBuildingUpgradeDataState(response.data.buildingUpgradeData);
-      setSelectedUpgrade(null);
       setSelectedBuilding(response.data.buildingUpgradeData.find(b => b.key === selectedBuilding.key));
+      setSelectedUpgrade(null);
+      openModal({
+        header: 'Confirmation',
+        text: response.data.response_message,
+        ContentComponent: null,
+        onConfirm: null
+      });
+    });
+  };
+  const CheckBoostConstruction = () => {
+    apiFetch(villageAPI, {
+      request: 'GetConstructionBoostCost',
+      building_key: selectedBuilding.key
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      openModal({
+        header: 'Confirmation',
+        text: "Boosting the construction of this building will cost " + response.data.response_message + " Village Points",
+        ContentComponent: null,
+        onConfirm: () => BoostConstruction()
+      });
+    });
+  };
+  const CheckBoostResearch = () => {
+    apiFetch(villageAPI, {
+      request: 'GetResearchBoostCost',
+      upgrade_key: selectedUpgrade.key
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      openModal({
+        header: 'Confirmation',
+        text: "Boosting the research of this upgrade will cost " + response.data.response_message + " Village Points",
+        ContentComponent: null,
+        onConfirm: () => BoostResearch()
+      });
+    });
+  };
+  const BoostConstruction = () => {
+    apiFetch(villageAPI, {
+      request: 'CreateProposal',
+      type: 'boost_construction',
+      building_key: selectedBuilding.key
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      setProposalDataState(response.data.proposalData);
+      openModal({
+        header: 'Confirmation',
+        text: response.data.response_message,
+        ContentComponent: null,
+        onConfirm: null
+      });
+    });
+  };
+  const BoostResearch = () => {
+    apiFetch(villageAPI, {
+      request: 'CreateProposal',
+      type: 'boost_research',
+      upgrade_key: selectedUpgrade.key
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      setProposalDataState(response.data.proposalData);
       openModal({
         header: 'Confirmation',
         text: response.data.response_message,
@@ -760,25 +832,30 @@ export function VillageUpgrades({
     }), /*#__PURE__*/React.createElement("span", null, selectedBuilding.construction_time, " ", selectedBuilding.construction_time > 1 || selectedBuilding.construction_time == 0 ? " days" : " day"))), /*#__PURE__*/React.createElement("div", {
       className: "building_buttons_container"
     }, selectedBuilding.status === "default" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, !!selectedBuilding.requirements_met && current_materials > selectedBuilding.materials_construction_cost && current_food > selectedBuilding.food_construction_cost && current_wealth > selectedBuilding.wealth_construction_cost ? /*#__PURE__*/React.createElement("div", {
-      className: "construction_begin_button",
+      className: "construction_begin_button upgrades_control_button",
       onClick: () => openModal({
         header: 'Confirmation',
-        text: "sometext?",
+        text: "Are you sure you want to begin construction of " + selectedBuilding.name + "?\nYou may only have one building under construction at a time.",
         ContentComponent: null,
         onConfirm: () => BeginConstruction()
       })
     }, "build") : /*#__PURE__*/React.createElement("div", {
-      className: "construction_begin_button disabled"
+      className: "construction_begin_button  upgrades_control_button disabled"
     }, "build")), selectedBuilding.status === "upgrading" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-      className: "construction_cancel_button",
+      className: "construction_cancel_button upgrades_control_button",
       onClick: () => openModal({
         header: 'Confirmation',
-        text: "sometext?",
+        text: "Are you sure you want to cancel construction of " + selectedBuilding.name + "?\nExisting progress toward construction will be saved.",
         ContentComponent: null,
         onConfirm: () => CancelConstruction()
       })
-    }, "cancel")), selectedBuilding.health < selectedBuilding.max_health && playerSeatState.seat_type === "kage" ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-      className: "repair_begin_button",
+    }, "cancel"), selectedBuilding.construction_boosted ? /*#__PURE__*/React.createElement("div", {
+      className: "construction_boost_button upgrades_control_button",
+      onClick: () => CheckBoostConstruction()
+    }, "boost") : /*#__PURE__*/React.createElement("div", {
+      className: "construction_boost_button upgrades_control_button disabled"
+    }, "boost")), selectedBuilding.status !== "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, selectedBuilding.health < selectedBuilding.max_health && playerSeatState.seat_type === "kage" ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+      className: "repair_begin_button upgrades_control_button",
       onClick: () => openModal({
         header: 'Confirmation',
         text: "sometext?",
@@ -786,8 +863,8 @@ export function VillageUpgrades({
         onConfirm: () => BeginRepairs()
       })
     }, "repair")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-      className: "repair_begin_button disabled"
-    }, "repair"))))))));
+      className: "repair_begin_button upgrades_control_button disabled"
+    }, "repair")))))))));
   };
   const renderUpgradesContainer = () => {
     const renderUpgradeItems = upgrade_set => upgrade_set.upgrades.map((upgrade, index) => /*#__PURE__*/React.createElement("div", {
@@ -816,44 +893,49 @@ export function VillageUpgrades({
       }, /*#__PURE__*/React.createElement("div", {
         className: "upgrade_buttons_container"
       }, !!selectedUpgrade.requirements_met && selectedUpgrade.status === "locked" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-        className: "research_begin_button",
+        className: "research_begin_button upgrades_control_button",
         onClick: () => openModal({
           header: 'Confirmation',
-          text: "sometext?",
+          text: "Are you sure you want to begin research for " + selectedUpgrade.name + "?\nYou may only have one upgrade under research at a time.",
           ContentComponent: null,
           onConfirm: () => BeginResearch()
         })
       }, "research")), !!!selectedUpgrade.requirements_met && selectedUpgrade.status === "locked" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-        className: "research_begin_button disabled"
+        className: "research_begin_button upgrades_control_button disabled"
       }, "research")), selectedUpgrade.status === "researching" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-        className: "research_cancel_button",
+        className: "research_cancel_button upgrades_control_button",
         onClick: () => openModal({
           header: 'Confirmation',
-          text: "sometext?",
+          text: "Are you sure you want to cancel research for " + selectedUpgrade.name + "?\nExisting progress toward research will be saved.",
           ContentComponent: null,
           onConfirm: () => CancelResearch()
         })
-      }, "cancel")), selectedUpgrade.status === "inactive" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-        className: "upgrade_toggle_on_button",
+      }, "cancel"), selectedUpgrade.research_boosted ? /*#__PURE__*/React.createElement("div", {
+        className: "research_boost_button upgrades_control_button disabled"
+      }, "boost") : /*#__PURE__*/React.createElement("div", {
+        className: "research_boost_button upgrades_control_button",
+        onClick: () => CheckBoostResearch()
+      }, "boost")), selectedUpgrade.status === "inactive" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+        className: "upgrade_toggle_on_button upgrades_control_button",
         onClick: () => openModal({
           header: 'Confirmation',
-          text: "sometext?",
+          text: "Activating " + selectedUpgrade.name + " will take 3 days and require upkeep during the activation period.",
           ContentComponent: null,
           onConfirm: () => ActivateUpgrade()
         })
       }, "activate")), selectedUpgrade.status === "active" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-        className: "upgrade_toggle_off_button",
+        className: "upgrade_toggle_off_button upgrades_control_button",
         onClick: () => openModal({
           header: 'Confirmation',
-          text: "sometext?",
+          text: "Are you sure you want to deactivate " + selectedUpgrade.name + "?\nUpkeep will be disabled and reactivation will take 3 days.",
           ContentComponent: null,
           onConfirm: () => DeactivateUpgrade()
         })
       }, "deactivate")), selectedUpgrade.status === "activating" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-        className: "upgrade_toggle_off_button",
+        className: "upgrade_toggle_off_button upgrades_control_button",
         onClick: () => openModal({
           header: 'Confirmation',
-          text: "sometext?",
+          text: "Are you sure you want to cancel activation for " + selectedUpgrade.name + "?\nUpkeep will be disabled and reactivation will take 3 days.",
           ContentComponent: null,
           onConfirm: () => CancelActivation()
         })

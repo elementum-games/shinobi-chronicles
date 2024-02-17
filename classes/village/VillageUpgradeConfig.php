@@ -786,7 +786,7 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T2b_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5,
             WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 0.5,
             WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 2,
         ],

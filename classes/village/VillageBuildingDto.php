@@ -13,6 +13,7 @@ class VillageBuildingDto {
         public ?int $construction_progress = null,
         public ?int $construction_progress_required = null,
         public ?int $construction_progress_last_updated = null,
+        public bool $construction_boosted = false,
         public string $construction_time_remaining = '',
         public string $name,
         public string $description,

@@ -23,6 +23,7 @@ final class VillageUpgradeMigration extends AbstractMigration
             `construction_progress` INT(11) NULL DEFAULT NULL,
             `construction_progress_required` INT(11) NULL DEFAULT NULL,
             `construction_progress_last_updated` INT(11) NULL DEFAULT NULL,
+            `construction_boosted` TINYINT(1) NOT NULL DEFAULT 0,
             PRIMARY KEY (`id`),
             UNIQUE KEY `unique_key_village_id` (`key`, `village_id`));
 
@@ -35,6 +36,7 @@ final class VillageUpgradeMigration extends AbstractMigration
             `research_progress` INT(11) NULL DEFAULT NULL,
             `research_progress_required` INT(11) NULL DEFAULT NULL,
             `research_progress_last_updated` INT(11) NULL DEFAULT NULL,
+            `research_boosted` TINYINT(1) NOT NULL DEFAULT 0,
             PRIMARY KEY (`id`),
             UNIQUE KEY `unique_key_village_id` (`key`, `village_id`));
 

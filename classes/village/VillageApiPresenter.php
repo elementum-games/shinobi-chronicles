@@ -177,6 +177,7 @@ class VillageApiPresenter {
                         ],
                         "attacker_war_log" => VillageApiPresenter::warLogResponse($warRecordDto->attacker_war_log),
                         "defender_war_log" => VillageApiPresenter::warLogResponse($warRecordDto->defender_war_log),
+                        "victory_percent_required" => $warRecordDto->victory_percent_required,
                     ];
                 },
                 WarLogManager::getWarRecords($system, $page_number)
@@ -214,6 +215,8 @@ class VillageApiPresenter {
                     "status" => $villageBuildingDto->status,
                     "construction_progress" => $villageBuildingDto->construction_progress,
                     "construction_progress_required" => $villageBuildingDto->construction_progress_required,
+                    "construction_progress_last_updated" => $villageBuildingDto->construction_progress_last_updated,
+                    "construction_boosted" => $villageBuildingDto->construction_boosted,
                     "name" => $villageBuildingDto->name,
                     "description" => $villageBuildingDto->description,
                     "phrase" => $villageBuildingDto->phrase,
@@ -239,6 +242,8 @@ class VillageApiPresenter {
                                             "status" => $villageUpgradeDto->status,
                                             "research_progress" => $villageUpgradeDto->research_progress,
                                             "research_progress_required" => $villageUpgradeDto->research_progress_required,
+                                            "research_progress_last_updated" => $villageUpgradeDto->research_progress_last_updated,
+                                            "research_boosted" => $villageUpgradeDto->research_boosted,
                                             "name" => $villageUpgradeDto->name,
                                             "description" => $villageUpgradeDto->description,
                                             "materials_research_cost" => $villageUpgradeDto->materials_research_cost,
