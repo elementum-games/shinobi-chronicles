@@ -24,7 +24,7 @@ class VillageBuildingConfig {
     /* keys for each building */
     const BUILDING_VILLAGE_HQ = 'VILLAGE_HQ';
     const BUILDING_WORKSHOP = 'WORKSHOP';
-    const BUILDING_MARKET = 'MARKET';
+    const BUILDING_MARKETPLACE = 'MARKET';
     const BUILDING_ACADEMY = 'ACADEMY';
     const BUILDING_HOSPITAL = 'HOSPITAL';
     const BUILDING_ANBU_HQ = 'ANBU_HQ';
@@ -35,7 +35,7 @@ class VillageBuildingConfig {
     const BUILDING_KEYS = [
         self::BUILDING_VILLAGE_HQ,
         self::BUILDING_WORKSHOP,
-        self::BUILDING_MARKET,
+        self::BUILDING_MARKETPLACE,
         self::BUILDING_ACADEMY,
         self::BUILDING_HOSPITAL,
         self::BUILDING_ANBU_HQ,
@@ -50,7 +50,7 @@ class VillageBuildingConfig {
         self::BUILDING_ACADEMY => 'Academy',
         self::BUILDING_HOSPITAL => 'Hospital',
         self::BUILDING_ANBU_HQ => 'ANBU HQ',
-        self::BUILDING_MARKET => 'Market',
+        self::BUILDING_MARKETPLACE => 'Marketplace',
         self::BUILDING_RAMEN_STAND => 'Ramen Stand',
         self::BUILDING_SHRINE => 'Shrine',
     ];
@@ -91,7 +91,7 @@ class VillageBuildingConfig {
             2 => self::BASE_T2_MAX_HEALTH,
             3 => self::BASE_T3_MAX_HEALTH,
         ],
-        self::BUILDING_MARKET => [
+        self::BUILDING_MARKETPLACE => [
             0 => self::BASE_T0_MAX_HEALTH,
             1 => self::BASE_T1_MAX_HEALTH,
             2 => self::BASE_T2_MAX_HEALTH,
@@ -118,33 +118,33 @@ class VillageBuildingConfig {
         self::BUILDING_ACADEMY => 'images/building_backgrounds/Academy.jpg',
         self::BUILDING_HOSPITAL => 'images/building_backgrounds/Hospital.jpg',
         self::BUILDING_ANBU_HQ => 'images/building_backgrounds/Anbuhq.jpg',
-        self::BUILDING_MARKET => 'images/building_backgrounds/Markets.jpg',
+        self::BUILDING_MARKETPLACE => 'images/building_backgrounds/Markets.jpg',
         self::BUILDING_SHRINE => 'images/building_backgrounds/Shrine.jpg',
         self::BUILDING_RAMEN_STAND => 'images/building_backgrounds/Ramenstand.jpg',
     ];
 
     /* building description indexed by building key */
     const BUILDING_DESCRIPTION = [
-        self::BUILDING_VILLAGE_HQ => "The central hub of the village, where all other buildings are managed.",
-        self::BUILDING_WORKSHOP => "The workshop is where all the village's tools and equipment are made.",
-        self::BUILDING_ACADEMY => "The academy is where the village's shinobi are trained.",
-        self::BUILDING_HOSPITAL => "The hospital is where the village's injured shinobi are treated.",
-        self::BUILDING_ANBU_HQ => "The ANBU HQ is where the village's elite shinobi are trained and managed.",
-        self::BUILDING_MARKET => "The market handles resources and goods distribution as well as monetary matters.",
-        self::BUILDING_SHRINE => "The shrine is where the village's spiritual needs are met.",
-        self::BUILDING_RAMEN_STAND => "The ramen stand is where the village's shinobi go to eat.",
+        self::BUILDING_VILLAGE_HQ => "This central hub orchestrates the village's operations, guiding its development and ensuring the well-being of its inhabitants.",
+        self::BUILDING_WORKSHOP => "A cradle of innovation and construction, the workshop serves as the vital forge where raw materials are transformed into the building blocks of tomorrow.",
+        self::BUILDING_ACADEMY => "A forge where the mettle of young shinobi is tested and honed, equipping them with essential skills and knowledge.",
+        self::BUILDING_HOSPITAL => "Dedicated to the swift recovery of its warriors, the hospital stands as a beacon of resilience and care within the village.",
+        self::BUILDING_ANBU_HQ => "Command center for the village's military might, the ANBU HQ coordinates training and deployment of elite operatives to safeguard the village from unseen threats.",
+        self::BUILDING_MARKETPLACE => "A bustling heart of commerce, the marketplace is a vibrant tapestry of traders and goods ensuring that the needs of the village are met.",
+        self::BUILDING_SHRINE => "A sacred space of solace and spirituality, the shrine connects the physical to the divine, offering a place for reflection, reverence, and ritual.",
+        self::BUILDING_RAMEN_STAND => "More than just a place to eat, the ramen stand is a culinary refuge where delicious flavors and warm conversations nourish both body and soul.",
     ];
 
     /* building poetic phrase indexed by building key */
     const BUILDING_PHRASE = [
-        self::BUILDING_VILLAGE_HQ => "The heart of the village.",
-        self::BUILDING_WORKSHOP => "The hands of the village.",
-        self::BUILDING_ACADEMY => "The mind of the village.",
-        self::BUILDING_HOSPITAL => "The soul of the village.",
-        self::BUILDING_ANBU_HQ => "The shadow of the village.",
-        self::BUILDING_MARKET => "Where coin flows, fortune follows.",
-        self::BUILDING_SHRINE => "The spirit of the village.",
-        self::BUILDING_RAMEN_STAND => "The belly of the village.",
+        self::BUILDING_VILLAGE_HQ => "The heart from which all paths are drawn.",
+        self::BUILDING_WORKSHOP => "Where ambition meets foundation.",
+        self::BUILDING_ACADEMY => "Today's students, tomorrow's masters.",
+        self::BUILDING_HOSPITAL => "Where warriors mend and strength renews.",
+        self::BUILDING_ANBU_HQ => "Watchful eyes and honed blades.",
+        self::BUILDING_MARKETPLACE => "Where coin flows, fortune follows.",
+        self::BUILDING_SHRINE => "Hushed prayers and solemn offerings.",
+        self::BUILDING_RAMEN_STAND => "A bowl of warmth, a friendly smile.",
     ];
 
     /* construction cost indexed by building key, then tier, then resource type */
@@ -234,7 +234,7 @@ class VillageBuildingConfig {
                 WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3,
             ],
         ],
-        self::BUILDING_MARKET => [
+        self::BUILDING_MARKETPLACE => [
             1 => [
                 WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2,
                 WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2,
@@ -314,7 +314,7 @@ class VillageBuildingConfig {
             2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS,
             3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS,
         ],
-        self::BUILDING_MARKET => [
+        self::BUILDING_MARKETPLACE => [
             1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS,
             2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS,
             3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS,
@@ -391,7 +391,7 @@ class VillageBuildingConfig {
             self::UPGRADE_SET_KEY_ENGINEERING_CORPS,
             self::UPGRADE_SET_KEY_FORTIFICATIONS,
         ],
-        self::BUILDING_MARKET => [
+        self::BUILDING_MARKETPLACE => [
             self::UPGRADE_SET_KEY_BULK_SUPPLIERS,
             self::UPGRADE_SET_KEY_FARMERS_MARKET,
             self::UPGRADE_SET_KEY_MERCHANTS_GUILD,
