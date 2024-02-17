@@ -27,6 +27,7 @@ class VillageUpgradeManager {
             $upgrade_array[$key] = new VillageUpgradeConfigData(
                 key: $key,
                 name: VillageUpgradeConfig::UPGRADE_NAMES[$key],
+                tier: VillageUpgradeConfig::UPGRADE_TIERS[$key],
                 description: VillageUpgradeConfig::UPGRADE_DESCRIPTIONS[$key],
                 materials_research_cost: VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$key][WarManager::RESOURCE_MATERIALS],
                 food_research_cost: VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$key][WarManager::RESOURCE_FOOD],
@@ -166,6 +167,7 @@ class VillageUpgradeManager {
                         research_boosted: $upgrade ? $upgrade->research_boosted : false,
                         research_time_remaining: $upgrade ? System::TimeRemaining($upgrade->research_progress_required - $upgrade->research_progress, format: "long", include_seconds: false, include_minutes: false) : '',
                         name: $upgrade_config_data->getName(),
+                        tier: $upgrade_config_data->getTier(),
                         description: $upgrade_config_data->getDescription(),
                         materials_research_cost: ($upgrade && $upgrade->research_progress !== null) ? 0 : $upgrade_config_data->getResearchCostMaterials(),
                         food_research_cost: ($upgrade && $upgrade->research_progress !== null) ? 0 : $upgrade_config_data->getResearchCostFood(),

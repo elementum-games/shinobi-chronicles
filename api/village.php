@@ -91,6 +91,14 @@ try {
                     $upgrade_key = $system->db->clean($_POST['upgrade_key']);
                     $message = VillageManager::createCancelResearchProposal($system, $player, $upgrade_key);
                     break;
+                case "boost_construction":
+                    $building_key = $system->db->clean($_POST['building_key']);
+                    $message = VillageManager::createBoostConstructionProposal($system, $player, $building_key);
+                    break;
+                case "boost_research":
+                    $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+                    $message = VillageManager::createBoostResearchProposal($system, $player, $upgrade_key);
+                    break;
                 default:
                     break;
             }
@@ -210,6 +218,20 @@ try {
             $message = VillageUpgradeManager::deactivateUpgrade($system, $player->village, $upgrade_key);
             $VillageAPIResponse->response = [
                 'buildingUpgradeData' => VillageApiPresenter::buildingUpgradeDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'GetConstructionBoostCost':
+            $building_key = $system->db->clean($_POST['building_key']);
+            $message = VillageUpgradeManager::calcBoostConstructionCost($system, $player->village, $building_key);
+            $VillageAPIResponse->response = [
+                'response_message' => $message,
+            ];
+            break;
+        case 'GetResearchBoostCost':
+            $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+            $message = VillageUpgradeManager::calcBoostResearchCost($system, $player->village, $upgrade_key);
+            $VillageAPIResponse->response = [
                 'response_message' => $message,
             ];
             break;

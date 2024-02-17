@@ -520,7 +520,7 @@ export function VillageUpgrades({
                 >
                     <div className="upgrade_item_wrapper" onClick={() => setSelectedUpgrade(upgrade)}>
                         <div className="upgrade_item_inner">
-                            <div className="upgrade_tier">{romanize(index + 1)}</div>
+                            <div className="upgrade_tier">{romanize(upgrade.tier)}</div>
                         </div>
                     </div>
                 </div>

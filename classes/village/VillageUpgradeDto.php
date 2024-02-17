@@ -12,6 +12,7 @@ class VillageUpgradeDto {
         public bool $research_boosted = false,
         public string $research_time_remaining = '',
         public string $name,
+        public int $tier,
         public string $description,
         public int $materials_research_cost,
         public int $food_research_cost,
