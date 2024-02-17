@@ -9,15 +9,39 @@ class VillageBuildingConfig {
     const BUILDING_STATUS_DISABLED = 'disabled'; // used when disabled, currently unused
     const BUILDING_STATUS_REPAIRING = 'repairing'; // used when repairing damage, currently unused
 
-    /* indentifiers for each building */
+    /* base values used for upgrade configuration */
+    const BASE_T1_CONSTRUCTION_COST_TOTAL = 14400;
+    const BASE_T2_CONSTRUCTION_COST_TOTAL = 108000;
+    const BASE_T3_CONSTRUCTION_COST_TOTAL = 540000;
+    const BASE_T1_CONSTRUCTION_TIME_DAYS = 4;
+    const BASE_T2_CONSTRUCTION_TIME_DAYS = 12;
+    const BASE_T3_CONSTRUCTION_TIME_DAYS = 36;
+    const BASE_T0_MAX_HEALTH = 125000;
+    const BASE_T1_MAX_HEALTH = 250000;
+    const BASE_T2_MAX_HEALTH = 500000;
+    const BASE_T3_MAX_HEALTH = 750000;
+
+    /* keys for each building */
     const BUILDING_VILLAGE_HQ = 'VILLAGE_HQ';
     const BUILDING_WORKSHOP = 'WORKSHOP';
-    const BUILDING_MARKET = 'MARKET';
+    const BUILDING_MARKETPLACE = 'MARKET';
     const BUILDING_ACADEMY = 'ACADEMY';
     const BUILDING_HOSPITAL = 'HOSPITAL';
     const BUILDING_ANBU_HQ = 'ANBU_HQ';
     const BUILDING_SHRINE = 'SHRINE';
     const BUILDING_RAMEN_STAND = 'RAMEN_STAND';
+
+    /* Used for auto population */
+    const BUILDING_KEYS = [
+        self::BUILDING_VILLAGE_HQ,
+        self::BUILDING_WORKSHOP,
+        self::BUILDING_MARKETPLACE,
+        self::BUILDING_ACADEMY,
+        self::BUILDING_HOSPITAL,
+        self::BUILDING_ANBU_HQ,
+        self::BUILDING_SHRINE,
+        self::BUILDING_RAMEN_STAND,
+    ];
 
     /* names for each building */
     const BUILDING_NAMES = [
@@ -26,7 +50,7 @@ class VillageBuildingConfig {
         self::BUILDING_ACADEMY => 'Academy',
         self::BUILDING_HOSPITAL => 'Hospital',
         self::BUILDING_ANBU_HQ => 'ANBU HQ',
-        self::BUILDING_MARKET => 'Market',
+        self::BUILDING_MARKETPLACE => 'Marketplace',
         self::BUILDING_RAMEN_STAND => 'Ramen Stand',
         self::BUILDING_SHRINE => 'Shrine',
     ];
@@ -35,263 +59,275 @@ class VillageBuildingConfig {
     const BUILDING_REQUIREMENT_BUILDINGS = "BUILDINGS";
     const BUILDING_REQUIREMENT_UPGRADES = "UPGRADES";
 
-    /* building healthed indexed by building ID, then tier */
+    /* building healthed indexed by building key, then tier */
     const BUILDING_MAX_HEALTH = [
         self::BUILDING_VILLAGE_HQ => [
-            0 => 125000,
-            1 => 250000,
-            2 => 500000,
-            3 => 750000,
+            0 => self::BASE_T0_MAX_HEALTH,
+            1 => self::BASE_T1_MAX_HEALTH,
+            2 => self::BASE_T2_MAX_HEALTH,
+            3 => self::BASE_T3_MAX_HEALTH,
         ],
         self::BUILDING_WORKSHOP => [
-            0 => 125000,
-            1 => 250000,
-            2 => 500000,
-            3 => 750000,
+            0 => self::BASE_T0_MAX_HEALTH,
+            1 => self::BASE_T1_MAX_HEALTH,
+            2 => self::BASE_T2_MAX_HEALTH,
+            3 => self::BASE_T3_MAX_HEALTH,
         ],
         self::BUILDING_ACADEMY => [
-            0 => 125000,
-            1 => 250000,
-            2 => 500000,
-            3 => 750000,
+            0 => self::BASE_T0_MAX_HEALTH,
+            1 => self::BASE_T1_MAX_HEALTH,
+            2 => self::BASE_T2_MAX_HEALTH,
+            3 => self::BASE_T3_MAX_HEALTH,
         ],
         self::BUILDING_HOSPITAL => [
-            0 => 125000,
-            1 => 250000,
-            2 => 500000,
-            3 => 750000,
+            0 => self::BASE_T0_MAX_HEALTH,
+            1 => self::BASE_T1_MAX_HEALTH,
+            2 => self::BASE_T2_MAX_HEALTH,
+            3 => self::BASE_T3_MAX_HEALTH,
         ],
         self::BUILDING_ANBU_HQ => [
-            0 => 125000,
-            1 => 250000,
-            2 => 500000,
-            3 => 750000,
+            0 => self::BASE_T0_MAX_HEALTH,
+            1 => self::BASE_T1_MAX_HEALTH,
+            2 => self::BASE_T2_MAX_HEALTH,
+            3 => self::BASE_T3_MAX_HEALTH,
         ],
-        self::BUILDING_MARKET => [
-            0 => 125000,
-            1 => 250000,
-            2 => 500000,
-            3 => 750000,
+        self::BUILDING_MARKETPLACE => [
+            0 => self::BASE_T0_MAX_HEALTH,
+            1 => self::BASE_T1_MAX_HEALTH,
+            2 => self::BASE_T2_MAX_HEALTH,
+            3 => self::BASE_T3_MAX_HEALTH,
         ],
         self::BUILDING_SHRINE => [
-            0 => 125000,
-            1 => 250000,
-            2 => 500000,
-            3 => 750000,
+            0 => self::BASE_T0_MAX_HEALTH,
+            1 => self::BASE_T1_MAX_HEALTH,
+            2 => self::BASE_T2_MAX_HEALTH,
+            3 => self::BASE_T3_MAX_HEALTH,
         ],
         self::BUILDING_RAMEN_STAND => [
-            0 => 125000,
-            1 => 250000,
-            2 => 500000,
-            3 => 750000,
+            0 => self::BASE_T0_MAX_HEALTH,
+            1 => self::BASE_T1_MAX_HEALTH,
+            2 => self::BASE_T2_MAX_HEALTH,
+            3 => self::BASE_T3_MAX_HEALTH,
         ],
     ];
 
-    /* building description indexed by building ID */
-    const BUILDING_DESCRIPTIONS = [
-        self::BUILDING_VILLAGE_HQ => "The central hub of the village, where all other buildings are managed.",
-        self::BUILDING_WORKSHOP => "The workshop is where all the village's tools and equipment are made.",
-        self::BUILDING_ACADEMY => "The academy is where the village's shinobi are trained.",
-        self::BUILDING_HOSPITAL => "The hospital is where the village's injured shinobi are treated.",
-        self::BUILDING_ANBU_HQ => "The ANBU HQ is where the village's elite shinobi are trained and managed.",
-        self::BUILDING_MARKET => "The market is where the village's resources are traded.",
-        self::BUILDING_SHRINE => "The shrine is where the village's spiritual needs are met.",
-        self::BUILDING_RAMEN_STAND => "The ramen stand is where the village's shinobi go to eat.",
+    /* building image indexed by building key */
+    const BUILDING_BACKGROUND_IMAGE = [
+        self::BUILDING_VILLAGE_HQ => 'images/building_backgrounds/Villagehq.jpg',
+        self::BUILDING_WORKSHOP => 'images/building_backgrounds/Workshop.jpg',
+        self::BUILDING_ACADEMY => 'images/building_backgrounds/Academy.jpg',
+        self::BUILDING_HOSPITAL => 'images/building_backgrounds/Hospital.jpg',
+        self::BUILDING_ANBU_HQ => 'images/building_backgrounds/Anbuhq.jpg',
+        self::BUILDING_MARKETPLACE => 'images/building_backgrounds/Markets.jpg',
+        self::BUILDING_SHRINE => 'images/building_backgrounds/Shrine.jpg',
+        self::BUILDING_RAMEN_STAND => 'images/building_backgrounds/Ramenstand.jpg',
     ];
 
-    /* building poetic phrase indexed by building ID */
+    /* building description indexed by building key */
+    const BUILDING_DESCRIPTION = [
+        self::BUILDING_VILLAGE_HQ => "This central hub orchestrates the village's operations, guiding its development and ensuring the well-being of its inhabitants.",
+        self::BUILDING_WORKSHOP => "A cradle of innovation and construction, the workshop serves as the vital forge where raw materials are transformed into the building blocks of tomorrow.",
+        self::BUILDING_ACADEMY => "A forge where the mettle of young shinobi is tested and honed, equipping them with essential skills and knowledge.",
+        self::BUILDING_HOSPITAL => "Dedicated to the swift recovery of its warriors, the hospital stands as a beacon of resilience and care within the village.",
+        self::BUILDING_ANBU_HQ => "Command center for the village's military might, the ANBU HQ coordinates training and deployment of elite operatives to safeguard the village from unseen threats.",
+        self::BUILDING_MARKETPLACE => "A bustling heart of commerce, the marketplace is a vibrant tapestry of traders and goods ensuring that the needs of the village are met.",
+        self::BUILDING_SHRINE => "A sacred space of solace and spirituality, the shrine connects the physical to the divine, offering a place for reflection, reverence, and ritual.",
+        self::BUILDING_RAMEN_STAND => "More than just a place to eat, the ramen stand is a culinary refuge where delicious flavors and warm conversations nourish both body and soul.",
+    ];
+
+    /* building poetic phrase indexed by building key */
     const BUILDING_PHRASE = [
-        self::BUILDING_VILLAGE_HQ => "The heart of the village.",
-        self::BUILDING_WORKSHOP => "The hands of the village.",
-        self::BUILDING_ACADEMY => "The mind of the village.",
-        self::BUILDING_HOSPITAL => "The soul of the village.",
-        self::BUILDING_ANBU_HQ => "The shadow of the village.",
-        self::BUILDING_MARKET => "The lifeblood of the village.",
-        self::BUILDING_SHRINE => "The spirit of the village.",
-        self::BUILDING_RAMEN_STAND => "The belly of the village.",
+        self::BUILDING_VILLAGE_HQ => "The heart from which all paths are drawn.",
+        self::BUILDING_WORKSHOP => "Where ambition meets foundation.",
+        self::BUILDING_ACADEMY => "Today's students, tomorrow's masters.",
+        self::BUILDING_HOSPITAL => "Where warriors mend and strength renews.",
+        self::BUILDING_ANBU_HQ => "Watchful eyes and honed blades.",
+        self::BUILDING_MARKETPLACE => "Where coin flows, fortune follows.",
+        self::BUILDING_SHRINE => "Hushed prayers and solemn offerings.",
+        self::BUILDING_RAMEN_STAND => "A bowl of warmth, a friendly smile.",
     ];
 
-    /* construction cost indexed by building ID, then tier, then resource type */
+    /* construction cost indexed by building key, then tier, then resource type */
     const BUILDING_CONSTRUCTION_COST = [
         self::BUILDING_VILLAGE_HQ => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 10800,
-                WarManager::RESOURCE_FOOD => 4320,
-                WarManager:: RESOURCE_WEALTH => 6480,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.5 * 1.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3 * 1.5,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 54000,
-                WarManager::RESOURCE_FOOD => 21600,
-                WarManager:: RESOURCE_WEALTH => 32400,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.5 * 1.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3 * 1.5,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 270000,
-                WarManager::RESOURCE_FOOD => 108000,
-                WarManager:: RESOURCE_WEALTH => 162000,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.5 * 1.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3 * 1.5,
             ],
         ],
         self::BUILDING_WORKSHOP => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 12960,
-                WarManager::RESOURCE_FOOD => 4320,
-                WarManager::RESOURCE_WEALTH => 4320,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.6 * 1.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 64800,
-                WarManager::RESOURCE_FOOD => 21600,
-                WarManager::RESOURCE_WEALTH => 21600,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.6 * 1.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 324000,
-                WarManager::RESOURCE_FOOD => 108000,
-                WarManager::RESOURCE_WEALTH => 108000,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.6 * 1.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2 * 1.5,
             ],
         ],
         self::BUILDING_ACADEMY => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 8640,
-                WarManager::RESOURCE_FOOD => 6480,
-                WarManager::RESOURCE_WEALTH => 6480,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.4,
+                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3,
+                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 43200,
-                WarManager::RESOURCE_FOOD => 32400,
-                WarManager::RESOURCE_WEALTH => 32400,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.4,
+                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3,
+                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 216000,
-                WarManager::RESOURCE_FOOD => 162000,
-                WarManager::RESOURCE_WEALTH => 162000,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.4,
+                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3,
+                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3,
             ],
         ],
         self::BUILDING_HOSPITAL => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 8640,
-                WarManager::RESOURCE_FOOD => 6480,
-                WarManager::RESOURCE_WEALTH => 6480,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.4,
+                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3,
+                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 43200,
-                WarManager::RESOURCE_FOOD => 32400,
-                WarManager::RESOURCE_WEALTH => 32400,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.4,
+                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3,
+                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 216000,
-                WarManager::RESOURCE_FOOD => 162000,
-                WarManager::RESOURCE_WEALTH => 162000,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.4,
+                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3,
+                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3,
             ],
         ],
         self::BUILDING_ANBU_HQ => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 10800,
-                WarManager::RESOURCE_FOOD => 4320,
-                WarManager::RESOURCE_WEALTH => 6480,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 54000,
-                WarManager::RESOURCE_FOOD => 21600,
-                WarManager::RESOURCE_WEALTH => 32400,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 270000,
-                WarManager::RESOURCE_FOOD => 108000,
-                WarManager::RESOURCE_WEALTH => 162000,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3,
             ],
         ],
-        self::BUILDING_MARKET => [
+        self::BUILDING_MARKETPLACE => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 4320,
-                WarManager::RESOURCE_FOOD => 4320,
-                WarManager::RESOURCE_WEALTH => 12960,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.6,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 21600,
-                WarManager::RESOURCE_FOOD => 21600,
-                WarManager::RESOURCE_WEALTH => 64800,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.6,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 108000,
-                WarManager::RESOURCE_FOOD => 108000,
-                WarManager::RESOURCE_WEALTH => 32400,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2,
+                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.6,
             ],
         ],
         self::BUILDING_SHRINE => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 8640,
-                WarManager::RESOURCE_FOOD => 6480,
-                WarManager::RESOURCE_WEALTH => 6480,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.4 * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3 * 0.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.3 * 0.5,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 43200,
-                WarManager::RESOURCE_FOOD => 32400,
-                WarManager::RESOURCE_WEALTH => 32400,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.4 * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3 * 0.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.3 * 0.5,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 216000,
-                WarManager::RESOURCE_FOOD => 162000,
-                WarManager::RESOURCE_WEALTH => 162000,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.4 * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3 * 0.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.3 * 0.5,
             ],
         ],
         self::BUILDING_RAMEN_STAND => [
             1 => [
-                WarManager::RESOURCE_MATERIALS => 4320,
-                WarManager::RESOURCE_FOOD => 12960,
-                WarManager::RESOURCE_WEALTH => 4320,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2 * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.6 * 0.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T1_CONSTRUCTION_COST_TOTAL * 0.2 * 0.5,
             ],
             2 => [
-                WarManager::RESOURCE_MATERIALS => 21600,
-                WarManager::RESOURCE_FOOD => 64800,
-                WarManager::RESOURCE_WEALTH => 21600,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2 * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.6 * 0.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T2_CONSTRUCTION_COST_TOTAL * 0.2 * 0.5,
             ],
             3 => [
-                WarManager::RESOURCE_MATERIALS => 108000,
-                WarManager::RESOURCE_FOOD => 324000,
-                WarManager::RESOURCE_WEALTH => 108000,
+                WarManager::RESOURCE_MATERIALS => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2 * 0.5,
+                WarManager::RESOURCE_FOOD => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.6 * 0.5,
+                WarManager::RESOURCE_WEALTH => self::BASE_T3_CONSTRUCTION_COST_TOTAL * 0.2 * 0.5,
             ],
         ],
     ];
 
-    /* construction time indexed by building ID, then tier */
+    /* construction time indexed by building key, then tier */
     const BUILDING_CONSTRUCTION_TIME = [
         self::BUILDING_VILLAGE_HQ => [
-            1 => 3,
-            2 => 15,
-            3 => 75,
+            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS * 1.5,
+            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS * 1.5,
+            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS * 1.5,
         ],
         self::BUILDING_WORKSHOP => [
-            1 => 3,
-            2 => 15,
-            3 => 75,
+            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS * 1.5,
+            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS * 1.5,
+            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS * 1.5,
         ],
         self::BUILDING_ACADEMY => [
-            1 => 3,
-            2 => 15,
-            3 => 75,
+            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS,
+            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS,
+            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS,
         ],
         self::BUILDING_HOSPITAL => [
-            1 => 3,
-            2 => 15,
-            3 => 75,
+            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS,
+            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS,
+            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS,
         ],
         self::BUILDING_ANBU_HQ => [
-            1 => 3,
-            2 => 15,
-            3 => 75,
+            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS,
+            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS,
+            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS,
         ],
-        self::BUILDING_MARKET => [
-            1 => 3,
-            2 => 15,
-            3 => 75,
+        self::BUILDING_MARKETPLACE => [
+            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS,
+            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS,
+            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS,
         ],
         self::BUILDING_SHRINE => [
-            1 => 3,
-            2 => 15,
-            3 => 75,
+            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS * 0.5,
+            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS * 0.5,
+            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS * 0.5,
         ],
         self::BUILDING_RAMEN_STAND => [
-            1 => 3,
-            2 => 15,
-            3 => 75,
+            1 => self::BASE_T1_CONSTRUCTION_TIME_DAYS * 0.5,
+            2 => self::BASE_T2_CONSTRUCTION_TIME_DAYS * 0.5,
+            3 => self::BASE_T3_CONSTRUCTION_TIME_DAYS * 0.5,
         ],
     ];
 
@@ -321,12 +357,12 @@ class VillageBuildingConfig {
     const UPGRADE_SET_KEY_WAREHOUSES = 'WAREHOUSES';
     const UPGRADE_SET_KEY_ANCESTRAL_LEGACY = 'ANCESTRAL_LEGACY';
     const UPGRADE_SET_KEY_FORTUNES_BOUNTY = 'FORTUNES_BOUNTY';
-    const UPGRADE_SET_KEY_NEW_RECIPE = 'NEW_RECIPE';
+    const UPGRADE_SET_KEY_INSPIRED_ITAMAE = 'INSPIRED ITAMAE';
+    const UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES = 'NINJA_FRIENDLY_RATES';
     const UPGRADE_SET_KEY_QUALITY_INGREDIENTS = 'QUALITY_INGREDIENTS';
-    const UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES = 'SHINOBI_DISCOUNT';
-    const UPGRADE_SET_KEY_INSPIRED_ITAMAE = 'LUCK_IN_LEFTOVERS';
+    const UPGRADE_SET_KEY_LUCK_IN_LEFTOVERS = 'LUCK_IN_LEFTOVERS';
 
-    /* upgrade sets for each building, indexed by building ID */
+    /* upgrade sets for each building, indexed by building key */
     const BUILDING_UPGRADE_SETS = [
         self::BUILDING_VILLAGE_HQ => [
             self::UPGRADE_SET_KEY_RESEARCH_SUBSIDIES,
@@ -355,7 +391,7 @@ class VillageBuildingConfig {
             self::UPGRADE_SET_KEY_ENGINEERING_CORPS,
             self::UPGRADE_SET_KEY_FORTIFICATIONS,
         ],
-        self::BUILDING_MARKET => [
+        self::BUILDING_MARKETPLACE => [
             self::UPGRADE_SET_KEY_BULK_SUPPLIERS,
             self::UPGRADE_SET_KEY_FARMERS_MARKET,
             self::UPGRADE_SET_KEY_MERCHANTS_GUILD,
@@ -366,10 +402,10 @@ class VillageBuildingConfig {
             self::UPGRADE_SET_KEY_FORTUNES_BOUNTY,
         ],
         self::BUILDING_RAMEN_STAND => [
-            self::UPGRADE_SET_KEY_NEW_RECIPE,
-            self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS,
-            self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES,
             self::UPGRADE_SET_KEY_INSPIRED_ITAMAE,
+            self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES,
+            self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS,
+            self::UPGRADE_SET_KEY_LUCK_IN_LEFTOVERS,
         ],
     ];
 
@@ -400,10 +436,10 @@ class VillageBuildingConfig {
         self::UPGRADE_SET_KEY_WAREHOUSES => 'Warehouses',
         self::UPGRADE_SET_KEY_ANCESTRAL_LEGACY => 'Ancestral Legacy',
         self::UPGRADE_SET_KEY_FORTUNES_BOUNTY => 'Fortune\'s Bounty',
-        self::UPGRADE_SET_KEY_NEW_RECIPE => 'New Recipe',
-        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => 'Quality Ingredients',
-        self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES => 'Ninja Friendly Rates',
         self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => 'Inspired Itamae',
+        self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES => 'Ninja Friendly Rates',
+        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => 'Quality Ingredients',
+        self::UPGRADE_SET_KEY_LUCK_IN_LEFTOVERS => 'Luck in Leftovers',
     ];
 
     /* upgrade set descriptions, indexed by upgrade set key */
@@ -433,10 +469,10 @@ class VillageBuildingConfig {
         self::UPGRADE_SET_KEY_WAREHOUSES => "Increases maximum resource capacity.",
         self::UPGRADE_SET_KEY_ANCESTRAL_LEGACY => "Increases chance of obtaining a bloodline.",
         self::UPGRADE_SET_KEY_FORTUNES_BOUNTY => "Chance for double yen gains from battle.",
-        self::UPGRADE_SET_KEY_NEW_RECIPE => "Unlocks new ramen recipes.",
-        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => "Increases duration of ramen buffs.",
+        self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => "Unlocks new ramen recipes.",
         self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES => "Decreases cost of ramen.",
-        self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => "Increases chance of Mystery Ramen appearing.",
+        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => "Increases duration of ramen buffs.",
+        self::UPGRADE_SET_KEY_LUCK_IN_LEFTOVERS => "Increases chance of Mystery Ramen appearing.",
     ];
 
     /* upgrade set upgrades, indexed by upgrade set key */
@@ -565,21 +601,21 @@ class VillageBuildingConfig {
             VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_II,
             VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_III,
         ],
-        self::UPGRADE_SET_KEY_NEW_RECIPE => [
-            VillageUpgradeConfig::UPGRADE_KEY_NEW_RECIPE_I,
-        ],
-        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => [
-            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I,
-            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II,
-            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III,
+        self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => [
+            VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I,
+            VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II,
         ],
         self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES => [
             VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I,
             VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II,
             VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III,
         ],
-        self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => [
-            VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I,
+        self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => [
+            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I,
+            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II,
+            VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III,
+        ],
+        self::UPGRADE_SET_KEY_LUCK_IN_LEFTOVERS => [
             VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_I,
             VillageUpgradeConfig::UPGRADE_KEY_LUCK_IN_LEFTOVERS_II,
         ],
