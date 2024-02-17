@@ -3,7 +3,6 @@
 require_once __DIR__ . "/VillageSeatDto.php";
 require_once __DIR__ . "/VillageProposalDto.php";
 require_once __DIR__ . "/VillageStrategicInfoDto.php";
-require_once __DIR__ . "/VillageUpgradeManager.php";
 require_once __DIR__ . "/ChallengeRequestDto.php";
 require_once __DIR__ . "/../notification/NotificationManager.php";
 require_once __DIR__ . '/../notification/BlockedNotificationManager.php';
@@ -26,13 +25,9 @@ class VillageManager {
 
     const RESOURCE_LOG_PRODUCTION = 1;
     const RESOURCE_LOG_COLLECTION = 2;
-    const RESOURCE_LOG_EXPENSE = 3; // legacy
+    const RESOURCE_LOG_EXPENSE = 3;
     const RESOURCE_LOG_TRADE_GAIN = 4;
     const RESOURCE_LOG_TRADE_LOSS = 5;
-    const RESOURCE_LOG_CONSTRUCTION_COST = 6;
-    const RESOURCE_LOG_RESEARCH_COST = 7;
-    const RESOURCE_LOG_DECAY = 8;
-    const RESOURCE_LOG_UPGRADE_UPKEEP = 9;
 
     const MIN_KAGE_CLAIM_TIER = 5;
     const MIN_KAGE_CHALLENGE_TIER = 5;
@@ -40,7 +35,7 @@ class VillageManager {
     const MIN_ELDER_CHALLENGE_TIER = 4;
 
     // Set these to correct values for release
-    const PROPOSAL_VOTE_HOURS = 12; // 12
+    const PROPOSAL_VOTE_HOURS = 24; // 24
     const PROPOSAL_ENACT_HOURS = 24; // 24
     const PROPOSAL_COOLDOWN_HOURS = 1; // 1
     const KAGE_PROVISIONAL_DAYS = 7; // 7
@@ -61,12 +56,6 @@ class VillageManager {
     const PROPOSAL_TYPE_BREAK_ALLIANCE = "break_alliance";
     const PROPOSAL_TYPE_OFFER_TRADE = "offer_trade";
     const PROPOSAL_TYPE_ACCEPT_TRADE = "accept_trade";
-    const PROPOSAL_TYPE_BEGIN_CONSTRUCTION = "begin_construction";
-    const PROPOSAL_TYPE_BEGIN_RESEARCH = "begin_research";
-    const PROPOSAL_TYPE_CANCEL_CONSTRUCTION = "cancel_construction";
-    const PROPOSAL_TYPE_CANCEL_RESEARCH = "cancel_research";
-    const PROPOSAL_TYPE_BOOST_CONSTRUCTION = "boost_construction";
-    const PROPOSAL_TYPE_BOOST_RESEARCH = "boost_research";
 
     const CHALLENGE_EXPIRE_DAYS = 1;
     const CHALLENGE_MIN_DELAY_HOURS = 12;
@@ -81,9 +70,6 @@ class VillageManager {
 
     const MAX_TRADE_RESOURCE_TYPE = 25000;
     const TRADE_COOLDOWN_DAYS = 1;
-
-    const MAX_RESOURCE_CAPACITY = 50000;
-    const EXCESS_RESOURCE_DECAY_PER_DAY = 2; // 2% per day, 2/24% per hour
 
     public static function getLocation(System $system, string $village_id): ?TravelCoords {
         $result = $system->db->query(
@@ -532,7 +518,8 @@ class VillageManager {
     /**
      * @return array
      */
-    public static function getResources(System $system, int $village_id): array {
+    public static function getResources(System $system, int $village_id): array
+    {
         $resources_result = $system->db->query("SELECT `resources` FROM `villages` WHERE `village_id` = {$village_id}");
         $resources_result = $system->db->fetch($resources_result);
         return json_decode($resources_result['resources'], true);
@@ -540,50 +527,31 @@ class VillageManager {
     /**
      * @return array
      */
-    public static function getResourceHistory(System $system, int $village_id, int $days): array {
-        $resource_history = [
-            WarManager::RESOURCE_MATERIALS => ['produced' => 0, 'collected' => 0, 'spent' => 0, 'claimed' => 0, 'lost' => 0],
-            WarManager::RESOURCE_FOOD => ['produced' => 0, 'collected' => 0, 'spent' => 0, 'claimed' => 0, 'lost' => 0],
-            WarManager::RESOURCE_WEALTH => ['produced' => 0, 'collected' => 0, 'spent' => 0, 'claimed' => 0, 'lost' => 0],
-        ];
+    public static function getResourceHistory(System $system, int $village_id, int $days): array
+    {
+        $resource_history = [];
         $time = time() - ($days * 86400);
-        $query = "
-            SELECT
-                `resource_id`,
-                SUM(CASE WHEN `type` = " . self::RESOURCE_LOG_PRODUCTION . " THEN `quantity` ELSE 0 END) AS 'produced',
-                SUM(CASE WHEN `type` = " . self::RESOURCE_LOG_COLLECTION . " THEN `quantity` ELSE 0 END) AS 'collected',
-                SUM(CASE WHEN `type` = " . self::RESOURCE_LOG_UPGRADE_UPKEEP . " THEN `quantity` ELSE 0 END) AS 'spent'
-            FROM `resource_logs`
-            WHERE `village_id` = {$village_id}
-            AND `time` > {$time}
-            GROUP BY `resource_id`
-        ";
-        $result = $system->db->query($query);
-        while ($row = $system->db->fetch($result)) {
-            $resource_id = $row['resource_id'];
-            $resource_history[$resource_id]['produced'] = (int) $row['produced'];
-            $resource_history[$resource_id]['collected'] = (int) $row['collected'];
-            $resource_history[$resource_id]['spent'] = (int) $row['spent'];
-        }
-        $query = "
-            SELECT
-                `resource_id`,
-                COUNT(CASE WHEN `claimed_village_id` = {$village_id} THEN 1 ELSE NULL END) AS 'claimed_loot_count',
-                COUNT(CASE WHEN `target_village_id` = {$village_id} AND (`claimed_village_id` != {$village_id} OR `claimed_village_id` IS NULL) THEN 1 ELSE NULL END) AS 'lost_loot_count'
-            FROM `loot`
-            WHERE (`claimed_village_id` = {$village_id} OR `target_village_id` = {$village_id})
-            AND (`claimed_time` > {$time} OR `claimed_time` IS NULL)
-            GROUP BY `resource_id`
-        ";
-        $result = $system->db->query($query);
-        while ($row = $system->db->fetch($result)) {
-            $resource_id = $row['resource_id'];
-            if (isset($row['claimed_loot_count'])) {
-                $resource_history[$resource_id]['claimed'] = (int) $row['claimed_loot_count'];
-            }
-            if (isset($row['lost_loot_count'])) {
-                $resource_history[$resource_id]['lost'] = (int) $row['lost_loot_count'];
-            }
+        foreach (array_keys(WarManager::RESOURCE_NAMES) as $resource_id) {
+            // get produced
+            $result = $system->db->query("SELECT SUM(`quantity`) as 'produced' FROM `resource_logs` WHERE `resource_id` = {$resource_id} AND `village_id` = {$village_id} AND `type` = " . self::RESOURCE_LOG_PRODUCTION . " AND `time` > {$time}");
+            $result = $system->db->fetch($result);
+            $resource_history[$resource_id]['produced'] = (int)$result['produced'];
+            // get collected
+            $result = $system->db->query("SELECT SUM(`quantity`) as 'collected' FROM `resource_logs` WHERE `resource_id` = {$resource_id} AND `village_id` = {$village_id} AND `type` = " . self::RESOURCE_LOG_COLLECTION . " AND `time` > {$time}");
+            $result = $system->db->fetch($result);
+            $resource_history[$resource_id]['collected'] = (int)$result['collected'];
+            // get claimed
+            $result = $system->db->query("SELECT COUNT(*) as 'claimed_loot_count' FROM `loot` WHERE `resource_id` = {$resource_id} AND `claimed_village_id` = {$village_id} AND `claimed_time` > {$time}");
+            $result = $system->db->fetch($result);
+            $resource_history[$resource_id]['claimed'] = (int)$result['claimed_loot_count'];
+            // get lost (lol)
+            $result = $system->db->query("SELECT COUNT(*) as 'lost_loot_count' FROM `loot` WHERE `resource_id` = {$resource_id} AND `target_village_id` = {$village_id} AND (`claimed_village_id` != {$village_id} OR `claimed_village_id` IS NULL) AND (`claimed_time` > {$time} OR `claimed_time` IS NULL)");
+            $result = $system->db->fetch($result);
+            $resource_history[$resource_id]['lost'] = (int) $result['lost_loot_count'];
+            // get upkeep - WIP
+            $result = $system->db->query("SELECT SUM(`quantity`) as 'spent' FROM `resource_logs` WHERE `resource_id` = {$resource_id} AND `village_id` = {$village_id} AND `type` = " . self::RESOURCE_LOG_EXPENSE . " AND `time` > {$time}");
+            $result = $system->db->fetch($result);
+            $resource_history[$resource_id]['spent'] = (int) $result['spent'];
         }
         return $resource_history;
     }
@@ -591,7 +559,8 @@ class VillageManager {
     /**
      * @return Village
      */
-    public static function getVillageByID(System $system, int $village_id): Village {
+    public static function getVillageByID(System $system, int $village_id): Village
+    {
         $result = $system->db->query(
             "SELECT * FROM `villages`
                 WHERE `villages`.`village_id`='{$village_id}'"
@@ -1226,8 +1195,6 @@ class VillageManager {
                 vote_time_remaining: $proposal['vote_time_remaining'],
                 enact_time_remaining: $proposal['enact_time_remaining'],
                 trade_data: $trade_data,
-                building_key: $proposal['building_key'],
-                upgrade_key: $proposal['upgrade_key'],
                 votes: $proposal['votes'],
             );
             unset($proposal);
@@ -1243,10 +1210,6 @@ class VillageManager {
         $seat = $player->village_seat;
         if ($seat->seat_type != "kage") {
             return "You do not meet the seat requirements.";
-        }
-        // check policy id
-        if ($policy_id < 1 || $policy_id > 5) {
-            return "Invalid policy.";
         }
         // check cooldown on policy
         $query = $system->db->query("SELECT `start_time` FROM `policy_logs` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} LIMIT 1");
@@ -1410,7 +1373,8 @@ class VillageManager {
     /**
      * @return string
      */
-    public static function enactProposal(System $system, User $player, int $proposal_id): string {
+    public static function enactProposal(System $system, User $player, int $proposal_id): string
+    {
         // check if kage
         $seat = $player->village_seat;
         if ($seat->seat_type != "kage") {
@@ -1625,6 +1589,15 @@ class VillageManager {
                 $message = "Accepted peace offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
+                // if village occupied by enemy, return to owner's control
+                $system->db->query("UPDATE `region_locations`
+                    INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+                    SET `region_locations`.`occupying_village_id` = NULL
+                    WHERE `regions`.`village` = {$proposal['target_village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['village_id']}");
+                $system->db->query("UPDATE `region_locations`
+                    INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+                    SET `region_locations`.`occupying_village_id` = NULL
+                    WHERE `regions`.`village` = {$proposal['village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['target_village_id']}");
                 break;
             case self::PROPOSAL_TYPE_ACCEPT_ALLIANCE:
                 // check neutral
@@ -1668,6 +1641,15 @@ class VillageManager {
                 $message = "Forced peace with " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
+                // if village occupied by enemy, return to owner's control
+                $system->db->query("UPDATE `region_locations`
+                    INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+                    SET `region_locations`.`occupying_village_id` = NULL
+                    WHERE `regions`.`village` = {$proposal['target_village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['village_id']}");
+                $system->db->query("UPDATE `region_locations`
+                    INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
+                    SET `region_locations`.`occupying_village_id` = NULL
+                    WHERE `regions`.`village` = {$proposal['village_id']} AND `region_locations`.`occupying_village_id` = {$proposal['target_village_id']}");
                 break;
             case self::PROPOSAL_TYPE_OFFER_TRADE:
                 // check is ally
@@ -1725,72 +1707,6 @@ class VillageManager {
                 // create notification
                 self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
                 $message = "Accepted trade offer from " . VillageManager::VILLAGE_NAMES[$proposal['target_village_id']] . "!";
-                break;
-            case self::PROPOSAL_TYPE_BEGIN_CONSTRUCTION:
-                try {
-                    $message = VillageUpgradeManager::beginConstruction($system, $player->village, $proposal['building_key']);
-                    // update proposal
-                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
-                    // create notification
-                    self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
-                } catch (RuntimeException $e) {
-                    return $e->getMessage();
-                }
-                break;
-            case self::PROPOSAL_TYPE_BEGIN_RESEARCH:
-                try {
-                    $message = VillageUpgradeManager::beginResearch($system, $player->village, $proposal['upgrade_key']);
-                    // update proposal
-                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
-                    // create notification
-                    self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
-                } catch (RuntimeException $e) {
-                    return $e->getMessage();
-                }
-                break;
-            case self::PROPOSAL_TYPE_CANCEL_CONSTRUCTION:
-                try {
-                    $message = VillageUpgradeManager::cancelConstruction($system, $player->village, $proposal['building_key']);
-                    // update proposal
-                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
-                    // create notification
-                    self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
-                } catch (RuntimeException $e) {
-                    return $e->getMessage();
-                }
-                break;
-            case self::PROPOSAL_TYPE_CANCEL_RESEARCH:
-                try {
-                    $message = VillageUpgradeManager::cancelResearch($system, $player->village, $proposal['upgrade_key']);
-                    // update proposal
-                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
-                    // create notification
-                    self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
-                } catch (RuntimeException $e) {
-                    return $e->getMessage();
-                }
-                break;
-            case self::PROPOSAL_TYPE_BOOST_CONSTRUCTION:
-                try {
-                    $message = VillageUpgradeManager::boostConstruction($system, $player->village, $proposal['building_key']);
-                    // update proposal
-                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
-                    // create notification
-                    self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
-                } catch (RuntimeException $e) {
-                    return $e->getMessage();
-                }
-                break;
-            case self::PROPOSAL_TYPE_BOOST_RESEARCH:
-                try {
-                    $message = VillageUpgradeManager::boostResearch($system, $player->village, $proposal['upgrade_key']);
-                    // update proposal
-                    $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'passed' WHERE `proposal_id` = {$proposal['proposal_id']}");
-                    // create notification
-                    self::createProposalNotification($system, $proposal['village_id'], NotificationManager::NOTIFICATION_PROPOSAL_PASSED, $proposal['name']);
-                } catch (RuntimeException $e) {
-                    return $e->getMessage();
-                }
                 break;
             default:
                 return "Invalid proposal type.";
@@ -1872,7 +1788,9 @@ class VillageManager {
             $supply_points = [];
             $resource_counts = $system->db->query("SELECT `region_locations`.`resource_id`, COUNT(`region_locations`.`resource_id`) AS `supply_points`
                 FROM `region_locations`
-                WHERE `region_locations`.`occupying_village_id` = {$i}
+                INNER JOIN `regions` ON `region_locations`.`region_id` = `regions`.`region_id`
+                WHERE (`regions`.`village` = {$i} AND `region_locations`.`occupying_village_id` IS NULL)
+                OR `region_locations`.`occupying_village_id` = {$i}
                 GROUP BY `region_locations`.`resource_id`");
             $resource_data = [];
             while ($row = $system->db->fetch($resource_counts)) {
@@ -2214,251 +2132,6 @@ class VillageManager {
         return "Proposal created!";
     }
 
-    /**
-     * @return string
-     */
-    public static function createConstructionProposal(System $system, User $player, string $building_key): string {
-        // check player permissions
-        $seat = $player->village_seat;
-        if ($seat->seat_type != "kage") {
-            return "You do not meet the seat requirements.";
-        }
-        // check construction requirements
-        if (!VillageUpgradeManager::checkConstructionRequirementsMet($player->village, $building_key, $player->village->buildings[$building_key]->tier + 1)) {
-            return "Construction requirements not met.";
-        }
-        // check no pending proposal of same type
-        $proposal_type = self::PROPOSAL_TYPE_BEGIN_CONSTRUCTION;
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = '{$proposal_type}' LIMIT 1");
-        $last_change = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            return "There is already a pending proposal of the same type.";
-        }
-        // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
-        }
-        // insert into DB
-        $time = time();
-        $name = "Begin Construction: " . VillageBuildingConfig::BUILDING_NAMES[$building_key];
-        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `building_key`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$proposal_type}', '{$name}', '{$building_key}')");
-        // create notification
-        self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
-        return "Proposal created!";
-    }
-
-    public static function createCancelConstructionProposal(System $system, User $player, string $building_key): string {
-        // check player permissions
-        $seat = $player->village_seat;
-        if ($seat->seat_type != "kage") {
-            return "You do not meet the seat requirements.";
-        }
-        // check that building is under construction
-        if ($player->village->buildings[$building_key]->status != VillageBuildingConfig::BUILDING_STATUS_UPGRADING) {
-            return "Building is not under construction.";
-        }
-        // check no pending proposal of same type
-        $proposal_type = self::PROPOSAL_TYPE_CANCEL_CONSTRUCTION;
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = '{$proposal_type}' LIMIT 1");
-        $last_change = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            return "There is already a pending proposal of the same type.";
-        }
-        // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
-        }
-        // insert into DB
-        $time = time();
-        $name = "Cancel Construction: " . VillageBuildingConfig::BUILDING_NAMES[$building_key];
-        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `building_key`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$proposal_type}', '{$name}', '{$building_key}')");
-        // create notification
-        self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
-        return "Proposal created!";
-    }
-
-    public static function createResearchProposal(System $system, User $player, string $upgrade_key): string {
-        // check player permissions
-        $seat = $player->village_seat;
-        if ($seat->seat_type != "kage") {
-            return "You do not meet the seat requirements.";
-        }
-        // check research requirements
-        if (!VillageUpgradeManager::checkResearchRequirementsMet($player->village, $upgrade_key)) {
-            return "Research requirements not met.";
-        }
-        // check no pending proposal of same type
-        $proposal_type = self::PROPOSAL_TYPE_BEGIN_RESEARCH;
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = '{$proposal_type}' LIMIT 1");
-        $last_change = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            return "There is already a pending proposal of the same type.";
-        }
-        // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
-        }
-        // insert into DB
-        $time = time();
-        $name = "Begin Research: " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key];
-        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `upgrade_key`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$proposal_type}', '{$name}', '{$upgrade_key}')");
-        // create notification
-        self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
-        return "Proposal created!";
-    }
-
-    public static function createCancelResearchProposal(System $system, User $player, string $upgrade_key): string {
-        // check player permissions
-        $seat = $player->village_seat;
-        if ($seat->seat_type != "kage") {
-            return "You do not meet the seat requirements.";
-        }
-        // check that research is active
-        if ($player->village->upgrades[$upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING) {
-            return "Research is not active for this upgrade.";
-        }
-        // check no pending proposal of same type
-        $proposal_type = self::PROPOSAL_TYPE_CANCEL_RESEARCH;
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = '{$proposal_type}' LIMIT 1");
-        $last_change = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            return "There is already a pending proposal of the same type.";
-        }
-        // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
-        }
-        // insert into DB
-        $time = time();
-        $name = "Cancel Research: " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key];
-        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `upgrade_key`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$proposal_type}', '{$name}', '{$upgrade_key}')");
-        // create notification
-        self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
-        return "Proposal created!";
-    }
-
-    /**
-     * @return string
-     */
-    public static function createboostConstructionProposal(System $system, User $player, string $building_key): string {
-        // check player permissions
-        $seat = $player->village_seat;
-        if ($seat->seat_type != "kage") {
-            return "You do not meet the seat requirements.";
-        }
-        // check that building is under construction
-        if ($player->village->buildings[$building_key]->status != VillageBuildingConfig::BUILDING_STATUS_UPGRADING) {
-            return "Building is not under construction.";
-        }
-        // check that building construction has not yet been boosted
-        if ($player->village->buildings[$building_key]->construction_boosted) {
-            return "Building construction has already been boosted.";
-        }
-        // check no pending proposal of same type
-        $proposal_type = self::PROPOSAL_TYPE_BOOST_CONSTRUCTION;
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = '{$proposal_type}' LIMIT 1");
-        $last_change = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            return "There is already a pending proposal of the same type.";
-        }
-        // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
-        }
-        // insert into DB
-        $time = time();
-        $name = "Boost Construction: " . VillageBuildingConfig::BUILDING_NAMES[$building_key];
-        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `building_key`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$proposal_type}', '{$name}', '{$building_key}')");
-        // create notification
-        self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
-        return "Proposal created!";
-    }
-
-    /**
-     * @return string
-     */
-    public static function createBoostResearchProposal(System $system, User $player, string $upgrade_key) {
-        // check player permissions
-        $seat = $player->village_seat;
-        if ($seat->seat_type != "kage") {
-            return "You do not meet the seat requirements.";
-        }
-        // check that research is active
-        if ($player->village->upgrades[$upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING) {
-            return "Research is not active for this upgrade.";
-        }
-        // check that research has not yet been boosted
-        if ($player->village->upgrades[$upgrade_key]->research_boosted) {
-            return "Research has already been boosted.";
-        }
-        // check no pending proposal of same type
-        $proposal_type = self::PROPOSAL_TYPE_BOOST_RESEARCH;
-        $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = '{$proposal_type}' LIMIT 1");
-        $last_change = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            return "There is already a pending proposal of the same type.";
-        }
-        // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
-        }
-        // insert into DB
-        $time = time();
-        $name = "Boost Research: " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key];
-        $system->db->query("INSERT INTO `proposals` (`village_id`, `user_id`, `start_time`, `type`, `name`, `upgrade_key`) VALUES ({$player->village->village_id}, {$player->user_id}, {$time}, '{$proposal_type}', '{$name}', '{$upgrade_key}')");
-        // create notification
-        self::createProposalNotification($system, $player->village->village_id, NotificationManager::NOTIFICATION_PROPOSAL_CREATED, $name);
-        return "Proposal created!";
-    }
-
     private static function checkTradeValid(System $system, int $village1_id, int $village2_id, array $offered_resources, array $offered_regions, array $requested_resources, array $requested_regions): bool {
         // get regions
         $village1_regions = $system->db->query("SELECT `region_id` FROM `regions` WHERE `village` = {$village1_id}");
@@ -2504,12 +2177,11 @@ class VillageManager {
         return true;
     }
 
-    private static function handleTradeCompletion(System $system, int $village1_id, int $village2_id, array $offered_resources, array $offered_regions, array $requested_resources, array $requested_regions) {
+    private static function handleTradeCompletion(System $system, int $village1_id, int $village2_id, array $offered_resources, array $offered_regions, array $requested_resources, array $requested_regions)
+    {
         // update regions
         foreach ($offered_regions as $region) {
             $system->db->query("UPDATE `regions` SET `village` = {$village2_id} WHERE `region_id` = {$region}");
-            // update castles and towns in region if available to trade
-            $system->db->query("UPDATE `region_locations` SET `occupying_village_id` = {$village2_id} WHERE `region_id` = {$region} AND `occupying_village_id` = {$village1_id}");
             // update patrols, move back 5 minutes
             $patrol_spawn = time() + (60 * 5);
             $system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$village2_id} WHERE `region_id` = {$region}");
@@ -2520,8 +2192,6 @@ class VillageManager {
         }
         foreach ($requested_regions as $region) {
             $system->db->query("UPDATE `regions` SET `village` = {$village1_id} WHERE `region_id` = {$region}");
-            // update castles and towns in region if available to trade
-            $system->db->query("UPDATE `region_locations` SET `occupying_village_id` = {$village1_id} WHERE `region_id` = {$region} AND `occupying_village_id` = {$village2_id}");
             // update patrols, move back 5 minutes
             $patrol_spawn = time() + (60 * 5);
             $system->db->query("UPDATE `patrols` SET `start_time` = {$patrol_spawn}, `village_id` = {$village1_id} WHERE `region_id` = {$region}");
@@ -2585,10 +2255,10 @@ class VillageManager {
                     $relation_name = "Neutral";
                     break;
                 case VillageRelation::RELATION_ALLIANCE:
-                    $relation_name = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " - " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . " Alliance";
+                    $relation_name = VillageManager::VILLAGE_NAMES[$initiator_village_id] . "-" . VillageManager::VILLAGE_NAMES[$recipient_village_id] . " Alliance";
                     break;
                 case VillageRelation::RELATION_WAR:
-                    $relation_name = VillageManager::VILLAGE_NAMES[$initiator_village_id] . " - " . VillageManager::VILLAGE_NAMES[$recipient_village_id] . " War";
+                    $relation_name = VillageManager::VILLAGE_NAMES[$initiator_village_id] . "-" . VillageManager::VILLAGE_NAMES[$recipient_village_id] . " War";
                     break;
                 default:
                     break;
