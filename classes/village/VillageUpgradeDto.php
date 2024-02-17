@@ -9,6 +9,7 @@ class VillageUpgradeDto {
         public ?int $research_progress = null,
         public ?int $research_progress_required = null,
         public ?int $research_progress_last_updated = null,
+        public bool $research_boosted = false,
         public string $research_time_remaining = '',
         public string $name,
         public string $description,

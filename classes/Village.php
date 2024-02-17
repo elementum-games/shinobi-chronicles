@@ -150,4 +150,22 @@ class Village {
         }
         return ($this->relations[$target_village_id]->relation_type == VillageRelation::RELATION_NEUTRAL);
     }
+    public function subtractPoints(int $points): int {
+        $change = 0;
+        if ($this->points >= $points) {
+            $change = $points;
+            $this->points -= $points;
+        } else {
+            $change = $this->points;
+            $this->points = 0;
+        }
+        return $change;
+    }
+    public function updatePoints(bool $run_query = true): string {
+        $query = "UPDATE `villages` SET `points` = {$this->points} WHERE `village_id` = {$this->village_id}";
+        if ($run_query) {
+            $this->system->db->query("UPDATE `villages` SET `points` = {$this->points} WHERE `village_id` = {$this->village_id}");
+        }
+        return $query;
+    }
 }

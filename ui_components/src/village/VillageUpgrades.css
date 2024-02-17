@@ -376,7 +376,7 @@
     margin-bottom: -10px;
     padding-right: 20px;
 }
-.construction_begin_button, .research_begin_button, .repair_begin_button, .construction_cancel_button, .research_cancel_button, .upgrade_toggle_off_button, .upgrade_toggle_on_button {
+.upgrades_control_button {
     width: 80px;
     height: 25px;
     text-align: center;
@@ -393,23 +393,23 @@
 .construction_begin_button, .research_begin_button {
     background: #343d77;
 }
-.repair_begin_button, .upgrade_toggle_on_button {
+.repair_begin_button, .upgrade_toggle_on_button, .construction_boost_button, .research_boost_button {
     background: #35582d;
 }
 .construction_cancel_button, .research_cancel_button, .upgrade_toggle_off_button {
     background: #6f3043;
 }
-    .construction_begin_button:hover, .construction_cancel_button:hover, .research_begin_button:hover, .research_cancel_button:hover, .repair_begin_button:hover, .upgrade_toggle_off_button:hover, .upgrade_toggle_on_button:hover {
-        color: white;
-    }
-        .construction_begin_button.disabled, .construction_cancel_button.disabled, .research_begin_button.disabled, .research_cancel_button.disabled, .repair_begin_button.disabled, .upgrade_toggle_off_button:disabled, .upgrade_toggle_on_button:disabled {
-            opacity: 30%;
-            pointer-events: none;
-        }
-        .construction_begin_button.disabled:hover, .construction_cancel_button.disabled:hover, .research_begin_button.disabled:hover, .research_cancel_button.disabled:hover, .repair_begin_button.disabled:hover, .upgrade_toggle_off_button.disabled:hover, .upgrade_toggle_on_button.disabled:hover {
-            color: #ccc1af;
-            cursor: default;
-        }
+.upgrades_control_button:hover {
+    color: white;
+}
+.upgrades_control_button.disabled {
+    opacity: 30%;
+    pointer-events: none;
+}
+.upgrades_control_button.disabled:hover {
+    color: #ccc1af;
+    cursor: default;
+}
 .building_upgrade_requirements {
     text-transform: uppercase;
     color: #c0c7dc;
