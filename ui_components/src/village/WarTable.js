@@ -1,4 +1,5 @@
 // @flow
+
 import { apiFetch } from "../utils/network.js";
 import { getPolicyDisplayData, getVillageBanner, getVillageIcon } from "./villageUtils.js";
 
@@ -15,194 +16,6 @@ export function WarTable({
     const [warRecords, setWarRecords] = React.useState(warRecordData.war_records);
     const [warRecordsPageNumber, setWarRecordsPageNumber] = React.useState(1);
     const [selectedWarRecord, setSelectedWarRecord] = React.useState(null);
-
-    const GlobalLeaderboardNextPage = (page_number) => {
-        apiFetch(
-            villageAPI,
-            {
-                request: 'GetGlobalWarLeaderboard',
-                page_number: page_number,
-            }
-        ).then((response) => {
-            if (response.errors.length) {
-                handleErrors(response.errors);
-                return;
-            }
-            if (response.data.warLogData.global_leaderboard_war_logs.length == 0) {
-                return;
-            } else {
-                setGlobalLeaderboardPageNumber(page_number);
-                setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
-            }
-        });
-    }
-    const GlobalLeaderboardPreviousPage = (page_number) => {
-        if (page_number > 0) {
-            apiFetch(
-                villageAPI,
-                {
-                    request: 'GetGlobalWarLeaderboard',
-                    page_number: page_number,
-                }
-            ).then((response) => {
-                if (response.errors.length) {
-                    handleErrors(response.errors);
-                    return;
-                }
-                setGlobalLeaderboardPageNumber(page_number);
-                setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
-            });
-        }
-    }
-    const WarRecordsNextPage = (page_number) => {
-        apiFetch(
-            villageAPI,
-            {
-                request: 'GetWarRecords',
-                page_number: page_number,
-            }
-        ).then((response) => {
-            if (response.errors.length) {
-                handleErrors(response.errors);
-                return;
-            }
-            if (response.data.warRecordData.war_records.length == 0) {
-                return;
-            } else {
-                setWarRecordsPageNumber(page_number);
-                setWarRecords(response.data.warRecordData.war_records);
-            }
-        });
-    }
-    const WarRecordsPreviousPage = (page_number) => {
-        if (page_number > 0) {
-            apiFetch(
-                villageAPI,
-                {
-                    request: 'GetWarRecords',
-                    page_number: page_number,
-                }
-            ).then((response) => {
-                if (response.errors.length) {
-                    handleErrors(response.errors);
-                    return;
-                }
-                setWarRecordsPageNumber(page_number);
-                setWarRecords(response.data.warRecordData.war_records);
-            });
-        }
-    }
-
-    return (
-        <div className="wartable_container">
-            <div className="row first">
-                <div className="column first">
-                    <div className="header">your war score</div>
-                    <div className="player_warlog_container">
-                        <WarLogHeader />
-                        <PlayerWarLog log={playerWarLog} index={0} animate={false} getVillageIcon={getVillageIcon} />
-                    </div>
-                </div>
-            </div>
-            <div className="row second">
-                <div className="column first">
-                    <div className="header">global war score</div>
-                    <div className="global_leaderboard_container">
-                        <div className="warlog_label_row">
-                            <div className="warlog_username_label"></div>
-                            <div className="warlog_war_score_label">war score</div>
-                            <div className="warlog_pvp_wins_label">pvp wins</div>
-                            <div className="warlog_raid_label">raid</div>
-                            <div className="warlog_reinforce_label">reinforce</div>
-                            <div className="warlog_infiltrate_label">infiltrate</div>
-                            <div className="warlog_defense_label">def</div>
-                            <div className="warlog_captures_label">captures</div>
-                            <div className="warlog_patrols_label">patrols</div>
-                            <div className="warlog_resources_label">resources</div>
-                            <div className="warlog_chart_label"></div>
-                        </div>
-                        {globalLeaderboardWarLogs
-                            .map((log, index) => (
-                                <PlayerWarLog log={log} index={index} animate={true} getVillageIcon={getVillageIcon} />
-                            ))}
-                    </div>
-                    <div className="global_leaderboard_navigation">
-                        <div className="global_leaderboard_navigation_divider_left">
-                            <svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg>
-                        </div>
-                        <div className="global_leaderboard_pagination_wrapper">
-                            {globalLeaderboardPageNumber > 1 && <a className="global_leaderboard_pagination" onClick={() => GlobalLeaderboardPreviousPage(globalLeaderboardPageNumber - 1)}>{"<< Prev"}</a>}
-                        </div>
-                        <div className="global_leaderboard_navigation_divider_middle"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
-                        <div className="global_leaderboard_pagination_wrapper">
-                            <a className="global_leaderboard_pagination" onClick={() => GlobalLeaderboardNextPage(globalLeaderboardPageNumber + 1)}>{"Next >>"}</a>
-                        </div>
-                        <div className="global_leaderboard_navigation_divider_right"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
-                    </div>
-                </div>
-            </div>
-            <div className="row third">
-                <div className="column first">
-                    <svg height="0" width="0">
-                        <defs>
-                            <filter id="war_record_hover">
-                                <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
-                                <feFlood floodColor="white" result="floodColor" />
-                                <feComponentTransfer in="blur" result="opacityAdjustedBlur">
-                                    <feFuncA type="linear" slope="1" />
-                                </feComponentTransfer>
-                                <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
-                                <feMerge>
-                                    <feMergeNode in="coloredBlur" />
-                                    <feMergeNode in="SourceGraphic" />
-                                </feMerge>
-                            </filter>
-                        </defs>
-                    </svg>
-                    <div className="header">war records</div>
-                    <div className="war_records_container">
-                        {warRecords
-                            .map((record, index) => (
-                                <WarRecord record={record} index={index} getVillageIcon={getVillageIcon} getVillageBanner={getVillageBanner} />
-                            ))}
-                    </div>
-                    <div className="global_leaderboard_navigation">
-                        <div className="global_leaderboard_navigation_divider_left">
-                            <svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg>
-                        </div>
-                        <div className="global_leaderboard_pagination_wrapper">
-                            {warRecordsPageNumber > 1 && <a className="global_leaderboard_pagination" onClick={() => WarRecordsPreviousPage(warRecordsPageNumber - 1)}>{"<< Prev"}</a>}
-                        </div>
-                        <div className="global_leaderboard_navigation_divider_middle"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
-                        <div className="global_leaderboard_pagination_wrapper">
-                            <a className="global_leaderboard_pagination" onClick={() => WarRecordsNextPage(warRecordsPageNumber + 1)}>{"Next >>"}</a>
-                        </div>
-                        <div className="global_leaderboard_navigation_divider_right"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
-                    </div>
-                    {selectedWarRecord &&
-                        <div className="village_warlog_container">
-                            <VillageWarLog
-                                log={selectedWarRecord.attacker_war_log}
-                                getVillageIcon={getVillageIcon}
-                                animate={true}
-                                is_attacker={true}
-                                getPolicyDisplayData={getPolicyDisplayData}
-                                strategicDataState={strategicDataState}
-                            />
-                            <VillageWarLog
-                                log={selectedWarRecord.defender_war_log}
-                                getVillageIcon={getVillageIcon}
-                                animate={true}
-                                is_attacker={false}
-                                getPolicyDisplayData={getPolicyDisplayData}
-                                strategicDataState={strategicDataState}
-                            />
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    );
 
     function WarLogHeader() {
         return (
@@ -221,7 +34,7 @@ export function WarTable({
             </div>
         );
     }
-    function PlayerWarLog({ log, index, animate, getVillageIcon }) {
+    function PlayerWarLog({ log, index, animate }) {
         const scoreData = [
             { name: 'Objective Score', score: log.objective_score },
             { name: 'Resource Score', score: log.resource_score },
@@ -231,13 +44,13 @@ export function WarTable({
         return (
             <div key={index} className="warlog_item">
                 <div className="warlog_data_row">
-                    {log.rank == 1 &&
+                    {log.rank === 1 &&
                         <span className="warlog_rank_wrapper"><span className="warlog_rank first">{log.rank}</span></span>
                     }
-                    {log.rank == 2 &&
+                    {log.rank === 2 &&
                         <span className="warlog_rank_wrapper"><span className="warlog_rank second">{log.rank}</span></span>
                     }
-                    {log.rank == 3 &&
+                    {log.rank === 3 &&
                         <span className="warlog_rank_wrapper"><span className="warlog_rank third">{log.rank}</span></span>
                     }
                     {log.rank > 3 &&
@@ -299,7 +112,7 @@ export function WarTable({
         );
     }
 
-    function WarRecord({ record, index, getVillageIcon, getVillageBanner }) {
+    function WarRecord({ record, index }) {
         const is_active = record.village_relation.relation_end ? false : true;
         function calculateBarPercent() {
             let victory_percent_required = record.victory_percent_required;
@@ -322,7 +135,7 @@ export function WarTable({
                             width: (100 - attacker_score_percentage) + "%",
                         }}>
                     </div>
-                    <svg className="war_record_score_divider" viewBox="0 0 200 200" width="7" height="7" style={{ paddingBottom: "1px", left: (attacker_score_percentage - 1) + "%" }}>
+                    <svg className="war_record_score_divider" viewBox="0 0 200 200" width="7" height="7" style={{paddingBottom: "1px", left: (attacker_score_percentage - 1) + "%" }}>
                         <defs>
                             <linearGradient id="war_record_score_divider_gradient">
                                 <stop stopColor="#f8de97" offset="0%" />
@@ -343,23 +156,34 @@ export function WarTable({
                         </defs>
                         <polygon points="0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0" fill="url(#war_record_score_divider_gradient)" stroke="#4d401c" strokeWidth="20"></polygon>
                     </svg>
-                    {/*<svg className="war_record_score_divider" viewBox="0 0 200 200" width="7" height="7" style={{ paddingBottom: "1px", left: victory_bar_percentage + "%" }}>
+                    <svg className="war_record_score_divider" viewBox="0 0 200 200" width="7" height="7" style={{ paddingBottom: "1px", left: victory_bar_percentage + "%" }}>
                         <polygon points="0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0" fill="url(#war_record_score_divider_gradient)" stroke="#4d401c" strokeWidth="20"></polygon>
                     </svg>
                     <svg className="war_record_score_divider" viewBox="0 0 200 200" width="7" height="7" style={{ paddingBottom: "1px", left: (100 - victory_bar_percentage) + "%" }}>
                         <polygon points="0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0" fill="url(#war_record_score_divider_gradient)" stroke="#4d401c" strokeWidth="20"></polygon>
-                    </svg>*/}
+                    </svg>
                 </div>
             );
         }
         return (
-            <div key={index} className={"war_record" + (selectedWarRecord && (record.village_relation.relation_id == selectedWarRecord.village_relation.relation_id) ? " selected" : "")} onClick={() => setSelectedWarRecord(record)}
+            <div
+                key={index}
+                className={"war_record" + (selectedWarRecord && (
+                    record.village_relation.relation_id === selectedWarRecord.village_relation.relation_id
+                    ) ? " selected" : "")
+                }
+                onClick={() => setSelectedWarRecord(record)}
                 style={{
-                    background: `linear-gradient(to right, transparent 0%, #17161b 30%, #17161b 70%, transparent 100%), url('${getVillageBanner(record.village_relation.village1_id)}'), url('${getVillageBanner(record.village_relation.village2_id)}')`,
+                    background: `
+                        linear-gradient(to right, transparent 0%, #17161b 30%, #17161b 70%, transparent 100%), 
+                        url('${getVillageBanner(record.village_relation.village1_id)}'), 
+                        url('${getVillageBanner(record.village_relation.village2_id)}')
+                    `,
                     backgroundPosition: "center, -20% center, 115% center",
                     backgroundSize: "cover, auto, auto",
                     backgroundRepeat: "no-repeat"
-                }}>
+                }}
+            >
                 <div className="war_record_village left">
                     <div className="war_record_village_inner">
                         <img src={getVillageIcon(record.village_relation.village1_id)} />
@@ -369,10 +193,10 @@ export function WarTable({
                     <div className={"war_record_relation_name" + (is_active ? " active" : " inactive")}>{record.village_relation.relation_name}</div>
                     <div className="war_record_label_row">
                         <div className={"war_record_score left" + (is_active ? " active" : " inactive")}>{record.attacker_war_log.war_score}</div>
-                        <div className={"war_record_status" + (is_active ? " active" : " inactive")}>
+                        <div className={"war_record_status" + (is_active ?  " active" : " inactive")}>
                             {record.village_relation.relation_end ?
                                 <>
-                                    {record.village_relation.relation_start + " - " + record.village_relation.relation_end}
+                                    {record.village_relation.relation_start + " - " + record.village_relation.relation_end} 
                                 </>
                                 :
                                 <>
@@ -393,9 +217,9 @@ export function WarTable({
         );
     }
 
-    function VillageWarLog({ log, getVillageIcon, animate, is_attacker, getPolicyDisplayData, strategicDataState }) {
-        console.log(strategicDataState.find(item => item.village.name == "Stone"));
-        const policy_name = getPolicyDisplayData(strategicDataState.find(item => item.village.name == log.village_name).village.policy_id).name;
+    function VillageWarLog({ log, animate, is_attacker, strategicDataState }) {
+        console.log(strategicDataState.find(item => item.village.name === "Stone"));
+        const policy_name = getPolicyDisplayData(strategicDataState.find(item => item.village.name === log.village_name).village.policy_id).name;
         const scoreData = [
             { name: 'Objective Score', score: log.objective_score },
             { name: 'Resource Score', score: log.resource_score },
@@ -405,7 +229,7 @@ export function WarTable({
         return (
             <div className="village_warlog">
                 <div className="village_warlog_header">
-                    <img src={getVillageIcon(log.village_id)} />
+                    <img src={getVillageIcon(log.village_id)}/>
                     <div className="village_warlog_header_name">{log.village_name}</div>
                     <div className="village_warlog_header_policy">{policy_name}</div>
                     <div className={"village_warlog_header_war_score" + (is_attacker ? " attacker" : " defender")}>{log.war_score}</div>
@@ -487,4 +311,188 @@ export function WarTable({
             </div>
         );
     }
+
+    const GlobalLeaderboardNextPage = (page_number) => {
+        apiFetch(
+            villageAPI,
+            {
+                request: 'GetGlobalWarLeaderboard',
+                page_number: page_number,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            if (response.data.warLogData.global_leaderboard_war_logs.length === 0) {
+                return;
+            } else {
+                setGlobalLeaderboardPageNumber(page_number);
+                setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
+            }
+        });
+    }
+    const GlobalLeaderboardPreviousPage = (page_number) => {
+        if (page_number > 0) {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'GetGlobalWarLeaderboard',
+                    page_number: page_number,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setGlobalLeaderboardPageNumber(page_number);
+                setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
+            });
+        }
+    }
+    const WarRecordsNextPage = (page_number) => {
+        apiFetch(
+            villageAPI,
+            {
+                request: 'GetWarRecords',
+                page_number: page_number,
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            if (response.data.warRecordData.war_records.length === 0) {
+                return;
+            } else {
+                setWarRecordsPageNumber(page_number);
+                setWarRecords(response.data.warRecordData.war_records);
+            }
+        });
+    }
+    const WarRecordsPreviousPage = (page_number) => {
+        if (page_number > 0) {
+            apiFetch(
+                villageAPI,
+                {
+                    request: 'GetWarRecords',
+                    page_number: page_number,
+                }
+            ).then((response) => {
+                if (response.errors.length) {
+                    handleErrors(response.errors);
+                    return;
+                }
+                setWarRecordsPageNumber(page_number);
+                setWarRecords(response.data.warRecordData.war_records);
+            });
+        }
+    }
+
+    return (
+        <div className="wartable_container">
+            <div className="row first">
+                <div className="column first">
+                    <div className="header">your war score</div>
+                    <div className="player_warlog_container">
+                        <WarLogHeader />
+                        <PlayerWarLog log={playerWarLog} index={0} animate={false} />
+                    </div>
+                </div>
+            </div>
+            <div className="row second">
+                <div className="column first">
+                    <div className="header">global war score</div>
+                    <div className="global_leaderboard_container">
+                        <div className="warlog_label_row">
+                            <div className="warlog_username_label"></div>
+                            <div className="warlog_war_score_label">war score</div>
+                            <div className="warlog_pvp_wins_label">pvp wins</div>
+                            <div className="warlog_raid_label">raid</div>
+                            <div className="warlog_reinforce_label">reinforce</div>
+                            <div className="warlog_infiltrate_label">infiltrate</div>
+                            <div className="warlog_defense_label">def</div>
+                            <div className="warlog_captures_label">captures</div>
+                            <div className="warlog_patrols_label">patrols</div>
+                            <div className="warlog_resources_label">resources</div>
+                            <div className="warlog_chart_label"></div>
+                        </div>
+                        {globalLeaderboardWarLogs
+                            .map((log, index) => (
+                                <PlayerWarLog log={log} index={index} animate={true} />
+                            ))}
+                    </div>
+                    <div className="global_leaderboard_navigation">
+                        <div className="global_leaderboard_navigation_divider_left">
+                            <svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg>
+                        </div>
+                        <div className="global_leaderboard_pagination_wrapper">
+                            {globalLeaderboardPageNumber > 1 && <a className="global_leaderboard_pagination" onClick={() => GlobalLeaderboardPreviousPage(globalLeaderboardPageNumber - 1)}>{"<< Prev"}</a>}
+                        </div>
+                        <div className="global_leaderboard_navigation_divider_middle"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
+                        <div className="global_leaderboard_pagination_wrapper">
+                            <a className="global_leaderboard_pagination" onClick={() => GlobalLeaderboardNextPage(globalLeaderboardPageNumber + 1)}>{"Next >>"}</a>
+                        </div>
+                        <div className="global_leaderboard_navigation_divider_right"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
+                    </div>
+                </div>
+            </div>
+            <div className="row third" style={{display: "none"}}>
+                <div className="column first">
+                    <svg height="0" width="0">
+                        <defs>
+                            <filter id="war_record_hover">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                                <feFlood floodColor="white" result="floodColor" />
+                                <feComponentTransfer in="blur" result="opacityAdjustedBlur">
+                                    <feFuncA type="linear" slope="1" />
+                                </feComponentTransfer>
+                                <feComposite in="floodColor" in2="opacityAdjustedBlur" operator="in" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+                    </svg>
+                    <div className="header">war records</div>
+                    <div className="war_records_container">
+                        {warRecords
+                            .map((record, index) => (
+                                <WarRecord record={record} index={index} />
+                            ))}
+                    </div>
+                    <div className="global_leaderboard_navigation">
+                        <div className="global_leaderboard_navigation_divider_left">
+                            <svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg>
+                        </div>
+                        <div className="global_leaderboard_pagination_wrapper">
+                            {warRecordsPageNumber > 1 && <a className="global_leaderboard_pagination" onClick={() => WarRecordsPreviousPage(warRecordsPageNumber - 1)}>{"<< Prev"}</a>}
+                        </div>
+                        <div className="global_leaderboard_navigation_divider_middle"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
+                        <div className="global_leaderboard_pagination_wrapper">
+                            <a className="global_leaderboard_pagination" onClick={() => WarRecordsNextPage(warRecordsPageNumber + 1)}>{"Next >>"}</a>
+                        </div>
+                        <div className="global_leaderboard_navigation_divider_right"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
+                    </div>
+                    {selectedWarRecord &&
+                        <div className="village_warlog_container">
+                            <VillageWarLog
+                                log={selectedWarRecord.attacker_war_log}
+                                animate={true}
+                                is_attacker={true}
+                                strategicDataState={strategicDataState}
+                            />
+                            <VillageWarLog
+                                log={selectedWarRecord.defender_war_log}
+                                animate={true}
+                                is_attacker={false}
+                                strategicDataState={strategicDataState}
+                            />
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    );
 }

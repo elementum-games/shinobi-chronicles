@@ -90,6 +90,11 @@ class WarManager {
         20 => 5
     ];
 
+    const INITIAL_VICTORY_SCORE_PERCENT_REQUIRED = 100; // 2:1 ratio of war score for victory
+    const FINAL_VICTORY_SCORE_PERCENT_REQUIRED = 50; // 1.5:1 ratio of war score for victory
+    const MIN_WAR_DURATION_DAYS = 3;
+    const MAX_WAR_DURATION_DAYS = 7;
+
     private System $system;
     private User $user;
 
@@ -637,6 +642,27 @@ class WarManager {
     public function villagesAreAllies(int $village1_id, int $village2_id): bool {
         return $village1_id == $village2_id ||
             $this->village_relations_by_village_ids[$village1_id][$village2_id]->relation_type == VillageRelation::RELATION_ALLIANCE;
+    }
+
+    public static function getVictoryPercentRequired(System $system, VillageRelation $village_relation): int {
+        // calculate war duration
+        if (isset($village_relation->relation_end)) {
+            $war_duration = $village_relation->relation_end - $village_relation->relation_start;
+        } else {
+            $war_duration = time() - $village_relation->relation_start;
+        }
+        $min_duration = self::MIN_WAR_DURATION_DAYS * 86400;
+        $max_duration = self::MAX_WAR_DURATION_DAYS * 86400;
+        if ($war_duration <= $min_duration) {
+            return self::INITIAL_VICTORY_SCORE_PERCENT_REQUIRED;
+        }
+        else if ($war_duration >= $max_duration) {
+            return self::FINAL_VICTORY_SCORE_PERCENT_REQUIRED;
+        }
+        else {
+            $duration_percent = ($war_duration - $min_duration) / ($max_duration - $min_duration);
+            return self::INITIAL_VICTORY_SCORE_PERCENT_REQUIRED - ($duration_percent * (self::INITIAL_VICTORY_SCORE_PERCENT_REQUIRED - self::FINAL_VICTORY_SCORE_PERCENT_REQUIRED));
+        }
     }
 }
 
