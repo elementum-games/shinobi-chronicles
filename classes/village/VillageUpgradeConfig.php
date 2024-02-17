@@ -1515,14 +1515,14 @@ class VillageUpgradeConfig {
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 1
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 2
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
                 VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I
@@ -1530,7 +1530,7 @@ class VillageUpgradeConfig {
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 3
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
                 VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II
@@ -1538,14 +1538,14 @@ class VillageUpgradeConfig {
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 1
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 2
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
                 VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I
@@ -1553,7 +1553,7 @@ class VillageUpgradeConfig {
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 3
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
                 VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II
@@ -1561,14 +1561,14 @@ class VillageUpgradeConfig {
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 1
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 2
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
                 VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I
@@ -1576,7 +1576,7 @@ class VillageUpgradeConfig {
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 3
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 3
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
                 VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II
@@ -1584,14 +1584,14 @@ class VillageUpgradeConfig {
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 1
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 1
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
             ],
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
-                VillageBuildingConfig::BUILDING_MARKET => 2
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 2
             ],
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
                 VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I
