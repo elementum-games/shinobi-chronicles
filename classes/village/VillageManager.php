@@ -26,7 +26,7 @@ class VillageManager {
 
     const RESOURCE_LOG_PRODUCTION = 1;
     const RESOURCE_LOG_COLLECTION = 2;
-    const RESOURCE_LOG_UPKEEP = 3; // legacy
+    const RESOURCE_LOG_EXPENSE = 3; // legacy
     const RESOURCE_LOG_TRADE_GAIN = 4;
     const RESOURCE_LOG_TRADE_LOSS = 5;
     const RESOURCE_LOG_CONSTRUCTION_COST = 6;
