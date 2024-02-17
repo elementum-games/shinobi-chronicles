@@ -339,6 +339,8 @@ export function VillageUpgrades({
       }), /*#__PURE__*/React.createElement("rect", {
         x: "15",
         y: "0",
+        rx: "2",
+        ry: "2",
         width: "10",
         height: "5",
         style: {
@@ -349,6 +351,8 @@ export function VillageUpgrades({
       }), /*#__PURE__*/React.createElement("rect", {
         x: "25",
         y: "0",
+        rx: "2",
+        ry: "2",
         width: "10",
         height: "5",
         style: {
@@ -359,6 +363,8 @@ export function VillageUpgrades({
       }), /*#__PURE__*/React.createElement("rect", {
         x: "35",
         y: "0",
+        rx: "2",
+        ry: "2",
         width: "10",
         height: "5",
         style: {
@@ -849,7 +855,7 @@ export function VillageUpgrades({
         ContentComponent: null,
         onConfirm: () => CancelConstruction()
       })
-    }, "cancel"), selectedBuilding.construction_boosted ? /*#__PURE__*/React.createElement("div", {
+    }, "cancel"), selectedBuilding.construction_boosted === "true" ? /*#__PURE__*/React.createElement("div", {
       className: "construction_boost_button upgrades_control_button",
       onClick: () => CheckBoostConstruction()
     }, "boost") : /*#__PURE__*/React.createElement("div", {

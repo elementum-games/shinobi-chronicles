@@ -337,9 +337,9 @@ export function VillageUpgrades({
                         </g>
                         <g transform="skewX(-25)">
                             <rect x="5" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
-                            <rect x="15" y="0" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
-                            <rect x="25" y="0" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
-                            <rect x="35" y="0" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="15" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="25" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
+                            <rect x="35" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
                             <rect x="45" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
                             <rect x="55" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
                             <rect x="65" y="0" rx="2" ry="2" width="10" height="5" style={{ fill: 'transparent', stroke: strokeColor, strokeWidth: '2' }} />
@@ -473,9 +473,9 @@ export function VillageUpgrades({
                                                 ContentComponent: null,
                                                 onConfirm: () => CancelConstruction(),
                                             })}>cancel</div>
-                                            {selectedBuilding.construction_boosted
+                                            {selectedBuilding.construction_boosted === "true"
                                                 ?
-                                            <div className="construction_boost_button upgrades_control_button" onClick={() => CheckBoostConstruction()}>boost</div>
+                                                <div className="construction_boost_button upgrades_control_button" onClick={() => CheckBoostConstruction()}>boost</div>
                                                 :
                                                 <div className="construction_boost_button upgrades_control_button disabled">boost</div>
                                             }
