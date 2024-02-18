@@ -226,7 +226,6 @@ if($battle->battle_text) {
             margin-top: 1px;
         }
         .active_effect .effect_name {
-            line-height: 21px;
             font-size: 12px;
             height: 21px;
             padding-left: 10px;
@@ -244,7 +243,11 @@ if($battle->battle_text) {
             display: none;
         }
     .hover_text {
+        line-height: 20px;
         display: none;
+    }
+    .non_hover_text {
+        line-height: 20px;
     }
 </style>
 
