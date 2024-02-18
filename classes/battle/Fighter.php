@@ -455,7 +455,8 @@ abstract class Fighter {
         bool $residual_damage = false,
         bool $apply_resists = true,
         string $element = Jutsu::ELEMENT_NONE,
-        bool $is_raw_damage = true
+        bool $is_raw_damage = true,
+        bool $apply_weakness = true
     ): float|int {
         $defense = self::BASE_DEFENSE;
 
@@ -526,7 +527,9 @@ abstract class Fighter {
             default:
                 break;
         }
-        $raw_damage *= 1 + $weakness_modifier;
+        if ($apply_weakness) {
+            $raw_damage *= 1 + $weakness_modifier;
+        }
 
         if ($apply_resists && $this->reputation_defense_boost > 0) {
             $raw_damage *= (100 - $this->reputation_defense_boost) / 100;
