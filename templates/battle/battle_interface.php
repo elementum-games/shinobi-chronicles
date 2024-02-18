@@ -233,18 +233,20 @@ if($battle->battle_text) {
             border-radius: 4px;
             box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
             text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-            width: 100px;
             text-align: center;
+            display: flex;
+            justify-content: center;
         }
         .active_effect:hover .hover_text {
             display: initial;
         }
         .active_effect:hover .non_hover_text {
-            display: none;
+            visibility: hidden;
         }
     .hover_text {
         line-height: 20px;
         display: none;
+        position: absolute;
     }
     .non_hover_text {
         line-height: 20px;
