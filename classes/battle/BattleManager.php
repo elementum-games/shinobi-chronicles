@@ -1186,13 +1186,11 @@ class BattleManager {
         foreach ($attack->jutsu->effects as $effect) {
             if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual") {
                 $effect_power = $effect->effect_amount * $effect->effect_length;
-                echo "test";
                 $residual_damage = $target->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type, apply_resists: false, apply_weakness: false);
                 $effect->potential_damage = $residual_damage;
             }
             if ($effect->effect == "reflect_damage") {
                 $effect_power = $effect->effect_amount * $effect->effect_length;
-                echo "test2";
                 $reflect_damage = $user->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type, apply_resists: false, apply_weakness: false);
                 $effect->potential_damage = $reflect_damage;
             }
@@ -1200,13 +1198,11 @@ class BattleManager {
         foreach ($attack->effects as $effect) {
             if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual") {
                 $effect_power = $effect->effect_amount * $effect->effect_length;
-                echo "test";
                 $residual_damage = $target->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type, apply_resists: false, apply_weakness: false);
                 $effect->potential_damage = $residual_damage;
             }
             if ($effect->effect == "reflect_damage") {
                 $effect_power = $effect->effect_amount * $effect->effect_length;
-                echo "test2";
                 $reflect_damage = $user->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type, apply_resists: false, apply_weakness: false);
                 $effect->potential_damage = $reflect_damage;
             }
