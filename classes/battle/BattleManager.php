@@ -862,7 +862,7 @@ class BattleManager {
         $attack->jutsu->setCombatId($fighter->combat_id);
 
         $disable_randomness = false;
-        switch($this->battle->battle_type) {
+        switch ($this->battle->battle_type) {
             case Battle::TYPE_AI_ARENA:
             case Battle::TYPE_AI_MISSION:
                 $disable_randomness = true;
@@ -883,6 +883,7 @@ class BattleManager {
                     break;
                 case 'recoil':
                     $attack->recoil_percent += $effect->effect_amount / 100;
+                    $attack->jutsu->power *= 1 + ($effect->effect_amount / 100);
                     break;
                 case 'immolate':
                     $attack->immolate_percent += $effect->effect_amount / 100;
