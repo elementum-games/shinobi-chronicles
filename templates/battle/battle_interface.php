@@ -23,7 +23,10 @@ $opponent_avatar_size = $opponent->getAvatarSize() . 'px';
 $battle_text = null;
 if($battle->battle_text) {
     $battle_text = $system->html_parse(stripslashes($battle->battle_text));
-    $battle_text = str_replace(array('[br]', '[hr]'), array('<br />', '<hr />'), $battle_text);
+    $battle_text = str_replace(
+        array('[br]', '[hr]', '[taijutsu]', '[ninjutsu]', '[genjutsu]', '[/taijutsu]', '[/ninjutsu]', '[/genjutsu]'),
+        array('<br />', '<hr />', '<span class="battle_text_taijutsu">', '<span class="battle_text_ninjutsu">', '<span class="battle_text_genjutsu">', '</span>', '</span>', '</span>'),
+    $battle_text);
 }
 ?>
 
