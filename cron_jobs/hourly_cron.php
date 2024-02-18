@@ -8,6 +8,9 @@ session_start();
  *
  *  Hourly Cron does the following:
  *      Calculates research and construction progress
+ *      Applies upkeep from upgrades
+ *      Applies resource decay
+ *      Triggers war victory conditions
  *      Applies base production for each village
  *      Increases resource count of each region by production rate
  *      Increases/Decreases region_location stability value toward baseline
@@ -89,6 +92,8 @@ if (isset($_SESSION['user_id'])) {
 }
 
 function hourlyCron(System $system, $debug = true): void {
+    // get war manager
+    $war_manager = new WarManager($system);
     // get regions
     $region_result = $system->db->query("SELECT * FROM `regions`");
     $region_result = $system->db->fetch_all($region_result);
@@ -188,6 +193,15 @@ function hourlyCron(System $system, $debug = true): void {
             }
         }
     }
+    /* trigger victory conditions
+    $war_type = VillageRelation::RELATION_WAR;
+    $query = "SELECT * FROM `village_relations` WHERE `relation_type` = {$war_type} AND `relation_end` IS NULL";
+    $wars = $system->db->query($query);
+    $wars = $system->db->fetch_all($wars);
+    foreach ($wars as $war_data) {
+        $war = new VillageRelation($war_data);
+        $queries = array_merge($queries, $war_manager->checkHandleVictoryConditions($war));
+    }*/
     // apply base production
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);
