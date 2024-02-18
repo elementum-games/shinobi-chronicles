@@ -138,7 +138,7 @@ function hourlyCaravan(System $system, $debug = true): void
     $region_result = $system->db->fetch_all($region_result);
     foreach ($region_result as $region) {
         // get region locations for region, ignore occupied villages
-        $region_location_result = $system->db->query("SELECT * FROM `region_locations` WHERE `region_id` = {$region['region_id']} AND `occupying_village_id` IS NULL");
+        $region_location_result = $system->db->query("SELECT * FROM `region_locations` WHERE `region_id` = {$region['region_id']} AND `occupying_village_id` = {$region['village']}");
         $region_location_result = $system->db->fetch_all($region_location_result);
         $caravan_resources = [];
         // add resources to region caravan
@@ -147,10 +147,10 @@ function hourlyCaravan(System $system, $debug = true): void
             $resources_remaining = $region_location['resource_count'] - $resources_taken;
             if (!empty($caravan_resources[$region_location['resource_id']])) {
                 $caravan_resources[$region_location['resource_id']] += $resources_taken;
-                $queries[] = "UPDATE `region_locations` SET `resource_count` = {$resources_remaining} WHERE `id` = {$region_location['id']}";
+                $queries[] = "UPDATE `region_locations` SET `resource_count` = {$resources_remaining} WHERE `region_location_id` = {$region_location['region_location_id']}";
             } else {
                 $caravan_resources[$region_location['resource_id']] = $resources_taken;
-                $queries[] = "UPDATE `region_locations` SET `resource_count` = {$resources_remaining} WHERE `id` = {$region_location['id']}";
+                $queries[] = "UPDATE `region_locations` SET `resource_count` = {$resources_remaining} WHERE `region_location_id` = {$region_location['region_location_id']}";
             }
         }
         // create new caravan for region
