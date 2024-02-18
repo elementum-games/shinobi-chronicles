@@ -281,8 +281,8 @@ function hourlyCron(System $system, $debug = true): void {
                 default;
                     break;
             }
-            // if one of the home regions, collect resources bypassing caravans
-            if ($region['region_id'] <= 5) {
+            // if one of the home regions or occupying village does not control region, collect resources bypassing caravans
+            if ($region['region_id'] <= 5 || $region['village'] != $region_location['occupying_village_id']) {
                 $villages[$region['village']]->addResource($region_location['resource_id'], $region_location['resource_count']);
                 $queries[] = "INSERT INTO `resource_logs`
                     (`village_id`, `resource_id`, `type`, `quantity`, `time`)
