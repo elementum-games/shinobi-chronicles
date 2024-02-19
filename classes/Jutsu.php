@@ -241,7 +241,7 @@ class Jutsu {
         );
     }
 
-    public function setLevel(int $level, int $exp) {
+    public function setLevel(int $level, int $exp): void {
         $this->level = $level;
         $this->exp = $exp;
 

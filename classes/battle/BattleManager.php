@@ -195,6 +195,7 @@ class BattleManager {
         $result = $this->system->db->query($query);
         while($row = $this->system->db->fetch($result)) {
             $default_attacks[$row['jutsu_id']] = Jutsu::fromArray($row['jutsu_id'], $row);
+            $default_attacks[$row['jutsu_id']]->setLevel(100, 0);
         }
         return $default_attacks;
     }
