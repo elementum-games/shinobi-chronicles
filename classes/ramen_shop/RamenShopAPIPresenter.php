@@ -7,8 +7,9 @@ class RamenShopAPIPresenter {
             "name" => $owner->name,
             "image" => $owner->image,
             "background" => $owner->background,
-            "description" => $owner->description,
+            "shop_description" => $owner->shop_description,
             "dialogue" => $owner->dialogue,
+            "shop_name" => $owner->shop_name
         ];
     }
     public static function getMysteryRamenResponse(System $system, User $player) {
@@ -18,7 +19,18 @@ class RamenShopAPIPresenter {
         ];
     }
     public static function getBasicRamenResponse(System $system, User $player) {
-        return [];
+        return array_map(
+            function (BasicRamenDto $ramen) {
+                return [
+                    "key" => $ramen->key,
+                    "cost" => $ramen->cost,
+                    "health_amount" => $ramen->health_amount,
+                    "label" => $ramen->label,
+                    "image" => $ramen->image,
+                ];
+            },
+            RamenShopManager::loadBasicRamen($system, $player)
+        );
     }
     public static function getSpecialRamenResponse(System $system, User $player) {
         return [];

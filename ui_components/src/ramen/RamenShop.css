@@ -1,0 +1,204 @@
+/* General Containers */
+.ramen_shop_container {
+    margin-top: 15px;
+    margin-left: 25px;
+    margin-right: 25px;
+}
+    .ramen_shop_container .row.first {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+    }
+    .ramen_shop_container .row.second {
+        display: flex;
+        flex-direction: row;
+    }
+.row.first .column.first {
+    display: flex;
+    flex-direction: column;
+}
+.row.first .column.second {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    gap: 8px;
+}
+
+.player_info_container {
+}
+
+.ramen_shop_basic_menu_container {
+}
+
+.ramen_shop_mystery_ramen_container {
+}
+
+.special_menu_container {
+}
+
+/* Ramen Shop Owner */
+.ramen_shop_owner_container {
+    width: 330px;
+    height: 430px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--ramen-shop-owner-container-border, #4d4445);
+    outline: 1px solid var(--ramen-shop-owner-container-outline, #1d1717);
+}
+
+.ramen_shop_dialogue_container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 25px;
+    width: 250px;
+    background-color: var(--ramen-shop-dialogue-container-background, #efe1c7);
+    box-sizing: border-box;
+    padding: 15px 40px 15px 40px;
+    outline: 1px solid var(--ramen-shop-dialogue-container-outline, #a9928a);
+}
+
+.ramen_shop_dialogue_nameplate {
+    position: absolute;
+    left: 10%;
+    top: -10px;
+    background-color: var(--ramen-shop-dialogue-nameplate-background, #252331);
+    color: var(--ramen-shop-dialogue-nameplate-text-color, #d5d0e4);
+    box-sizing: border-box;
+    padding: 3px 12px 4px 12px;
+    font-weight: bold;
+    font-variant: small-caps;
+    font-size: 12px;
+}
+
+.ramen_shop_dialogue_text {
+    font-size: 13px;
+    color: var(--ramen-shop-dialogue-text-color, #1c1409);
+    font-style: italic;
+    font-family: (--font-secondary);
+}
+
+.ramen_shop_owner_img {
+    margin-bottom: -20px;
+}
+
+/* Player Info */
+.player_health_container {
+}
+
+.player_money_container {
+}
+
+.player_money_label {
+}
+
+.player_money_text {
+}
+
+/* Ramen Shop Intro */
+.ramen_shop_intro_container {
+    box-sizing: border-box;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.header {
+    font-size: 16px;
+    font-weight: bold;
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+    color: var(--font-color-1);
+}
+
+.intro_text {
+    color: var(--ramen-shop-default-text-color, #e7e0d8);
+    padding-bottom: 10px;
+}
+
+.ramen_shop_descriptive_text {
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ramen-shop-descriptive-text-color, #c2c5cc);
+    text-align: center;
+    padding: 18px;
+}
+
+/* Basic Ramen */
+.ramen_shop_basic_menu {
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 20px;
+}
+.basic_ramen {
+    display: flex;
+    gap: 10px;
+}
+
+.basic_ramen_img {
+    width: 75px;
+}
+
+.basic_ramen_details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+}
+
+.basic_ramen_name {
+    color: var(--ramen-name-color, #d4c88e);
+    text-align: center;
+    font-weight: bold;
+}
+
+.basic_ramen_effect {
+    color: var(--ramen-effect-color, #e7e0d8);
+    text-align: center;
+}
+
+.basic_ramen_button {
+    margin-top: auto;
+    width: 65px;
+    height: 25px;
+    text-align: center;
+    color: #ccc1af;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 25px;
+    text-shadow: 0 0 1px black;
+    background: #343d77;
+}
+    .basic_ramen_button:hover {
+        color: white;
+    }
+
+/* Special Ramen */
+.special_ramen {
+}
+
+.special_ramen_img {
+}
+
+.special_ramen_name {
+}
+
+.special_ramen_description {
+}
+
+.special_ramen_effect {
+}
+
+.special_ramen_duration {
+}
+
+.special_ramen_button {
+}
