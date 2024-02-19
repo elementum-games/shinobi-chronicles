@@ -753,15 +753,15 @@ export function VillageUpgrades({
       style: {
         color: "#e98b99"
       }
-    }, upkeep.materials), /*#__PURE__*/React.createElement("span", {
+    }, upkeep.materials * 24), /*#__PURE__*/React.createElement("span", {
       style: {
         color: "#e98b99"
       }
-    }, upkeep.food), /*#__PURE__*/React.createElement("span", {
+    }, upkeep.food * 24), /*#__PURE__*/React.createElement("span", {
       style: {
         color: "#e98b99"
       }
-    }, upkeep.wealth)), /*#__PURE__*/React.createElement("div", {
+    }, upkeep.wealth * 24)), /*#__PURE__*/React.createElement("div", {
       className: "building_upkeep_label_column"
     }, /*#__PURE__*/React.createElement("img", {
       src: "/images/icons/materials.png",
@@ -835,9 +835,9 @@ export function VillageUpgrades({
       style: {
         height: "16px"
       }
-    }), /*#__PURE__*/React.createElement("span", null, selectedBuilding.construction_time, " ", selectedBuilding.construction_time > 1 || selectedBuilding.construction_time == 0 ? " days" : " day"))), /*#__PURE__*/React.createElement("div", {
+    }), /*#__PURE__*/React.createElement("span", null, selectedBuilding.construction_time, " ", selectedBuilding.construction_time > 1 || selectedBuilding.construction_time == 0 ? " days" : " day"))), playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement("div", {
       className: "building_buttons_container"
-    }, selectedBuilding.status === "default" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, !!selectedBuilding.requirements_met && current_materials > selectedBuilding.materials_construction_cost && current_food > selectedBuilding.food_construction_cost && current_wealth > selectedBuilding.wealth_construction_cost ? /*#__PURE__*/React.createElement("div", {
+    }, selectedBuilding.status === "default" && /*#__PURE__*/React.createElement(React.Fragment, null, !!selectedBuilding.requirements_met && current_materials > selectedBuilding.materials_construction_cost && current_food > selectedBuilding.food_construction_cost && current_wealth > selectedBuilding.wealth_construction_cost ? /*#__PURE__*/React.createElement("div", {
       className: "construction_begin_button upgrades_control_button",
       onClick: () => openModal({
         header: 'Confirmation',
@@ -847,7 +847,7 @@ export function VillageUpgrades({
       })
     }, "build") : /*#__PURE__*/React.createElement("div", {
       className: "construction_begin_button  upgrades_control_button disabled"
-    }, "build")), selectedBuilding.status === "upgrading" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    }, "build")), selectedBuilding.status === "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "construction_cancel_button upgrades_control_button",
       onClick: () => openModal({
         header: 'Confirmation',
@@ -860,7 +860,7 @@ export function VillageUpgrades({
       onClick: () => CheckBoostConstruction()
     }, "boost") : /*#__PURE__*/React.createElement("div", {
       className: "construction_boost_button upgrades_control_button disabled"
-    }, "boost")), selectedBuilding.status !== "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, selectedBuilding.health < selectedBuilding.max_health && playerSeatState.seat_type === "kage" ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    }, "boost")), selectedBuilding.status !== "upgrading" && /*#__PURE__*/React.createElement(React.Fragment, null, selectedBuilding.health < selectedBuilding.max_health ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "repair_begin_button upgrades_control_button",
       onClick: () => openModal({
         header: 'Confirmation',
@@ -896,9 +896,9 @@ export function VillageUpgrades({
         className: "upgrade_description"
       }, selectedUpgrade.description), /*#__PURE__*/React.createElement("div", {
         className: "upgrade_controls_container"
-      }, /*#__PURE__*/React.createElement("div", {
+      }, playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement("div", {
         className: "upgrade_buttons_container"
-      }, !!selectedUpgrade.requirements_met && selectedUpgrade.status === "locked" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+      }, !!selectedUpgrade.requirements_met && selectedUpgrade.status === "locked" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
         className: "research_begin_button upgrades_control_button",
         onClick: () => openModal({
           header: 'Confirmation',
@@ -906,9 +906,9 @@ export function VillageUpgrades({
           ContentComponent: null,
           onConfirm: () => BeginResearch()
         })
-      }, "research")), !!!selectedUpgrade.requirements_met && selectedUpgrade.status === "locked" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+      }, "research")), !!!selectedUpgrade.requirements_met && selectedUpgrade.status === "locked" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
         className: "research_begin_button upgrades_control_button disabled"
-      }, "research")), selectedUpgrade.status === "researching" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+      }, "research")), selectedUpgrade.status === "researching" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
         className: "research_cancel_button upgrades_control_button",
         onClick: () => openModal({
           header: 'Confirmation',
@@ -921,7 +921,7 @@ export function VillageUpgrades({
       }, "boost") : /*#__PURE__*/React.createElement("div", {
         className: "research_boost_button upgrades_control_button",
         onClick: () => CheckBoostResearch()
-      }, "boost")), selectedUpgrade.status === "inactive" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+      }, "boost")), selectedUpgrade.status === "inactive" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
         className: "upgrade_toggle_on_button upgrades_control_button",
         onClick: () => openModal({
           header: 'Confirmation',
@@ -929,7 +929,7 @@ export function VillageUpgrades({
           ContentComponent: null,
           onConfirm: () => ActivateUpgrade()
         })
-      }, "activate")), selectedUpgrade.status === "active" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+      }, "activate")), selectedUpgrade.status === "active" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
         className: "upgrade_toggle_off_button upgrades_control_button",
         onClick: () => openModal({
           header: 'Confirmation',
@@ -937,7 +937,7 @@ export function VillageUpgrades({
           ContentComponent: null,
           onConfirm: () => DeactivateUpgrade()
         })
-      }, "deactivate")), selectedUpgrade.status === "activating" && playerSeatState.seat_type === "kage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+      }, "deactivate")), selectedUpgrade.status === "activating" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
         className: "upgrade_toggle_off_button upgrades_control_button",
         onClick: () => openModal({
           header: 'Confirmation',

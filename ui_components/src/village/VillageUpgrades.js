@@ -408,9 +408,9 @@ export function VillageUpgrades({
                         </div>
                         <div className="building_upkeep">
                             <div className="building_upkeep_cost_column">
-                                <span style={{ color: "#e98b99" }}>{upkeep.materials}</span>
-                                <span style={{ color: "#e98b99" }}>{upkeep.food}</span>
-                                <span style={{ color: "#e98b99" }}>{upkeep.wealth}</span>
+                                <span style={{ color: "#e98b99" }}>{upkeep.materials * 24}</span>
+                                <span style={{ color: "#e98b99" }}>{upkeep.food * 24}</span>
+                                <span style={{ color: "#e98b99" }}>{upkeep.wealth * 24}</span>
                             </div>
                             <div className="building_upkeep_label_column">
                                 <img src="/images/icons/materials.png" alt="materials" style={{ maxHeight: "20px" }} />
@@ -449,59 +449,61 @@ export function VillageUpgrades({
                                         </>
                                     }
                                 </div>
-                                <div className="building_buttons_container">
-                                    {(selectedBuilding.status === "default" && playerSeatState.seat_type === "kage") &&
-                                        <>
-                                        {(!!selectedBuilding.requirements_met && current_materials > selectedBuilding.materials_construction_cost && current_food > selectedBuilding.food_construction_cost && current_wealth > selectedBuilding.wealth_construction_cost)
-                                            ?
-                                            <div className="construction_begin_button upgrades_control_button" onClick={() => openModal({
-                                                header: 'Confirmation',
-                                                text: "Are you sure you want to begin construction of " + selectedBuilding.name + "?\nYou may only have one building under construction at a time.",
-                                                ContentComponent: null,
-                                                onConfirm: () => BeginConstruction(),
-                                            })}>build</div>
-                                            :
-                                            <div className="construction_begin_button  upgrades_control_button disabled">build</div>
-                                        }
-                                        </>
-                                    }
-                                    {(selectedBuilding.status === "upgrading" && playerSeatState.seat_type === "kage") &&
-                                        <>
-                                            <div className="construction_cancel_button upgrades_control_button" onClick={() => openModal({
-                                                header: 'Confirmation',
-                                                text: "Are you sure you want to cancel construction of " + selectedBuilding.name + "?\nExisting progress toward construction will be saved.",
-                                                ContentComponent: null,
-                                                onConfirm: () => CancelConstruction(),
-                                            })}>cancel</div>
-                                            {selectedBuilding.construction_boosted === "true"
-                                                ?
-                                                <div className="construction_boost_button upgrades_control_button" onClick={() => CheckBoostConstruction()}>boost</div>
-                                                :
-                                                <div className="construction_boost_button upgrades_control_button disabled">boost</div>
-                                            }
-
-                                        </>
-                                    }
-                                    {selectedBuilding.status !== "upgrading" &&
-                                        <>
-                                            {(selectedBuilding.health < selectedBuilding.max_health && playerSeatState.seat_type === "kage")
-                                                ?
-                                                <>
-                                                    <div className="repair_begin_button upgrades_control_button" onClick={() => openModal({
+                                {playerSeatState.seat_type === "kage" &&
+                                    <div className="building_buttons_container">
+                                        {(selectedBuilding.status === "default") &&
+                                            <>
+                                                {(!!selectedBuilding.requirements_met && current_materials > selectedBuilding.materials_construction_cost && current_food > selectedBuilding.food_construction_cost && current_wealth > selectedBuilding.wealth_construction_cost)
+                                                    ?
+                                                    <div className="construction_begin_button upgrades_control_button" onClick={() => openModal({
                                                         header: 'Confirmation',
-                                                        text: "sometext?",
+                                                        text: "Are you sure you want to begin construction of " + selectedBuilding.name + "?\nYou may only have one building under construction at a time.",
                                                         ContentComponent: null,
-                                                        onConfirm: () => BeginRepairs(),
-                                                    })}>repair</div>
-                                                </>
-                                                :
-                                                <>
-                                                    <div className="repair_begin_button upgrades_control_button disabled">repair</div>
-                                                </>
-                                            }
-                                        </>
-                                    }
-                                </div>
+                                                        onConfirm: () => BeginConstruction(),
+                                                    })}>build</div>
+                                                    :
+                                                    <div className="construction_begin_button  upgrades_control_button disabled">build</div>
+                                                }
+                                            </>
+                                        }
+                                        {(selectedBuilding.status === "upgrading") &&
+                                            <>
+                                                <div className="construction_cancel_button upgrades_control_button" onClick={() => openModal({
+                                                    header: 'Confirmation',
+                                                    text: "Are you sure you want to cancel construction of " + selectedBuilding.name + "?\nExisting progress toward construction will be saved.",
+                                                    ContentComponent: null,
+                                                    onConfirm: () => CancelConstruction(),
+                                                })}>cancel</div>
+                                                {selectedBuilding.construction_boosted === "true"
+                                                    ?
+                                                    <div className="construction_boost_button upgrades_control_button" onClick={() => CheckBoostConstruction()}>boost</div>
+                                                    :
+                                                    <div className="construction_boost_button upgrades_control_button disabled">boost</div>
+                                                }
+
+                                            </>
+                                        }
+                                        {selectedBuilding.status !== "upgrading" &&
+                                            <>
+                                                {(selectedBuilding.health < selectedBuilding.max_health)
+                                                    ?
+                                                    <>
+                                                        <div className="repair_begin_button upgrades_control_button" onClick={() => openModal({
+                                                            header: 'Confirmation',
+                                                            text: "sometext?",
+                                                            ContentComponent: null,
+                                                            onConfirm: () => BeginRepairs(),
+                                                        })}>repair</div>
+                                                    </>
+                                                    :
+                                                    <>
+                                                        <div className="repair_begin_button upgrades_control_button disabled">repair</div>
+                                                    </>
+                                                }
+                                            </>
+                                        }
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
@@ -533,69 +535,71 @@ export function VillageUpgrades({
                     <div className="upgrade_name">{selectedUpgrade.name}</div>
                     <div className="upgrade_description">{selectedUpgrade.description}</div>
                     <div className="upgrade_controls_container">
-                        <div className="upgrade_buttons_container">
-                            {(!!selectedUpgrade.requirements_met && selectedUpgrade.status === "locked" && playerSeatState.seat_type === "kage") &&
-                                <>
-                                    <div className="research_begin_button upgrades_control_button" onClick={() => openModal({
-                                        header: 'Confirmation',
-                                        text: "Are you sure you want to begin research for " + selectedUpgrade.name + "?\nYou may only have one upgrade under research at a time.",
-                                        ContentComponent: null,
-                                        onConfirm: () => BeginResearch(),
-                                    })}>research</div>
-                                </>
-                            }
-                            {(!(!!selectedUpgrade.requirements_met) && selectedUpgrade.status === "locked" && playerSeatState.seat_type === "kage") &&
-                                <>
-                                    <div className="research_begin_button upgrades_control_button disabled">research</div>
-                                </>
-                            }
-                            {(selectedUpgrade.status === "researching" && playerSeatState.seat_type === "kage") &&
-                                <>
-                                    <div className="research_cancel_button upgrades_control_button" onClick={() => openModal({
-                                        header: 'Confirmation',
-                                        text: "Are you sure you want to cancel research for " + selectedUpgrade.name + "?\nExisting progress toward research will be saved.",
-                                        ContentComponent: null,
-                                        onConfirm: () => CancelResearch(),
-                                    })}>cancel</div>
-                                    {selectedUpgrade.research_boosted
-                                        ?
-                                        <div className="research_boost_button upgrades_control_button disabled">boost</div>
-                                        :
-                                        <div className="research_boost_button upgrades_control_button" onClick={() => CheckBoostResearch()}>boost</div>
-                                    }
-                                </>
-                            }
-                            {(selectedUpgrade.status === "inactive" && playerSeatState.seat_type === "kage") &&
-                                <>
-                                    <div className="upgrade_toggle_on_button upgrades_control_button" onClick={() => openModal({
-                                        header: 'Confirmation',
-                                        text: "Activating " + selectedUpgrade.name + " will take 3 days and require upkeep during the activation period.",
-                                        ContentComponent: null,
-                                        onConfirm: () => ActivateUpgrade(),
-                                    })}>activate</div>
-                                </>
-                            }
-                            {(selectedUpgrade.status === "active" && playerSeatState.seat_type === "kage") &&
-                                <>
-                                    <div className="upgrade_toggle_off_button upgrades_control_button" onClick={() => openModal({
-                                        header: 'Confirmation',
-                                        text: "Are you sure you want to deactivate " + selectedUpgrade.name + "?\nUpkeep will be disabled and reactivation will take 3 days.",
-                                        ContentComponent: null,
-                                        onConfirm: () => DeactivateUpgrade(),
-                                    })}>deactivate</div>
-                                </>
-                            }
-                            {(selectedUpgrade.status === "activating" && playerSeatState.seat_type === "kage") &&
-                                <>
-                                    <div className="upgrade_toggle_off_button upgrades_control_button" onClick={() => openModal({
-                                        header: 'Confirmation',
-                                        text: "Are you sure you want to cancel activation for " + selectedUpgrade.name + "?\nUpkeep will be disabled and reactivation will take 3 days.",
-                                        ContentComponent: null,
-                                        onConfirm: () => CancelActivation(),
-                                    })}>cancel</div>
-                                </>
-                            }
-                        </div>
+                        {playerSeatState.seat_type === "kage" && 
+                            <div className="upgrade_buttons_container">
+                                {(!!selectedUpgrade.requirements_met && selectedUpgrade.status === "locked") &&
+                                    <>
+                                        <div className="research_begin_button upgrades_control_button" onClick={() => openModal({
+                                            header: 'Confirmation',
+                                            text: "Are you sure you want to begin research for " + selectedUpgrade.name + "?\nYou may only have one upgrade under research at a time.",
+                                            ContentComponent: null,
+                                            onConfirm: () => BeginResearch(),
+                                        })}>research</div>
+                                    </>
+                                }
+                                {(!(!!selectedUpgrade.requirements_met) && selectedUpgrade.status === "locked") &&
+                                    <>
+                                        <div className="research_begin_button upgrades_control_button disabled">research</div>
+                                    </>
+                                }
+                                {(selectedUpgrade.status === "researching") &&
+                                    <>
+                                        <div className="research_cancel_button upgrades_control_button" onClick={() => openModal({
+                                            header: 'Confirmation',
+                                            text: "Are you sure you want to cancel research for " + selectedUpgrade.name + "?\nExisting progress toward research will be saved.",
+                                            ContentComponent: null,
+                                            onConfirm: () => CancelResearch(),
+                                        })}>cancel</div>
+                                        {selectedUpgrade.research_boosted
+                                            ?
+                                            <div className="research_boost_button upgrades_control_button disabled">boost</div>
+                                            :
+                                            <div className="research_boost_button upgrades_control_button" onClick={() => CheckBoostResearch()}>boost</div>
+                                        }
+                                    </>
+                                }
+                                {(selectedUpgrade.status === "inactive") &&
+                                    <>
+                                        <div className="upgrade_toggle_on_button upgrades_control_button" onClick={() => openModal({
+                                            header: 'Confirmation',
+                                            text: "Activating " + selectedUpgrade.name + " will take 3 days and require upkeep during the activation period.",
+                                            ContentComponent: null,
+                                            onConfirm: () => ActivateUpgrade(),
+                                        })}>activate</div>
+                                    </>
+                                }
+                                {(selectedUpgrade.status === "active") &&
+                                    <>
+                                        <div className="upgrade_toggle_off_button upgrades_control_button" onClick={() => openModal({
+                                            header: 'Confirmation',
+                                            text: "Are you sure you want to deactivate " + selectedUpgrade.name + "?\nUpkeep will be disabled and reactivation will take 3 days.",
+                                            ContentComponent: null,
+                                            onConfirm: () => DeactivateUpgrade(),
+                                        })}>deactivate</div>
+                                    </>
+                                }
+                                {(selectedUpgrade.status === "activating") &&
+                                    <>
+                                        <div className="upgrade_toggle_off_button upgrades_control_button" onClick={() => openModal({
+                                            header: 'Confirmation',
+                                            text: "Are you sure you want to cancel activation for " + selectedUpgrade.name + "?\nUpkeep will be disabled and reactivation will take 3 days.",
+                                            ContentComponent: null,
+                                            onConfirm: () => CancelActivation(),
+                                        })}>cancel</div>
+                                    </>
+                                }
+                            </div>
+                        }
                         {selectedUpgrade.status === "locked" && 
                             <>
                                 <div className="upgrade_controls_label">research cost</div>
