@@ -5,7 +5,8 @@ class RamenOwnerDto {
         public string $name,
         public string $image,
         public string $background,
-        public string $description,
+        public string $shop_description,
         public string $dialogue,
+        public string $shop_name,
     ) {}
 }
