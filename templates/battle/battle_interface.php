@@ -371,7 +371,7 @@ if($battle->battle_text) {
                 <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
                     <div class="effect_name">
                         <?php
-                            if ($effect->effect == "residual_damage" || $effect->effect == "residual_damage" || $effect->effect == "reflect_damage") {
+                            if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual" || $effect->effect == "reflect_damage") {
                                 $effect_power = $effect->effect_amount * $effect->turns;
                                 $residual_damage = $player->calcDamageTaken($effect_power, $effect->damage_type, apply_resists: false, apply_weakness: false);
                                 echo "<span class='hover_text'>" . round($residual_damage) . " Damage</span>";
@@ -399,7 +399,7 @@ if($battle->battle_text) {
                         <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
                                     <div class="effect_name">
                                         <?php
-                                            if ($effect->effect == "residual_damage" || $effect->effect == "residual_damage" || $effect->effect == "reflect_damage") {
+                                            if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual" || $effect->effect == "reflect_damage") {
                                                 $effect_power = $effect->effect_amount * $effect->turns;
                                                 $residual_damage = $opponent->calcDamageTaken($effect_power, $effect->damage_type, apply_resists: false, apply_weakness: false);
                                                 echo "<span class='hover_text'>" . round($residual_damage) . " Damage</span>";
