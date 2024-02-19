@@ -17,14 +17,14 @@ class VillageUpgradeConfig {
 
     /* base values used for upgrade configuration */
     const BASE_T1_RESEARCH_COST = 1200;
-    const BASE_T2_RESEARCH_COST = 6000;
-    const BASE_T3_RESEARCH_COST = 30000;
+    const BASE_T2_RESEARCH_COST = 8400;
+    const BASE_T3_RESEARCH_COST = 25200;
     const BASE_T1_UPKEEP_COST = 4;
     const BASE_T2_UPKEEP_COST = 6;
     const BASE_T3_UPKEEP_COST = 10;
     const BASE_T1_RESEARCH_TIME_DAYS = 1;
-    const BASE_T2_RESEARCH_TIME_DAYS = 5;
-    const BASE_T3_RESEARCH_TIME_DAYS = 25;
+    const BASE_T2_RESEARCH_TIME_DAYS = 7;
+    const BASE_T3_RESEARCH_TIME_DAYS = 21;
 
     /* keys used for individual upgrade identifiers */
     const UPGRADE_KEY_TEST = 'TEST';
@@ -96,6 +96,9 @@ class VillageUpgradeConfig {
     const UPGRADE_KEY_MERCHANTS_GUILD_III = 'MERCHANTS_GUILD_III';
     const UPGRADE_KEY_WAREHOUSES_I = 'WAREHOUSES_I';
     const UPGRADE_KEY_WAREHOUSES_II = 'WAREHOUSES_II';
+    const UPGRADE_KEY_SUPPLY_LINES_I = 'SUPPLY_LINES_I';
+    const UPGRADE_KEY_SUPPLY_LINES_II = 'SUPPLY_LINES_II';
+    const UPGRADE_KEY_SUPPLY_LINES_III = 'SUPPLY_LINES_III';
     const UPGRADE_KEY_ANCESTRAL_LEGACY_I = 'ANCESTRAL_LEGACY_I';
     const UPGRADE_KEY_ANCESTRAL_LEGACY_II = 'ANCESTRAL_LEGACY_II';
     const UPGRADE_KEY_ANCESTRAL_LEGACY_III = 'ANCESTRAL_LEGACY_III';
@@ -184,6 +187,9 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III,
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I,
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II,
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I,
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II,
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III,
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I,
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II,
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III,
@@ -207,12 +213,6 @@ class VillageUpgradeConfig {
     const UPGRADE_EFFECT_WEALTH_PRODUCTION = 'WEALTH_PRODUCTION';
     const UPGRADE_EFFECT_CONSTRUCTION_SPEED = 'CONSTRUCTION_SPEED';
     const UPGRADE_EFFECT_RESEARCH_SPEED = 'RESEARCH_SPEED';
-    const UPGRADE_EFFECT_RESEARCH_T1_ENABLED = 'RESEARCH_T1';
-    const UPGRADE_EFFECT_RESEARCH_T2_ENABLED = 'RESEARCH_T2_ENABLED';
-    const UPGRADE_EFFECT_RESEARCH_T3_ENABLED = 'RESEARCH_T3_ENABLED';
-    const UPGRADE_EFFECT_CONSTRUCTION_T1_ENABLED = 'CONSTRUCTION_T1_ENABLED';
-    const UPGRADE_EFFECT_CONSTRUCTION_T2_ENABLED = 'CONSTRUCTION_T2_ENABLED';
-    const UPGRADE_EFFECT_CONSTRUCTION_T3_ENABLED = 'CONSTRUCTION_T3_ENABLED';
     const UPGRADE_EFFECT_UPGRADE_UPKEEP = 'UPGRADE_UPKEEP';
     const UPGRADE_EFFECT_BASE_STABILITY = 'BASE_STABILITY';
     const UPGRADE_EFFECT_MAX_STABILITY = 'MAX_STABILITY';
@@ -239,6 +239,7 @@ class VillageUpgradeConfig {
     const UPGRADE_EFFECT_RAMEN_COST = 'RAMEN_COST';
     const UPGRADE_EFFECT_MYSTERY_RAMEN_ENABLED = 'MYSTERY_RAMEN_ENABLED';
     const UPGRADE_EFFECT_MYSTERY_RAMEN_CHANCE = 'MYSTERY_RAMEN_CHANCE';
+    const UPGRADE_EFFECT_CARAVAN_SPEED = 'CARAVAN_SPEED';
 
     /* Used for auto population */
     const UPGRADE_EFFECTS_LIST = [
@@ -247,12 +248,6 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION,
         VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED,
         VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T1_ENABLED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T2_ENABLED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T3_ENABLED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T1_ENABLED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T2_ENABLED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T3_ENABLED,
         VillageUpgradeConfig::UPGRADE_EFFECT_UPGRADE_UPKEEP,
         VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY,
         VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY,
@@ -278,7 +273,8 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION,
         VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST,
         VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_ENABLED,
-        VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_CHANCE
+        VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_CHANCE,
+        VillageUpgradeConfig::UPGRADE_EFFECT_CARAVAN_SPEED
     ];
 
     /* tiers for each upgrade indexed by upgrade key */
@@ -352,6 +348,9 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => 3,
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => 1,
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => 2,
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => 1,
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => 2,
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => 3,
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => 1,
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => 2,
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => 3,
@@ -441,6 +440,9 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => 'Merchants Guild III',
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => 'Warehouses I',
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => 'Warehouses II',
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => 'Supply Lines I',
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => 'Supply Lines II',
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => 'Supply Lines III',
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => 'Ancestral Legacy I',
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => 'Ancestral Legacy II',
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => 'Ancestral Legacy III',
@@ -528,8 +530,11 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => '+25 Wealth production/hour',
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => '+50 Wealth production/hour',
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => '+75 Wealth production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => '+100000 resource capacity',
-        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => '+500000 resource capacity',
+        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => '+150000 resource capacity',
+        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => '+300000 resource capacity',
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => '+5% Caravan speed',
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => '+5% Caravan speed',
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => '+5% Caravan speed',
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => '10% increased chance of obtaining a Bloodline',
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => '10% increased chance of obtaining a Bloodline',
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => '10% increased chance of obtaining a Bloodline',
@@ -556,19 +561,19 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_WEALTH => 30000,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I => [
-            WarManager::RESOURCE_MATERIALS => 0,
-            WarManager::RESOURCE_FOOD => 0,
-            WarManager::RESOURCE_WEALTH => 0,
+            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
+            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 1.5 * 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II => [
-            WarManager::RESOURCE_MATERIALS => 3000,
-            WarManager::RESOURCE_FOOD => 6000,
-            WarManager::RESOURCE_WEALTH => 9000,
+            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 0.5 * 2,
+            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 1.5 * 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III => [
-            WarManager::RESOURCE_MATERIALS => 15000,
-            WarManager::RESOURCE_FOOD => 30000,
-            WarManager::RESOURCE_WEALTH => 45000,
+            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 0.5 * 2,
+            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 1.5 * 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => [
             WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
@@ -766,19 +771,19 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I => [
-            WarManager::RESOURCE_MATERIALS => 0,
-            WarManager::RESOURCE_FOOD => 0,
-            WarManager::RESOURCE_WEALTH => 0,
+            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 2 * 2,
+            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II => [
-            WarManager::RESOURCE_MATERIALS => 12000,
-            WarManager::RESOURCE_FOOD => 3000,
-            WarManager::RESOURCE_WEALTH => 3000,
+            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 2 * 2,
+            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 0.5 * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 0.5 * 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III => [
-            WarManager::RESOURCE_MATERIALS => 60000,
-            WarManager::RESOURCE_FOOD => 15000,
-            WarManager::RESOURCE_WEALTH => 15000,
+            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 2 * 2,
+            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 0.5 * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 0.5 * 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I => [
             WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 2,
@@ -886,29 +891,44 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => [
-            WarManager::RESOURCE_MATERIALS => 10800,
-            WarManager::RESOURCE_FOOD => 4320,
-            WarManager::RESOURCE_WEALTH => 6480,
+            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 1.5 * 2,
+            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => [
-            WarManager::RESOURCE_MATERIALS => 54000,
-            WarManager::RESOURCE_FOOD => 21600,
-            WarManager::RESOURCE_WEALTH => 32400,
+            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 1.5 * 2,
+            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 0.5 * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 2,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => [
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => [
             WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST,
             WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST,
             WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => [
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => [
             WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST,
             WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST,
             WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST,
         ],
-        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => [
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => [
             WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST,
             WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST,
             WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => [
+            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 2,
+            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 2,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => [
+            WarManager::RESOURCE_MATERIALS => self::BASE_T2_RESEARCH_COST * 2,
+            WarManager::RESOURCE_FOOD => self::BASE_T2_RESEARCH_COST * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T2_RESEARCH_COST * 2,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => [
+            WarManager::RESOURCE_MATERIALS => self::BASE_T3_RESEARCH_COST * 2,
+            WarManager::RESOURCE_FOOD => self::BASE_T3_RESEARCH_COST * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST * 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTUNES_BOUNTY_I => [
             WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST,
@@ -926,14 +946,14 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_WEALTH => self::BASE_T3_RESEARCH_COST,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
+            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2 * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => [
-            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
-            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2,
-            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5,
+            WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
+            WarManager::RESOURCE_FOOD => self::BASE_T1_RESEARCH_COST * 2 * 2,
+            WarManager::RESOURCE_WEALTH => self::BASE_T1_RESEARCH_COST * 0.5 * 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => [
             WarManager::RESOURCE_MATERIALS => self::BASE_T1_RESEARCH_COST * 0.5,
@@ -1046,8 +1066,11 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => self::BASE_T1_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => self::BASE_T2_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => self::BASE_T3_RESEARCH_TIME_DAYS,
-        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => self::BASE_T1_RESEARCH_TIME_DAYS * 3,
-        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II =>  self::BASE_T3_RESEARCH_TIME_DAYS * 3,
+        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => self::BASE_T1_RESEARCH_TIME_DAYS,
+        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II =>  self::BASE_T2_RESEARCH_TIME_DAYS,
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => self::BASE_T1_RESEARCH_TIME_DAYS,
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => self::BASE_T2_RESEARCH_TIME_DAYS,
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => self::BASE_T3_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => self::BASE_T1_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_II => self::BASE_T2_RESEARCH_TIME_DAYS,
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_III => self::BASE_T3_RESEARCH_TIME_DAYS,
@@ -1597,6 +1620,29 @@ class VillageUpgradeConfig {
                 VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I
             ],
         ],
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => [
+            VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 1
+            ],
+            VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+            ],
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => [
+            VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 2
+            ],
+            VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I
+            ],
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => [
+            VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
+                VillageBuildingConfig::BUILDING_MARKETPLACE => 3
+            ],
+            VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES => [
+                VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II
+            ],
+        ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => [
             VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS => [
                 VillageBuildingConfig::BUILDING_SHRINE => 1
@@ -2070,6 +2116,21 @@ class VillageUpgradeConfig {
             WarManager::RESOURCE_FOOD => 0,
             WarManager::RESOURCE_WEALTH => 0,
         ],
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => [
+            WarManager::RESOURCE_MATERIALS => self::BASE_T1_UPKEEP_COST,
+            WarManager::RESOURCE_FOOD => self::BASE_T1_UPKEEP_COST,
+            WarManager::RESOURCE_WEALTH => self::BASE_T1_UPKEEP_COST,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => [
+            WarManager::RESOURCE_MATERIALS => self::BASE_T2_UPKEEP_COST,
+            WarManager::RESOURCE_FOOD => self::BASE_T2_UPKEEP_COST,
+            WarManager::RESOURCE_WEALTH => self::BASE_T2_UPKEEP_COST,
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => [
+            WarManager::RESOURCE_MATERIALS => self::BASE_T3_UPKEEP_COST,
+            WarManager::RESOURCE_FOOD => self::BASE_T3_UPKEEP_COST,
+            WarManager::RESOURCE_WEALTH => self::BASE_T3_UPKEEP_COST,
+        ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => [
             WarManager::RESOURCE_MATERIALS => 0,
             WarManager::RESOURCE_FOOD => 0,
@@ -2159,13 +2220,13 @@ class VillageUpgradeConfig {
             VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY => 2,
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T1_ENABLED => 1
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T2_ENABLED => 1
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_T3_ENABLED => 1
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_SUBSIDIES_I => [
             VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED => 5
@@ -2291,13 +2352,13 @@ class VillageUpgradeConfig {
             VillageUpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T1_ENABLED => 1
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T2_ENABLED => 1
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_CONSTRUCTION_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_T3_ENABLED => 1
+            VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_SUBSIDIES_I => [
             VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED => 5
@@ -2363,10 +2424,19 @@ class VillageUpgradeConfig {
             VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 100
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 200000
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 150000
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 500000
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 300000
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_CARAVAN_SPEED => 5
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_CARAVAN_SPEED => 5
+        ],
+        VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III => [
+            VillageUpgradeConfig::UPGRADE_EFFECT_CARAVAN_SPEED => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I => [
             VillageUpgradeConfig::UPGRADE_EFFECT_BLOODLINE_CHANCE => 5
