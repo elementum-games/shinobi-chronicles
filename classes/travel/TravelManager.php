@@ -447,7 +447,7 @@ class TravelManager {
         if ($this->system->isDevEnvironment()) {
             $placeholder_coords = new TravelCoords(19, 14, 1);
 
-            for ($i = 0; $i < 2; $i++) {
+            for ($i = 0; $i < 0; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
@@ -468,7 +468,7 @@ class TravelManager {
                     is_protected: false,
                 );
             }
-            for ($i = 0; $i < 2; $i++) {
+            for ($i = 0; $i < 0; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
@@ -489,7 +489,7 @@ class TravelManager {
                     is_protected: false,
                 );
             }
-            for ($i = 0; $i < 2; $i++) {
+            for ($i = 0; $i < 0; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
