@@ -24,51 +24,12 @@ try {
 
 
     switch($request) {
-        case "PurchaseBasicRamen":
-            $ramen_key = $system->db->clean($_POST['ramen_key']);
-            $result = RamenShopManager::purchaseBasicRamen($system, $player, $ramen_key);
-            if ($result->succeeded) {
-                $response->data = [
-                    "player_data" => UserAPIPresenter::playerDataResponse($player, RankManager::fetchNames($system)),
-                    "player_resources" => UserAPIPresenter::playerResourcesResponse($player),
-                ];
-            } else {
-                $response->errors[] = $result->error_message;
-            }
-            break;
-        case "PurchaseSpecialRamen":
-            $ramen_key = $system->db->clean($_POST['ramen_key']);
-            $result = RamenShopManager::purchaseSpecialRamen($system, $player, $ramen_key);
-            if ($result->succeeded) {
-                $response->data = [
-                    "player_data" => UserAPIPresenter::playerDataResponse($player, RankManager::fetchNames($system)),
-                    "mystery_ramen_details" => RamenShopAPIPresenter::getMysteryRamenResponse($player),
-                    "character_ramen_data" => RamenShopAPIPresenter::getCharacterRamenResponse($system, $player),
-                    "response_message" => $result->success_message,
-                ];
-            } else {
-                $response->errors[] = $result->error_message;
-            }
-            break;
-        case "PurchaseMysteryRamen":
-            $result = RamenShopManager::purchaseMysteryRamen($system, $player);
-            if ($result->succeeded) {
-                $response->data = [
-                    "player_data" => UserAPIPresenter::playerDataResponse($player, RankManager::fetchNames($system)),
-                    "mystery_ramen_details" => RamenShopAPIPresenter::getMysteryRamenResponse($player),
-                    "character_ramen_data" => RamenShopAPIPresenter::getCharacterRamenResponse($system, $player),
-                    "response_message" => $result->success_message,
-                ];
-            } else {
-                $response->errors[] = $result->error_message;
-            }
-            break;
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
     }
 
     API::exitWithData(
-        data: $response->data,
+        data: $response->response,
         errors: $response->errors,
         debug_messages: $system->debug_messages,
         system: $system,
