@@ -92,8 +92,6 @@ if (isset($_SESSION['user_id'])) {
 }
 
 function hourlyCron(System $system, $debug = true): void {
-    // get war manager
-    $war_manager = new WarManager($system);
     // get regions
     $region_result = $system->db->query("SELECT * FROM `regions`");
     $region_result = $system->db->fetch_all($region_result);
@@ -193,15 +191,15 @@ function hourlyCron(System $system, $debug = true): void {
             }
         }
     }
-    /* trigger victory conditions
+    // trigger victory conditions
     $war_type = VillageRelation::RELATION_WAR;
     $query = "SELECT * FROM `village_relations` WHERE `relation_type` = {$war_type} AND `relation_end` IS NULL";
     $wars = $system->db->query($query);
     $wars = $system->db->fetch_all($wars);
     foreach ($wars as $war_data) {
         $war = new VillageRelation($war_data);
-        $queries = array_merge($queries, $war_manager->checkHandleVictoryConditions($war));
-    }*/
+        $queries = array_merge($queries, WarManager::getHandleVictoryQueries($system, $war));
+    }
     // apply base production
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);
@@ -385,7 +383,7 @@ function hourlyCron(System $system, $debug = true): void {
     } else {
         echo "Script running...<br>";
         foreach ($queries as $query) {
-            $system->db->query("LOCK TABLES `region_locations` WRITE, `villages` WRITE, `resource_logs` WRITE, `village_buildings` WRITE, `village_upgrades` WRITE;");
+            $system->db->query("LOCK TABLES `region_locations` WRITE, `villages` WRITE, `resource_logs` WRITE, `village_buildings` WRITE, `village_upgrades` WRITE, `village_relations` WRITE;");
             $system->db->query($query);
             $system->db->query("UNLOCK TABLES;");
         }
