@@ -33,7 +33,7 @@ class RamenShopManager {
     ];
     /* ramen shop owner descriptions indexed by village id */
     const RAMEN_SHOP_DESCRIPTIONS_BY_VILLAGE = [
-        1 => "A traditional ramen stand proudly run by the Ichikawa family for generations. The owner Menma is preparing to step down as his daughter Suika has taken over the business.",
+        1 => "A traditional ramen stand proudly run by the Ichikawa family for generations. The owner [keyword]Menma[/keyword] is preparing to step down as his daughter [keyword]Suika[/keyword] has taken over the business.",
         2 => "A traditional ramen stand proudly run by the Ichikawa family for generations. The owner Menma is preparing to step down as his daughter Suika has taken over the business.",
         3 => "A traditional ramen stand proudly run by the Ichikawa family for generations. The owner Menma is preparing to step down as his daughter Suika has taken over the business.",
         4 => "A traditional ramen stand proudly run by the Ichikawa family for generations. The owner Menma is preparing to step down as his daughter Suika has taken over the business.",
@@ -105,7 +105,14 @@ class RamenShopManager {
         );
     }
 
+    /**
+     * Load the basic ramen details for the given player
+     * @param System $system
+     * @param User $player
+     * @return BasicRamenDto[]
+     */
     public static function loadBasicRamen(System $system, User $player): array {
+        $ramen_cost_multiplier = 1 - ($player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST] / 100);
         $rankManager = new RankManager($system);
         $rankManager->loadRanks();
 
@@ -115,23 +122,23 @@ class RamenShopManager {
         $health[4] = $rankManager->healthForRankAndLevel(4, $rankManager->ranks[4]->max_level);
         // $health[5] = $rankManager->healthForRankAndLevel(5, $rankManager->ranks[5]->max_level);
 
-        $basic_ramen[] = new BasicRamenDto(
+        $basic_ramen[self::BASIC_RAMEN_SMALL] = new BasicRamenDto(
             key: self::BASIC_RAMEN_SMALL,
-            cost: !$player->location->equals($player->village_location) ? $player->rank_num * 5 * 5 : $player->rank_num * 5,
+            cost: !$player->location->equals($player->village_location) ? $player->rank_num * 5 * 5 : ($player->rank_num * 5 * $ramen_cost_multiplier),
             health_amount: $health[$player->rank_num] * 0.1,
             label: 'Shio S',
             image: "images/ramen/ShioS.png",
         );
-        $basic_ramen[] = new BasicRamenDto(
+        $basic_ramen[self::BASIC_RAMEN_MEDIUM] = new BasicRamenDto(
             key: self::BASIC_RAMEN_MEDIUM,
-            cost: !$player->location->equals($player->village_location) ? $player->rank_num * 25 * 5 : $player->rank_num * 25,
+            cost: !$player->location->equals($player->village_location) ? $player->rank_num * 25 * 5 : ($player->rank_num * 25 * $ramen_cost_multiplier),
             health_amount: $health[$player->rank_num] * 0.5,
             label: 'Shio M',
             image: "images/ramen/ShioM.png",
         );
-        $basic_ramen[] = new BasicRamenDto(
+        $basic_ramen[self::BASIC_RAMEN_LARGE] = new BasicRamenDto(
             key: self::BASIC_RAMEN_LARGE,
-            cost: !$player->location->equals($player->village_location) ? $player->rank_num * 50 * 5 : $player->rank_num * 50,
+            cost: !$player->location->equals($player->village_location) ? $player->rank_num * 50 * 5 : ($player->rank_num * 50 * $ramen_cost_multiplier),
             health_amount: $health[$player->rank_num] * 1,
             label: 'Shio L',
             image: "images/ramen/ShioL.png",
@@ -146,8 +153,49 @@ class RamenShopManager {
         return $basic_ramen;
     }
 
-    public static function loadSpecialRamen(): array {
-        return [];
+    public static function loadSpecialRamen(User $player): array {
+        $special_ramen = [];
+        $ramen_cost_multiplier = 1 - ($player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST] / 100);
+        $ramen_duration_bonus = $player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION];
+        if ($player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_SET_ONE]) {
+            $special_ramen[self::SPECIAL_RAMEN_SHOYU] = new SpecialRamenDto(
+                key: self::SPECIAL_RAMEN_SHOYU,
+                cost: (2500 + 2500 * $player->rank_num) * $ramen_cost_multiplier,
+                label: 'Shoyu',
+                image: "images/ramen/Shoyu.png",
+                description: "Delicious ramen in soy sauce broth with strong flavors.",
+                effect: "+2 Stealth",
+                duration: 10 + $ramen_duration_bonus,
+            );
+            $special_ramen[self::SPECIAL_RAMEN_KING] = new SpecialRamenDto(
+                key: self::SPECIAL_RAMEN_KING,
+                cost: 2500 + 2500 * $player->rank_num * $ramen_cost_multiplier,
+                label: 'King',
+                image: "images/ramen/King.png",
+                description: "Topped with every meat and vegetable. Eat your fill.",
+                effect: "+1 Reputation gain (PvP excluded)",
+                duration: 10 + $ramen_duration_bonus,
+            );
+            $special_ramen[self::SPECIAL_RAMEN_SPICY_MISO] = new SpecialRamenDto(
+                key: self::SPECIAL_RAMEN_SPICY_MISO,
+                cost: 5000 + 5000 * $player->rank_num * $ramen_cost_multiplier,
+                label: 'Spicy Miso',
+                image: "images/ramen/SpicyMiso.png",
+                description: "Spices are balanced with a savoury broth and bits of sweet corn.",
+                effect: "+25% Regen",
+                duration: 10 + $ramen_duration_bonus,
+            );
+            $special_ramen[self::SPECIAL_RAMEN_WARRIOR] = new SpecialRamenDto(
+                key: self::SPECIAL_RAMEN_WARRIOR,
+                cost: 10000 + 10000 * $player->rank_num * $ramen_cost_multiplier,
+                label: 'Warrior',
+                image: "images/ramen/Warrior.png",
+                description: "The burning spiciness is enough to embolden anyone.",
+                effect: "Heal to full after winning a battle.",
+                duration: 10 + $ramen_duration_bonus,
+            );
+        }
+        return $special_ramen;
     }
 
     /**
@@ -159,5 +207,31 @@ class RamenShopManager {
         return new MysteryRamenDto(
             mystery_ramen_enabled: false,
         );
+    }
+
+    public static function purchaseBasicRamen(System $system, User $player, string $ramen_key): ActionResult {
+        $rankManager = new RankManager($system);
+        $rankManager->loadRanks();
+
+        $ramen_options = self::loadBasicRamen($system, $player);
+        $ramen = $ramen_options[$ramen_key];
+        if (!isset($ramen)) {
+            return ActionResult::failed("Invalid ramen selection!");
+        }
+        if ($player->getMoney() < $ramen->cost) {
+            return ActionResult::failed("You do not have enough money!");
+        }
+        if ($player->health >= $player->max_health) {
+            return ActionResult::failed("Your health is already maxed out!");
+        }
+        if (!$system->isDevEnvironment()) {
+            $player->subtractMoney($ramen->cost, "Purchased {$ramen_key} health");
+        }
+        $player->health += $ramen->health_amount;
+        if ($player->health > $player->max_health) {
+            $player->health = $player->max_health;
+        }
+        $player->updateData();
+        return ActionResult::succeeded("");
     }
 }

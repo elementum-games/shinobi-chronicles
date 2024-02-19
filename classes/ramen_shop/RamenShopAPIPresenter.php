@@ -22,17 +22,30 @@ class RamenShopAPIPresenter {
         return array_map(
             function (BasicRamenDto $ramen) {
                 return [
-                    "key" => $ramen->key,
+                    "ramen_key" => $ramen->key,
                     "cost" => $ramen->cost,
                     "health_amount" => $ramen->health_amount,
                     "label" => $ramen->label,
                     "image" => $ramen->image,
                 ];
             },
-            RamenShopManager::loadBasicRamen($system, $player)
+            array_values(RamenShopManager::loadBasicRamen($system, $player))
         );
     }
     public static function getSpecialRamenResponse(System $system, User $player) {
-        return [];
+        return array_map(
+            function (SpecialRamenDto $ramen) {
+                return [
+                    "ramen_key" => $ramen->key,
+                    "cost" => $ramen->cost,
+                    "label" => $ramen->label,
+                    "image" => $ramen->image,
+                    "description" => $ramen->description,
+                    "effect" => $ramen->effect,
+                    "duration" => $ramen->duration,
+                ];
+            },
+            array_values(RamenShopManager::loadSpecialRamen($player))
+        );
     }
 }
