@@ -129,20 +129,6 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 
     // Display
     $system->printMessage();
-    $prompt = '';
-    switch($player->exam_stage) {
-        case 1:
-            $prompt = 'Please demonstrate ' . $jutsu_data[1]['name'] . ':';
-            break;
-        case 2:
-            $prompt = 'Please demonstrate ' . $jutsu_data[2]['name'] . ':';
-            break;
-        case 3:
-            $prompt = 'Please demonstrate ' . $jutsu_data[3]['name'] . ':';
-            break;
-        default:
-            break;
-    }
 
     if(!$player->exam_stage) {
         require 'templates/level_rank_up/exam_assignment.php';
