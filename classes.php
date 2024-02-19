@@ -84,3 +84,6 @@ require_once __DIR__ . "/classes/village/VillageApiPresenter.php";
 require_once __DIR__ . "/classes/war/WarManager.php";
 require_once __DIR__ . "/classes/war/WarAction.php";
 require_once __DIR__ . "/classes/war/WarLogManager.php";
+
+require_once __DIR__ . "/classes/ramen_shop/RamenShopManager.php";
+require_once __DIR__ . "/classes/ramen_shop/RamenShopAPIPresenter.php";
