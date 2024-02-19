@@ -162,7 +162,7 @@ class Village {
         return $change;
     }
     public function updatePoints(bool $run_query = true): string {
-        $query = "UPDATE `villages` SET `points` = {$this->points} WHERE `village_id` = {$this->village_id}";
+        $query = "UPDATE `villages` SET `points` = {$this->points}, `monthly_points` = {$this->monthly_points} WHERE `village_id` = {$this->village_id}";
         if ($run_query) {
             $this->system->db->query("UPDATE `villages` SET `points` = {$this->points} WHERE `village_id` = {$this->village_id}");
         }

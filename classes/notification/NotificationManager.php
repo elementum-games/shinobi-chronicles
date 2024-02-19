@@ -60,7 +60,7 @@ class NotificationManager {
     const NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION = 1;
     const NOTIFICATION_EXPIRATION_DAYS_DAILY_TASK = 1;
 
-    public static function createNotification(NotificationDto $notification, System $system, int $UPDATE, int $limit = 5): bool {
+    public static function createNotification(NotificationDto $notification, System $system, int $UPDATE, int $limit = 3): bool {
         $db_modified = false;
         $attributes = json_encode($notification->getAttributes(), JSON_FORCE_OBJECT);
 

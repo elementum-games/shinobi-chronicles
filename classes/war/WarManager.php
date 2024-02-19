@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . "/WarAction.php";
+require_once __DIR__ . "/WarLogManager.php";
 
 class WarManager {
     const BASE_TOWN_RESOURCE_PRODUCTION = 15; // 2x at full stability, 26/hour at 75%
@@ -94,6 +95,7 @@ class WarManager {
     const FINAL_VICTORY_SCORE_PERCENT_REQUIRED = 50; // 1.5:1 ratio of war score for victory
     const MIN_WAR_DURATION_DAYS = 3;
     const MAX_WAR_DURATION_DAYS = 7;
+    const SCORE_TO_POINTS_RATIO = 1000; // 1000 score = 1 point
 
     private System $system;
     private User $user;
@@ -644,6 +646,11 @@ class WarManager {
             $this->village_relations_by_village_ids[$village1_id][$village2_id]->relation_type == VillageRelation::RELATION_ALLIANCE;
     }
 
+    /**
+     * @param System $system
+     * @param VillageRelation $village_relation
+     * @return int
+     */
     public static function getVictoryPercentRequired(System $system, VillageRelation $village_relation): int {
         // calculate war duration
         if (isset($village_relation->relation_end)) {
@@ -663,6 +670,108 @@ class WarManager {
             $duration_percent = ($war_duration - $min_duration) / ($max_duration - $min_duration);
             return self::INITIAL_VICTORY_SCORE_PERCENT_REQUIRED - ($duration_percent * (self::INITIAL_VICTORY_SCORE_PERCENT_REQUIRED - self::FINAL_VICTORY_SCORE_PERCENT_REQUIRED));
         }
+    }
+
+    /**
+     * @param System $system
+     * @param VillageRelation $war
+     * @return array
+     */
+    public static function getHandleVictoryQueries(System $system, VillageRelation $war): array {
+        $queries = [];
+        // check war valid
+        if ($war->relation_type != VillageRelation::RELATION_WAR || $war->relation_end != null) {
+            return [];
+        }
+        $war_duration = time() - $war->relation_start;
+        $min_duration = self::MIN_WAR_DURATION_DAYS * 86400;
+        $max_duration = self::MAX_WAR_DURATION_DAYS * 86400;
+        $victory_percent_required = self::getVictoryPercentRequired($system, $war);
+        // get attacker war log
+        $query = "SELECT * FROM `village_war_logs` WHERE `relation_id` = {$war->relation_id} AND `village_id` = {$war->village1_id}";
+        $result = $system->db->query($query);
+        $result = $system->db->fetch($result);
+        $attacker_war_log = new WarLogDto($result, WarLogManager::WAR_LOG_TYPE_VILLAGE);
+        WarLogManager::calculateWarScore($attacker_war_log);
+        // get defender war log
+        $query = "SELECT * FROM `village_war_logs` WHERE `relation_id` = {$war->relation_id} AND `village_id` = {$war->village2_id}";
+        $result = $system->db->query($query);
+        $result = $system->db->fetch($result);
+        $defender_war_log = new WarLogDto($result, WarLogManager::WAR_LOG_TYPE_VILLAGE);
+        WarLogManager::calculateWarScore($defender_war_log);
+        $winning_village_id = null;
+        $total_score = $attacker_war_log->war_score + $defender_war_log->war_score;
+        // A = C(100 + D) / (200 + D), derived formula
+        $victory_score_required = $total_score * (100 + $victory_percent_required) / (200 + $victory_percent_required);
+        if ($attacker_war_log->war_score >= $victory_score_required) {
+            $winning_village_id = $war->village1_id;
+        } else if ($defender_war_log->war_score >= $victory_score_required) {
+            $winning_village_id = $war->village2_id;
+        }
+        // check duration
+        $war_record = new WarRecordDto($war, $attacker_war_log, $defender_war_log, $victory_score_required);
+        if ($war_duration <= $min_duration) {
+            return [];
+        } else if ($war_duration >= $max_duration) {
+            $queries = array_merge($queries, self::getEndWarQueries($system, $war_record, $winning_village_id, $total_score));
+        } else if (isset($winning_village_id)) {
+            $queries = array_merge($queries, self::getEndWarQueries($system, $war_record, $winning_village_id, $total_score));
+        }
+        return $queries;
+    }
+
+    /**
+     * @param System $system
+     * @param VillageRelation $war
+     * @param int|null $winning_village_id
+     * @param int $total_score
+     * @return array
+     */
+    private static function getEndWarQueries(System $system, WarRecordDto $war, ?int $winning_village_id, int $total_score): array {
+        $queries = [];
+        $time = time();
+        if (isset($winning_village_id)) {
+            $reward = floor($total_score / self::SCORE_TO_POINTS_RATIO);
+            $queries[] = "UPDATE `villages` SET `points` = `points` + {$reward}, `monthly_points` = `monthly_points` + {$reward} WHERE `village_id` = {$winning_village_id}";
+        } else {
+            $reward = floor($total_score / 2 / self::SCORE_TO_POINTS_RATIO);
+            $queries[] = "UPDATE `villages` SET `points` = `points` + {$reward}, `monthly_points` = `monthly_points` + {$reward} WHERE `village_id` = {$war->village_relation->village1_id}";
+            $queries[] = "UPDATE `villages` SET `points` = `points` + {$reward}, `monthly_points` = `monthly_points` + {$reward} WHERE `village_id` = {$war->village_relation->village2_id}";
+        }
+        $queries[] = "UPDATE `village_relations` SET `relation_end` = {$time} WHERE `relation_id` = {$war->village_relation->relation_id}";
+        $relation_name = "Neutral";
+        $relation_type = VillageRelation::RELATION_NEUTRAL;
+        $queries[] = "INSERT INTO `village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`) VALUES ({$war->village_relation->village1_id}, {$war->village_relation->village2_id}, '{$relation_type}', '{$relation_name}', {$time})";
+        $notification_type = NotificationManager::NOTIFICATION_DIPLOMACY_END_WAR;
+        if (isset($winning_village_id)) {
+            $message = VillageManager::VILLAGE_NAMES[$winning_village_id] . " has claimed victory in the " . $war->village_relation->relation_name . " and gained {$reward} points!";
+        } else {
+            $message = $war->village_relation->relation_name . " has ended in a draw. Villages have gained {$reward} points!";
+        }
+        $attacker_village_name = VillageManager::VILLAGE_NAMES[$war->attacker_war_log->village_id];
+        $defender_village_name = VillageManager::VILLAGE_NAMES[$war->defender_war_log->village_id];
+        $active_threshold = time() - (NotificationManager::ACTIVE_PLAYER_DAYS_LAST_ACTIVE * 86400);
+        $village_users_result = $system->db->query("SELECT `user_id`, `blocked_notifications` FROM `users` WHERE (`village` = '{$attacker_village_name}' OR `village` = '{$defender_village_name}') AND `last_login` > {$active_threshold}");
+        $village_users = $system->db->fetch_all($village_users_result);
+        foreach ($village_users as $user) {
+            $blockedNotifManager = BlockedNotificationManager::fromDb(
+                system: $system,
+                blocked_notifications_string: $user['blocked_notifications']
+            );
+            if($blockedNotifManager->notificationBlocked(notification_type: NotificationManager::NOTIFICATION_DIPLOMACY)) {
+                continue;
+            }
+            $new_notification = new NotificationDto(
+                type: $notification_type,
+                message: $message,
+                user_id: $user['user_id'],
+                created: $time,
+                expires: $time + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_DIPLOMACY * 86400),
+                alert: false,
+            );
+            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_MULTIPLE);
+        }
+        return $queries;
     }
 }
 
