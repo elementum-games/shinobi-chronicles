@@ -156,12 +156,12 @@ export function WarTable({
                         </defs>
                         <polygon points="0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0" fill="url(#war_record_score_divider_gradient)" stroke="#4d401c" strokeWidth="20"></polygon>
                     </svg>
-                    <svg className="war_record_score_divider" viewBox="0 0 200 200" width="7" height="7" style={{ paddingBottom: "1px", left: victory_bar_percentage + "%" }}>
+                    {/*<svg className="war_record_score_divider" viewBox="0 0 200 200" width="7" height="7" style={{ paddingBottom: "1px", left: victory_bar_percentage + "%" }}>
                         <polygon points="0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0" fill="url(#war_record_score_divider_gradient)" stroke="#4d401c" strokeWidth="20"></polygon>
                     </svg>
                     <svg className="war_record_score_divider" viewBox="0 0 200 200" width="7" height="7" style={{ paddingBottom: "1px", left: (100 - victory_bar_percentage) + "%" }}>
                         <polygon points="0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0" fill="url(#war_record_score_divider_gradient)" stroke="#4d401c" strokeWidth="20"></polygon>
-                    </svg>
+                    </svg>*/}
                 </div>
             );
         }
