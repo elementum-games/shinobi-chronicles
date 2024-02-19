@@ -1182,11 +1182,37 @@ class BattleManager {
             }
         }
 
+       // simulate damage of jutsu effect
+        foreach ($attack->jutsu->effects as $effect) {
+            if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual") {
+                $effect_power = $effect->effect_amount * $effect->effect_length;
+                $residual_damage = $target->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type, apply_resists: false, apply_weakness: false);
+                $effect->potential_damage = $residual_damage;
+            }
+            if ($effect->effect == "reflect_damage") {
+                $effect_power = $effect->effect_amount * $effect->effect_length;
+                $reflect_damage = $user->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type, apply_resists: false, apply_weakness: false);
+                $effect->potential_damage = $reflect_damage;
+            }
+        }
+        foreach ($attack->effects as $effect) {
+            if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual") {
+                $effect_power = $effect->effect_amount * $effect->effect_length;
+                $residual_damage = $target->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type, apply_resists: false, apply_weakness: false);
+                $effect->potential_damage = $residual_damage;
+            }
+            if ($effect->effect == "reflect_damage") {
+                $effect_power = $effect->effect_amount * $effect->effect_length;
+                $reflect_damage = $user->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type, apply_resists: false, apply_weakness: false);
+                $effect->potential_damage = $reflect_damage;
+            }
+        }
+
        if($attack->jutsu->hasEffect()){
             foreach ($attack->jutsu->effects as $effect) {
                 if ($effect && $effect->effect != 'none') {
                     $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                        $this->system->db->clean($this->effects->getAnnouncementText($effect)) .
+                        $this->system->db->clean($this->effects->getAnnouncementText($effect, $attack->jutsu->jutsu_type)) .
                         "</p>";
                 }
             }
@@ -1195,7 +1221,7 @@ class BattleManager {
             foreach ($attack->effects as $effect) {
                 if ($effect && $effect->effect != 'none') {
                     $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                        $this->system->db->clean($this->effects->getAnnouncementText($effect)) .
+                        $this->system->db->clean($this->effects->getAnnouncementText($effect, $attack->jutsu->jutsu_type)) .
                         "</p>";
                 }
             }

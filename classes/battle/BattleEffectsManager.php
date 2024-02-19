@@ -665,9 +665,28 @@ class BattleEffectsManager {
         }
     }
 
-    public function getAnnouncementText(Effect $effect) : string{
+    public function getAnnouncementText(Effect $effect, string $jutsu_type) : string{
         $announcement_text = "";
+        $attack_jutsu_color = BattleManager::getJutsuTextColor($jutsu_type);
         $effect_details = " (" . round($effect->display_effect_amount, 0) . "%, " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
+        switch ($jutsu_type) {
+            case "taijutsu":
+                $tag_open = "[taijutsu]";
+                $tag_close = "[/taijutsu]";
+                break;
+            case "ninjutsu":
+                $tag_open = "[ninjutsu]";
+                $tag_close = "[/ninjutsu]";
+                break;
+            case "genjutsu":
+                $tag_open = "[genjutsu]";
+                $tag_close = "[/genjutsu]";
+                break;
+            default:
+                $tag_open = "";
+                $tag_close = "";
+                break;
+        }
         switch($effect->effect){
             case 'taijutsu_nerf':
                 $announcement_text = "[opponent]'s Taijutsu offense is being lowered" . $effect_details;
@@ -694,10 +713,10 @@ class BattleEffectsManager {
                 break;
             case 'residual_damage':
             case 'delayed_residual':
-                $announcement_text = "[opponent] is taking Residual Damage" . $effect_details;
+                $announcement_text = "[opponent] is taking Residual Damage" . " ({$tag_open}" . round($effect->potential_damage, 0) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
                 break;
             case 'reflect_damage':
-                $announcement_text = "[opponent] is taking Reflect Damage";
+                $announcement_text = "[opponent] is taking Reflect Damage" . " ({$tag_open}" . round($effect->potential_damage, 0) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
                 break;
             case 'drain_chakra':
                 $announcement_text = "[opponent]'s Chakra is being drained" . $effect_details;
