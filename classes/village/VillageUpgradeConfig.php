@@ -16,12 +16,12 @@ class VillageUpgradeConfig {
     const UPGRADE_REQUIREMENT_UPGRADES = "UPGRADES";
 
     /* base values used for upgrade configuration */
-    const BASE_T1_RESEARCH_COST = 1200;
+    const BASE_T1_RESEARCH_COST = 4800;
     const BASE_T2_RESEARCH_COST = 8400;
     const BASE_T3_RESEARCH_COST = 25200;
-    const BASE_T1_UPKEEP_COST = 4;
-    const BASE_T2_UPKEEP_COST = 6;
-    const BASE_T3_UPKEEP_COST = 10;
+    const BASE_T1_UPKEEP_COST = 2;
+    const BASE_T2_UPKEEP_COST = 4;
+    const BASE_T3_UPKEEP_COST = 8;
     const BASE_T1_RESEARCH_TIME_DAYS = 1;
     const BASE_T2_RESEARCH_TIME_DAYS = 7;
     const BASE_T3_RESEARCH_TIME_DAYS = 21;
@@ -530,7 +530,7 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => '+25 Wealth production/hour',
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => '+50 Wealth production/hour',
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => '+75 Wealth production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => '+150000 resource capacity',
+        VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => '+100000 resource capacity',
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => '+300000 resource capacity',
         VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => '+5% Caravan speed',
         VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II => '+5% Caravan speed',
@@ -2424,7 +2424,7 @@ class VillageUpgradeConfig {
             VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 100
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 150000
+            VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 100000
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => [
             VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 300000

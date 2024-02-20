@@ -79,10 +79,10 @@ class VillageManager {
     const FORCE_PEACE_MINIMUM_DURATION_DAYS = 7;
     const WAR_COOLDOWN_DAYS = 1;
 
-    const MAX_TRADE_RESOURCE_TYPE = 25000;
+    const MAX_TRADE_RESOURCE_TYPE = 50000;
     const TRADE_COOLDOWN_DAYS = 1;
 
-    const MAX_RESOURCE_CAPACITY = 50000;
+    const MAX_RESOURCE_CAPACITY = 100000;
     const EXCESS_RESOURCE_DECAY_PER_DAY = 2; // 2% per day, 2/24% per hour
 
     public static function getLocation(System $system, string $village_id): ?TravelCoords {
