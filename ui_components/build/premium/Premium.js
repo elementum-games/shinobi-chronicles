@@ -4,7 +4,9 @@ import { CharacterChanges } from "./CharacterChanges.js";
 function PremiumPage({
   userAPILink,
   initialPage,
-  userAPIData
+  userAPIData,
+  genders,
+  skills
 }) {
   const characterChanges = "character_changes";
   const bloodlines = "bloodlines";
@@ -48,7 +50,9 @@ function PremiumPage({
     page: page,
     handlePageChange: handlePageChange
   }), page === characterChanges && /*#__PURE__*/React.createElement(CharacterChanges, {
-    playerData: playerData
+    playerData: playerData,
+    genders: genders,
+    skills: skills
   }), page === bloodlines && /*#__PURE__*/React.createElement(Bloodlines, null), page === forbiddenSeal && /*#__PURE__*/React.createElement(ForbiddenSeals, null), page === purchaseAK && /*#__PURE__*/React.createElement(PurchaseAK, null));
 }
 function MarketHeader({

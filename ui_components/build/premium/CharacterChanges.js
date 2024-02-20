@@ -1,31 +1,40 @@
 import { useModal } from "../utils/modalContext.js";
 import { RenderPurchaseConfirmation } from "./PurchaseConfirmation.js";
 export function CharacterChanges({
-  playerData
+  playerData,
+  genders,
+  skills
 }) {
   const {
     openModal
   } = useModal();
-  const stats = ['ninjutsu', 'taijutsu', 'genjutsu', 'speed', 'cast_speed', 'intelligence', 'willpower'];
-  const [newUsername, setName] = React.useState(playerData.user_name);
-  const [statResetName, setStatReset] = React.useState(stats[0]);
-  const [statResetAmount, setStatRestAmount] = React.useState(100);
+  const [newUsername, setName] = React.useState("");
+  const [statResetName, setStatReset] = React.useState(skills[0]);
+  const [newGender, setGender] = React.useState(genders[0]);
   const handleNameFieldChange = event => {
     setName(event.target.value);
   };
   const handleStatResetChange = event => {
     setStatReset(event.target.value);
   };
-  const handleStateResetAmountChange = event => {
-    setStatRestAmount(event.target.value);
+  const handleGenderFieldChange = event => {
+    setGender(event.target.value);
   };
+  function formatSkillName(skillName) {
+    let nameArray = skillName.split("_");
+    let returnName = '';
+    nameArray.map(function (namePos) {
+      returnName += namePos[0].toUpperCase() + namePos.substring(1) + ' ';
+    });
+    return returnName.substring(0, returnName.length - 1);
+  }
   React.useEffect(() => {
     const testInterval = setInterval(() => {
-      console.log(statResetName + ' @ ' + statResetAmount + '%');
+      console.log("PD: " + playerData + "\r\nSRN: " + statResetName + "\r\nNCFN: " + newUsername + "\r\nGenders: " + genders + "\r\nGender Select: " + newGender + "\r\nSkills: " + skills);
     }, 1000);
     return () => clearInterval(testInterval);
   });
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement("div", {
     className: "purchaseContainer"
   }, /*#__PURE__*/React.createElement("div", {
     className: "box-secondary halfWidth center"
@@ -36,69 +45,58 @@ export function CharacterChanges({
   }, /*#__PURE__*/React.createElement("b", null, "Individual Stat Reset"), "You can reset an individual stat to free up space in your total stat cap.", /*#__PURE__*/React.createElement("br", null), "This change is free and can be used to allow further training.", /*#__PURE__*/React.createElement("select", {
     className: "purchaseSelectField",
     onChange: handleStatResetChange
-  }, stats.map(function (name) {
+  }, skills.map(function (name) {
     return /*#__PURE__*/React.createElement("option", {
       key: name,
       value: name
-    }, name.replace('_', ' '));
-  })), /*#__PURE__*/React.createElement("select", {
-    className: "purchaseSelectField",
-    onChange: handleStateResetAmountChange
-  }, [100, 90, 80, 70, 60, 50, 40, 30, 20, 10].map(function (percentAmount) {
-    return /*#__PURE__*/React.createElement("option", {
-      key: percentAmount,
-      value: percentAmount
-    }, percentAmount, "%");
+    }, formatSkillName(name));
   })), /*#__PURE__*/React.createElement(RenderPurchaseConfirmation, {
-    text: "Are you certain you wish to reset your X stat?"
-  }))), /*#__PURE__*/React.createElement("table", {
-    className: "table"
-  }, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
-    colSpan: "2"
-  }, "Character Changes")), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Reset"), /*#__PURE__*/React.createElement("th", null, "Individual Stat Reset")), /*#__PURE__*/React.createElement("tr", {
-    className: "center"
-  }, /*#__PURE__*/React.createElement("td", null, "You can reset your character to a level 1 Akademi-sai.", /*#__PURE__*/React.createElement("br", null), "This change is ", /*#__PURE__*/React.createElement("b", null, "free"), " and ", /*#__PURE__*/React.createElement("u", null, "is not"), " reversible.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("div", {
-    className: "purchase_button",
-    onClick: () => openModal({
-      header: 'Purchase Confirmation',
-      text: 'Are you sure you would like to reset your character?',
-      ContentComponent: null,
-      onConfirm: () => console.log("purchase....")
-    })
-  }, "purchase")), /*#__PURE__*/React.createElement("td", null, "Your can reset an individual stat, freeing up space in your total stat cap to train something else higher.", /*#__PURE__*/React.createElement("br", null), "This purchase is ", /*#__PURE__*/React.createElement("b", null, "free"), " and ", /*#__PURE__*/React.createElement("u", null, "is not"), " reversible.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("div", {
-    className: "purchase_button",
-    onClick: () => openModal({
-      header: 'Purchase Confirmation',
-      text: 'Are you sure you would like to reset your character?',
-      ContentComponent: null,
-      onConfirm: () => {
-        playerData.premiumCredits -= 5;
-        openModal({
-          header: 'Confirmation',
-          text: 'Stat reset....',
-          ContentComponent: null,
-          onConfirm: () => window.location.reload()
-        });
-      }
-    })
-  }, "purchase"))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Reset AI Battle Counts"), /*#__PURE__*/React.createElement("th", null, "Reset PvP Battle Counts")), /*#__PURE__*/React.createElement("tr", {
-    className: "center"
-  }, /*#__PURE__*/React.createElement("td", null, "This will reset your AI Wins and AI Losses to 0.", /*#__PURE__*/React.createElement("br", null)), /*#__PURE__*/React.createElement("td", null, "This will reset your PvP Wins and PvP Losses to 0.", /*#__PURE__*/React.createElement("br", null))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Username Change"), /*#__PURE__*/React.createElement("th", null, "Gender Change")), /*#__PURE__*/React.createElement("tr", {
-    className: "center"
-  }, /*#__PURE__*/React.createElement("td", null, "Your first username change is free and X Ancient Kunai afterward.", /*#__PURE__*/React.createElement("br", null), "Free changes: Y", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("input", {
+    text: "Are you certain you wish to reset your " + formatSkillName(statResetName) + "?"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "box-primary fullWidth center"
+  }, /*#__PURE__*/React.createElement("b", null, "Reset Ai and PvP Battle Counts"), /*#__PURE__*/React.createElement("div", {
+    className: "subPurchaseContainer"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "box-secondary halfWidth noBorder center"
+  }, "Reset AI wins and lossess to 0.", /*#__PURE__*/React.createElement("br", null), "Cost: ", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement(RenderPurchaseConfirmation, {
+    text: "Are you certain you wish to reset your AI wins and losses?"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "box-secondary halfWidth noBorder center"
+  }, "You can reset your PvP wins and losses to 0.", /*#__PURE__*/React.createElement("br", null), "Cost:", /*#__PURE__*/React.createElement(RenderPurchaseConfirmation, {
+    text: "Are you certain you wish to reset your PvP wins and losses?"
+  }))), "You can reset both AI and PvP wins and losses at a discounted rate of", /*#__PURE__*/React.createElement(RenderPurchaseConfirmation, {
+    text: "Are you certain you want to reset both you PvP and AI wins/losses?"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "box-secondary halfWidth center"
+  }, /*#__PURE__*/React.createElement("b", null, "Change Name"), "You can change your character name for free once.", /*#__PURE__*/React.createElement("br", null), "Each change afterward costs ", /*#__PURE__*/React.createElement("br", null), "Name case changes are free (example: name1 => NaMe1).", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("input", {
+    className: "purchaseTextField",
     type: "text",
     onChange: handleNameFieldChange
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "purchase_button",
-    onClick: () => openModal({
-      header: 'Confirm Purchase',
-      text: 'Are you certain you would like to change your username?',
-      ContentComponent: null,
-      onConfirm: () => openModal({
-        header: 'Purchase Confirmed',
-        text: 'You have successfully changed your name to ' + newUsername,
-        ContentComponent: null
-      })
-    })
-  }, "purchase")), /*#__PURE__*/React.createElement("td", null)))));
+  }), /*#__PURE__*/React.createElement(RenderPurchaseConfirmation, {
+    text: "Are you certain you wish to change your name from " + playerData.user_name + " to " + newUsername + "?"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "box-secondary halfWidth center"
+  }, /*#__PURE__*/React.createElement("b", null, "Change Gender"), "You can change your characters gender for ", /*#__PURE__*/React.createElement("br", null), "('None' gender will not be displayed on view profile)", /*#__PURE__*/React.createElement("select", {
+    className: "purchaseSelectField",
+    onChange: handleGenderFieldChange
+  }, genders.map(function (name) {
+    return /*#__PURE__*/React.createElement("option", {
+      key: name,
+      value: name
+    }, formatSkillName(name));
+  })), /*#__PURE__*/React.createElement(RenderPurchaseConfirmation, {
+    text: "Are you certain you wish to change your gender from " + playerData.gender + " to " + newGender + "?"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "box-secondary fullWidth center"
+  }, /*#__PURE__*/React.createElement("b", null, "Change Village"), "This is changing village....", /*#__PURE__*/React.createElement("br", null), "This is just to show what full width would look like for now...", /*#__PURE__*/React.createElement(RenderPurchaseConfirmation, {
+    text: "Are you certain you would like to change your village?"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "box-secondary halfWidth center"
+  }, /*#__PURE__*/React.createElement("b", null, "Post-full-width Test"), /*#__PURE__*/React.createElement(RenderPurchaseConfirmation, {
+    text: "You would like to purchase???"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "box-secondary halfWidth center"
+  }, /*#__PURE__*/React.createElement("b", null, "Post-full-width Test"), /*#__PURE__*/React.createElement(RenderPurchaseConfirmation, {
+    text: "You would like to purchase???"
+  })));
 }

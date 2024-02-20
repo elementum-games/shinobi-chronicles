@@ -22,6 +22,8 @@
                 userAPIData: {
                     playerData: <?= json_encode(UserAPIPresenter::playerDataResponse(player: $player, rank_names: RankManager::fetchNames($system))) ?>
                 },
+                genders: <?= json_encode(User::$genders) ?>,
+                skills: <?= json_encode(array_merge(TrainingManager::$skill_types, TrainingManager::$attribute_types)) ?>,
             }),
             shopContainer
         );

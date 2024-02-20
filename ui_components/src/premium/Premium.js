@@ -8,12 +8,16 @@ import type { PlayerDataType } from "../_schema/userSchema";
 type PremiumProps = {|
     +userAPILink: string,
     +initialPage: string,
-    +userAPIData: PlayerDataType
+    +userAPIData: [],
+    +genders: [],
+    +skills: [],
 |};
 function PremiumPage({
     userAPILink,
     initialPage,
-    userAPIData
+    userAPIData,
+    genders,
+    skills
  }: PremiumProps) {
     const characterChanges = "character_changes";
     const bloodlines = "bloodlines";
@@ -67,6 +71,8 @@ function PremiumPage({
             {page === characterChanges &&
                 <CharacterChanges
                     playerData={playerData}
+                    genders={genders}
+                    skills={skills}
                 />
             }
             {page === bloodlines &&
