@@ -33,9 +33,10 @@ function RamenShop({
   specialMenuOptions,
   mysteryRamenDetails
 }) {
-  console.log(mysteryRamenDetails.effects);
   const [playerDataState, setPlayerDataState] = React.useState(playerData);
   const [playerResourcesDataState, setPlayerResourcesDataState] = React.useState(playerResourcesData);
+  const [characterRamenDataState, setCharacterRamenDataState] = React.useState(characterRamenData);
+  const [mysteryRamenDetailsState, setMysteryRamenDetailsState] = React.useState(mysteryRamenDetails);
   const {
     openModal
   } = useModal();
@@ -73,7 +74,7 @@ function RamenShop({
       className: "special_ramen_img"
     }), /*#__PURE__*/React.createElement("div", {
       className: "special_ramen_name"
-    }, ramenInfo.name), /*#__PURE__*/React.createElement("div", {
+    }, ramenInfo.label), /*#__PURE__*/React.createElement("div", {
       className: "special_ramen_description"
     }, ramenInfo.description), /*#__PURE__*/React.createElement("div", {
       className: "special_ramen_effect"
@@ -107,6 +108,14 @@ function RamenShop({
         return;
       }
       setPlayerDataState(response.data.player_data);
+      setMysteryRamenDetailsState(response.data.mystery_ramen_details);
+      setCharacterRamenDataState(response.data.character_ramen_data);
+      openModal({
+        header: 'Confirmation',
+        text: response.data.response_message,
+        ContentComponent: null,
+        onConfirm: null
+      });
     });
   }
   function PurchaseMysteryRamen() {
@@ -118,6 +127,14 @@ function RamenShop({
         return;
       }
       setPlayerDataState(response.data.player_data);
+      setMysteryRamenDetailsState(response.data.mystery_ramen_details);
+      setCharacterRamenDataState(response.data.character_ramen_data);
+      openModal({
+        header: 'Confirmation',
+        text: response.data.response_message,
+        ContentComponent: null,
+        onConfirm: null
+      });
     });
   }
   function handleErrors(errors) {
@@ -188,8 +205,8 @@ function RamenShop({
     className: "header"
   }, "Mystery ramen"), /*#__PURE__*/React.createElement("div", {
     className: "ramen_shop_mystery_ramen_container box-primary"
-  }, mysteryRamenDetails.mystery_ramen_unlocked ? /*#__PURE__*/React.createElement(React.Fragment, null, characterRamenData.mystery_ramen_available ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
-    src: mysteryRamenDetails.image,
+  }, mysteryRamenDetailsState.mystery_ramen_unlocked ? /*#__PURE__*/React.createElement(React.Fragment, null, characterRamenDataState.mystery_ramen_available ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
+    src: mysteryRamenDetailsState.image,
     className: "special_ramen_img"
   }), /*#__PURE__*/React.createElement("div", {
     className: "mystery_ramen_details_container"
@@ -197,17 +214,17 @@ function RamenShop({
     className: "mystery_ramen_description"
   }, "Made using leftover ingredients. You can't quite tell what's in it."), /*#__PURE__*/React.createElement("div", {
     className: "mystery_ramen_effects"
-  }, mysteryRamenDetails.effects.map((effect, index) => {
+  }, mysteryRamenDetailsState.effects.map((effect, index) => {
     return /*#__PURE__*/React.createElement("div", {
       key: index,
       className: "mystery_ramen_effect"
     }, effect.effect);
   })), /*#__PURE__*/React.createElement("div", {
     className: "mystery_ramen_duration"
-  }, "Duration: ", mysteryRamenDetails.duration, " minutes"), /*#__PURE__*/React.createElement("div", {
+  }, "Duration: ", mysteryRamenDetailsState.duration, " minutes"), /*#__PURE__*/React.createElement("div", {
     className: "mystery_ramen_button",
     onClick: () => PurchaseMysteryRamen()
-  }, /*#__PURE__*/React.createElement(React.Fragment, null, "\xA5"), mysteryRamenDetails.cost))) : /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(React.Fragment, null, "\xA5"), mysteryRamenDetailsState.cost))) : /*#__PURE__*/React.createElement("div", {
     className: "mystery_ramen_locked"
   }, "Check back soon!")) : /*#__PURE__*/React.createElement("div", {
     className: "mystery_ramen_locked"

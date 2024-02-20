@@ -436,6 +436,12 @@ class UserReputation {
         $this->bonus_pve_loaded = true;
     }
 
+    public function addBonusPveRep($amount): void {
+        if ($this->bonus_pve_loaded) {
+            $this->bonus_pve_rep += $amount;
+        }
+    }
+
     public function getBonusPveRep(): int {
         return $this->bonus_pve_rep;
     }

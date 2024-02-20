@@ -187,10 +187,10 @@
     .upgrade_item.inactive .upgrade_item_inner {
         background: linear-gradient(to bottom, #aa5472 0%, #8c3855 100%);
     }
-.upgrade_item.active, .upgrade_item_unlocked {
+.upgrade_item.active, .upgrade_item.unlocked {
     background: linear-gradient(to bottom, #38a774 0%, #2a5e3c 100%);
 }
-    .upgrade_item.active .upgrade_item_inner, .upgrade_item_unlocked .upgrade_item_inner {
+    .upgrade_item.active .upgrade_item_inner, .upgrade_item.unlocked .upgrade_item_inner {
         background: linear-gradient(to bottom, #38a774 0%, #2a5e3c 100%);
     }
 .upgrade_item.available {

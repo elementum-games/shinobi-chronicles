@@ -42,6 +42,9 @@ try {
             if ($result->succeeded) {
                 $response->data = [
                     "player_data" => UserAPIPresenter::playerDataResponse($player, RankManager::fetchNames($system)),
+                    "mystery_ramen_details" => RamenShopAPIPresenter::getMysteryRamenResponse($player),
+                    "character_ramen_data" => RamenShopAPIPresenter::getCharacterRamenResponse($system, $player),
+                    "response_message" => $result->success_message,
                 ];
             } else {
                 $response->errors[] = $result->error_message;
@@ -52,6 +55,9 @@ try {
             if ($result->succeeded) {
                 $response->data = [
                     "player_data" => UserAPIPresenter::playerDataResponse($player, RankManager::fetchNames($system)),
+                    "mystery_ramen_details" => RamenShopAPIPresenter::getMysteryRamenResponse($player),
+                    "character_ramen_data" => RamenShopAPIPresenter::getCharacterRamenResponse($system, $player),
+                    "response_message" => $result->success_message,
                 ];
             } else {
                 $response->errors[] = $result->error_message;

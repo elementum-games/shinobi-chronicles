@@ -132,7 +132,7 @@ class VillageUpgradeManager {
         }
         // go through all active upgrades and add effects to array
         foreach ($upgrades as $upgrade) {
-            if ($upgrade->status == VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
+            if ($upgrade->status == VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE || $upgrade->status == VillageUpgradeConfig::UPGRADE_STATUS_UNLOCKED) {
                 foreach ($upgrade->getEffects() as $key => $value) {
                     $effects[$key] += $value;
                 }

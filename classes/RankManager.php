@@ -12,6 +12,13 @@ class RankManager {
     const CHUUNIN_STAGE_DUEL = 5;
     const CHUUNIN_STAGE_PASS = 6;
 
+    const REGEN_RATE = [
+        1 => 25,
+        2 => 50,
+        3 => 100,
+        4 => 170
+    ];
+
     const JONIN_MISSION_ID = 10;
 
     private static array $RANK_NAMES = [];
