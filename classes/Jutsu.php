@@ -129,32 +129,6 @@ class Jutsu {
 
     private bool $rank_scaling_applied = false;
 
-    /**
-     * Jutsu constructor.
-     * @param int         $id
-     * @param string      $name
-     * @param int         $rank
-     * @param string      $jutsu_type
-     * @param float       $base_power
-     * @param int         $range
-     * @param string|null $effect_1
-     * @param float|null  $base_effect_amount_1
-     * @param int|null    $effect_length_1
-     * @param string|null $effect_2
-     * @param float|null  $base_effect_amount_2
-     * @param int|null    $effect_length_2
-     * @param string      $description
-     * @param string      $battle_text
-     * @param int         $cooldown
-     * @param string      $use_type
-     * @param string      $target_type
-     * @param int         $use_cost
-     * @param int         $purchase_cost
-     * @param int         $purchase_type
-     * @param int|null    $parent_jutsu
-     * @param string      $element
-     * @param string      $hand_seals
-     */
     public function __construct(int $id, string $name, int $rank, string $jutsu_type, float $base_power, int $range,
         ?string $effect_1, ?float $base_effect_amount_1, ?int $effect_length_1, ?string $effect_2, ?float $base_effect_amount_2, ?int $effect_length_2,
         string $description, string $battle_text, int $cooldown,
@@ -173,11 +147,6 @@ class Jutsu {
         if($this->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
             $this->range = 1;
         }
-        /*
-        if($this->jutsu_type == Jutsu::TYPE_GENJUTSU && in_array($use_type, self::$attacking_use_types)) {
-            $this->power = round($this->base_power * self::GENJUTSU_ATTACK_POWER_MODIFIER, 2);
-            // $this->effect_only = true; // toggle this if you turn the power back to 1
-        }*/
 
         // legacy
         $this->effect = $effect_1;
@@ -211,7 +180,6 @@ class Jutsu {
         }
     }
 
-    #[Pure]
     public static function fromArray(int $id, array $jutsu_data): Jutsu {
         return new Jutsu(
             id: $id,
@@ -337,6 +305,7 @@ class Jutsu {
     /**
      * @param System $system
      * @return Jutsu[]
+     * @throws DatabaseDeadlockException
      */
     public static function fetchAll(System $system): array {
         $result = $system->db->query("SELECT * FROM `jutsu` ORDER BY `rank` ASC, `purchase_cost` ASC");
