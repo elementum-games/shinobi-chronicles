@@ -36,18 +36,18 @@ export function KageQuarters({
     const [proposalRepAdjustment, setProposalRepAdjustment] = React.useState(0);
     const [strategicDisplayLeft, setStrategicDisplayLeft] = React.useState(strategicDataState.find(item => item.village.name == villageName));
     const [strategicDisplayRight, setStrategicDisplayRight] = React.useState(strategicDataState.find(item => item.village.name != villageName));
-    const [offeredResources, setOfferedResources] = React.useState([
+    const offeredResources = React.useRef([
         { resource_id: 1, resource_name: "materials", count: 0 },
         { resource_id: 2, resource_name: "food", count: 0 },
         { resource_id: 3, resource_name: "wealth", count: 0 }
     ]);
-    const [offeredRegions, setOfferedRegions] = React.useState([]);
-    const [requestedResources, setRequestedResources] = React.useState([
+    const offeredRegions = React.useRef([]);
+    const requestedResources = React.useRef([
         { resource_id: 1, resource_name: "materials", count: 0 },
         { resource_id: 2, resource_name: "food", count: 0 },
         { resource_id: 3, resource_name: "wealth", count: 0 }
     ]);
-    const [requestedRegions, setRequestedRegions] = React.useState([]);
+    const requestedRegions = React.useRef([]);
     const { openModal } = useModal();
 
     const ChangePolicy = () => {
@@ -190,10 +190,10 @@ export function KageQuarters({
                 request: 'CreateProposal',
                 type: 'offer_trade',
                 target_village_id: strategicDisplayRight.village.village_id,
-                offered_resources: offeredResources,
-                offered_regions: offeredRegions,
-                requested_resources: requestedResources,
-                requested_regions: requestedRegions
+                offered_resources: offeredResources.current,
+                offered_regions: offeredRegions.current,
+                requested_resources: requestedResources.current,
+                requested_regions: requestedRegions.current
             }
         ).then((response) => {
             if (response.errors.length) {
@@ -392,15 +392,12 @@ export function KageQuarters({
                                                             offeringVillageResources: resourceDataState,
                                                             offeringVillageRegions: strategicDisplayLeft.regions,
                                                             offeredResources: offeredResources,
-                                                            setOfferedResources: setOfferedResources,
                                                             offeredRegions: offeredRegions,
-                                                            setOfferedRegions: setOfferedRegions,
                                                             targetVillageResources: null,
                                                             targetVillageRegions: strategicDisplayRight.regions,
                                                             requestedResources: requestedResources,
-                                                            setRequestedResources: setRequestedResources,
                                                             requestedRegions: requestedRegions,
-                                                            setRequestedRegions: setRequestedRegions,
+                                                            proposalData: currentProposal.trade_data
                                                         }),
                                                         onConfirm: null,
                                                     })
@@ -457,15 +454,12 @@ export function KageQuarters({
                                                                         offeringVillageResources: resourceDataState,
                                                                         offeringVillageRegions: strategicDisplayLeft.regions,
                                                                         offeredResources: offeredResources,
-                                                                        setOfferedResources: setOfferedResources,
                                                                         offeredRegions: offeredRegions,
-                                                                        setOfferedRegions: setOfferedRegions,
                                                                         targetVillageResources: null,
                                                                         targetVillageRegions: strategicDisplayRight.regions,
                                                                         requestedResources: requestedResources,
-                                                                        setRequestedResources: setRequestedResources,
                                                                         requestedRegions: requestedRegions,
-                                                                        setRequestedRegions: setRequestedRegions,
+                                                                        proposalData: currentProposal.trade_data
                                                                     }),
                                                                     onConfirm: null,
                                                                 })
@@ -497,15 +491,12 @@ export function KageQuarters({
                                                                         offeringVillageResources: resourceDataState,
                                                                         offeringVillageRegions: strategicDisplayLeft.regions,
                                                                         offeredResources: offeredResources,
-                                                                        setOfferedResources: setOfferedResources,
                                                                         offeredRegions: offeredRegions,
-                                                                        setOfferedRegions: setOfferedRegions,
                                                                         targetVillageResources: null,
                                                                         targetVillageRegions: strategicDisplayRight.regions,
                                                                         requestedResources: requestedResources,
-                                                                        setRequestedResources: setRequestedResources,
                                                                         requestedRegions: requestedRegions,
-                                                                        setRequestedRegions: setRequestedRegions,
+                                                                        proposalData: currentProposal.trade_data
                                                                     }),
                                                                     onConfirm: null,
                                                                 })
@@ -546,15 +537,12 @@ export function KageQuarters({
                                                                         offeringVillageResources: resourceDataState,
                                                                         offeringVillageRegions: strategicDisplayLeft.regions,
                                                                         offeredResources: offeredResources,
-                                                                        setOfferedResources: setOfferedResources,
                                                                         offeredRegions: offeredRegions,
-                                                                        setOfferedRegions: setOfferedRegions,
                                                                         targetVillageResources: null,
                                                                         targetVillageRegions: strategicDisplayRight.regions,
                                                                         requestedResources: requestedResources,
-                                                                        setRequestedResources: setRequestedResources,
                                                                         requestedRegions: requestedRegions,
-                                                                        setRequestedRegions: setRequestedRegions,
+                                                                        proposalData: currentProposal.trade_data
                                                                     }),
                                                                     onConfirm: null,
                                                                 })
@@ -593,15 +581,12 @@ export function KageQuarters({
                                                                         offeringVillageResources: resourceDataState,
                                                                         offeringVillageRegions: strategicDisplayLeft.regions,
                                                                         offeredResources: offeredResources,
-                                                                        setOfferedResources: setOfferedResources,
                                                                         offeredRegions: offeredRegions,
-                                                                        setOfferedRegions: setOfferedRegions,
                                                                         targetVillageResources: null,
                                                                         targetVillageRegions: strategicDisplayRight.regions,
                                                                         requestedResources: requestedResources,
-                                                                        setRequestedResources: setRequestedResources,
                                                                         requestedRegions: requestedRegions,
-                                                                        setRequestedRegions: setRequestedRegions,
+                                                                        proposalData: currentProposal.trade_data
                                                                     }),
                                                                     onConfirm: null,
                                                                 })
@@ -847,7 +832,7 @@ export function KageQuarters({
                                         <div className="diplomacy_action_button_wrapper alliance"
                                             onClick={
                                                 () => openModal({
-                                                    header: 'View trade offer',
+                                                    header: 'Offer trade',
                                                     text: '',
                                                     ContentComponent: TradeDisplay,
                                                     componentProps: ({
@@ -855,15 +840,11 @@ export function KageQuarters({
                                                         offeringVillageResources: resourceDataState,
                                                         offeringVillageRegions: strategicDisplayLeft.regions,
                                                         offeredResources: offeredResources,
-                                                        setOfferedResources: setOfferedResources,
                                                         offeredRegions: offeredRegions,
-                                                        setOfferedRegions: setOfferedRegions,
                                                         targetVillageResources: null,
                                                         targetVillageRegions: strategicDisplayRight.regions,
                                                         requestedResources: requestedResources,
-                                                        setRequestedResources: setRequestedResources,
                                                         requestedRegions: requestedRegions,
-                                                        setRequestedRegions: setRequestedRegions,
                                                     }),
                                                     onConfirm: () => OfferTrade(),
                                                 })
