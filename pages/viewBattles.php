@@ -366,7 +366,10 @@ function viewBattles() {
                 if ($system->db->last_num_rows > 0) {
                     while ($turn = $system->db->fetch($logs_result)) {
                         $battle_text = $system->html_parse(stripslashes($turn['content']));
-                        $battle_text = str_replace(array('[br]', '[hr]'), array('<br />', '<hr />'), $battle_text);
+                        $battle_text = str_replace(
+                            array('[br]', '[hr]', '[taijutsu]', '[ninjutsu]', '[genjutsu]', '[/taijutsu]', '[/ninjutsu]', '[/genjutsu]'),
+                            array('<br />', '<hr />', '<span class="battle_text_taijutsu">', '<span class="battle_text_ninjutsu">', '<span class="battle_text_genjutsu">', '</span>', '</span>', '</span>'), 
+                            $battle_text);
                         $p1_health = null;
                         $p1_key = "T1:U:" . $p1->id;
                         $p2_health = null;
