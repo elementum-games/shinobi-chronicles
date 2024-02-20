@@ -3,18 +3,21 @@ export function TradeDisplay({
     offeringVillageResources,
     offeringVillageRegions,
     offeredResources,
-    setOfferedResources,
     offeredRegions,
-    setOfferedRegions,
     targetVillageResources,
     targetVillageRegions,
     requestedResources,
-    setRequestedResources,
     requestedRegions,
-    setRequestedRegions,
+    proposalData,
 }) {
+
+    console.log(offeringVillageResources);
+    const [offeredRegionsState, setOfferedRegionsState] = React.useState([...offeredRegions.current]);
+    const [requestedRegionsState, setRequestedRegionsState] = React.useState([...requestedRegions.current]);
+    const [offeredResourcesState, setOfferedResourcesState] = React.useState([...offeredResources.current]);
+    const [requestedResourcesState, setRequestedResourcesState] = React.useState([...requestedResources.current]);
     const toggleOfferedRegion = (regionId) => {
-        setOfferedRegions(current => {
+        setOfferedRegionsState(current => {
             // Check if the region is already selected
             if (current.includes(regionId)) {
                 // If it is, filter it out (unselect it)
@@ -26,7 +29,7 @@ export function TradeDisplay({
         });
     };
     const toggleRequestedRegion = (regionId) => {
-        setRequestedRegions(current => {
+        setRequestedRegionsState(current => {
             // Check if the region is already selected
             if (current.includes(regionId)) {
                 // If it is, filter it out (unselect it)
@@ -38,7 +41,7 @@ export function TradeDisplay({
         });
     };
     const handleOfferedResourcesChange = (resourceName, value) => {
-        setOfferedResources(currentResources =>
+        setOfferedResourcesState(currentResources =>
             currentResources.map(resource =>
                 resource.resource_name === resourceName
                     ? { ...resource, count: value }
@@ -47,7 +50,7 @@ export function TradeDisplay({
         );
     };
     const handleRequestedResourcesChange = (resourceName, value) => {
-        setRequestedResources(currentResources =>
+        setRequestedResourcesState(currentResources =>
             currentResources.map(resource =>
                 resource.resource_name === resourceName
                     ? { ...resource, count: value }
@@ -55,6 +58,19 @@ export function TradeDisplay({
             )
         );
     };
+
+    React.useEffect(() => {
+        offeredRegions.current = [...offeredRegionsState];
+    }, [offeredRegionsState]);
+    React.useEffect(() => {
+        requestedRegions.current = [...requestedRegionsState];
+    }, [requestedRegionsState]);
+    React.useEffect(() => {
+        offeredResources.current = [...offeredResourcesState];
+    }, [offeredResourcesState]);
+    React.useEffect(() => {
+        requestedResources.current = [...requestedResourcesState];
+    }, [requestedResourcesState]);
 
     return (
         <>
@@ -67,9 +83,9 @@ export function TradeDisplay({
                     <div className="trade_display_offer_container">
                         <div className="header">Offered Resources</div>
                         <div className="trade_display_resources">
-                            {offeredResources
+                            {proposalData.offered_resources
                                 .map((resource, index) => {
-                                    const total = offeringVillageResources ? offeringVillageResources.find(total => total.resource_id === resource.resource_id).count : null;
+                                    const total = offeringVillageResources ? offeringVillageResources.find(total => total.resource_id === resource.resource_id)?.count ?? null : null;
                                     return (
                                         <div key={resource.resource_id} className="trade_display_resource_wrapper">
                                             <input
@@ -95,7 +111,7 @@ export function TradeDisplay({
                         </div>
                         <div className="header">Offered Regions</div>
                         <div className="trade_display_regions">
-                            {offeredRegions
+                            {proposalData.offered_regions
                                 .filter(region => region.region_id > 5)
                                 .map((region, index) => (
                                     <div key={region.name} className="trade_display_region_wrapper">
@@ -107,9 +123,9 @@ export function TradeDisplay({
                     <div className="trade_display_request_container">
                         <div className="header">Requested Resources</div>
                         <div className="trade_display_resources">
-                            {requestedResources
+                            {proposalData.requested_resources
                                 .map((resource, index) => {
-                                    const total = targetVillageResources ? targetVillageResources.find(total => total.resource_id === resource.resource_id).count : null;
+                                    const total = targetVillageResources ? targetVillageResources.find(total => total.resource_id === resource.resource_id)?.count ?? null : null;
                                     return (
                                         <div key={resource.resource_id} className="trade_display_resource_wrapper">
                                             <input
@@ -136,7 +152,7 @@ export function TradeDisplay({
                         </div>
                         <div className="header">Requested Regions</div>
                         <div className="trade_display_regions">
-                            {requestedRegions
+                            {proposalData.requested_regions
                                 .filter(region => region.region_id > 5)
                                 .map((region, index) => (
                                     <div key={region.name} className="trade_display_region_wrapper">
@@ -151,7 +167,7 @@ export function TradeDisplay({
                     <div className="trade_display_offer_container">
                         <div className="header">Offer Resources</div>
                         <div className="trade_display_resources">
-                            {offeredResources
+                            {offeredResourcesState
                                 .map((resource, index) => {
                                     const total = offeringVillageResources ? offeringVillageResources.find(total => total.resource_id === resource.resource_id).count : null;
                                     return (
@@ -185,7 +201,7 @@ export function TradeDisplay({
                                         <div className="trade_display_region_name">{region.name}</div>
                                         <input
                                             type="checkbox"
-                                            checked={offeredRegions.includes(region.region_id)}
+                                            checked={offeredRegionsState.includes(region.region_id)}
                                             onChange={() => toggleOfferedRegion(region.region_id)}
                                         />
                                     </div>
@@ -195,7 +211,7 @@ export function TradeDisplay({
                     <div className="trade_display_request_container">
                         <div className="header">Request Resources</div>
                         <div className="trade_display_resources">
-                            {requestedResources
+                            {requestedResourcesState
                                 .map((resource, index) => {
                                     const total = targetVillageResources ? targetVillageResources.find(total => total.resource_id === resource.resource_id).count : null;
                                     return (
