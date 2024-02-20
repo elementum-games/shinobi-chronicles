@@ -96,18 +96,17 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 
     $player->getInventory();
 
-    $replacement_jutsu_id = 4;
     $clone_jutsu_id = 87;
     $transform_jutsu_id = 12;
-    $jutsu_ids = implode(",", [$replacement_jutsu_id, $clone_jutsu_id, $transform_jutsu_id]);
+    $jutsu_ids = implode(",", [$clone_jutsu_id, $transform_jutsu_id]);
 
     $result = $system->db->query(
         "SELECT `jutsu_id`, `name`, `hand_seals` FROM `jutsu` WHERE `jutsu_id` IN({$jutsu_ids})"
     );
     $jutsu_data = array();
-    $count = 1;
+    $jutsu_count = 0;
     while($row = $system->db->fetch($result)) {
-        $jutsu_data[$count++] = $row;
+        $jutsu_data[++$jutsu_count] = $row;
     }
 
     // Input
@@ -130,31 +129,17 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 
     // Display
     $system->printMessage();
-    $prompt = '';
-    switch($player->exam_stage) {
-        case 1:
-            $prompt = 'Please demonstrate ' . $jutsu_data[1]['name'] . ':';
-            break;
-        case 2:
-            $prompt = 'Please demonstrate ' . $jutsu_data[2]['name'] . ':';
-            break;
-        case 3:
-            $prompt = 'Please demonstrate ' . $jutsu_data[3]['name'] . ':';
-            break;
-        default:
-            break;
-    }
 
     if(!$player->exam_stage) {
         require 'templates/level_rank_up/exam_assignment.php';
     }
-    else if($player->exam_stage >= 1 && $player->exam_stage <= 3) {
+    else if($player->exam_stage >= 1 && $player->exam_stage <= $jutsu_count) {
         //Abandon Exam
         require 'templates/level_rank_up/abandon_exam.php';
         $submitted_hand_seals = $_POST['hand_seals'] ?? '';
         require 'templates/level_rank_up/genin_exam.php';
     }
-    else if($player->exam_stage == 4) {
+    else if($player->exam_stage > $jutsu_count) {
         try {
             $player->exam_stage = 0;
             $gender = $player->getPossessivePronoun();
@@ -201,10 +186,10 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                 // If no bloodlines were found, this flag will have been set to false
                 if($bloodline_rolled) {
                     $bloodlines = array();
-                    $count = 0;
+                    $bl_count = 0;
                     while($row = $system->db->fetch($result)) {
                         $bloodlines[$row['bloodline_id']] = $row;
-                        $count++;
+                        $bl_count++;
                     }
 
                     $query = "SELECT ";
@@ -212,7 +197,7 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                     foreach($bloodlines as $id => $bloodline) {
                         $query .= "SUM(IF(`bloodline_id` = $id, 1, 0)) as `$id`";
                         $x++;
-                        if($x < $count) {
+                        if($x < $bl_count) {
                             $query .= ', ';
                         }
                     }
@@ -227,7 +212,7 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                         $total_users += $user_count;
                     }
 
-                    $average_users = round($total_users / $count);
+                    $average_users = round($total_users / $bl_count);
 
                     $bloodline_rolls = array();
                     foreach($bloodlines as $id => $bloodline) {

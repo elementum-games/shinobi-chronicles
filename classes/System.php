@@ -31,6 +31,7 @@ class System {
         'Jan 1' => 'New Years Boost',
         'Jan 15' => 'Martin Luther King Day Boost',
         'Feb 14' => 'Valentines Day Boost',
+        'Feb 19' => 'Presidents Day Boost',
         'May 27' => 'Memorial Day Boost',
         'Jun 19' => 'Juneteenth Boost',
         'Jul 4' => 'Independence Day Boost',

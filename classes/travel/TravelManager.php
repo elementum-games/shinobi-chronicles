@@ -163,7 +163,7 @@ class TravelManager {
         }
 
         // check if the user is in a special mission
-        if ($this->user->special_mission) {
+        if ($this->user->special_mission_id) {
             throw new InvalidMovementException('You are currently in a Special Mission and cannot travel!');
         }
 

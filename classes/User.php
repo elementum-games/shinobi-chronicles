@@ -264,7 +264,7 @@ class User extends Fighter {
      */
     public $mission_stage;
 
-    public int $special_mission;
+    public int $special_mission_id;
 
     public int $operation;
 
@@ -563,7 +563,7 @@ class User extends Fighter {
             $this->mission_stage = json_decode($user_data['mission_stage'], true);
         }
 
-        $this->special_mission = $user_data['special_mission'];
+        $this->special_mission_id = $user_data['special_mission'];
         $this->operation = $user_data['operation'];
 
         $this->exam_stage = $user_data['exam_stage'];
@@ -1853,8 +1853,8 @@ class User extends Fighter {
             $query .= "`mission_id`=0,";
         }
 
-        if ($this->special_mission) {
-            $query .= "`special_mission`='$this->special_mission',";
+        if ($this->special_mission_id) {
+            $query .= "`special_mission`='$this->special_mission_id',";
         } else {
             $query .= "`special_mission`='0',";
         }

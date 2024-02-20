@@ -28,6 +28,8 @@ class WarLogDto {
     public int $objective_score = 0;
     public int $resource_score = 0;
     public int $battle_score = 0;
+    public int $stability_gained = 0;
+    public int $stability_reduced = 0;
 
     public function __construct(array $row, string $log_type) {
         $this->log_id = $row['log_id'];
@@ -53,6 +55,8 @@ class WarLogDto {
         $this->villages_captured = $row['villages_captured'] ?? 0;
         $this->pvp_wins = $row['pvp_wins'] ?? 0;
         $this->points_gained = $row['points_gained'] ?? 0;
+        $this->stability_gained = $row['stability_gained'] ?? 0;
+        $this->stability_reduced = $row['stability_reduced'] ?? 0;
     }
 
     public function addValues(WarLogDto $new_log) {
@@ -71,6 +75,8 @@ class WarLogDto {
         $this->villages_captured += $new_log->villages_captured;
         $this->pvp_wins += $new_log->pvp_wins;
         $this->points_gained += $new_log->points_gained;
+        $this->stability_gained += $new_log->stability_gained;
+        $this->stability_reduced += $new_log->stability_reduced;
         $this->war_score += $new_log->war_score;
         $this->objective_score += $new_log->objective_score;
         $this->resource_score += $new_log->resource_score;

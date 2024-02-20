@@ -713,7 +713,7 @@ function premiumShop(): void {
                 // Lose rep tier for subsequent village changes (5k minimum rep)
                 if ($player->village_changes > 0 && $player->reputation->rank >= 3) {
                     $policy_reduction = $target_village->policy->transfer_cost_reduction / 100;
-                    $new_reputation = floor(max($player->village_rep * (1 - (0.2 * $policy_reduction)), UserReputation::$VillageRep[3]['min_rep']));
+                    $new_reputation = floor(max($player->village_rep * (1 - (0.2 * (1 - $policy_reduction))), UserReputation::$VillageRep[3]['min_rep']));
                     $player->village_rep = $new_reputation;
                 }
 

@@ -365,7 +365,7 @@ class WarManager {
             return;
         }
         // if in a special mission
-        if ($this->user->special_mission > 0) {
+        if ($this->user->special_mission_id > 0) {
             return;
         }
         if ($this->user->operation > 0) {

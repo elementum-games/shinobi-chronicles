@@ -7,6 +7,7 @@ class Effect
     public float $display_effect_amount;
     public float $effect_amount;
     public int $effect_length;
+    public int $potential_damage = 0;
 
     public function __construct(?string $effect, float $effect_amount, int $effect_length)
     {
@@ -15,5 +16,6 @@ class Effect
         $this->display_effect_amount = $effect_amount;
         $this->effect_amount = $effect_amount;
         $this->effect_length = $effect_length;
+        $this->potential_damage = 0;
     }
 }

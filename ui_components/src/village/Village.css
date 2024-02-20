@@ -718,109 +718,6 @@
     justify-content: center;
 }
 
-.modal {
-    min-width: 400px;
-    min-height: 150px;
-    background-color: #141317;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1001;
-    box-sizing: border-box;
-    padding-left: 12px;
-    padding-right: 12px;
-    padding-top: 15px;
-    border: 1px solid #4d4434;
-    outline: 1px solid #25232d;
-    outline-offset: 1px;
-}
-.modal_header {
-    width: 100%;
-    text-align: left;
-    border-bottom: 1px solid #141317;
-    font-size: 16px;
-    font-weight: bold;
-    font-family: var(--font-primary);
-    font-variant: var(--font-primary-variant);
-    color: var(--font-color-1);
-    margin-bottom: 11px;
-}
-.modal_text {
-    height: 100%;
-    border-top: 1px solid #1e1d23;
-    padding-top: 20px;
-    padding-bottom: 30px;
-    text-align: center;
-    color: var(--village-text-color-1);
-    white-space: pre-wrap;
-}
-.modal_cancel_button {
-    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
-    width: 125px;
-    height: 25px;
-    background: linear-gradient(to bottom, #6f3043 50%, #622231 50%);
-    line-height: 20px;
-    font-variant: small-caps;
-    text-align: center;
-    color: #f3c4bc;
-    cursor: pointer;
-    user-select: none;
-    position: absolute;
-    right: 50px;
-    bottom: -15px;
-}
-    .modal_cancel_button:hover {
-        color: white;
-    }
-.modal_close_button {
-    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
-    width: 125px;
-    height: 25px;
-    background: linear-gradient(to bottom, #6f3043 50%, #622231 50%);
-    line-height: 20px;
-    font-variant: small-caps;
-    text-align: center;
-    color: #f3c4bc;
-    cursor: pointer;
-    user-select: none;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: -15px;
-}
-    .modal_close_button:hover {
-        color: white;
-    }
-.modal_confirm_button {
-    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
-    width: 125px;
-    height: 25px;
-    background: linear-gradient(to bottom, #3b4176 50%, #2f345e 50%);
-    line-height: 20px;
-    font-variant: small-caps;
-    text-align: center;
-    color: #ccc1af;
-    cursor: pointer;
-    user-select: none;
-    position: absolute;
-    left: 50px;
-    bottom: -15px;
-}
-    .modal_confirm_button:hover {
-        color: white;
-    }
-.modal_backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
-    z-index: 1000; /* Assuming your modal has a higher z-index */
-    filter: blur(5px); /* Add blur effect */
-}
-
 .kq_container {
     margin-top: 15px;
     margin-left: 25px;
@@ -1123,7 +1020,10 @@
 .war_glow {
     text-shadow: 0 0 0px #402727, 0 0 1px #402727, 0 0 2px #402727, 0 0 3px #402727, 0 0 4px #402727, 0 0 5px #402727, 0 0 6px #402727, 0 0 7px #b10000, 0 0 8px #b10000;
 }
-.policy_bonus_item, .policy_penalty_item {
+.prosperity_glow {
+    text-shadow: 0 0 0px #251e14, 0 0 1px #251e14, 0 0 2px #251e14, 0 0 3px #251e14, 0 0 4px #251e14, 0 0 5px #251e14, 0 0 6px #251e14, 0 0 7px #251e14, 0 0 8px #bb9334;
+}
+.policy_bonus_item, .policy_resource_item, .policy_penalty_item {
     display: flex;
     line-height: 10px;
     margin-left: 15px;

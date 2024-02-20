@@ -320,11 +320,8 @@
                     Choose your element to attune to:<br/>
                     <select name='new_element'>
                         <?php foreach(Jutsu::$elements as $new_element): ?>
-                            <?php
-                            if(in_array($new_element, $player->elements)) {
-                                continue;
-                            }
-                            ?>
+                            <?php if($new_element == Jutsu::ELEMENT_NONE) continue; ?>
+                            <?php if(in_array($new_element, $player->elements)) continue; ?>
                             <option value='<?= $new_element ?>'><?= $new_element ?></option>
                         <?php endforeach; ?>
                     </select><br/>

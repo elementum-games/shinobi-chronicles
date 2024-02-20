@@ -14,6 +14,10 @@ class SpecialMission {
     // Number of jutsu to use per fight, picked at random from equipped and bloodline jutsu
     const JUTSU_USES_PER_FIGHT = 3;
     const JUTSU_COST_DISCOUNT_PERCENT = 25;
+
+    // % of Extra damage taken if a jutsu is failed (no jutsu equipped, or out of pools)
+    const FAILED_JUTSU_DAMAGE_PERCENT = 100;
+
     // % chance to use a bloodline jutsu instead of an equipped jutsu
     const BLOODLINE_JUTSU_CHANCE = 25;
 
@@ -34,26 +38,33 @@ class SpecialMission {
             'yen_per_battle' => 8,
             'yen_per_mission' => 70,
             'stats_per_mission' => 2,
-            'hp_lost_percent' => 2.5, // 22.5% => 67.5% lost
-            'intel_gain' => 12, // 9 fights
+            // 22.5% => 67.5% lost
+            'hp_lost_percent' => 2.5,
+            // 9 fights
+            'intel_gain' => 12,
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_EASY],
             'battles_per_region' => 3, // 3 regions
         ],
         SpecialMission::DIFFICULTY_NORMAL => [
-            'yen_per_battle' => 10, // 10 * 11 = 110
+            // 10 * 11 = 110
+            'yen_per_battle' => 10,
             'yen_per_mission' => 110,
             'stats_per_mission' => 4,
-            'hp_lost_percent' => 2.5, // 30% => 90% lost
+            // 2.9: 34.8% => 104.4% lost
+            'hp_lost_percent' => 2.9,
             'intel_gain' => 9, // 12 fights
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_NORMAL],
             'battles_per_region' => 4, // 3 regions
         ],
         SpecialMission::DIFFICULTY_HARD => [
-            'yen_per_battle' => 12, // 12 * 12.5 = 150
+            // 12 * 12.5 = 150
+            'yen_per_battle' => 12,
             'yen_per_mission' => 150,
             'stats_per_mission' => 6,
-            'hp_lost_percent' => 3.5, // 52.5% => 157.5% lost
-            'intel_gain' => 7, // 15 fights
+            // 3: 45% => 135%
+            'hp_lost_percent' => 3,
+            // 15 fights
+            'intel_gain' => 7,
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_HARD],
             'battles_per_region' => 5, // 3 regions
         ],
@@ -61,7 +72,8 @@ class SpecialMission {
             'yen_per_battle' => 14, // 20 * 14.28 = 285
             'yen_per_mission' => 200,
             'stats_per_mission' => 8,
-            'hp_lost_percent' => 4.5, // 76.5% => 229.5% lost
+            // 3.9: 66.3% => 198.9% lost
+            'hp_lost_percent' => 3.9,
             'intel_gain' => 6, // 17 fights
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_NIGHTMARE],
             'battles_per_region' => 6, // 3 regions
@@ -129,6 +141,10 @@ class SpecialMission {
     const SPY_TARGET_SAND = 'Sand';
     const SPY_TARGET_CLOUD = 'Cloud';
     const SPY_TARGET_MIST = 'Mist';
+
+    const STATUS_ACTIVE = 0;
+    const STATUS_COMPLETED = 1;
+    const STATUS_FAILED = 2;
 
     public static array $valid_targets = [
         SpecialMission::SPY_TARGET_LEAF => [
@@ -202,47 +218,53 @@ class SpecialMission {
     ];
 
     private User $player;
-    private ?Team $team;
     private System $system;
 
     public int $mission_id;
+
     public int $status;
+    private string $difficulty;
+
     public int $start_time;
     public int $end_time;
     public int $progress;
+
+    private ?SpecialMissionTarget $target;
+
     public $log;
     public int $player_health;
     public int $player_max_health;
     public int $reward;
 
-    public function __construct(System $system, User $player, $mission_id) {
+    /**
+     * @throws DatabaseDeadlockException
+     */
+    public function __construct(
+        System $system,
+        User $player,
+        int $mission_id,
+         int $status,
+         string $difficulty,
+         int $start_time,
+         int $end_time,
+         int $progress,
+        array $log,
+        int $reward,
+        ?SpecialMissionTarget $target
+    ) {
         $this->system = $system;
         $this->player = $player;
-        $this->team = ($this->player->team ? $this->player->team : null);
         $this->mission_id = $mission_id;
-        // Override if player special mission set
-        if ($this->player->special_mission) {
-            $this->mission_id = $this->player->special_mission;
-        }
 
-        // GET MISSION DATA
-        $sql = "SELECT * FROM `special_missions` WHERE `mission_id`={$this->mission_id}";
-        $result = $this->system->db->query($sql);
-        // Return if the mission doesn't exist
-        if ($this->system->db->last_num_rows == 0) {
-            return false;
-        }
+        $this->status = $status;
+        $this->difficulty = $difficulty;
+        $this->start_time = $start_time;
+        $this->end_time = $end_time;
+        $this->progress = $progress;
+        $this->log = $log;
+        $this->reward = $reward;
 
-        $mission_data = $this->system->db->fetch($result);
-
-        $this->status = $mission_data['status'];
-        $this->difficulty = $mission_data['difficulty'];
-        $this->start_time = $mission_data['start_time'];
-        $this->end_time = $mission_data['end_time'];
-        $this->progress = $mission_data['progress'];
-        $this->target = json_decode($mission_data['target'], true);
-        $this->log = json_decode($mission_data['log'], true);
-        $this->reward = $mission_data['reward'];
+        $this->target = $target;
 
         $this->player_health = $this->player->health;
         $this->player_max_health = $this->player->max_health;
@@ -281,30 +303,28 @@ class SpecialMission {
         }
     }
 
-
     // Plays the next event in the mission
     public function nextEvent() {
         $last_event = $this->returnLatestLog();
 
         $new_event = null;
+        $move_to_x = $this->player->location->x;
+        $move_to_y = $this->player->location->y;
 
         // Check if the user is in battle
         if ($this->player->battle_id) {
             $new_event = self::EVENT_COMPLETE_FAIL;
             $event_text = self::$event_names[$new_event]['text'];
         }
-
         else {
             // Check if the user is in the target square
-            if ($this->target['x'] == $this->player->location->x && $this->target['y'] == $this->player->location->y) {
+            if ($this->target->x == $this->player->location->x && $this->target->y == $this->player->location->y) {
                 $new_event = self::EVENT_BATTLE;
-                $event_text = self::$event_names[$new_event]['text'];
             }
 
             // check if the user lost the battle, fail the mission
             if ($last_event['event'] == self::EVENT_BATTLE_LOSE) {
                 $new_event = self::EVENT_COMPLETE_FAIL;
-                $event_text = self::$event_names[$new_event]['text'];
             }
 
             // check if the user has enough progress to complete mission and is back home
@@ -313,23 +333,21 @@ class SpecialMission {
                 && $this->player->location->y == self::$target_villages[$this->player->village->name]['y']
             ) {
                 $new_event = self::EVENT_COMPLETE_SUCCESS;
-                $event_text = self::$event_names[$new_event]['text'];
             }
 
             // check what direction the user has to travel
             $villages = TravelManager::fetchVillageLocationsByCoordsStr($this->system);
-            $move_to_x = $this->player->location->x;
-            $move_to_y = $this->player->location->y;
-            if ($this->player->location->x != $this->target['x']) {
-                if ($this->target['x'] > $this->player->location->x) {
+
+            if ($this->player->location->x != $this->target->x) {
+                if ($this->target->x > $this->player->location->x) {
                     $move_to_x = $this->player->location->x + 1;
                 } else {
                     $move_to_x = $this->player->location->x - 1;
                 }
 
                 // Move Diagonal
-                if ($this->player->location->y != $this->target['y']) {
-                    if ($this->target['y'] > $this->player->location->y) {
+                if ($this->player->location->y != $this->target->y) {
+                    if ($this->target->y > $this->player->location->y) {
                         $move_to_y = $this->player->location->y + 1;
                     } else {
                         $move_to_y = $this->player->location->y - 1;
@@ -339,7 +357,7 @@ class SpecialMission {
                 // Go around village not into it
                 $target_location = new TravelCoords($move_to_x, $move_to_y, $this->player->location->map_id);
                 if (isset($villages[$target_location->toString()]) && !$this->player->village_location->equals($target_location)) {
-                    if ($this->player->location->y > $this->target['y']) {
+                    if ($this->player->location->y > $this->target->y) {
                         $move_to_y--;
                     } else {
                         $move_to_y++;
@@ -347,18 +365,17 @@ class SpecialMission {
                 }
 
                 $new_event = self::EVENT_MOVE_X;
-                $event_text = self::$event_names[$new_event]['text'] . $move_to_x . '.' . $move_to_y;
 
-            } else if ($this->player->location->y != $this->target['y']) {
-                if ($this->target['y'] > $this->player->location->y) {
+            } else if ($this->player->location->y != $this->target->y) {
+                if ($this->target->y > $this->player->location->y) {
                     $move_to_y = $this->player->location->y + 1;
                 } else {
                     $move_to_y = $this->player->location->y - 1;
                 }
 
                 // Move Diagonal
-                if ($this->player->location->x != $this->target['x']) {
-                    if ($this->target['x'] > $this->player->location->x) {
+                if ($this->player->location->x != $this->target->x) {
+                    if ($this->target->x > $this->player->location->x) {
                         $move_to_x = $this->player->location->x + 1;
                     } else {
                         $move_to_x = $this->player->location->x - 1;
@@ -368,7 +385,7 @@ class SpecialMission {
                 // Skip past village if trying to move into it
                 $target_location = new TravelCoords($move_to_x, $move_to_y, $this->player->location->map_id);
                 if (isset($villages[$target_location->toString()]) && !$this->player->village_location->equals($target_location)) {
-                    if ($this->player->location->x > $this->target['x']) {
+                    if ($this->player->location->x > $this->target->x) {
                         $move_to_x--;
                     } else {
                         $move_to_x++;
@@ -376,19 +393,40 @@ class SpecialMission {
                 }
 
                 $new_event = self::EVENT_MOVE_Y;
-                $event_text = self::$event_names[$new_event]['text'] . $move_to_x . '.' . $move_to_y;
             }
 
             // check if the mission is complete
-            if ($this->progress >= 100 && $this->target['target'] != $this->player->village->name) {
+            if ($this->progress >= 100 && $this->target->target_village != $this->player->village->name) {
                 $new_event = self::EVENT_HOME;
-                $event_text = self::$event_names[$new_event]['text'];
             }
         }
 
-
         // Log the event
-        $this->logNewEvent($new_event, $event_text);
+        if(SpecialMission::isMovingEvent($new_event)) {
+            $event_text = "You moved to {$move_to_x}.{$move_to_y}";
+
+            // Temporarily doing one-move-per-log on dev environment for network performance benchmarking
+            if($this->system->isDevEnvironment()) {
+                $this->logNewEvent($new_event, $event_text);
+            }
+            else {
+                $latest_log_index = array_key_first($this->log);
+                if(SpecialMission::isMovingEvent($this->log[$latest_log_index]['event'])) {
+                    $this->log[$latest_log_index] = [
+                        'event' => $new_event,
+                        'timestamp_ms' => System::currentTimeMs(),
+                        'description' => $event_text,
+                    ];
+                }
+                else {
+                    $this->logNewEvent($new_event, "You set out towards the next location at {$this->target->x}.{$this->target->y}");
+                    $this->logNewEvent($new_event, $event_text);
+                }
+            }
+        }
+        else {
+            $this->logNewEvent($new_event, self::$event_names[$new_event]['text']);
+        }
 
         // Play Events
         switch($new_event) {
@@ -434,8 +472,8 @@ class SpecialMission {
                     message: "Special Mission failed",
                     user_id: $this->player->user_id,
                     created: time(),
-                    expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION * 86400),
                     alert: true,
+                    expires: time() + (NotificationManager::NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION * 86400),
                 );
                 NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
                 break;
@@ -462,11 +500,11 @@ class SpecialMission {
             $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
             $yen_gain = floor($yen_gain);
 
-            $this->status = 1;
+            $this->status = self::STATUS_COMPLETED;
             $this->end_time = time();
             $this->player->addMoney($yen_gain, "Special mission");
             $this->reward += $yen_gain;
-            $this->player->special_mission = 0;
+            $this->player->special_mission_id = 0;
 
             $reward_text = self::$event_names[self::EVENT_COMPLETE_REWARD]['text'] . $yen_gain . '!';
 
@@ -517,33 +555,19 @@ class SpecialMission {
         // Use Jutsu
         $this->player->getInventory();
 
-        $has_equipped_jutsu = count($this->player->equipped_jutsu) > 0;
-        $has_bloodline_jutsu = $this->player->bloodline && count($this->player->bloodline->jutsu) > 0;
-        $equipped_jutsu_chance = 100 - self::BLOODLINE_JUTSU_CHANCE;
         $extra_health_lost = 0; // if you can't use any jutsu, consumes double the HP cost
 
-        $failed_jutsu_extra_health_lost = ($health_lost / self::JUTSU_USES_PER_FIGHT) / 2;
+        $health_per_jutsu = $health_lost / self::JUTSU_USES_PER_FIGHT;
+        $failed_jutsu_extra_health_lost = $health_per_jutsu * (self::FAILED_JUTSU_DAMAGE_PERCENT / 100);
 
         for($i = 0; $i < self::JUTSU_USES_PER_FIGHT; $i++) {
-            if($has_equipped_jutsu && (
-                mt_rand(1, 100) < $equipped_jutsu_chance || !$has_bloodline_jutsu
-            )) {
-                $jutsu_key = array_rand($this->player->equipped_jutsu);
-                $jutsu_id = $this->player->equipped_jutsu[$jutsu_key]['id'];
-                $jutsu = $this->player->jutsu[$jutsu_id] ?? null;
-            }
-            else if($has_bloodline_jutsu) {
-                $jutsu_key = array_rand($this->player->bloodline->jutsu);
-                $jutsu = $this->player->bloodline->jutsu[$jutsu_key];
-            }
-            else {
-                $jutsu = null;
-            }
-
+            $jutsu = $this->pickJutsuToUse();
             if($jutsu == null) {
                 $extra_health_lost += $failed_jutsu_extra_health_lost;
                 continue;
             }
+
+            $battle_text .= "[br] - Used {$jutsu->name} (level {$jutsu->level})";
 
             $original_level = $jutsu->level;
 
@@ -561,21 +585,19 @@ class SpecialMission {
         }
 
         $health_lost += $extra_health_lost;
-        if($extra_health_lost > 0 && ($has_equipped_jutsu || $has_bloodline_jutsu)) {
-            $battle_text .= "[br]You ran out of chakra/stamina mid fight, and were wounded as you fought with only basic taijutsu.";
-        }
-        else if($extra_health_lost > 0) {
-            $battle_text .= "[br]You did not have any jutsu prepared, and were wounded as you fought with only basic taijutsu.";
+        if($extra_health_lost > 0) {
+            if($this->pickJutsuToUse() == null) {
+                $battle_text .= "[br]You did not have any jutsu prepared, and were wounded as you fought with only basic taijutsu.";
+            }
+            else {
+                $battle_text .= "[br]You ran out of chakra/stamina mid fight, and were wounded as you fought with only basic taijutsu.";
+            }
         }
 
         $this->player->updateInventory();
 
         // Gains for mission progress, basic stuff at the moment.
-        // 20% variance up/down from base on intel gains. Averages to 105% base
-
         $intel_gained = self::$difficulties[$this->difficulty]['intel_gain'];
-        //$intel_gained *= 0.8 + (mt_rand(1, 4) / 10);
-        //$intel_gained = floor($intel_gained);
 
         $yen_gain = self::$difficulties[$this->difficulty]['yen_per_battle'] * $this->player->rank_num;
         $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
@@ -598,9 +620,7 @@ class SpecialMission {
             // Damage HP
             $this->player->health -= $health_lost;
             $this->player_health -= $health_lost;
-            if($this->system->isDevEnvironment()) {
-                $battle_text .= "[br]You lost {$health_lost} health";
-            }
+            $battle_text .= "[br]You lost {$health_lost} health";
 
             // Yen Gain
             $this->player->addMoney($yen_gain, "Special mission encounter");
@@ -610,21 +630,67 @@ class SpecialMission {
             $this->generateTarget();
 
             // Modify the event text
-            $battle_text .= "[br]You collected &#165;{$yen_gain}!";
+            $battle_text .= "[br][br]You collected &#165;{$yen_gain}!";
         }
 
         return ([$battle_result, $battle_text]);
     }
 
+    protected function pickJutsuToUse(): ?Jutsu {
+        $has_equipped_jutsu = count($this->player->equipped_jutsu) > 0;
+        $has_bloodline_jutsu = $this->player->bloodline && count($this->player->bloodline->jutsu) > 0;
+
+        $equipped_jutsu_ids = array_map(function($ej){ return $ej['id']; }, $this->player->equipped_jutsu);
+        $uncapped_jutsu_ids = array_filter($equipped_jutsu_ids, function($jutsu_id) {
+            return $this->player->hasJutsu($jutsu_id) && $this->player->jutsu[$jutsu_id]->level < 100;
+        });
+
+        $bloodline_jutsu_ids = array_map(function($bj){ return $bj->id; }, $this->player->bloodline?->jutsu ?? []);
+        $uncapped_bl_jutsu_ids = array_filter($bloodline_jutsu_ids, function($jutsu_id) {
+            return $this->player->bloodline->jutsu[$jutsu_id]->level < 100;
+        });
+
+        $use_bloodline_jutsu = $has_bloodline_jutsu && mt_rand(1, 100) <= self::BLOODLINE_JUTSU_CHANCE;
+
+        // First, try uncapped BL jutsu (if BL roll has been triggered)
+        if($use_bloodline_jutsu && count($uncapped_bl_jutsu_ids) > 0) {
+            $jutsu_key = array_rand($uncapped_bl_jutsu_ids);
+            $jutsu_id = $uncapped_bl_jutsu_ids[$jutsu_key];
+            $jutsu = $this->player->bloodline->jutsu[$jutsu_id];
+        }
+        // Then uncapped equipped jutsu
+        else if(count($uncapped_jutsu_ids) > 0) {
+            $jutsu_key = array_rand($uncapped_jutsu_ids);
+            $jutsu_id = $uncapped_jutsu_ids[$jutsu_key];
+            $jutsu = $this->player->jutsu[$jutsu_id] ?? null;
+        }
+        // Then capped BL jutsu (if BL roll has been triggered)
+        else if($use_bloodline_jutsu) {
+            $jutsu_id = array_rand($this->player->bloodline->jutsu);
+            $jutsu = $this->player->bloodline->jutsu[$jutsu_id];
+        }
+        // Then uncapped equipped jutsu
+        else if($has_equipped_jutsu) {
+            $jutsu_key = array_rand($this->player->equipped_jutsu);
+            $jutsu_id = $this->player->equipped_jutsu[$jutsu_key]['id'];
+            $jutsu = $this->player->jutsu[$jutsu_id] ?? null;
+        }
+        else {
+            $jutsu = null;
+        }
+
+        return $jutsu;
+    }
+
     // Fails the mission
     public function failMission(): bool {
         $this->end_time = time();
-        $this->status = 2;
+        $this->status = self::STATUS_FAILED;
         if (!$this->player->battle_id) {
             $this->player->location->x = self::$target_villages[$this->player->village->name]['x'];
             $this->player->location->y = self::$target_villages[$this->player->village->name]['y'];
         }
-        $this->player->special_mission = 0;
+        $this->player->special_mission_id = 0;
         return true;
     }
 
@@ -632,7 +698,7 @@ class SpecialMission {
     public function logNewEvent($new_event, $event_text): bool {
         $log_entry = [
             'event' => $new_event,
-            'timestamp_ms' => floor(microtime(true) * 1000),
+            'timestamp_ms' => System::currentTimeMs(),
             'description' => $event_text
         ];
         array_unshift($this->log, $log_entry);
@@ -640,106 +706,87 @@ class SpecialMission {
     }
 
     // Generates a new target location
-    public function generateTarget($home = false): int {
+    public function generateTarget($return_home = false): bool {
+        /* general flow here - Pick a target village (e.g. cloud) and then visit a number of minor villages in that region */
+
         if ($this->target == null) {
-            // Set the Village
-            $random_village_key = false;
-            while ($random_village_key == false) {
-                $key = array_rand(self::$target_villages, 1);
-                if ($key != $this->player->village->name && SpecialMission::$valid_targets[$this->player->village->name][$key]) {
-                    $random_village_key = $key;
-                }
-            }
-
-            // Set the coords
-            $is_x_negative = (bool) mt_rand(0, 1);
-            $max_x = ($is_x_negative ? self::$target_villages[$random_village_key]['negative_x'] : self::$target_villages[$random_village_key]['positive_x']);
-            $random_x = mt_rand(1, $max_x);
-            $target_x = ($is_x_negative ?
-                (self::$target_villages[$random_village_key]['x'] - $random_x) :
-                (self::$target_villages[$random_village_key]['x'] + $random_x));
-
-            $is_y_negative = (bool) mt_rand(0, 1);
-            $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
-            $random_y = mt_rand(1, $max_y);
-            $target_y = ($is_y_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
-
-            $new_target = [
-                'target' => $random_village_key,
-                'x' => $target_x,
-                'y' => $target_y,
-                'count' => 1,
-            ];
+            $this->target = $this->generateVillageTarget();
         }
-        else if ($home) {
-            if ($home) {
-                $new_target = [
-                    'target' => $this->player->village->name,
-                    'x' => self::$target_villages[$this->player->village->name]['x'],
-                    'y' => self::$target_villages[$this->player->village->name]['y']
-                ];
-            }
+        else if ($return_home) {
+            $this->target = new SpecialMissionTarget(
+                target_village: $this->player->village->name,
+                x: self::$target_villages[$this->player->village->name]['x'],
+                y: self::$target_villages[$this->player->village->name]['y'],
+                count: 0,
+            );
         }
         // create a set number of battles per region targeted
-        else if ($this->target['count'] < self::$difficulties[$this->difficulty]['battles_per_region']) {
+        else if ($this->target->count < self::$difficulties[$this->difficulty]['battles_per_region']) {
             // Set the Village
-            $random_village_key = $this->target['target'];
+            $target_village = $this->target->target_village;
+            $action_target_coords = $this->generateTargetCoords($target_village);
 
-            // Set the coords
-            $is_x_negative = (bool) mt_rand(0, 1);
-            $max_x = ($is_x_negative ? self::$target_villages[$random_village_key]['negative_x'] : self::$target_villages[$random_village_key]['positive_x']);
-            $random_x = mt_rand(1, $max_x);
-            $target_x = ($is_x_negative ?
-                (self::$target_villages[$random_village_key]['x'] - $random_x) :
-                (self::$target_villages[$random_village_key]['x'] + $random_x));
-
-            $is_y_negative = (bool) mt_rand(0, 1);
-            $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
-            $random_y = mt_rand(1, $max_y);
-            $target_y = ($is_y_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
-
-            $new_target = [
-                'target' => $random_village_key,
-                'x' => $target_x,
-                'y' => $target_y,
-                'count' => $this->target['count'] + 1,
-            ];
+            $this->target = new SpecialMissionTarget(
+                target_village: $target_village,
+                x: $action_target_coords->x,
+                y: $action_target_coords->y,
+                count: $this->target->count + 1,
+            );
         }
         else {
-            // Set the Village
-            $random_village_key = false;
-            while ($random_village_key == false) {
-                $key = array_rand(self::$target_villages, 1);
-                if ($key != $this->player->village->name && $key != $this->target['target'] && SpecialMission::$valid_targets[$this->target['target']][$key]) {
-                    $random_village_key = $key;
-                }
-            }
-
-            // Set the coords
-            $is_x_negative = (bool) mt_rand(0, 1);
-            $max_x = ($is_x_negative ? self::$target_villages[$random_village_key]['negative_x'] : self::$target_villages[$random_village_key]['positive_x']);
-            $random_x = mt_rand(1, $max_x);
-            $target_x = ($is_x_negative ?
-                (self::$target_villages[$random_village_key]['x'] - $random_x) :
-                (self::$target_villages[$random_village_key]['x'] + $random_x));
-
-            $is_y_negative = (bool) mt_rand(0, 1);
-            $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
-            $random_y = mt_rand(1, $max_y);
-            $target_y = ($is_y_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
-
-            $new_target = [
-                'target' => $random_village_key,
-                'x' => $target_x,
-                'y' => $target_y,
-                'count' => 1,
-            ];
+            $this->target = $this->generateVillageTarget();
         }
 
-        $this->target = $new_target;
-
         return true;
+    }
 
+    protected function generateVillageTarget(): SpecialMissionTarget {
+        // Set the Village
+        $random_village_key = false;
+        while ($random_village_key == false) {
+            $key = array_rand(self::$target_villages, 1);
+            if ($key != $this->player->village->name && SpecialMission::$valid_targets[$this->player->village->name][$key]) {
+                $random_village_key = $key;
+            }
+        }
+
+        $action_target_coords = $this->generateTargetCoords($random_village_key);
+
+        return new SpecialMissionTarget(
+            target_village: $random_village_key,
+            x: $action_target_coords->x,
+            y: $action_target_coords->y,
+            count: 1,
+        );
+    }
+
+    protected function generateTargetCoords(string $target_village): TravelCoords {
+        $target_village_zone = self::$target_villages[$target_village];
+
+        // Set the coords
+        $is_x_negative = (bool) mt_rand(0, 1);
+        $max_x = $is_x_negative
+            ? $target_village_zone['negative_x']
+            : $target_village_zone['positive_x'];
+        $random_x = mt_rand(1, $max_x);
+        $target_x = $is_x_negative
+            ? ($target_village_zone['x'] - $random_x)
+            : ($target_village_zone['x'] + $random_x);
+
+        $is_y_negative = (bool) mt_rand(0, 1);
+        $max_y = $is_y_negative
+            ? $target_village_zone['negative_y']
+            : $target_village_zone['positive_y'];
+        $random_y = mt_rand(1, $max_y);
+        $target_y = $is_y_negative
+            ? ($target_village_zone['y'] - $random_y)
+            : ($target_village_zone['y'] + $random_y);
+
+        return new TravelCoords(
+            x: $target_x,
+            y: $target_y,
+            map_id: Travel::DEFAULT_MAP_ID
+        );
     }
 
     // returns the latest entry to the log
@@ -770,7 +817,7 @@ class SpecialMission {
             $stats_percent = self::BASE_STAT_CAP_PERCENT;
         }
         $adjusted_stats_percent = (
-            ($stats_percent - self::BASE_STAT_CAP_PERCENT - 1) /
+            ($stats_percent - self::BASE_STAT_CAP_PERCENT) /
             (100 - self::BASE_STAT_CAP_PERCENT)
         ) * 100;
         $inverse_stats_percent = 100 - $adjusted_stats_percent;
@@ -785,22 +832,73 @@ class SpecialMission {
         $damage_multiplier += (self::MAX_DAMAGE_MULTIPLIER - 1) * ($inverse_stats_percent / 100);
 
         $hp_lost_percent = $base_hp_lost_percent * $damage_multiplier;
-        return floor(($hp_lost_percent / 100) * $this->player->max_health);
+        $nominal_health_lost = $this->player->max_health * ($hp_lost_percent / 100);
+
+        return floor(
+            ($nominal_health_lost * mt_rand(95, 105)) / 100
+        );
+    }
+
+    protected static function isMovingEvent(string $event): bool {
+        switch($event) {
+            case self::EVENT_MOVE_Y:
+            case self::EVENT_MOVE_X:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * @throws DatabaseDeadlockException
+     */
+    public static function load(System $system, User $player, int $mission_id): ?SpecialMission {
+        // GET MISSION DATA
+        $result = $system->db->query("SELECT * FROM `special_missions` 
+            WHERE `mission_id`={$mission_id}
+            AND `user_id`={$player->user_id}
+        ");
+
+        // Return if the mission doesn't exist
+        if ($system->db->last_num_rows == 0) {
+            return null;
+        }
+
+        $mission_data = $system->db->fetch($result);
+
+        $target_data = json_decode($mission_data['target'], true);
+        $target = $target_data ? SpecialMissionTarget::fromArray($target_data) : null;
+
+        return new SpecialMission(
+            system: $system,
+            player: $player,
+            mission_id: $mission_id,
+            status: $mission_data['status'],
+            difficulty: $mission_data['difficulty'],
+            start_time: $mission_data['start_time'],
+            end_time: $mission_data['end_time'],
+            progress: $mission_data['progress'],
+            log: json_decode($mission_data['log'], true),
+            reward: $mission_data['reward'],
+            target: $target
+        );
     }
 
     // Cancel the mission
-    public static function cancelMission($system, $player, $mission_id) {
+    public static function cancelMission(System $system, User $player, int $mission_id): bool {
         $timestamp = time();
-        $result = $system->db->query("UPDATE `special_missions`
-SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
-        $player->special_mission = 0;
+        $system->db->query("UPDATE `special_missions`
+            SET `status`=" . self::STATUS_FAILED . ", `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
+        $player->special_mission_id = 0;
         $player->updateData();
         return true;
     }
 
-    public static function startMission($system, $player, $difficulty): SpecialMission {
-
-        if ($player->special_mission != 0) {
+    /**
+     * @throws DatabaseDeadlockException
+     */
+    public static function startMission($system, User $player, $difficulty): SpecialMission {
+        if ($player->special_mission_id != 0) {
             throw new RuntimeException('You cannot start multiple missions!');
         }
 
@@ -808,30 +906,56 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
             throw new RuntimeException('Error setting difficulty!');
         }
 
-        if ($player->location != $player->village_location) {
+        if (!$player->location->equals($player->village_location)) {
             throw new RuntimeException('Must be in village to begin a Special Mission!');
         }
+
+        // Clean up old special missions (>6 hours)
+        $system->db->query("DELETE FROM `special_missions` WHERE `user_id`={$player->user_id} AND `start_time` < " . (time() - 21600));
 
         $timestamp = time();
 
         $log = [
             0 => [
-            'event' => self::$event_names['start']['event'],
-            'timestamp_ms' => floor(microtime(true) * 1000),
-            'description' => self::$event_names['start']['text']
+                'event' => self::$event_names['start']['event'],
+                'timestamp_ms' => floor(microtime(true) * 1000),
+                'description' => self::$event_names['start']['text']
             ]
         ];
         $log_encode = json_encode($log);
 
-        $sql = "INSERT INTO `special_missions` (`user_id`, `start_time`, `log`, `difficulty`)
-                VALUES ('{$player->user_id}', '{$timestamp}', '$log_encode', '{$difficulty}')";
-        $result = $system->db->query($sql);
+
+        $result = $system->db->query("
+            INSERT INTO `special_missions` 
+                (`user_id`, `start_time`, `log`, `difficulty`)
+            VALUES 
+                ('{$player->user_id}', '{$timestamp}', '$log_encode', '{$difficulty}')
+        ");
 
         $mission_id = $system->db->last_insert_id;
-        $player->special_mission = $mission_id;
+        $player->special_mission_id = $mission_id;
 
-        return (new SpecialMission($system, $player, $mission_id));
-
+        return SpecialMission::load($system, $player, $mission_id);
     }
 
+}
+
+class SpecialMissionTarget {
+    public function __construct(
+        public string $target_village,
+        public int $x,
+        public int $y,
+        public int $count,
+    ){}
+
+    public static function fromArray(array $data): SpecialMissionTarget {
+        return new SpecialMissionTarget(
+            // old special missions before this class will have it under `target`, new
+            // special missions after this class will be `target_village`
+            target_village: $data['target_village'] ?? $data['target'],
+            x: $data['x'],
+            y: $data['y'],
+            count: $data['count'],
+        );
+    }
 }

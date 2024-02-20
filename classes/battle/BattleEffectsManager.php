@@ -221,61 +221,7 @@ class BattleEffectsManager {
             }
         }
 
-        // Weaken jutsu that do not match player's primary jutsu type, or are not equipped
-        $player1_primary_jutsu_type = $player1->getPrimaryJutsuType();
-        $player2_primary_jutsu_type = $player2->getPrimaryJutsuType();
-
-        $player1_equipped_jutsu_ids = array_flip(
-            array_map(function($equipped_jutsu) {
-                return $equipped_jutsu['id'];
-            }, $player1->equipped_jutsu)
-        );
-        $player2_equipped_jutsu_ids = array_flip(
-            array_map(function ($equipped_jutsu) {
-                return $equipped_jutsu['id'];
-            }, $player2->equipped_jutsu)
-        );
-
-        foreach ($player1->jutsu as $jutsu) {
-            if ($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player1_equipped_jutsu_ids[$jutsu->id])) {
-                $jutsu->power *= 0.75;
-                foreach($jutsu->effects as $effect) {
-                    $effect->display_effect_amount *= 0.75;
-                    $effect->effect_amount *= 0.75;
-                }
-            }
-
-            if ($jutsu->rank == 1) continue;
-
-            if ($jutsu->jutsu_type != $player1_primary_jutsu_type) {
-                $jutsu->power *= 0.5;
-                foreach($jutsu->effects as $effect) {
-                    $effect->display_effect_amount *= 0.5;
-                    $effect->effect_amount *= 0.5;
-                }
-            }
-        }
-        foreach ($player2->jutsu as $jutsu) {
-            if ($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT && !isset($player2_equipped_jutsu_ids[$jutsu->id])) {
-                $jutsu->power *= 0.75;
-                foreach ($jutsu->effects as $effect) {
-                    $effect->display_effect_amount *= 0.75;
-                    $effect->effect_amount *= 0.75;
-                }
-            }
-
-            if ($jutsu->rank == 1) continue;
-
-            if (!$player2 instanceof NPC) {
-                if ($jutsu->jutsu_type != $player2_primary_jutsu_type) {
-                    $jutsu->power *= 0.5;
-                    foreach ($jutsu->effects as $effect) {
-                        $effect->display_effect_amount *= 0.5;
-                        $effect->effect_amount *= 0.5;
-                    }
-                }
-            }
-        }
+        $this->applyJutsuModifiers($player1, $player2);
 
         // Jutsu passive effects
         foreach($this->active_effects as $id => $effect) {
@@ -318,6 +264,62 @@ class BattleEffectsManager {
             }
             else if ($tier_difference < 0) {
                 $player2->reputation_defense_boost = Battle::REPUTATION_DAMAGE_RESISTANCE_BOOST * abs($tier_difference);
+            }
+        }
+    }
+
+    public function applyJutsuModifiers(Fighter $player1, Fighter $player2): void {
+        // Weaken non-default jutsu that do not match player's primary jutsu type, or are not equipped
+        $player1_primary_jutsu_type = $player1->getPrimaryJutsuType();
+        $player2_primary_jutsu_type = $player2->getPrimaryJutsuType();
+
+        $player1_equipped_jutsu_ids = array_flip(
+            array_map(function($equipped_jutsu) {
+                return $equipped_jutsu['id'];
+            }, $player1->equipped_jutsu)
+        );
+        $player2_equipped_jutsu_ids = array_flip(
+            array_map(function ($equipped_jutsu) {
+                return $equipped_jutsu['id'];
+            }, $player2->equipped_jutsu)
+        );
+
+        foreach ($player1->jutsu as $jutsu) {
+            if($jutsu->purchase_type == Jutsu::PURCHASE_TYPE_DEFAULT) continue;
+
+            if (!isset($player1_equipped_jutsu_ids[$jutsu->id])) {
+                $jutsu->power *= 0.75;
+                foreach($jutsu->effects as $effect) {
+                    $effect->display_effect_amount *= 0.75;
+                    $effect->effect_amount *= 0.75;
+                }
+            }
+            if ($jutsu->jutsu_type != $player1_primary_jutsu_type) {
+                $jutsu->power *= 0.5;
+                foreach($jutsu->effects as $effect) {
+                    $effect->display_effect_amount *= 0.5;
+                    $effect->effect_amount *= 0.5;
+                }
+            }
+        }
+        foreach ($player2->jutsu as $jutsu) {
+            if($jutsu->purchase_type != Jutsu::PURCHASE_TYPE_DEFAULT) continue;
+
+            if (!isset($player2_equipped_jutsu_ids[$jutsu->id])) {
+                $jutsu->power *= 0.75;
+                foreach ($jutsu->effects as $effect) {
+                    $effect->display_effect_amount *= 0.75;
+                    $effect->effect_amount *= 0.75;
+                }
+            }
+            if (!$player2 instanceof NPC) {
+                if ($jutsu->jutsu_type != $player2_primary_jutsu_type) {
+                    $jutsu->power *= 0.5;
+                    foreach ($jutsu->effects as $effect) {
+                        $effect->display_effect_amount *= 0.5;
+                        $effect->effect_amount *= 0.5;
+                    }
+                }
             }
         }
     }
@@ -665,9 +667,28 @@ class BattleEffectsManager {
         }
     }
 
-    public function getAnnouncementText(Effect $effect) : string{
+    public function getAnnouncementText(Effect $effect, string $jutsu_type) : string{
         $announcement_text = "";
+        $attack_jutsu_color = BattleManager::getJutsuTextColor($jutsu_type);
         $effect_details = " (" . round($effect->display_effect_amount, 0) . "%, " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
+        switch ($jutsu_type) {
+            case "taijutsu":
+                $tag_open = "[taijutsu]";
+                $tag_close = "[/taijutsu]";
+                break;
+            case "ninjutsu":
+                $tag_open = "[ninjutsu]";
+                $tag_close = "[/ninjutsu]";
+                break;
+            case "genjutsu":
+                $tag_open = "[genjutsu]";
+                $tag_close = "[/genjutsu]";
+                break;
+            default:
+                $tag_open = "";
+                $tag_close = "";
+                break;
+        }
         switch($effect->effect){
             case 'taijutsu_nerf':
                 $announcement_text = "[opponent]'s Taijutsu offense is being lowered" . $effect_details;
@@ -694,10 +715,10 @@ class BattleEffectsManager {
                 break;
             case 'residual_damage':
             case 'delayed_residual':
-                $announcement_text = "[opponent] is taking Residual Damage" . $effect_details;
+                $announcement_text = "[opponent] is taking Residual Damage" . " ({$tag_open}" . round($effect->potential_damage, 0) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
                 break;
             case 'reflect_damage':
-                $announcement_text = "[opponent] is taking Reflect Damage";
+                $announcement_text = "[opponent] is taking Reflect Damage" . " ({$tag_open}" . round($effect->potential_damage, 0) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
                 break;
             case 'drain_chakra':
                 $announcement_text = "[opponent]'s Chakra is being drained" . $effect_details;

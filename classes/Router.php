@@ -20,7 +20,7 @@ class Router {
         'arena' => 12,
         'training' => 13,
         'mission' => 14,
-        'specialmissions' => 15,
+        'special_missions' => 15,
         'mod' => 16,
         'admin' => 17,
         'report' => 18,
