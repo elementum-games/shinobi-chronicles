@@ -183,7 +183,6 @@ final class VillageUpgradeMigration extends AbstractMigration
             -- Alter table proposals
             ALTER TABLE `proposals` DROP `building_key`;
             ALTER TABLE `proposals` DROP `upgrade_key`;
-            ALTER TABLE `proposals` DROP `upgrade_data`;
 
             -- Alter table player_war_logs
             ALTER TABLE `player_war_logs` DROP `stability_gained`;
