@@ -10,7 +10,7 @@ class VillageBuildingConfig {
     const BUILDING_STATUS_REPAIRING = 'repairing'; // used when repairing damage, currently unused
 
     /* base values used for upgrade configuration */
-    const BASE_T1_CONSTRUCTION_COST_TOTAL = 14400;
+    const BASE_T1_CONSTRUCTION_COST_TOTAL = 57600;
     const BASE_T2_CONSTRUCTION_COST_TOTAL = 108000;
     const BASE_T3_CONSTRUCTION_COST_TOTAL = 302400;
     const BASE_T1_CONSTRUCTION_TIME_DAYS = 2;
