@@ -111,6 +111,24 @@
     top: 100%;
     transform: translate(calc(-100% - 20px), 0%);
 }
+.topbar_notification_wrapper.to-right:hover::after {
+    content: attr(data-content);
+    position: absolute;
+    z-index: 1000;
+    transform: translate(-18px, 0px);
+    background-color: var(--notification-background-color);
+    border-color: var(--notification-background-border);
+    color: var(--font-color-6);
+    font-family: var(--font-secondary);
+    font-size: 12px;
+    font-style: italic;
+    border-width: 1.75px;
+    border-style: solid;
+    padding: 5px;
+    white-space: nowrap;
+    font-weight: bold;
+    top: 100%;
+}
 
 .topbar_notification_wrapper.has_duration:hover::after {
     content: attr(data-content) ": " attr(data-time); 

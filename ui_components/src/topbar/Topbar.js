@@ -108,7 +108,8 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
     const leftNotificationTypes = [
         "training",
         "training_complete",
-        "stat_transfer"
+        "stat_transfer",
+        "ramen_buff"
     ];
 
     const rightNotificationTypes = [

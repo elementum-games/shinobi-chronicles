@@ -479,6 +479,19 @@ class NotificationAPIManager {
                 }
             }
         }
+        // Ramen Buff
+        if ($this->player->ramen_data->purchase_time + $this->player->ramen_data->buff_duration > time()) {
+            $remaining_time = $this->player->ramen_data->purchase_time + $this->player->ramen_data->buff_duration - time();
+            $notifications[] = new NotificationDto(
+                action_url: $this->system->router->getUrl('healingShop'),
+                type: NotificationManager::NOTIFICATION_RAMEN_BUFF,
+                message: "Ramen Buff Active!",
+                user_id: $this->player->user_id,
+                created: time(),
+                duration: $remaining_time,
+                alert: false,
+            );
+        }
 
         return $notifications;
     }

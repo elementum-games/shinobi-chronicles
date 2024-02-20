@@ -49,6 +49,7 @@ class NotificationManager {
     const NOTIFICATION_ACHIEVEMENT = "achievement";
     const NOTIFICATION_SPAR = "spar"; // General, used for blocking notifications
     const NOTIFICATION_DAILY_TASK = "daily_task";
+    const NOTIFICATION_RAMEN_BUFF = "ramen_buff";
 
     const ACTIVE_PLAYER_DAYS_LAST_ACTIVE = 14;
 
