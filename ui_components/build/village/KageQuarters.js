@@ -475,7 +475,8 @@ export function KageQuarters({
         targetVillageResources: null,
         targetVillageRegions: strategicDisplayRight.regions,
         requestedResources: requestedResources,
-        requestedRegions: requestedRegions
+        requestedRegions: requestedRegions,
+        proposalData: currentProposal.trade_data
       },
       onConfirm: null
     })
@@ -508,7 +509,8 @@ export function KageQuarters({
         targetVillageResources: null,
         targetVillageRegions: strategicDisplayRight.regions,
         requestedResources: requestedResources,
-        requestedRegions: requestedRegions
+        requestedRegions: requestedRegions,
+        proposalData: currentProposal.trade_data
       },
       onConfirm: null
     })
@@ -546,7 +548,8 @@ export function KageQuarters({
         targetVillageResources: null,
         targetVillageRegions: strategicDisplayRight.regions,
         requestedResources: requestedResources,
-        requestedRegions: requestedRegions
+        requestedRegions: requestedRegions,
+        proposalData: currentProposal.trade_data
       },
       onConfirm: null
     })
@@ -584,7 +587,8 @@ export function KageQuarters({
         targetVillageResources: null,
         targetVillageRegions: strategicDisplayRight.regions,
         requestedResources: requestedResources,
-        requestedRegions: requestedRegions
+        requestedRegions: requestedRegions,
+        proposalData: currentProposal.trade_data
       },
       onConfirm: null
     })
