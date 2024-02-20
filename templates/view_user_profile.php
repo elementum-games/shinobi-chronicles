@@ -49,7 +49,7 @@ $clan_positions = array(
         </td>
         <td style='width:50%;'>
 			<label style='width:6.5em;'>Level:</label> 	<?= $viewUser->level ?><br />
-			<label style='width:6.5em;'>Exp:</label> 	<?= $viewUser->exp ?><br />
+			<label style='width:6.5em;'>Exp:</label> 	<?= number_format($viewUser->exp) ?><br />
 			<label style='width:6.5em;'>Rank:</label> 	<?= $ranks[$viewUser->rank_num] ?><br />
             <label style='width:6.5em;'>Bloodline:</label> <?= ($viewUser->bloodline_id ? $viewUser->bloodline_name : "None") ?><br />
             <?php if($viewUser->elements): ?>
@@ -64,7 +64,7 @@ $clan_positions = array(
 
 			<label style='width:6.5em;'>Village:</label> <?= $viewUser->village->name ?><br />
             <label style='width:6.5em;'>Reputation:</label> <?= $viewUser->reputation->rank_name ?>
-            (<?=$viewUser->reputation->getRepAmount()?>)<br />
+            (<?=number_format($viewUser->reputation->getRepAmount())?>)<br />
 			
             <?php if (SenseiManager::isActiveSensei($viewUser->user_id, $system)): ?>
                 <label style='width:6.5em;'>Students:</label>
