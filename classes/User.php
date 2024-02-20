@@ -323,6 +323,8 @@ class User extends Fighter {
 
     public BlockedNotificationManager $blocked_notifications;
 
+    public CharacterRamenData $ramen_data;
+
     /**
      * User constructor.
      * @param System $system
@@ -947,6 +949,9 @@ class User extends Fighter {
                 VillageManager::checkChallengeLock($this->system, $this);
             }
         }
+
+        // Ramen Data
+        $this->ramen_data = RamenShopManager::getCharacterRamenData($this->system, $this->user_id);
 
         return;
     }

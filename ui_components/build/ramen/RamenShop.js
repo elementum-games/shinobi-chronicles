@@ -6,30 +6,34 @@ function RamenShopReactContainer({
   ramenShopAPI,
   playerData,
   playerResourcesData,
+  characterRamenData,
   ramenOwnerDetails,
-  mysteryRamenDetails,
   basicRamenOptions,
-  specialRamenOptions
+  specialRamenOptions,
+  mysteryRamenDetails
 }) {
   return /*#__PURE__*/React.createElement(ModalProvider, null, /*#__PURE__*/React.createElement(RamenShop, {
     ramenShopAPI: ramenShopAPI,
     playerData: playerData,
     playerResourcesData: playerResourcesData,
+    characterRamenData: characterRamenData,
     ramenOwnerDetails: ramenOwnerDetails,
-    mysteryRamenDetails: mysteryRamenDetails,
     basicMenuOptions: basicRamenOptions,
-    specialMenuOptions: specialRamenOptions
+    specialMenuOptions: specialRamenOptions,
+    mysteryRamenDetails: mysteryRamenDetails
   }));
 }
 function RamenShop({
   ramenShopAPI,
   playerData,
   playerResourcesData,
+  characterRamenData,
   ramenOwnerDetails,
-  mysteryRamenDetails,
   basicMenuOptions,
-  specialMenuOptions
+  specialMenuOptions,
+  mysteryRamenDetails
 }) {
+  console.log(mysteryRamenDetails.effects);
   const [playerDataState, setPlayerDataState] = React.useState(playerData);
   const [playerResourcesDataState, setPlayerResourcesDataState] = React.useState(playerResourcesData);
   const {
@@ -75,7 +79,7 @@ function RamenShop({
       className: "special_ramen_effect"
     }, ramenInfo.effect), /*#__PURE__*/React.createElement("div", {
       className: "special_ramen_duration"
-    }, ramenInfo.duration, " minutes"), /*#__PURE__*/React.createElement("div", {
+    }, "Duration: ", ramenInfo.duration, " minutes"), /*#__PURE__*/React.createElement("div", {
       className: "special_ramen_button",
       onClick: () => PurchaseSpecialRamen(ramenInfo.ramen_key)
     }, /*#__PURE__*/React.createElement(React.Fragment, null, "\xA5"), ramenInfo.cost));
@@ -105,10 +109,9 @@ function RamenShop({
       setPlayerDataState(response.data.player_data);
     });
   }
-  function PurchaseMysteryRamen(ramen_key) {
+  function PurchaseMysteryRamen() {
     apiFetch(ramenShopAPI, {
-      request: 'PurchaseMysteryRamen',
-      ramen_key: ramen_key
+      request: 'PurchaseMysteryRamen'
     }).then(response => {
       if (response.errors.length) {
         handleErrors(response.errors);
@@ -185,23 +188,25 @@ function RamenShop({
     className: "header"
   }, "Mystery ramen"), /*#__PURE__*/React.createElement("div", {
     className: "ramen_shop_mystery_ramen_container box-primary"
-  }, mysteryRamenDetails.mystery_ramen_enabled ? /*#__PURE__*/React.createElement(React.Fragment, null, mysteryRamenDetails.available ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
+  }, mysteryRamenDetails.mystery_ramen_unlocked ? /*#__PURE__*/React.createElement(React.Fragment, null, characterRamenData.mystery_ramen_available ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
     src: mysteryRamenDetails.image,
     className: "special_ramen_img"
   }), /*#__PURE__*/React.createElement("div", {
     className: "mystery_ramen_details_container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "mystery_ramen_description"
-  }, "Made using leftover ingredients. You can't quite tell what's in it."), mysteryRamenDetails.effects.map((effect, index) => {
+  }, "Made using leftover ingredients. You can't quite tell what's in it."), /*#__PURE__*/React.createElement("div", {
+    className: "mystery_ramen_effects"
+  }, mysteryRamenDetails.effects.map((effect, index) => {
     return /*#__PURE__*/React.createElement("div", {
       key: index,
       className: "mystery_ramen_effect"
-    }, effect);
-  }), /*#__PURE__*/React.createElement("div", {
+    }, effect.effect);
+  })), /*#__PURE__*/React.createElement("div", {
     className: "mystery_ramen_duration"
-  }, mysteryRamenDetails.duration, " minutes"), /*#__PURE__*/React.createElement("div", {
+  }, "Duration: ", mysteryRamenDetails.duration, " minutes"), /*#__PURE__*/React.createElement("div", {
     className: "mystery_ramen_button",
-    onClick: () => PurchaseMysteryRamen(mysteryRamenDetails.ramen_key)
+    onClick: () => PurchaseMysteryRamen()
   }, /*#__PURE__*/React.createElement(React.Fragment, null, "\xA5"), mysteryRamenDetails.cost))) : /*#__PURE__*/React.createElement("div", {
     className: "mystery_ramen_locked"
   }, "Check back soon!")) : /*#__PURE__*/React.createElement("div", {

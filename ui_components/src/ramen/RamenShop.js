@@ -7,10 +7,11 @@ function RamenShopReactContainer({
     ramenShopAPI,
     playerData,
     playerResourcesData,
+    characterRamenData,
     ramenOwnerDetails,
-    mysteryRamenDetails,
     basicRamenOptions,
     specialRamenOptions,
+    mysteryRamenDetails
 }) {
     return (
         <ModalProvider>
@@ -18,10 +19,11 @@ function RamenShopReactContainer({
                 ramenShopAPI={ramenShopAPI}
                 playerData={playerData}
                 playerResourcesData={playerResourcesData}
+                characterRamenData={characterRamenData}
                 ramenOwnerDetails={ramenOwnerDetails}
-                mysteryRamenDetails={mysteryRamenDetails}
                 basicMenuOptions={basicRamenOptions}
                 specialMenuOptions={specialRamenOptions}
+                mysteryRamenDetails={mysteryRamenDetails}
             />
         </ModalProvider>
     );
@@ -31,11 +33,13 @@ function RamenShop({
     ramenShopAPI,
     playerData,
     playerResourcesData,
+    characterRamenData,
     ramenOwnerDetails,
-    mysteryRamenDetails,
     basicMenuOptions,
     specialMenuOptions,
+    mysteryRamenDetails,
 }) {
+    console.log(mysteryRamenDetails.effects);
     const [playerDataState, setPlayerDataState] = React.useState(playerData);
     const [playerResourcesDataState, setPlayerResourcesDataState] = React.useState(playerResourcesData);
     const { openModal } = useModal();
@@ -58,7 +62,7 @@ function RamenShop({
                 <div className="special_ramen_name">{ramenInfo.name}</div>
                 <div className="special_ramen_description">{ramenInfo.description}</div>
                 <div className="special_ramen_effect">{ramenInfo.effect}</div>
-                <div className="special_ramen_duration">{ramenInfo.duration} minutes</div>
+                <div className="special_ramen_duration">Duration: {ramenInfo.duration} minutes</div>
                 <div className="special_ramen_button" onClick={() => PurchaseSpecialRamen(ramenInfo.ramen_key)}><>&yen;</>{ramenInfo.cost}</div>
             </div>
         );
@@ -94,12 +98,11 @@ function RamenShop({
             setPlayerDataState(response.data.player_data);
         });
     }
-    function PurchaseMysteryRamen(ramen_key) {
+    function PurchaseMysteryRamen() {
         apiFetch(
             ramenShopAPI,
             {
-                request: 'PurchaseMysteryRamen',
-                ramen_key: ramen_key,
+                request: 'PurchaseMysteryRamen'
             }
         ).then((response) => {
             if (response.errors.length) {
@@ -158,22 +161,23 @@ function RamenShop({
                     }
                     <div className="header">Mystery ramen</div>
                     <div className="ramen_shop_mystery_ramen_container box-primary">
-                        {mysteryRamenDetails.mystery_ramen_enabled ?
+                        {mysteryRamenDetails.mystery_ramen_unlocked ?
                             <>
-                                {mysteryRamenDetails.available
+                                {characterRamenData.mystery_ramen_available
                                     ?
                                     <>
                                         <img src={mysteryRamenDetails.image} className="special_ramen_img" />
                                         <div className="mystery_ramen_details_container">
                                             <div className="mystery_ramen_description">Made using leftover ingredients. You can't quite tell what's in it.</div>
-                                            {mysteryRamenDetails.effects.map((effect, index) => {
-                                                return (
-                                                    <div key={index} className="mystery_ramen_effect">{effect}</div>
-                                                );
-                                            })
-                                            }
-                                            <div className="mystery_ramen_duration">{mysteryRamenDetails.duration} minutes</div>
-                                            <div className="mystery_ramen_button" onClick={() => PurchaseMysteryRamen(mysteryRamenDetails.ramen_key)}><>&yen;</>{mysteryRamenDetails.cost}</div>
+                                            <div className="mystery_ramen_effects">
+                                                {mysteryRamenDetails.effects.map((effect, index) => {
+                                                    return (
+                                                        <div key={index} className="mystery_ramen_effect">{effect.effect}</div>
+                                                    );
+                                                })}
+                                            </div>
+                                            <div className="mystery_ramen_duration">Duration: {mysteryRamenDetails.duration} minutes</div>
+                                            <div className="mystery_ramen_button" onClick={() => PurchaseMysteryRamen()}><>&yen;</>{mysteryRamenDetails.cost}</div>
                                         </div>
                                     </>
                                     :

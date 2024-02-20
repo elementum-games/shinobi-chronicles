@@ -20,10 +20,11 @@
                 ramenShopAPI: "<?= $system->router->api_links['ramen_shop'] ?>",
                 playerData: <?= json_encode(UserAPIPresenter::playerDataResponse(player: $player, rank_names: RankManager::fetchNames($system))) ?>,
                 playerResourcesData: <?= json_encode(UserAPIPresenter::playerResourcesResponse($player)) ?>,
+                characterRamenData: <?= json_encode(RamenShopAPIPresenter::getCharacterRamenResponse($system, $player)) ?>,
                 ramenOwnerDetails: <?= json_encode(RamenShopAPIPresenter::ramenShopOwnerResponse($system, $player)) ?>,
-                mysteryRamenDetails: <?= json_encode(RamenShopAPIPresenter::getMysteryRamenResponse($system, $player)) ?>,
                 basicRamenOptions: <?= json_encode(RamenShopAPIPresenter::getBasicRamenResponse($system, $player)) ?>,
-                specialRamenOptions: <?= json_encode(RamenShopAPIPresenter::getSpecialRamenResponse($system, $player)) ?>,
+                specialRamenOptions: <?= json_encode(RamenShopAPIPresenter::getSpecialRamenResponse($player)) ?>,
+                mysteryRamenDetails: <?= json_encode(RamenShopAPIPresenter::getMysteryRamenResponse($player)) ?>,
             }),
             ramenShopContainer
         );
