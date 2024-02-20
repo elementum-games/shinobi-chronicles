@@ -1,51 +1,81 @@
 // @flow
 
 import { apiFetch } from "../utils/network.js";
-import { ModalProvider, useModal } from "../utils/modalContext.js"
+import { ModalProvider } from "../utils/modalContext.js"
+import { CharacterChanges } from "./CharacterChanges.js";
 import type { PlayerDataType } from "../_schema/userSchema";
 
 type PremiumProps = {|
-    +currentPage: string,
-    +playerData: PlayerDataType
+    +userAPILink: string,
+    +initialPage: string,
+    +userAPIData: PlayerDataType
 |};
 function PremiumPage({
-    page,
-    playerData
+    userAPILink,
+    initialPage,
+    userAPIData
  }: PremiumProps) {
-    React.State = {
-        currentPage: page
-    }
     const characterChanges = "character_changes";
     const bloodlines = "bloodlines";
     const forbiddenSeal = "forbidden_seal";
     const purchaseAK = "purchase_ak";
 
-    const [currentPage, setPage] = React.useState(page);
+    const [page, setPage] = React.useState(initialPage);
+    const [playerData, setPlayerData] = React.useState(userAPIData.playerData);
 
+    function handleAPIErrors(errors) {
+        console.warn(errors);
+    }
+
+    function getPlayerData() {
+        apiFetch(userAPILink, {
+            request: 'getPlayerData'
+        }).then(response => {
+            if(response.errors.length) {
+                handleAPIErrors(response.errors);
+                return;
+            }
+            else {
+                setPlayerData(response.data.playerData);
+            }
+        })
+    }
     function handlePageChange(newPage) {
-        if(newPage !== currentPage) {
+        if(newPage !== page) {
             setPage(newPage);
         }
     }
 
+    // Initialize
+    React.useEffect(() => {
+        const playerDataInterval = setInterval(() => {
+            getPlayerData();
+        }, 15000);
 
+        return () => clearInterval(playerDataInterval);
+    }, []);
+
+    // Display
     return(
         <ModalProvider>
             <MarketHeader
                 playerData={playerData}
                 pages={[characterChanges, bloodlines, forbiddenSeal, purchaseAK]}
+                page={page}
                 handlePageChange={handlePageChange}
             />
-            {currentPage === characterChanges &&
-                <CharacterChanges />
+            {page === characterChanges &&
+                <CharacterChanges
+                    playerData={playerData}
+                />
             }
-            {currentPage === bloodlines &&
+            {page === bloodlines &&
                 <Bloodlines />
             }
-            {currentPage === forbiddenSeal &&
+            {page === forbiddenSeal &&
                 <ForbiddenSeals />
             }
-            {currentPage === purchaseAK &&
+            {page === purchaseAK &&
                 <PurchaseAK />
             }
         </ModalProvider>
@@ -60,30 +90,42 @@ type headerProps = {|
 function MarketHeader({
     playerData,
     pages,
+    page,
     handlePageChange
 }: headerProps) {
     return(
         <>
-            <NavBar
-                handlePageChange={handlePageChange}
-                pages={pages}
-            />
-            <div className="center">
-                Welcome to the ancient Market, where you can purchase premium features.<br />
-                <b>Your Ancient Kunai:</b> {playerData.premiumCredits}
+            <div className="box-primary">
+                <NavBar
+                    handlePageChange={handlePageChange}
+                    pages={pages}
+                    page={page}
+                />
+                <p className="center">
+                    Welcome to the Ancient Market! The vendors you find here seek something <b>more valuable</b> than just yen.<br />
+                    You can trade your <em>Ancient Kunai</em> to purchase and manage premium benefits.<br />
+                    <br />
+                    Ancient Kunai: {playerData.premiumCredits.toLocaleString('US')}
+                    <br />
+                    &yen;{playerData.money.toLocaleString('US')}
+                </p>
             </div>
+            <br />
         </>
     )
 }
 function NavBar({
     handlePageChange,
-    pages
+    pages,
+    page
 }) {
     return(
         <div className='navigation_row'>
             {pages.map(function(name) {
+                let buttonClass = (name === page) ? 'nav_button selected' : 'nav_button';
+
                 return (
-                    <div key={name} className='nav_button' onClick={() => handlePageChange(name)}>
+                    <div key={name} className={buttonClass} onClick={() => handlePageChange(name)}>
                         {name.replace('_', ' ')}
                     </div>
                 )
@@ -92,34 +134,34 @@ function NavBar({
     );
 }
 
-function CharacterChanges() {
-    return(
-        <div className="header">Character Changes</div>
-    );
-}
-
 function Bloodlines() {
     return(
-        <div>
-            Bloodlines
-        </div>
+        <table className="table">
+            <tbody>
+            <tr><th>Bloodline</th></tr>
+            </tbody>
+        </table>
     );
 }
 
 function ForbiddenSeals() {
     return(
-        <div>
-            Forbidden Seals
-        </div>
-    )
+        <table className="table">
+            <tbody>
+            <tr><th>Forbidden Seal</th></tr>
+            </tbody>
+        </table>
+    );
 }
 
 function PurchaseAK() {
     return(
         <>
-            <div>
-                Purchase AK
-            </div>
+            <table className="table">
+                <tbody>
+                <tr><th>Purchase Ancient Kunai</th></tr>
+                </tbody>
+            </table>
             <AKMarket />
         </>
     );
@@ -127,9 +169,11 @@ function PurchaseAK() {
 
 function AKMarket() {
     return(
-        <div>
-            AK Market
-        </div>
+        <table className="table">
+            <tbody>
+            <tr><th>Anicnet Kunai Market</th></tr>
+            </tbody>
+        </table>
     );
 }
 

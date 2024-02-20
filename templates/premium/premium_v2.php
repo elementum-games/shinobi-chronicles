@@ -17,10 +17,11 @@
     window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(PremiumPage, {
-                page: "<?= $landing_page ?>",
-                playerData: <?= json_encode(
-                    UserAPIPresenter::playerDAtaResponse(player: $player, rank_names: RankManager::fetchNames($system))
-                ) ?>
+                userAPILink: "<?= $system->router->api_links['user'] ?>",
+                initialPage: "<?= $landing_page ?>",
+                userAPIData: {
+                    playerData: <?= json_encode(UserAPIPresenter::playerDataResponse(player: $player, rank_names: RankManager::fetchNames($system))) ?>
+                },
             }),
             shopContainer
         );
