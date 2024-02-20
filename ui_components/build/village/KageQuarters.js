@@ -2,6 +2,7 @@ import { apiFetch } from "../utils/network.js";
 import { StrategicInfoItem } from "./StrategicInfoItem.js";
 import { useModal } from '../utils/modalContext.js';
 import { TradeDisplay } from "./TradeDisplay.js";
+import KageDisplay from "./KageDisplay.js";
 export function KageQuarters({
   playerID,
   playerSeatState,
@@ -20,7 +21,6 @@ export function KageQuarters({
   strategicDataState,
   setStrategicDataState,
   handleErrors,
-  getKageKanji,
   getVillageIcon,
   getPolicyDisplayData,
   StrategicInfoItem
@@ -64,6 +64,7 @@ export function KageQuarters({
   const {
     openModal
   } = useModal();
+
   const ChangePolicy = () => {
     apiFetch(villageAPI, {
       request: 'CreateProposal',
@@ -74,6 +75,7 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
+
       setProposalDataState(response.data.proposalData);
       openModal({
         header: 'Confirmation',
@@ -83,6 +85,7 @@ export function KageQuarters({
       });
     });
   };
+
   const DeclareWar = () => {
     apiFetch(villageAPI, {
       request: 'CreateProposal',
@@ -93,6 +96,7 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
+
       setProposalDataState(response.data.proposalData);
       openModal({
         header: 'Confirmation',
@@ -102,6 +106,7 @@ export function KageQuarters({
       });
     });
   };
+
   const OfferPeace = () => {
     apiFetch(villageAPI, {
       request: 'CreateProposal',
@@ -112,6 +117,7 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
+
       setProposalDataState(response.data.proposalData);
       openModal({
         header: 'Confirmation',
@@ -121,6 +127,7 @@ export function KageQuarters({
       });
     });
   };
+
   const OfferAlliance = () => {
     apiFetch(villageAPI, {
       request: 'CreateProposal',
@@ -131,6 +138,7 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
+
       setProposalDataState(response.data.proposalData);
       openModal({
         header: 'Confirmation',
@@ -140,6 +148,7 @@ export function KageQuarters({
       });
     });
   };
+
   const BreakAlliance = () => {
     apiFetch(villageAPI, {
       request: 'CreateProposal',
@@ -150,6 +159,7 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
+
       setProposalDataState(response.data.proposalData);
       openModal({
         header: 'Confirmation',
@@ -159,6 +169,7 @@ export function KageQuarters({
       });
     });
   };
+
   const CancelProposal = () => {
     apiFetch(villageAPI, {
       request: 'CancelProposal',
@@ -168,6 +179,7 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
+
       setProposalDataState(response.data.proposalData);
       setCurrentProposal(null);
       setCurrentProposalKey(null);
@@ -179,6 +191,7 @@ export function KageQuarters({
       });
     });
   };
+
   const OfferTrade = () => {
     apiFetch(villageAPI, {
       request: 'CreateProposal',
@@ -193,6 +206,7 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
+
       setProposalDataState(response.data.proposalData);
       openModal({
         header: 'Confirmation',
@@ -202,6 +216,7 @@ export function KageQuarters({
       });
     });
   };
+
   const EnactProposal = () => {
     apiFetch(villageAPI, {
       request: 'EnactProposal',
@@ -211,6 +226,7 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
+
       setProposalDataState(response.data.proposalData);
       setCurrentProposal(null);
       setCurrentProposalKey(null);
@@ -228,6 +244,7 @@ export function KageQuarters({
       });
     });
   };
+
   const BoostVote = () => {
     apiFetch(villageAPI, {
       request: 'BoostVote',
@@ -237,6 +254,7 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
+
       setProposalDataState(response.data.proposalData);
       setCurrentProposal(response.data.proposalData[currentProposalKey]);
       openModal({
@@ -247,6 +265,7 @@ export function KageQuarters({
       });
     });
   };
+
   const CancelVote = () => {
     apiFetch(villageAPI, {
       request: 'CancelVote',
@@ -256,6 +275,7 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
+
       setProposalDataState(response.data.proposalData);
       setCurrentProposal(response.data.proposalData[currentProposalKey]);
       openModal({
@@ -266,6 +286,7 @@ export function KageQuarters({
       });
     });
   };
+
   const SubmitVote = vote => {
     apiFetch(villageAPI, {
       request: 'SubmitVote',
@@ -276,10 +297,12 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
+
       setProposalDataState(response.data.proposalData);
       setCurrentProposal(response.data.proposalData[currentProposalKey]);
     });
   };
+
   React.useEffect(() => {
     if (proposalDataState.length && currentProposal === null) {
       setCurrentProposal(proposalDataState[0]);
@@ -293,38 +316,12 @@ export function KageQuarters({
     className: "row first"
   }, /*#__PURE__*/React.createElement("div", {
     className: "column first"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "kage_container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "kage_header"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "header"
-  }, "Kage"), /*#__PURE__*/React.createElement("div", {
-    className: "kage_kanji"
-  }, getKageKanji(villageName))), kage.avatar_link && /*#__PURE__*/React.createElement("div", {
-    className: "kage_avatar_wrapper"
-  }, /*#__PURE__*/React.createElement("img", {
-    className: "kage_avatar",
-    src: kage.avatar_link
-  })), !kage.avatar_link && /*#__PURE__*/React.createElement("div", {
-    className: "kage_avatar_wrapper_empty"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "kage_avatar_fill"
+  }, /*#__PURE__*/React.createElement(KageDisplay, {
+    username: kage.user_name,
+    avatarLink: kage.avatar_link,
+    seatTitle: kage.seat_title,
+    villageName: villageName
   })), /*#__PURE__*/React.createElement("div", {
-    className: "kage_nameplate_wrapper"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "kage_nameplate_decoration nw"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "kage_nameplate_decoration ne"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "kage_nameplate_decoration se"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "kage_nameplate_decoration sw"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "kage_name"
-  }, kage.user_name ? kage.user_name : "---"), /*#__PURE__*/React.createElement("div", {
-    className: "kage_title"
-  }, kage.seat_title + " of " + villageName)))), /*#__PURE__*/React.createElement("div", {
     className: "column second"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_container"
@@ -942,14 +939,17 @@ export function KageQuarters({
     strategicInfoData: strategicDisplayRight,
     getPolicyDisplayData: getPolicyDisplayData
   }))))));
+
   function cyclePolicy(direction) {
     var newPolicyID;
+
     switch (direction) {
       case "increment":
         newPolicyID = Math.min(5, displayPolicyID + 1);
         setDisplayPolicyID(newPolicyID);
         setPolicyDisplay(getPolicyDisplayData(newPolicyID));
         break;
+
       case "decrement":
         newPolicyID = Math.max(1, displayPolicyID - 1);
         setDisplayPolicyID(newPolicyID);
@@ -957,11 +957,14 @@ export function KageQuarters({
         break;
     }
   }
+
   function cycleProposal(direction) {
     if (proposalDataState.length == 0) {
       return;
     }
+
     var newProposalKey;
+
     switch (direction) {
       case "increment":
         newProposalKey = Math.min(proposalDataState.length - 1, currentProposalKey + 1);
@@ -969,6 +972,7 @@ export function KageQuarters({
         setCurrentProposal(proposalDataState[newProposalKey]);
         setProposalRepAdjustment(proposalDataState[newProposalKey].votes.reduce((acc, vote) => acc + vote.rep_adjustment, 0));
         break;
+
       case "decrement":
         newProposalKey = Math.max(0, currentProposalKey - 1);
         setCurrentProposalKey(newProposalKey);

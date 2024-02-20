@@ -41,15 +41,7 @@ function Village({
     function handleErrors(errors) {
         console.warn(errors);
     }
-    function getKageKanji(village_id) {
-        switch (village_id) {
-            case 'Stone': return '土影';
-            case 'Cloud': return '雷影';
-            case 'Leaf': return '火影';
-            case 'Sand': return '風影';
-            case 'Mist': return '水影';
-        }
-    }
+
     function getVillageIcon(village_id) {
         switch (village_id) {
             case 1:
@@ -168,7 +160,6 @@ function Village({
                 clanData={clanData}
                 kageRecords={kageRecords}
                 handleErrors={handleErrors}
-                getKageKanji={getKageKanji}
                 getVillageIcon={getVillageIcon}
                 getPolicyDisplayData={getPolicyDisplayData}
                 TimeGrid={TimeGrid}
@@ -196,7 +187,6 @@ function Village({
                 strategicDataState={strategicDataState}
                 setStrategicDataState={setStrategicDataState}
                 handleErrors={handleErrors}
-                getKageKanji={getKageKanji}
                 getVillageIcon={getVillageIcon}
                 getPolicyDisplayData={getPolicyDisplayData}
                 StrategicInfoItem={StrategicInfoItem}

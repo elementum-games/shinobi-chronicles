@@ -1,7 +1,10 @@
+// @flow strict-local
+
 import { apiFetch } from "../utils/network.js";
 import { StrategicInfoItem } from "./StrategicInfoItem.js";
 import { useModal } from '../utils/modalContext.js';
 import { TradeDisplay } from "./TradeDisplay.js";
+import KageDisplay from "./KageDisplay.js";
 
 export function KageQuarters({
     playerID,
@@ -21,7 +24,6 @@ export function KageQuarters({
     strategicDataState,
     setStrategicDataState,
     handleErrors,
-    getKageKanji,
     getVillageIcon,
     getPolicyDisplayData,
     StrategicInfoItem
@@ -47,6 +49,7 @@ export function KageQuarters({
     ]);
     const [requestedRegions, setRequestedRegions] = React.useState([]);
     const { openModal } = useModal();
+
     const ChangePolicy = () => {
         apiFetch(
             villageAPI,
@@ -296,6 +299,7 @@ export function KageQuarters({
             setCurrentProposal(response.data.proposalData[currentProposalKey]);
         });
     }
+
     React.useEffect(() => {
         if (proposalDataState.length && currentProposal === null) {
             setCurrentProposal(proposalDataState[0]);
@@ -303,36 +307,18 @@ export function KageQuarters({
             setProposalRepAdjustment(proposalDataState[0].votes.reduce((acc, vote) => acc + parseInt(vote.rep_adjustment), 0));
         }
     }, [proposalDataState]);
+
     return (
         <>
             <div className="kq_container">
                 <div className="row first">
                     <div className="column first">
-                        <div className="kage_container">
-                            <div className="kage_header">
-                                <div className="header">Kage</div>
-                                <div className="kage_kanji">{getKageKanji(villageName)}</div>
-                            </div>
-
-                            {kage.avatar_link &&
-                                <div className="kage_avatar_wrapper">
-                                    <img className="kage_avatar" src={kage.avatar_link} />
-                                </div>
-                            }
-                            {!kage.avatar_link &&
-                                <div className="kage_avatar_wrapper_empty">
-                                    <div className="kage_avatar_fill"></div>
-                                </div>
-                            }
-                            <div className="kage_nameplate_wrapper">
-                                <div className="kage_nameplate_decoration nw"></div>
-                                <div className="kage_nameplate_decoration ne"></div>
-                                <div className="kage_nameplate_decoration se"></div>
-                                <div className="kage_nameplate_decoration sw"></div>
-                                <div className="kage_name">{kage.user_name ? kage.user_name : "---"}</div>
-                                <div className="kage_title">{kage.seat_title + " of " + villageName}</div>
-                            </div>
-                        </div>
+                        <KageDisplay
+                            username={kage.user_name}
+                            avatarLink={kage.avatar_link}
+                            seatTitle={kage.seat_title}
+                            villageName={villageName}
+                        />
                     </div>
                     <div className="column second">
                         <div className="proposal_container">

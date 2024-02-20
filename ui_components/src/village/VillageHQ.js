@@ -1,5 +1,7 @@
 import { apiFetch } from "../utils/network.js";
 import { useModal } from '../utils/modalContext.js';
+import KageDisplay from "./KageDisplay.js";
+
 export function VillageHQ({
     playerID,
     playerSeatState,
@@ -19,7 +21,6 @@ export function VillageHQ({
     clanData,
     kageRecords,
     handleErrors,
-    getKageKanji,
     getVillageIcon,
     getPolicyDisplayData
 }) {
@@ -315,50 +316,24 @@ export function VillageHQ({
                     </div>
                     <div className="column second">
                         <div className="kage_container">
-                            <div className="kage_header">
-                                <div className="header">Kage</div>
-                                <div className="kage_kanji">{getKageKanji(villageName)}</div>
-                            </div>
-
-                            {kage.avatar_link &&
-                                <div className="kage_avatar_wrapper">
-                                    <img className="kage_avatar" src={kage.avatar_link} />
-                                </div>
-                            }
-                            {!kage.avatar_link &&
-                                <div className="kage_avatar_wrapper_empty">
-                                    <div className="kage_avatar_fill"></div>
-                                </div>
-                            }
-                            <div className="kage_nameplate_wrapper">
-                                <div className="kage_nameplate_decoration nw"></div>
-                                <div className="kage_nameplate_decoration ne"></div>
-                                <div className="kage_nameplate_decoration se"></div>
-                                <div className="kage_nameplate_decoration sw"></div>
-                                <div className="kage_name">{kage.user_name ? kage.user_name : "---"}</div>
-                                <div className="kage_title">
-                                    {kage.is_provisional ? kage.seat_title + ": " + kage.provisional_days_label : kage.seat_title + " of " + villageName}
-                                </div>
-                                {kage.seat_id && kage.seat_id == playerSeatState.seat_id &&
-                                    <div className="kage_resign_button"
-                                        onClick={
-                                            () => openModal({
-                                                header: 'Confirmation',
-                                                text: 'Are you sure you wish to resign from your current position?',
-                                                ContentComponent: null,
-                                                onConfirm: () => Resign(),
-                                            })
-                                        }>
-                                        resign
-                                    </div>
-                                }
-                                {!kage.seat_id &&
-                                    <div className="kage_claim_button" onClick={() => ClaimSeat("kage")}>claim</div>
-                                }
-                                {(kage.seat_id && kage.seat_id != playerSeatState.seat_id) &&
-                                    <div className="kage_challenge_button" onClick={() => Challenge(kage)}>challenge</div>
-                                }
-                            </div>
+                            <KageDisplay
+                                username={kage.user_name}
+                                avatarLink={kage.avatar_link}
+                                villageName={villageName}
+                                seatTitle={kage.seat_title}
+                                isProvisional={kage.is_provisional}
+                                provisionalDaysLabel={kage.provisional_days_label}
+                                seatId={kage.seat_id}
+                                playerSeatId={playerSeatState.seat_id}
+                                onResign={() => openModal({
+                                    header: 'Confirmation',
+                                    text: 'Are you sure you wish to resign from your current position?',
+                                    ContentComponent: null,
+                                    onConfirm: () => Resign(),
+                                })}
+                                onClaim={() => ClaimSeat("kage")}
+                                onChallenge={() => Challenge(kage)}
+                            />
                         </div>
                     </div>
                     <div className="column third">

@@ -1,5 +1,6 @@
 import { apiFetch } from "../utils/network.js";
 import { useModal } from '../utils/modalContext.js';
+import KageDisplay from "./KageDisplay.js";
 export function VillageHQ({
   playerID,
   playerSeatState,
@@ -19,7 +20,6 @@ export function VillageHQ({
   clanData,
   kageRecords,
   handleErrors,
-  getKageKanji,
   getVillageIcon,
   getPolicyDisplayData
 }) {
@@ -31,35 +31,44 @@ export function VillageHQ({
   const {
     openModal
   } = useModal();
+
   const DisplayFromDays = days => {
     switch (days) {
       case 1:
         return 'daily';
         break;
+
       case 7:
         return 'weekly';
         break;
+
       case 30:
         return 'monthly';
         break;
+
       default:
         return days;
         break;
     }
   };
+
   const FetchNextIntervalTypeResources = () => {
     var days;
+
     switch (resourceDaysToShow) {
       case 1:
         days = 7;
         break;
+
       case 7:
         days = 30;
         break;
+
       case 30:
         days = 1;
         break;
     }
+
     apiFetch(villageAPI, {
       request: 'LoadResourceData',
       days: days
@@ -68,10 +77,12 @@ export function VillageHQ({
         handleErrors(response.errors);
         return;
       }
+
       setResourceDaysToShow(days);
       setResourceDataState(response.data);
     });
   };
+
   const ClaimSeat = seat_type => {
     apiFetch(villageAPI, {
       request: 'ClaimSeat',
@@ -81,6 +92,7 @@ export function VillageHQ({
         handleErrors(response.errors);
         return;
       }
+
       setSeatDataState(response.data.seatData);
       setPlayerSeatState(response.data.playerSeat);
       openModal({
@@ -91,6 +103,7 @@ export function VillageHQ({
       });
     });
   };
+
   const Resign = () => {
     apiFetch(villageAPI, {
       request: 'Resign'
@@ -99,6 +112,7 @@ export function VillageHQ({
         handleErrors(response.errors);
         return;
       }
+
       setSeatDataState(response.data.seatData);
       setPlayerSeatState(response.data.playerSeat);
       openModal({
@@ -109,12 +123,14 @@ export function VillageHQ({
       });
     });
   };
+
   const [challengeSubmittedFlag, setChallengeSubmittedFlag] = React.useState(false);
   React.useEffect(() => {
     if (challengeSubmittedFlag) {
       ConfirmSubmitChallenge();
     }
   }, [challengeSubmittedFlag]);
+
   const Challenge = target_seat => {
     challengeTarget.current = target_seat;
     openModal({
@@ -131,8 +147,10 @@ export function VillageHQ({
       onConfirm: () => setChallengeSubmittedFlag(true)
     });
   };
+
   const ConfirmSubmitChallenge = () => {
     setChallengeSubmittedFlag(false);
+
     if (selectedTimesUTC.length < 12) {
       openModal({
         header: 'Submit Challenge',
@@ -157,6 +175,7 @@ export function VillageHQ({
           handleErrors(response.errors);
           return;
         }
+
         setChallengeDataState(response.data.challengeData);
         openModal({
           header: 'Confirmation',
@@ -167,6 +186,7 @@ export function VillageHQ({
       });
     }
   };
+
   const CancelChallenge = () => {
     apiFetch(villageAPI, {
       request: 'CancelChallenge'
@@ -175,6 +195,7 @@ export function VillageHQ({
         handleErrors(response.errors);
         return;
       }
+
       setChallengeDataState(response.data.challengeData);
       openModal({
         header: 'Confirmation',
@@ -184,12 +205,14 @@ export function VillageHQ({
       });
     });
   };
+
   const [challengeAcceptedFlag, setChallengeAcceptedFlag] = React.useState(false);
   React.useEffect(() => {
     if (challengeAcceptedFlag) {
       ConfirmAcceptChallenge();
     }
   }, [challengeAcceptedFlag]);
+
   const AcceptChallenge = target_challenge => {
     challengeTarget.current = target_challenge;
     openModal({
@@ -204,8 +227,10 @@ export function VillageHQ({
       onConfirm: () => setChallengeAcceptedFlag(true)
     });
   };
+
   const ConfirmAcceptChallenge = () => {
     setChallengeAcceptedFlag(false);
+
     if (!selectedTimeUTC) {
       openModal({
         header: 'Accept Challenge',
@@ -228,6 +253,7 @@ export function VillageHQ({
           handleErrors(response.errors);
           return;
         }
+
         setChallengeDataState(response.data.challengeData);
         openModal({
           header: 'Confirmation',
@@ -238,6 +264,7 @@ export function VillageHQ({
       });
     }
   };
+
   const LockChallenge = target_challenge => {
     apiFetch(villageAPI, {
       request: 'LockChallenge',
@@ -247,6 +274,7 @@ export function VillageHQ({
         handleErrors(response.errors);
         return;
       }
+
       setChallengeDataState(response.data.challengeData);
       openModal({
         header: 'Confirmation',
@@ -256,6 +284,7 @@ export function VillageHQ({
       });
     });
   };
+
   const totalPopulation = populationData.reduce((acc, rank) => acc + rank.count, 0);
   const kage = seatDataState.find(seat => seat.seat_type === 'kage');
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ChallengeContainer, {
@@ -308,50 +337,24 @@ export function VillageHQ({
     className: "column second"
   }, /*#__PURE__*/React.createElement("div", {
     className: "kage_container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "kage_header"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "header"
-  }, "Kage"), /*#__PURE__*/React.createElement("div", {
-    className: "kage_kanji"
-  }, getKageKanji(villageName))), kage.avatar_link && /*#__PURE__*/React.createElement("div", {
-    className: "kage_avatar_wrapper"
-  }, /*#__PURE__*/React.createElement("img", {
-    className: "kage_avatar",
-    src: kage.avatar_link
-  })), !kage.avatar_link && /*#__PURE__*/React.createElement("div", {
-    className: "kage_avatar_wrapper_empty"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "kage_avatar_fill"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "kage_nameplate_wrapper"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "kage_nameplate_decoration nw"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "kage_nameplate_decoration ne"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "kage_nameplate_decoration se"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "kage_nameplate_decoration sw"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "kage_name"
-  }, kage.user_name ? kage.user_name : "---"), /*#__PURE__*/React.createElement("div", {
-    className: "kage_title"
-  }, kage.is_provisional ? kage.seat_title + ": " + kage.provisional_days_label : kage.seat_title + " of " + villageName), kage.seat_id && kage.seat_id == playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
-    className: "kage_resign_button",
-    onClick: () => openModal({
+  }, /*#__PURE__*/React.createElement(KageDisplay, {
+    username: kage.user_name,
+    avatarLink: kage.avatar_link,
+    villageName: villageName,
+    seatTitle: kage.seat_title,
+    isProvisional: kage.is_provisional,
+    provisionalDaysLabel: kage.provisional_days_label,
+    seatId: kage.seat_id,
+    playerSeatId: playerSeatState.seat_id,
+    onResign: () => openModal({
       header: 'Confirmation',
       text: 'Are you sure you wish to resign from your current position?',
       ContentComponent: null,
       onConfirm: () => Resign()
-    })
-  }, "resign"), !kage.seat_id && /*#__PURE__*/React.createElement("div", {
-    className: "kage_claim_button",
-    onClick: () => ClaimSeat("kage")
-  }, "claim"), kage.seat_id && kage.seat_id != playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
-    className: "kage_challenge_button",
-    onClick: () => Challenge(kage)
-  }, "challenge")))), /*#__PURE__*/React.createElement("div", {
+    }),
+    onClaim: () => ClaimSeat("kage"),
+    onChallenge: () => Challenge(kage)
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "column third"
   }, /*#__PURE__*/React.createElement("div", {
     className: "elders_container"
@@ -678,6 +681,7 @@ export const TimeGrid = ({
 }) => {
   const [selectedTimes, setSelectedTimes] = React.useState([]);
   const timeSlots = generateSlotsForTimeZone(startHourUTC);
+
   function generateSlotsForTimeZone(startHour) {
     return Array.from({
       length: 24
@@ -687,24 +691,31 @@ export const TimeGrid = ({
       zone: 'utc'
     }).setZone('local'));
   }
+
   ;
+
   function toggleSlot(time) {
     const formattedTime = time.toFormat('HH:mm');
     let newSelectedTimes;
+
     if (selectedTimes.includes(formattedTime)) {
       newSelectedTimes = selectedTimes.filter(t => t !== formattedTime);
     } else {
       newSelectedTimes = [...selectedTimes, formattedTime];
     }
+
     setSelectedTimes(newSelectedTimes);
     selectedTimesUTC.current = convertSlotsToUTC(newSelectedTimes);
   }
+
   ;
+
   function convertSlotsToUTC(times) {
     return times.map(time => luxon.DateTime.fromFormat(time, 'HH:mm', {
       zone: 'local'
     }).setZone('utc').toFormat('HH:mm'));
   }
+
   ;
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "schedule_challenge_subtext_wrapper"
@@ -739,6 +750,7 @@ export const TimeGridResponse = ({
 }) => {
   const [selectedTime, setSelectedTime] = React.useState(null);
   const timeSlots = generateSlotsForTimeZone(startHourUTC);
+
   function generateSlotsForTimeZone(startHour) {
     return Array.from({
       length: 24
@@ -748,10 +760,13 @@ export const TimeGridResponse = ({
       zone: 'utc'
     }).toLocal());
   }
+
   ;
+
   function toggleSlot(time) {
     const formattedTimeLocal = time.toFormat('HH:mm');
     const formattedTimeUTC = time.toUTC().toFormat('HH:mm');
+
     if (selectedTime === formattedTimeLocal) {
       setSelectedTime(null);
       selectedTimeUTC.current = null;
@@ -760,6 +775,7 @@ export const TimeGridResponse = ({
       selectedTimeUTC.current = formattedTimeUTC;
     }
   }
+
   ;
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "schedule_challenge_subtext_wrapper"

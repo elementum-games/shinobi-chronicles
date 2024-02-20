@@ -7,6 +7,7 @@ import { StrategicInfoItem } from "./StrategicInfoItem.js";
 import { TimeGrid } from "./VillageHQ.js";
 import { TimeGridResponse } from "./VillageHQ.js";
 import { ChallengeContainer } from "./VillageHQ.js";
+
 function Village({
   playerID,
   playerSeat,
@@ -36,39 +37,33 @@ function Village({
   const [strategicDataState, setStrategicDataState] = React.useState(strategicData);
   const [challengeDataState, setChallengeDataState] = React.useState(challengeData);
   const [villageTab, setVillageTab] = React.useState("villageHQ");
+
   function handleErrors(errors) {
     console.warn(errors);
   }
-  function getKageKanji(village_id) {
-    switch (village_id) {
-      case 'Stone':
-        return '土影';
-      case 'Cloud':
-        return '雷影';
-      case 'Leaf':
-        return '火影';
-      case 'Sand':
-        return '風影';
-      case 'Mist':
-        return '水影';
-    }
-  }
+
   function getVillageIcon(village_id) {
     switch (village_id) {
       case 1:
         return '/images/village_icons/stone.png';
+
       case 2:
         return '/images/village_icons/cloud.png';
+
       case 3:
         return '/images/village_icons/leaf.png';
+
       case 4:
         return '/images/village_icons/sand.png';
+
       case 5:
         return '/images/village_icons/mist.png';
+
       default:
         return null;
     }
   }
+
   function getPolicyDisplayData(policy_id) {
     let data = {
       banner: "",
@@ -79,6 +74,7 @@ function Village({
       penalties: [],
       glowClass: ""
     };
+
     switch (policy_id) {
       case 0:
         data.banner = "";
@@ -90,6 +86,7 @@ function Village({
         data.penalties = [];
         data.glowClass = "";
         break;
+
       case 1:
         data.banner = "/images/v2/decorations/policy_banners/growthpolicy.jpg";
         data.name = "From the Ashes";
@@ -99,6 +96,7 @@ function Village({
         data.penalties = ["-30 Materials/hour", "-50 Food/hour", "-20 Wealth/hour", "Cannot declare War"];
         data.glowClass = "growth_glow";
         break;
+
       case 2:
         data.banner = "/images/v2/decorations/policy_banners/espionagepolicy.jpg";
         data.name = "Eye of the Storm";
@@ -108,6 +106,7 @@ function Village({
         data.penalties = ["-25 Materials/hour", "-25 Food/hour", "-50 Wealth/hour"];
         data.glowClass = "espionage_glow";
         break;
+
       case 3:
         data.banner = "/images/v2/decorations/policy_banners/defensepolicy.jpg";
         data.name = "Fortress of Solitude";
@@ -117,6 +116,7 @@ function Village({
         data.penalties = ["-45 Materials/hour", "-30 Food/hour", "-25 Wealth/hour"];
         data.glowClass = "defense_glow";
         break;
+
       case 4:
         data.banner = "/images/v2/decorations/policy_banners/warpolicy.jpg";
         data.name = "Forged in Flames";
@@ -126,6 +126,7 @@ function Village({
         data.penalties = ["-30 Materials/hour", "-40 Food/hour", "-30 Wealth/hour", "Cannot form Alliances"];
         data.glowClass = "war_glow";
         break;
+
       case 5:
         data.banner = "/images/v2/decorations/policy_banners/prosperitypolicy.jpg";
         data.name = "The Gilded Hand";
@@ -137,8 +138,10 @@ function Village({
         data.glowClass = "prosperity_glow";
         break;
     }
+
     return data;
   }
+
   return /*#__PURE__*/React.createElement(ModalProvider, null, /*#__PURE__*/React.createElement("div", {
     className: "navigation_row"
   }, /*#__PURE__*/React.createElement("div", {
@@ -174,7 +177,6 @@ function Village({
     clanData: clanData,
     kageRecords: kageRecords,
     handleErrors: handleErrors,
-    getKageKanji: getKageKanji,
     getVillageIcon: getVillageIcon,
     getPolicyDisplayData: getPolicyDisplayData,
     TimeGrid: TimeGrid,
@@ -199,7 +201,6 @@ function Village({
     strategicDataState: strategicDataState,
     setStrategicDataState: setStrategicDataState,
     handleErrors: handleErrors,
-    getKageKanji: getKageKanji,
     getVillageIcon: getVillageIcon,
     getPolicyDisplayData: getPolicyDisplayData,
     StrategicInfoItem: StrategicInfoItem
@@ -219,4 +220,5 @@ function Village({
     getPolicyDisplayData: getPolicyDisplayData
   }));
 }
+
 window.Village = Village;
