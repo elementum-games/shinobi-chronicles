@@ -2,6 +2,11 @@
 
 class MysteryRamenDto {
     public function __construct(
-        public bool $mystery_ramen_enabled = false,
+        public string $cost,
+        public string $label,
+        public int $duration,
+        public string $image,
+        public array $effects,
+        public bool $mystery_ramen_unlocked,
     ) {}
 }

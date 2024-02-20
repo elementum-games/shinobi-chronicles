@@ -40,6 +40,18 @@ final class VillageUpgradeMigration extends AbstractMigration
             PRIMARY KEY (`id`),
             UNIQUE KEY `unique_key_village_id` (`key`, `village_id`));
 
+            -- Create table character_ramen
+            CREATE TABLE `character_ramen`
+            (`id` INT(11) NOT NULL AUTO_INCREMENT,
+            `user_id` INT(11) NOT NULL,
+            `buff_duration` INT(11) NOT NULL DEFAULT '0',
+            `purchase_time` INT(11) NOT NULL DEFAULT '0',
+            `buff_effects` VARCHAR(200) NOT NULL DEFAULT '[]',
+            `mystery_ramen_available` TINYINT(1) NOT NULL DEFAULT '0',
+            `mystery_ramen_effects` VARCHAR(200) NOT NULL DEFAULT '[]',
+            `purchase_count_since_last_mystery` INT(11) NOT NULL DEFAULT '0',
+            PRIMARY KEY (`id`));
+
             -- Alter table region_locations
             ALTER TABLE `region_locations` ADD `stability` INT(11) DEFAULT 0;
             ALTER TABLE `region_locations` CHANGE `id` `region_location_id` INT(11) NOT NULL AUTO_INCREMENT;
@@ -146,6 +158,9 @@ final class VillageUpgradeMigration extends AbstractMigration
 
             -- Drop table village_upgrades
             DROP TABLE `village_upgrades`;
+
+            -- Drop table character_ramen
+            DROP TABLE `character_ramen`;
 
             -- Update columns on region_locations
             ALTER TABLE `region_locations` DROP `stability`;

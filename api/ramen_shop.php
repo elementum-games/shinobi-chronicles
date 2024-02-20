@@ -36,6 +36,27 @@ try {
                 $response->errors[] = $result->error_message;
             }
             break;
+        case "PurchaseSpecialRamen":
+            $ramen_key = $system->db->clean($_POST['ramen_key']);
+            $result = RamenShopManager::purchaseSpecialRamen($system, $player, $ramen_key);
+            if ($result->succeeded) {
+                $response->data = [
+                    "player_data" => UserAPIPresenter::playerDataResponse($player, RankManager::fetchNames($system)),
+                ];
+            } else {
+                $response->errors[] = $result->error_message;
+            }
+            break;
+        case "PurchaseMysteryRamen":
+            $result = RamenShopManager::purchaseMysteryRamen($system, $player);
+            if ($result->succeeded) {
+                $response->data = [
+                    "player_data" => UserAPIPresenter::playerDataResponse($player, RankManager::fetchNames($system)),
+                ];
+            } else {
+                $response->errors[] = $result->error_message;
+            }
+            break;
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
     }
