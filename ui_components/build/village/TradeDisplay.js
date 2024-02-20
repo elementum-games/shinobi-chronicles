@@ -49,21 +49,21 @@ export function TradeDisplay({
       count: value
     } : resource));
   };
-  return viewOnly ? /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: "20px",
+      marginTop: "-30px",
+      color: "#b6bdd0",
+      fontSize: "11px",
+      textAlign: "center",
+      display: "flex",
+      flexDirection: "column"
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "Each village can offer up to 25000 resources of each resource type per trade."), /*#__PURE__*/React.createElement("span", null, "Trades have a cooldown of 24 hours.")), viewOnly ? /*#__PURE__*/React.createElement("div", {
     className: "trade_display_container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "trade_display_offer_container"
   }, /*#__PURE__*/React.createElement("div", {
-    class: "schedule_challenge_subtext_wrapper",
-    style: {
-      marginBottom: "20px",
-      marginTop: "-10px"
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    class: "schedule_challenge_subtext"
-  }, "Each village can offer up to 25000 resources of each resource type per trade."), /*#__PURE__*/React.createElement("span", {
-    class: "schedule_challenge_subtext"
-  }, "Trades have a cooldown of 24 hours.")), /*#__PURE__*/React.createElement("div", {
     className: "header"
   }, "Offered Resources"), /*#__PURE__*/React.createElement("div", {
     className: "trade_display_resources"
@@ -222,5 +222,5 @@ export function TradeDisplay({
     type: "checkbox",
     checked: requestedRegions.includes(region.region_id),
     onChange: () => toggleRequestedRegion(region.region_id)
-  }))))));
+  })))))));
 }
