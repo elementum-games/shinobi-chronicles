@@ -51,6 +51,11 @@ $clan_positions = array(
 			<label style='width:6.5em;'>Level:</label> 	<?= $viewUser->level ?><br />
 			<label style='width:6.5em;'>Exp:</label> 	<?= $viewUser->exp ?><br />
 			<label style='width:6.5em;'>Rank:</label> 	<?= $ranks[$viewUser->rank_num] ?><br />
+            <label style='width:6.5em;'>Bloodline:</label> <?= ($viewUser->bloodline_id ? $viewUser->bloodline_name : "None") ?><br />
+            <?php if($viewUser->elements): ?>
+                <label style='width:6.5em;'>Element<?= (count($viewUser->elements) > 1 ? 's' : '') ?>:</label>
+                <?= implode(', ', $viewUser->elements) ?><br />
+            <?php endif; ?>
             <br />
 
             <?php if($viewUser->gender != User::GENDER_NONE): ?>
@@ -60,8 +65,7 @@ $clan_positions = array(
 			<label style='width:6.5em;'>Village:</label> <?= $viewUser->village->name ?><br />
             <label style='width:6.5em;'>Reputation:</label> <?= $viewUser->reputation->rank_name ?>
             (<?=$viewUser->reputation->getRepAmount()?>)<br />
-			<label style='width:6.5em;'>Bloodline:</label> <?= ($viewUser->bloodline_id ? $viewUser->bloodline_name : "None") ?>
-            <br />
+			
             <?php if (SenseiManager::isActiveSensei($viewUser->user_id, $system)): ?>
                 <label style='width:6.5em;'>Students:</label>
                 <?php foreach ($students as $student): ?>
@@ -87,13 +91,10 @@ $clan_positions = array(
             <?php if($viewUser->team): ?>
                 <label style='width:6.5em;'>Team:</label> <a href='<?= $self_link ?>&view_team=<?= $viewUser->team->id ?>'><?= $viewUser->team->name ?></a><br />
             <?php endif; ?>
-
-            <br /><label style='width:6.5em;'>Spouse:</label>
             <?php if($viewUser->spouse > 0): ?>
+                <br /><label style='width:6.5em;'>Spouse:</label>
                 <a href='<?= $self_link ?>&user=<?= $viewUser->spouse_name ?>'><?= $viewUser->spouse_name ?></a><br />
-                <label style='width:6.5em;'>Anniversary:</label> <?= Date('F j, Y', $viewUser->marriage_time) ?><br />
-            <?php else: ?>
-                None<br />
+                <label style='width:6.5em;'>Anniversary:</label> <?= Date('F j, Y', $viewUser->marriage_time) ?><br /> 
             <?php endif; ?>
 
             <?php if($player->user_id == $viewUser->spouse): ?>
