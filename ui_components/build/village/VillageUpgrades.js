@@ -855,7 +855,7 @@ export function VillageUpgrades({
         ContentComponent: null,
         onConfirm: () => CancelConstruction()
       })
-    }, "cancel"), selectedBuilding.construction_boosted === "true" ? /*#__PURE__*/React.createElement("div", {
+    }, "cancel"), selectedBuilding.construction_boosted !== "true" ? /*#__PURE__*/React.createElement("div", {
       className: "construction_boost_button upgrades_control_button",
       onClick: () => CheckBoostConstruction()
     }, "boost") : /*#__PURE__*/React.createElement("div", {
@@ -916,7 +916,7 @@ export function VillageUpgrades({
           ContentComponent: null,
           onConfirm: () => CancelResearch()
         })
-      }, "cancel"), selectedUpgrade.research_boosted ? /*#__PURE__*/React.createElement("div", {
+      }, "cancel"), selectedUpgrade.research_boosted === "true" ? /*#__PURE__*/React.createElement("div", {
         className: "research_boost_button upgrades_control_button disabled"
       }, "boost") : /*#__PURE__*/React.createElement("div", {
         className: "research_boost_button upgrades_control_button",

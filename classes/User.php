@@ -21,6 +21,8 @@ require_once __DIR__ . "/travel/TravelManager.php";
 require_once __DIR__ . "/travel/Region.php";
 require_once __DIR__ . "/notification/BlockedNotificationManager.php";
 require_once __DIR__ . "/user/Blacklist.php";
+require_once __DIR__ . "/ramen_shop/CharacterRamenData.php";
+require_once __DIR__ . "/ramen_shop/RamenShopManager.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -952,6 +954,15 @@ class User extends Fighter {
 
         // Ramen Data
         $this->ramen_data = RamenShopManager::getCharacterRamenData($this->system, $this->user_id);
+        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_SHOYU)) {
+            $this->stealth += 2;
+        }
+        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_SPICY_MISO)) {
+            $this->regen_boost += 0.25 * RankManager::REGEN_RATE[$this->rank_num];
+        }
+        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_KING)) {
+            $this->reputation->addBonusPveRep(1);
+        }
 
         return;
     }

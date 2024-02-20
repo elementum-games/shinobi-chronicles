@@ -103,10 +103,10 @@ class RamenShopManager {
 
     /* ramen effect descriptions indexed by ramen key */
     const RAMEN_EFFECT_DESCRIPTIONS = [
-        self::SPECIAL_RAMEN_SHOYU => "+2 Stealth",
-        self::SPECIAL_RAMEN_KING => "+1 Reputation gain (PvP excluded)",
-        self::SPECIAL_RAMEN_SPICY_MISO => "+25% Regen",
-        self::SPECIAL_RAMEN_WARRIOR => "Heal to full after winning a battle.",
+        self::SPECIAL_RAMEN_SHOYU => "+2 Stealth.",
+        self::SPECIAL_RAMEN_KING => "+1 Reputation gain (PvP excluded).",
+        self::SPECIAL_RAMEN_SPICY_MISO => "+25% base regen.",
+        self::SPECIAL_RAMEN_WARRIOR => "Heal to full after winning a battle",
     ];
 
     const MYSTERY_RAMEN_COST_MULTIPLIER = 1;
@@ -309,16 +309,16 @@ class RamenShopManager {
         if ($player->getMoney() < $ramen->cost) {
             return ActionResult::failed("You do not have enough money!");
         }
-        if (!$system->isDevEnvironment()) {
-            $player->subtractMoney($ramen->cost, "Purchased {$ramen_key} health");
-        }
+        $player->subtractMoney($ramen->cost, "Purchased {$ramen_key} health");
         $player->ramen_data->buff_duration = $ramen->duration * 60;
-        $player->ramen_data->buff_effects[] = $ramen->effect;
+        $player->ramen_data->buff_effects = [];
+        $player->ramen_data->buff_effects[] = $ramen->key;
         $player->ramen_data->purchase_count_since_last_mystery++;
-        self::rollMysteryRamen($system, $player->ramen_data);
+        $player->ramen_data->purchase_time = time();
+        self::rollMysteryRamen($system, $player);
         self::updateCharacterRamenData($system, $player->ramen_data);
         $player->updateData();
-        return ActionResult::succeeded("");
+        return ActionResult::succeeded("Purchased {$ramen->label} Ramen!");
     }
 
     /**
@@ -338,16 +338,16 @@ class RamenShopManager {
         if ($player->getMoney() < $mystery_ramen->cost) {
             return ActionResult::failed("You do not have enough money!");
         }
-        if (!$system->isDevEnvironment()) {
-            $player->subtractMoney($mystery_ramen->cost, "Purchased mystery ramen");
-        }
+        $player->subtractMoney($mystery_ramen->cost, "Purchased mystery ramen");
         $player->ramen_data->buff_duration = $mystery_ramen->duration * 60;
+        $player->ramen_data->buff_effects = [];
         $player->ramen_data->buff_effects = $mystery_ramen->effects;
         $player->ramen_data->purchase_count_since_last_mystery = 0;
         $player->ramen_data->mystery_ramen_available = false;
+        $player->ramen_data->purchase_time = time();
         self::updateCharacterRamenData($system, $player->ramen_data);
         $player->updateData();
-        return ActionResult::succeeded("");
+        return ActionResult::succeeded("Purchased Mystery Ramen!");
     }
 
     /**

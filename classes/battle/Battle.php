@@ -446,6 +446,15 @@ class Battle {
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
         );
 
+        if (isset($this->winner)) {
+            if ($this->winner == Battle::TEAM1 && $this->player1 instanceof User && $this->player1->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_WARRIOR)) {
+                $this->player1->health = $this->player1->max_health;
+            }
+            if ($this->winner == Battle::TEAM2 && $this->player2 instanceof User && $this->player2->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_WARRIOR)) {
+                $this->player2->health = $this->player2->max_health;
+            }
+        }
+
         $fighter_health = $this->fighter_health;
         $fighter_health[$this->player1->combat_id] = [
            'current' => $this->fighter_health[$this->player1->combat_id],

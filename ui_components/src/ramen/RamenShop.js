@@ -39,9 +39,10 @@ function RamenShop({
     specialMenuOptions,
     mysteryRamenDetails,
 }) {
-    console.log(mysteryRamenDetails.effects);
     const [playerDataState, setPlayerDataState] = React.useState(playerData);
     const [playerResourcesDataState, setPlayerResourcesDataState] = React.useState(playerResourcesData);
+    const [characterRamenDataState, setCharacterRamenDataState] = React.useState(characterRamenData);
+    const [mysteryRamenDetailsState, setMysteryRamenDetailsState] = React.useState(mysteryRamenDetails);
     const { openModal } = useModal();
     function BasicRamen({ index, ramenInfo, PurchaseBasicRamen }) {
         return (
@@ -59,7 +60,7 @@ function RamenShop({
         return (
             <div key={index} className="special_ramen">
                 <img src={ramenInfo.image} className="special_ramen_img" />
-                <div className="special_ramen_name">{ramenInfo.name}</div>
+                <div className="special_ramen_name">{ramenInfo.label}</div>
                 <div className="special_ramen_description">{ramenInfo.description}</div>
                 <div className="special_ramen_effect">{ramenInfo.effect}</div>
                 <div className="special_ramen_duration">Duration: {ramenInfo.duration} minutes</div>
@@ -96,6 +97,14 @@ function RamenShop({
                 return;
             }
             setPlayerDataState(response.data.player_data);
+            setMysteryRamenDetailsState(response.data.mystery_ramen_details);
+            setCharacterRamenDataState(response.data.character_ramen_data);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
+            });
         });
     }
     function PurchaseMysteryRamen() {
@@ -110,6 +119,14 @@ function RamenShop({
                 return;
             }
             setPlayerDataState(response.data.player_data);
+            setMysteryRamenDetailsState(response.data.mystery_ramen_details);
+            setCharacterRamenDataState(response.data.character_ramen_data);
+            openModal({
+                header: 'Confirmation',
+                text: response.data.response_message,
+                ContentComponent: null,
+                onConfirm: null,
+            });
         });
     }
     function handleErrors(errors) {
@@ -161,23 +178,23 @@ function RamenShop({
                     }
                     <div className="header">Mystery ramen</div>
                     <div className="ramen_shop_mystery_ramen_container box-primary">
-                        {mysteryRamenDetails.mystery_ramen_unlocked ?
+                        {mysteryRamenDetailsState.mystery_ramen_unlocked ?
                             <>
-                                {characterRamenData.mystery_ramen_available
+                                {characterRamenDataState.mystery_ramen_available
                                     ?
                                     <>
-                                        <img src={mysteryRamenDetails.image} className="special_ramen_img" />
+                                        <img src={mysteryRamenDetailsState.image} className="special_ramen_img" />
                                         <div className="mystery_ramen_details_container">
                                             <div className="mystery_ramen_description">Made using leftover ingredients. You can't quite tell what's in it.</div>
                                             <div className="mystery_ramen_effects">
-                                                {mysteryRamenDetails.effects.map((effect, index) => {
+                                                {mysteryRamenDetailsState.effects.map((effect, index) => {
                                                     return (
                                                         <div key={index} className="mystery_ramen_effect">{effect.effect}</div>
                                                     );
                                                 })}
                                             </div>
-                                            <div className="mystery_ramen_duration">Duration: {mysteryRamenDetails.duration} minutes</div>
-                                            <div className="mystery_ramen_button" onClick={() => PurchaseMysteryRamen()}><>&yen;</>{mysteryRamenDetails.cost}</div>
+                                            <div className="mystery_ramen_duration">Duration: {mysteryRamenDetailsState.duration} minutes</div>
+                                            <div className="mystery_ramen_button" onClick={() => PurchaseMysteryRamen()}><>&yen;</>{mysteryRamenDetailsState.cost}</div>
                                         </div>
                                     </>
                                     :

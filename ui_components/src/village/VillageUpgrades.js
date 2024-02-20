@@ -474,7 +474,7 @@ export function VillageUpgrades({
                                                     ContentComponent: null,
                                                     onConfirm: () => CancelConstruction(),
                                                 })}>cancel</div>
-                                                {selectedBuilding.construction_boosted === "true"
+                                                {selectedBuilding.construction_boosted !== "true"
                                                     ?
                                                     <div className="construction_boost_button upgrades_control_button" onClick={() => CheckBoostConstruction()}>boost</div>
                                                     :
@@ -560,7 +560,7 @@ export function VillageUpgrades({
                                             ContentComponent: null,
                                             onConfirm: () => CancelResearch(),
                                         })}>cancel</div>
-                                        {selectedUpgrade.research_boosted
+                                        {selectedUpgrade.research_boosted === "true"
                                             ?
                                             <div className="research_boost_button upgrades_control_button disabled">boost</div>
                                             :
