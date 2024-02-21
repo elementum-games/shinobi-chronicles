@@ -11,11 +11,12 @@ class RamenShopManager {
     const RAMEN_SHOP_OWNER_NAMES_BY_VILLAGE = [
         1 => "Tomomi",
         2 => "Suika",
-        3 => "Suika",
+        3 => "Hideo",
         4 => "Kataba & Ryoba",
         5 => "Kouji",
         0 => "Nobu",
-        "mystery" => "Whisperwhip",
+        "mystery" => "Shokunyan Hige",
+        "colosseum" => "Zetsuka",
     ];
     /* ramen shop owner images indexed by village id */
     const RAMEN_SHOP_OWNER_IMAGES_BY_VILLAGE = [
@@ -25,7 +26,8 @@ class RamenShopManager {
         4 => "images/ramen/KatabaRyoba.png",
         5 => "images/ramen/Kouji.png",
         0 => "images/ramen/Nobu.png",
-        "mystery" => "images/ramen/Whisperwhip.png",
+        "mystery" => "images/ramen/Higa.png",
+        "colosseum" => "images/ramen/Zetsuka.png",
     ];
     /* ramen shop owner background images indexed by village id */
     const RAMEN_SHOP_OWNER_BACKGROUNDS_BY_VILLAGE = [
@@ -38,71 +40,72 @@ class RamenShopManager {
     ];
     /* ramen shop owner descriptions indexed by village id */
     const RAMEN_SHOP_DESCRIPTIONS_BY_VILLAGE = [
-        1 => "A traditional ramen stand proudly run by the Ichikawa family for generations. As the main chef of a village often in war, [keyword]Tomomi[/keyword] knows first hand the importance of a well fed shinobi force and takes her job seriously.",
-        2 => "A traditional ramen stand proudly run by the Ichikawa family for generations. A traditional ramen stand proudly run by Ichikawa family for generations. As years have passed the Ichikawa Ramen has become a successful restaurant chain, now led by [keyword]Suika[/keyword].",
-        3 => "A traditional ramen stand proudly run by the Ichikawa family for generations.",
-        4 => "A traditional ramen stand proudly run by the Ichikawa family for generations.",
-        5 => "A traditional ramen stand proudly run by Ichikawa family for generations. Many travel to Mist from far to see Kouji cook. His slow and meticulous cooking and soothing voice has made watching him work a meditative experience. Offers free life advice.",
+        1 => "A traditional ramen stand proudly run by the [keyword]Ichikawa[/keyword] family for generations. As the main chef of a village often in war, [keyword]Tomomi[/keyword] knows first hand the importance of a well fed shinobi force and takes her job seriously.",
+        2 => "A traditional ramen stand proudly run by the [keyword]Ichikawa[/keyword] family for generations. A traditional ramen stand proudly run by Ichikawa family for generations. As years have passed the Ichikawa Ramen has become a successful restaurant chain, now led by [keyword]Suika[/keyword].",
+        3 => "A traditional ramen stand proudly run by the [keyword]Ichikawa[/keyword] family for generations.",
+        4 => "A traditional ramen stand proudly run by the [keyword]Ichikawa[/keyword] family for generations.",
+        5 => "A traditional ramen stand proudly run by the [keyword]Ichikawa[/keyword] family for generations. Many travel to Mist from far to see [keyword]Kouji[/keyword] cook. His slow and meticulous cooking and soothing voice has made watching him work a meditative experience. Offers free life advice.",
         0 => "A traveling ramen cart that appears whenever you need it the most. It's difficult to make a living outside villages, but [keyword]Nobu[/keyword] gets by with his skills - and loyal customers.",
+        "colosseum" => "[keyword]Bite Down[/keyword] serves the visitors with a quick bowl of ramen to down before their next bout. Its owner [keyword][/keyword] not only runs the stand, but is said to know a thing or two about gambling...",
     ];
     /* ramen shop owner dialogue options indexed by village id */
     const RAMEN_SHOP_DIALOGUE_OPTIONS_BY_VILLAGE = [
         1 => [
-            "Irasshaimase! Just a minute.",
-            "Hectic as usual. Decided what to order?",
-            "Training hard, huh. You keep that up and we'll win next time for sure.",
-            "What I wouldn't do to have more hands working here...",
+            "[quote]Irasshaimase! Just a minute.[/quote]",
+            "[quote]Hectic as usual. Decided what to order?[/quote]",
+            "[quote]Training hard, huh. You keep that up and we'll win next time for sure.[/quote]",
+            "[quote]What I wouldn't do to have more hands working here...[/quote]",
             "Watching Tomomi work you are reminded of a battle with how fast and intense her movements are. She clearly has battle experience.",
-            "A shinobi doesn't fight with their techniques or strength alone. You need to take care of your body, too.",
-            "War makes it difficult to get ingredients if not for you guys out there. Thanks for helping us out.",
-            "Before you next head out, make sure you have a bowl of Warrior's Ramen!",
+            "[quote]A shinobi doesn't fight with their techniques or strength alone. You need to take care of your body, too.[/quote]",
+            "[quote]War makes it difficult to get ingredients if not for you guys out there. Thanks for helping us out.[/quote]",
+            "[quote]Before you next head out, make sure you have a bowl of Warrior's Ramen![/quote]",
             "Tomomi's expression turns serious as she takes and prepares orders.",
-            "Everyone's working so hard for all of our sakes. You and I must work hard, too.",
-            "... Hey. Don't go and get yourself injured, alright?",
+            "[quote]Everyone's working so hard for all of our sakes. You and I must work hard, too.[/quote]",
+            "[quote]... Hey. Don't go and get yourself injured, alright?[/quote]",
         ],
         2 => [
-            "Irasshaimase!!!",
-            "Hehe, you can never be too enthusiastic about a friendly face.",
-            "Ah, the sweet sounds of sizzling pans and laughter! I'm your chef, and this kitchen is where love for food meets love for people.",
-            "Food is my love language, and every dish is a love letter to those who savor it.",
-            "What culinary delight can I create for you today?",
-            "In my kitchen, it's all about savoring life's moments.",
+            "[quote]Irasshaimase!!![/quote]",
+            "[quote]Hehe, you can never be too enthusiastic about a friendly face.[/quote]",
+            "[quote]Ah, the sweet sounds of sizzling pans and laughter! I'm your chef, and this kitchen is where love for food meets love for people.[/quote]",
+            "[quote]Food is my love language, and every dish is a love letter to those who savor it.[/quote]",
+            "[quote]What culinary delight can I create for you today?[/quote]",
+            "[quote]In my kitchen, it's all about savoring life's moments.[/quote]",
         ],
         3 => [
-            "... Oh. Irasshai. What will you have?",
-            "Oh please sit anywhere you like. I'll be with you in a moment.",
-            "The texture is there but the consistency…The flavors aren't quite matching well…",
-            "How does Suika get the flavor just right…",
-            "They say it's good but it needs to be better than good. Ichikawa's future depends on me.",
-            "Grandpa used to say that I have a prodigious sense of what makes a good dish, but I'm not so sure…",
-            "Is it the broth? Or is it the noodles? Too much spice? Too little? Argh…",
-            "If you see new dishes out there, could you tell me about them? I…want to learn. I have a lot to learn.",
-            "Um. Excuse me. Could you…tell your honest opinion… Uh. Um. Nevermind.",
-            "Feel like I'm never going to be worth the Ichikawa name…",
+            "[quote]... Oh. Irasshai. What will you have?[/quote]",
+            "[quote]Oh please sit anywhere you like. I'll be with you in a moment.[/quote]",
+            "[quote]The texture is there but the consistency... The flavors aren't quite matching well.[/quote]",
+            "[quote]How does Suika get the flavor just right.[/quote]",
+            "[quote]They say it's good but it needs to be better than good. Ichikawa's future depends on me.[/quote]",
+            "[quote]Grandpa used to say that I have a prodigious sense of what makes a good dish, but I'm not so sure.[/quote]",
+            "[quote]Is it the broth? Or is it the noodles? Too much spice? Too little? Argh.[/quote]",
+            "[quote]If you see new dishes out there, could you tell me about them? I... want to learn. I have a lot to learn.[/quote]",
+            "[quote]Um. Excuse me. Could you...tell your honest opinion... Uh. Um. Nevermind.[/quote]",
+            "[quote]Feel like I'm never going to be worth the Ichikawa name...[/quote]",
         ],
         4 => [
-            "Oi! Customer! Irasshai!",
-            "These may be old Ichikawa's recipes but we're working on coming up with our own.",
-            "Ryoooobaaaa, where's the order?!",
-            "I can't make any sense out of your scribbles, Kataba! What's the order meant to be?",
-            "Forget the norms; we're about to break culinary boundaries.",
-            "You're a shinobi, right? Could ya show us how you use a kunai? Y'know, for…reasons.",
-            "Ryoba, you think senbon would work when making skewers?[br]Kataba, the only thing we're meant to skewer are enemies. We make RAMEN!",
-            "We're a team here. Kataba sets 'em up with service; I knock 'em down with my dish.",
-            "In the future we'll start our own ramen chain for sure. You can be our first customer.",
-            "Ryoba's Ramen. I like the sound of that.",
+            "[quote]Oi! Customer! Irasshai!",
+            "[quote]These may be old Ichikawa's recipes but we're working on coming up with our own.",
+            "[quote]Ryoooobaaaa, where's the order?!",
+            "[quote]I can't make any sense out of your scribbles, Kataba! What's the order meant to be?",
+            "[quote]Forget the norms; we're about to break culinary boundaries.",
+            "[quote]You're a shinobi, right? Could ya show us how you use a kunai? Y'know, for…reasons.",
+            "[quote]Ryoba, you think senbon would work when making skewers?[br]Kataba, the only thing we're meant to skewer are enemies. We make RAMEN!",
+            "[quote]We're a team here. Kataba sets 'em up with service; I knock 'em down with my dish.",
+            "[quote]In the future we'll start our own ramen chain for sure. You can be our first customer.",
+            "[quote]Ryoba's Ramen. I like the sound of that.",
         ],
         5 => [
-            "Irasshai.",
-            "Rough day, eh? Have a seat.",
-            "Here for your usual? Got it prepped up, had a feeling you'd come visit.",
-            "Ever feel like you need to shut the world out for a bit? I do. And that's what my ramen offers.",
-            "Stay as long as you need. There's no rush.",
-            "Ever tried fishing? You should.",
-            "Maybe I'll take you fishing with me some time. We all deserve some time off.",
-            "You take care of yourself out there, yeah?",
-            "Just think of your enemies out there as little fish grinding their little teeth. Heh.",
-            "You look like you have a lot on your mind. Have a meal to take your mind off of things.",
+            "[quote]Irasshai.",
+            "[quote]Rough day, eh? Have a seat.",
+            "[quote]Here for your usual? Got it prepped up, had a feeling you'd come visit.",
+            "[quote]Ever feel like you need to shut the world out for a bit? I do. And that's what my ramen offers.",
+            "[quote]Stay as long as you need. There's no rush.",
+            "[quote]Ever tried fishing? You should.",
+            "[quote]Maybe I'll take you fishing with me some time. We all deserve some time off.",
+            "[quote]You take care of yourself out there, yeah?",
+            "[quote]Just think of your enemies out there as little fish grinding their little teeth. Heh.",
+            "[quote]You look like you have a lot on your mind. Have a meal to take your mind off of things.",
         ],
         0 => [
             "[quote]Yo.[/quote]",
@@ -120,11 +123,35 @@ class RamenShopManager {
             "[quote]I'm starting to think I should just deliver food instead...[/quote]",
         ],
         "mystery" => [
-            "The great Shokunyan has arrived.",
-            "I have come to offer a gift from my brethren.",
-            "I am borrowing this stand for the duration of my stay. Yes, borrowing. Yes, with permission.",
-            "A feast for the eyes, a feast for the soul. Hige nods profoundly",
-            "Taste the heaven, taste the earth. Taste the blessing of life itself.",
+            "[quote]The great Shokunyan has arrived.[/quote]",
+            "[quote]I have come to offer a gift from my brethren.[/quote]",
+            "[quote]I am borrowing this stand for the duration of my stay. Yes, borrowing. Yes, with permission.[/quote]",
+            "[quote]A feast for the eyes, a feast for the soul.[quote] Hige nods profoundly",
+            "[quote]Taste the heaven, taste the earth. Taste the blessing of life itself.[/quote]",
+            "You notice Hige's eyes darting towards your coin purse every now and then.",
+            "[quote]You do not need to know what's in the ramen - only that it's worth your money.[/quote]",
+            "[quote]Nekogakure thanks you for your continued patronage.[/quote]",
+            "Hige's eyes your coin purse greedily before resuming his stoic pose.",
+            "[quote]Purrhaps I may in future find further use for your coin... and services.[/quote]",
+            "[quote]A village of shinobi... Not much different than a village of cats when you think about it...[/quote]",
+            "[quote]Nya.[/quote] ... Hige looks flustered for a moment before clearing his throat.",
+            "[quote]I smell opportunities here.[/quote]",
+        ],
+        "colosseum" => [
+            "[quote]Irasshai.[/quote]",
+            "[quote]Better eat quick, the crowd is waiting for you.[/quote]",
+            "[quote]Think you've got enough time to eat that? Next challenger awaits.[/quote]",
+            "[quote]I had a bet on you going on. I'll let you guess the outcome.[/quote]",
+            "[quote]I don't care if you win or lose as long as you make the fight interesting.[/quote]",
+            "[quote]When you come here, you are not only another brawler, but also an entertainer.[/quote]",
+            "[quote]Saw you fight out there. Ever considered... alternative strategies?[/quote]",
+            "[quote]Fighting fair is boring. Fighting dirty is what we’re here for.[/quote]",
+            "[quote]You can use any weapons you bring with you but you can’t take the chopsticks, alright?[/quote]",
+            "[quote]Considering your appetite, I think I'll put my next bet on you.[/quote]",
+            "[quote]I didn't expect much of you to be honest, but...[/quote]",
+            "[quote]Wouldn't mind seeing you in the ring more often.[/quote]",
+            "[quote]Make it a good show.[/quote]",
+            "[quote]Show us what you’re worth.[/quote]",
         ],
     ];
     /* ramen shop names indexed by village id */
@@ -135,6 +162,7 @@ class RamenShopManager {
         4 => "Ichikawa ramen",
         5 => "Ichikawa ramen",
         0 => "Ichikawa ramen",
+        "colosseum" => "Bite Down",
     ];
 
     /* ramen keys */
@@ -176,7 +204,7 @@ class RamenShopManager {
      * @param Village $village
      * @return RamenOwnerDto
      */
-    public static function loadRamenOwnerDetails(User $player): RamenOwnerDto {
+    public static function loadRamenOwnerDetails(System $system, User $player): RamenOwnerDto {
         if ($player->location->equals($player->village_location)) {
             $ramenOwnerDto = new RamenOwnerDto(
                 name: self::RAMEN_SHOP_OWNER_NAMES_BY_VILLAGE[$player->village->village_id],
@@ -195,6 +223,16 @@ class RamenShopManager {
                 dialogue: self::RAMEN_SHOP_DIALOGUE_OPTIONS_BY_VILLAGE[0][array_rand(self::RAMEN_SHOP_DIALOGUE_OPTIONS_BY_VILLAGE[0])],
                 shop_name: self::RAMEN_SHOP_NAMES_BY_VILLAGE[0],
             );
+        }
+        $result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
+		$location_result = $system->db->fetch($result);
+		$colosseum_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
+        if ($player->location->equals($colosseum_coords)) {
+            $ramenOwnerDto->name = self::RAMEN_SHOP_OWNER_NAMES_BY_VILLAGE["colosseum"];
+            $ramenOwnerDto->image = self::RAMEN_SHOP_OWNER_IMAGES_BY_VILLAGE["colosseum"];
+            $ramenOwnerDto->dialogue = self::RAMEN_SHOP_DIALOGUE_OPTIONS_BY_VILLAGE["colosseum"][array_rand(self::RAMEN_SHOP_DIALOGUE_OPTIONS_BY_VILLAGE["colosseum"])];
+            $ramenOwnerDto->shop_description = self::RAMEN_SHOP_DESCRIPTIONS_BY_VILLAGE["colosseum"];
+            $ramenOwnerDto->shop_name = self::RAMEN_SHOP_NAMES_BY_VILLAGE["colosseum"];
         }
         if ($player->ramen_data->mystery_ramen_available) {
             $ramenOwnerDto->name = self::RAMEN_SHOP_OWNER_NAMES_BY_VILLAGE["mystery"];
