@@ -6,33 +6,38 @@ import { CharacterChanges } from "./CharacterChanges.js";
 import type { PlayerDataType } from "../_schema/userSchema";
 
 type PremiumProps = {|
-    +userAPILink: string,
+    +APILinks: [],
+    +APIData: [],
     +initialPage: string,
-    +userAPIData: [],
     +genders: [],
     +skills: [],
 |};
 function PremiumPage({
-    userAPILink,
+    APILinks,
+    APIData,
     initialPage,
-    userAPIData,
     genders,
     skills
  }: PremiumProps) {
+    let costsLoaded = Date.now();
+    const reloadCostsMS = 15 * 60 * 1000; // 15 minutes
+    const reloadPlayerData = 30 * 1000; // 30 seconds
+
     const characterChanges = "character_changes";
     const bloodlines = "bloodlines";
     const forbiddenSeal = "forbidden_seal";
     const purchaseAK = "purchase_ak";
 
     const [page, setPage] = React.useState(initialPage);
-    const [playerData, setPlayerData] = React.useState(userAPIData.playerData);
+    const [playerData, setPlayerData] = React.useState(APIData.playerData);
+    const [costs, setCosts] = React.useState(APIData.costs);
 
     function handleAPIErrors(errors) {
         console.warn(errors);
     }
 
     function getPlayerData() {
-        apiFetch(userAPILink, {
+        apiFetch(APILinks.user, {
             request: 'getPlayerData'
         }).then(response => {
             if(response.errors.length) {
@@ -44,21 +49,36 @@ function PremiumPage({
             }
         })
     }
+    function getCosts() {
+        apiFetch(APILinks.premium_shop, {
+            request: 'LoadCosts'
+        }).then(response => {
+            if(response.errors.length) {
+                handleAPIErrors(response.errors);
+                return;
+            }
+            else {
+                setCosts(response.data.costs);
+            }
+        })
+    }
     function handlePageChange(newPage) {
         if(newPage !== page) {
             setPage(newPage);
         }
     }
 
-    // Initialize
     React.useEffect(() => {
-        const playerDataInterval = setInterval(() => {
+        const dataInterval = setInterval(() => {
             getPlayerData();
-        }, 15000);
+            if(Date.now() - costsLoaded >= reloadCostsMS) {
+                getCosts();
+                costsLoaded = Date.now();
+            }
+        }, reloadPlayerData);
 
-        return () => clearInterval(playerDataInterval);
+        return () => clearInterval(dataInterval);
     }, []);
-
     // Display
     return(
         <ModalProvider>
@@ -71,6 +91,7 @@ function PremiumPage({
             {page === characterChanges &&
                 <CharacterChanges
                     playerData={playerData}
+                    costs={costs}
                     genders={genders}
                     skills={skills}
                 />

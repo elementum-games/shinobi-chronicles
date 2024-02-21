@@ -2,23 +2,28 @@ import { apiFetch } from "../utils/network.js";
 import { ModalProvider } from "../utils/modalContext.js";
 import { CharacterChanges } from "./CharacterChanges.js";
 function PremiumPage({
-  userAPILink,
+  APILinks,
+  APIData,
   initialPage,
-  userAPIData,
   genders,
   skills
 }) {
+  let costsLoaded = Date.now();
+  const reloadCostsMS = 15 * 60 * 1000; // 15 minutes
+  const reloadPlayerData = 30 * 1000; // 30 seconds
+
   const characterChanges = "character_changes";
   const bloodlines = "bloodlines";
   const forbiddenSeal = "forbidden_seal";
   const purchaseAK = "purchase_ak";
   const [page, setPage] = React.useState(initialPage);
-  const [playerData, setPlayerData] = React.useState(userAPIData.playerData);
+  const [playerData, setPlayerData] = React.useState(APIData.playerData);
+  const [costs, setCosts] = React.useState(APIData.costs);
   function handleAPIErrors(errors) {
     console.warn(errors);
   }
   function getPlayerData() {
-    apiFetch(userAPILink, {
+    apiFetch(APILinks.user, {
       request: 'getPlayerData'
     }).then(response => {
       if (response.errors.length) {
@@ -29,20 +34,33 @@ function PremiumPage({
       }
     });
   }
+  function getCosts() {
+    apiFetch(APILinks.premium_shop, {
+      request: 'LoadCosts'
+    }).then(response => {
+      if (response.errors.length) {
+        handleAPIErrors(response.errors);
+        return;
+      } else {
+        setCosts(response.data.costs);
+      }
+    });
+  }
   function handlePageChange(newPage) {
     if (newPage !== page) {
       setPage(newPage);
     }
   }
-
-  // Initialize
   React.useEffect(() => {
-    const playerDataInterval = setInterval(() => {
+    const dataInterval = setInterval(() => {
       getPlayerData();
-    }, 15000);
-    return () => clearInterval(playerDataInterval);
+      if (Date.now() - costsLoaded >= reloadCostsMS) {
+        getCosts();
+        costsLoaded = Date.now();
+      }
+    }, reloadPlayerData);
+    return () => clearInterval(dataInterval);
   }, []);
-
   // Display
   return /*#__PURE__*/React.createElement(ModalProvider, null, /*#__PURE__*/React.createElement(MarketHeader, {
     playerData: playerData,
@@ -51,6 +69,7 @@ function PremiumPage({
     handlePageChange: handlePageChange
   }), page === characterChanges && /*#__PURE__*/React.createElement(CharacterChanges, {
     playerData: playerData,
+    costs: costs,
     genders: genders,
     skills: skills
   }), page === bloodlines && /*#__PURE__*/React.createElement(Bloodlines, null), page === forbiddenSeal && /*#__PURE__*/React.createElement(ForbiddenSeals, null), page === purchaseAK && /*#__PURE__*/React.createElement(PurchaseAK, null));

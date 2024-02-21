@@ -5,12 +5,14 @@ type purchaseConfirmationProps = {|
     +text: string,
     +ContentComponent: function,
     +onConfirm: function,
+    +buttonValue: 'purchase'
 |}
-export function RenderPurchaseConfirmation({
+export function PurchaseConfirmation({
     text,
     header = "Purchase Confirmation",
     contentComponent = null,
-    onConfirm = null
+    onConfirm = null,
+    buttonValue = "purchase"
 }: purchaseConfirmationProps) {
     const { openModal } = useModal();
 
@@ -20,6 +22,6 @@ export function RenderPurchaseConfirmation({
             text: text,
             ContentComponent: contentComponent,
             onConfirm: onConfirm,
-        })}>purchase</div>
+        })}>{buttonValue.toLowerCase()}</div>
     );
 }

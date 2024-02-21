@@ -17,11 +17,15 @@
     window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(PremiumPage, {
-                userAPILink: "<?= $system->router->api_links['user'] ?>",
-                initialPage: "<?= $landing_page ?>",
-                userAPIData: {
-                    playerData: <?= json_encode(UserAPIPresenter::playerDataResponse(player: $player, rank_names: RankManager::fetchNames($system))) ?>
+                APILinks: {
+                    user: "<?= $system->router->api_links['user'] ?>",
+                    premium_shop: "<?= $system->router->api_links['premium_shop'] ?>",
                 },
+                APIData: {
+                    playerData: <?= json_encode(UserAPIPresenter::playerDataResponse(player: $player, rank_names: RankManager::fetchNames($system))) ?>,
+                    costs: <?= json_encode(PremiumAPIPresenter::getCosts(player: $player)) ?>,
+                },
+                initialPage: "<?= $landing_page ?>",
                 genders: <?= json_encode(User::$genders) ?>,
                 skills: <?= json_encode(array_merge(TrainingManager::$skill_types, TrainingManager::$attribute_types)) ?>,
             }),

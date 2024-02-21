@@ -1,9 +1,10 @@
 import { useModal } from "../utils/modalContext.js";
-export function RenderPurchaseConfirmation({
+export function PurchaseConfirmation({
   text,
   header = "Purchase Confirmation",
   contentComponent = null,
-  onConfirm = null
+  onConfirm = null,
+  buttonValue = "purchase"
 }) {
   const {
     openModal
@@ -16,5 +17,5 @@ export function RenderPurchaseConfirmation({
       ContentComponent: contentComponent,
       onConfirm: onConfirm
     })
-  }, "purchase");
+  }, buttonValue.toLowerCase());
 }

@@ -1,14 +1,16 @@
 import { useModal } from "../utils/modalContext.js";
-import { RenderPurchaseConfirmation } from "./PurchaseConfirmation.js";
+import { PurchaseConfirmation } from "./PurchaseConfirmation.js";
 import type {PlayerDataType} from "../_schema/userSchema";
 
 type characterChangeProps = {|
     +playerData: PlayerDataType,
+    +costs: [],
     +genders: [],
     +skills: [],
 |}
 export function CharacterChanges({
     playerData,
+    costs,
     genders,
     skills
 }: characterChangeProps) {
@@ -40,7 +42,7 @@ export function CharacterChanges({
         return returnName.substring(0, returnName.length - 1);
     }
 
-    React.useEffect(() => {
+    /*React.useEffect(() => {
         const testInterval = setInterval(() => {
             console.log(
             "PD: " + playerData +
@@ -50,7 +52,7 @@ export function CharacterChanges({
         }, 1000);
 
         return () => clearInterval(testInterval);
-    })
+    })*/
 
     return(
         <div className="purchaseContainer">
@@ -58,8 +60,9 @@ export function CharacterChanges({
                 <b>Reset Character</b>
                 You can reset your to a level 1 Akademi-sai.<br />
                 This change is free and can not be reversed.<br />
-                    <RenderPurchaseConfirmation
+                    <PurchaseConfirmation
                         text="Are you certain you wish to reset your character?"
+                        buttonValue={"reset"}
                     />
             </div>
             <div className="box-secondary halfWidth center">
@@ -74,32 +77,36 @@ export function CharacterChanges({
                         )
                     })}
                 </select>
-                    <RenderPurchaseConfirmation
+                    <PurchaseConfirmation
                         text={"Are you certain you wish to reset your " + formatSkillName(statResetName) + "?"}
+                        buttonValue={"reset"}
                     />
             </div>
-            <div className="box-primary fullWidth center">
+            <div className="box-secondary fullWidth center">
                 <b>Reset Ai and PvP Battle Counts</b>
                 <div className="subPurchaseContainer">
                     <div className="box-secondary halfWidth noBorder center">
-                        Reset AI wins and lossess to 0.<br />
-                        Cost: <br />
-                        <RenderPurchaseConfirmation
+                        Reset AI wins and losses to 0.<br />
+                        Costs {costs.ai_count_reset} Ancient Kunai<br />
+                        <PurchaseConfirmation
                             text="Are you certain you wish to reset your AI wins and losses?"
+                            buttonValue={"reset"}
                         />
                     </div>
                     <div className="box-secondary halfWidth noBorder center">
                         You can reset your PvP wins and losses to 0.
                         <br />
-                        Cost:
-                        <RenderPurchaseConfirmation
+                        Costs {costs.pvp_count_reset} Anicent Kunai<br />
+                        <PurchaseConfirmation
                             text={"Are you certain you wish to reset your PvP wins and losses?"}
+                            buttonValue={"reset"}
                         />
                     </div>
                 </div>
-                You can reset both AI and PvP wins and losses at a discounted rate of
-                <RenderPurchaseConfirmation
+                You can reset both AI and PvP wins and losses at a discounted rate of {costs.pvp_and_ai_count_reset} Ancient Kunai
+                <PurchaseConfirmation
                     text="Are you certain you want to reset both you PvP and AI wins/losses?"
+                    buttonValue={"reset"}
                 />
             </div>
             <div className="box-secondary halfWidth center">
@@ -108,11 +115,12 @@ export function CharacterChanges({
                 Each change afterward costs <br />
                 Name case changes are free (example: name1 => NaMe1).<br />
                 <input className="purchaseTextField" type="text" onChange={handleNameFieldChange} />
-                <RenderPurchaseConfirmation
+                <PurchaseConfirmation
                     text={
                         "Are you certain you wish to change your name from " + playerData.user_name + " to "
                         + newUsername + "?"
                     }
+                    buttonValue={"change"}
                 />
             </div>
             <div className="box-secondary halfWidth center">
@@ -126,29 +134,31 @@ export function CharacterChanges({
                         )
                     })}
                 </select>
-                <RenderPurchaseConfirmation
+                <PurchaseConfirmation
                     text={"Are you certain you wish to change your gender from " + playerData.gender
                         +  " to " + newGender + "?"
                     }
+                    buttonValue={"change"}
                 />
             </div>
             <div className="box-secondary fullWidth center">
                 <b>Change Village</b>
                 This is changing village....<br />
                 This is just to show what full width would look like for now...
-                <RenderPurchaseConfirmation
+                <PurchaseConfirmation
                     text="Are you certain you would like to change your village?"
+                    buttonValue={"change"}
                 />
             </div>
             <div className="box-secondary halfWidth center">
                 <b>Post-full-width Test</b>
-                <RenderPurchaseConfirmation
+                <PurchaseConfirmation
                     text="You would like to purchase???"
                 />
             </div>
             <div className="box-secondary halfWidth center">
                 <b>Post-full-width Test</b>
-                <RenderPurchaseConfirmation
+                <PurchaseConfirmation
                     text="You would like to purchase???"
                 />
             </div>
