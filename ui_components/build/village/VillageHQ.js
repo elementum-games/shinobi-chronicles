@@ -1,7 +1,8 @@
 import { apiFetch } from "../utils/network.js";
 import { useModal } from '../utils/modalContext.js';
 import KageDisplay from "./KageDisplay.js";
-import { getPolicyDisplayData, getVillageIcon } from "./villageUtils.js";
+import { getVillageIcon } from "./villageUtils.js";
+import VillagePolicy from "./VillagePolicy.js";
 export function VillageHQ({
   playerID,
   playerSeatState,
@@ -23,7 +24,6 @@ export function VillageHQ({
   handleErrors
 }) {
   const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
-  const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
   const selectedTimesUTC = React.useRef([]);
   const selectedTimeUTC = React.useRef(null);
   const challengeTarget = React.useRef(null);
@@ -277,43 +277,12 @@ export function VillageHQ({
     className: "row first"
   }, /*#__PURE__*/React.createElement("div", {
     className: "column first"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "clan_container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "header"
-  }, "Clans"), /*#__PURE__*/React.createElement("div", {
-    className: "content box-primary"
-  }, clanData.map((clan, index) => /*#__PURE__*/React.createElement("div", {
-    key: clan.clan_id,
-    className: "clan_item"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "clan_item_header"
-  }, clan.name))))), /*#__PURE__*/React.createElement("div", {
-    className: "population_container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "header"
-  }, "Population"), /*#__PURE__*/React.createElement("div", {
-    className: "content box-primary"
-  }, populationData.map((rank, index) => /*#__PURE__*/React.createElement("div", {
-    key: rank.rank,
-    className: "population_item"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "population_item_header"
-  }, rank.rank), /*#__PURE__*/React.createElement("div", {
-    className: "population_item_count"
-  }, rank.count))), /*#__PURE__*/React.createElement("div", {
-    className: "population_item",
-    style: {
-      width: "100%"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "population_item_header"
-  }, "total"), /*#__PURE__*/React.createElement("div", {
-    className: "population_item_count last"
-  }, totalPopulation))))), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(VillageMembers, {
+    clans: clanData,
+    populationData: populationData,
+    totalPopulation: totalPopulation
+  })), /*#__PURE__*/React.createElement("div", {
     className: "column second"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "kage_container"
   }, /*#__PURE__*/React.createElement(KageDisplay, {
     username: kage.user_name,
     avatarLink: kage.avatar_link,
@@ -331,45 +300,15 @@ export function VillageHQ({
     }),
     onClaim: () => ClaimSeat("kage"),
     onChallenge: () => Challenge(kage)
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "column third"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "elders_container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "header"
-  }, "Elders"), /*#__PURE__*/React.createElement("div", {
-    className: "elder_list"
-  }, seatDataState.filter(elder => elder.seat_type === 'elder').map((elder, index) => /*#__PURE__*/React.createElement("div", {
-    key: elder.seat_key,
-    className: "elder_item"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "elder_avatar_wrapper"
-  }, elder.avatar_link && /*#__PURE__*/React.createElement("img", {
-    className: "elder_avatar",
-    src: elder.avatar_link
-  }), !elder.avatar_link && /*#__PURE__*/React.createElement("div", {
-    className: "elder_avatar_fill"
   })), /*#__PURE__*/React.createElement("div", {
-    className: "elder_name"
-  }, elder.user_name ? /*#__PURE__*/React.createElement("a", {
-    href: "/?id=6&user=" + elder.user_name
-  }, elder.user_name) : "---"), elder.seat_id && elder.seat_id === playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
-    className: "elder_resign_button",
-    onClick: () => openModal({
-      header: 'Confirmation',
-      text: 'Are you sure you wish to resign from your current position?',
-      ContentComponent: null,
-      onConfirm: () => Resign()
-    })
-  }, "resign"), !elder.seat_id && /*#__PURE__*/React.createElement("div", {
-    className: playerSeatState.seat_id ? "elder_claim_button disabled" : "elder_claim_button",
-    onClick: playerSeatState.seat_id ? null : () => ClaimSeat("elder")
-  }, "claim"), elder.seat_id && playerSeatState.seat_id == null && /*#__PURE__*/React.createElement("div", {
-    className: "elder_challenge_button",
-    onClick: () => Challenge(elder)
-  }, "challenge"), elder.seat_id && playerSeatState.seat_id !== null && playerSeatState.seat_id !== elder.seat_id && /*#__PURE__*/React.createElement("div", {
-    className: "elder_challenge_button disabled"
-  }, "challenge"))))), /*#__PURE__*/React.createElement("div", {
+    className: "column third"
+  }, /*#__PURE__*/React.createElement(VillageElders, {
+    seatDataState: seatDataState,
+    playerSeatState: playerSeatState,
+    handleResign: Resign,
+    handleClaim: ClaimSeat,
+    handleChallenge: Challenge
+  }), /*#__PURE__*/React.createElement("div", {
     className: "points_container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "header"
@@ -393,60 +332,11 @@ export function VillageHQ({
     className: "column first"
   }, /*#__PURE__*/React.createElement("div", {
     className: "header"
-  }, "Village policy"), /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_bonus_container"
-  }, policyDisplay.bonuses.map((bonus, index) => /*#__PURE__*/React.createElement("div", {
-    key: index,
-    className: "policy_bonus_item"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "16",
-    height: "16",
-    viewBox: "0 0 100 100"
-  }, /*#__PURE__*/React.createElement("polygon", {
-    points: "25,20 50,45 25,70 0,45",
-    fill: "#4a5e45"
-  }), /*#__PURE__*/React.createElement("polygon", {
-    points: "25,0 50,25 25,50 0,25",
-    fill: "#6ab352"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "policy_bonus_text"
-  }, bonus)))), /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_main_container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_main_inner"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_banner",
-    style: {
-      backgroundImage: "url(" + policyDisplay.banner + ")"
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_name_container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_name " + policyDisplay.glowClass
-  }, policyDisplay.name)), /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_phrase"
-  }, policyDisplay.phrase), /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_description"
-  }, policyDisplay.description))), /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_penalty_container"
-  }, policyDisplay.penalties.map((penalty, index) => /*#__PURE__*/React.createElement("div", {
-    key: index,
-    className: "policy_penalty_item"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "16",
-    height: "16",
-    viewBox: "0 0 100 100"
-  }, /*#__PURE__*/React.createElement("polygon", {
-    points: "25,20 50,45 25,70 0,45",
-    fill: "#4f1e1e"
-  }), /*#__PURE__*/React.createElement("polygon", {
-    points: "25,0 50,25 25,50 0,25",
-    fill: "#ad4343"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "policy_penalty_text"
-  }, penalty))))))), /*#__PURE__*/React.createElement("div", {
+  }, "Village policy"), /*#__PURE__*/React.createElement(VillagePolicy, {
+    policyDataState: policyDataState,
+    playerSeatState: playerSeatState,
+    displayPolicyID: policyDataState.policy_id
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "row third"
   }, /*#__PURE__*/React.createElement("div", {
     className: "column first"
@@ -555,6 +445,96 @@ function DisplayFromDays(days) {
     default:
       return days;
   }
+}
+
+function VillageMembers({
+  clans,
+  populationData,
+  totalPopulation
+}) {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "clan_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "Clans"), /*#__PURE__*/React.createElement("div", {
+    className: "content box-primary"
+  }, clans.map((clan, index) => /*#__PURE__*/React.createElement("div", {
+    key: clan.clan_id,
+    className: "clan_item"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "clan_item_header"
+  }, clan.name))))), /*#__PURE__*/React.createElement("div", {
+    className: "population_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "Population"), /*#__PURE__*/React.createElement("div", {
+    className: "content box-primary"
+  }, populationData.map((rank, index) => /*#__PURE__*/React.createElement("div", {
+    key: rank.rank,
+    className: "population_item"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "population_item_header"
+  }, rank.rank), /*#__PURE__*/React.createElement("div", {
+    className: "population_item_count"
+  }, rank.count))), /*#__PURE__*/React.createElement("div", {
+    className: "population_item",
+    style: {
+      width: "100%"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "population_item_header"
+  }, "total"), /*#__PURE__*/React.createElement("div", {
+    className: "population_item_count last"
+  }, totalPopulation)))));
+}
+
+function VillageElders({
+  seatDataState,
+  playerSeatState,
+  handleResign,
+  handleClaim,
+  handleChallenge
+}) {
+  const {
+    openModal
+  } = useModal();
+  return /*#__PURE__*/React.createElement("div", {
+    className: "elders_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, "Elders"), /*#__PURE__*/React.createElement("div", {
+    className: "elder_list"
+  }, seatDataState.filter(elder => elder.seat_type === 'elder').map((elder, index) => /*#__PURE__*/React.createElement("div", {
+    key: elder.seat_key,
+    className: "elder_item"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "elder_avatar_wrapper"
+  }, elder.avatar_link && /*#__PURE__*/React.createElement("img", {
+    className: "elder_avatar",
+    src: elder.avatar_link
+  }), !elder.avatar_link && /*#__PURE__*/React.createElement("div", {
+    className: "elder_avatar_fill"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "elder_name"
+  }, elder.user_name ? /*#__PURE__*/React.createElement("a", {
+    href: `/?id=6&user=${elder.user_name}`
+  }, elder.user_name) : "---"), elder.seat_id && elder.seat_id === playerSeatState.seat_id && /*#__PURE__*/React.createElement("div", {
+    className: "elder_resign_button",
+    onClick: () => openModal({
+      header: 'Confirmation',
+      text: 'Are you sure you wish to resign from your current position?',
+      ContentComponent: null,
+      onConfirm: handleResign
+    })
+  }, "resign"), !elder.seat_id && /*#__PURE__*/React.createElement("div", {
+    className: playerSeatState.seat_id ? "elder_claim_button disabled" : "elder_claim_button",
+    onClick: playerSeatState.seat_id ? null : () => handleClaim("elder")
+  }, "claim"), elder.seat_id && playerSeatState.seat_id == null && /*#__PURE__*/React.createElement("div", {
+    className: "elder_challenge_button",
+    onClick: () => handleChallenge(elder)
+  }, "challenge"), elder.seat_id && playerSeatState.seat_id !== null && playerSeatState.seat_id !== elder.seat_id && /*#__PURE__*/React.createElement("div", {
+    className: "elder_challenge_button disabled"
+  }, "challenge")))));
 }
 
 export const ChallengeContainer = ({

@@ -2,6 +2,10 @@
 
 export type ResourceNameType = 'materials' | 'food' | 'wealth';
 
+export type VillagePolicyType = {|
+    +policy_id: number,
+|};
+
 export type VillageProposalType = {|
     +building_key: ?string,
     +upgrade_key: ?string,

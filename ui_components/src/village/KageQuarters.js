@@ -5,7 +5,8 @@ import { StrategicInfoItem } from "./StrategicInfoItem.js";
 import { useModal } from '../utils/modalContext.js';
 import { TradeDisplay } from "./TradeDisplay.js";
 import KageDisplay from "./KageDisplay.js";
-import { getPolicyDisplayData, getVillageIcon } from "./villageUtils.js";
+import VillagePolicy from "./VillagePolicy.js";
+import { getVillageIcon } from "./villageUtils.js";
 
 import type {
     VillageProposalType,
@@ -14,18 +15,12 @@ import type {
     VillageStrategicInfo
 } from "./villageSchema.js";
 
-
-
-type PolicyState = {|
-    +policy_id: number,
-|};
-
 type Props = {|
     +playerSeatState: VillageSeatType,
     +villageName: string,
     +villageApiUrl: string,
-    +policyDataState: PolicyState,
-    +setPolicyDataState: (PolicyState) => void,
+    +policyDataState: VillagePolicyType,
+    +setPolicyDataState: (VillagePolicyType) => void,
     +seatDataState: $ReadOnlyArray<VillageSeatType>,
     +resourceDataState: $ReadOnlyArray<VillageResourceStrategicInfo>,
     +proposalDataState: $ReadOnlyArray<VillageProposalType>,
@@ -52,7 +47,6 @@ export function KageQuarters({
     const [currentProposal, setCurrentProposal] = React.useState(null);
     const [currentProposalKey, setCurrentProposalKey] = React.useState(null);
     const [displayPolicyID, setDisplayPolicyID] = React.useState(policyDataState.policy_id);
-    const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(displayPolicyID));
     const [playerVillageData, setPlayerVillageData] = React.useState(strategicDataState.find(item => item.village.name === villageName));
     const [viewingTargetVillage, setViewingTargetVillage] = React.useState(strategicDataState.find(item => item.village.name !== villageName));
 
@@ -246,7 +240,6 @@ export function KageQuarters({
             setCurrentProposalKey(null);
             setPolicyDataState(response.data.policyData);
             setDisplayPolicyID(response.data.policyData.policy_id);
-            setPolicyDisplay(getPolicyDisplayData(response.data.policyData.policy_id));
             setStrategicDataState(response.data.strategicData);
             setPlayerVillageData(response.data.strategicData.find(item => item.village.name === villageName));
             setViewingTargetVillage(response.data.strategicData.find(item => item.village.name === viewingTargetVillage.village.name));
@@ -356,8 +349,9 @@ export function KageQuarters({
                                 onCancelClick={() => CancelProposal()}
                                 onPrevProposalClick={() => cycleProposal("decrement")}
                                 onNextProposalClick={() => cycleProposal("increment")}
-                                handleBoostVote={() => BoostVote()}
-                                handleCancelVote={() => CancelVote()}
+                                handleBoostVote={BoostVote}
+                                handleCancelVote={CancelVote}
+                                handleSubmitVote={SubmitVote}
                             />
                             <div className="proposal_elder_header">Elders</div>
                             <div className="elder_list">
@@ -423,70 +417,15 @@ export function KageQuarters({
                 <div className="row second">
                     <div className="column first">
                         <div className="header">Village policy</div>
-                        <div className="village_policy_container">
-                            <div className="village_policy_bonus_container">
-                                {policyDisplay.bonuses.map((bonus, index) => (
-                                    <div key={index} className="policy_bonus_item">
-                                        <svg width="16" height="16" viewBox="0 0 100 100">
-                                            <polygon points="25,20 50,45 25,70 0,45" fill="#4a5e45" />
-                                            <polygon points="25,0 50,25 25,50 0,25" fill="#6ab352" />
-                                        </svg>
-                                        <div className="policy_bonus_text">{bonus}</div>
-                                    </div>
-                                ))}
-                            </div>
-                            {displayPolicyID !== policyDataState.policy_id &&
-                                <div
-                                    className={playerSeatState.seat_type === "kage"
-                                        ? "village_policy_change_button"
-                                        : "village_policy_change_button disabled"
-                                    }
-                                    onClick={() => openModal({
-                                        header: 'Confirmation',
-                                        text: "Are you sure you want to change policies? You will be unable to select a new policy for 3 days.",
-                                        ContentComponent: null,
-                                        onConfirm: () => ChangePolicy(),
-                                    })}
-                                >change policy</div>
-                            }
-                            <div className="village_policy_main_container">
-                                <div className="village_policy_main_inner">
-                                    <div className="village_policy_banner" style={{ backgroundImage: "url(" + policyDisplay.banner + ")" }}></div>
-                                    <div className="village_policy_name_container">
-                                        <div className={"village_policy_name " + policyDisplay.glowClass}>{policyDisplay.name}</div>
-                                    </div>
-                                    <div className="village_policy_phrase">{policyDisplay.phrase}</div>
-                                    <div className="village_policy_description">{policyDisplay.description}</div>
-                                    {displayPolicyID > 1 &&
-                                        <div className="village_policy_previous_wrapper">
-                                            <svg className="previous_policy_button" width="20" height="20" viewBox="0 0 100 100" onClick={() => cyclePolicy("decrement")}>
-                                                <polygon className="previous_policy_triangle_inner" points="100,0 100,100 35,50" />
-                                                <polygon className="previous_policy_triangle_outer" points="65,0 65,100 0,50" />
-                                            </svg>
-                                        </div>
-                                    }
-                                    {displayPolicyID < 5 &&
-                                        <div className="village_policy_next_wrapper">
-                                            <svg className="next_policy_button" width="20" height="20" viewBox="0 0 100 100" onClick={() => cyclePolicy("increment")}>
-                                                <polygon className="next_policy_triangle_inner" points="0,0 0,100 65,50" />
-                                                <polygon className="next_policy_triangle_outer" points="35,0 35,100 100,50" />
-                                            </svg>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                            <div className="village_policy_penalty_container">
-                                {policyDisplay.penalties.map((penalty, index) => (
-                                    <div key={index} className="policy_penalty_item">
-                                        <svg width="16" height="16" viewBox="0 0 100 100">
-                                            <polygon points="25,20 50,45 25,70 0,45" fill="#4f1e1e" />
-                                            <polygon points="25,0 50,25 25,50 0,25" fill="#ad4343" />
-                                        </svg>
-                                        <div className="policy_penalty_text">{penalty}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <VillagePolicy
+                            policyDataState={policyDataState}
+                            playerSeatState={playerSeatState}
+                            displayPolicyID={displayPolicyID}
+                            handlePrevPolicyClick={() => cyclePolicy("decrement")}
+                            handleNextPolicyClick={() => cyclePolicy("increment")}
+                            handlePolicyChange={ChangePolicy}
+                            showPolicyControls={true}
+                        />
                     </div>
                 </div>
                 <div className="row third">
@@ -499,10 +438,7 @@ export function KageQuarters({
                 <div className="row fourth">
                     <div className="column first">
                         <div className="strategic_info_container">
-                            <StrategicInfoItem
-                                strategicInfoData={playerVillageData}
-                                getPolicyDisplayData={getPolicyDisplayData}
-                            />
+                            <StrategicInfoItem strategicInfoData={playerVillageData} />
                             <div className="strategic_info_navigation">
                                 <div className="strategic_info_navigation_diplomacy_buttons">
                                     {playerVillageData.enemies.find(enemy => enemy === viewingTargetVillage.village.name) ?
@@ -616,10 +552,7 @@ export function KageQuarters({
                                     }
                                 </div>
                             </div>
-                            <StrategicInfoItem
-                                strategicInfoData={viewingTargetVillage}
-                                getPolicyDisplayData={getPolicyDisplayData}
-                            />
+                            <StrategicInfoItem strategicInfoData={viewingTargetVillage} />
                         </div>
                     </div>
                 </div>
@@ -633,12 +566,10 @@ export function KageQuarters({
             case "increment":
                 newPolicyID = Math.min(5, displayPolicyID + 1);
                 setDisplayPolicyID(newPolicyID);
-                setPolicyDisplay(getPolicyDisplayData(newPolicyID));
                 break;
             case "decrement":
                 newPolicyID = Math.max(1, displayPolicyID - 1);
                 setDisplayPolicyID(newPolicyID);
-                setPolicyDisplay(getPolicyDisplayData(newPolicyID));
                 break;
         }
     }
@@ -672,12 +603,13 @@ type VillageProposalsProps = {|
     +villageRegions: VillageStrategicInfo["village"]["regions"],
     +currentProposalKey: ?number,
     +currentProposal: ?VillageProposalType,
-    +onEnactClick: () => mixed,
-    +onCancelClick: () => mixed,
-    +onPrevProposalClick: () => mixed,
-    +onNextProposalClick: () => mixed,
-    +handleBoostVote: () => mixed,
-    +handleCancelVote: () => mixed,
+    +onEnactClick: () => void,
+    +onCancelClick: () => void,
+    +onPrevProposalClick: () => void,
+    +onNextProposalClick: () => void,
+    +handleBoostVote: () => void,
+    +handleCancelVote: () => void,
+    +handleSubmitVote: (number) => void,
 |};
 function VillageProposals({
     playerSeatState,
@@ -693,7 +625,8 @@ function VillageProposals({
     onPrevProposalClick,
     onNextProposalClick,
     handleBoostVote,
-    handleCancelVote
+    handleCancelVote,
+    handleSubmitVote
 }: VillageProposalsProps) {
     let proposalRepAdjustment = 0;
     let canEnactProposal = false;
@@ -826,7 +759,7 @@ function VillageProposals({
                     {(currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id === playerID)) &&
                         <>
                             <div className="proposal_yes_button_wrapper">
-                                <div className="proposal_yes_button" onClick={() => SubmitVote(1)}>vote in favor</div>
+                                <div className="proposal_yes_button" onClick={() => handleSubmitVote(1)}>vote in favor</div>
                             </div>
                             {(currentProposal && (currentProposal.type === "offer_trade" || currentProposal.type === "accept_trade")) &&
                                 <div className="trade_view_button_wrapper alliance"
@@ -856,7 +789,7 @@ function VillageProposals({
                                 </div>
                             }
                             <div className="proposal_no_button_wrapper">
-                                <div className="proposal_no_button" onClick={() => SubmitVote(0)}>vote against</div>
+                                <div className="proposal_no_button" onClick={() => handleSubmitVote(0)}>vote against</div>
                             </div>
                         </>
                     }

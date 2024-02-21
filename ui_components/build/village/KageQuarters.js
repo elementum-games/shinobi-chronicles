@@ -3,7 +3,8 @@ import { StrategicInfoItem } from "./StrategicInfoItem.js";
 import { useModal } from '../utils/modalContext.js';
 import { TradeDisplay } from "./TradeDisplay.js";
 import KageDisplay from "./KageDisplay.js";
-import { getPolicyDisplayData, getVillageIcon } from "./villageUtils.js";
+import VillagePolicy from "./VillagePolicy.js";
+import { getVillageIcon } from "./villageUtils.js";
 export function KageQuarters({
   playerSeatState,
   villageName,
@@ -22,7 +23,6 @@ export function KageQuarters({
   const [currentProposal, setCurrentProposal] = React.useState(null);
   const [currentProposalKey, setCurrentProposalKey] = React.useState(null);
   const [displayPolicyID, setDisplayPolicyID] = React.useState(policyDataState.policy_id);
-  const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(displayPolicyID));
   const [playerVillageData, setPlayerVillageData] = React.useState(strategicDataState.find(item => item.village.name === villageName));
   const [viewingTargetVillage, setViewingTargetVillage] = React.useState(strategicDataState.find(item => item.village.name !== villageName));
   const offeredResources = React.useRef([{
@@ -224,7 +224,6 @@ export function KageQuarters({
       setCurrentProposalKey(null);
       setPolicyDataState(response.data.policyData);
       setDisplayPolicyID(response.data.policyData.policy_id);
-      setPolicyDisplay(getPolicyDisplayData(response.data.policyData.policy_id));
       setStrategicDataState(response.data.strategicData);
       setPlayerVillageData(response.data.strategicData.find(item => item.village.name === villageName));
       setViewingTargetVillage(response.data.strategicData.find(item => item.village.name === viewingTargetVillage.village.name));
@@ -332,8 +331,9 @@ export function KageQuarters({
     onCancelClick: () => CancelProposal(),
     onPrevProposalClick: () => cycleProposal("decrement"),
     onNextProposalClick: () => cycleProposal("increment"),
-    handleBoostVote: () => BoostVote(),
-    handleCancelVote: () => CancelVote()
+    handleBoostVote: BoostVote,
+    handleCancelVote: CancelVote,
+    handleSubmitVote: SubmitVote
   }), /*#__PURE__*/React.createElement("div", {
     className: "proposal_elder_header"
   }, "Elders"), /*#__PURE__*/React.createElement("div", {
@@ -428,96 +428,15 @@ export function KageQuarters({
     className: "column first"
   }, /*#__PURE__*/React.createElement("div", {
     className: "header"
-  }, "Village policy"), /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_bonus_container"
-  }, policyDisplay.bonuses.map((bonus, index) => /*#__PURE__*/React.createElement("div", {
-    key: index,
-    className: "policy_bonus_item"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "16",
-    height: "16",
-    viewBox: "0 0 100 100"
-  }, /*#__PURE__*/React.createElement("polygon", {
-    points: "25,20 50,45 25,70 0,45",
-    fill: "#4a5e45"
-  }), /*#__PURE__*/React.createElement("polygon", {
-    points: "25,0 50,25 25,50 0,25",
-    fill: "#6ab352"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "policy_bonus_text"
-  }, bonus)))), displayPolicyID !== policyDataState.policy_id && /*#__PURE__*/React.createElement("div", {
-    className: playerSeatState.seat_type === "kage" ? "village_policy_change_button" : "village_policy_change_button disabled",
-    onClick: () => openModal({
-      header: 'Confirmation',
-      text: "Are you sure you want to change policies? You will be unable to select a new policy for 3 days.",
-      ContentComponent: null,
-      onConfirm: () => ChangePolicy()
-    })
-  }, "change policy"), /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_main_container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_main_inner"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_banner",
-    style: {
-      backgroundImage: "url(" + policyDisplay.banner + ")"
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_name_container"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_name " + policyDisplay.glowClass
-  }, policyDisplay.name)), /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_phrase"
-  }, policyDisplay.phrase), /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_description"
-  }, policyDisplay.description), displayPolicyID > 1 && /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_previous_wrapper"
-  }, /*#__PURE__*/React.createElement("svg", {
-    className: "previous_policy_button",
-    width: "20",
-    height: "20",
-    viewBox: "0 0 100 100",
-    onClick: () => cyclePolicy("decrement")
-  }, /*#__PURE__*/React.createElement("polygon", {
-    className: "previous_policy_triangle_inner",
-    points: "100,0 100,100 35,50"
-  }), /*#__PURE__*/React.createElement("polygon", {
-    className: "previous_policy_triangle_outer",
-    points: "65,0 65,100 0,50"
-  }))), displayPolicyID < 5 && /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_next_wrapper"
-  }, /*#__PURE__*/React.createElement("svg", {
-    className: "next_policy_button",
-    width: "20",
-    height: "20",
-    viewBox: "0 0 100 100",
-    onClick: () => cyclePolicy("increment")
-  }, /*#__PURE__*/React.createElement("polygon", {
-    className: "next_policy_triangle_inner",
-    points: "0,0 0,100 65,50"
-  }), /*#__PURE__*/React.createElement("polygon", {
-    className: "next_policy_triangle_outer",
-    points: "35,0 35,100 100,50"
-  }))))), /*#__PURE__*/React.createElement("div", {
-    className: "village_policy_penalty_container"
-  }, policyDisplay.penalties.map((penalty, index) => /*#__PURE__*/React.createElement("div", {
-    key: index,
-    className: "policy_penalty_item"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "16",
-    height: "16",
-    viewBox: "0 0 100 100"
-  }, /*#__PURE__*/React.createElement("polygon", {
-    points: "25,20 50,45 25,70 0,45",
-    fill: "#4f1e1e"
-  }), /*#__PURE__*/React.createElement("polygon", {
-    points: "25,0 50,25 25,50 0,25",
-    fill: "#ad4343"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "policy_penalty_text"
-  }, penalty))))))), /*#__PURE__*/React.createElement("div", {
+  }, "Village policy"), /*#__PURE__*/React.createElement(VillagePolicy, {
+    policyDataState: policyDataState,
+    playerSeatState: playerSeatState,
+    displayPolicyID: displayPolicyID,
+    handlePrevPolicyClick: () => cyclePolicy("decrement"),
+    handleNextPolicyClick: () => cyclePolicy("increment"),
+    handlePolicyChange: ChangePolicy,
+    showPolicyControls: true
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "row third"
   }, /*#__PURE__*/React.createElement("div", {
     className: "column first"
@@ -532,8 +451,7 @@ export function KageQuarters({
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_container"
   }, /*#__PURE__*/React.createElement(StrategicInfoItem, {
-    strategicInfoData: playerVillageData,
-    getPolicyDisplayData: getPolicyDisplayData
+    strategicInfoData: playerVillageData
   }), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_navigation"
   }, /*#__PURE__*/React.createElement("div", {
@@ -653,8 +571,7 @@ export function KageQuarters({
     src: "/images/v2/icons/trade.png",
     className: "diplomacy_action_button_icon"
   }))))), /*#__PURE__*/React.createElement(StrategicInfoItem, {
-    strategicInfoData: viewingTargetVillage,
-    getPolicyDisplayData: getPolicyDisplayData
+    strategicInfoData: viewingTargetVillage
   }))))));
 
   function cyclePolicy(direction) {
@@ -664,13 +581,11 @@ export function KageQuarters({
       case "increment":
         newPolicyID = Math.min(5, displayPolicyID + 1);
         setDisplayPolicyID(newPolicyID);
-        setPolicyDisplay(getPolicyDisplayData(newPolicyID));
         break;
 
       case "decrement":
         newPolicyID = Math.max(1, displayPolicyID - 1);
         setDisplayPolicyID(newPolicyID);
-        setPolicyDisplay(getPolicyDisplayData(newPolicyID));
         break;
     }
   }
@@ -712,7 +627,8 @@ function VillageProposals({
   onPrevProposalClick,
   onNextProposalClick,
   handleBoostVote,
-  handleCancelVote
+  handleCancelVote,
+  handleSubmitVote
 }) {
   let proposalRepAdjustment = 0;
   let canEnactProposal = false;
@@ -862,7 +778,7 @@ function VillageProposals({
     className: "proposal_yes_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button",
-    onClick: () => SubmitVote(1)
+    onClick: () => handleSubmitVote(1)
   }, "vote in favor")), currentProposal && (currentProposal.type === "offer_trade" || currentProposal.type === "accept_trade") && /*#__PURE__*/React.createElement("div", {
     className: "trade_view_button_wrapper alliance",
     onClick: () => openModal({
@@ -892,7 +808,7 @@ function VillageProposals({
     className: "proposal_no_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button",
-    onClick: () => SubmitVote(0)
+    onClick: () => handleSubmitVote(0)
   }, "vote against"))), currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id === playerID) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {

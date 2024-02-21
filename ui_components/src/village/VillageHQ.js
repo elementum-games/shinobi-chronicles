@@ -3,7 +3,9 @@
 import { apiFetch } from "../utils/network.js";
 import { useModal } from '../utils/modalContext.js';
 import KageDisplay from "./KageDisplay.js";
-import { getPolicyDisplayData, getVillageIcon } from "./villageUtils.js";
+import { getVillageIcon } from "./villageUtils.js";
+import type { VillageSeatType } from "./villageSchema.js";
+import VillagePolicy from "./VillagePolicy.js";
 
 export function VillageHQ({
     playerID,
@@ -26,7 +28,6 @@ export function VillageHQ({
     handleErrors,
 }) {
     const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
-    const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
     const selectedTimesUTC = React.useRef([]);
     const selectedTimeUTC = React.useRef(null);
     const challengeTarget = React.useRef(null);
@@ -277,90 +278,40 @@ export function VillageHQ({
             <div className="hq_container">
                 <div className="row first">
                     <div className="column first">
-                        <div className="clan_container">
-                            <div className="header">Clans</div>
-                            <div className="content box-primary">
-                                {clanData
-                                    .map((clan, index) => (
-                                        <div key={clan.clan_id} className="clan_item">
-                                            <div className="clan_item_header">{clan.name}</div>
-                                        </div>
-                                    ))}
-                            </div>
-                        </div>
-                        <div className="population_container">
-                            <div className="header">Population</div>
-                            <div className="content box-primary">
-                                {populationData
-                                    .map((rank, index) => (
-                                        <div key={rank.rank} className="population_item">
-                                            <div className="population_item_header">{rank.rank}</div>
-                                            <div className="population_item_count">{rank.count}</div>
-                                        </div>
-                                    ))}
-                                <div className="population_item" style={{ width: "100%" }}>
-                                    <div className="population_item_header">total</div>
-                                    <div className="population_item_count last">{totalPopulation}</div>
-                                </div>
-                            </div>
-                        </div>
+                        <VillageMembers
+                            clans={clanData}
+                            populationData={populationData}
+                            totalPopulation={totalPopulation}
+                        />
                     </div>
                     <div className="column second">
-                        <div className="kage_container">
-                            <KageDisplay
-                                username={kage.user_name}
-                                avatarLink={kage.avatar_link}
-                                villageName={villageName}
-                                seatTitle={kage.seat_title}
-                                isProvisional={kage.is_provisional}
-                                provisionalDaysLabel={kage.provisional_days_label}
-                                seatId={kage.seat_id}
-                                playerSeatId={playerSeatState.seat_id}
-                                onResign={() => openModal({
-                                    header: 'Confirmation',
-                                    text: 'Are you sure you wish to resign from your current position?',
-                                    ContentComponent: null,
-                                    onConfirm: () => Resign(),
-                                })}
-                                onClaim={() => ClaimSeat("kage")}
-                                onChallenge={() => Challenge(kage)}
-                            />
-                        </div>
+                        <KageDisplay
+                            username={kage.user_name}
+                            avatarLink={kage.avatar_link}
+                            villageName={villageName}
+                            seatTitle={kage.seat_title}
+                            isProvisional={kage.is_provisional}
+                            provisionalDaysLabel={kage.provisional_days_label}
+                            seatId={kage.seat_id}
+                            playerSeatId={playerSeatState.seat_id}
+                            onResign={() => openModal({
+                                header: 'Confirmation',
+                                text: 'Are you sure you wish to resign from your current position?',
+                                ContentComponent: null,
+                                onConfirm: () => Resign(),
+                            })}
+                            onClaim={() => ClaimSeat("kage")}
+                            onChallenge={() => Challenge(kage)}
+                        />
                     </div>
                     <div className="column third">
-                        <div className="elders_container">
-                            <div className="header">Elders</div>
-                            <div className="elder_list">
-                                {seatDataState
-                                    .filter(elder => elder.seat_type === 'elder')
-                                    .map((elder, index) => (
-                                        <div key={elder.seat_key} className="elder_item">
-                                            <div className="elder_avatar_wrapper">
-                                                {elder.avatar_link && <img className="elder_avatar" src={elder.avatar_link} />}
-                                                {!elder.avatar_link && <div className="elder_avatar_fill"></div>}
-                                            </div>
-                                            <div className="elder_name">{elder.user_name ? <a href={"/?id=6&user=" + elder.user_name}>{elder.user_name}</a> : "---"}</div>
-                                            {(elder.seat_id && elder.seat_id === playerSeatState.seat_id) &&
-                                                <div className="elder_resign_button" onClick={() => openModal({
-                                                    header: 'Confirmation',
-                                                    text: 'Are you sure you wish to resign from your current position?',
-                                                    ContentComponent: null,
-                                                    onConfirm: () => Resign(),
-                                                })}>resign</div>
-                                            }
-                                            {!elder.seat_id &&
-                                                <div className={playerSeatState.seat_id ? "elder_claim_button disabled" : "elder_claim_button"} onClick={playerSeatState.seat_id ? null : () => ClaimSeat("elder")}>claim</div>
-                                            }
-                                            {(elder.seat_id && playerSeatState.seat_id == null) &&
-                                                <div className="elder_challenge_button" onClick={() => Challenge(elder)}>challenge</div>
-                                            }
-                                            {(elder.seat_id && playerSeatState.seat_id !== null && playerSeatState.seat_id !== elder.seat_id) &&
-                                                <div className="elder_challenge_button disabled">challenge</div>
-                                            }
-                                        </div>
-                                    ))}
-                            </div>
-                        </div>
+                        <VillageElders
+                            seatDataState={seatDataState}
+                            playerSeatState={playerSeatState}
+                            handleResign={Resign}
+                            handleClaim={ClaimSeat}
+                            handleChallenge={Challenge}
+                        />
                         <div className="points_container">
                             <div className="header">Village points</div>
                             <div className="content box-primary">
@@ -379,40 +330,11 @@ export function VillageHQ({
                 <div className="row second">
                     <div className="column first">
                         <div className="header">Village policy</div>
-                        <div className="village_policy_container">
-                            <div className="village_policy_bonus_container">
-                                {policyDisplay.bonuses.map((bonus, index) => (
-                                    <div key={index} className="policy_bonus_item">
-                                        <svg width="16" height="16" viewBox="0 0 100 100">
-                                            <polygon points="25,20 50,45 25,70 0,45" fill="#4a5e45" />
-                                            <polygon points="25,0 50,25 25,50 0,25" fill="#6ab352" />
-                                        </svg>
-                                        <div className="policy_bonus_text">{bonus}</div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="village_policy_main_container">
-                                <div className="village_policy_main_inner">
-                                    <div className="village_policy_banner" style={{ backgroundImage: "url(" + policyDisplay.banner + ")" }}></div>
-                                    <div className="village_policy_name_container">
-                                        <div className={"village_policy_name " + policyDisplay.glowClass}>{policyDisplay.name}</div>
-                                    </div>
-                                    <div className="village_policy_phrase">{policyDisplay.phrase}</div>
-                                    <div className="village_policy_description">{policyDisplay.description}</div>
-                                </div>
-                            </div>
-                            <div className="village_policy_penalty_container">
-                                {policyDisplay.penalties.map((penalty, index) => (
-                                    <div key={index} className="policy_penalty_item">
-                                        <svg width="16" height="16" viewBox="0 0 100 100">
-                                            <polygon points="25,20 50,45 25,70 0,45" fill="#4f1e1e" />
-                                            <polygon points="25,0 50,25 25,50 0,25" fill="#ad4343" />
-                                        </svg>
-                                        <div className="policy_penalty_text">{penalty}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <VillagePolicy
+                            policyDataState={policyDataState}
+                            playerSeatState={playerSeatState}
+                            displayPolicyID={policyDataState.policy_id}
+                        />
                     </div>
                 </div>
                 <div className="row third">
@@ -515,7 +437,107 @@ function DisplayFromDays(days) {
     }
 }
 
-export const ChallengeContainer = ({ playerID, challengeDataState, CancelChallenge, AcceptChallenge, LockChallenge, openModal }) => {
+function VillageMembers({ clans, populationData, totalPopulation }) {
+    return <>
+        <div className="clan_container">
+            <div className="header">Clans</div>
+            <div className="content box-primary">
+                {clans.map((clan, index) => (
+                    <div key={clan.clan_id} className="clan_item">
+                        <div className="clan_item_header">{clan.name}</div>
+                    </div>
+                ))}
+            </div>
+        </div>
+        <div className="population_container">
+            <div className="header">Population</div>
+            <div className="content box-primary">
+                {populationData.map((rank, index) => (
+                    <div key={rank.rank} className="population_item">
+                        <div className="population_item_header">{rank.rank}</div>
+                        <div className="population_item_count">{rank.count}</div>
+                    </div>
+                ))}
+                <div className="population_item" style={{ width: "100%" }}>
+                    <div className="population_item_header">total</div>
+                    <div className="population_item_count last">{totalPopulation}</div>
+                </div>
+            </div>
+        </div>
+    </>;
+}
+
+type VillageEldersProps = {|
+    +seatDataState: $ReadOnlyArray<VillageSeatType>,
+    +playerSeatState: VillageSeatType,
+    +handleResign: () => void,
+    +handleClaim: (string) => void,
+    +handleChallenge: (string) => void,
+|};
+function VillageElders({
+    seatDataState,
+    playerSeatState,
+    handleResign,
+    handleClaim,
+    handleChallenge
+}: VillageEldersProps) {
+    const { openModal } = useModal();
+
+    return <div className="elders_container">
+        <div className="header">Elders</div>
+        <div className="elder_list">
+            {seatDataState
+                .filter(elder => elder.seat_type === 'elder')
+                .map((elder, index) => (
+                    <div key={elder.seat_key} className="elder_item">
+                        <div className="elder_avatar_wrapper">
+                            {elder.avatar_link && <img className="elder_avatar" src={elder.avatar_link} />}
+                            {!elder.avatar_link && <div className="elder_avatar_fill"></div>}
+                        </div>
+                        <div className="elder_name">
+                            {elder.user_name ? <a href={`/?id=6&user=${elder.user_name}`}>{elder.user_name}</a> : "---"}
+                        </div>
+                        {(elder.seat_id && elder.seat_id === playerSeatState.seat_id) &&
+                            <div
+                                className="elder_resign_button"
+                                onClick={() => openModal({
+                                    header: 'Confirmation',
+                                    text: 'Are you sure you wish to resign from your current position?',
+                                    ContentComponent: null,
+                                    onConfirm: handleResign,
+                                })}
+                            >resign</div>
+                        }
+                        {!elder.seat_id &&
+                            <div
+                                className={playerSeatState.seat_id
+                                    ? "elder_claim_button disabled"
+                                    : "elder_claim_button"
+                                }
+                                onClick={playerSeatState.seat_id ? null : () => handleClaim("elder")}
+                            >claim</div>
+                        }
+                        {(elder.seat_id && playerSeatState.seat_id == null) &&
+                            <div className="elder_challenge_button" onClick={() => handleChallenge(elder)}>challenge</div>
+                        }
+                        {(elder.seat_id && playerSeatState.seat_id !== null && playerSeatState.seat_id !== elder.seat_id) &&
+                            <div className="elder_challenge_button disabled">challenge</div>
+                        }
+                    </div>
+                ))}
+        </div>
+    </div>;
+}
+
+
+export const ChallengeContainer = ({
+    playerID,
+    challengeDataState,
+    CancelChallenge,
+    AcceptChallenge,
+    LockChallenge,
+    openModal
+}) => {
     return (
         <>
             {challengeDataState.length > 0 &&
