@@ -1,12 +1,11 @@
 // @flow
 
 import { StrategicInfoItem } from "./StrategicInfoItem.js";
+import { getVillageIcon } from "./villageUtils.js";
 
 export function WorldInfo({
     villageName,
     strategicDataState,
-    getVillageIcon,
-    getPolicyDisplayData
 }) {
     const [strategicDisplayLeft, setStrategicDisplayLeft] = React.useState(strategicDataState.find(item => item.village.name === villageName));
     const [strategicDisplayRight, setStrategicDisplayRight] = React.useState(strategicDataState.find(item => item.village.name !== villageName));
@@ -16,10 +15,7 @@ export function WorldInfo({
                 <div className="column first">
                     <div className="header">Strategic information</div>
                     <div className="strategic_info_container">
-                        <StrategicInfoItem
-                            strategicInfoData={strategicDisplayLeft}
-                            getPolicyDisplayData={getPolicyDisplayData}
-                        />
+                        <StrategicInfoItem strategicInfoData={strategicDisplayLeft} />
                         <div className="strategic_info_navigation" style={{marginTop: "155px"}}>
                             <div className="strategic_info_navigation_village_buttons">
                                 {villageName !== "Stone" &&
@@ -59,10 +55,7 @@ export function WorldInfo({
                                 }
                             </div>
                         </div>
-                        <StrategicInfoItem
-                            strategicInfoData={strategicDisplayRight}
-                            getPolicyDisplayData={getPolicyDisplayData}
-                        />
+                        <StrategicInfoItem strategicInfoData={strategicDisplayRight} />
                     </div>
                 </div>
             </div>

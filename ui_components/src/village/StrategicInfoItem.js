@@ -1,20 +1,13 @@
-export function StrategicInfoItem({ strategicInfoData, getPolicyDisplayData }) {
-    function getStrategicInfoBanner(village_id) {
-        switch (village_id) {
-            case 1:
-                return '/images/v2/decorations/strategic_banners/stratbannerstone.jpg';
-            case 2:
-                return '/images/v2/decorations/strategic_banners/stratbannercloud.jpg';
-            case 3:
-                return '/images/v2/decorations/strategic_banners/stratbannerleaf.jpg';
-            case 4:
-                return '/images/v2/decorations/strategic_banners/stratbannersand.jpg';
-            case 5:
-                return '/images/v2/decorations/strategic_banners/stratbannermist.jpg';
-            default:
-                return null;
-        }
-    }
+// @flow
+
+import { getPolicyDisplayData } from "./villageUtils.js";
+import type { VillageStrategicInfo } from "./villageSchema.js";
+
+export function StrategicInfoItem({
+    strategicInfoData
+}: {|
+    +strategicInfoData: VillageStrategicInfo
+|}) {
     return (
         <div className="strategic_info_item">
             <div className="strategic_info_name_wrapper">
@@ -26,15 +19,15 @@ export function StrategicInfoItem({ strategicInfoData, getPolicyDisplayData }) {
                 <div className="column">
                     <div className="strategic_info_kage_wrapper">
                         <div className="strategic_info_label">kage:</div>
-                        {strategicInfoData.seats.find(seat => seat.seat_type == "kage").user_name ?
-                            <div className="strategic_info_seat"><a href={"/?id=6&user=" + strategicInfoData.seats.find(seat => seat.seat_type == "kage").user_name}>{strategicInfoData.seats.find(seat => seat.seat_type == "kage").user_name}</a></div> :
+                        {strategicInfoData.seats.find(seat => seat.seat_type === "kage").user_name ?
+                            <div className="strategic_info_seat"><a href={"/?id=6&user=" + strategicInfoData.seats.find(seat => seat.seat_type === "kage").user_name}>{strategicInfoData.seats.find(seat => seat.seat_type === "kage").user_name}</a></div> :
                             <div className="strategic_info_seat">-None-</div>
                         }
                     </div>
                     <div className="strategic_info_elder_wrapper">
                         <div className="strategic_info_label">elders:</div>
                         <div className="strategic_info_elders">
-                            {strategicInfoData.seats.filter(seat => seat.seat_type == "elder")
+                            {strategicInfoData.seats.filter(seat => seat.seat_type === "elder")
                                 .map((elder, index) => (
                                     elder.user_name ?
                                         <div key={elder.seat_key} className="strategic_info_seat"><a href={"/?id=6&user=" + elder.user_name}>{elder.user_name}</a></div> :
@@ -104,4 +97,21 @@ export function StrategicInfoItem({ strategicInfoData, getPolicyDisplayData }) {
             </div>
         </div>
     );
+}
+
+function getStrategicInfoBanner(village_id) {
+    switch (village_id) {
+        case 1:
+            return '/images/v2/decorations/strategic_banners/stratbannerstone.jpg';
+        case 2:
+            return '/images/v2/decorations/strategic_banners/stratbannercloud.jpg';
+        case 3:
+            return '/images/v2/decorations/strategic_banners/stratbannerleaf.jpg';
+        case 4:
+            return '/images/v2/decorations/strategic_banners/stratbannersand.jpg';
+        case 5:
+            return '/images/v2/decorations/strategic_banners/stratbannermist.jpg';
+        default:
+            return null;
+    }
 }

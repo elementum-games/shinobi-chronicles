@@ -1,9 +1,8 @@
 import { StrategicInfoItem } from "./StrategicInfoItem.js";
+import { getVillageIcon } from "./villageUtils.js";
 export function WorldInfo({
   villageName,
-  strategicDataState,
-  getVillageIcon,
-  getPolicyDisplayData
+  strategicDataState
 }) {
   const [strategicDisplayLeft, setStrategicDisplayLeft] = React.useState(strategicDataState.find(item => item.village.name === villageName));
   const [strategicDisplayRight, setStrategicDisplayRight] = React.useState(strategicDataState.find(item => item.village.name !== villageName));
@@ -18,8 +17,7 @@ export function WorldInfo({
   }, "Strategic information"), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_container"
   }, /*#__PURE__*/React.createElement(StrategicInfoItem, {
-    strategicInfoData: strategicDisplayLeft,
-    getPolicyDisplayData: getPolicyDisplayData
+    strategicInfoData: strategicDisplayLeft
   }), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_navigation",
     style: {
@@ -68,7 +66,6 @@ export function WorldInfo({
     src: getVillageIcon(5),
     className: "strategic_info_nav_button_icon"
   }))))), /*#__PURE__*/React.createElement(StrategicInfoItem, {
-    strategicInfoData: strategicDisplayRight,
-    getPolicyDisplayData: getPolicyDisplayData
+    strategicInfoData: strategicDisplayRight
   })))));
 }

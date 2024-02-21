@@ -1,7 +1,7 @@
 import { apiFetch } from "../utils/network.js";
 import { useModal } from '../utils/modalContext.js';
 import KageDisplay from "./KageDisplay.js";
-import { getPolicyDisplayData } from "./villageUtils.js";
+import { getPolicyDisplayData, getVillageIcon } from "./villageUtils.js";
 export function VillageHQ({
   playerID,
   playerSeatState,

@@ -1,23 +1,7 @@
+import { getPolicyDisplayData } from "./villageUtils.js";
 export function StrategicInfoItem({
-  strategicInfoData,
-  getPolicyDisplayData
+  strategicInfoData
 }) {
-  function getStrategicInfoBanner(village_id) {
-    switch (village_id) {
-      case 1:
-        return '/images/v2/decorations/strategic_banners/stratbannerstone.jpg';
-      case 2:
-        return '/images/v2/decorations/strategic_banners/stratbannercloud.jpg';
-      case 3:
-        return '/images/v2/decorations/strategic_banners/stratbannerleaf.jpg';
-      case 4:
-        return '/images/v2/decorations/strategic_banners/stratbannersand.jpg';
-      case 5:
-        return '/images/v2/decorations/strategic_banners/stratbannermist.jpg';
-      default:
-        return null;
-    }
-  }
   return /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_item"
   }, /*#__PURE__*/React.createElement("div", {
@@ -39,11 +23,11 @@ export function StrategicInfoItem({
     className: "strategic_info_kage_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_label"
-  }, "kage:"), strategicInfoData.seats.find(seat => seat.seat_type == "kage").user_name ? /*#__PURE__*/React.createElement("div", {
+  }, "kage:"), strategicInfoData.seats.find(seat => seat.seat_type === "kage").user_name ? /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_seat"
   }, /*#__PURE__*/React.createElement("a", {
-    href: "/?id=6&user=" + strategicInfoData.seats.find(seat => seat.seat_type == "kage").user_name
-  }, strategicInfoData.seats.find(seat => seat.seat_type == "kage").user_name)) : /*#__PURE__*/React.createElement("div", {
+    href: "/?id=6&user=" + strategicInfoData.seats.find(seat => seat.seat_type === "kage").user_name
+  }, strategicInfoData.seats.find(seat => seat.seat_type === "kage").user_name)) : /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_seat"
   }, "-None-")), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_elder_wrapper"
@@ -51,7 +35,7 @@ export function StrategicInfoItem({
     className: "strategic_info_label"
   }, "elders:"), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_elders"
-  }, strategicInfoData.seats.filter(seat => seat.seat_type == "elder").map((elder, index) => elder.user_name ? /*#__PURE__*/React.createElement("div", {
+  }, strategicInfoData.seats.filter(seat => seat.seat_type === "elder").map((elder, index) => elder.user_name ? /*#__PURE__*/React.createElement("div", {
     key: elder.seat_key,
     className: "strategic_info_seat"
   }, /*#__PURE__*/React.createElement("a", {
@@ -129,4 +113,26 @@ export function StrategicInfoItem({
   }, /*#__PURE__*/React.createElement("span", {
     className: "supply_point_name"
   }, supply_point.name), " x", supply_point.count)))))));
+}
+
+function getStrategicInfoBanner(village_id) {
+  switch (village_id) {
+    case 1:
+      return '/images/v2/decorations/strategic_banners/stratbannerstone.jpg';
+
+    case 2:
+      return '/images/v2/decorations/strategic_banners/stratbannercloud.jpg';
+
+    case 3:
+      return '/images/v2/decorations/strategic_banners/stratbannerleaf.jpg';
+
+    case 4:
+      return '/images/v2/decorations/strategic_banners/stratbannersand.jpg';
+
+    case 5:
+      return '/images/v2/decorations/strategic_banners/stratbannermist.jpg';
+
+    default:
+      return null;
+  }
 }
