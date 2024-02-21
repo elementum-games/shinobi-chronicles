@@ -144,7 +144,7 @@ function RamenShop({
                     <div className="ramen_shop_owner_container" style={{ background: `url(${ramenOwnerDetails.background}) center center no-repeat` }}>
                         <div className="ramen_shop_dialogue_container">
                             <div className="ramen_shop_dialogue_nameplate">{ramenOwnerDetails.name}</div>
-                            <div className="ramen_shop_dialogue_text">{ramenOwnerDetails.dialogue}</div>
+                            <div className="ramen_shop_dialogue_text">{parseKeywords(ramenOwnerDetails.dialogue)}</div>
                         </div>
                         <img src={ramenOwnerDetails.image} className="ramen_shop_owner_img" />
                     </div>
