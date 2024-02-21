@@ -53,6 +53,10 @@ require_once __DIR__ . "/classes/notification/NotificationAPIResponse.php";
 require_once __DIR__ . "/classes/notification/NotificationManager.php";
 require_once __DIR__ . "/classes/notification/BlockedNotificationManager.php";
 
+require_once __DIR__ . "/classes/premium/PremiumManager.php";
+require_once __DIR__ . "/classes/premium/PremiumAPIResponse.php";
+require_once __DIR__ . "/classes/premium/PremiumAPIPresenter.php";
+
 require_once __DIR__ . "/classes/training/TrainingManager.php";
 
 require_once __DIR__ . "/classes/travel/MapLocation.php";

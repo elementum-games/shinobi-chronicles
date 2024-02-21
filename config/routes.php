@@ -175,6 +175,14 @@ return $routes = [
         menu: Route::MENU_VILLAGE,
         challenge_lock_ok: false,
     ),
+    99 => new Route(
+        file_name: 'premium_shopV2.php',
+        title: 'Ancient Market2',
+        function_name: 'premiumShop',
+        menu: Route::MENU_VILLAGE,
+        challenge_lock_ok: false,
+        dev_only: true,
+    ),
     33 => new Route(
         file_name: 'academy.php',
         title: 'Academy',
