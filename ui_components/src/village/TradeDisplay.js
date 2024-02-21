@@ -10,8 +10,6 @@ export function TradeDisplay({
     requestedRegions,
     proposalData,
 }) {
-
-    console.log(offeringVillageResources);
     const [offeredRegionsState, setOfferedRegionsState] = React.useState([...offeredRegions.current]);
     const [requestedRegionsState, setRequestedRegionsState] = React.useState([...requestedRegions.current]);
     const [offeredResourcesState, setOfferedResourcesState] = React.useState([...offeredResources.current]);
@@ -245,7 +243,7 @@ export function TradeDisplay({
                                         <div className="trade_display_region_name">{region.name}</div>
                                         <input
                                             type="checkbox"
-                                            checked={requestedRegions.includes(region.region_id)}
+                                            checked={requestedRegionsState.includes(region.region_id)}
                                             onChange={() => toggleRequestedRegion(region.region_id)}
                                         />
                                     </div>
