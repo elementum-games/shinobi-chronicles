@@ -225,6 +225,8 @@ class VillageApiPresenter {
                     "food_construction_cost" => $villageBuildingDto->food_construction_cost,
                     "wealth_construction_cost" => $villageBuildingDto->wealth_construction_cost,
                     "construction_time" => $villageBuildingDto->construction_time,
+                    "construction_time_remaining" => $villageBuildingDto->construction_time_remaining,
+                    "requirements_met" => $villageBuildingDto->requirements_met,
                     "upgrade_sets" => array_map(
                         function ($villageUpgradeSetDto) {
                             return [
