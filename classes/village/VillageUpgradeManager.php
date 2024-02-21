@@ -603,6 +603,9 @@ class VillageUpgradeManager {
             $upkeep[WarManager::RESOURCE_FOOD] += $building_upkeep[WarManager::RESOURCE_FOOD];
             $upkeep[WarManager::RESOURCE_WEALTH] += $building_upkeep[WarManager::RESOURCE_WEALTH];
         }
+        foreach ($upkeep as $resource => $count) {
+            $upkeep[$resource] = ceil($count * (1 - ($village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_UPGRADE_UPKEEP] / 100)));
+        }
         return $upkeep;
     }
 

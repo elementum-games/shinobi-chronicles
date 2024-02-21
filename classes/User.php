@@ -856,7 +856,11 @@ class User extends Fighter {
 
         // Location with Regen Boost
         if ($this->current_location->location_id && $this->current_location->regen) {
-            $this->regen_boost += ($this->current_location->regen / 100) * $this->regen_rate;
+            $regen_modifier = $this->current_location->regen / 100;
+            if ($this->in_village) {
+                $regen_modifier *= (1 + ($this->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_VILLAGE_REGEN] / 100));
+            }
+            $this->regen_boost += $regen_modifier * $this->regen_rate;
         }
 
         // Elements
@@ -1017,7 +1021,7 @@ class User extends Fighter {
     {
         $this->trainingManager = new TrainingManager($this->system, $this->train_type, $this->train_gain,
     $this->train_time, $this->rank, $this->forbidden_seal, $this->reputation, $this->team, $this->clan, $this->sensei_id,
-            $this->bloodline_id, $this->village->policy);
+            $this->bloodline_id, $this->village->policy, $this->village);
     }
 
     public function setForbiddenSealFromDb(string $forbidden_seal_db, bool $remote_view) {

@@ -134,7 +134,13 @@ function battle(): bool {
  * @throws RuntimeException
  */
 function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $player, System $system): string {
+    $double_yen_gain_chance = $player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE];
+    $double_xp_gain_chance = $player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_XP_CHANCE];
+
     $pvp_yen = $player->rank_num * 50;
+    if ($double_yen_gain_chance > 0 && mt_rand(0, 100) < $double_yen_gain_chance) {
+        $pvp_yen *= 2;
+    }
 
     $result = "";
 
