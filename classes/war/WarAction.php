@@ -80,10 +80,28 @@ class WarAction {
         }
         $this->system = $system;
         $this->user = $user;
-        if ($this->type == self::WAR_ACTION_LOOT || $this->type == self::WAR_ACTION_LOOT_TOWN) {
-            $interval = self::LOOT_WAR_ACTION_INTERVAL_SECONDS;
-        } else {
-            $interval = self::BASE_WAR_ACTION_INTERVAL_SECONDS;
+        switch ($this->type) {
+            case self::WAR_ACTION_LOOT:
+            case self::WAR_ACTION_LOOT_TOWN:
+                $interval = self::LOOT_WAR_ACTION_INTERVAL_SECONDS;
+                break;
+            case self::WAR_ACTION_INFILTRATE:
+                $interval = self::BASE_WAR_ACTION_INTERVAL_SECONDS;
+                $interval = $interval * (100 / (100 + $this->user->village->policy->infiltrate_speed));
+                $interval = round($interval * (100 / (100 + $this->user->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_INFILTRATE_SPEED])), 1);
+                break;
+            case self::WAR_ACTION_REINFORCE:
+                $interval = self::BASE_WAR_ACTION_INTERVAL_SECONDS;
+                $interval = $interval * (100 / (100 + $this->user->village->policy->reinforce_speed));
+                $interval = round($interval * (100 / (100 + $this->user->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_SPEED])), 1);
+                break;
+            case self::WAR_ACTION_RAID:
+                $interval = self::BASE_WAR_ACTION_INTERVAL_SECONDS;
+                $interval = $interval * (100 / (100 + $this->user->village->policy->raid_speed));
+                $interval = round($interval * (100 / (100 + $this->user->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAID_SPEED])), 1);
+                break;
+            default:
+                break;
         }
         $this->interval_progress = (((microtime(true) * 1000) - $this->last_update_ms) / ($interval * 1000)) * 100;
     }
@@ -103,8 +121,7 @@ class WarAction {
         $this->system->db->query($query);
     }
 
-    public function progressActiveWarAction(): string
-    {
+    public function progressActiveWarAction(): string {
         $message = '';
         switch ($this->type) {
             case self::WAR_ACTION_LOOT:
@@ -114,19 +131,22 @@ class WarAction {
                 break;
             case self::WAR_ACTION_INFILTRATE:
                 $interval = self::BASE_WAR_ACTION_INTERVAL_SECONDS;
-                $interval = round($interval * (100 / (100 + $this->user->village->policy->infiltrate_speed)), 1);
+                $interval = $interval * (100 / (100 + $this->user->village->policy->infiltrate_speed));
+                $interval = round($interval * (100 / (100 + $this->user->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_INFILTRATE_SPEED])), 1);
                 $cost = self::BASE_WAR_ACTION_POOL_COST[$this->user->rank_num];
                 $speed = self::BASE_WAR_ACTION_INTERVAL_PROGRESS_PERCENT;
                 break;
             case self::WAR_ACTION_REINFORCE:
                 $interval = self::BASE_WAR_ACTION_INTERVAL_SECONDS;
-                $interval = round($interval * (100 / (100 + $this->user->village->policy->reinforce_speed)), 1);
+                $interval = $interval * (100 / (100 + $this->user->village->policy->reinforce_speed));
+                $interval = round($interval * (100 / (100 + $this->user->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_SPEED])), 1);
                 $cost = self::BASE_WAR_ACTION_POOL_COST[$this->user->rank_num];
                 $speed = self::BASE_WAR_ACTION_INTERVAL_PROGRESS_PERCENT;
                 break;
             case self::WAR_ACTION_RAID:
                 $interval = self::BASE_WAR_ACTION_INTERVAL_SECONDS;
-                $interval = round($interval * (100 / (100 + $this->user->village->policy->raid_speed)), 1);
+                $interval = $interval * (100 / (100 + $this->user->village->policy->raid_speed));
+                $interval = round($interval * (100 / (100 + $this->user->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAID_SPEED])), 1);
                 $cost = self::BASE_WAR_ACTION_POOL_COST[$this->user->rank_num];
                 $speed = self::BASE_WAR_ACTION_INTERVAL_PROGRESS_PERCENT;
                 break;
@@ -136,6 +156,8 @@ class WarAction {
                 $speed = self::BASE_WAR_ACTION_INTERVAL_PROGRESS_PERCENT;
                 break;
         }
+
+        $cost *= 1 - ($this->user->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_WAR_ACTION_COST] / 100);
 
         // only progress if active and interval time has passed
         if ($this->status == self::WAR_ACTION_ACTIVE && microtime(true) * 1000 > $this->last_update_ms + $interval * 1000) {
@@ -191,16 +213,17 @@ class WarAction {
                 case self::WAR_ACTION_REINFORCE:
                     switch ($location_target['type']) {
                         case 'castle':
-                            $location_target['max_health'] = WarManager::BASE_CASTLE_HEALTH;
+                            $location_target['max_health'] = WarManager::getLocationMaxHealth($this->system, $location_target);
                             break;
                         case 'village':
-                            $location_target['max_health'] = WarManager::BASE_TOWN_HEALTH;
+                            $location_target['max_health'] = WarManager::getLocationMaxHealth($this->system, $location_target);
                             break;
                         default:
                             break;
                     }
                     if ($location_target['health'] < $location_target['max_health']) {
                         $player_heal = floor($this->user->level / 2);
+                        $player_heal *= 1 + ($this->user->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_HEAL] / 100);
                         $new_health = $location_target['health'] + $player_heal;
                         $actual_heal = min($new_health, $location_target['max_health']) - $location_target['health'];
                         $location_target['health'] = $location_target['health'] + $actual_heal;
@@ -213,7 +236,9 @@ class WarAction {
                     if ($location_target['health'] > 0) {
                         //$player_damage = max($this->user->level - $location_target['defense'], 0);
                         $defense_reduction = min($location_target['defense'] / 100, 1);
-                        $player_damage = intval($this->user->level * (1 - $defense_reduction));
+                        $player_damage = $this->user->level;
+                        $player_damage *= 1 + ($this->user->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAID_DAMAGE] / 100);
+                        $player_damage = intval($player_damage * (1 - $defense_reduction));
                         $player_damage = max($player_damage, 0);
                         $new_health = $location_target['health'] - $player_damage;
                         $actual_damage = $location_target['health'] - max($new_health, 0);
@@ -298,6 +323,7 @@ class WarAction {
         }
         $location_target = $this->system->db->query("SELECT * from `region_locations` WHERE `region_location_id` = {$this->target_id} LIMIT 1");
         $location_target = $this->system->db->fetch($location_target);
+        $target_village = VillageManager::getVillageByID($this->system, $this->target_village);
         switch ($this->type) {
             case self::WAR_ACTION_INFILTRATE:
                 WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_INFILTRATE, $this->target_village);
@@ -328,6 +354,7 @@ class WarAction {
                 WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_REINFORCE, $this->target_village);
                 $defense_gain = 1 + $this->user->village->policy->reinforce_defense;
                 $stability_gain = 1 + $this->user->village->policy->reinforce_stability;
+                $max_stability = floor(WarManager::MAX_STABILITY * (1 + ($target_village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY] / 100)));
                 if ($location_target['defense'] < 100) {
                     $result = min($location_target['defense'] + $defense_gain, 100);
                     $defense_gain = $result - $location_target['defense'];
@@ -338,15 +365,15 @@ class WarAction {
                 } else {
                     $message .= "\nTarget Defense already at 100!";
                 }
-                if ($location_target['stability'] < WarManager::MAX_STABILITY) {
-                    $result = min($location_target['stability'] + $stability_gain, 100);
+                if ($location_target['stability'] < $max_stability) {
+                    $result = min($location_target['stability'] + $stability_gain, $max_stability);
                     $stability_gain = $result - $location_target['stability'];
                     $location_target['stability'] = $result;
                     $message .= "\nIncreased target Stability by {$stability_gain}!";
                     WarLogManager::logAction($this->system, $this->user, $stability_gain, WarLogManager::WAR_LOG_STABILITY_GAINED, $this->target_village);
                     $this->system->db->query("UPDATE `region_locations` SET `stability` = {$location_target['stability']} WHERE `region_location_id` = {$this->target_id}");
                 } else {
-                    $message .= "\nTarget Stability already at " . WarManager::MAX_STABILITY . "!";
+                    $message .= "\nTarget Stability already at " . $max_stability . "!";
                 }
                 break;
             case self::WAR_ACTION_RAID:

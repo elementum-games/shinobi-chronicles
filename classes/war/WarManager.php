@@ -485,14 +485,31 @@ class WarManager {
         if ($this->system->db->last_num_rows == 0) {
             return $message;
         }
+        $village = VillageManager::getVillageByID($this->system, $patrol_result['village_id']);
         WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_PATROLS_DEFEATED, $patrol_result['village_id']);
         $x = mt_rand(1, 100);
         if ($x <= self::PATROL_CHANCE[3]) {
             $tier = 3;
         } else if ($x <= self::PATROL_CHANCE[3] + self::PATROL_CHANCE[2]) {
             $tier = 2;
+            $tier_increase_chance = $village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE];
+            if ($tier_increase_chance > 0) {
+                $tier_increase_chance = min($tier_increase_chance, 100);
+                $tier_increase_roll = mt_rand(1, 100);
+                if ($tier_increase_roll <= $tier_increase_chance) {
+                    $tier = 3;
+                }
+            }
         } else {
             $tier = 1;
+            $tier_increase_chance = $village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_PATROL_TIER_CHANCE];
+            if ($tier_increase_chance > 0) {
+                $tier_increase_chance = min($tier_increase_chance, 100);
+                $tier_increase_roll = mt_rand(1, 100);
+                if ($tier_increase_roll <= $tier_increase_chance) {
+                    $tier = 2;
+                }
+            }
         }
         $tier = min($tier + $this->user->village->policy->patrol_tier, self::MAX_PATROL_TIER);
         $name = self::PATROL_NAMES[$tier];
@@ -772,6 +789,26 @@ class WarManager {
             NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_MULTIPLE);
         }
         return $queries;
+    }
+
+    /**
+     * @param System $system
+     * @param array $region_location_data
+     * @param ?Village $village
+     * @return int
+     */
+    public static function getLocationMaxHealth(System $system, $region_location_data, ?Village $village): int {
+        if (!isset($village)) {
+            $village = VillageManager::getVillageByID($system, $region_location_data['occupying_village_id']);
+        }
+        switch ($region_location_data['type']) {
+            case 'Castle':
+                return floor(self::BASE_CASTLE_HEALTH * (1 + ($village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP] / 100)));
+            case 'Village':
+                return floor(self::BASE_TOWN_HEALTH * (1 + ($village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_TOWN_HP] / 100)));
+            default:
+                return 0;
+        }
     }
 }
 

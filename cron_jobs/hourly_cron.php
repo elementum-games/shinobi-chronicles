@@ -25,6 +25,7 @@ require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/inbox/Inbox.php';
 require_once __DIR__ . '/../classes/war/WarManager.php';
 require_once __DIR__ . '/../classes/travel/MapNPC.php';
+require_once __DIR__ . '/../classes/village/VillageUpgradeManager.php';
 
 $system = System::initialize(load_layout: false);
 $system->db->connect();
@@ -203,9 +204,9 @@ function hourlyCron(System $system, $debug = true): void {
     // apply base production
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);
-        $materials_production = $villages[$village['village_id']]->policy->materials_production;
-        $food_production = $villages[$village['village_id']]->policy->food_production;
-        $wealth_production = $villages[$village['village_id']]->policy->wealth_production;
+        $materials_production = $villages[$village['village_id']]->policy->materials_production + $villages[$village['village_id']]->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION];
+        $food_production = $villages[$village['village_id']]->policy->food_production + $villages[$village['village_id']]->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION];
+        $wealth_production = $villages[$village['village_id']]->policy->wealth_production + $villages[$village['village_id']]->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION];
         $villages[$village['village_id']]->addResource(1, $materials_production);
         $villages[$village['village_id']]->addResource(2, $food_production);
         $villages[$village['village_id']]->addResource(3, $wealth_production);
@@ -239,7 +240,7 @@ function hourlyCron(System $system, $debug = true): void {
         foreach ($region_location_result as &$region_location) {
             if ($region_location['type'] === 'castle') {
                 $castle_occupying_village_id = $region_location['occupying_village_id'];
-                $stability_baseline = WarManager::BASE_CASTLE_STABILITY;
+                $stability_baseline = WarManager::BASE_CASTLE_STABILITY + $villages[$region_location['occupying_village_id']]->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY];
                 $stability_gap = abs($stability_baseline - $region_location['stability']);
                 $stability_shift = min(WarManager::BASE_STABILITY_SHIFT_PER_HOUR + floor($stability_gap / WarManager::STABILITY_DEFENSE_SHIFT_INCREMENT), WarManager::MAX_STABILITY_DEFENSE_SHIFT);
                 if ($region_location['stability'] < $stability_baseline) {
@@ -255,7 +256,7 @@ function hourlyCron(System $system, $debug = true): void {
         }
         foreach ($region_location_result as &$region_location) {
             if ($region_location['type'] === 'village') {
-                $stability_baseline = WarManager::BASE_TOWN_STABILITY;
+                $stability_baseline = WarManager::BASE_TOWN_STABILITY + $villages[$region_location['occupying_village_id']]->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY];
                 // if home region
                 if ($region_location['region_id'] < 5) {
                     $stability_baseline += WarManager::HOME_REGION_STABILITY_BONUS;
@@ -267,6 +268,7 @@ function hourlyCron(System $system, $debug = true): void {
                 // if non-native region
                 if ($region_location['occupying_village_id'] != WarManager::REGION_ORIGINAL_VILLAGE[$region['region_id']]) {
                     $stability_baseline -= WarManager::OCCUPIED_TOWN_STABILITY_PENALTY;
+                    $stability_baseline -= $villages[WarManager::REGION_ORIGINAL_VILLAGE[$region['region_id']]]->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY_REDUCTION];
                 }
                 $stability_gap = abs($stability_baseline - $region_location['stability']);
                 $stability_shift = min(WarManager::BASE_STABILITY_SHIFT_PER_HOUR + floor($stability_gap / WarManager::STABILITY_DEFENSE_SHIFT_INCREMENT), WarManager::MAX_STABILITY_DEFENSE_SHIFT);
