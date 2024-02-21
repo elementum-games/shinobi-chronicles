@@ -1,5 +1,6 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
 import RadarNinjaChart from '../charts/Chart.js';
+
 function Profile({
   isDevEnvironment,
   links,
@@ -12,10 +13,12 @@ function Profile({
 }) {
   //Chart.js variables
   const [showChart, setShowChart] = React.useState(false);
+
   function handleShowGraph() {
     setShowChart(!showChart);
-  }
-  //marginRight temp fix for wrapping to same row as chart when window width changes
+  } //marginRight temp fix for wrapping to same row as chart when window width changes
+
+
   let showChartButtonStyle = {
     display: 'block',
     marginRight: '75%',
@@ -24,63 +27,6 @@ function Profile({
     borderRadius: '12px 12px 0 0',
     marginTop: '10px'
   };
-
-  // Update timers
-  function updateTimers() {
-    playerData.dailyTaskTimeLeft -= 1;
-    repReset -= 1;
-    $("#reputationTimer").text(formatTimer(repReset));
-    $("#taskTimer").text(formatTimer(playerData.dailyTaskTimeLeft));
-  }
-  function formatTimer(timeRemaining, prependMessage = '') {
-    if (prependMessage.length > 0) {
-      prependMessage = prependMessage + " ";
-    }
-    let returnString = prependMessage;
-
-    // Calc days
-    if (timeRemaining > 86400) {
-      let days = Math.floor(timeRemaining / 86400);
-      let daysIndicator = days >= 1 ? 'days' : 'day';
-      timeRemaining -= days * 86400;
-      returnString += days + " " + daysIndicator + " ";
-    }
-    // Calc hours
-    if (timeRemaining >= 3600) {
-      let hours = Math.floor(timeRemaining / 3600);
-      let hoursString = hours < 10 ? "0" + hours : hours;
-      timeRemaining -= hours * 3600;
-      returnString += hoursString + ":";
-    } else {
-      returnString += "00:";
-    }
-    // Calc minutes
-    if (timeRemaining >= 60) {
-      let minutes = Math.floor(timeRemaining / 60);
-      let minutesString = minutes < 10 ? "0" + minutes : minutes;
-      timeRemaining -= minutes * 60;
-      returnString += minutesString + ":";
-    } else {
-      returnString += "00:";
-    }
-    // Calc seconds
-    if (timeRemaining > 0) {
-      let seconds = timeRemaining;
-      let secondsString = seconds < 10 ? "0" + seconds : seconds;
-      returnString += secondsString;
-    } else {
-      returnString += "00";
-    }
-    return returnString;
-  }
-
-  // Initialize
-  React.useEffect(() => {
-    const timerInterval = setInterval(() => {
-      updateTimers();
-    }, 1000);
-    return () => clearInterval(timerInterval);
-  }, []);
   return /*#__PURE__*/React.createElement("div", {
     className: "profile_container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -103,22 +49,21 @@ function Profile({
     className: "profile_row_second_col2"
   }, /*#__PURE__*/React.createElement(PlayerUserRep, {
     playerData: playerData,
-    repReset: repReset,
-    formatTimer: formatTimer
+    repReset: repReset
   }), /*#__PURE__*/React.createElement(PlayerBloodline, {
     bloodlinePageUrl: links.bloodlinePage,
     buyBloodlineUrl: links.buyBloodline,
     playerData: playerData
   }), /*#__PURE__*/React.createElement(DailyTasks, {
     playerData: playerData,
-    dailyTasks: playerDailyTasks,
-    formatTimer: formatTimer
+    dailyTasks: playerDailyTasks
   }))), /*#__PURE__*/React.createElement("div", {
     className: "profile_row_third"
   }, /*#__PURE__*/React.createElement("h2", null, "Achievements"), /*#__PURE__*/React.createElement(PlayerAchievements, {
     playerAchievements: playerAchievements
   })));
 }
+
 function StatusAttributes({
   playerData,
   playerSettings,
@@ -188,6 +133,7 @@ function StatusAttributes({
     href: links.team
   }, playerData.teamName)))))));
 }
+
 function PlayerStats({
   playerData,
   playerStats
@@ -262,6 +208,7 @@ function PlayerStats({
     className: "ft-c3"
   })))));
 }
+
 function PlayerBloodline({
   playerData,
   bloodlinePageUrl,
@@ -283,10 +230,10 @@ function PlayerBloodline({
     href: buyBloodlineUrl
   }, "None")));
 }
+
 function PlayerUserRep({
   playerData,
-  repReset,
-  formatTimer
+  repReset
 }) {
   let img_link = "images/village_icons/" + playerData.villageName.toLowerCase() + ".png";
   return /*#__PURE__*/React.createElement("div", {
@@ -305,18 +252,20 @@ function PlayerUserRep({
     className: "weekly_reputation"
   }, playerData.weeklyPveRep, "/", playerData.maxWeeklyPveRep, " PvE \xA0|\xA0", playerData.weeklyWarRep, "/", playerData.maxWeeklyWarRep, " War \xA0|\xA0", playerData.weeklyPvpRep, "/", playerData.maxWeeklyPvpRep, " PvP")), /*#__PURE__*/React.createElement("div", {
     id: "reputationTimer"
-  }, formatTimer(repReset)));
+  }, /*#__PURE__*/React.createElement(Timer, {
+    timeRemaining: repReset
+  })));
 }
+
 function DailyTasks({
   playerData,
-  dailyTasks,
-  formatTimer
+  dailyTasks
 }) {
   return /*#__PURE__*/React.createElement("div", {
     className: "daily_tasks_container"
-  }, /*#__PURE__*/React.createElement("h2", null, "Daily tasks ", /*#__PURE__*/React.createElement("p", {
-    id: "taskTimer"
-  }, formatTimer(playerData.dailyTaskTimeLeft))), dailyTasks.map((dailyTask, i) => /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("h2", null, "Daily tasks ", /*#__PURE__*/React.createElement(Timer, {
+    timeRemaining: playerData.dailyTaskTimeLeft
+  })), dailyTasks.map((dailyTask, i) => /*#__PURE__*/React.createElement("div", {
     key: `daily_task:${i}`,
     className: "daily_task"
   }, /*#__PURE__*/React.createElement("h3", null, dailyTask.name), /*#__PURE__*/React.createElement("section", {
@@ -341,6 +290,7 @@ function DailyTasks({
     }
   }, dailyTask.progressCaption)))));
 }
+
 function PlayerAchievements({
   playerAchievements
 }) {
@@ -366,45 +316,59 @@ function PlayerAchievements({
     className: "progress_label"
   }, achievement.progressLabel)))));
 }
-function formatTimer(timeRemaining, prependMessage = '') {
-  if (prependMessage.length > 0) {
-    prependMessage = prependMessage + " ";
-  }
-  let returnString = prependMessage;
 
-  // Calc days
-  if (timeRemaining > 86400) {
-    let days = Math.floor(timeRemaining / 86400);
-    let daysIndicator = days >= 1 ? 'days' : 'day';
-    timeRemaining -= days * 86400;
-    returnString += days + " " + daysIndicator + " ";
-  }
-  // Calc hours
-  if (timeRemaining >= 3600) {
-    let hours = Math.floor(timeRemaining / 3600);
+function Timer({
+  timeRemaining: initialTimeRemaining
+}) {
+  const [timeRemaining, setTimeRemaining] = React.useState(initialTimeRemaining);
+  React.useEffect(() => {
+    setTimeRemaining(initialTimeRemaining);
+  }, [initialTimeRemaining]);
+  React.useEffect(() => {
+    const intervalId = setInterval(() => {
+      setTimeRemaining(prevTime => prevTime >= 0 ? prevTime - 1 : prevTime);
+    }, 1000);
+    return () => clearInterval(intervalId);
+  });
+  let displayString = '';
+  let seconds = timeRemaining; // Calc days
+
+  if (seconds > 86400) {
+    let days = Math.floor(seconds / 86400);
+    seconds -= days * 86400;
+    let daysUnit = days >= 1 ? 'days' : 'day';
+    displayString += `${days} ${daysUnit} `;
+  } // Calc hours
+
+
+  if (seconds >= 3600) {
+    let hours = Math.floor(seconds / 3600);
     let hoursString = hours < 10 ? "0" + hours : hours;
-    timeRemaining -= hours * 3600;
-    returnString += hoursString + ":";
+    seconds -= hours * 3600;
+    displayString += hoursString + ":";
   } else {
-    returnString += "00:";
-  }
-  // Calc minutes
-  if (timeRemaining >= 60) {
-    let minutes = Math.floor(timeRemaining / 60);
+    displayString += "00:";
+  } // Calc minutes
+
+
+  if (seconds >= 60) {
+    let minutes = Math.floor(seconds / 60);
     let minutesString = minutes < 10 ? "0" + minutes : minutes;
-    timeRemaining -= minutes * 60;
-    returnString += minutesString + ":";
+    seconds -= minutes * 60;
+    displayString += minutesString + ":";
   } else {
-    returnString += "00:";
-  }
-  // Calc seconds
+    displayString += "00:";
+  } // Calc seconds
+
+
   if (timeRemaining > 0) {
-    let seconds = timeRemaining;
     let secondsString = seconds < 10 ? "0" + seconds : seconds;
-    returnString += secondsString;
+    displayString += secondsString;
   } else {
-    returnString += "00";
+    displayString += "00";
   }
-  return returnString;
+
+  return /*#__PURE__*/React.createElement("span", null, displayString);
 }
+
 window.Profile = Profile;

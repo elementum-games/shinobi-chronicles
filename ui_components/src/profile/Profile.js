@@ -46,75 +46,6 @@ function Profile({
     //marginRight temp fix for wrapping to same row as chart when window width changes
     let showChartButtonStyle={display:'block', marginRight: '75%', backgroundColor: 'rgb(20, 19, 23)', color: 'rgb(209, 197, 173)', borderRadius: '12px 12px 0 0', marginTop: '10px'}
 
-    // Update timers
-    function updateTimers() {
-        playerData.dailyTaskTimeLeft -= 1;
-        repReset -= 1;
-
-        $("#reputationTimer").text(formatTimer(repReset));
-        $("#taskTimer").text(formatTimer(playerData.dailyTaskTimeLeft));
-    }
-
-    function formatTimer(timeRemaining, prependMessage = '') {
-        if(prependMessage.length > 0) {
-            prependMessage = prependMessage + " ";
-        }
-        let returnString = prependMessage;
-
-        // Calc days
-        if(timeRemaining > 86400) {
-            let days = Math.floor(timeRemaining / 86400);
-            let daysIndicator = ((days >= 1) ? 'days' : 'day');
-            timeRemaining -= days * 86400;
-
-            returnString += days + " " + daysIndicator + " ";
-        }
-        // Calc hours
-        if(timeRemaining >= 3600) {
-            let hours = Math.floor(timeRemaining / 3600);
-            let hoursString = ((hours < 10) ? "0" + hours : hours)
-            timeRemaining -= hours * 3600;
-
-            returnString += hoursString + ":";
-        }
-        else {
-            returnString += "00:";
-        }
-        // Calc minutes
-        if(timeRemaining >= 60) {
-            let minutes = Math.floor(timeRemaining / 60);
-            let minutesString = ((minutes < 10) ? "0" + minutes : minutes)
-            timeRemaining -= minutes * 60;
-
-            returnString += minutesString + ":";
-        }
-        else {
-            returnString += "00:";
-        }
-        // Calc seconds
-        if(timeRemaining > 0) {
-            let seconds = timeRemaining;
-            let secondsString = ((seconds < 10) ? "0" + seconds : seconds);
-
-            returnString += secondsString;
-        }
-        else {
-            returnString += "00";
-        }
-
-        return returnString;
-    }
-
-    // Initialize
-    React.useEffect(() => {
-
-        const timerInterval = setInterval(() => {
-            updateTimers();
-        }, 1000);
-
-        return () => clearInterval(timerInterval);
-    }, []);
-
     return (
         <div className="profile_container">
             {/* First row */}
@@ -151,7 +82,6 @@ function Profile({
                     <PlayerUserRep
                         playerData={playerData}
                         repReset={repReset}
-                        formatTimer={formatTimer}
                     />
                     <PlayerBloodline
                         bloodlinePageUrl={links.bloodlinePage}
@@ -161,7 +91,6 @@ function Profile({
                     <DailyTasks
                         playerData={playerData}
                         dailyTasks={playerDailyTasks}
-                        formatTimer={formatTimer}
                     />
                 </div>
             </div>
@@ -356,9 +285,8 @@ function PlayerBloodline({ playerData, bloodlinePageUrl, buyBloodlineUrl }) {
 type PlayerUserRepProps = {|
     +playerData: PlayerDataType,
     +repReset: number,
-    +formatTimer: function
 |};
-function PlayerUserRep({playerData, repReset, formatTimer}: PlayerUserRepProps) {
+function PlayerUserRep({playerData, repReset}: PlayerUserRepProps) {
     let img_link = "images/village_icons/" + playerData.villageName.toLowerCase() + ".png";
     return (
         <div className="reputation_display">
@@ -378,7 +306,9 @@ function PlayerUserRep({playerData, repReset, formatTimer}: PlayerUserRepProps) 
                     {playerData.weeklyPvpRep}/{playerData.maxWeeklyPvpRep} PvP
                 </span>
             </div>
-            <div id="reputationTimer">{formatTimer(repReset)}</div>
+            <div id="reputationTimer">
+                <Timer timeRemaining={repReset} />
+            </div>
         </div>
     )
 }
@@ -386,12 +316,11 @@ function PlayerUserRep({playerData, repReset, formatTimer}: PlayerUserRepProps) 
 type DailyTasksProps = {|
     +playerData: PlayerDataType,
     +dailyTasks: $ReadOnlyArray<DailyTaskType>,
-    +formatTimer: function
 |};
-function DailyTasks({ playerData, dailyTasks, formatTimer }: DailyTasksProps) {
+function DailyTasks({ playerData, dailyTasks }: DailyTasksProps) {
     return (
         <div className="daily_tasks_container">
-            <h2>Daily tasks <p id="taskTimer">{formatTimer(playerData.dailyTaskTimeLeft)}</p></h2>
+            <h2>Daily tasks <Timer timeRemaining={playerData.dailyTaskTimeLeft} /></h2>
             {dailyTasks.map(((dailyTask, i) => (
                 <div key={`daily_task:${i}`} className="daily_task">
                     <h3>{dailyTask.name}</h3>
@@ -436,58 +365,73 @@ function PlayerAchievements({ playerAchievements }: PlayerAchievementsProps) {
     );
 }
 
-type formatTimerProps = {|
-    +timeRemaining: number,
-    +prependMessage: string,
-|};
-function formatTimer(timeRemaining, prependMessage = '') {
-    if(prependMessage.length > 0) {
-        prependMessage = prependMessage + " ";
-    }
-    let returnString = prependMessage;
+function Timer({ timeRemaining: initialTimeRemaining }: { +timeRemaining: number }) {
+    const [timeRemaining, setTimeRemaining] = React.useState(initialTimeRemaining);
+
+    React.useEffect(() => {
+        setTimeRemaining(initialTimeRemaining);
+    }, [initialTimeRemaining])
+
+    React.useEffect(() => {
+        const intervalId = setInterval(() => {
+            setTimeRemaining(prevTime =>
+                prevTime >= 0
+                    ? prevTime - 1
+                    : prevTime
+            );
+        }, 1000);
+
+        return () => clearInterval(intervalId);
+    })
+
+    let displayString = '';
+    let seconds = timeRemaining;
 
     // Calc days
-    if(timeRemaining > 86400) {
-        let days = Math.floor(timeRemaining / 86400);
-        let daysIndicator = ((days >= 1) ? 'days' : 'day');
-        timeRemaining -= days * 86400;
+    if(seconds > 86400) {
+        let days = Math.floor(seconds / 86400);
+        seconds -= days * 86400;
 
-        returnString += days + " " + daysIndicator + " ";
+        let daysUnit = (days >= 1 ? 'days' : 'day')
+        displayString += `${days} ${daysUnit} `;
     }
+
     // Calc hours
-    if(timeRemaining >= 3600) {
-        let hours = Math.floor(timeRemaining / 3600);
+    if(seconds >= 3600) {
+        let hours = Math.floor(seconds / 3600);
         let hoursString = ((hours < 10) ? "0" + hours : hours)
-        timeRemaining -= hours * 3600;
+        seconds -= hours * 3600;
 
-        returnString += hoursString + ":";
+        displayString += hoursString + ":";
     }
     else {
-        returnString += "00:";
+        displayString += "00:";
     }
+
     // Calc minutes
-    if(timeRemaining >= 60) {
-        let minutes = Math.floor(timeRemaining / 60);
+    if(seconds >= 60) {
+        let minutes = Math.floor(seconds / 60);
         let minutesString = ((minutes < 10) ? "0" + minutes : minutes)
-        timeRemaining -= minutes * 60;
+        seconds -= minutes * 60;
 
-        returnString += minutesString + ":";
+        displayString += minutesString + ":";
     }
     else {
-        returnString += "00:";
+        displayString += "00:";
     }
+
     // Calc seconds
     if(timeRemaining > 0) {
-        let seconds = timeRemaining;
         let secondsString = ((seconds < 10) ? "0" + seconds : seconds);
 
-        returnString += secondsString;
+        displayString += secondsString;
     }
     else {
-        returnString += "00";
+        displayString += "00";
     }
 
-    return returnString;
+    return <span>{displayString}</span>
 }
+
 
 window.Profile = Profile;
