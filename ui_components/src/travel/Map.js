@@ -1,5 +1,6 @@
 
-export const Map = ({ mapData, scoutData, patrolData, playerId, ranksToView, strategicView, displayGrid}) => {
+export const Map = ({ mapData, scoutData, npcData, playerId, ranksToView, strategicView, displayGrid }) => {
+    console.log(npcData);
     // Visible field info
     const map_div = document.getElementsByClassName('travel-container')[0];
 
@@ -62,7 +63,7 @@ export const Map = ({ mapData, scoutData, patrolData, playerId, ranksToView, str
 
     const PlayerStyle = {
         position: "absolute",
-        backgroundImage: mapData.operation_type ? null : `url(./${mapData.invulnerable ? 'images/ninja_head_grey.png' : mapData.player_icon})`,
+        backgroundImage: mapData.war_action_type ? null : `url(./${mapData.invulnerable ? 'images/ninja_head_grey.png' : mapData.player_icon})`,
         top: 0,
         left: 0,
         transform: `translate3d(
@@ -148,8 +149,8 @@ export const Map = ({ mapData, scoutData, patrolData, playerId, ranksToView, str
                         playerId={playerId}
                         ranksToView={ranksToView}
                     />
-                    <MapNearbyPatrols
-                        patrolData={patrolData || []}
+                    <MapNearbyNPCs
+                        npcData={npcData || []}
                         tileWidth={tile_width}
                         tileHeight={tile_height}
                         playerId={playerId}
@@ -372,14 +373,41 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, pl
                                 filter: "blur(0)",
                             }}
                         >
-                            <div className={'region_objective_tooltip' + (objective.is_occupied ? ' occupied' : '')} style={{ display: strategicView || (objective.x == player_x && objective.y == player_y) ? 'flex' : 'none' }}>
-                                <span className='region_objective_tooltip_name'>{objective.name}</span>
-                                <div className='region_objective_tooltip_tags'>
-                                    <span className='region_objective_tooltip_defense'>{objective.defense}</span>
-                                    <img className='region_objective_tooltip_village' src={getVillageIcon(objective.village_id)} />
-                                    <img className='region_objective_tooltip_resource' src={getResourceIcon(objective.resource_id)} />
-                                </div>
-                            </div>
+                            {(() => {
+                                let backgroundColor;
+
+                                const stability = objective.stability;
+                                const maxStability = 100; // assuming 100 is the max value for positive and negative
+
+                                if (stability > 100) {
+                                    const excessStability = stability - 100;
+                                    const excessPercentage = (excessStability / maxStability) * 100;
+                                    backgroundColor = `linear-gradient(to right, rgba(0, 0, 128, 0.6) 0%, rgba(0, 0, 128, 0.6) ${excessPercentage}%, #295C26cc ${excessPercentage}%, #295C26cc 100%)`;
+                                } else if (stability > 0) {
+                                    const barWidth = (stability / maxStability) * 100;
+                                    backgroundColor = `linear-gradient(to right, #295C26cc ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
+                                } else if (stability < 0) {
+                                    const barWidth = (-stability / maxStability) * 100;
+                                    backgroundColor = `linear-gradient(to right, #620909cc ${barWidth}%, #3c2b2bcc ${barWidth}%)`;
+                                } else {
+                                    backgroundColor = '#3c2b2bcc'; // Original background
+                                }
+                                return (
+                                    <div className={`region_objective_tooltip${objective.rebellion_active ? ' rebellion_glow' : ''}`}
+                                        style={{
+                                            display: strategicView || (objective.x == player_x && objective.y == player_y) ? 'flex' : 'none',
+                                            background: backgroundColor
+                                        }}
+                                    >
+                                        <span className={`region_objective_tooltip_name${objective.rebellion_active ? ' rebellion_text' : ''}`}>{objective.name}</span>
+                                        <div className='region_objective_tooltip_tags'>
+                                            <span className='region_objective_tooltip_defense'>{objective.defense}</span>
+                                            <img className='region_objective_tooltip_village' src={getVillageIcon(objective.village_id)} />
+                                            <img className='region_objective_tooltip_resource' src={getResourceIcon(objective.resource_id)} />
+                                        </div>
+                                    </div>
+                                );
+                            })()}
                             {strategicView &&
                                 <div className='region_objective_details'>
                                     {/*<div className='region_objective_details_name'>
@@ -393,6 +421,9 @@ function RegionObjectives({ objectives, tileWidth, tileHeight, strategicView, pl
                                     </div>*/}
                                     <div className='region_objective_details_health'>
                                         <img className='region_objective_details_health_icon' src={objective.image} />  {objective.objective_health} / {objective.objective_max_health}
+                                    </div>
+                                    <div className='region_objective_details_stability'>
+                                        <span className='region_objective_details_stability_icon'>{objective.stability}</span>  stability
                                     </div>
                                 </div>
                             }
@@ -475,35 +506,35 @@ function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId, ranksToV
     );
 }
 
-function MapNearbyPatrols({ patrolData, tileWidth, tileHeight, strategicView }) {
+function MapNearbyNPCs({ npcData, tileWidth, tileHeight, strategicView }) {
     return (
-        <div id="patrol_locations" className='map_locations'>
-            {patrolData
-                .map((patrol, index) => (
-                    <div key={patrol.patrol_id + '_' + patrol.patrol_type}
+        <div id="npc_locations" className='map_locations'>
+            {npcData
+                .map((npc, index) => (
+                    <div key={npc.npc_id + '_' + npc.npc_type}
                         className='map_location'
                         style={{
                             cursor: "pointer",
-                            transform: `translate3d(${(patrol.target_x - 1) * tileWidth}px, ${(patrol.target_y - 1) * tileHeight}px, 0)`,
+                            transform: `translate3d(${(npc.target_x - 1) * tileWidth}px, ${(npc.target_y - 1) * tileHeight}px, 0)`,
                             backfaceVisibility: "hidden",
                         }}>
-                        <div className='map_location_tooltip'>{patrol.patrol_name}</div>
-                        <div className={alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type + ' tier_' + patrol.tier}></div>
-                        {(patrol.resources.length !== 0 && strategicView) &&
-                            <div className='patrol_details'>
-                            {patrol.resources[1] &&
-                                <div className='patrol_details_resource'>
-                                <img className='patrol_details_resource_icon' src='/images/map/icons/materials.png' />  {patrol.resources[1]} Materials
+                        <div className='map_location_tooltip'>{npc.npc_name}</div>
+                        <div className={alignmentClassNPC(npc.alignment, npc.village_id) + ' ' + npc.npc_type + ' tier_' + npc.tier}></div>
+                        {(npc.resources.length !== 0 && strategicView) &&
+                            <div className='npc_details'>
+                            {npc.resources[1] &&
+                                <div className='npc_details_resource'>
+                                <img className='npc_details_resource_icon' src='/images/map/icons/materials.png' />  {npc.resources[1]} Materials
                                 </div>
                             }
-                            {patrol.resources[2] &&
-                                <div className='patrol_details_resource'>
-                                <img className='patrol_details_resource_icon' src='/images/map/icons/food.png' />  {patrol.resources[2]} Food
+                            {npc.resources[2] &&
+                                <div className='npc_details_resource'>
+                                <img className='npc_details_resource_icon' src='/images/map/icons/food.png' />  {npc.resources[2]} Food
                                 </div>
                             }
-                            {patrol.resources[3] &&
-                                <div className='patrol_details_resource'>
-                                <img className='patrol_details_resource_icon' src='/images/map/icons/wealth.png' />  {patrol.resources[3]} Wealth
+                            {npc.resources[3] &&
+                                <div className='npc_details_resource'>
+                                <img className='npc_details_resource_icon' src='/images/map/icons/wealth.png' />  {npc.resources[3]} Wealth
                                 </div>
                             }
                             </div>
@@ -517,13 +548,13 @@ function MapNearbyPatrols({ patrolData, tileWidth, tileHeight, strategicView }) 
 function Player({ mapData, playerStyle }) {
     return (
         <div id='map_player' style={playerStyle}>
-            {mapData.operation_type &&
+            {mapData.war_action_type &&
                 <>
-                    <div className='operation_text'>{mapData.operation_type}</div>
-                    <div id="operation_progress_bar">
+                 <div className='war_action_text'>{mapData.war_action_type}</div>
+                    <div id="war_action_progress_bar">
                         <svg height="32" width="32" viewBox="0 0 50 50">
                             <circle
-                                id="operation_progress_circle_background_outer"
+                                id="war_action_progress_circle_background_outer"
                                 stroke="#592424"
                                 cx="24.5"
                                 cy="24"
@@ -534,7 +565,7 @@ function Player({ mapData, playerStyle }) {
                                 transform="rotate(-90, 24.5, 24)"
                             />
                             <circle
-                                id="operation_progress_circle_background"
+                                id="war_action_progress_circle_background"
                                 stroke="#592424"
                                 cx="24.5"
                                 cy="24"
@@ -547,7 +578,7 @@ function Player({ mapData, playerStyle }) {
                                 transform="rotate(-90, 24.5, 24)"
                             />
                             <circle
-                                id="operation_progress_circle"
+                                id="war_action_progress_circle"
                                 stroke="#ff6a6a"
                                 cx="24.5"
                                 cy="24"
@@ -556,11 +587,11 @@ function Player({ mapData, playerStyle }) {
                                 strokeMiterlimit="0"
                                 fill="none"
                                 strokeDasharray="62.83"
-                                strokeDashoffset={62.83 - ((62.83 / 100) * mapData.operation_progress)}
+                                strokeDashoffset={62.83 - ((62.83 / 100) * mapData.war_action_progress)}
                                 transform="rotate(-90, 24.5, 24)"
                             />
                             <circle
-                                id="operation_interval_circle"
+                                id="war_action_interval_circle"
                                 stroke="#00b044"
                                 cx="24.5"
                                 cy="24"
@@ -569,7 +600,7 @@ function Player({ mapData, playerStyle }) {
                                 strokeMiterlimit="0"
                                 fill="none"
                                 strokeDasharray="100"
-                                strokeDashoffset={100 - ((100 / 100) * mapData.operation_interval)}
+                                strokeDashoffset={100 - ((100 / 100) * mapData.war_action_interval)}
                                 transform="rotate(-90, 24.5, 24)"
                             />
                         </svg>
@@ -635,34 +666,34 @@ const alignmentClassPlayer = (alignment, village_id) => {
     return class_name;
 }
 
-const alignmentClassPatrol = (alignment, village_id) => {
+const alignmentClassNPC = (alignment, village_id) => {
     let class_name = '';
     switch (alignment) {
         case 'Ally':
-            class_name += 'patrol_ally';
+            class_name += 'npc_ally';
             break;
         case 'Enemy':
-            class_name += 'patrol_enemy';
+            class_name += 'npc_enemy';
             break;
         case 'Neutral':
-            class_name += 'patrol_neutral';
+            class_name += 'npc_neutral';
             break;
     }
     switch (village_id) {
         case 1:
-            class_name += ' patrol_stone';
+            class_name += ' npc_stone';
             break;
         case 2:
-            class_name += ' patrol_cloud';
+            class_name += ' npc_cloud';
             break;
         case 3:
-            class_name += ' patrol_leaf';
+            class_name += ' npc_leaf';
             break;
         case 4:
-            class_name += ' patrol_sand';
+            class_name += ' npc_sand';
             break;
         case 5:
-            class_name += ' patrol_mist';
+            class_name += ' npc_mist';
             break;
     }
     return class_name;

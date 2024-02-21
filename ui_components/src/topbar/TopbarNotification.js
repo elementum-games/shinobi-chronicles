@@ -19,6 +19,10 @@ export function TopbarNotification({
                 notification={notification}
                 closeNotification={closeNotification}
             />;
+        case "ramen_buff":
+            return <RamenBuffNotification
+                notification={notification}
+            />;
         case "specialmission":
         case "specialmission_complete":
         case "specialmission_failed":
@@ -766,6 +770,40 @@ function TrainingNotification({
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#52466a" />
+                        <image className="topbar_notification_icon" height="50" width="50" x="25.5%" y="27.5%" href="images/v2/icons/timer.png" />
+                    </svg>
+                </a>
+            }
+        </>
+    )
+}
+
+function RamenBuffNotification({
+    notification,
+}: TopbarNotificationProps) {
+    const [timeRemaining, setTimeRemaining] = React.useState(
+        calculateTimeRemaining(notification.created, notification.duration)
+    );
+
+    React.useEffect(() => {
+        const intervalId = setInterval(function () {
+            setTimeRemaining(prevTime => prevTime - 1);
+        }, 999);
+
+        return () => clearInterval(intervalId);
+    }, [timeRemaining]);
+
+    return (
+        <>
+            {notification.type === "ramen_buff" &&
+                <a href={notification.action_url}
+                    className="topbar_notification_wrapper has_duration to-right"
+                    data-content={notification.message}
+                    data-time={formatTimeRemaining(timeRemaining)}
+                >
+                    <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#316849" />
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#316849" />
                         <image className="topbar_notification_icon" height="50" width="50" x="25.5%" y="27.5%" href="images/v2/icons/timer.png" />
                     </svg>
                 </a>
