@@ -3,12 +3,14 @@ import { PurchaseConfirmation } from "./PurchaseConfirmation.js";
 import type {PlayerDataType} from "../_schema/userSchema";
 
 type characterChangeProps = {|
+    +handlePremiumPurchase: function,
     +playerData: PlayerDataType,
     +costs: [],
     +genders: [],
     +skills: [],
 |}
 export function CharacterChanges({
+    handlePremiumPurchase,
     playerData,
     costs,
     genders,
@@ -63,6 +65,7 @@ export function CharacterChanges({
                     <PurchaseConfirmation
                         text="Are you certain you wish to reset your character?"
                         buttonValue={"reset"}
+                        onConfirm={() => handlePremiumPurchase('reset_char')}
                     />
             </div>
             <div className="box-secondary halfWidth center">
@@ -80,33 +83,28 @@ export function CharacterChanges({
                     <PurchaseConfirmation
                         text={"Are you certain you wish to reset your " + formatSkillName(statResetName) + "?"}
                         buttonValue={"reset"}
+                        onConfirm={() => handlePremiumPurchase('reset_stat', {stat: statResetName})}
                     />
             </div>
-            <div className="box-secondary fullWidth center">
-                <b>Reset Ai and PvP Battle Counts</b>
-                <div className="subPurchaseContainer">
-                    <div className="box-secondary halfWidth noBorder center">
-                        Reset AI wins and losses to 0.<br />
-                        Costs {costs.ai_count_reset} Ancient Kunai<br />
-                        <PurchaseConfirmation
-                            text="Are you certain you wish to reset your AI wins and losses?"
-                            buttonValue={"reset"}
-                        />
-                    </div>
-                    <div className="box-secondary halfWidth noBorder center">
-                        You can reset your PvP wins and losses to 0.
-                        <br />
-                        Costs {costs.pvp_count_reset} Anicent Kunai<br />
-                        <PurchaseConfirmation
-                            text={"Are you certain you wish to reset your PvP wins and losses?"}
-                            buttonValue={"reset"}
-                        />
-                    </div>
-                </div>
-                You can reset both AI and PvP wins and losses at a discounted rate of {costs.pvp_and_ai_count_reset} Ancient Kunai
+            <div className="box-secondary halfWidth center">
+                <b>Reset AI Battles</b>
+                Reset AI wins and losses to 0.<br />
+                Costs {costs.ai_count_reset} Ancient Kunai<br />
                 <PurchaseConfirmation
-                    text="Are you certain you want to reset both you PvP and AI wins/losses?"
+                    text="Are you certain you wish to reset your AI wins and losses?"
                     buttonValue={"reset"}
+                    onConfirm={() => handlePremiumPurchase('reset_ai_battles')}
+                />
+            </div>
+            <div className="box-secondary halfWidth center">
+                <b>Reset PvP battles</b>
+                You can reset your PvP wins and losses to 0.
+                <br />
+                Costs {costs.pvp_count_reset} Anicent Kunai<br />
+                <PurchaseConfirmation
+                    text={"Are you certain you wish to reset your PvP wins and losses?"}
+                    buttonValue={"reset"}
+                    onConfirm={() => handlePremiumPurchase('reset_pvp_battles')}
                 />
             </div>
             <div className="box-secondary halfWidth center">
@@ -121,6 +119,7 @@ export function CharacterChanges({
                         + newUsername + "?"
                     }
                     buttonValue={"change"}
+                    onConfirm={() => handlePremiumPurchase('change_name', {name: newUsername})}
                 />
             </div>
             <div className="box-secondary halfWidth center">
@@ -139,6 +138,7 @@ export function CharacterChanges({
                         +  " to " + newGender + "?"
                     }
                     buttonValue={"change"}
+                    onConfirm={() => handlePremiumPurchase('gender_change', {gender: newGender})}
                 />
             </div>
             <div className="box-secondary fullWidth center">
@@ -148,18 +148,7 @@ export function CharacterChanges({
                 <PurchaseConfirmation
                     text="Are you certain you would like to change your village?"
                     buttonValue={"change"}
-                />
-            </div>
-            <div className="box-secondary halfWidth center">
-                <b>Post-full-width Test</b>
-                <PurchaseConfirmation
-                    text="You would like to purchase???"
-                />
-            </div>
-            <div className="box-secondary halfWidth center">
-                <b>Post-full-width Test</b>
-                <PurchaseConfirmation
-                    text="You would like to purchase???"
+                    onConfirm={() => handlePremiumPurchase('change_village')}
                 />
             </div>
         </div>

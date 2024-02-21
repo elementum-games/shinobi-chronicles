@@ -1,7 +1,7 @@
 // @flow
 
 import { apiFetch } from "../utils/network.js";
-import { ModalProvider } from "../utils/modalContext.js"
+import { ModalProvider, useModal } from "../utils/modalContext.js"
 import { CharacterChanges } from "./CharacterChanges.js";
 import type { PlayerDataType } from "../_schema/userSchema";
 
@@ -32,8 +32,35 @@ function PremiumPage({
     const [playerData, setPlayerData] = React.useState(APIData.playerData);
     const [costs, setCosts] = React.useState(APIData.costs);
 
+
+    function handlePageChange(newPage) {
+        if(newPage !== page) {
+            setPage(newPage);
+        }
+    }
+
     function handleAPIErrors(errors) {
         console.warn(errors);
+    }
+
+    function handlePurchaseError() {
+
+    }
+
+    function handlePremiumPurchase(purchaseType, purchaseVars = {}) {
+        apiFetch(APILinks.premium_shop, {
+            request: 'Purchase',
+            purchaseType: purchaseType,
+            purchaseVars: purchaseVars
+        }).then(response => {
+            if(response.errors.length) {
+                handleAPIErrors(response.errors);
+                return response;
+            }
+            else {
+
+            }
+        })
     }
 
     function getPlayerData() {
@@ -62,11 +89,6 @@ function PremiumPage({
             }
         })
     }
-    function handlePageChange(newPage) {
-        if(newPage !== page) {
-            setPage(newPage);
-        }
-    }
 
     React.useEffect(() => {
         const dataInterval = setInterval(() => {
@@ -90,6 +112,7 @@ function PremiumPage({
             />
             {page === characterChanges &&
                 <CharacterChanges
+                    handlePremiumPurchase={handlePremiumPurchase}
                     playerData={playerData}
                     costs={costs}
                     genders={genders}
