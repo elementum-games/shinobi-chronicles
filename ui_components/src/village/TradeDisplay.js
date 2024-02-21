@@ -1,3 +1,20 @@
+// @flow strict
+
+import type { VillageProposalType, VillageStrategicInfo } from "./villageSchema.js";
+
+type Props = {|
+    +viewOnly: boolean,
+    +offeringVillageResources: VillageStrategicInfo["village"]["resources"],
+    +offeringVillageRegions: VillageStrategicInfo["village"]["regions"],
+    +offeredResources: VillageProposalType["trade_data"]["offered_resources"],
+    +offeredRegions: VillageProposalType["trade_data"]["offered_regions"],
+    +targetVillageResources: VillageStrategicInfo["village"]["resources"],
+    +targetVillageRegions:  VillageStrategicInfo["village"]["regions"],
+    +requestedResources: VillageProposalType["trade_data"]["requested_resources"],
+    +requestedRegions: VillageProposalType["trade_data"]["requested_regions"],
+    +proposalData: VillageProposalType,
+|};
+
 export function TradeDisplay({
     viewOnly,
     offeringVillageResources,
@@ -9,7 +26,7 @@ export function TradeDisplay({
     requestedResources,
     requestedRegions,
     proposalData,
-}) {
+}: Props) {
     const [offeredRegionsState, setOfferedRegionsState] = React.useState([...offeredRegions.current]);
     const [requestedRegionsState, setRequestedRegionsState] = React.useState([...requestedRegions.current]);
     const [offeredResourcesState, setOfferedResourcesState] = React.useState([...offeredResources.current]);

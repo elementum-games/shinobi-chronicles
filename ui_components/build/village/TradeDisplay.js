@@ -14,6 +14,7 @@ export function TradeDisplay({
   const [requestedRegionsState, setRequestedRegionsState] = React.useState([...requestedRegions.current]);
   const [offeredResourcesState, setOfferedResourcesState] = React.useState([...offeredResources.current]);
   const [requestedResourcesState, setRequestedResourcesState] = React.useState([...requestedResources.current]);
+
   const toggleOfferedRegion = regionId => {
     setOfferedRegionsState(current => {
       // Check if the region is already selected
@@ -26,6 +27,7 @@ export function TradeDisplay({
       }
     });
   };
+
   const toggleRequestedRegion = regionId => {
     setRequestedRegionsState(current => {
       // Check if the region is already selected
@@ -38,18 +40,19 @@ export function TradeDisplay({
       }
     });
   };
+
   const handleOfferedResourcesChange = (resourceName, value) => {
-    setOfferedResourcesState(currentResources => currentResources.map(resource => resource.resource_name === resourceName ? {
-      ...resource,
+    setOfferedResourcesState(currentResources => currentResources.map(resource => resource.resource_name === resourceName ? { ...resource,
       count: value
     } : resource));
   };
+
   const handleRequestedResourcesChange = (resourceName, value) => {
-    setRequestedResourcesState(currentResources => currentResources.map(resource => resource.resource_name === resourceName ? {
-      ...resource,
+    setRequestedResourcesState(currentResources => currentResources.map(resource => resource.resource_name === resourceName ? { ...resource,
       count: value
     } : resource));
   };
+
   React.useEffect(() => {
     offeredRegions.current = [...offeredRegionsState];
   }, [offeredRegionsState]);

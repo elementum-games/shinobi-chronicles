@@ -1,0 +1,3 @@
+const RELATION_NEUTRAL = 1;
+const RELATION_ALLIANCE = 2;
+const RELATION_WAR = 3;
