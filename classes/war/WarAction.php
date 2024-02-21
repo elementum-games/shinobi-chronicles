@@ -354,7 +354,7 @@ class WarAction {
                 WarLogManager::logAction($this->system, $this->user, 1, WarLogManager::WAR_LOG_REINFORCE, $this->target_village);
                 $defense_gain = 1 + $this->user->village->policy->reinforce_defense;
                 $stability_gain = 1 + $this->user->village->policy->reinforce_stability;
-                $max_stability = floor(WarManager::MAX_STABILITY * (1 + ($target_village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY] / 100)));
+                $max_stability = WarManager::MAX_STABILITY + $target_village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY] + $target_village->policy->max_stability;
                 if ($location_target['defense'] < 100) {
                     $result = min($location_target['defense'] + $defense_gain, 100);
                     $defense_gain = $result - $location_target['defense'];

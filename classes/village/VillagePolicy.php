@@ -26,6 +26,7 @@ class VillagePolicy {
     const POLICY_BONUS_MAX_STABILITY = "MAX_STABILITY";
     const POLICY_BONUS_PVE_INCOME = "PVE_INCOME";
     const POLICY_BONUS_UPKEEP_REDUCTION = "UPKEEP_REDUCTION";
+    const POLICY_BONUS_REPAIR_SPEED = "REPAIR_SPEED";
     const POLICY_RESTRICTION_WAR_ENABLED = "WAR_ENABLED";
     const POLICY_RESTRICTION_ALLIANCE_ENABLED = "ALLIANCE_ENABLED";
     const POLICY_BASE_MATERIALS_PRODUCTION = "MATERIALS_PRODUCTION";
@@ -72,8 +73,8 @@ class VillagePolicy {
     public int $research_speed;
     public int $base_stability;
     public int $max_stability;
-    public int $pve_income;
     public int $upkeep_reduction;
+    public int $repair_speed;
     public bool $war_enabled;
     public bool $alliance_enabled;
     public int $materials_production;
@@ -108,8 +109,8 @@ class VillagePolicy {
                 self::POLICY_BONUS_RESEARCH_SPEED => 0,
                 self::POLICY_BONUS_BASE_STABILITY => 0,
                 self::POLICY_BONUS_MAX_STABILITY => 0,
-                self::POLICY_BONUS_PVE_INCOME => 0,
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
+                self::POLICY_BONUS_REPAIR_SPEED => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
                 self::POLICY_BASE_MATERIALS_PRODUCTION => 0,
@@ -126,7 +127,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_RAID_SPEED => 0,
                 self::POLICY_BONUS_RAID_DEFENSE => 0,
                 self::POLICY_BONUS_RAID_STABILITY => 0,
-                self::POLICY_BONUS_CARAVAN_SPEED => 25,
+                self::POLICY_BONUS_CARAVAN_SPEED => 0,
                 self::POLICY_BONUS_PATROL_RESPAWN => 0,
                 self::POLICY_BONUS_PATROL_TIER => 0,
                 self::POLICY_BONUS_TRAINING_SPEED => 0,
@@ -136,12 +137,12 @@ class VillagePolicy {
                 self::POLICY_BONUS_STEALTH => 0,
                 self::POLICY_BONUS_LOOT_CAPACITY => 0,
                 self::POLICY_BONUS_PVP_VILLAGE_POINT => 0,
-                self::POLICY_BONUS_CONSTRUCTION_SPEED => 15,
-                self::POLICY_BONUS_RESEARCH_SPEED => 15,
+                self::POLICY_BONUS_CONSTRUCTION_SPEED => 5,
+                self::POLICY_BONUS_RESEARCH_SPEED => 5,
                 self::POLICY_BONUS_BASE_STABILITY => 0,
                 self::POLICY_BONUS_MAX_STABILITY => 0,
-                self::POLICY_BONUS_PVE_INCOME => 0,
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
+                self::POLICY_BONUS_REPAIR_SPEED => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => false,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
                 self::POLICY_BASE_MATERIALS_PRODUCTION => 70,
@@ -172,8 +173,8 @@ class VillagePolicy {
                 self::POLICY_BONUS_RESEARCH_SPEED => 0,
                 self::POLICY_BONUS_BASE_STABILITY => 0,
                 self::POLICY_BONUS_MAX_STABILITY => 0,
-                self::POLICY_BONUS_PVE_INCOME => 0,
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
+                self::POLICY_BONUS_REPAIR_SPEED => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
                 self::POLICY_BASE_MATERIALS_PRODUCTION => 70,
@@ -204,8 +205,8 @@ class VillagePolicy {
                 self::POLICY_BONUS_RESEARCH_SPEED => 0,
                 self::POLICY_BONUS_BASE_STABILITY => 0,
                 self::POLICY_BONUS_MAX_STABILITY => 0,
-                self::POLICY_BONUS_PVE_INCOME => 0,
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
+                self::POLICY_BONUS_REPAIR_SPEED => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
                 self::POLICY_BASE_MATERIALS_PRODUCTION => 100,
@@ -223,7 +224,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_RAID_DEFENSE => 1,
                 self::POLICY_BONUS_RAID_STABILITY => 1,
                 self::POLICY_BONUS_CARAVAN_SPEED => 0,
-                self::POLICY_BONUS_PATROL_RESPAWN => 25,
+                self::POLICY_BONUS_PATROL_RESPAWN => 0,
                 self::POLICY_BONUS_PATROL_TIER => 0,
                 self::POLICY_BONUS_TRAINING_SPEED => 0,
                 self::POLICY_BONUS_TRANSFER_COST_REDUCTION => 0,
@@ -236,8 +237,8 @@ class VillagePolicy {
                 self::POLICY_BONUS_RESEARCH_SPEED => 0,
                 self::POLICY_BONUS_BASE_STABILITY => 0,
                 self::POLICY_BONUS_MAX_STABILITY => 0,
-                self::POLICY_BONUS_PVE_INCOME => 0,
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
+                self::POLICY_BONUS_REPAIR_SPEED => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => false,
                 self::POLICY_BASE_MATERIALS_PRODUCTION => 70,
@@ -254,7 +255,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_RAID_SPEED => 0,
                 self::POLICY_BONUS_RAID_DEFENSE => 0,
                 self::POLICY_BONUS_RAID_STABILITY => 0,
-                self::POLICY_BONUS_CARAVAN_SPEED => 0,
+                self::POLICY_BONUS_CARAVAN_SPEED => 25,
                 self::POLICY_BONUS_PATROL_RESPAWN => 0,
                 self::POLICY_BONUS_PATROL_TIER => 0,
                 self::POLICY_BONUS_TRAINING_SPEED => 0,
@@ -268,8 +269,8 @@ class VillagePolicy {
                 self::POLICY_BONUS_RESEARCH_SPEED => 0,
                 self::POLICY_BONUS_BASE_STABILITY => 25,
                 self::POLICY_BONUS_MAX_STABILITY => 25,
-                self::POLICY_BONUS_PVE_INCOME => 25,
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 25,
+                self::POLICY_BONUS_REPAIR_SPEED => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
                 self::POLICY_BASE_MATERIALS_PRODUCTION => 40,
@@ -309,7 +310,8 @@ class VillagePolicy {
         $this->research_speed = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_RESEARCH_SPEED];
         $this->base_stability = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_BASE_STABILITY];
         $this->max_stability = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_MAX_STABILITY];
-        $this->pve_income = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_PVE_INCOME];
+        $this->upkeep_reduction = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_UPKEEP_REDUCTION];
+        $this->repair_speed = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_REPAIR_SPEED];
         $this->war_enabled = self::$POLICY_EFFECTS[$policy_id][self::POLICY_RESTRICTION_WAR_ENABLED];
         $this->alliance_enabled = self::$POLICY_EFFECTS[$policy_id][self::POLICY_RESTRICTION_ALLIANCE_ENABLED];
         $this->materials_production = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BASE_MATERIALS_PRODUCTION];

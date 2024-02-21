@@ -38,6 +38,8 @@ class Village {
     public float $construction_speed = 1; // corresponds to 1 per second
     public float $research_speed = 1; // corresponds to 1 per second
     public int $resource_capacity = VillageManager::MAX_RESOURCE_CAPACITY;
+    public int $research_score = 0;
+    public int $construction_score = 0;
 
     // to-do: we should restructure how village data is being saved
     // player village should reference the village ID and this constructor should get row by ID
@@ -59,9 +61,31 @@ class Village {
             $this->buildings = VillageUpgradeManager::getBuildingsForVillage($this->system, $this->village_id);
             $this->upgrades = VillageUpgradeManager::getUpgradesForVillage($this->system, $this->village_id);
             $this->active_upgrade_effects = VillageUpgradeManager::initializeEffectsForVillage($this->system, $this->upgrades);
-            $this->construction_speed += $this->policy->construction_speed + $this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED];
-            $this->research_speed += $this->policy->research_speed + $this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED];
+            $this->construction_speed += ($this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED] / 100);
+            $this->research_speed += ($this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED] / 100);
             $this->resource_capacity += $this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY];
+            if ($this->policy->construction_speed > 0) {
+                $result = $system->db->query("SELECT `village_id`, `construction_score` FROM `villages`");
+                $village_scores = $system->db->fetch_all($result);
+                $num_villages = 0;
+                foreach ($village_scores as $score) {
+                    if ($score['village_id'] != $this->village_id && $score['construction_score'] > $this->construction_score) {
+                        $num_villages++;
+                    }
+                }
+                $this->construction_speed += ($num_villages * $this->policy->construction_speed) / 100;
+            }
+            if ($this->policy->research_speed > 0) {
+                $result = $system->db->query("SELECT `village_id`, `research_score` FROM `villages`");
+                $village_scores = $system->db->fetch_all($result);
+                $num_villages = 0;
+                foreach ($village_scores as $score) {
+                    if ($score['village_id'] != $this->village_id && $score['research_score'] > $this->research_score) {
+                        $num_villages++;
+                    }
+                }
+                $this->research_speed += ($num_villages * $this->policy->research_speed) / 100;
+            }
         }
         // updated legacy constructor logic
         else {

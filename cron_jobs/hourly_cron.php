@@ -119,6 +119,8 @@ function hourlyCron(System $system, $debug = true): void {
                         $upgrade->status = VillageUpgradeConfig::UPGRADE_STATUS_INACTIVE;
                     }
                     $queries[] = "UPDATE `village_upgrades` SET `status` = '{$upgrade->status}', `research_progress` = NULL, `research_progress_required` = NULL, `research_progress_last_updated` = {$upgrade->research_progress_last_updated}, `research_boosted` = 0 WHERE `village_id` = {$village->village_id} AND `id` = {$upgrade->id}";
+                    $village->research_score = VillageUpgradeManager::calcResearchScore($system, $village);
+                    $queries[] = "UPDATE `villages` SET `research_score` = {$village->research_score} WHERE `village_id` = {$village->village_id}";
                 } else {
                     $queries[] = "UPDATE `village_upgrades` SET `research_progress` = {$upgrade->research_progress}, `research_progress_last_updated` = {$upgrade->research_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$upgrade->id}";
                 }
@@ -145,6 +147,8 @@ function hourlyCron(System $system, $debug = true): void {
                     $building->construction_progress = 0;
                     $building->health = VillageBuildingConfig::BUILDING_MAX_HEALTH[$building->key][$building->tier];
                     $queries[] = "UPDATE `village_buildings` SET `status` = '{$building->status}', `construction_progress` = NULL, `construction_progress_required` = NULL, `construction_progress_last_updated` = {$building->construction_progress_last_updated}, `tier` = {$building->tier}, `construction_boosted` = 0, `health` = {$building->health} WHERE `village_id` = {$village->village_id} AND `id` = {$building->id}";
+                    $village->construction_score = VillageUpgradeManager::calcConstructionScore($system, $village);
+                    $queries[] = "UPDATE `villages` SET `construction_score` = {$village->construction_score} WHERE `village_id` = {$village->village_id}";
                 } else {
                     $queries[] = "UPDATE `village_buildings` SET `construction_progress` = {$building->construction_progress}, `construction_progress_last_updated` = {$building->construction_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$building->id}";
                 }
@@ -240,7 +244,7 @@ function hourlyCron(System $system, $debug = true): void {
         foreach ($region_location_result as &$region_location) {
             if ($region_location['type'] === 'castle') {
                 $castle_occupying_village_id = $region_location['occupying_village_id'];
-                $stability_baseline = WarManager::BASE_CASTLE_STABILITY + $villages[$region_location['occupying_village_id']]->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY];
+                $stability_baseline = WarManager::BASE_CASTLE_STABILITY + $villages[$region_location['occupying_village_id']]->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY] + $villages[$region_location['occupying_village_id']]->policy->base_stability;
                 $stability_gap = abs($stability_baseline - $region_location['stability']);
                 $stability_shift = min(WarManager::BASE_STABILITY_SHIFT_PER_HOUR + floor($stability_gap / WarManager::STABILITY_DEFENSE_SHIFT_INCREMENT), WarManager::MAX_STABILITY_DEFENSE_SHIFT);
                 if ($region_location['stability'] < $stability_baseline) {
@@ -256,7 +260,7 @@ function hourlyCron(System $system, $debug = true): void {
         }
         foreach ($region_location_result as &$region_location) {
             if ($region_location['type'] === 'village') {
-                $stability_baseline = WarManager::BASE_TOWN_STABILITY + $villages[$region_location['occupying_village_id']]->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY];
+                $stability_baseline = WarManager::BASE_TOWN_STABILITY + $villages[$region_location['occupying_village_id']]->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_BASE_STABILITY] + $villages[$region_location['occupying_village_id']]->policy->base_stability;
                 // if home region
                 if ($region_location['region_id'] < 5) {
                     $stability_baseline += WarManager::HOME_REGION_STABILITY_BONUS;

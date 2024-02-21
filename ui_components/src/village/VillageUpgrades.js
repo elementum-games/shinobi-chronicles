@@ -25,7 +25,6 @@ export function VillageUpgrades({
         let materials_cost = 0;
         let food_cost = 0;
         let wealth_cost = 0;
-        let return_string = "upkeep cost / day: ";
         building.upgrade_sets.forEach((upgrade_set) => {
             upgrade_set.upgrades.forEach((upgrade) => {
                 if (upgrade.status == "active" || upgrade.status == "activating") {
