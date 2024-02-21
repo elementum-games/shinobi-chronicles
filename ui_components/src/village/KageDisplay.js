@@ -7,8 +7,8 @@ type Props = {|
     +seatTitle: string,
     +isProvisional?: boolean,
     +provisionalDaysLabel?: string,
-    +seatId: ?number,
-    +playerSeatId: ?number,
+    +seatId?: ?number,
+    +playerSeatId?: ?number,
     +onResign?: () => {},
     +onClaim?: () => {},
     +onChallenge?: () => {},
@@ -25,7 +25,7 @@ export default function KageDisplay({
     onResign = null,
     onClaim = null,
     onChallenge = null,
-}: Props) {
+}: Props): React$Node {
     return <div className="kage_container">
         <div className="kage_header">
             <div className="header">Kage</div>
