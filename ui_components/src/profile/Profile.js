@@ -43,8 +43,15 @@ function Profile({
     function handleShowGraph() {
         setShowChart(!showChart);
     }
+
     //marginRight temp fix for wrapping to same row as chart when window width changes
-    let showChartButtonStyle={display:'block', marginRight: '75%', backgroundColor: 'rgb(20, 19, 23)', color: 'rgb(209, 197, 173)', borderRadius: '12px 12px 0 0', marginTop: '10px'}
+    let showChartButtonStyle = {
+        display:'block',
+        marginRight: '75%',
+        backgroundColor: 'rgb(20, 19, 23)', color: 'rgb(209, 197, 173)',
+        borderRadius: '12px 12px 0 0',
+        marginTop: '10px'
+    };
 
     return (
         <div className="profile_container">
@@ -65,15 +72,12 @@ function Profile({
             
             {/* Second row */}
             <div className="profile_row_second">
-                {/* Show Chart or Graph */}
-                {
-                    (!showChart) ? 
-                    <PlayerStats
+                {!showChart
+                    ? <PlayerStats
                         playerData={playerData}
                         playerStats={playerStats}
                     />
-                    :
-                    <RadarNinjaChart 
+                    : <RadarNinjaChart
                         playerStats={playerStats}
                     />
                 }
@@ -264,7 +268,7 @@ type PlayerBloodlineProps = {|
     +bloodlinePageUrl: string,
     +buyBloodlineUrl: string,
 |};
-function PlayerBloodline({ playerData, bloodlinePageUrl, buyBloodlineUrl }) {
+function PlayerBloodline({ playerData, bloodlinePageUrl, buyBloodlineUrl }: PlayerBloodlineProps) {
     return (
         <div className="bloodline_display">
             <div className="bloodline_mastery_indicator">
