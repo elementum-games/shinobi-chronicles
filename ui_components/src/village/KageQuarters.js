@@ -5,31 +5,49 @@ import { StrategicInfoItem } from "./StrategicInfoItem.js";
 import { useModal } from '../utils/modalContext.js';
 import { TradeDisplay } from "./TradeDisplay.js";
 import KageDisplay from "./KageDisplay.js";
+import { getPolicyDisplayData, getVillageIcon } from "./villageUtils.js";
 
-import type { VillageProposalType, VillageStrategicInfo } from "./villageSchema.js";
+import type {
+    VillageProposalType,
+    VillageResourceStrategicInfo,
+    VillageSeatType,
+    VillageStrategicInfo
+} from "./villageSchema.js";
 
+
+
+type PolicyState = {|
+    +policy_id: number,
+|};
+
+type Props = {|
+    +playerSeatState: VillageSeatType,
+    +villageName: string,
+    +villageApiUrl: string,
+    +policyDataState: PolicyState,
+    +setPolicyDataState: (PolicyState) => void,
+    +seatDataState: $ReadOnlyArray<VillageSeatType>,
+    +resourceDataState: $ReadOnlyArray<VillageResourceStrategicInfo>,
+    +proposalDataState: $ReadOnlyArray<VillageProposalType>,
+    +strategicDataState: $ReadOnlyArray<VillageStrategicInfo>,
+    +setProposalDataState: ($ReadOnlyArray<VillageProposalType>) => void,
+    +setStrategicDataState: ($ReadOnlyArray<VillageStrategicInfo>) => void,
+    +handleErrors: ($ReadOnlyArray<string>) => void,
+|};
 export function KageQuarters({
-    playerID,
     playerSeatState,
     villageName,
-    villageAPI,
+    villageApiUrl,
     policyDataState,
     setPolicyDataState,
     seatDataState,
-    pointsDataState,
-    setPointsDataState,
-    diplomacyDataState,
     resourceDataState,
-    setResourceDataState,
     proposalDataState,
     setProposalDataState,
     strategicDataState,
     setStrategicDataState,
     handleErrors,
-    getVillageIcon,
-    getPolicyDisplayData,
-    StrategicInfoItem
-}) {
+}: Props) {
     const kage = seatDataState.find(seat => seat.seat_type === 'kage');
     const [currentProposal, setCurrentProposal] = React.useState(null);
     const [currentProposalKey, setCurrentProposalKey] = React.useState(null);
@@ -54,7 +72,7 @@ export function KageQuarters({
 
     const ChangePolicy = () => {
         apiFetch(
-            villageAPI,
+            villageApiUrl,
             {
                 request: 'CreateProposal',
                 type: 'policy',
@@ -76,7 +94,7 @@ export function KageQuarters({
     }
     const DeclareWar = () => {
         apiFetch(
-            villageAPI,
+            villageApiUrl,
             {
                 request: 'CreateProposal',
                 type: 'declare_war',
@@ -98,7 +116,7 @@ export function KageQuarters({
     }
     const OfferPeace = () => {
         apiFetch(
-            villageAPI,
+            villageApiUrl,
             {
                 request: 'CreateProposal',
                 type: 'offer_peace',
@@ -120,7 +138,7 @@ export function KageQuarters({
     }
     const OfferAlliance = () => {
         apiFetch(
-            villageAPI,
+            villageApiUrl,
             {
                 request: 'CreateProposal',
                 type: 'offer_alliance',
@@ -142,7 +160,7 @@ export function KageQuarters({
     }
     const BreakAlliance = () => {
         apiFetch(
-            villageAPI,
+            villageApiUrl,
             {
                 request: 'CreateProposal',
                 type: 'break_alliance',
@@ -164,7 +182,7 @@ export function KageQuarters({
     }
     const CancelProposal = () => {
         apiFetch(
-            villageAPI,
+            villageApiUrl,
             {
                 request: 'CancelProposal',
                 proposal_id: currentProposal.proposal_id,
@@ -187,7 +205,7 @@ export function KageQuarters({
     }
     const OfferTrade = () => {
         apiFetch(
-            villageAPI,
+            villageApiUrl,
             {
                 request: 'CreateProposal',
                 type: 'offer_trade',
@@ -213,7 +231,7 @@ export function KageQuarters({
     }
     const EnactProposal = () => {
         apiFetch(
-            villageAPI,
+            villageApiUrl,
             {
                 request: 'EnactProposal',
                 proposal_id: currentProposal.proposal_id,
@@ -242,7 +260,7 @@ export function KageQuarters({
     }
     const BoostVote = () => {
         apiFetch(
-            villageAPI,
+            villageApiUrl,
             {
                 request: 'BoostVote',
                 proposal_id: currentProposal.proposal_id,
@@ -264,7 +282,7 @@ export function KageQuarters({
     }
     const CancelVote = () => {
         apiFetch(
-            villageAPI,
+            villageApiUrl,
             {
                 request: 'CancelVote',
                 proposal_id: currentProposal.proposal_id,
@@ -286,7 +304,7 @@ export function KageQuarters({
     }
     const SubmitVote = (vote) => {
         apiFetch(
-            villageAPI,
+            villageApiUrl,
             {
                 request: 'SubmitVote',
                 proposal_id: currentProposal.proposal_id,
@@ -418,12 +436,18 @@ export function KageQuarters({
                                 ))}
                             </div>
                             {displayPolicyID !== policyDataState.policy_id &&
-                                <div className={playerSeatState.seat_type === "kage" ? "village_policy_change_button" : "village_policy_change_button disabled"} onClick={() => openModal({
-                                    header: 'Confirmation',
-                                    text: "Are you sure you want to change policies? You will be unable to select a new policy for 3 days.",
-                                    ContentComponent: null,
-                                    onConfirm: () => ChangePolicy(),
-                                })}>change policy</div>
+                                <div
+                                    className={playerSeatState.seat_type === "kage"
+                                        ? "village_policy_change_button"
+                                        : "village_policy_change_button disabled"
+                                    }
+                                    onClick={() => openModal({
+                                        header: 'Confirmation',
+                                        text: "Are you sure you want to change policies? You will be unable to select a new policy for 3 days.",
+                                        ContentComponent: null,
+                                        onConfirm: () => ChangePolicy(),
+                                    })}
+                                >change policy</div>
                             }
                             <div className="village_policy_main_container">
                                 <div className="village_policy_main_inner">
@@ -639,14 +663,14 @@ export function KageQuarters({
 }
 
 type VillageProposalsProps = {|
-    +playerSeatState: mixed,
-    +proposalDataState: mixed,
-    +seatDataState: mixed,
-    +resourceDataState: mixed,
+    +playerSeatState: VillageSeatType,
+    +proposalDataState: $ReadOnlyArray<VillageProposalType>,
+    +seatDataState: $ReadOnlyArray<VillageSeatType>,
+    +resourceDataState: $ReadOnlyArray<VillageResourceStrategicInfo>,
     +strategicDataState: $ReadOnlyArray<VillageStrategicInfo>,
-    +playerVillageData: mixed,
-    +villageRegions: mixed,
-    +currentProposalKey: mixed,
+    +playerVillageData: VillageStrategicInfo,
+    +villageRegions: VillageStrategicInfo["village"]["regions"],
+    +currentProposalKey: ?number,
     +currentProposal: ?VillageProposalType,
     +onEnactClick: () => mixed,
     +onCancelClick: () => mixed,

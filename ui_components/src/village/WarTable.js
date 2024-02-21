@@ -1,5 +1,7 @@
+// @flow
+
 import { apiFetch } from "../utils/network.js";
-import { ModalProvider } from "../utils/modalContext.js";
+import { getPolicyDisplayData, getVillageBanner, getVillageIcon } from "./villageUtils.js";
 
 export function WarTable({
     playerWarLogData,
@@ -7,8 +9,6 @@ export function WarTable({
     strategicDataState,
     villageAPI,
     handleErrors,
-    getVillageIcon,
-    getPolicyDisplayData
 }) {
     const [playerWarLog, setPlayerWarLog] = React.useState(playerWarLogData.player_war_log);
     const [globalLeaderboardWarLogs, setGlobalLeaderboardWarLogs] = React.useState(playerWarLogData.global_leaderboard_war_logs);
@@ -16,22 +16,7 @@ export function WarTable({
     const [warRecords, setWarRecords] = React.useState(warRecordData.war_records);
     const [warRecordsPageNumber, setWarRecordsPageNumber] = React.useState(1);
     const [selectedWarRecord, setSelectedWarRecord] = React.useState(null);
-    function getVillageBanner(village_id) {
-        switch (village_id) {
-            case 1:
-                return '/images/v2/decorations/strategic_banners/stratbannerstone.jpg';
-            case 2:
-                return '/images/v2/decorations/strategic_banners/stratbannercloud.jpg';
-            case 3:
-                return '/images/v2/decorations/strategic_banners/stratbannerleaf.jpg';
-            case 4:
-                return '/images/v2/decorations/strategic_banners/stratbannersand.jpg';
-            case 5:
-                return '/images/v2/decorations/strategic_banners/stratbannermist.jpg';
-            default:
-                return null;
-        }
-    }
+
     function WarLogHeader() {
         return (
             <div className="warlog_label_row">
@@ -49,7 +34,7 @@ export function WarTable({
             </div>
         );
     }
-    function PlayerWarLog({ log, index, animate, getVillageIcon }) {
+    function PlayerWarLog({ log, index, animate }) {
         const scoreData = [
             { name: 'Objective Score', score: log.objective_score },
             { name: 'Resource Score', score: log.resource_score },
@@ -59,13 +44,13 @@ export function WarTable({
         return (
             <div key={index} className="warlog_item">
                 <div className="warlog_data_row">
-                    {log.rank == 1 &&
+                    {log.rank === 1 &&
                         <span className="warlog_rank_wrapper"><span className="warlog_rank first">{log.rank}</span></span>
                     }
-                    {log.rank == 2 &&
+                    {log.rank === 2 &&
                         <span className="warlog_rank_wrapper"><span className="warlog_rank second">{log.rank}</span></span>
                     }
-                    {log.rank == 3 &&
+                    {log.rank === 3 &&
                         <span className="warlog_rank_wrapper"><span className="warlog_rank third">{log.rank}</span></span>
                     }
                     {log.rank > 3 &&
@@ -127,7 +112,7 @@ export function WarTable({
         );
     }
 
-    function WarRecord({ record, index, getVillageIcon, getVillageBanner }) {
+    function WarRecord({ record, index }) {
         const is_active = record.village_relation.relation_end ? false : true;
         const renderScoreBar = () => {
             const total_score = record.attacker_war_log.war_score + record.defender_war_log.war_score;
@@ -169,13 +154,24 @@ export function WarTable({
             );
         }
         return (
-            <div key={index} className={"war_record" + (selectedWarRecord && (record.village_relation.relation_id == selectedWarRecord.village_relation.relation_id) ? " selected" : "")} onClick={() => setSelectedWarRecord(record)}
+            <div
+                key={index}
+                className={"war_record" + (selectedWarRecord && (
+                    record.village_relation.relation_id === selectedWarRecord.village_relation.relation_id
+                    ) ? " selected" : "")
+                }
+                onClick={() => setSelectedWarRecord(record)}
                 style={{
-                    background: `linear-gradient(to right, transparent 0%, #17161b 30%, #17161b 70%, transparent 100%), url('${getVillageBanner(record.village_relation.village1_id)}'), url('${getVillageBanner(record.village_relation.village2_id)}')`,
+                    background: `
+                        linear-gradient(to right, transparent 0%, #17161b 30%, #17161b 70%, transparent 100%), 
+                        url('${getVillageBanner(record.village_relation.village1_id)}'), 
+                        url('${getVillageBanner(record.village_relation.village2_id)}')
+                    `,
                     backgroundPosition: "center, -20% center, 115% center",
                     backgroundSize: "cover, auto, auto",
                     backgroundRepeat: "no-repeat"
-                }}>
+                }}
+            >
                 <div className="war_record_village left">
                     <div className="war_record_village_inner">
                         <img src={getVillageIcon(record.village_relation.village1_id)} />
@@ -209,9 +205,9 @@ export function WarTable({
         );
     }
 
-    function VillageWarLog({ log, getVillageIcon, animate, is_attacker, getPolicyDisplayData, strategicDataState }) {
-        console.log(strategicDataState.find(item => item.village.name == "Stone"));
-        const policy_name = getPolicyDisplayData(strategicDataState.find(item => item.village.name == log.village_name).village.policy_id).name;
+    function VillageWarLog({ log, animate, is_attacker, strategicDataState }) {
+        console.log(strategicDataState.find(item => item.village.name === "Stone"));
+        const policy_name = getPolicyDisplayData(strategicDataState.find(item => item.village.name === log.village_name).village.policy_id).name;
         const scoreData = [
             { name: 'Objective Score', score: log.objective_score },
             { name: 'Resource Score', score: log.resource_score },
@@ -316,7 +312,7 @@ export function WarTable({
                 handleErrors(response.errors);
                 return;
             }
-            if (response.data.warLogData.global_leaderboard_war_logs.length == 0) {
+            if (response.data.warLogData.global_leaderboard_war_logs.length === 0) {
                 return;
             } else {
                 setGlobalLeaderboardPageNumber(page_number);
@@ -354,7 +350,7 @@ export function WarTable({
                 handleErrors(response.errors);
                 return;
             }
-            if (response.data.warRecordData.war_records.length == 0) {
+            if (response.data.warRecordData.war_records.length === 0) {
                 return;
             } else {
                 setWarRecordsPageNumber(page_number);
@@ -388,7 +384,7 @@ export function WarTable({
                     <div className="header">your war score</div>
                     <div className="player_warlog_container">
                         <WarLogHeader />
-                        <PlayerWarLog log={playerWarLog} index={0} animate={false} getVillageIcon={getVillageIcon} />
+                        <PlayerWarLog log={playerWarLog} index={0} animate={false} />
                     </div>
                 </div>
             </div>
@@ -411,7 +407,7 @@ export function WarTable({
                         </div>
                         {globalLeaderboardWarLogs
                             .map((log, index) => (
-                                <PlayerWarLog log={log} index={index} animate={true} getVillageIcon={getVillageIcon} />
+                                <PlayerWarLog log={log} index={index} animate={true} />
                             ))}
                     </div>
                     <div className="global_leaderboard_navigation">
@@ -451,7 +447,7 @@ export function WarTable({
                     <div className="war_records_container">
                         {warRecords
                             .map((record, index) => (
-                                <WarRecord record={record} index={index} getVillageIcon={getVillageIcon} getVillageBanner={getVillageBanner} />
+                                <WarRecord record={record} index={index} />
                             ))}
                     </div>
                     <div className="global_leaderboard_navigation">
@@ -471,18 +467,14 @@ export function WarTable({
                         <div className="village_warlog_container">
                             <VillageWarLog
                                 log={selectedWarRecord.attacker_war_log}
-                                getVillageIcon={getVillageIcon}
                                 animate={true}
                                 is_attacker={true}
-                                getPolicyDisplayData={getPolicyDisplayData}
                                 strategicDataState={strategicDataState}
                             />
                             <VillageWarLog
                                 log={selectedWarRecord.defender_war_log}
-                                getVillageIcon={getVillageIcon}
                                 animate={true}
                                 is_attacker={false}
-                                getPolicyDisplayData={getPolicyDisplayData}
                                 strategicDataState={strategicDataState}
                             />
                         </div>

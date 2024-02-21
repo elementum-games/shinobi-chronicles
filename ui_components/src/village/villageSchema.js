@@ -42,6 +42,31 @@ const RELATION_NEUTRAL = 1;
 const RELATION_ALLIANCE = 2;
 const RELATION_WAR = 3;
 
+export type VillageSeatType = {|
+    +seat_key: "kage" | "elder_1" | "elder_2" | "elder_3",
+    +seat_id: number,
+    +user_id: ?number,
+    +village_id: number,
+    +seat_type: "kage" | "elder",
+    +seat_title: string,
+    +seat_start: ?number,
+    +user_name: string,
+    +avatar_link: string,
+    +is_provisional: boolean,
+    +provisional_days_label: ?string,
+|};
+
+export type VillageResourceStrategicInfo = {|
+    +claimed: number,
+    +collected: number,
+    +count: number,
+    +lost: number,
+    +produced: number,
+    +resource_id: number,
+    +resource_name: ResourceNameType,
+    +spent: 0,
+|};
+
 export type VillageStrategicInfo = {|
     +village: {|
         +coords: {|
@@ -100,19 +125,7 @@ export type VillageStrategicInfo = {|
         +location: string,
         +prev_monthly_points: number|string,
     |},
-    +seats: $ReadOnlyArray<{|
-        +seat_key: "kage" | "elder_1" | "elder_2" | "elder_3",
-        +seat_id: number,
-        +user_id: ?number,
-        +village_id: number,
-        +seat_type: "kage" | "elder",
-        +seat_title: string,
-        +seat_start: ?number,
-        +user_name: string,
-        +avatar_link: string,
-        +is_provisional: boolean,
-        +provisional_days_label: ?string,
-    |}>,
+    +seats: $ReadOnlyArray<VillageSeatType>,
     +population: $ReadOnlyArray<{|
         +rank: "academy" | "genin" | "chuunin" | "jonin",
         +count: number,

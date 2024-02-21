@@ -1,6 +1,9 @@
+// @flow
+
 import { apiFetch } from "../utils/network.js";
 import { useModal } from '../utils/modalContext.js';
 import KageDisplay from "./KageDisplay.js";
+import { getPolicyDisplayData } from "./villageUtils.js";
 
 export function VillageHQ({
     playerID,
@@ -21,8 +24,6 @@ export function VillageHQ({
     clanData,
     kageRecords,
     handleErrors,
-    getVillageIcon,
-    getPolicyDisplayData
 }) {
     const [resourceDaysToShow, setResourceDaysToShow] = React.useState(1);
     const [policyDisplay, setPolicyDisplay] = React.useState(getPolicyDisplayData(policyDataState.policy_id));
@@ -30,22 +31,10 @@ export function VillageHQ({
     const selectedTimeUTC = React.useRef(null);
     const challengeTarget = React.useRef(null);
     const { openModal } = useModal();
-    const DisplayFromDays = (days) => {
-        switch (days) {
-            case 1:
-                return 'daily';
-                break;
-            case 7:
-                return 'weekly';
-                break;
-            case 30:
-                return 'monthly';
-                break;
-            default:
-                return days;
-                break;
-        }
-    }
+
+    const [challengeSubmittedFlag, setChallengeSubmittedFlag] = React.useState(false);
+    const [challengeAcceptedFlag, setChallengeAcceptedFlag] = React.useState(false);
+
     const FetchNextIntervalTypeResources = () => {
         var days;
         switch (resourceDaysToShow) {
@@ -74,6 +63,7 @@ export function VillageHQ({
             setResourceDataState(response.data);
         });
     }
+
     const ClaimSeat = (seat_type) => {
         apiFetch(
             villageAPI,
@@ -117,12 +107,6 @@ export function VillageHQ({
             });
         });
     }
-    const [challengeSubmittedFlag, setChallengeSubmittedFlag] = React.useState(false);
-    React.useEffect(() => {
-        if (challengeSubmittedFlag) {
-            ConfirmSubmitChallenge();
-        }
-    }, [challengeSubmittedFlag]);
     const Challenge = (target_seat) => {
         challengeTarget.current = target_seat;
         openModal({
@@ -192,12 +176,7 @@ export function VillageHQ({
             });
         });
     }
-    const [challengeAcceptedFlag, setChallengeAcceptedFlag] = React.useState(false);
-    React.useEffect(() => {
-        if (challengeAcceptedFlag) {
-            ConfirmAcceptChallenge();
-        }
-    }, [challengeAcceptedFlag]);
+
     const AcceptChallenge = (target_challenge) => {
         challengeTarget.current = target_challenge;
         openModal({
@@ -270,6 +249,18 @@ export function VillageHQ({
             });
         });
     }
+
+    React.useEffect(() => {
+        if (challengeSubmittedFlag) {
+            ConfirmSubmitChallenge();
+        }
+    }, [challengeSubmittedFlag]);
+    React.useEffect(() => {
+        if (challengeAcceptedFlag) {
+            ConfirmAcceptChallenge();
+        }
+    }, [challengeAcceptedFlag]);
+
     const totalPopulation = populationData.reduce((acc, rank) => acc + rank.count, 0);
     const kage = seatDataState.find(seat => seat.seat_type === 'kage');
 
@@ -349,7 +340,7 @@ export function VillageHQ({
                                                 {!elder.avatar_link && <div className="elder_avatar_fill"></div>}
                                             </div>
                                             <div className="elder_name">{elder.user_name ? <a href={"/?id=6&user=" + elder.user_name}>{elder.user_name}</a> : "---"}</div>
-                                            {(elder.seat_id && elder.seat_id == playerSeatState.seat_id) &&
+                                            {(elder.seat_id && elder.seat_id === playerSeatState.seat_id) &&
                                                 <div className="elder_resign_button" onClick={() => openModal({
                                                     header: 'Confirmation',
                                                     text: 'Are you sure you wish to resign from your current position?',
@@ -363,7 +354,7 @@ export function VillageHQ({
                                             {(elder.seat_id && playerSeatState.seat_id == null) &&
                                                 <div className="elder_challenge_button" onClick={() => Challenge(elder)}>challenge</div>
                                             }
-                                            {(elder.seat_id && playerSeatState.seat_id !== null && playerSeatState.seat_id != elder.seat_id) &&
+                                            {(elder.seat_id && playerSeatState.seat_id !== null && playerSeatState.seat_id !== elder.seat_id) &&
                                                 <div className="elder_challenge_button disabled">challenge</div>
                                             }
                                         </div>
@@ -511,6 +502,19 @@ export function VillageHQ({
     );
 }
 
+function DisplayFromDays(days) {
+    switch (days) {
+        case 1:
+            return 'daily';
+        case 7:
+            return 'weekly';
+        case 30:
+            return 'monthly';
+        default:
+            return days;
+    }
+}
+
 export const ChallengeContainer = ({ playerID, challengeDataState, CancelChallenge, AcceptChallenge, LockChallenge, openModal }) => {
     return (
         <>
@@ -611,13 +615,6 @@ export const TimeGrid = ({ selectedTimesUTC, startHourUTC = 0 }) => {
     const [selectedTimes, setSelectedTimes] = React.useState([]);
     const timeSlots = generateSlotsForTimeZone(startHourUTC);
 
-    function generateSlotsForTimeZone(startHour) {
-        return Array.from({ length: 24 }, (slot, index) => (index + startHour) % 24).map(hour =>
-            luxon.DateTime.fromObject({ hour }, { zone: 'utc' })
-                .setZone('local')
-        );
-    };
-
     function toggleSlot(time) {
         const formattedTime = time.toFormat('HH:mm');
         let newSelectedTimes;
@@ -630,14 +627,6 @@ export const TimeGrid = ({ selectedTimesUTC, startHourUTC = 0 }) => {
 
         setSelectedTimes(newSelectedTimes);
         selectedTimesUTC.current = convertSlotsToUTC(newSelectedTimes);
-    };
-
-    function convertSlotsToUTC(times) {
-        return times.map(time =>
-            luxon.DateTime.fromFormat(time, 'HH:mm', { zone: 'local' })
-                .setZone('utc')
-                .toFormat('HH:mm')
-        );
     };
 
     return (
@@ -667,15 +656,34 @@ export const TimeGrid = ({ selectedTimesUTC, startHourUTC = 0 }) => {
     );
 }
 
+function generateSlotsForTimeZone(startHour) {
+    return Array.from(
+        { length: 24 },
+        (slot, index) => (index + startHour) % 24
+    ).map(hour =>
+        luxon.DateTime.fromObject({ hour }, { zone: 'utc' }).setZone('local')
+    );
+}
+function convertSlotsToUTC(times) {
+    return times.map(time =>
+        luxon.DateTime.fromFormat(time, 'HH:mm', { zone: 'local' })
+            .setZone('utc')
+            .toFormat('HH:mm')
+    );
+}
+
 export const TimeGridResponse = ({ availableTimesUTC, selectedTimeUTC, startHourUTC = 0 }) => {
     const [selectedTime, setSelectedTime] = React.useState(null);
     const timeSlots = generateSlotsForTimeZone(startHourUTC);
 
     function generateSlotsForTimeZone(startHour) {
-        return Array.from({ length: 24 }, (slot, index) => (index + startHour) % 24).map(hour =>
+        return Array.from(
+            { length: 24 },
+            (slot, index) => (index + startHour) % 24
+        ).map(hour =>
             luxon.DateTime.fromObject({ hour }, { zone: 'utc' }).toLocal()
         );
-    };
+    }
 
     function toggleSlot(time) {
         const formattedTimeLocal = time.toFormat('HH:mm');
@@ -688,7 +696,7 @@ export const TimeGridResponse = ({ availableTimesUTC, selectedTimeUTC, startHour
             setSelectedTime(formattedTimeLocal);
             selectedTimeUTC.current = formattedTimeUTC;
         }
-    };
+    }
 
     return (
         <>

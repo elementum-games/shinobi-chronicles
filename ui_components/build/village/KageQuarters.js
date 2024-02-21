@@ -3,27 +3,20 @@ import { StrategicInfoItem } from "./StrategicInfoItem.js";
 import { useModal } from '../utils/modalContext.js';
 import { TradeDisplay } from "./TradeDisplay.js";
 import KageDisplay from "./KageDisplay.js";
+import { getPolicyDisplayData, getVillageIcon } from "./villageUtils.js";
 export function KageQuarters({
-  playerID,
   playerSeatState,
   villageName,
-  villageAPI,
+  villageApiUrl,
   policyDataState,
   setPolicyDataState,
   seatDataState,
-  pointsDataState,
-  setPointsDataState,
-  diplomacyDataState,
   resourceDataState,
-  setResourceDataState,
   proposalDataState,
   setProposalDataState,
   strategicDataState,
   setStrategicDataState,
-  handleErrors,
-  getVillageIcon,
-  getPolicyDisplayData,
-  StrategicInfoItem
+  handleErrors
 }) {
   const kage = seatDataState.find(seat => seat.seat_type === 'kage');
   const [currentProposal, setCurrentProposal] = React.useState(null);
@@ -65,7 +58,7 @@ export function KageQuarters({
   } = useModal();
 
   const ChangePolicy = () => {
-    apiFetch(villageAPI, {
+    apiFetch(villageApiUrl, {
       request: 'CreateProposal',
       type: 'policy',
       policy_id: displayPolicyID
@@ -86,7 +79,7 @@ export function KageQuarters({
   };
 
   const DeclareWar = () => {
-    apiFetch(villageAPI, {
+    apiFetch(villageApiUrl, {
       request: 'CreateProposal',
       type: 'declare_war',
       target_village_id: viewingTargetVillage.village.village_id
@@ -107,7 +100,7 @@ export function KageQuarters({
   };
 
   const OfferPeace = () => {
-    apiFetch(villageAPI, {
+    apiFetch(villageApiUrl, {
       request: 'CreateProposal',
       type: 'offer_peace',
       target_village_id: viewingTargetVillage.village.village_id
@@ -128,7 +121,7 @@ export function KageQuarters({
   };
 
   const OfferAlliance = () => {
-    apiFetch(villageAPI, {
+    apiFetch(villageApiUrl, {
       request: 'CreateProposal',
       type: 'offer_alliance',
       target_village_id: viewingTargetVillage.village.village_id
@@ -149,7 +142,7 @@ export function KageQuarters({
   };
 
   const BreakAlliance = () => {
-    apiFetch(villageAPI, {
+    apiFetch(villageApiUrl, {
       request: 'CreateProposal',
       type: 'break_alliance',
       target_village_id: viewingTargetVillage.village.village_id
@@ -170,7 +163,7 @@ export function KageQuarters({
   };
 
   const CancelProposal = () => {
-    apiFetch(villageAPI, {
+    apiFetch(villageApiUrl, {
       request: 'CancelProposal',
       proposal_id: currentProposal.proposal_id
     }).then(response => {
@@ -192,7 +185,7 @@ export function KageQuarters({
   };
 
   const OfferTrade = () => {
-    apiFetch(villageAPI, {
+    apiFetch(villageApiUrl, {
       request: 'CreateProposal',
       type: 'offer_trade',
       target_village_id: viewingTargetVillage.village.village_id,
@@ -217,7 +210,7 @@ export function KageQuarters({
   };
 
   const EnactProposal = () => {
-    apiFetch(villageAPI, {
+    apiFetch(villageApiUrl, {
       request: 'EnactProposal',
       proposal_id: currentProposal.proposal_id
     }).then(response => {
@@ -245,7 +238,7 @@ export function KageQuarters({
   };
 
   const BoostVote = () => {
-    apiFetch(villageAPI, {
+    apiFetch(villageApiUrl, {
       request: 'BoostVote',
       proposal_id: currentProposal.proposal_id
     }).then(response => {
@@ -266,7 +259,7 @@ export function KageQuarters({
   };
 
   const CancelVote = () => {
-    apiFetch(villageAPI, {
+    apiFetch(villageApiUrl, {
       request: 'CancelVote',
       proposal_id: currentProposal.proposal_id
     }).then(response => {
@@ -287,7 +280,7 @@ export function KageQuarters({
   };
 
   const SubmitVote = vote => {
-    apiFetch(villageAPI, {
+    apiFetch(villageApiUrl, {
       request: 'SubmitVote',
       proposal_id: currentProposal.proposal_id,
       vote: vote

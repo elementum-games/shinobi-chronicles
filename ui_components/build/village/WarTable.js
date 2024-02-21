@@ -1,13 +1,11 @@
 import { apiFetch } from "../utils/network.js";
-import { ModalProvider } from "../utils/modalContext.js";
+import { getPolicyDisplayData, getVillageBanner, getVillageIcon } from "./villageUtils.js";
 export function WarTable({
   playerWarLogData,
   warRecordData,
   strategicDataState,
   villageAPI,
-  handleErrors,
-  getVillageIcon,
-  getPolicyDisplayData
+  handleErrors
 }) {
   const [playerWarLog, setPlayerWarLog] = React.useState(playerWarLogData.player_war_log);
   const [globalLeaderboardWarLogs, setGlobalLeaderboardWarLogs] = React.useState(playerWarLogData.global_leaderboard_war_logs);
@@ -15,22 +13,7 @@ export function WarTable({
   const [warRecords, setWarRecords] = React.useState(warRecordData.war_records);
   const [warRecordsPageNumber, setWarRecordsPageNumber] = React.useState(1);
   const [selectedWarRecord, setSelectedWarRecord] = React.useState(null);
-  function getVillageBanner(village_id) {
-    switch (village_id) {
-      case 1:
-        return '/images/v2/decorations/strategic_banners/stratbannerstone.jpg';
-      case 2:
-        return '/images/v2/decorations/strategic_banners/stratbannercloud.jpg';
-      case 3:
-        return '/images/v2/decorations/strategic_banners/stratbannerleaf.jpg';
-      case 4:
-        return '/images/v2/decorations/strategic_banners/stratbannersand.jpg';
-      case 5:
-        return '/images/v2/decorations/strategic_banners/stratbannermist.jpg';
-      default:
-        return null;
-    }
-  }
+
   function WarLogHeader() {
     return /*#__PURE__*/React.createElement("div", {
       className: "warlog_label_row"
@@ -58,11 +41,11 @@ export function WarTable({
       className: "warlog_chart_label"
     }));
   }
+
   function PlayerWarLog({
     log,
     index,
-    animate,
-    getVillageIcon
+    animate
   }) {
     const scoreData = [{
       name: 'Objective Score',
@@ -80,15 +63,15 @@ export function WarTable({
       className: "warlog_item"
     }, /*#__PURE__*/React.createElement("div", {
       className: "warlog_data_row"
-    }, log.rank == 1 && /*#__PURE__*/React.createElement("span", {
+    }, log.rank === 1 && /*#__PURE__*/React.createElement("span", {
       className: "warlog_rank_wrapper"
     }, /*#__PURE__*/React.createElement("span", {
       className: "warlog_rank first"
-    }, log.rank)), log.rank == 2 && /*#__PURE__*/React.createElement("span", {
+    }, log.rank)), log.rank === 2 && /*#__PURE__*/React.createElement("span", {
       className: "warlog_rank_wrapper"
     }, /*#__PURE__*/React.createElement("span", {
       className: "warlog_rank second"
-    }, log.rank)), log.rank == 3 && /*#__PURE__*/React.createElement("span", {
+    }, log.rank)), log.rank === 3 && /*#__PURE__*/React.createElement("span", {
       className: "warlog_rank_wrapper"
     }, /*#__PURE__*/React.createElement("span", {
       className: "warlog_rank third"
@@ -174,13 +157,13 @@ export function WarTable({
       fill: "#d64866"
     })), /*#__PURE__*/React.createElement("div", null, "Battle score (", Math.round(log.battle_score / Math.max(log.war_score, 1) * 100), "%)"))))));
   }
+
   function WarRecord({
     record,
-    index,
-    getVillageIcon,
-    getVillageBanner
+    index
   }) {
     const is_active = record.village_relation.relation_end ? false : true;
+
     const renderScoreBar = () => {
       const total_score = record.attacker_war_log.war_score + record.defender_war_log.war_score;
       const attacker_score_percentage = Math.round(record.attacker_war_log.war_score / total_score * 100);
@@ -244,12 +227,17 @@ export function WarTable({
         strokeWidth: "20"
       })));
     };
+
     return /*#__PURE__*/React.createElement("div", {
       key: index,
-      className: "war_record" + (selectedWarRecord && record.village_relation.relation_id == selectedWarRecord.village_relation.relation_id ? " selected" : ""),
+      className: "war_record" + (selectedWarRecord && record.village_relation.relation_id === selectedWarRecord.village_relation.relation_id ? " selected" : ""),
       onClick: () => setSelectedWarRecord(record),
       style: {
-        background: `linear-gradient(to right, transparent 0%, #17161b 30%, #17161b 70%, transparent 100%), url('${getVillageBanner(record.village_relation.village1_id)}'), url('${getVillageBanner(record.village_relation.village2_id)}')`,
+        background: `
+                        linear-gradient(to right, transparent 0%, #17161b 30%, #17161b 70%, transparent 100%), 
+                        url('${getVillageBanner(record.village_relation.village1_id)}'), 
+                        url('${getVillageBanner(record.village_relation.village2_id)}')
+                    `,
         backgroundPosition: "center, -20% center, 115% center",
         backgroundSize: "cover, auto, auto",
         backgroundRepeat: "no-repeat"
@@ -280,16 +268,15 @@ export function WarTable({
       src: getVillageIcon(record.village_relation.village2_id)
     }))));
   }
+
   function VillageWarLog({
     log,
-    getVillageIcon,
     animate,
     is_attacker,
-    getPolicyDisplayData,
     strategicDataState
   }) {
-    console.log(strategicDataState.find(item => item.village.name == "Stone"));
-    const policy_name = getPolicyDisplayData(strategicDataState.find(item => item.village.name == log.village_name).village.policy_id).name;
+    console.log(strategicDataState.find(item => item.village.name === "Stone"));
+    const policy_name = getPolicyDisplayData(strategicDataState.find(item => item.village.name === log.village_name).village.policy_id).name;
     const scoreData = [{
       name: 'Objective Score',
       score: log.objective_score
@@ -419,6 +406,7 @@ export function WarTable({
       className: "village_warlog_details_value"
     }, log.resources_stolen))));
   }
+
   const GlobalLeaderboardNextPage = page_number => {
     apiFetch(villageAPI, {
       request: 'GetGlobalWarLeaderboard',
@@ -428,7 +416,8 @@ export function WarTable({
         handleErrors(response.errors);
         return;
       }
-      if (response.data.warLogData.global_leaderboard_war_logs.length == 0) {
+
+      if (response.data.warLogData.global_leaderboard_war_logs.length === 0) {
         return;
       } else {
         setGlobalLeaderboardPageNumber(page_number);
@@ -436,6 +425,7 @@ export function WarTable({
       }
     });
   };
+
   const GlobalLeaderboardPreviousPage = page_number => {
     if (page_number > 0) {
       apiFetch(villageAPI, {
@@ -446,11 +436,13 @@ export function WarTable({
           handleErrors(response.errors);
           return;
         }
+
         setGlobalLeaderboardPageNumber(page_number);
         setGlobalLeaderboardWarLogs(response.data.warLogData.global_leaderboard_war_logs);
       });
     }
   };
+
   const WarRecordsNextPage = page_number => {
     apiFetch(villageAPI, {
       request: 'GetWarRecords',
@@ -460,7 +452,8 @@ export function WarTable({
         handleErrors(response.errors);
         return;
       }
-      if (response.data.warRecordData.war_records.length == 0) {
+
+      if (response.data.warRecordData.war_records.length === 0) {
         return;
       } else {
         setWarRecordsPageNumber(page_number);
@@ -468,6 +461,7 @@ export function WarTable({
       }
     });
   };
+
   const WarRecordsPreviousPage = page_number => {
     if (page_number > 0) {
       apiFetch(villageAPI, {
@@ -478,11 +472,13 @@ export function WarTable({
           handleErrors(response.errors);
           return;
         }
+
         setWarRecordsPageNumber(page_number);
         setWarRecords(response.data.warRecordData.war_records);
       });
     }
   };
+
   return /*#__PURE__*/React.createElement("div", {
     className: "wartable_container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -496,8 +492,7 @@ export function WarTable({
   }, /*#__PURE__*/React.createElement(WarLogHeader, null), /*#__PURE__*/React.createElement(PlayerWarLog, {
     log: playerWarLog,
     index: 0,
-    animate: false,
-    getVillageIcon: getVillageIcon
+    animate: false
   })))), /*#__PURE__*/React.createElement("div", {
     className: "row second"
   }, /*#__PURE__*/React.createElement("div", {
@@ -533,8 +528,7 @@ export function WarTable({
   })), globalLeaderboardWarLogs.map((log, index) => /*#__PURE__*/React.createElement(PlayerWarLog, {
     log: log,
     index: index,
-    animate: true,
-    getVillageIcon: getVillageIcon
+    animate: true
   }))), /*#__PURE__*/React.createElement("div", {
     className: "global_leaderboard_navigation"
   }, /*#__PURE__*/React.createElement("div", {
@@ -623,9 +617,7 @@ export function WarTable({
     className: "war_records_container"
   }, warRecords.map((record, index) => /*#__PURE__*/React.createElement(WarRecord, {
     record: record,
-    index: index,
-    getVillageIcon: getVillageIcon,
-    getVillageBanner: getVillageBanner
+    index: index
   }))), /*#__PURE__*/React.createElement("div", {
     className: "global_leaderboard_navigation"
   }, /*#__PURE__*/React.createElement("div", {
@@ -678,17 +670,13 @@ export function WarTable({
     className: "village_warlog_container"
   }, /*#__PURE__*/React.createElement(VillageWarLog, {
     log: selectedWarRecord.attacker_war_log,
-    getVillageIcon: getVillageIcon,
     animate: true,
     is_attacker: true,
-    getPolicyDisplayData: getPolicyDisplayData,
     strategicDataState: strategicDataState
   }), /*#__PURE__*/React.createElement(VillageWarLog, {
     log: selectedWarRecord.defender_war_log,
-    getVillageIcon: getVillageIcon,
     animate: true,
     is_attacker: false,
-    getPolicyDisplayData: getPolicyDisplayData,
     strategicDataState: strategicDataState
   })))));
 }
