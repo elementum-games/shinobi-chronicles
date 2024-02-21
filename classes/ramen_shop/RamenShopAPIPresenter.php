@@ -2,7 +2,7 @@
 
 class RamenShopAPIPresenter {
     public static function ramenShopOwnerResponse(System $system, User $player) {
-        $owner = RamenShopManager::loadRamenOwnerDetails($player->village);
+        $owner = RamenShopManager::loadRamenOwnerDetails($player);
         return [
             "name" => $owner->name,
             "image" => $owner->image,

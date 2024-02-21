@@ -162,7 +162,7 @@ function RamenShop({
     className: "ramen_shop_dialogue_nameplate"
   }, ramenOwnerDetails.name), /*#__PURE__*/React.createElement("div", {
     className: "ramen_shop_dialogue_text"
-  }, ramenOwnerDetails.dialogue)), /*#__PURE__*/React.createElement("img", {
+  }, parseKeywords(ramenOwnerDetails.dialogue))), /*#__PURE__*/React.createElement("img", {
     src: ramenOwnerDetails.image,
     className: "ramen_shop_owner_img"
   }))), /*#__PURE__*/React.createElement("div", {
