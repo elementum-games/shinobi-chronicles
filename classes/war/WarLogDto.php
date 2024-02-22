@@ -24,12 +24,12 @@ class WarLogDto {
     public int $villages_captured = 0;
     public int $pvp_wins = 0;
     public int $points_gained = 0;
+    public int $stability_gained = 0;
+    public int $stability_reduced = 0;
     public int $war_score = 0;
     public int $objective_score = 0;
     public int $resource_score = 0;
     public int $battle_score = 0;
-    public int $stability_gained = 0;
-    public int $stability_reduced = 0;
 
     public function __construct(array $row, string $log_type) {
         $this->log_id = $row['log_id'];
