@@ -943,7 +943,7 @@
     flex-direction: column;
     gap: 3px;
     box-sizing: border-box;
-    padding-top: 18px;
+    padding-top: 20px;
 }
 .village_policy_main_container {
     clip-path: polygon(17px 0%, calc(100% - 17px) 0%, 100% 20px, 100% calc(100% - 20px), calc(100% - 17px) 100%, 17px 100%, 0% calc(100% - 20px), 0% 20px);
@@ -1025,6 +1025,7 @@
 }
 .policy_bonus_item, .policy_resource_item, .policy_penalty_item {
     display: flex;
+    line-height: 10px;
     margin-left: 15px;
 }
 .village_policy_previous_wrapper {

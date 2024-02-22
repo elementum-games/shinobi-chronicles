@@ -22,14 +22,11 @@ type Props = {|
     +policyDataState: VillagePolicyType,
     +setPolicyDataState: (VillagePolicyType) => void,
     +seatDataState: $ReadOnlyArray<VillageSeatType>,
-    +resourceDataState: $ReadOnlyArray < VillageResourceStrategicInfo >,
-    +setResourceDataState: ($ReadOnlyArray < VillageResourceStrategicInfo >) => void,
+    +resourceDataState: $ReadOnlyArray<VillageResourceStrategicInfo>,
     +proposalDataState: $ReadOnlyArray<VillageProposalType>,
     +strategicDataState: $ReadOnlyArray<VillageStrategicInfo>,
     +setProposalDataState: ($ReadOnlyArray<VillageProposalType>) => void,
-    +setStrategicDataState: ($ReadOnlyArray < VillageStrategicInfo >) => void,
-    +buildingUpgradeDataState: $ReadOnlyArray < BuildingUpgradeDataType >,
-    +setBuildingUpgradeDataState: ($ReadOnlyArray < BuildingUpgradeDataType >) => void,
+    +setStrategicDataState: ($ReadOnlyArray<VillageStrategicInfo>) => void,
     +handleErrors: ($ReadOnlyArray<string>) => void,
 |};
 export function KageQuarters({
@@ -40,13 +37,10 @@ export function KageQuarters({
     setPolicyDataState,
     seatDataState,
     resourceDataState,
-    setResourceDataState,
     proposalDataState,
     setProposalDataState,
     strategicDataState,
     setStrategicDataState,
-    buildingUpgradeDataState,
-    setBuildingUpgradeDataState,
     handleErrors,
 }: Props) {
     const kage = seatDataState.find(seat => seat.seat_type === 'kage');
@@ -249,8 +243,6 @@ export function KageQuarters({
             setStrategicDataState(response.data.strategicData);
             setPlayerVillageData(response.data.strategicData.find(item => item.village.name === villageName));
             setViewingTargetVillage(response.data.strategicData.find(item => item.village.name === viewingTargetVillage.village.name));
-            setBuildingUpgradeDataState(response.data.buildingUpgradeData);
-            setResourceDataState(response.data.resourceData);
             openModal({
                 header: 'Confirmation',
                 text: response.data.response_message,

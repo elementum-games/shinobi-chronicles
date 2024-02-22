@@ -4,7 +4,6 @@ import { WarTable } from "./WarTable.js";
 import { VillageHQ } from "./VillageHQ.js";
 import { WorldInfo } from "./WorldInfo.js";
 import { KageQuarters } from "./KageQuarters.js";
-import { VillageUpgrades } from "./VillageUpgrades.js";
 
 function Village({
     playerID,
@@ -24,7 +23,6 @@ function Village({
     playerWarLogData,
     warRecordData,
     kageRecords,
-    buildingUpgradeData,
 }) {
     const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
     const [policyDataState, setPolicyDataState] = React.useState(policyData);
@@ -35,7 +33,6 @@ function Village({
     const [proposalDataState, setProposalDataState] = React.useState(proposalData);
     const [strategicDataState, setStrategicDataState] = React.useState(strategicData);
     const [challengeDataState, setChallengeDataState] = React.useState(challengeData);
-    const [buildingUpgradeDataState, setBuildingUpgradeDataState] = React.useState(buildingUpgradeData);
     const [villageTab, setVillageTab] = React.useState("villageHQ");
 
     function handleErrors(errors) {
@@ -48,7 +45,7 @@ function Village({
                 <div className="nav_button" onClick={() => setVillageTab("villageHQ")}>village hq</div>
                 <div className="nav_button" onClick={() => setVillageTab("worldInfo")}>world info</div>
                 <div className="nav_button" onClick={() => setVillageTab("warTable")}>war table</div>
-                <div className="nav_button" onClick={() => setVillageTab("villageUpgrades")}>upgrades</div>
+                <div className="nav_button disabled">members & teams</div>
                 <div className={playerSeatState.seat_id != null ? "nav_button" : "nav_button disabled"} onClick={() => setVillageTab("kageQuarters")}>kage's quarters</div>
             </div>
             {villageTab === "villageHQ" &&
@@ -94,8 +91,6 @@ function Village({
                     strategicDataState={strategicDataState}
                     setStrategicDataState={setStrategicDataState}
                     handleErrors={handleErrors}
-                    buildingUpgradeDataState={buildingUpgradeDataState}
-                    setBuildingUpgradeDataState={setBuildingUpgradeDataState}
                 />
             }
             {villageTab === "worldInfo" &&
@@ -111,18 +106,6 @@ function Village({
                     strategicDataState={strategicDataState}
                     villageAPI={villageAPI}
                     handleErrors={handleErrors}
-                />
-            }
-            {villageTab == "villageUpgrades" &&
-                <VillageUpgrades
-                    playerID={playerID}
-                    playerSeatState={playerSeatState}
-                    villageName={villageName}
-                    villageAPI={villageAPI}
-                    buildingUpgradeDataState={buildingUpgradeDataState}
-                    setBuildingUpgradeDataState={setBuildingUpgradeDataState}
-                    resourceDataState={resourceDataState}
-                    setProposalDataState={setProposalDataState}
                 />
             }
         </ModalProvider>

@@ -13,13 +13,10 @@ export function KageQuarters({
   setPolicyDataState,
   seatDataState,
   resourceDataState,
-  setResourceDataState,
   proposalDataState,
   setProposalDataState,
   strategicDataState,
   setStrategicDataState,
-  buildingUpgradeDataState,
-  setBuildingUpgradeDataState,
   handleErrors
 }) {
   const kage = seatDataState.find(seat => seat.seat_type === 'kage');
@@ -214,8 +211,6 @@ export function KageQuarters({
       setStrategicDataState(response.data.strategicData);
       setPlayerVillageData(response.data.strategicData.find(item => item.village.name === villageName));
       setViewingTargetVillage(response.data.strategicData.find(item => item.village.name === viewingTargetVillage.village.name));
-      setBuildingUpgradeDataState(response.data.buildingUpgradeData);
-      setResourceDataState(response.data.resourceData);
       openModal({
         header: 'Confirmation',
         text: response.data.response_message,
