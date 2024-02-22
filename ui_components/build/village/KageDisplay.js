@@ -53,21 +53,16 @@ export default function KageDisplay({
     onClick: onChallenge
   }, "challenge")));
 }
-
 function getKageKanji(village_name) {
   switch (village_name) {
     case 'Stone':
       return '土影';
-
     case 'Cloud':
       return '雷影';
-
     case 'Leaf':
       return '火影';
-
     case 'Sand':
       return '風影';
-
     case 'Mist':
       return '水影';
   }

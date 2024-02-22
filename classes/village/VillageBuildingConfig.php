@@ -10,12 +10,12 @@ class VillageBuildingConfig {
     const BUILDING_STATUS_REPAIRING = 'repairing'; // used when repairing damage, currently unused
 
     /* base values used for upgrade configuration */
-    const BASE_T1_CONSTRUCTION_COST_TOTAL = 14400;
+    const BASE_T1_CONSTRUCTION_COST_TOTAL = 57600;
     const BASE_T2_CONSTRUCTION_COST_TOTAL = 108000;
-    const BASE_T3_CONSTRUCTION_COST_TOTAL = 540000;
-    const BASE_T1_CONSTRUCTION_TIME_DAYS = 4;
-    const BASE_T2_CONSTRUCTION_TIME_DAYS = 12;
-    const BASE_T3_CONSTRUCTION_TIME_DAYS = 36;
+    const BASE_T3_CONSTRUCTION_COST_TOTAL = 302400;
+    const BASE_T1_CONSTRUCTION_TIME_DAYS = 2;
+    const BASE_T2_CONSTRUCTION_TIME_DAYS = 14;
+    const BASE_T3_CONSTRUCTION_TIME_DAYS = 42;
     const BASE_T0_MAX_HEALTH = 125000;
     const BASE_T1_MAX_HEALTH = 250000;
     const BASE_T2_MAX_HEALTH = 500000;
@@ -332,6 +332,21 @@ class VillageBuildingConfig {
     ];
 
     /* upgrade set keys */
+    const UPGRADE_SET_KEY_HIDDEN_1 = 'HIDDEN_1';
+    const UPGRADE_SET_KEY_HIDDEN_2 = 'HIDDEN_2';
+    const UPGRADE_SET_KEY_HIDDEN_3 = 'HIDDEN_3';
+    const UPGRADE_SET_KEY_HIDDEN_4 = 'HIDDEN_4';
+    const UPGRADE_SET_KEY_HIDDEN_5 = 'HIDDEN_5';
+    const UPGRADE_SET_KEY_HIDDEN_6 = 'HIDDEN_6';
+    const UPGRADE_SET_KEY_HIDDEN_7 = 'HIDDEN_7';
+    const UPGRADE_SET_KEY_HIDDEN_8 = 'HIDDEN_8';
+    const UPGRADE_SET_KEY_HIDDEN_9 = 'HIDDEN_9';
+    const UPGRADE_SET_KEY_HIDDEN_10 = 'HIDDEN_10';
+    const UPGRADE_SET_KEY_HIDDEN_11 = 'HIDDEN_11';
+    const UPGRADE_SET_KEY_HIDDEN_12 = 'HIDDEN_12';
+    const UPGRADE_SET_KEY_HIDDEN_13 = 'HIDDEN_13';
+    const UPGRADE_SET_KEY_HIDDEN_14 = 'HIDDEN_14';
+    const UPGRADE_SET_KEY_HIDDEN_15 = 'HIDDEN_15';
     const UPGRADE_SET_KEY_RESEARCH = 'RESEARCH';
     const UPGRADE_SET_KEY_RESEARCH_SUBSIDIES = 'RESEARCH_SUBSIDIES';
     const UPGRADE_SET_KEY_ADMINISTRATION = 'ADMINISTRATION';
@@ -355,6 +370,7 @@ class VillageBuildingConfig {
     const UPGRADE_SET_KEY_FARMERS_MARKET = 'FARMERS_MARKET';
     const UPGRADE_SET_KEY_MERCHANTS_GUILD = 'MERCHANTS_GUILD';
     const UPGRADE_SET_KEY_WAREHOUSES = 'WAREHOUSES';
+    const UPGRADE_SET_KEY_SUPPLY_LINES = 'SUPPLY_LINES';
     const UPGRADE_SET_KEY_ANCESTRAL_LEGACY = 'ANCESTRAL_LEGACY';
     const UPGRADE_SET_KEY_FORTUNES_BOUNTY = 'FORTUNES_BOUNTY';
     const UPGRADE_SET_KEY_INSPIRED_ITAMAE = 'INSPIRED ITAMAE';
@@ -365,17 +381,25 @@ class VillageBuildingConfig {
     /* upgrade sets for each building, indexed by building key */
     const BUILDING_UPGRADE_SETS = [
         self::BUILDING_VILLAGE_HQ => [
+            self::UPGRADE_SET_KEY_RESEARCH,
             self::UPGRADE_SET_KEY_RESEARCH_SUBSIDIES,
             self::UPGRADE_SET_KEY_ADMINISTRATION,
             self::UPGRADE_SET_KEY_POWER_PROJECTION,
+            self::UPGRADE_SET_KEY_HIDDEN_1,
+            self::UPGRADE_SET_KEY_HIDDEN_2,
         ],
         self::BUILDING_ACADEMY => [
             self::UPGRADE_SET_KEY_EDUCATION_SUBSIDIES,
             self::UPGRADE_SET_KEY_TRAINING_GROUNDS,
+            self::UPGRADE_SET_KEY_HIDDEN_3,
+            self::UPGRADE_SET_KEY_HIDDEN_4,
         ],
         self::BUILDING_HOSPITAL => [
             self::UPGRADE_SET_KEY_MEDICAL_SUBSIDIES,
             self::UPGRADE_SET_KEY_HERBICULTURE,
+            self::UPGRADE_SET_KEY_HIDDEN_5,
+            self::UPGRADE_SET_KEY_HIDDEN_6,
+            self::UPGRADE_SET_KEY_HIDDEN_7,
         ],
         self::BUILDING_ANBU_HQ => [
             self::UPGRADE_SET_KEY_MILITARY_SUBSIDIES,
@@ -384,22 +408,32 @@ class VillageBuildingConfig {
             self::UPGRADE_SET_KEY_UNDERWORLD_CONNECTIONS,
             self::UPGRADE_SET_KEY_GUERRILLA_WARFARE,
             self::UPGRADE_SET_KEY_SELECTIVE_RECRUITMENT,
+            self::UPGRADE_SET_KEY_HIDDEN_8,
+            self::UPGRADE_SET_KEY_HIDDEN_9,
         ],
         self::BUILDING_WORKSHOP => [
+            self::UPGRADE_SET_KEY_CONSTRUCTION,
             self::UPGRADE_SET_KEY_ENGINEERING_SUBSIDIES,
             self::UPGRADE_SET_KEY_RAPID_DEPLOYMENT,
             self::UPGRADE_SET_KEY_ENGINEERING_CORPS,
             self::UPGRADE_SET_KEY_FORTIFICATIONS,
+            self::UPGRADE_SET_KEY_HIDDEN_10,
         ],
         self::BUILDING_MARKETPLACE => [
             self::UPGRADE_SET_KEY_BULK_SUPPLIERS,
             self::UPGRADE_SET_KEY_FARMERS_MARKET,
             self::UPGRADE_SET_KEY_MERCHANTS_GUILD,
             self::UPGRADE_SET_KEY_WAREHOUSES,
+            self::UPGRADE_SET_KEY_SUPPLY_LINES,
+            self::UPGRADE_SET_KEY_HIDDEN_11,
         ],
         self::BUILDING_SHRINE => [
             self::UPGRADE_SET_KEY_ANCESTRAL_LEGACY,
             self::UPGRADE_SET_KEY_FORTUNES_BOUNTY,
+            self::UPGRADE_SET_KEY_HIDDEN_12,
+            self::UPGRADE_SET_KEY_HIDDEN_13,
+            self::UPGRADE_SET_KEY_HIDDEN_14,
+            self::UPGRADE_SET_KEY_HIDDEN_15,
         ],
         self::BUILDING_RAMEN_STAND => [
             self::UPGRADE_SET_KEY_INSPIRED_ITAMAE,
@@ -411,6 +445,22 @@ class VillageBuildingConfig {
 
     /* upgrade set names, indexed by upgrade set key */
     const UPGRADE_SET_NAMES = [
+        self::UPGRADE_SET_KEY_HIDDEN_1 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_1 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_2 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_3 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_4 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_5 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_6 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_7 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_8 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_9 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_10 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_11 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_12 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_13 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_14 => 'To Be Discovered',
+        self::UPGRADE_SET_KEY_HIDDEN_15 => 'To Be Discovered',
         self::UPGRADE_SET_KEY_RESEARCH => 'Research',
         self::UPGRADE_SET_KEY_RESEARCH_SUBSIDIES => 'Research Subsidies',
         self::UPGRADE_SET_KEY_ADMINISTRATION => 'Administration',
@@ -434,6 +484,7 @@ class VillageBuildingConfig {
         self::UPGRADE_SET_KEY_FARMERS_MARKET => 'Farmers Market',
         self::UPGRADE_SET_KEY_MERCHANTS_GUILD => 'Merchants Guild',
         self::UPGRADE_SET_KEY_WAREHOUSES => 'Warehouses',
+        self::UPGRADE_SET_KEY_SUPPLY_LINES => 'Supply Lines',
         self::UPGRADE_SET_KEY_ANCESTRAL_LEGACY => 'Ancestral Legacy',
         self::UPGRADE_SET_KEY_FORTUNES_BOUNTY => 'Fortune\'s Bounty',
         self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => 'Inspired Itamae',
@@ -444,10 +495,25 @@ class VillageBuildingConfig {
 
     /* upgrade set descriptions, indexed by upgrade set key */
     const UPGRADE_SET_DESCRIPTIONS = [
-        self::UPGRADE_SET_KEY_RESEARCH => "Enables researching higher tier upgrades.",
+        self::UPGRADE_SET_KEY_HIDDEN_1 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_2 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_3 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_4 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_5 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_6 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_7 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_8 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_9 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_10 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_11 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_12 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_13 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_14 => "",
+        self::UPGRADE_SET_KEY_HIDDEN_15 => "",
+        self::UPGRADE_SET_KEY_RESEARCH => "Permanently increases research speed.",
         self::UPGRADE_SET_KEY_RESEARCH_SUBSIDIES => "Increases overall research speed.",
         self::UPGRADE_SET_KEY_ADMINISTRATION => "Decreases upkeep from active upgrades.",
-        self::UPGRADE_SET_KEY_POWER_PROJECTION => "Increases the baseline and maximum Stability.",
+        self::UPGRADE_SET_KEY_POWER_PROJECTION => "Increases the baseline and maximum stability.",
         self::UPGRADE_SET_KEY_EDUCATION_SUBSIDIES => "Increases training speed.",
         self::UPGRADE_SET_KEY_TRAINING_GROUNDS => "Chance for double experience gains from battle.",
         self::UPGRADE_SET_KEY_MEDICAL_SUBSIDIES => "Increases village regen rate.",
@@ -458,7 +524,7 @@ class VillageBuildingConfig {
         self::UPGRADE_SET_KEY_UNDERWORLD_CONNECTIONS => "Increases speed of infiltrating.",
         self::UPGRADE_SET_KEY_GUERRILLA_WARFARE => "Increases stability for villages occupied by an enemy.",
         self::UPGRADE_SET_KEY_SELECTIVE_RECRUITMENT => "Increases strength of patrols.",
-        self::UPGRADE_SET_KEY_CONSTRUCTION => "Enables construction higher tier buildings",
+        self::UPGRADE_SET_KEY_CONSTRUCTION => "Permanently increases construction speed.",
         self::UPGRADE_SET_KEY_ENGINEERING_SUBSIDIES => "Increases construction speed.",
         self::UPGRADE_SET_KEY_RAPID_DEPLOYMENT => "Increases speed of reinforcing.",
         self::UPGRADE_SET_KEY_ENGINEERING_CORPS => "Increases heal from reinforcing.",
@@ -466,10 +532,11 @@ class VillageBuildingConfig {
         self::UPGRADE_SET_KEY_BULK_SUPPLIERS => "Increases masterials production in exchange for wealth.",
         self::UPGRADE_SET_KEY_FARMERS_MARKET => "Increases food production in exchange for wealth.",
         self::UPGRADE_SET_KEY_MERCHANTS_GUILD => "Increases wealth production in exchange for materials and food.",
-        self::UPGRADE_SET_KEY_WAREHOUSES => "Increases maximum resource capacity.",
-        self::UPGRADE_SET_KEY_ANCESTRAL_LEGACY => "Increases chance of obtaining a bloodline.",
+        self::UPGRADE_SET_KEY_WAREHOUSES => "Permanently increases maximum resource capacity.",
+        self::UPGRADE_SET_KEY_SUPPLY_LINES => "Increases caravan speed.",
+        self::UPGRADE_SET_KEY_ANCESTRAL_LEGACY => "Permanently increases chance of obtaining a bloodline.",
         self::UPGRADE_SET_KEY_FORTUNES_BOUNTY => "Chance for double yen gains from battle.",
-        self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => "Unlocks new ramen recipes.",
+        self::UPGRADE_SET_KEY_INSPIRED_ITAMAE => "Permanently unlocks new ramen recipes.",
         self::UPGRADE_SET_KEY_NINJA_FRIENDLY_RATES => "Decreases cost of ramen.",
         self::UPGRADE_SET_KEY_QUALITY_INGREDIENTS => "Increases duration of ramen buffs.",
         self::UPGRADE_SET_KEY_LUCK_IN_LEFTOVERS => "Increases chance of Mystery Ramen appearing.",
@@ -477,6 +544,21 @@ class VillageBuildingConfig {
 
     /* upgrade set upgrades, indexed by upgrade set key */
     const UPGRADE_SET_UPGRADES = [
+        self::UPGRADE_SET_KEY_HIDDEN_1 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_2 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_3 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_4 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_5 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_6 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_7 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_8 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_9 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_10 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_11 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_12 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_13 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_14 => [],
+        self::UPGRADE_SET_KEY_HIDDEN_15 => [],
         self::UPGRADE_SET_KEY_RESEARCH => [
             VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_I,
             VillageUpgradeConfig::UPGRADE_KEY_RESEARCH_II,
@@ -590,6 +672,11 @@ class VillageBuildingConfig {
         self::UPGRADE_SET_KEY_WAREHOUSES => [
             VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I,
             VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II,
+        ],
+        self::UPGRADE_SET_KEY_SUPPLY_LINES => [
+            VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I,
+            VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_II,
+            VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_III,
         ],
         self::UPGRADE_SET_KEY_ANCESTRAL_LEGACY => [
             VillageUpgradeConfig::UPGRADE_KEY_ANCESTRAL_LEGACY_I,
