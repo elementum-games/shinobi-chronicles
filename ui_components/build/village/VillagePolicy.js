@@ -23,12 +23,15 @@ export default function VillagePolicy({
   }, /*#__PURE__*/React.createElement("svg", {
     width: "16",
     height: "16",
-    viewBox: "0 0 100 100"
+    viewBox: "0 0 100 100",
+    style: {
+      flex: "0 0 auto"
+    }
   }, /*#__PURE__*/React.createElement("polygon", {
-    points: "25,20 50,45 25,70 0,45",
+    points: "25,40 50,65 25,90 0,65",
     fill: "#4a5e45"
   }), /*#__PURE__*/React.createElement("polygon", {
-    points: "25,0 50,25 25,50 0,25",
+    points: "25,20 50,45 25,70 0,45",
     fill: "#6ab352"
   })), /*#__PURE__*/React.createElement("div", {
     className: "policy_bonus_text"
@@ -87,7 +90,22 @@ export default function VillagePolicy({
     points: "35,0 35,100 100,50"
   }))))), /*#__PURE__*/React.createElement("div", {
     className: "village_policy_penalty_container"
-  }, policyDisplay.penalties.map((penalty, index) => /*#__PURE__*/React.createElement("div", {
+  }, policyDisplay.resources.map((resource, index) => /*#__PURE__*/React.createElement("div", {
+    key: index,
+    className: "policy_resource_item"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "16",
+    height: "16",
+    viewBox: "0 0 100 100"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "25,20 50,45 25,70 0,45",
+    fill: "#414b8c"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "25,0 50,25 25,50 0,25",
+    fill: "#5964a6"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "policy_resource_text"
+  }, resource))), policyDisplay.penalties.map((penalty, index) => /*#__PURE__*/React.createElement("div", {
     key: index,
     className: "policy_penalty_item"
   }, /*#__PURE__*/React.createElement("svg", {
