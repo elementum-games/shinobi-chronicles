@@ -100,6 +100,28 @@ class Village {
             $this->active_upgrade_effects = VillageUpgradeManager::initializeEffectsForVillage($this->system, $this->upgrades);
             $this->construction_speed += $this->policy->construction_speed + $this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED];
             $this->research_speed += $this->policy->research_speed + $this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED];
+            if ($this->policy->construction_speed > 0) {
+                $result = $system->db->query("SELECT `village_id`, `construction_score` FROM `villages`");
+                $village_scores = $system->db->fetch_all($result);
+                $num_villages = 0;
+                foreach ($village_scores as $score) {
+                    if ($score['village_id'] != $this->village_id && $score['construction_score'] > $this->construction_score) {
+                        $num_villages++;
+                    }
+                }
+                $this->construction_speed += ($num_villages * $this->policy->construction_speed) / 100;
+            }
+            if ($this->policy->research_speed > 0) {
+                $result = $system->db->query("SELECT `village_id`, `research_score` FROM `villages`");
+                $village_scores = $system->db->fetch_all($result);
+                $num_villages = 0;
+                foreach ($village_scores as $score) {
+                    if ($score['village_id'] != $this->village_id && $score['research_score'] > $this->research_score) {
+                        $num_villages++;
+                    }
+                }
+                $this->research_speed += ($num_villages * $this->policy->research_speed) / 100;
+            }
         }
     }
 

@@ -157,8 +157,8 @@ class VillageUpgradeManager {
                     $upgrade_config_data = VillageUpgradeManager::$UPGRADE_CONFIGS[$upgrade_key];
                     $upgrade = $village->upgrades[$upgrade_key] ?? null;
                     if (isset($upgrade)) {
-                        if ($upgrade->construction_progress != null) {
-                            $research_time_remaining = ($upgrade->research_progress_required - $upgrade->construction_progress) / $village->research_speed;
+                        if ($upgrade->research_progress != null) {
+                            $research_time_remaining = ($upgrade->research_progress_required - $upgrade->research_progress) / $village->research_speed;
                             $research_time_remaining = System::TimeRemaining($research_time_remaining, format: "long", include_seconds: false, include_minutes: false);
                         } else {
                             $research_time_remaining = '';
