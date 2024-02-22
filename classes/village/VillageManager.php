@@ -42,7 +42,7 @@ class VillageManager {
     // Set these to correct values for release
     const PROPOSAL_VOTE_HOURS = 12; // 12
     const PROPOSAL_ENACT_HOURS = 24; // 24
-    const PROPOSAL_COOLDOWN_HOURS = 0; // 1
+    const PROPOSAL_COOLDOWN_HOURS = 1; // 1
     const KAGE_PROVISIONAL_DAYS = 7; // 7
     const POLICY_CHANGE_COOLDOWN_DAYS = 3; // 3
     const SEAT_RECLAIM_COOLDOWN_HOURS = 24; // 24
@@ -79,7 +79,7 @@ class VillageManager {
     const FORCE_PEACE_MINIMUM_DURATION_DAYS = 7;
     const WAR_COOLDOWN_DAYS = 1;
 
-    const MAX_TRADE_RESOURCE_TYPE = 50000;
+    const MAX_TRADE_RESOURCE_TYPE = 25000;
     const TRADE_COOLDOWN_DAYS = 1;
 
     const MAX_RESOURCE_CAPACITY = 100000;
