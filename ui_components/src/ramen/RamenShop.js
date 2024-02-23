@@ -1,7 +1,22 @@
+// @flow strict
+
 import { ModalProvider, useModal } from "../utils/modalContext.js";
 import { apiFetch } from "../utils/network.js";
 import { ResourceBar } from "../utils/resourceBar.js";
 import { parseKeywords } from "../utils/parseKeywords.js";
+
+import type {
+    CharacterRamenData,
+    MysteryRamenDto,
+    RamenOwnerDto,
+    BasicRamenDto,
+    SpecialRamenDto
+} from "./RamenShopSchema.js";
+
+import type {
+    PlayerDataType,
+    PlayerResourcesType
+} from "../_schema/userSchema.js";
 
 function RamenShopReactContainer({
     ramenShopAPI,
@@ -29,6 +44,16 @@ function RamenShopReactContainer({
     );
 }
 
+type Props = {|
+    ramenShopAPI: string,
+    playerData: PlayerDataType,
+    playerResourcesData: PlayerResourcesType,
+    characterRamenData: CharacterRamenData,
+    ramenOwnerDetails: RamenOwnerDto,
+    basicMenuOptions: Array<BasicRamenDto>,
+    specialMenuOptions: Array<SpecialRamenDto>,
+    mysteryRamenDetails: MysteryRamenDto,
+|};
 function RamenShop({
     ramenShopAPI,
     playerData,
@@ -191,7 +216,7 @@ function RamenShop({
                             ?
                             specialMenuOptions.map((option, index) => {
                                 return (
-                                    <SpecialRamen index={index} ramenInfo={option} />
+                                    <SpecialRamen index={index} ramenInfo={option} PurchaseSpecialRamen={PurchaseSpecialRamen} />
                                 );
                             })
                             :
@@ -216,7 +241,7 @@ function BasicRamen({ index, ramenInfo, PurchaseBasicRamen }) {
         </div>
     );
 }
-function SpecialRamen({ index, ramenInfo }) {
+function SpecialRamen({ index, ramenInfo, PurchaseSpecialRamen }) {
     return (
         <div key={index} className="special_ramen">
             <img src={ramenInfo.image} className="special_ramen_img" />

@@ -194,7 +194,8 @@ function RamenShop({
   }, specialMenuOptions.length > 0 ? specialMenuOptions.map((option, index) => {
     return /*#__PURE__*/React.createElement(SpecialRamen, {
       index: index,
-      ramenInfo: option
+      ramenInfo: option,
+      PurchaseSpecialRamen: PurchaseSpecialRamen
     });
   }) : /*#__PURE__*/React.createElement("div", {
     className: "special_menu_locked"
@@ -224,7 +225,8 @@ function BasicRamen({
 }
 function SpecialRamen({
   index,
-  ramenInfo
+  ramenInfo,
+  PurchaseSpecialRamen
 }) {
   return /*#__PURE__*/React.createElement("div", {
     key: index,
