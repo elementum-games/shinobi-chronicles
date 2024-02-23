@@ -79,7 +79,7 @@ class VillageManager {
     const FORCE_PEACE_MINIMUM_DURATION_DAYS = 7;
     const WAR_COOLDOWN_DAYS = 1;
 
-    const MAX_TRADE_RESOURCE_TYPE = 50000;
+    const MAX_TRADE_RESOURCE_TYPE = 25000;
     const TRADE_COOLDOWN_DAYS = 1;
 
     const MAX_RESOURCE_CAPACITY = 100000;
