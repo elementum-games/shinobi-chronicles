@@ -44,30 +44,6 @@ function RamenShop({
     const [characterRamenDataState, setCharacterRamenDataState] = React.useState(characterRamenData);
     const [mysteryRamenDetailsState, setMysteryRamenDetailsState] = React.useState(mysteryRamenDetails);
     const { openModal } = useModal();
-    function BasicRamen({ index, ramenInfo, PurchaseBasicRamen }) {
-        return (
-            <div key={index} className="basic_ramen">
-                <img src={ramenInfo.image} className="basic_ramen_img" />
-                <div className="basic_ramen_details">
-                    <div className="basic_ramen_name">{ramenInfo.label}</div>
-                    <div className="basic_ramen_effect">{ramenInfo.health_amount} HP</div>
-                    <div className="basic_ramen_button" onClick={() => PurchaseBasicRamen(ramenInfo.ramen_key)}><>&yen;</>{ramenInfo.cost}</div>
-                </div>
-            </div>
-        );
-    }
-    function SpecialRamen({ index, ramenInfo }) {
-        return (
-            <div key={index} className="special_ramen">
-                <img src={ramenInfo.image} className="special_ramen_img" />
-                <div className="special_ramen_name">{ramenInfo.label}</div>
-                <div className="special_ramen_description">{ramenInfo.description}</div>
-                <div className="special_ramen_effect">{ramenInfo.effect}</div>
-                <div className="special_ramen_duration">Duration: {ramenInfo.duration} minutes</div>
-                <div className="special_ramen_button" onClick={() => PurchaseSpecialRamen(ramenInfo.ramen_key)}><>&yen;</>{ramenInfo.cost}</div>
-            </div>
-        );
-    }
     function PurchaseBasicRamen(ramen_key) {
         apiFetch(
             ramenShopAPI,
@@ -224,6 +200,31 @@ function RamenShop({
                     </div>
                 </div>
             </div>
+        </div>
+    );
+}
+
+function BasicRamen({ index, ramenInfo, PurchaseBasicRamen }) {
+    return (
+        <div key={index} className="basic_ramen">
+            <img src={ramenInfo.image} className="basic_ramen_img" />
+            <div className="basic_ramen_details">
+                <div className="basic_ramen_name">{ramenInfo.label}</div>
+                <div className="basic_ramen_effect">{ramenInfo.health_amount} HP</div>
+                <div className="basic_ramen_button" onClick={() => PurchaseBasicRamen(ramenInfo.ramen_key)}><>&yen;</>{ramenInfo.cost}</div>
+            </div>
+        </div>
+    );
+}
+function SpecialRamen({ index, ramenInfo }) {
+    return (
+        <div key={index} className="special_ramen">
+            <img src={ramenInfo.image} className="special_ramen_img" />
+            <div className="special_ramen_name">{ramenInfo.label}</div>
+            <div className="special_ramen_description">{ramenInfo.description}</div>
+            <div className="special_ramen_effect">{ramenInfo.effect}</div>
+            <div className="special_ramen_duration">Duration: {ramenInfo.duration} minutes</div>
+            <div className="special_ramen_button" onClick={() => PurchaseSpecialRamen(ramenInfo.ramen_key)}><>&yen;</>{ramenInfo.cost}</div>
         </div>
     );
 }

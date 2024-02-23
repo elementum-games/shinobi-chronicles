@@ -40,51 +40,6 @@ function RamenShop({
   const {
     openModal
   } = useModal();
-  function BasicRamen({
-    index,
-    ramenInfo,
-    PurchaseBasicRamen
-  }) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: index,
-      className: "basic_ramen"
-    }, /*#__PURE__*/React.createElement("img", {
-      src: ramenInfo.image,
-      className: "basic_ramen_img"
-    }), /*#__PURE__*/React.createElement("div", {
-      className: "basic_ramen_details"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "basic_ramen_name"
-    }, ramenInfo.label), /*#__PURE__*/React.createElement("div", {
-      className: "basic_ramen_effect"
-    }, ramenInfo.health_amount, " HP"), /*#__PURE__*/React.createElement("div", {
-      className: "basic_ramen_button",
-      onClick: () => PurchaseBasicRamen(ramenInfo.ramen_key)
-    }, /*#__PURE__*/React.createElement(React.Fragment, null, "\xA5"), ramenInfo.cost)));
-  }
-  function SpecialRamen({
-    index,
-    ramenInfo
-  }) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: index,
-      className: "special_ramen"
-    }, /*#__PURE__*/React.createElement("img", {
-      src: ramenInfo.image,
-      className: "special_ramen_img"
-    }), /*#__PURE__*/React.createElement("div", {
-      className: "special_ramen_name"
-    }, ramenInfo.label), /*#__PURE__*/React.createElement("div", {
-      className: "special_ramen_description"
-    }, ramenInfo.description), /*#__PURE__*/React.createElement("div", {
-      className: "special_ramen_effect"
-    }, ramenInfo.effect), /*#__PURE__*/React.createElement("div", {
-      className: "special_ramen_duration"
-    }, "Duration: ", ramenInfo.duration, " minutes"), /*#__PURE__*/React.createElement("div", {
-      className: "special_ramen_button",
-      onClick: () => PurchaseSpecialRamen(ramenInfo.ramen_key)
-    }, /*#__PURE__*/React.createElement(React.Fragment, null, "\xA5"), ramenInfo.cost));
-  }
   function PurchaseBasicRamen(ramen_key) {
     apiFetch(ramenShopAPI, {
       request: 'PurchaseBasicRamen',
@@ -244,5 +199,50 @@ function RamenShop({
   }) : /*#__PURE__*/React.createElement("div", {
     className: "special_menu_locked"
   }, "Special ramen not yet unlocked.")))));
+}
+function BasicRamen({
+  index,
+  ramenInfo,
+  PurchaseBasicRamen
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    key: index,
+    className: "basic_ramen"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: ramenInfo.image,
+    className: "basic_ramen_img"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "basic_ramen_details"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "basic_ramen_name"
+  }, ramenInfo.label), /*#__PURE__*/React.createElement("div", {
+    className: "basic_ramen_effect"
+  }, ramenInfo.health_amount, " HP"), /*#__PURE__*/React.createElement("div", {
+    className: "basic_ramen_button",
+    onClick: () => PurchaseBasicRamen(ramenInfo.ramen_key)
+  }, /*#__PURE__*/React.createElement(React.Fragment, null, "\xA5"), ramenInfo.cost)));
+}
+function SpecialRamen({
+  index,
+  ramenInfo
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    key: index,
+    className: "special_ramen"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: ramenInfo.image,
+    className: "special_ramen_img"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "special_ramen_name"
+  }, ramenInfo.label), /*#__PURE__*/React.createElement("div", {
+    className: "special_ramen_description"
+  }, ramenInfo.description), /*#__PURE__*/React.createElement("div", {
+    className: "special_ramen_effect"
+  }, ramenInfo.effect), /*#__PURE__*/React.createElement("div", {
+    className: "special_ramen_duration"
+  }, "Duration: ", ramenInfo.duration, " minutes"), /*#__PURE__*/React.createElement("div", {
+    className: "special_ramen_button",
+    onClick: () => PurchaseSpecialRamen(ramenInfo.ramen_key)
+  }, /*#__PURE__*/React.createElement(React.Fragment, null, "\xA5"), ramenInfo.cost));
 }
 window.RamenShopReactContainer = RamenShopReactContainer;

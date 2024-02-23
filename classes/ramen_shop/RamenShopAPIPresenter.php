@@ -2,7 +2,7 @@
 
 class RamenShopAPIPresenter {
     public static function ramenShopOwnerResponse(System $system, User $player) {
-        $owner = RamenShopManager::loadRamenOwnerDetails($system, $player);
+        $owner = RamenShopManager::getRamenOwnerDetails($system, $player);
         return [
             "name" => $owner->name,
             "image" => $owner->image,
@@ -50,7 +50,7 @@ class RamenShopAPIPresenter {
                     "image" => $ramen->image,
                 ];
             },
-            array_values(RamenShopManager::loadBasicRamen($system, $player))
+            array_values(RamenShopManager::getBasicRamen($system, $player))
         );
     }
     public static function getSpecialRamenResponse(User $player) {
@@ -66,11 +66,11 @@ class RamenShopAPIPresenter {
                     "duration" => $ramen->duration,
                 ];
             },
-            array_values(RamenShopManager::loadSpecialRamen($player))
+            array_values(RamenShopManager::getSpecialRamen($player))
         );
     }
     public static function getMysteryRamenResponse(User $player) {
-        $mystery_ramen = RamenShopManager::loadMysteryRamen($player);
+        $mystery_ramen = RamenShopManager::getMysteryRamen($player);
         return [
             "cost" => $mystery_ramen->cost,
             "label" => $mystery_ramen->label,

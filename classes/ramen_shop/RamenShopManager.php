@@ -204,7 +204,7 @@ class RamenShopManager {
      * @param Village $village
      * @return RamenOwnerDto
      */
-    public static function loadRamenOwnerDetails(System $system, User $player): RamenOwnerDto {
+    public static function getRamenOwnerDetails(System $system, User $player): RamenOwnerDto {
         if ($player->location->equals($player->village_location)) {
             $ramenOwnerDto = new RamenOwnerDto(
                 name: self::RAMEN_SHOP_OWNER_NAMES_BY_VILLAGE[$player->village->village_id],
@@ -248,35 +248,35 @@ class RamenShopManager {
      * @param User $player
      * @return BasicRamenDto[]
      */
-    public static function loadBasicRamen(System $system, User $player): array {
+    public static function getBasicRamen(System $system, User $player): array
+    {
         $ramen_cost_multiplier = 1 - ($player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST] / 100);
         $rankManager = new RankManager($system);
         $rankManager->loadRanks();
 
-        $health[1] = $rankManager->healthForRankAndLevel(1, $rankManager->ranks[1]->max_level);
-        $health[2] = $rankManager->healthForRankAndLevel(2, $rankManager->ranks[2]->max_level);
-        $health[3] = $rankManager->healthForRankAndLevel(3, $rankManager->ranks[3]->max_level);
-        $health[4] = $rankManager->healthForRankAndLevel(4, $rankManager->ranks[4]->max_level);
-        // $health[5] = $rankManager->healthForRankAndLevel(5, $rankManager->ranks[5]->max_level);
+        $player_rank_max_health = $rankManager->healthForRankAndLevel(
+         $player->rank_num,
+         $rankManager->ranks[$player->rank_num]->max_level
+       );
 
         $basic_ramen[self::BASIC_RAMEN_SMALL] = new BasicRamenDto(
             key: self::BASIC_RAMEN_SMALL,
             cost: !$player->location->equals($player->village_location) ? $player->rank_num * 5 * 5 : ($player->rank_num * 5 * $ramen_cost_multiplier),
-            health_amount: $health[$player->rank_num] * 0.1,
+            health_amount: $player_rank_max_health * 0.1,
             label: 'Shio S',
             image: "images/ramen/ShioS.png",
         );
         $basic_ramen[self::BASIC_RAMEN_MEDIUM] = new BasicRamenDto(
             key: self::BASIC_RAMEN_MEDIUM,
             cost: !$player->location->equals($player->village_location) ? $player->rank_num * 25 * 5 : ($player->rank_num * 25 * $ramen_cost_multiplier),
-            health_amount: $health[$player->rank_num] * 0.5,
+            health_amount: $player_rank_max_health * 0.5,
             label: 'Shio M',
             image: "images/ramen/ShioM.png",
         );
         $basic_ramen[self::BASIC_RAMEN_LARGE] = new BasicRamenDto(
             key: self::BASIC_RAMEN_LARGE,
             cost: !$player->location->equals($player->village_location) ? $player->rank_num * 50 * 5 : ($player->rank_num * 50 * $ramen_cost_multiplier),
-            health_amount: $health[$player->rank_num] * 1,
+            health_amount: $player_rank_max_health * 1,
             label: 'Shio L',
             image: "images/ramen/ShioL.png",
         );
@@ -295,7 +295,7 @@ class RamenShopManager {
      * @param User $player
      * @return SpecialRamenDto[]
      */
-    public static function loadSpecialRamen(User $player): array {
+    public static function getSpecialRamen(User $player): array {
         $special_ramen = [];
         $ramen_cost_multiplier = 1 - ($player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST] / 100);
         $ramen_duration_bonus = $player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION];
@@ -345,7 +345,7 @@ class RamenShopManager {
      * @param Village $village
      * @return MysteryRamenDto
      */
-    public static function loadMysteryRamen(User $player): MysteryRamenDto {
+    public static function getMysteryRamen(User $player): MysteryRamenDto {
         if ($player->ramen_data->mystery_ramen_available) {
             $cost = 0;
             $effects = [];
@@ -382,7 +382,7 @@ class RamenShopManager {
      * @return ActionResult
      */
     public static function purchaseBasicRamen(System $system, User $player, string $ramen_key): ActionResult {
-        $ramen_options = self::loadBasicRamen($system, $player);
+        $ramen_options = self::getBasicRamen($system, $player);
         $ramen = $ramen_options[$ramen_key];
         if (!isset($ramen)) {
             return ActionResult::failed("Invalid ramen selection!");
@@ -412,7 +412,7 @@ class RamenShopManager {
      * @return ActionResult
      */
     public static function purchaseSpecialRamen(System $system, User $player, string $ramen_key): ActionResult {
-        $ramen_options = self::loadSpecialRamen($player);
+        $ramen_options = self::getSpecialRamen($player);
         $ramen = $ramen_options[$ramen_key];
         if (!isset($ramen)) {
             return ActionResult::failed("Invalid ramen selection!");
@@ -422,8 +422,7 @@ class RamenShopManager {
         }
         $player->subtractMoney($ramen->cost, "Purchased {$ramen_key} health");
         $player->ramen_data->buff_duration = $ramen->duration * 60;
-        $player->ramen_data->buff_effects = [];
-        $player->ramen_data->buff_effects[] = $ramen->key;
+        $player->ramen_data->buff_effects = [$ramen->key];
         $player->ramen_data->purchase_count_since_last_mystery++;
         $player->ramen_data->purchase_time = time();
         self::rollMysteryRamen($system, $player);
@@ -439,7 +438,7 @@ class RamenShopManager {
      * @return ActionResult
      */
     public static function purchaseMysteryRamen(System $system, User $player): ActionResult {
-        $mystery_ramen = self::loadMysteryRamen($player);
+        $mystery_ramen = self::getMysteryRamen($player);
         if (!$mystery_ramen->mystery_ramen_unlocked) {
             return ActionResult::failed("Mystery ramen is not available!");
         }
@@ -484,7 +483,7 @@ class RamenShopManager {
         $chance = self::getMysteryRamenChance($system, $player);
         $roll = mt_rand(1, 100);
         if ($roll <= $chance) {
-            $special_ramen_options = self::loadSpecialRamen($player);
+            $special_ramen_options = self::getSpecialRamen($player);
             $player->ramen_data->mystery_ramen_available = true;
             $player->ramen_data->mystery_ramen_effects = [];
             $keys = array_keys($special_ramen_options);
