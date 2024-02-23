@@ -6,11 +6,11 @@ import { ResourceBar } from "../utils/resourceBar.js";
 import { parseKeywords } from "../utils/parseKeywords.js";
 
 import type {
-    CharacterRamenData,
-    MysteryRamenDto,
-    RamenOwnerDto,
-    BasicRamenDto,
-    SpecialRamenDto
+    CharacterRamenType,
+    MysteryRamenType,
+    RamenOwnerType,
+    BasicRamenType,
+    SpecialRamenType
 } from "./RamenShopSchema.js";
 
 import type {
@@ -48,11 +48,11 @@ type Props = {|
     ramenShopAPI: string,
     playerData: PlayerDataType,
     playerResourcesData: PlayerResourcesType,
-    characterRamenData: CharacterRamenData,
-    ramenOwnerDetails: RamenOwnerDto,
-    basicMenuOptions: Array<BasicRamenDto>,
-    specialMenuOptions: Array<SpecialRamenDto>,
-    mysteryRamenDetails: MysteryRamenDto,
+    characterRamenData: CharacterRamenType,
+    ramenOwnerDetails: RamenOwnerType,
+    basicMenuOptions: Array<BasicRamenType>,
+    specialMenuOptions: Array<SpecialRamenType>,
+    mysteryRamenDetails: MysteryRamenType,
 |};
 function RamenShop({
     ramenShopAPI,
