@@ -53,7 +53,7 @@ class RamenShopAPIPresenter {
             array_values(RamenShopManager::getBasicRamen($system, $player))
         );
     }
-    public static function getSpecialRamenResponse(User $player) {
+    public static function getSpecialRamenResponse(System $system, User $player) {
         return array_map(
             function (SpecialRamenDto $ramen) {
                 return [
@@ -66,7 +66,7 @@ class RamenShopAPIPresenter {
                     "duration" => $ramen->duration,
                 ];
             },
-            array_values(RamenShopManager::getSpecialRamen($player))
+            array_values(RamenShopManager::getSpecialRamen($system, $player))
         );
     }
     public static function getMysteryRamenResponse(User $player) {

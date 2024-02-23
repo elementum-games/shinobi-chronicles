@@ -23,7 +23,7 @@
                 characterRamenData: <?= json_encode(RamenShopAPIPresenter::getCharacterRamenResponse($system, $player)) ?>,
                 ramenOwnerDetails: <?= json_encode(RamenShopAPIPresenter::ramenShopOwnerResponse($system, $player)) ?>,
                 basicRamenOptions: <?= json_encode(RamenShopAPIPresenter::getBasicRamenResponse($system, $player)) ?>,
-                specialRamenOptions: <?= json_encode(RamenShopAPIPresenter::getSpecialRamenResponse($player)) ?>,
+                specialRamenOptions: <?= json_encode(RamenShopAPIPresenter::getSpecialRamenResponse($system, $player)) ?>,
                 mysteryRamenDetails: <?= json_encode(RamenShopAPIPresenter::getMysteryRamenResponse($player)) ?>,
             }),
             ramenShopContainer

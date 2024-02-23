@@ -4,6 +4,7 @@ require_once __DIR__ . "/VillageSeatDto.php";
 require_once __DIR__ . "/VillageProposalDto.php";
 require_once __DIR__ . "/VillageStrategicInfoDto.php";
 require_once __DIR__ . "/VillageUpgradeManager.php";
+require_once __DIR__ . "/ProposalManager.php";
 require_once __DIR__ . "/ChallengeRequestDto.php";
 require_once __DIR__ . "/../notification/NotificationManager.php";
 require_once __DIR__ . '/../notification/BlockedNotificationManager.php';
@@ -42,7 +43,6 @@ class VillageManager {
     // Set these to correct values for release
     const PROPOSAL_VOTE_HOURS = 12; // 12
     const PROPOSAL_ENACT_HOURS = 24; // 24
-    const PROPOSAL_COOLDOWN_HOURS = 1; // 1
     const KAGE_PROVISIONAL_DAYS = 7; // 7
     const POLICY_CHANGE_COOLDOWN_DAYS = 3; // 3
     const SEAT_RECLAIM_COOLDOWN_HOURS = 24; // 24
@@ -1271,16 +1271,9 @@ class VillageManager {
             return "There is already a pending proposal of the same type.";
         }
         // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
+        $proposal_cooldown_result = ProposalManager::checkProposalCooldown($system, $player);
+        if ($proposal_cooldown_result->failed) {
+            return $proposal_cooldown_result->error_message;
         }
         // insert into DB
         $time = time();
@@ -1957,16 +1950,9 @@ class VillageManager {
             }
         }
         // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
+        $proposal_cooldown_result = ProposalManager::checkProposalCooldown($system, $player);
+        if ($proposal_cooldown_result->failed) {
+            return $proposal_cooldown_result->error_message;
         }
         // insert into DB
         $time = time();
@@ -2015,16 +2001,9 @@ class VillageManager {
             return "There is already a pending proposal of the same type.";
         }
         // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
+        $proposal_cooldown_result = ProposalManager::checkProposalCooldown($system, $player);
+        if ($proposal_cooldown_result->failed) {
+            return $proposal_cooldown_result->error_message;
         }
         // insert into DB
         $time = time();
@@ -2071,16 +2050,9 @@ class VillageManager {
             return "There is already a pending proposal of the same type.";
         }
         // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
+        $proposal_cooldown_result = ProposalManager::checkProposalCooldown($system, $player);
+        if ($proposal_cooldown_result->failed) {
+            return $proposal_cooldown_result->error_message;
         }
         // check neither village has existing alliance
         $time = time();
@@ -2125,16 +2097,9 @@ class VillageManager {
         }
         // also check alliance duration requirement
         // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
+        $proposal_cooldown_result = ProposalManager::checkProposalCooldown($system, $player);
+        if ($proposal_cooldown_result->failed) {
+            return $proposal_cooldown_result->error_message;
         }
         // insert into DB
         $time = time();
@@ -2172,14 +2137,9 @@ class VillageManager {
             return "One or either village does not have the necessary items to complete the trade.";
         }
         // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $time_remaining = $system->timeRemaining($seconds_remaining, 'long');
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
+        $proposal_cooldown_result = ProposalManager::checkProposalCooldown($system, $player);
+        if ($proposal_cooldown_result->failed) {
+            return $proposal_cooldown_result->error_message;
         }
         // check trade cooldown
         $proposal_type = self::PROPOSAL_TYPE_OFFER_TRADE;
@@ -2235,16 +2195,9 @@ class VillageManager {
             return "There is already a pending proposal of the same type.";
         }
         // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
+        $proposal_cooldown_result = ProposalManager::checkProposalCooldown($system, $player);
+        if ($proposal_cooldown_result->failed) {
+            return $proposal_cooldown_result->error_message;
         }
         // insert into DB
         $time = time();
@@ -2273,16 +2226,9 @@ class VillageManager {
             return "There is already a pending proposal of the same type.";
         }
         // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
+        $proposal_cooldown_result = ProposalManager::checkProposalCooldown($system, $player);
+        if ($proposal_cooldown_result->failed) {
+            return $proposal_cooldown_result->error_message;
         }
         // insert into DB
         $time = time();
@@ -2311,16 +2257,9 @@ class VillageManager {
             return "There is already a pending proposal of the same type.";
         }
         // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
+        $proposal_cooldown_result = ProposalManager::checkProposalCooldown($system, $player);
+        if ($proposal_cooldown_result->failed) {
+            return $proposal_cooldown_result->error_message;
         }
         // insert into DB
         $time = time();
@@ -2349,16 +2288,9 @@ class VillageManager {
             return "There is already a pending proposal of the same type.";
         }
         // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
+        $proposal_cooldown_result = ProposalManager::checkProposalCooldown($system, $player);
+        if ($proposal_cooldown_result->failed) {
+            return $proposal_cooldown_result->error_message;
         }
         // insert into DB
         $time = time();
@@ -2394,16 +2326,9 @@ class VillageManager {
             return "There is already a pending proposal of the same type.";
         }
         // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
+        $proposal_cooldown_result = ProposalManager::checkProposalCooldown($system, $player);
+        if ($proposal_cooldown_result->failed) {
+            return $proposal_cooldown_result->error_message;
         }
         // insert into DB
         $time = time();
@@ -2439,16 +2364,9 @@ class VillageManager {
             return "There is already a pending proposal of the same type.";
         }
         // check player cooldown on submit proposal
-        $query = $system->db->query("SELECT `start_time` FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        $last_proposal = $system->db->fetch($query);
-        if ($system->db->last_num_rows > 0) {
-            if ($last_proposal['start_time'] + self::PROPOSAL_COOLDOWN_HOURS * 3600 > time()) {
-                $seconds_remaining = (self::PROPOSAL_COOLDOWN_HOURS * 3600) + $last_proposal['start_time'] - time();
-                $hours = floor($seconds_remaining / 3600);
-                $minutes = floor(($seconds_remaining % 3600) / 60);
-                $time_remaining = ($hours == 1 ? $hours . " hour " : $hours . " hours ") . ($minutes == 1 ? $minutes . " minute" : $minutes . " minutes");
-                return "Cannot submit another proposal for " . $time_remaining . ".";
-            }
+        $proposal_cooldown_result = ProposalManager::checkProposalCooldown($system, $player);
+        if ($proposal_cooldown_result->failed) {
+            return $proposal_cooldown_result->error_message;
         }
         // insert into DB
         $time = time();

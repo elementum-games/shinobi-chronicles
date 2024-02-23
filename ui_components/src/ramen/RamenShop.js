@@ -63,7 +63,7 @@ function RamenShop({
     basicMenuOptions,
     specialMenuOptions,
     mysteryRamenDetails,
-}) {
+}: Props) {
     const [playerDataState, setPlayerDataState] = React.useState(playerData);
     const [playerResourcesDataState, setPlayerResourcesDataState] = React.useState(playerResourcesData);
     const [characterRamenDataState, setCharacterRamenDataState] = React.useState(characterRamenData);
