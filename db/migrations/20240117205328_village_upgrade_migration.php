@@ -148,7 +148,7 @@ final class VillageUpgradeMigration extends AbstractMigration
             UPDATE region_locations SET name = 'Ōtaiyō Castle' WHERE `region_location_id` = 32;
             UPDATE region_locations SET name = 'Ōhirahara Castle' WHERE `region_location_id` = 37;
             UPDATE region_locations SET name = 'Sakurama Castle' WHERE `region_location_id` = 58;
-            UPDATE region_locations SET name = 'Sabaku-ishi Castle' WHERE `region_location_id` = 4;
+            UPDATE region_locations SET name = 'Sabaku Castle' WHERE `region_location_id` = 4;
             UPDATE region_locations SET name = 'Ōkaze Castle' WHERE `region_location_id` = 34;
             UPDATE region_locations SET name = 'Arashiyama Castle' WHERE `region_location_id` = 56;
             UPDATE region_locations SET name = 'Ōkaiyō Castle' WHERE `region_location_id` = 46;
