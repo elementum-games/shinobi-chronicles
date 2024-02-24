@@ -339,7 +339,7 @@ class ForbiddenSeal {
             avatar_size: self::AVATAR_SIZES[$seal_level],
             avatar_filesize: self::AVATAR_FILE_SIZES[$seal_level],
             avatar_styles: self::getAvyFrames(seal_level: $seal_level),
-            direct_avatar_upload: self::DIRECT_AVATAR_UPLOAD($seal_level),
+            direct_avatar_upload: self::DIRECT_AVATAR_UPLOAD[$seal_level],
 
             inbox_size: self::INBOX_SIZES[$seal_level],
             journal_size: self::JOURNAL_SIZES[$seal_level],
