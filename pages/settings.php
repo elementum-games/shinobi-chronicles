@@ -108,7 +108,7 @@ function userSettings() {
 			
 			// Remove existing avatar
 			foreach($valid_file_types as $type) {
-				$rem_dir = $target_dir . strtolower($player->user_name) . '.' . $file_type;
+				$rem_dir = $target_dir . strtolower($player->user_name) . '.' . $type;
 				if(file_exists($rem_dir)) {
 					unlink($rem_dir);
 				}
