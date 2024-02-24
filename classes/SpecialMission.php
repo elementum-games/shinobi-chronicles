@@ -6,6 +6,10 @@ class SpecialMission {
     const DIFFICULTY_HARD = 'hard';
     const DIFFICULTY_NIGHTMARE = 'nightmare';
 
+    // Used for incrementing mission ranks & completing daily tasks
+    public static array $UPGRADE_DIFFICULTIES = [self::DIFFICULTY_HARD, self::DIFFICULTY_NIGHTMARE];
+    public static int $MAX_MISSION_RANK = Mission::RANK_A;
+
     // Scale damage multiplier from this point in the rank to cap
     const BASE_STAT_CAP_PERCENT = 20;
     // Damage multiplier starts here at the base number, then scales down to 1x at cap
@@ -141,10 +145,41 @@ class SpecialMission {
     const SPY_TARGET_SAND = 'Sand';
     const SPY_TARGET_CLOUD = 'Cloud';
     const SPY_TARGET_MIST = 'Mist';
-
+  
     const STATUS_ACTIVE = 0;
     const STATUS_COMPLETED = 1;
     const STATUS_FAILED = 2;
+
+    const SPECIAL_MISSION_RANKS = [
+        // AS
+        1 => [
+            self::DIFFICULTY_EASY => Mission::RANK_D,
+            self::DIFFICULTY_NORMAL => Mission::RANK_D,
+            self::DIFFICULTY_HARD => Mission::RANK_D,
+            self::DIFFICULTY_NIGHTMARE => Mission::RANK_C,
+        ],
+        // Genin
+        2 => [
+            self::DIFFICULTY_EASY => Mission::RANK_D,
+            self::DIFFICULTY_NORMAL => Mission::RANK_C,
+            self::DIFFICULTY_HARD => Mission::RANK_C,
+            self::DIFFICULTY_NIGHTMARE => Mission::RANK_B,
+        ],
+        // Chuunin
+        3 => [
+            self::DIFFICULTY_EASY => Mission::RANK_C,
+            self::DIFFICULTY_NORMAL => Mission::RANK_B,
+            self::DIFFICULTY_HARD => Mission::RANK_B,
+            self::DIFFICULTY_NIGHTMARE => Mission::RANK_A,
+        ],
+        // Jonin
+        4 => [
+            self::DIFFICULTY_EASY => Mission::RANK_B,
+            self::DIFFICULTY_NORMAL => Mission::RANK_A,
+            self::DIFFICULTY_HARD => Mission::RANK_A,
+            self::DIFFICULTY_NIGHTMARE => Mission::RANK_S,
+        ],
+    ];
 
     public static array $valid_targets = [
         SpecialMission::SPY_TARGET_LEAF => [
@@ -535,6 +570,20 @@ class SpecialMission {
             }
         }
 
+        // Award mission completes
+        $mission_rank = $this->getMissionRank();
+        if(isset($this->player->missions_completed[$mission_rank])) {
+            $this->player->missions_completed[$mission_rank]++;
+        }
+        else {
+            $this->player->missions_completed[$mission_rank] = 1;
+        }
+        // Check daily tasks
+        if($this->player->daily_tasks->hasTaskType(type: DailyTask::ACTIVITY_MISSIONS)) {
+            $this->player->daily_tasks->progressTask(activity: DailyTask::ACTIVITY_MISSIONS, amount: 1, sub_task: $mission_rank);
+        }
+        $reward_text .= " You have completed a " . Mission::$rank_names[$mission_rank] . " mission.";
+
         return $reward_text;
     }
 
@@ -887,6 +936,12 @@ class SpecialMission {
         );
     }
 
+    public function getMissionRank(): int {
+        $mission_rank = self::SPECIAL_MISSION_RANKS[$this->player->rank_num][$this->difficulty];
+        // Return mission rank, conforming to max mission level
+        return min($mission_rank, self::$MAX_MISSION_RANK);
+    }
+
     // Cancel the mission
     public static function cancelMission(System $system, User $player, int $mission_id): bool {
         $timestamp = time();
@@ -896,6 +951,7 @@ class SpecialMission {
         $player->updateData();
         return true;
     }
+
 
     /**
      * @throws DatabaseDeadlockException
@@ -940,7 +996,6 @@ class SpecialMission {
 
         return SpecialMission::load($system, $player, $mission_id);
     }
-
 }
 
 class SpecialMissionTarget {
