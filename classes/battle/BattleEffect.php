@@ -52,6 +52,16 @@ class BattleEffect {
         $this->layer_active = $layer_active;
     }
 
+    public function isDamageOverTime(): bool {
+        return in_array($this->effect, [
+            'residual_damage',
+            'compound_residual',
+            'bleed',
+            'delayed_residual',
+            'reflect_damage'
+        ]);
+    }
+
     public static function fromArray(array $raw_data): BattleEffect {
         return new BattleEffect(
             user: $raw_data['user'],
@@ -65,4 +75,6 @@ class BattleEffect {
             layer_active: $raw_data['layer_active'] ?? false,
         );
     }
+
+
 }

@@ -78,6 +78,7 @@ class Item {
     public function effectDisplayUnit(): string {
         switch($this->effect) {
             case 'residual_damage':
+            case 'compound_residual':
             case 'diffuse':
             case 'element':
             case 'daze':
