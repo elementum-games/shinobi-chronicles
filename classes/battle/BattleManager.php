@@ -1139,13 +1139,13 @@ class BattleManager {
                 $text .= "<p style=\"font-weight:bold;\">
                         {$user->getName()} deals
                             <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
-                                " . number_format(sprintf('%.0f', $attack_damage)) . " damage
+                                " . number_format( $attack_damage) . " damage
                             </span>
                                 to {$target->getName()}" . ($has_element ? $element_text : "") . ".
                             <span style=\"font-weight:bold;\">
                                 (resists
                              <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
-                                " . number_format(sprintf('%.0f', $damage_resisted)) . "
+                                " . number_format($damage_resisted) . "
                             </span>
                              damage)
                         </p>";
@@ -1154,7 +1154,7 @@ class BattleManager {
                 $text .= "<p style=\"font-weight:bold;\">
                 {$user->getName()} deals
                     <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
-                        " . number_format(sprintf('%.0f', $attack_damage)) . " damage
+                        " . number_format($attack_damage) . " damage
                     </span>
                         to {$target->getName()}" . ($has_element ? $element_text : "") . ".
                     </p>";
@@ -1163,23 +1163,23 @@ class BattleManager {
 
         if ($attack->recoil_percent > 0) {
             if ($recoil_damage_resisted > 0) {
-                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . number_format(round($recoil_damage, 0)) . "</span> recoil damage- (resists " . "<span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . number_format(round($recoil_damage_resisted)) . "</span>" . " recoil damage)" . '</span></br>';
+                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . number_format($recoil_damage) . "</span> recoil damage- (resists " . "<span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . number_format($recoil_damage_resisted) . "</span>" . " recoil damage)" . '</span></br>';
             } else {
-                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . number_format(round($recoil_damage, 0)) . "</span> recoil damage-" . '</span></br>';
+                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . number_format($recoil_damage) . "</span> recoil damage-" . '</span></br>';
             }
         }
         if ($attack->countered_percent > 0) {
             if ($counter_damage_resisted > 0) {
-                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type}\">" . number_format(round($counter_damage, 0)) . "</span> counter damage- (resists " . "<span class=\"battle_text_{$attack->countered_jutsu_type}\">" . number_format(round($counter_damage_resisted)) . "</span>" . " counter damage)" . '</span></br>';
+                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type}\">" . number_format($counter_damage) . "</span> counter damage- (resists " . "<span class=\"battle_text_{$attack->countered_jutsu_type}\">" . number_format($counter_damage_resisted) . "</span>" . " counter damage)" . '</span></br>';
             } else {
-                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type}\">" . number_format(round($counter_damage, 0)) . "</span> counter damage-" . '</span></br>';
+                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type}\">" . number_format($counter_damage) . "</span> counter damage-" . '</span></br>';
             }
         }
         if ($attack->immolate_raw_damage > 0) {
             if ($immolate_damage_resisted > 0) {
-                $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . number_format(round($immolate_damage, 0)) . "</span> immolation damage- (resists " . "<span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . number_format(round($immolate_damage_resisted)) . "</span>" . " immolation damage)" . '</span></br>';
+                $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . number_format($immolate_damage) . "</span> immolation damage- (resists " . "<span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . number_format($immolate_damage_resisted) . "</span>" . " immolation damage)" . '</span></br>';
             } else {
-                $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . number_format(round($immolate_damage, 0)) . "</span> immolation damage-" . '</span></br>';
+                $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . number_format($immolate_damage) . "</span> immolation damage-" . '</span></br>';
             }
         }
 

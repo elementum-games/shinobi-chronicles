@@ -221,7 +221,7 @@
                             <img src='<?= $p1_avatar ?>' class='playerAvatar' alt='player_profile_img' />
                             <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 8px;'>
                                 <div class='resourceBarOuter healthPreview'>
-                                    <label class='innerResourceBarLabel'><?= number_format(sprintf("%.0f", $log['player1_health'])) ?> / <?= number_format(sprintf("%.0f", $p1_max_health)) ?></label>
+                                    <label class='innerResourceBarLabel'><?= number_format($log['player1_health']) ?> / <?= number_format($p1_max_health) ?></label>
                                     <div class='healthFill' style='width:<?= round(($log['player1_health'] / $p1_max_health) * 100) ?>%;'></div>
                                 </div>
                                 <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
@@ -240,7 +240,7 @@
                             <img src='<?= $p2_avatar ?>' class='opponentAvatar' />
                             <div id='ai_battle_stats_container' style='display: inline-block; text-align: center'>
                                 <div class='resourceBarOuter healthPreview' style='margin-top: 8px';>
-                                    <label class='innerResourceBarLabel'><?= number_format(sprintf("%.0f", $log['player2_health'])) ?> / <?= number_format(sprintf("%.0f", $p2_max_health)) ?></label>
+                                    <label class='innerResourceBarLabel'><?= number_format($log['player2_health']) ?> / <?= number_format($p2_max_health) ?></label>
                                     <div class='healthFill' style='width:<?= round(($log['player2_health'] / $p2_max_health) * 100) ?>%;'></div>
                                 </div>
                                 <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
