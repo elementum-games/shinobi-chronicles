@@ -77,6 +77,11 @@ function userSettings() {
 			$file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 			$target_file_path = $target_dir . strtolower($player->user_name) . '.' . $file_type;
 			$user_link = $system->router->base_url . '_user_imgs/' . strtolower($player->user_name) . '.' . $file_type;
+			
+			// Limit uploads to 1/day
+			if((time() - filemtime($target_file_path)) < 86400) {
+				throw new RuntimeException("You can only upload a file once per day!");
+			}
 
 			// Lack permission to upload file
 			if(!$player->forbidden_seal->direct_avatar_upload) {
