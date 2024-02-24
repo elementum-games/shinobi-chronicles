@@ -70,6 +70,48 @@ function userSettings() {
         }
         $system->printMessage();
     }
+	else if (!empty($_POST['upload_avatar'])) {
+        try {
+			$target_dir = __DIR__ . '/../_user_imgs/';
+			$target_file = $target_dir . basename($_FILES['fileToUpload']['name']);
+			$file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+			$target_file_path = $target_dir . strtolower($player->user_name) . '.' . $file_type;
+			$user_link = $system->router->base_url . '_user_imgs/' . strtolower($player->user_name) . '.' . $file_type;
+			
+			// Upload directory is missing, this should be manually created
+            if(!is_dir($target_dir)) {
+                throw new RuntimeException("User upload directory is missing! Notify an administrator.");
+            }
+			// Only ally gif, png and jpg file types
+			if(!in_array($file_type, ['gif', 'png', 'jpg'])) {
+				throw new RuntimeException("You may only upload gif, png and jpg images.");
+			}
+			// Check file size
+			$file_size = filesize($_FILES['fileToUpload']['tmp_name']);
+			if($file_size > $player->forbidden_seal->avatar_filesize) {
+				$filesize_display = round($file_size / 1024);
+                throw new RuntimeException(
+					"Image is too large! Size {$filesize_display}KB, maximum is " . $player->getAvatarFileSizeDisplay('kb')
+				);
+			}
+			
+			// Remove existing avatar
+			if(file_exists($target_file_path)) {
+				unlink($target_file_path);
+			}
+			// Upload file and update user link
+			if(move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $target_file_path)) {
+				$player->avatar_link = $user_link;
+				$system->message("Avatar uploaded.");
+			}
+			else {
+				$system->message("Error uploading file.");
+			}
+        } catch(RuntimeException $e) {
+            $system->message($e->getMessage());
+        }
+        $system->printMessage();
+    }
     else if (!empty($_POST['change_password'])) {
         $password = trim($_POST['current_password']);
         $new_password = trim($_POST['new_password']);

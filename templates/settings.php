@@ -84,6 +84,10 @@
                             <input type='submit' name='change_avatar' value='Change' />
                         </form>
                     <?php else: ?>
+                        <form action='<?=$self_link?>' method='post' enctype='multipart/form-data'>
+                            <input type='file' name='fileToUpload' id='fileToUpload' />
+                            <input type='submit' name='upload_avatar' value='Upload' />
+                        </form>
                     <?php endif ?>
                 </div>
                 <br style='clear:both;' />
