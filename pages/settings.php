@@ -71,6 +71,7 @@ function userSettings() {
         $system->printMessage();
     }
 	else if (!empty($_POST['upload_avatar'])) {
+		$valid_file_types = ['gif', 'png', 'jpg'];
         try {
 			$target_dir = __DIR__ . '/../_user_imgs/';
 			$target_file = $target_dir . $system->db->clean(basename($_FILES['fileToUpload']['name']));
@@ -93,7 +94,7 @@ function userSettings() {
                 throw new RuntimeException("User upload directory is missing! Notify an administrator.");
             }
 			// Only ally gif, png and jpg file types
-			if(!in_array($file_type, ['gif', 'png', 'jpg'])) {
+			if(!in_array($file_type, $valid_file_types)) {
 				throw new RuntimeException("You may only upload gif, png and jpg images.");
 			}
 			// Check file size
@@ -106,9 +107,13 @@ function userSettings() {
 			}
 			
 			// Remove existing avatar
-			if(file_exists($target_file_path)) {
-				unlink($target_file_path);
+			foreach($valid_file_types as $type) {
+				$rem_dir = $target_dir . strtolower($player->user_name) . '.' . $file_type;
+				if(file_exists($rem_dir)) {
+					unlink($rem_dir);
+				}
 			}
+			
 			// Upload file and update user link
 			if(move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $target_file_path)) {
 				$player->avatar_link = $user_link;
