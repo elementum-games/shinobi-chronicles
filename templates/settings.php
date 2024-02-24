@@ -78,10 +78,13 @@
                     Avatar can be larger than the limit, but it will be resized<br />
                     Max filesize: <?=$player->getAvatarFileSizeDisplay()?><br />
                     <br />
-                    <form action='<?=$self_link?>' method='post'>
-                        <input type='text' name='avatar_link' value='<?=$player->avatar_link?>' style='width:250px;margin-bottom:5px;' />
-                        <input type='submit' name='change_avatar' value='Change' />
-                    </form>
+                    <?php if(!$player->forbidden_seal->direct_avatar_upload): ?>
+                        <form action='<?=$self_link?>' method='post'>
+                            <input type='text' name='avatar_link' value='<?=$player->avatar_link?>' style='width:250px;margin-bottom:5px;' />
+                            <input type='submit' name='change_avatar' value='Change' />
+                        </form>
+                    <?php else: ?>
+                    <?php endif ?>
                 </div>
                 <br style='clear:both;' />
             <?php else: ?>
