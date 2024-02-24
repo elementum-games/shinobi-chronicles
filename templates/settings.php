@@ -75,6 +75,8 @@
                     <b>Avatar info:</b><br />
                     <?php if(!$player->forbidden_seal->direct_avatar_upload): ?>
                         Avatar must be hosted on another website<br />
+                    <?php else: ?>
+                        <b>WARNING:</b> You can only upload a file once per day!
                     <?php endif ?>
                     Default limit: <?=$player->getAvatarSize()?> x <?=$player->getAvatarSize()?> pixels<br />
                     Avatar can be larger than the limit, but it will be resized<br />
