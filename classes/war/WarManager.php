@@ -797,14 +797,14 @@ class WarManager {
      * @param ?Village $village
      * @return int
      */
-    public static function getLocationMaxHealth(System $system, $region_location_data, ?Village $village): int {
+    public static function getLocationMaxHealth(System $system, $region_location_data, ?Village $village = null): int {
         if (!isset($village)) {
             $village = VillageManager::getVillageByID($system, $region_location_data['occupying_village_id']);
         }
         switch ($region_location_data['type']) {
-            case 'Castle':
+            case 'castle':
                 return floor(self::BASE_CASTLE_HEALTH * (1 + ($village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP] / 100)));
-            case 'Village':
+            case 'village':
                 return floor(self::BASE_TOWN_HEALTH * (1 + ($village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_TOWN_HP] / 100)));
             default:
                 return 0;
