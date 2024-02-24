@@ -104,17 +104,26 @@ function nameColorDisplay(array $name_colors): string {
             <?= $twinSeal->avatar_size ?>x<?= $twinSeal->avatar_size ?>&nbsp;
             (<?= round($twinSeal->avatar_filesize / ForbiddenSeal::ONE_MEGABYTE, 1) ?> MB)
             <br />
+            <?php if($twinSeal->direct_avatar_upload): ?>
+                Direct upload of avatar<br />
+            <? endif ?>
             Additional avatar styles
         </td>
         <td>
             <?= $fourDragonSeal->avatar_size ?>x<?= $fourDragonSeal->avatar_size ?>&nbsp;
             (<?= round($fourDragonSeal->avatar_filesize / ForbiddenSeal::ONE_MEGABYTE, 1) ?> MB)
             <br />
+            <?php if($fourDragonSeal->direct_avatar_upload): ?>
+                Direct upload of avatar<br />
+            <? endif ?>
             Additional avatar styles
         </td>
         <td><?= $eightDeitiesSeal->avatar_size ?>x<?= $eightDeitiesSeal->avatar_size ?>&nbsp;
             (<?= round($eightDeitiesSeal->avatar_filesize / ForbiddenSeal::ONE_MEGABYTE, 1) ?> MB)
             <br />
+            <?php if($eightDeitiesSeal->direct_avatar_upload): ?>
+                Direct upload of avatar<br />
+            <? endif ?>
             Additional avatar styles
         </td>
     </tr>

@@ -30,6 +30,12 @@ class ForbiddenSeal {
         2 => 200,
         3 => 200,
     ];
+    const DIRECT_AVATAR_UPLOAD = [
+        0 => false,
+        1 => false,
+        2 => true,
+        3 => true,
+    ];
     /** NOTE: No need to duplicate frames, arrays are merged based on seal level **/
     const DEFAULT_AVATAR_FRAMES = [
         'avy_none' => 'none',
@@ -223,6 +229,7 @@ class ForbiddenSeal {
         public int $avatar_size,
         public int $avatar_filesize,
         public array $avatar_styles,
+        public bool $direct_avatar_upload,
 
         // Social benefits
         public int $inbox_size,
@@ -332,6 +339,7 @@ class ForbiddenSeal {
             avatar_size: self::AVATAR_SIZES[$seal_level],
             avatar_filesize: self::AVATAR_FILE_SIZES[$seal_level],
             avatar_styles: self::getAvyFrames(seal_level: $seal_level),
+            direct_avatar_upload: self::DIRECT_AVATAR_UPLOAD($seal_level),
 
             inbox_size: self::INBOX_SIZES[$seal_level],
             journal_size: self::JOURNAL_SIZES[$seal_level],
