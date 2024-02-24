@@ -73,11 +73,11 @@ function userSettings() {
 	else if (!empty($_POST['upload_avatar'])) {
         try {
 			$target_dir = __DIR__ . '/../_user_imgs/';
-			$target_file = $target_dir . basename($_FILES['fileToUpload']['name']);
+			$target_file = $target_dir . $system->db->clean(basename($_FILES['fileToUpload']['name']));
 			$file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 			$target_file_path = $target_dir . strtolower($player->user_name) . '.' . $file_type;
 			$user_link = $system->router->base_url . '_user_imgs/' . strtolower($player->user_name) . '.' . $file_type;
-			
+	
 			// Upload directory is missing, this should be manually created
             if(!is_dir($target_dir)) {
                 throw new RuntimeException("User upload directory is missing! Notify an administrator.");
