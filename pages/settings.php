@@ -79,7 +79,7 @@ function userSettings() {
 			$user_link = $system->router->base_url . '_user_imgs/' . strtolower($player->user_name) . '.' . $file_type;
 			
 			// Limit uploads to 1/day
-			if((time() - filemtime($target_file_path)) < 86400) {
+			if(file_exists($target_file_path) && (time() - filemtime($target_file_path)) < 86400) {
 				throw new RuntimeException("You can only upload a file once per day!");
 			}
 
