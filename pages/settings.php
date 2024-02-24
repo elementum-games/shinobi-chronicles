@@ -77,6 +77,11 @@ function userSettings() {
 			$file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 			$target_file_path = $target_dir . strtolower($player->user_name) . '.' . $file_type;
 			$user_link = $system->router->base_url . '_user_imgs/' . strtolower($player->user_name) . '.' . $file_type;
+
+			// Lack permission to upload file
+			if(!$player->forbidden_seal->direct_avatar_upload) {
+				throw new RuntimeException("You do not have permission to upload avatars!");
+			}
 	
 			// Upload directory is missing, this should be manually created
             if(!is_dir($target_dir)) {
