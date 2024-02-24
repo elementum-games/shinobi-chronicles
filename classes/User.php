@@ -327,6 +327,8 @@ class User extends Fighter {
 
     public CharacterRamenData $ramen_data;
 
+    public int $fatigue;
+
     /**
      * User constructor.
      * @param System $system
@@ -684,6 +686,8 @@ class User extends Fighter {
         $this->village_changes = $user_data['village_changes'];
         $this->clan_changes = $user_data['clan_changes'];
 
+        $this->fatigue = $user_data['fatigue'];
+
         // Village
         $this->village_location = VillageManager::getLocation($this->system, $this->village->village_id);
         /** @noinspection PhpConditionAlreadyCheckedInspection */
@@ -966,6 +970,14 @@ class User extends Fighter {
         }
         if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_KING)) {
             $this->reputation->addBonusPveRep(1);
+        }
+        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_WARRIOR)) {
+            $this->fatigue = 0;
+        }
+
+        // Fatigue
+        if ($this->in_village) {
+            $this->fatigue = 0;
         }
 
         return;
@@ -1937,7 +1949,8 @@ class User extends Fighter {
 		`clan_changes` = '$this->clan_changes',
         `locked_challenge` = '$this->locked_challenge',
 		`censor_explicit_language` = " . (int)$this->censor_explicit_language . ",
-		`blocked_notifications` = '{$this->blocked_notifications->dbEncode()}'
+		`blocked_notifications` = '{$this->blocked_notifications->dbEncode()}',
+        `fatigue` = '$this->fatigue'
 		WHERE `user_id` = '{$this->user_id}' LIMIT 1";
         $this->system->db->query($query);
 
@@ -2149,10 +2162,10 @@ class User extends Fighter {
 
     public function maxConsumableHealAmountPercent(): int {
         if($this->battle_id) {
-            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT;
+            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT - $this->fatigue;
         }
         if($this->consumableHealReductionMsLeft() > 0) {
-            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT;
+            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT - $this->fatigue;
         }
 
         return 100;

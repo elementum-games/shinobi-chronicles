@@ -178,6 +178,10 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
             $player->pvp_immunity_ms = System::currentTimeMs() + (5 * 1000);
         }*/
 
+        if (!$player->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_WARRIOR)) {
+            $player->fatigue += Battle::FATIGUE_PER_BATTLE;
+        }
+
         $village_point_gain = 1 + $player->village->policy->pvp_village_point;
         $team_point_gain = 1;
 
@@ -185,7 +189,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $result .= "You win the fight and earn ¥$pvp_yen![br]";
 
         $system->db->query(
-            "UPDATE `villages` SET 
+            "UPDATE `villages` SET
             `points` = `points` + '{$village_point_gain}',
             `monthly_points` = `monthly_points` + '{$village_point_gain}'
             WHERE `name`= '{$player->village->name}' LIMIT 1"

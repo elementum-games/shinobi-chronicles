@@ -146,8 +146,8 @@ class RamenShopManager {
             "[quote]I don't care if you win or lose as long as you make the fight interesting.[/quote]",
             "[quote]When you come here, you are not only another brawler, but also an entertainer.[/quote]",
             "[quote]Saw you fight out there. Ever considered... alternative strategies?[/quote]",
-            "[quote]Fighting fair is boring. Fighting dirty is what we’re here for.[/quote]",
-            "[quote]You can use any weapons you bring with you but you can’t take the chopsticks, alright?[/quote]",
+            "[quote]Fighting fair is boring. Fighting dirty is what we're here for.[/quote]",
+            "[quote]You can use any weapons you bring with you but you can't take the chopsticks, alright?[/quote]",
             "[quote]Considering your appetite, I think I'll put my next bet on you.[/quote]",
             "[quote]I didn't expect much of you to be honest, but...[/quote]",
             "[quote]Wouldn't mind seeing you in the ring more often.[/quote]",
@@ -191,7 +191,7 @@ class RamenShopManager {
         self::SPECIAL_RAMEN_SHOYU => "+2 Stealth.",
         self::SPECIAL_RAMEN_KING => "+1 Reputation gain (PvP excluded).",
         self::SPECIAL_RAMEN_SPICY_MISO => "+25% base regen.",
-        self::SPECIAL_RAMEN_WARRIOR => "Heal to full after winning a battle",
+        self::SPECIAL_RAMEN_WARRIOR => "Immunity to post-battle fatigue.",
     ];
 
     const MYSTERY_RAMEN_COST_MULTIPLIER = 1;

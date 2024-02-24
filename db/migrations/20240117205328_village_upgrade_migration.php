@@ -84,6 +84,9 @@ final class VillageUpgradeMigration extends AbstractMigration
             ALTER TABLE `villages` ADD `construction_score` INT(11) NOT NULL DEFAULT '0';
             ALTER TABLE `villages` ADD `research_score` INT(11) NOT NULL DEFAULT '0';
 
+            -- Alter table users
+            ALTER TABLE `users` ADD `fatigue` INT(11) NOT NULL DEFAULT '0';
+
             -- Use occupying_village_id as source of truth for region_locations
             UPDATE region_locations
             JOIN regions ON region_locations.region_id = regions.region_id
@@ -202,6 +205,9 @@ final class VillageUpgradeMigration extends AbstractMigration
             -- Alter table villages
             ALTER TABLE `villages` DROP `construction_score`;
             ALTER TABLE `villages` DROP `research_score`;
+
+            -- Alter table users
+            ALTER TABLE `users` DROP `fatigue`;
         ");
     }
 }
