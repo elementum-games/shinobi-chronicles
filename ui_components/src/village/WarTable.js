@@ -123,7 +123,7 @@ export function WarTable({
                         </div>
                         {globalLeaderboardWarLogs
                             .map((log, index) => (
-                                <PlayerWarLog log={log} index={index} animate={true} getVillageIcon={getVillageIcon} />
+                                <PlayerWarLog log={log} index={index} animate={false} getVillageIcon={getVillageIcon} />
                             ))}
                     </div>
                     <div className="global_leaderboard_navigation">

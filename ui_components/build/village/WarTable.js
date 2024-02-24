@@ -127,7 +127,7 @@ export function WarTable({
   })), globalLeaderboardWarLogs.map((log, index) => /*#__PURE__*/React.createElement(PlayerWarLog, {
     log: log,
     index: index,
-    animate: true,
+    animate: false,
     getVillageIcon: getVillageIcon
   }))), /*#__PURE__*/React.createElement("div", {
     className: "global_leaderboard_navigation"
