@@ -720,11 +720,12 @@ class TravelManager {
                     throw new RuntimeException("Target has died within the last minute, please wait " .
                         ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
                 }*/
+            /*
             if ($this->user->war_action_id > 0) {
                 $war_action = $this->warManager->getWarActionById($this->user->war_action_id);
                 $message = "You cannot attack while " . WarAction::WAR_ACTION_TYPE_DESCRIPTOR[$war_action->type] . "!";
                 throw new RuntimeException($message);
-            }
+            }*/
             if ($this->dbFetchIsProtectedByAlly($user) && $this->user->rank_num >= 4) {
                 throw new RuntimeException("Target is protected by a higher rank ally! Attack them first.");
             }

@@ -87,6 +87,9 @@ final class VillageUpgradeMigration extends AbstractMigration
             -- Alter table users
             ALTER TABLE `users` ADD `fatigue` INT(11) NOT NULL DEFAULT '0';
 
+            -- Alter table battles
+            ALTER TABLE `battles` ADD `total_loot` INT(11) NOT NULL DEFAULT '0';
+
             -- Use occupying_village_id as source of truth for region_locations
             UPDATE region_locations
             JOIN regions ON region_locations.region_id = regions.region_id
@@ -208,6 +211,9 @@ final class VillageUpgradeMigration extends AbstractMigration
 
             -- Alter table users
             ALTER TABLE `users` DROP `fatigue`;
+
+            -- Alter table battles
+            ALTER TABLE `battles` DROP `total_loot`;
         ");
     }
 }

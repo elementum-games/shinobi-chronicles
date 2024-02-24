@@ -208,10 +208,9 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                     $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, $rep_gained);
                 }
             }
-            // Loot - winner takes half loser's if retreat, which is all remaining since loser has left battle in order to flag as retreat
-            $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}");
+            $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id} LIMIT " . ceil($battle->getTotalLoot() / 2));
             if ($system->db->last_affected_rows > 0) {
-                $result .= "You have taken half the loot carried by your opponent.[br]";
+                $result .= "You have claimed half the total loot from this battle.[br]";
             }
         } else {
             // Calculate rep gains
@@ -228,7 +227,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
             // Loot
             $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}");
             if ($system->db->last_affected_rows > 0) {
-                $result .= "You have taken all loot carried by your opponent.[br]";
+                $result .= "You have claimed all of the loot from this battle.[br]";
             }
         }
 
@@ -283,16 +282,9 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                     $result .= "You have lost $rep_lost village reputation.[br]";
                 }
                 // Loot - winner takes half loser's if retreat
-                $loot_result = $system->db->query("SELECT COUNT(*) as total_loot FROM `loot` WHERE `user_id` = {$player->user_id} AND `battle_id` = {$player->battle_id}");
-                $loot_result = $system->db->fetch($loot_result);
-                if ($system->db->last_num_rows > 0) {
-                    $total_loot = $loot_result['total_loot'];
-                    $half_loot = floor($total_loot / 2);
-                    $query = "UPDATE `loot` SET `battle_id` = NULL WHERE `battle_id` = {$player->battle_id} ORDER BY `id` ASC LIMIT $half_loot";
-                    $system->db->query($query);
-                    if ($system->db->last_affected_rows > 0) {
-                        $result .= "Half of your loot was taken by your opponent.[br]";
-                    }
+                $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id} LIMIT " . ceil($battle->getTotalLoot() / 2));
+                if ($system->db->last_affected_rows > 0) {
+                    $result .= "You have claimed half the total loot from this battle.[br]";
                 }
             }
         } else {
@@ -332,12 +324,15 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
             $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1, DailyTask::SUB_TASK_COMPLETE);
         }
 
-        // Loot
-        $system->db->query("UPDATE `loot` SET `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}"); // clear hold on loot
+        // Take half loot on draw
+        $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id} LIMIT " . ceil($battle->getTotalLoot() / 2));
+        if ($system->db->last_affected_rows > 0) {
+            $result .= "You have claimed half the total loot from this battle.[br]";
+        }
     }
     else {
-        // Loot
-        $system->db->query("UPDATE `loot` SET `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}"); // clear hold on loot
+        // If stopped/error clear hold on loot
+        $system->db->query("UPDATE `loot` SET `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}");
 
         $result .= "Battle Stopped.[br]";
     }

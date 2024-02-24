@@ -88,6 +88,8 @@ class Battle {
     public int $team1_wins;
     public int $team2_wins;
 
+    public int $total_loot;
+
     /**
      * @param System  $system
      * @param Fighter $player1
@@ -147,28 +149,32 @@ class Battle {
         ");
         $battle_id = $system->db->last_insert_id;
 
+        $total_loot = 0;
         if($player1 instanceof User) {
             $player1->battle_id = $battle_id;
             if ($battle_type == self::TYPE_FIGHT) {
                 $player1->pvp_immunity_ms = 0; // if attacking lose immunity
-                $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player1->user_id}");
+                $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player1->user_id} AND `claimed_time` IS NULL");
+                $total_loot += $system->db->last_affected_rows;
             }
             if ($player1->war_action_id > 0) {
                 WarAction::cancelWarAction($system, $player1);
             }
-
             $player1->updateData();
         }
         if($player2 instanceof User) {
             $player2->battle_id = $battle_id;
             if ($battle_type == self::TYPE_FIGHT) {
-                $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player2->user_id}");
+                $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player2->user_id} AND `claimed_time` IS NULL");
+                $total_loot += $system->db->last_affected_rows;
             }
             if ($player2->war_action_id > 0) {
                 WarAction::cancelWarAction($system, $player2);
             }
             $player2->updateData();
         }
+
+        $system->db->query("UPDATE `battles` SET `total_loot` = {$total_loot} WHERE `battle_id` = {$battle_id}");
 
         // Create Notifications
         if ($battle_type == self::TYPE_FIGHT) {
@@ -274,6 +280,8 @@ class Battle {
         $this->round_count = $battle['round_count'];
         $this->team1_wins = $battle['team1_wins'];
         $this->team2_wins = $battle['team2_wins'];
+
+        $this->total_loot = $battle['total_loot'];
     }
 
     /**
