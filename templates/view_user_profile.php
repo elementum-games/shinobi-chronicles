@@ -102,8 +102,8 @@ $clan_positions = array(
             <?php endif; ?>
 
             <br />
-			<label style='width:6.5em;'>PvP wins:</label>	<?= $viewUser->pvp_wins ?><br />
-			<label style='width:6.5em;'>AI wins:</label> <?= $viewUser->ai_wins ?><br />
+			<label style='width:6.5em;'>PvP wins:</label>	<?= number_format($viewUser->pvp_wins) ?><br />
+			<label style='width:6.5em;'>AI wins:</label> <?= number_format($viewUser->ai_wins) ?><br />
         </td></tr>
 
         <!--//send message/money/ak-->

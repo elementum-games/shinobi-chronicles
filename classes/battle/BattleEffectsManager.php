@@ -574,9 +574,9 @@ class BattleEffectsManager {
             $damage_label = $effect->effect == 'reflect_damage' ? 'reflect damage' : 'residual damage';
 
             if ($residual_damage_resisted > 0) {
-                $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($damage) . "</span>" . " $damage_label (resists " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($residual_damage_resisted) . "</span>" . " damage)");
+                $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . number_format(round($damage)) . "</span>" . " $damage_label (resists " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . number_format(round($residual_damage_resisted)) . "</span>" . " damage)");
             } else {
-                $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round($damage) . "</span>" . " $damage_label");
+                $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . number_format(round($damage)) . "</span>" . " $damage_label");
             }
 
             $target->last_damage_taken += $damage;
@@ -589,7 +589,7 @@ class BattleEffectsManager {
             $heal = $effect->effect_amount;
 
             if ($effect->effect_amount > 0) {
-                $this->addDisplay($target, $target->getName() . " heals " . "<span class=\"battle_text_heal\" style=\"color:green\">" . round($heal) . "</span>" . " health");
+                $this->addDisplay($target, $target->getName() . " heals " . "<span class=\"battle_text_heal\" style=\"color:green\">" . number_format(round($heal)) . "</span>" . " health");
 
                 $target->health += $heal;
             }
@@ -715,10 +715,10 @@ class BattleEffectsManager {
                 break;
             case 'residual_damage':
             case 'delayed_residual':
-                $announcement_text = "[opponent] is taking Residual Damage" . " ({$tag_open}" . round($effect->potential_damage, 0) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
+                $announcement_text = "[opponent] is taking Residual Damage" . " ({$tag_open}" . number_format(round($effect->potential_damage, 0)) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
                 break;
             case 'reflect_damage':
-                $announcement_text = "[opponent] is taking Reflect Damage" . " ({$tag_open}" . round($effect->potential_damage, 0) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
+                $announcement_text = "[opponent] is taking Reflect Damage" . " ({$tag_open}" . number_format(round($effect->potential_damage, 0)) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
                 break;
             case 'drain_chakra':
                 $announcement_text = "[opponent]'s Chakra is being drained" . $effect_details;
