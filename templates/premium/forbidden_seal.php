@@ -124,9 +124,6 @@ function nameColorDisplay(array $name_colors): string {
             <?php if($eightDeitiesSeal->direct_avatar_upload): ?>
 				Direct upload of avatar image<br />
 			<?php endif ?>
-            <?php if($eightDeitiesSeal->direct_avatar_upload): ?>
-                Direct upload of avatar<br />
-            <? endif ?>
             Additional avatar styles
         </td>
     </tr>
