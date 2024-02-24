@@ -8,5 +8,6 @@ class RamenOwnerDto {
         public string $shop_description,
         public string $dialogue,
         public string $shop_name,
+        public string $basic_menu_description,
     ) {}
 }

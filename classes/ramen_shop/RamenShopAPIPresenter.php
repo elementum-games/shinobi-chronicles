@@ -9,7 +9,8 @@ class RamenShopAPIPresenter {
             "background" => $owner->background,
             "shop_description" => $owner->shop_description,
             "dialogue" => $owner->dialogue,
-            "shop_name" => $owner->shop_name
+            "shop_name" => $owner->shop_name,
+            "basic_menu_description" => $owner->basic_menu_description,
         ];
     }
     public static function getCharacterRamenResponse(System $system, User $player) {

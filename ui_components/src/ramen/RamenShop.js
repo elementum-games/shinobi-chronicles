@@ -169,7 +169,7 @@ function RamenShop({
                     </div>
                     {basicMenuOptions &&
                         <div className="ramen_shop_basic_menu_container box-primary">
-                            <div className="ramen_shop_descriptive_text">Light savory broth with eggs and noodles, perfect with sake.</div>
+                            <div className="ramen_shop_descriptive_text">{ramenOwnerDetailsState.basic_menu_description}</div>
                             <div className="ramen_shop_basic_menu">
                                 {basicMenuOptions.map((option, index) => {
                                     return (

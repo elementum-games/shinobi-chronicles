@@ -47,7 +47,17 @@ class RamenShopManager {
         4 => "A traditional ramen stand proudly run by the [keyword]Ichikawa[/keyword] family for generations. [keyword]Kataba[/keyword] and [keyword]Ryoba[/keyword] have put their fighting days behind them after Kataba’s injury, but carry on as a duo in a new battlefield of cooking.",
         5 => "A traditional ramen stand proudly run by the [keyword]Ichikawa[/keyword] family for generations. Many travel to Mist from far to see [keyword]Kouji[/keyword] cook. His slow and meticulous cooking and soothing voice has made watching him work a meditative experience. Offers free life advice.",
         0 => "A traveling ramen cart that appears whenever you need it the most. It's difficult to make a living outside villages, but [keyword]Nobu[/keyword] gets by with his skills - and loyal customers.",
-        "colosseum" => "[keyword]Bite Down[/keyword] serves the visitors with a quick bowl of ramen to down before their next bout. Its owner [keyword][/keyword] not only runs the stand, but is said to know a thing or two about gambling...",
+        "colosseum" => "[keyword]Bite Down[/keyword] serves the visitors with a quick, although somewhat expensive meal to down before their next bout. Its owner [keyword][/keyword] not only runs the stand, but is said to know a thing or two about gambling...",
+    ];
+    /* ramen shop owner basic menu description indexed by village id */
+    const RAMEN_SHOP_BASIC_MENU_DESCRIPTIONS_BY_VILLAGE = [
+        1 => "Light savory broth with eggs and noodles, perfect with sake.",
+        2 => "Light savory broth with eggs and noodles, perfect with sake.",
+        3 => "Light savory broth with eggs and noodles, perfect with sake.",
+        4 => "Light savory broth with eggs and noodles, perfect with sake.",
+        5 => "Light savory broth with eggs and noodles, perfect with sake.",
+        0 => "Light savory broth with eggs and noodles, perfect with sake.",
+        "colosseum" => "Delicate slices of fresh fish atop seasoned rice, served with wasabi and soy sauce.",
     ];
     /* ramen shop owner dialogue options indexed by village id */
     const RAMEN_SHOP_DIALOGUE_OPTIONS_BY_VILLAGE = [
@@ -216,6 +226,7 @@ class RamenShopManager {
                 shop_description: self::RAMEN_SHOP_DESCRIPTIONS_BY_VILLAGE[$player->village->village_id],
                 dialogue: self::RAMEN_SHOP_DIALOGUE_OPTIONS_BY_VILLAGE[$player->village->village_id][array_rand(self::RAMEN_SHOP_DIALOGUE_OPTIONS_BY_VILLAGE[$player->village->village_id])],
                 shop_name: self::RAMEN_SHOP_NAMES_BY_VILLAGE[$player->village->village_id],
+                basic_menu_description: self::RAMEN_SHOP_BASIC_MENU_DESCRIPTIONS_BY_VILLAGE[$player->village->village_id],
             );
         } else {
             $ramenOwnerDto = new RamenOwnerDto(
@@ -225,6 +236,7 @@ class RamenShopManager {
                 shop_description: self::RAMEN_SHOP_DESCRIPTIONS_BY_VILLAGE[0],
                 dialogue: self::RAMEN_SHOP_DIALOGUE_OPTIONS_BY_VILLAGE[0][array_rand(self::RAMEN_SHOP_DIALOGUE_OPTIONS_BY_VILLAGE[0])],
                 shop_name: self::RAMEN_SHOP_NAMES_BY_VILLAGE[0],
+                basic_menu_description: self::RAMEN_SHOP_BASIC_MENU_DESCRIPTIONS_BY_VILLAGE[0],
             );
         }
         $result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
@@ -237,6 +249,7 @@ class RamenShopManager {
             $ramenOwnerDto->shop_description = self::RAMEN_SHOP_DESCRIPTIONS_BY_VILLAGE["colosseum"];
             $ramenOwnerDto->shop_name = self::RAMEN_SHOP_NAMES_BY_VILLAGE["colosseum"];
             $ramenOwnerDto->background = self::RAMEN_SHOP_OWNER_BACKGROUNDS_BY_VILLAGE["colosseum"];
+            $ramenOwnerDto->basic_menu_description = self::RAMEN_SHOP_BASIC_MENU_DESCRIPTIONS_BY_VILLAGE["colosseum"];
         }
         if ($player->ramen_data->mystery_ramen_available) {
             $ramenOwnerDto->name = self::RAMEN_SHOP_OWNER_NAMES_BY_VILLAGE["mystery"];
@@ -340,7 +353,7 @@ class RamenShopManager {
                     cost: ceil((self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_SHOYU] * ($player->rank_num + 1)) * $ramen_cost_multiplier * (1 + (self::UC_SPECIAL_RAMEN_COST_MULTIPLIER_PERCENT / 100))),
                     label: 'Tempura',
                     image: "images/ramen/Tempura.png",
-                    description: "Delicious ramen in soy sauce broth with strong flavors.",
+                    description: "A lightly battered mix of seafood or vegetables, known for its delicate, crisp texture and golden color.",
                     effect: self::RAMEN_EFFECT_DESCRIPTIONS[self::SPECIAL_RAMEN_SHOYU],
                     duration: self::BASE_RAMEN_DURATION_MINUTES + $ramen_duration_bonus,
                 );
@@ -349,7 +362,7 @@ class RamenShopManager {
                     cost: ceil((self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_KING] * ($player->rank_num + 1)) * $ramen_cost_multiplier * (1 + (self::UC_SPECIAL_RAMEN_COST_MULTIPLIER_PERCENT / 100))),
                     label: 'Wagyu',
                     image: "images/ramen/Wagyu.png",
-                    description: "Topped with every meat and vegetable. Eat your fill.",
+                    description: "Celebrated for its buttery texture and complex flavors, often served in small portions to savor its quality.",
                     effect: self::RAMEN_EFFECT_DESCRIPTIONS[self::SPECIAL_RAMEN_KING],
                     duration: self::BASE_RAMEN_DURATION_MINUTES + $ramen_duration_bonus,
                 );
@@ -358,7 +371,7 @@ class RamenShopManager {
                     cost: ceil((self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_SPICY_MISO] * ($player->rank_num + 1)) * $ramen_cost_multiplier * (1 + (self::UC_SPECIAL_RAMEN_COST_MULTIPLIER_PERCENT / 100))),
                     label: 'Karaage',
                     image: "images/ramen/Karaage.png",
-                    description: "Spices are balanced with a savory broth and bits of sweet corn.",
+                    description: "Known for its juicy interior and flavorful, slightly garlic-ginger seasoned crust.",
                     effect: self::RAMEN_EFFECT_DESCRIPTIONS[self::SPECIAL_RAMEN_SPICY_MISO],
                     duration: self::BASE_RAMEN_DURATION_MINUTES + $ramen_duration_bonus,
                 );
@@ -367,7 +380,7 @@ class RamenShopManager {
                     cost: ceil((self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_WARRIOR] * ($player->rank_num + 1)) * $ramen_cost_multiplier * (1 + (self::UC_SPECIAL_RAMEN_COST_MULTIPLIER_PERCENT / 100))),
                     label: 'Gyoza',
                     image: "images/ramen/Gyoza.png",
-                    description: "The burning spiciness is enough to embolden anyone.",
+                    description: "Dumpling filled with ground meat and vegetables, often enjoyed with a spicy dipping sauce.",
                     effect: self::RAMEN_EFFECT_DESCRIPTIONS[self::SPECIAL_RAMEN_WARRIOR],
                     duration: self::BASE_RAMEN_DURATION_MINUTES + $ramen_duration_bonus,
                 );
