@@ -308,7 +308,10 @@ export function WarTable({
         }
         const renderScoreBar = () => {
             const total_score = record.attacker_war_log.war_score + record.defender_war_log.war_score;
-            const attacker_score_percentage = Math.round((record.attacker_war_log.war_score / total_score) * 100);
+            let attacker_score_percentage = 50;
+            if (total_score > 0) {
+                attacker_score_percentage = Math.round((record.attacker_war_log.war_score / total_score) * 100);
+            }
             const victory_bar_percentage = calculateBarPercent();
             return (
                 <div className="war_record_score_bar">
@@ -343,12 +346,12 @@ export function WarTable({
                         </defs>
                         <polygon points="0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0" fill="url(#war_record_score_divider_gradient)" stroke="#4d401c" strokeWidth="20"></polygon>
                     </svg>
-                    {/*<svg className="war_record_score_divider" viewBox="0 0 200 200" width="7" height="7" style={{ paddingBottom: "1px", left: victory_bar_percentage + "%" }}>
-                        <polygon points="0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0" fill="url(#war_record_score_divider_gradient)" stroke="#4d401c" strokeWidth="20"></polygon>
-                    </svg>
-                    <svg className="war_record_score_divider" viewBox="0 0 200 200" width="7" height="7" style={{ paddingBottom: "1px", left: (100 - victory_bar_percentage) + "%" }}>
-                        <polygon points="0,0 0,25 40,25 40,175 0,175 0,200 200,200 200,175 160,175 160,25 200,25 200,0" fill="url(#war_record_score_divider_gradient)" stroke="#4d401c" strokeWidth="20"></polygon>
-                    </svg>*/}
+                    {!record.village_relation.relation_end &&
+                        <>
+                            <img src="/images/icons/enemywarwin.png" className="war_record_score_victory_marker" style={{ left: victory_bar_percentage + "%" }} />
+                            <img src="/images/icons/allywarwin.png" className="war_record_score_victory_marker" style={{ left: (100 - victory_bar_percentage) + "%" }} />
+                        </>
+                    }
                 </div>
             );
         }
@@ -376,7 +379,7 @@ export function WarTable({
                                 </>
                                 :
                                 <>
-                                    {"war active"}
+                                    {record.war_duration}
                                 </>
                             }
                         </div>
@@ -393,8 +396,7 @@ export function WarTable({
         );
     }
 
-    function VillageWarLog({ log, getVillageIcon, animate, is_attacker, getPolicyDisplayData, strategicDataState }) {
-        console.log(strategicDataState.find(item => item.village.name == "Stone"));
+    function VillageWarLog({ log, getVillageIcon, animate, is_attacker, getPolicyDisplayData, strategicDataState }) {;
         const policy_name = getPolicyDisplayData(strategicDataState.find(item => item.village.name == log.village_name).village.policy_id).name;
         const scoreData = [
             { name: 'Objective Score', score: log.objective_score },

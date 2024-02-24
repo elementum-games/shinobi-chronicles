@@ -45,14 +45,14 @@ function RamenShopReactContainer({
 }
 
 type Props = {|
-    ramenShopAPI: string,
-    playerData: PlayerDataType,
-    playerResourcesData: PlayerResourcesType,
-    characterRamenData: CharacterRamenType,
-    ramenOwnerDetails: RamenOwnerType,
-    basicMenuOptions: Array<BasicRamenType>,
-    specialMenuOptions: Array<SpecialRamenType>,
-    mysteryRamenDetails: MysteryRamenType,
+    +ramenShopAPI: string,
+    +playerData: PlayerDataType,
+    +playerResourcesData: PlayerResourcesType,
+    +characterRamenData: CharacterRamenType,
+    +ramenOwnerDetails: RamenOwnerType,
+    +basicMenuOptions: Array<BasicRamenType>,
+    +specialMenuOptions: Array<SpecialRamenType>,
+    +mysteryRamenDetails: MysteryRamenType,
 |};
 function RamenShop({
     ramenShopAPI,

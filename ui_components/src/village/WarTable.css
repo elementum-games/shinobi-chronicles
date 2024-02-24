@@ -13,7 +13,7 @@
     justify-content: space-between;
     align-items: center;
     width: 90%;
-    height: 45px;
+    height: 55px;
     border: 1px solid #17161b;
     cursor: pointer;
 }
@@ -23,8 +23,8 @@
 .war_record_details_container {
     display: flex;
     flex-direction: column;
-    flex-basis: 50%;
-    margin-bottom: 4px;
+    flex-basis: 55%;
+    margin-bottom: 8px;
 }
 .war_record_relation_name {
     text-align: center;
@@ -104,7 +104,9 @@
 }
 .war_record_score_victory_marker {
     position: absolute;
-    bottom: -5px;
+    bottom: -12px;
+    height: 16px;
+    transform: translateX(-8px);
 }
 .war_record_village {
     clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);

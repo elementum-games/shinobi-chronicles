@@ -177,7 +177,8 @@ class VillageApiPresenter {
                         ],
                         "attacker_war_log" => VillageApiPresenter::warLogResponse($warRecordDto->attacker_war_log),
                         "defender_war_log" => VillageApiPresenter::warLogResponse($warRecordDto->defender_war_log),
-                        //"victory_percent_required" => $warRecordDto->victory_percent_required,
+                        "victory_percent_required" => $warRecordDto->victory_percent_required,
+                        "war_duration" => $warRecordDto->war_duration,
                     ];
                 },
                 WarLogManager::getWarRecords($system, $page_number)
