@@ -44,6 +44,7 @@ try {
                     "player_data" => UserAPIPresenter::playerDataResponse($player, RankManager::fetchNames($system)),
                     "mystery_ramen_details" => RamenShopAPIPresenter::getMysteryRamenResponse($player),
                     "character_ramen_data" => RamenShopAPIPresenter::getCharacterRamenResponse($system, $player),
+                    "ramen_owner_details" => RamenShopAPIPresenter::ramenShopOwnerResponse($system, $player),
                     "response_message" => $result->success_message,
                 ];
             } else {

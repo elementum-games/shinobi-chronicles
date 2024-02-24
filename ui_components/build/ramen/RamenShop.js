@@ -37,6 +37,7 @@ function RamenShop({
   const [playerResourcesDataState, setPlayerResourcesDataState] = React.useState(playerResourcesData);
   const [characterRamenDataState, setCharacterRamenDataState] = React.useState(characterRamenData);
   const [mysteryRamenDetailsState, setMysteryRamenDetailsState] = React.useState(mysteryRamenDetails);
+  const [ramenOwnerDetailsState, setRamenOwnerDetailsState] = React.useState(ramenOwnerDetails);
   const {
     openModal
   } = useModal();
@@ -65,6 +66,7 @@ function RamenShop({
       setPlayerDataState(response.data.player_data);
       setMysteryRamenDetailsState(response.data.mystery_ramen_details);
       setCharacterRamenDataState(response.data.character_ramen_data);
+      setRamenOwnerDetailsState(response.data.ramen_owner_details);
       openModal({
         header: 'Confirmation',
         text: response.data.response_message,
@@ -109,16 +111,16 @@ function RamenShop({
   }, /*#__PURE__*/React.createElement("div", {
     className: "ramen_shop_owner_container",
     style: {
-      background: `url(${ramenOwnerDetails.background}) center center no-repeat`
+      background: `url(${ramenOwnerDetailsState.background}) center center no-repeat`
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "ramen_shop_dialogue_container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "ramen_shop_dialogue_nameplate"
-  }, ramenOwnerDetails.name), /*#__PURE__*/React.createElement("div", {
+  }, ramenOwnerDetailsState.name), /*#__PURE__*/React.createElement("div", {
     className: "ramen_shop_dialogue_text"
-  }, parseKeywords(ramenOwnerDetails.dialogue))), /*#__PURE__*/React.createElement("img", {
-    src: ramenOwnerDetails.image,
+  }, parseKeywords(ramenOwnerDetailsState.dialogue))), /*#__PURE__*/React.createElement("img", {
+    src: ramenOwnerDetailsState.image,
     className: "ramen_shop_owner_img"
   }))), /*#__PURE__*/React.createElement("div", {
     className: "column second"
@@ -126,9 +128,9 @@ function RamenShop({
     className: "ramen_shop_intro_container box-primary"
   }, /*#__PURE__*/React.createElement("div", {
     className: "header"
-  }, ramenOwnerDetails.shop_name), /*#__PURE__*/React.createElement("div", {
+  }, ramenOwnerDetailsState.shop_name), /*#__PURE__*/React.createElement("div", {
     className: "intro_text"
-  }, parseKeywords(ramenOwnerDetails.shop_description))), /*#__PURE__*/React.createElement("div", {
+  }, parseKeywords(ramenOwnerDetailsState.shop_description))), /*#__PURE__*/React.createElement("div", {
     className: "basic_menu_header_row"
   }, /*#__PURE__*/React.createElement("div", {
     className: "header"

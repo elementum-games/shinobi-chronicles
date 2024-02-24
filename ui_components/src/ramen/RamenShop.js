@@ -68,6 +68,7 @@ function RamenShop({
     const [playerResourcesDataState, setPlayerResourcesDataState] = React.useState(playerResourcesData);
     const [characterRamenDataState, setCharacterRamenDataState] = React.useState(characterRamenData);
     const [mysteryRamenDetailsState, setMysteryRamenDetailsState] = React.useState(mysteryRamenDetails);
+    const [ramenOwnerDetailsState, setRamenOwnerDetailsState] = React.useState(ramenOwnerDetails);
     const { openModal } = useModal();
     function PurchaseBasicRamen(ramen_key) {
         apiFetch(
@@ -100,6 +101,7 @@ function RamenShop({
             setPlayerDataState(response.data.player_data);
             setMysteryRamenDetailsState(response.data.mystery_ramen_details);
             setCharacterRamenDataState(response.data.character_ramen_data);
+            setRamenOwnerDetailsState(response.data.ramen_owner_details);
             openModal({
                 header: 'Confirmation',
                 text: response.data.response_message,
@@ -142,18 +144,18 @@ function RamenShop({
         <div className="ramen_shop_container">
             <div className="row first">
                 <div className="column first">
-                    <div className="ramen_shop_owner_container" style={{ background: `url(${ramenOwnerDetails.background}) center center no-repeat` }}>
+                    <div className="ramen_shop_owner_container" style={{ background: `url(${ramenOwnerDetailsState.background}) center center no-repeat` }}>
                         <div className="ramen_shop_dialogue_container">
-                            <div className="ramen_shop_dialogue_nameplate">{ramenOwnerDetails.name}</div>
-                            <div className="ramen_shop_dialogue_text">{parseKeywords(ramenOwnerDetails.dialogue)}</div>
+                            <div className="ramen_shop_dialogue_nameplate">{ramenOwnerDetailsState.name}</div>
+                            <div className="ramen_shop_dialogue_text">{parseKeywords(ramenOwnerDetailsState.dialogue)}</div>
                         </div>
-                        <img src={ramenOwnerDetails.image} className="ramen_shop_owner_img" />
+                        <img src={ramenOwnerDetailsState.image} className="ramen_shop_owner_img" />
                     </div>
                 </div>
                 <div className="column second">
                     <div className="ramen_shop_intro_container box-primary">
-                        <div className="header">{ramenOwnerDetails.shop_name}</div>
-                        <div className="intro_text">{parseKeywords(ramenOwnerDetails.shop_description)}</div>
+                        <div className="header">{ramenOwnerDetailsState.shop_name}</div>
+                        <div className="intro_text">{parseKeywords(ramenOwnerDetailsState.shop_description)}</div>
                     </div>
                     <div className="basic_menu_header_row">
                         <div className="header">Basic menu</div>

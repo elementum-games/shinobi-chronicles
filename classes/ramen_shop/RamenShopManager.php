@@ -42,7 +42,7 @@ class RamenShopManager {
     /* ramen shop owner descriptions indexed by village id */
     const RAMEN_SHOP_DESCRIPTIONS_BY_VILLAGE = [
         1 => "A traditional ramen stand proudly run by the [keyword]Ichikawa[/keyword] family for generations. As the main chef of a village often in war, [keyword]Tomomi[/keyword] knows first hand the importance of a well fed shinobi force and takes her job seriously.",
-        2 => "A traditional ramen stand proudly run by the [keyword]Ichikawa[/keyword] family for generations. A traditional ramen stand proudly run by Ichikawa family for generations. As years have passed the Ichikawa Ramen has become a successful restaurant chain, now led by [keyword]Suika[/keyword].",
+        2 => "A traditional ramen stand proudly run by the [keyword]Ichikawa[/keyword] family for generations. As years have passed the Ichikawa Ramen has become a successful restaurant chain, now led by [keyword]Suika[/keyword].",
         3 => "A traditional ramen stand proudly run by the [keyword]Ichikawa[/keyword] family for generations. The family’s culinary genius [keyword]Hideo[/keyword] expects nothing less but perfection from his dishes.",
         4 => "A traditional ramen stand proudly run by the [keyword]Ichikawa[/keyword] family for generations. [keyword]Kataba[/keyword] and [keyword]Ryoba[/keyword] have put their fighting days behind them after Kataba’s injury, but carry on as a duo in a new battlefield of cooking.",
         5 => "A traditional ramen stand proudly run by the [keyword]Ichikawa[/keyword] family for generations. Many travel to Mist from far to see [keyword]Kouji[/keyword] cook. His slow and meticulous cooking and soothing voice has made watching him work a meditative experience. Offers free life advice.",
@@ -127,7 +127,7 @@ class RamenShopManager {
             "[quote]The great Shokunyan has arrived.[/quote]",
             "[quote]I have come to offer a gift from my brethren.[/quote]",
             "[quote]I am borrowing this stand for the duration of my stay. Yes, borrowing. Yes, with permission.[/quote]",
-            "[quote]A feast for the eyes, a feast for the soul.[quote] Hige nods profoundly",
+            "[quote]A feast for the eyes, a feast for the soul.[/quote] Hige nods profoundly",
             "[quote]Taste the heaven, taste the earth. Taste the blessing of life itself.[/quote]",
             "You notice Hige's eyes darting towards your coin purse every now and then.",
             "[quote]You do not need to know what's in the ramen - only that it's worth your money.[/quote]",
@@ -181,9 +181,9 @@ class RamenShopManager {
         self::BASIC_RAMEN_MEDIUM => 25,
         self::BASIC_RAMEN_LARGE => 50,
         self::SPECIAL_RAMEN_SHOYU => 1250,
-        self::SPECIAL_RAMEN_KING => 2500,
-        self::SPECIAL_RAMEN_SPICY_MISO => 5000,
-        self::SPECIAL_RAMEN_WARRIOR => 10000,
+        self::SPECIAL_RAMEN_KING => 1250,
+        self::SPECIAL_RAMEN_SPICY_MISO => 3000,
+        self::SPECIAL_RAMEN_WARRIOR => 3000,
     ];
 
     /* ramen effect descriptions indexed by ramen key */
@@ -195,10 +195,11 @@ class RamenShopManager {
     ];
 
     const MYSTERY_RAMEN_COST_MULTIPLIER = 1;
-    const MYSTERY_RAMEN_DURATION_MULTIPLIER = 5;
+    const MYSTERY_RAMEN_DURATION_MULTIPLIER = 2;
     const BASE_RAMEN_DURATION_MINUTES = 10;
     const BASE_MYSTERY_RAMEN_CHANCE = 5;
     const MYSTERY_RAMEN_CHANCE_PER_PURCHASE = 5;
+    const UC_BASIC_RAMEN_COST_MULTIPLIER = 5;
     const UC_SPECIAL_RAMEN_COST_MULTIPLIER_PERCENT = 15;
 
     /**
@@ -267,48 +268,48 @@ class RamenShopManager {
 		$colosseum_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
         if ($player->location->equals($colosseum_coords)) {
             $basic_ramen[self::BASIC_RAMEN_SMALL] = new BasicRamenDto(
-            key: self::BASIC_RAMEN_SMALL,
-            cost: !$player->location->equals($player->village_location) ? $player->rank_num * 5 * 5 : ($player->rank_num * 5 * $ramen_cost_multiplier),
-            health_amount: $player_rank_max_health * 0.1,
-            label: 'Sushi S',
-            image: "images/ramen/SushiS.png",
-        );
-        $basic_ramen[self::BASIC_RAMEN_MEDIUM] = new BasicRamenDto(
-            key: self::BASIC_RAMEN_MEDIUM,
-            cost: !$player->location->equals($player->village_location) ? $player->rank_num * 25 * 5 : ($player->rank_num * 25 * $ramen_cost_multiplier),
-            health_amount: $player_rank_max_health * 0.5,
-            label: 'Sushi M',
-            image: "images/ramen/SushiM.png",
-        );
-        $basic_ramen[self::BASIC_RAMEN_LARGE] = new BasicRamenDto(
-            key: self::BASIC_RAMEN_LARGE,
-            cost: !$player->location->equals($player->village_location) ? $player->rank_num * 50 * 5 : ($player->rank_num * 50 * $ramen_cost_multiplier),
-            health_amount: $player_rank_max_health * 1,
-            label: 'Sushi L',
-            image: "images/ramen/SushiL.png",
-        );
+                key: self::BASIC_RAMEN_SMALL,
+                cost: ceil($player->rank_num * 5 * $ramen_cost_multiplier * self::UC_BASIC_RAMEN_COST_MULTIPLIER),
+                health_amount: $player_rank_max_health * 0.1,
+                label: 'Sushi S',
+                image: "images/ramen/SushiS.png",
+            );
+            $basic_ramen[self::BASIC_RAMEN_MEDIUM] = new BasicRamenDto(
+                key: self::BASIC_RAMEN_MEDIUM,
+                cost: ceil($player->rank_num * 25 * $ramen_cost_multiplier * self::UC_BASIC_RAMEN_COST_MULTIPLIER),
+                health_amount: $player_rank_max_health * 0.5,
+                label: 'Sushi M',
+                image: "images/ramen/SushiM.png",
+            );
+            $basic_ramen[self::BASIC_RAMEN_LARGE] = new BasicRamenDto(
+                key: self::BASIC_RAMEN_LARGE,
+                cost: ceil($player->rank_num * 50 * $ramen_cost_multiplier * self::UC_BASIC_RAMEN_COST_MULTIPLIER),
+                health_amount: $player_rank_max_health * 1,
+                label: 'Sushi L',
+                image: "images/ramen/SushiL.png",
+            );
         } else {
             $basic_ramen[self::BASIC_RAMEN_SMALL] = new BasicRamenDto(
-            key: self::BASIC_RAMEN_SMALL,
-            cost: !$player->location->equals($player->village_location) ? $player->rank_num * 5 * 5 : ($player->rank_num * 5 * $ramen_cost_multiplier),
-            health_amount: $player_rank_max_health * 0.1,
-            label: 'Shio S',
-            image: "images/ramen/ShioS.png",
-        );
-        $basic_ramen[self::BASIC_RAMEN_MEDIUM] = new BasicRamenDto(
-            key: self::BASIC_RAMEN_MEDIUM,
-            cost: !$player->location->equals($player->village_location) ? $player->rank_num * 25 * 5 : ($player->rank_num * 25 * $ramen_cost_multiplier),
-            health_amount: $player_rank_max_health * 0.5,
-            label: 'Shio M',
-            image: "images/ramen/ShioM.png",
-        );
-        $basic_ramen[self::BASIC_RAMEN_LARGE] = new BasicRamenDto(
-            key: self::BASIC_RAMEN_LARGE,
-            cost: !$player->location->equals($player->village_location) ? $player->rank_num * 50 * 5 : ($player->rank_num * 50 * $ramen_cost_multiplier),
-            health_amount: $player_rank_max_health * 1,
-            label: 'Shio L',
-            image: "images/ramen/ShioL.png",
-        );
+                key: self::BASIC_RAMEN_SMALL,
+                cost: ceil($player->rank_num * 5 * $ramen_cost_multiplier),
+                health_amount: $player_rank_max_health * 0.1,
+                label: 'Shio S',
+                image: "images/ramen/ShioS.png",
+            );
+            $basic_ramen[self::BASIC_RAMEN_MEDIUM] = new BasicRamenDto(
+                key: self::BASIC_RAMEN_MEDIUM,
+                cost: ceil($player->rank_num * 25 * $ramen_cost_multiplier),
+                health_amount: $player_rank_max_health * 0.5,
+                label: 'Shio M',
+                image: "images/ramen/ShioM.png",
+            );
+            $basic_ramen[self::BASIC_RAMEN_LARGE] = new BasicRamenDto(
+                key: self::BASIC_RAMEN_LARGE,
+                cost: ceil($player->rank_num * 50 * $ramen_cost_multiplier),
+                health_amount: $player_rank_max_health * 1,
+                label: 'Shio L',
+                image: "images/ramen/ShioL.png",
+            );
         }
 
         if ($system->isDevEnvironment()) {
@@ -336,7 +337,7 @@ class RamenShopManager {
             if ($player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_SET_ONE]) {
                 $special_ramen[self::SPECIAL_RAMEN_SHOYU] = new SpecialRamenDto(
                     key: self::SPECIAL_RAMEN_SHOYU,
-                    cost: (self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_SHOYU] * ($player->rank_num + 1)) * $ramen_cost_multiplier * (1 + (self::UC_SPECIAL_RAMEN_COST_MULTIPLIER_PERCENT / 100)),
+                    cost: ceil((self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_SHOYU] * ($player->rank_num + 1)) * $ramen_cost_multiplier * (1 + (self::UC_SPECIAL_RAMEN_COST_MULTIPLIER_PERCENT / 100))),
                     label: 'Tempura',
                     image: "images/ramen/Tempura.png",
                     description: "Delicious ramen in soy sauce broth with strong flavors.",
@@ -345,7 +346,7 @@ class RamenShopManager {
                 );
                 $special_ramen[self::SPECIAL_RAMEN_KING] = new SpecialRamenDto(
                     key: self::SPECIAL_RAMEN_KING,
-                    cost: (self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_KING] * ($player->rank_num + 1)) * $ramen_cost_multiplier * (1 + (self::UC_SPECIAL_RAMEN_COST_MULTIPLIER_PERCENT / 100)),
+                    cost: ceil((self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_KING] * ($player->rank_num + 1)) * $ramen_cost_multiplier * (1 + (self::UC_SPECIAL_RAMEN_COST_MULTIPLIER_PERCENT / 100))),
                     label: 'Wagyu',
                     image: "images/ramen/Wagyu.png",
                     description: "Topped with every meat and vegetable. Eat your fill.",
@@ -354,7 +355,7 @@ class RamenShopManager {
                 );
                 $special_ramen[self::SPECIAL_RAMEN_SPICY_MISO] = new SpecialRamenDto(
                     key: self::SPECIAL_RAMEN_SPICY_MISO,
-                    cost: (self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_SPICY_MISO] * ($player->rank_num + 1)) * $ramen_cost_multiplier * (1 + (self::UC_SPECIAL_RAMEN_COST_MULTIPLIER_PERCENT / 100)),
+                    cost: ceil((self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_SPICY_MISO] * ($player->rank_num + 1)) * $ramen_cost_multiplier * (1 + (self::UC_SPECIAL_RAMEN_COST_MULTIPLIER_PERCENT / 100))),
                     label: 'Karaage',
                     image: "images/ramen/Karaage.png",
                     description: "Spices are balanced with a savory broth and bits of sweet corn.",
@@ -363,7 +364,7 @@ class RamenShopManager {
                 );
                 $special_ramen[self::SPECIAL_RAMEN_WARRIOR] = new SpecialRamenDto(
                     key: self::SPECIAL_RAMEN_WARRIOR,
-                    cost: (self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_WARRIOR] * ($player->rank_num + 1)) * $ramen_cost_multiplier * (1 + (self::UC_SPECIAL_RAMEN_COST_MULTIPLIER_PERCENT / 100)),
+                    cost: ceil((self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_WARRIOR] * ($player->rank_num + 1)) * $ramen_cost_multiplier * (1 + (self::UC_SPECIAL_RAMEN_COST_MULTIPLIER_PERCENT / 100))),
                     label: 'Gyoza',
                     image: "images/ramen/Gyoza.png",
                     description: "The burning spiciness is enough to embolden anyone.",
@@ -376,7 +377,7 @@ class RamenShopManager {
             if ($player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_SET_ONE]) {
                 $special_ramen[self::SPECIAL_RAMEN_SHOYU] = new SpecialRamenDto(
                     key: self::SPECIAL_RAMEN_SHOYU,
-                    cost: (self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_SHOYU] * ($player->rank_num + 1)) * $ramen_cost_multiplier,
+                    cost: ceil((self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_SHOYU] * ($player->rank_num + 1)) * $ramen_cost_multiplier),
                     label: 'Shoyu',
                     image: "images/ramen/Shoyu.png",
                     description: "Delicious ramen in soy sauce broth with strong flavors.",
@@ -385,7 +386,7 @@ class RamenShopManager {
                 );
                 $special_ramen[self::SPECIAL_RAMEN_KING] = new SpecialRamenDto(
                     key: self::SPECIAL_RAMEN_KING,
-                    cost: (self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_KING] * ($player->rank_num + 1)) * $ramen_cost_multiplier,
+                    cost: ceil((self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_KING] * ($player->rank_num + 1)) * $ramen_cost_multiplier),
                     label: 'King',
                     image: "images/ramen/King.png",
                     description: "Topped with every meat and vegetable. Eat your fill.",
@@ -394,7 +395,7 @@ class RamenShopManager {
                 );
                 $special_ramen[self::SPECIAL_RAMEN_SPICY_MISO] = new SpecialRamenDto(
                     key: self::SPECIAL_RAMEN_SPICY_MISO,
-                    cost: (self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_SPICY_MISO] * ($player->rank_num + 1)) * $ramen_cost_multiplier,
+                    cost: ceil((self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_SPICY_MISO] * ($player->rank_num + 1)) * $ramen_cost_multiplier),
                     label: 'Spicy Miso',
                     image: "images/ramen/SpicyMiso.png",
                     description: "Spices are balanced with a savory broth and bits of sweet corn.",
@@ -403,7 +404,7 @@ class RamenShopManager {
                 );
                 $special_ramen[self::SPECIAL_RAMEN_WARRIOR] = new SpecialRamenDto(
                     key: self::SPECIAL_RAMEN_WARRIOR,
-                    cost: (self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_WARRIOR] * ($player->rank_num + 1)) * $ramen_cost_multiplier,
+                    cost: ceil((self::BASE_RAMEN_COSTS[self::SPECIAL_RAMEN_WARRIOR] * ($player->rank_num + 1)) * $ramen_cost_multiplier),
                     label: 'Warrior',
                     image: "images/ramen/Warrior.png",
                     description: "The burning spiciness is enough to embolden anyone.",
@@ -424,13 +425,16 @@ class RamenShopManager {
         if ($player->ramen_data->mystery_ramen_available) {
             $cost = 0;
             $effects = [];
-            $duration = self::MYSTERY_RAMEN_DURATION_MULTIPLIER * $player->rank_num;
+            $ramen_cost_multiplier = 1 - ($player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_COST] / 100);
+            $ramen_duration_bonus = $player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RAMEN_DURATION];
+            $duration = (self::BASE_RAMEN_DURATION_MINUTES + $ramen_duration_bonus) * self::MYSTERY_RAMEN_DURATION_MULTIPLIER;
             foreach ($player->ramen_data->mystery_ramen_effects as $effect) {
                 $cost += self::BASE_RAMEN_COSTS[$effect] * (1 + $player->rank_num);
                 $effects[] = self::RAMEN_EFFECT_DESCRIPTIONS[$effect];
             }
+            $cost *= $ramen_cost_multiplier;
             return new MysteryRamenDto(
-                cost: $cost,
+                cost: ceil($cost),
                 label: "Mystery",
                 duration: $duration,
                 image: "images/ramen/Mystery.png",
