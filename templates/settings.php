@@ -73,7 +73,9 @@
             <?php if(!$player->checkBan(StaffManager::BAN_TYPE_AVATAR)):?>
                 <div>
                     <b>Avatar info:</b><br />
-                    Avatar must be hosted on another website<br />
+                    <?php if(!$player->forbidden_seal->direct_avatar_upload): ?>
+                        Avatar must be hosted on another website<br />
+                    <?php endif ?>
                     Default limit: <?=$player->getAvatarSize()?> x <?=$player->getAvatarSize()?> pixels<br />
                     Avatar can be larger than the limit, but it will be resized<br />
                     Max filesize: <?=$player->getAvatarFileSizeDisplay()?><br />
