@@ -73,6 +73,7 @@ class BattleManager {
      * @param bool   $spectate
      * @param bool   $load_fighters
      * @throws RuntimeException
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
     public function __construct(System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true) {
@@ -164,6 +165,10 @@ class BattleManager {
             $this->opponent =& $this->battle->player1;
         }
 
+        foreach($this->default_attacks as $id => $attack) {
+            $this->default_attacks[$id]->setCombatId($this->player->combat_id);
+        }
+
         if(!$this->spectate && !$this->battle->isComplete()) {
             if($this->battle->player1 instanceof User && $this->battle->player1->battle_id != $this->battle_id) {
                 $this->system->log(
@@ -190,6 +195,9 @@ class BattleManager {
         }
     }
 
+    /**
+     * @throws DatabaseDeadlockException
+     */
     protected function getDefaultAttacks(): array {
         $default_attacks = [];
 
@@ -1772,6 +1780,6 @@ class BattleManager {
     }
 
     public static function formatNumber(int|float $number, int $precision = 0): string {
-        return number_format(num: $number, decimals: $precision, thousands_separator: ' ');
+        return number_format(num: $number, decimals: $precision, thousands_separator: $number >= 10000 ? ',' : '');
     }
 }
