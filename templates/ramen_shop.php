@@ -61,7 +61,7 @@
             <div class='choices'>
                 <?php foreach($ramen_choices as $key => $ramen): ?>
                     <a href='<?= $self_link ?>&heal=<?= $key ?>'><span class='button' style='width:10em;'><?= $ramen['label'] ?> ramen</span></a>
-                    <span class='choiceLabel'>&nbsp;&nbsp;&nbsp;(<?= $ramen['health_amount'] ?> health, -&yen;<?= $ramen['cost'] ?>)</span><br />
+                    <span class='choiceLabel'>&nbsp;&nbsp;&nbsp;(<?= number_format($ramen['health_amount']) ?> health, -&yen;<?= number_format($ramen['cost']) ?>)</span><br />
                 <?php endforeach; ?>
             </div>
         </div>

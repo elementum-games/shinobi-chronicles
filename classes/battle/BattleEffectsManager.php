@@ -622,20 +622,17 @@ class BattleEffectsManager {
 
             if($residual_damage_resisted > 0) {
                 $this->addDisplay(
-                    $target, $target->getName(
-                    ) . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round(
-                        $damage
-                    ) . "</span>" . " $damage_label (resists " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round(
-                        $residual_damage_resisted
-                    ) . "</span>" . " damage)"
+                    $target, $target->getName() . " takes " 
+                      . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" 
+                      . number_format($damage) . "</span>" . " $damage_label (resists " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" 
+                      . number_format($residual_damage_resisted) . "</span>" . " damage)"
                 );
             }
             else {
                 $this->addDisplay(
-                    $target, $target->getName(
-                    ) . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . round(
-                        $damage
-                    ) . "</span>" . " $damage_label"
+                    $target, $target->getName() . " takes " 
+                      . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" 
+                      . number_format($damage) . "</span>" . " $damage_label"
                 );
             }
 
@@ -651,11 +648,8 @@ class BattleEffectsManager {
             if($effect->effect_amount > 0) {
                 $this->addDisplay(
                     $target,
-                    $target->getName() . " heals " . "<span class=\"battle_text_heal\" style=\"color:green\">" . round(
-                        $heal
-                    ) . "</span>" . " health"
+                    $target->getName() . " heals " . "<span class=\"battle_text_heal\" style=\"color:green\">" . number_format($heal) . "</span>" . " health"
                 );
-
                 $target->health += $heal;
             }
         }
@@ -766,19 +760,19 @@ class BattleEffectsManager {
             // damage
             case 'residual_damage':
             case 'delayed_residual':
-                $announcement_text = "[opponent] is taking Residual Damage" . " ({$tag_open}" . round(
-                        $effect->potential_damage, 0
-                    ) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
+                $announcement_text = "[opponent] is taking Residual Damage" 
+                  . " ({$tag_open}" . number_format($effect->potential_damage) . "{$tag_close} / " 
+                  . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
                 break;
             case 'compound_residual':
-                $announcement_text = "[opponent] is taking Compound Residual Damage" . " ({$tag_open}" . round(
-                        $effect->potential_damage, 0
-                    ) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
+                $announcement_text = "[opponent] is taking Compound Residual Damage" 
+                  . " ({$tag_open}" . number_format($effect->potential_damage) . "{$tag_close} / " 
+                  . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
                 break;
             case 'reflect_damage':
-                $announcement_text = "[opponent] is taking Reflect Damage" . " ({$tag_open}" . round(
-                        $effect->potential_damage, 0
-                    ) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
+                $announcement_text = "[opponent] is taking Reflect Damage"
+                  . " ({$tag_open}" . number_format($effect->potential_damage) . "{$tag_close} / " 
+                  . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
                 break;
 
             // Buff
@@ -843,7 +837,6 @@ class BattleEffectsManager {
             case 'cripple':
                 $announcement_text = "[opponent]'s Speed is being lowered" . $effect_details;
                 break;
-
             case 'vulnerability':
                 $announcement_text = "[opponent] is taking increased damage" . $effect_details;
                 break;
