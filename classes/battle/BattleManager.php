@@ -16,8 +16,10 @@ class BattleManager {
     const EVASION_SOFT_CAP_RATIO = 0.65; // evasion beyond soft cap only 65% as effective
     const EVASION_HARD_CAP = 0.65; // caps at 75% evasion
 
-    const RESIST_SOFT_CAP = 0.35; // caps at 35% resist
-    const RESIST_SOFT_CAP_RATIO = 0.65; // resist beyond soft cap only 65% as effective
+    const RESIST_DIMINISHING_RETURN_SCALE = 0.3;
+
+    const RESIST_SOFT_CAP = 0.3; // caps at 35% resist
+    const RESIST_SOFT_CAP_RATIO = 0.6; // resist beyond soft cap only 65% as effective
     const RESIST_HARD_CAP = 0.65; // caps at 65% resist
 
     const OFFENSE_NERF_SOFT_CAP = 0.35; // caps at 35% reduced damage
@@ -1430,12 +1432,10 @@ class BattleManager {
             player2_attack: $player2_attack
         );
 
-        echo "P1: {$player1_attack->damage} / P2:  {$player2_attack->damage}";
         $collision_text .= $this->applyCounter(
             player1_attack: $player1_attack,
             player2_attack: $player2_attack
         );
-        echo "P1: {$player1_attack->damage} / P2:  {$player2_attack->damage}";
 
         $collision_text .= $this->applyReflect(
             player1_attack: $player1_attack,
@@ -1761,5 +1761,19 @@ class BattleManager {
         }
 
         return $collision_text;
+    }
+
+    public static function diminishingReturns($val, $scale) {
+        if($val < 0) {
+            return -self::diminishingReturns(-$val, $scale);
+        }
+        else if($val < $scale) {
+            return $val;
+        }
+
+        $mult = $val / $scale;
+        $trinum = (sqrt(8.0 * $mult + 1.0) - 1.0) / 2.0;
+
+        return $trinum * $scale;
     }
 }

@@ -553,6 +553,9 @@ abstract class Fighter {
                 echo "Resist ({$this->resist_boost}) / Erosion ({$this->erosion}) => {$resist_boost}<br />";
             }
 
+            $normalized_resist_boost = BattleManager::diminishingReturns($resist_boost, BattleManager::RESIST_DIMINISHING_RETURN_SCALE);
+
+            /*
             // if higher than soft cap, apply penalty
             if ($resist_boost > BattleManager::RESIST_SOFT_CAP) {
                 $resist_boost = (($resist_boost - BattleManager::RESIST_SOFT_CAP) * BattleManager::RESIST_SOFT_CAP_RATIO) + BattleManager::RESIST_SOFT_CAP;
@@ -560,9 +563,13 @@ abstract class Fighter {
             // if still higher than cap, set to hard cap
             if ($resist_boost > BattleManager::RESIST_HARD_CAP) {
                 $resist_boost = BattleManager::RESIST_HARD_CAP;
+            }*/
+
+            if($this->system->debug['damage']) {
+                echo "Diminishing returns: {$resist_boost} => {$normalized_resist_boost}";
             }
 
-            $damage *= 1 - $resist_boost;
+            $damage *= 1 - $normalized_resist_boost;
         }
         return $damage;
     }
