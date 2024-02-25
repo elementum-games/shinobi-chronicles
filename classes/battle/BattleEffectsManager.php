@@ -61,6 +61,13 @@ class BattleEffectsManager {
         'offense_nerf',
         'erosion',
     ];
+    const DAMAGE_OVER_TIME_EFFECTS = [
+        'residual_damage',
+        'compound_residual',
+        'bleed',
+        'delayed_residual',
+        'reflect_damage'
+    ];
 
     protected System $system;
 
@@ -87,6 +94,10 @@ class BattleEffectsManager {
         $this->active_genjutsu = array_map(function ($effect) {
             return BattleEffect::fromArray($effect);
         }, $raw_active_genjutsu);
+    }
+
+    public static function isDamageOverTime(Effect $effect): bool {
+        return in_array($effect->effect, BattleEffectsManager::DAMAGE_OVER_TIME_EFFECTS);
     }
 
     public function setEffect(
@@ -133,6 +144,8 @@ class BattleEffectsManager {
             case 'genjutsu_boost':
             case 'speed_boost':
             case 'cast_speed_boost':
+
+            // Static debuffs
             case 'speed_nerf':
             case 'cripple':
             case 'evasion_boost':
@@ -151,6 +164,7 @@ class BattleEffectsManager {
             case 'earth_vulnerability':
             case 'water_vulnerability':
             case 'reflect_damage':
+            case 'erosion':
                 // No changes needed to base number, calculated in applyPassiveEffects
                 break;
             case 'intelligence_boost':

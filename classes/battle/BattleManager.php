@@ -1191,27 +1191,25 @@ class BattleManager {
 
        // simulate damage of jutsu effect
         foreach ($attack->jutsu->effects as $effect) {
-            if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual") {
+            if (BattleEffectsManager::isDamageOverTime($effect)) {
                 $effect_power = $effect->effect_amount * $effect->effect_length;
-                $residual_damage = $target->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type, apply_resists: false, apply_weakness: false);
-                $effect->potential_damage = $residual_damage;
-            }
-            if ($effect->effect == "reflect_damage") {
-                $effect_power = $effect->effect_amount * $effect->effect_length;
-                $reflect_damage = $user->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type, apply_resists: false, apply_weakness: false);
-                $effect->potential_damage = $reflect_damage;
+                $effect->potential_damage = $target->calcDamageTaken(
+                    raw_damage: $effect_power,
+                    defense_type: $attack->jutsu->jutsu_type,
+                    apply_resists: false,
+                    apply_weakness: false
+                );
             }
         }
         foreach ($attack->effects as $effect) {
-            if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual") {
+            if (BattleEffectsManager::isDamageOverTime($effect)) {
                 $effect_power = $effect->effect_amount * $effect->effect_length;
-                $residual_damage = $target->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type, apply_resists: false, apply_weakness: false);
-                $effect->potential_damage = $residual_damage;
-            }
-            if ($effect->effect == "reflect_damage") {
-                $effect_power = $effect->effect_amount * $effect->effect_length;
-                $reflect_damage = $user->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type, apply_resists: false, apply_weakness: false);
-                $effect->potential_damage = $reflect_damage;
+                $effect->potential_damage = $target->calcDamageTaken(
+                    raw_damage: $effect_power,
+                    defense_type: $attack->jutsu->jutsu_type,
+                    apply_resists: false,
+                    apply_weakness: false
+                );
             }
         }
 
@@ -1681,9 +1679,8 @@ class BattleManager {
             $player2_attack->damage *= (1 - $player1_attack->counter_percent);
             // Set display
             $block_percent = round($player1_attack->counter_percent * 100, 0);
-            if (!empty($collision_text)) {
-                $collision_text .= "[br]";
-            }
+
+            $collision_text .= "[br]";
             $collision_text .= "[player] countered $block_percent% of [opponent]'s damage!";
         }
         if ($player2_attack->counter_percent > 0 && $player1_attack->isDirectDamage()) {
@@ -1696,9 +1693,8 @@ class BattleManager {
             $player1_attack->damage *= (1 - $player2_attack->counter_percent);
             // Set display
             $block_percent = round($player2_attack->counter_percent * 100, 0);
-            if (!empty($collision_text)) {
-                $collision_text .= "[br]";
-            }
+
+            $collision_text .= "[br]";
             $collision_text .= "[opponent] countered $block_percent% of [player]'s damage!";
         }
 
@@ -1721,9 +1717,8 @@ class BattleManager {
             $player2_attack->damage *= (1 - $player1_attack->reflect_percent);
             // Set display
             $block_percent = round($player1_attack->reflect_percent * 100, 0);
-            if (!empty($collision_text)) {
-                $collision_text .= "[br]";
-            }
+
+            $collision_text .= "[br]";
             $collision_text .= "[player] reflected $block_percent% of [opponent]'s damage!";
         }
         if ($player2_attack->reflect_percent > 0 && $player1_attack->isDirectDamage()) {
@@ -1736,9 +1731,8 @@ class BattleManager {
             $player1_attack->damage *= (1 - $player2_attack->reflect_percent);
             // Set display
             $block_percent = round($player2_attack->reflect_percent * 100, 0);
-            if (!empty($collision_text)) {
-                $collision_text .= "[br]";
-            }
+
+            $collision_text .= "[br]";
             $collision_text .= "[opponent] reflected $block_percent% of [player]'s damage!";
         }
 

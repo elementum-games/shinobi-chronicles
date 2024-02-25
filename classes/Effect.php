@@ -1,7 +1,6 @@
 <?php
 
-class Effect
-{
+class Effect {
     public ?string $effect;
     public float $base_effect_amount;
     public float $display_effect_amount;
