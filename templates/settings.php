@@ -83,13 +83,14 @@
                     Max filesize: <?=$player->getAvatarFileSizeDisplay()?><br />
                     <br />
                     <?php if($player->forbidden_seal->direct_avatar_upload): ?>
+						<b>Upload Avatar</b><br />
                         <form action='<?=$self_link?>' method='post' enctype='multipart/form-data'>
                             <input type='file' name='fileToUpload' id='fileToUpload' />
                             <input type='submit' name='upload_avatar' value='Upload' />
                         </form>
 						<br />
-						<b>Manual File Change:</b><br />
                     <?php endif ?>
+					<b>Change Avatar</b><br />
 					<form action='<?=$self_link?>' method='post'>
 						<input type='text' id='avatar_link' name='avatar_link' value='<?=$player->avatar_link?>' style='width:250px;margin-bottom:5px;' />
 						<input type='submit' name='change_avatar' value='Change' />
