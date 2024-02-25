@@ -78,9 +78,17 @@ function userSettings() {
 			$file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 			$target_file_path = $target_dir . strtolower($player->user_name) . '.' . $file_type;
 			$user_link = $system->router->base_url . '_user_imgs/' . strtolower($player->user_name) . '.' . $file_type;
+			$current_file_path = null;
+
+			foreach($valid_file_types as $img_type) {
+				if(file_exists($target_dir . strtolower($player->user_name) . '.' . $img_type)) {
+					$current_file_path = $target_dir . strtolower($player->user_name) . '.' . $img_type;
+					break;
+				}
+			}
 			
 			// Limit uploads to 1/day
-			if(file_exists($target_file_path) && (time() - filemtime($target_file_path)) < 86400) {
+			if($current_file_path && (time() - filemtime($current_file_path)) < 86400) {
 				throw new RuntimeException("You can only upload a file once per day!");
 			}
 
@@ -106,16 +114,14 @@ function userSettings() {
 				);
 			}
 			
-			// Remove existing avatar
-			foreach($valid_file_types as $type) {
-				$rem_dir = $target_dir . strtolower($player->user_name) . '.' . $type;
-				if(file_exists($rem_dir)) {
-					unlink($rem_dir);
-				}
-			}
-			
 			// Upload file and update user link
 			if(move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $target_file_path)) {
+				// Remove existing avatar
+				if($current_file_path) {
+					unlink($current_file_path);
+				}
+
+				// Set new avatar
 				$player->avatar_link = $user_link;
 				$system->message("Avatar uploaded.");
 			}
