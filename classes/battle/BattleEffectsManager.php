@@ -749,6 +749,63 @@ class BattleEffectsManager {
                 break;
         }
         switch($effect->effect) {
+            // damage
+            case 'residual_damage':
+            case 'delayed_residual':
+                $announcement_text = "[opponent] is taking Residual Damage" . " ({$tag_open}" . round(
+                        $effect->potential_damage, 0
+                    ) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
+                break;
+            case 'compound_residual':
+                $announcement_text = "[opponent] is taking Compound Residual Damage" . " ({$tag_open}" . round(
+                        $effect->potential_damage, 0
+                    ) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
+                break;
+            case 'reflect_damage':
+                $announcement_text = "[opponent] is taking Reflect Damage" . " ({$tag_open}" . round(
+                        $effect->potential_damage, 0
+                    ) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
+                break;
+
+            // Buff
+            case 'taijutsu_boost':
+                $announcement_text = "[player]'s Taijutsu offense is being increased" . $effect_details;
+                break;
+            case 'ninjutsu_boost':
+                $announcement_text = "[player]'s Ninjutsu offense is being increased" . $effect_details;
+                break;
+            case 'genjutsu_boost':
+                $announcement_text = "[player]'s Genjutsu offense is being increased" . $effect_details;
+                break;
+            case 'speed_boost':
+                $announcement_text = "[player]'s Speed is being increased" . $effect_details;
+                break;
+            case 'cast_speed_boost':
+                $announcement_text = "[player]'s Cast Speed is being increased" . $effect_details;
+                break;
+            case 'evasion_boost':
+                $announcement_text = "[player]'s Evasion is being increased" . $effect_details;
+                break;
+            case 'fire_boost':
+                $announcement_text = "[player]'s Fire jutsu are empowered" . $effect_details;
+                break;
+            case 'wind_boost':
+                $announcement_text = "[player]'s Wind jutsu are empowered" . $effect_details;
+                break;
+            case 'lightning_boost':
+                $announcement_text = "[player]'s Lightning jutsu are empowered" . $effect_details;
+                break;
+            case 'earth_boost':
+                $announcement_text = "[player]'s Earth jutsu are empowered" . $effect_details;
+                break;
+            case 'water_boost':
+                $announcement_text = "[player]'s Water jutsu are empowered" . $effect_details;
+                break;
+            case 'resist_boost':
+                $announcement_text = "[player]'s Defenses are being increased" . $effect_details;
+                break;
+
+            // Debuff
             case 'taijutsu_nerf':
                 $announcement_text = "[opponent]'s Taijutsu offense is being lowered" . $effect_details;
                 break;
@@ -772,43 +829,7 @@ class BattleEffectsManager {
             case 'cripple':
                 $announcement_text = "[opponent]'s Speed is being lowered" . $effect_details;
                 break;
-            case 'residual_damage':
-            case 'delayed_residual':
-                $announcement_text = "[opponent] is taking Residual Damage" . " ({$tag_open}" . round(
-                        $effect->potential_damage, 0
-                    ) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
-                break;
-            case 'compound_residual':
-                $announcement_text = "[opponent] is taking Compound Residual Damage" . " ({$tag_open}" . round(
-                        $effect->potential_damage, 0
-                ) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
-                break;
-            case 'reflect_damage':
-                $announcement_text = "[opponent] is taking Reflect Damage" . " ({$tag_open}" . round(
-                        $effect->potential_damage, 0
-                    ) . "{$tag_close} / " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
-                break;
-            case 'drain_chakra':
-                $announcement_text = "[opponent]'s Chakra is being drained" . $effect_details;
-                break;
-            case 'drain_stamina':
-                $announcement_text = "[opponent]'s Stamina is being drained" . $effect_details;
-                break;
-            case 'taijutsu_boost':
-                $announcement_text = "[player]'s Taijutsu offense is being increased" . $effect_details;
-                break;
-            case 'ninjutsu_boost':
-                $announcement_text = "[player]'s Ninjutsu offense is being increased" . $effect_details;
-                break;
-            case 'genjutsu_boost':
-                $announcement_text = "[player]'s Genjutsu offense is being increased" . $effect_details;
-                break;
-            case 'speed_boost':
-                $announcement_text = "[player]'s Speed is being increased" . $effect_details;
-                break;
-            case 'cast_speed_boost':
-                $announcement_text = "[player]'s Cast Speed is being increased" . $effect_details;
-                break;
+
             case 'vulnerability':
                 $announcement_text = "[opponent] is taking increased damage" . $effect_details;
                 break;
@@ -827,33 +848,16 @@ class BattleEffectsManager {
             case 'water_vulnerability':
                 $announcement_text = "[opponent] is vulnerable to Water" . $effect_details;
                 break;
-            case 'fire_boost':
-                $announcement_text = "[player]'s Fire jutsu are empowered" . $effect_details;
-                break;
-            case 'wind_boost':
-                $announcement_text = "[player]'s Wind jutsu are empowered" . $effect_details;
-                break;
-            case 'lightning_boost':
-                $announcement_text = "[player]'s Lightning jutsu are empowered" . $effect_details;
-                break;
-            case 'earth_boost':
-                $announcement_text = "[player]'s Earth jutsu are empowered" . $effect_details;
-                break;
-            case 'water_boost':
-                $announcement_text = "[player]'s Water jutsu are empowered" . $effect_details;
-                break;
-            case 'evasion_boost':
-                $announcement_text = "[player]'s Evasion is being increased" . $effect_details;
-                break;
             case 'evasion_nerf':
                 $announcement_text = "[opponent]'s Evasion is being lowered" . $effect_details;
                 break;
             case 'offense_nerf':
                 $announcement_text = "[opponent]'s Offense is being lowered" . $effect_details;
                 break;
-            case 'resist_boost':
-                $announcement_text = "[player]'s Defenses are being increased" . $effect_details;
+            case 'erosion':
+                $announcement_text = "[opponent]'s Damage Resist is being lowered" . $effect_details;
                 break;
+
             default:
                 break;
         }
