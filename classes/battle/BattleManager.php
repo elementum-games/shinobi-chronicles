@@ -30,7 +30,7 @@ class BattleManager {
 
     const GENJUTSU_BARRIER_PENALTY = 37.5; // 37.5% reduction against Genjutsu (62.5% strength)
 
-    const ELEMENTAL_CLASH_MODIFIER = 0.20; // 20% damage loss and gain
+    const ELEMENTAL_CLASH_MODIFIER = 0.15; // 20% => 15% damage loss and gain
 
     private System $system;
 
@@ -1261,122 +1261,11 @@ class BattleManager {
         $player1_damage = &$player1_attack->raw_damage;
         $player2_damage = &$player2_attack->raw_damage;
 
-        // Fire > Wind > Lightning > Earth > Water > Fire
-        $elemental_clash_damage_modifier = self::ELEMENTAL_CLASH_MODIFIER;
-        $player1_elemental_damage_modifier = 1;
-        $player2_elemental_damage_modifier = 1;
+        $player1_elemental_damage_modifier = $this->getElementalDamageModifier($player1_jutsu, $player2_jutsu);
+        $player1->barrier *= 1 - $player1_elemental_damage_modifier;
 
-        // Calculate player1 elemental damage modifier
-        if (!empty($player1_jutsu->element)) {
-            switch (strtolower($player1_jutsu->element)) {
-                case 'fire':
-                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'water') {
-                        $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
-                        $player1->barrier *= 1 - $elemental_clash_damage_modifier;
-                    }
-                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'wind') {
-                        $player1_elemental_damage_modifier *= 1 + $elemental_clash_damage_modifier;
-                        $player1->barrier *= 1 + $elemental_clash_damage_modifier;
-                    }
-                    break;
-                case 'wind':
-                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'fire') {
-                        $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
-                        $player1->barrier *= 1 - $elemental_clash_damage_modifier;
-                    }
-                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'lightning') {
-                        $player1_elemental_damage_modifier *= 1 + $elemental_clash_damage_modifier;
-                        $player1->barrier *= 1 + $elemental_clash_damage_modifier;
-                    }
-                    break;
-                case 'lightning':
-                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'wind') {
-                        $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
-                        $player1->barrier *= 1 - $elemental_clash_damage_modifier;
-                    }
-                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'earth') {
-                        $player1_elemental_damage_modifier *= 1 + $elemental_clash_damage_modifier;
-                        $player1->barrier *= 1 + $elemental_clash_damage_modifier;
-                    }
-                    break;
-                case 'earth':
-                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'lightning') {
-                        $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
-                        $player1->barrier *= 1 - $elemental_clash_damage_modifier;
-                    }
-                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'water') {
-                        $player1_elemental_damage_modifier *= 1 + $elemental_clash_damage_modifier;
-                        $player1->barrier *= 1 + $elemental_clash_damage_modifier;
-                    }
-                    break;
-                case 'water':
-                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'earth') {
-                        $player1_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
-                        $player1->barrier *= 1 - $elemental_clash_damage_modifier;
-                    }
-                    if (!empty($player2_jutsu->element) && strtolower($player2_jutsu->element) == 'fire') {
-                        $player1_elemental_damage_modifier *= 1 + $elemental_clash_damage_modifier;
-                        $player1->barrier *= 1 + $elemental_clash_damage_modifier;
-                    }
-                    break;
-            }
-        }
-
-        // Calculate player2 elemental damage modifier
-        if (!empty($player2_jutsu->element)) {
-            switch (strtolower($player2_jutsu->element)) {
-                case 'fire':
-                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'water') {
-                        $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
-                        $player2->barrier *= 1 - $elemental_clash_damage_modifier;
-                    }
-                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'wind') {
-                        $player2_elemental_damage_modifier *= 1 + $elemental_clash_damage_modifier;
-                        $player2->barrier *= 1 + $elemental_clash_damage_modifier;
-                    }
-                    break;
-                case 'wind':
-                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'fire') {
-                        $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
-                        $player2->barrier *= 1 - $elemental_clash_damage_modifier;
-                    }
-                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'lightning') {
-                        $player2_elemental_damage_modifier *= 1 + $elemental_clash_damage_modifier;
-                        $player2->barrier *= 1 + $elemental_clash_damage_modifier;
-                    }
-                    break;
-                case 'lightning':
-                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'wind') {
-                        $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
-                        $player2->barrier *= 1 - $elemental_clash_damage_modifier;
-                    }
-                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'earth') {
-                        $player2_elemental_damage_modifier *= 1 + $elemental_clash_damage_modifier;
-                        $player2->barrier *= 1 + $elemental_clash_damage_modifier;
-                    }
-                    break;
-                case 'earth':
-                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'lightning') {
-                        $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
-                        $player2->barrier *= 1 - $elemental_clash_damage_modifier;
-                    }
-                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'water') {
-                        $player2_elemental_damage_modifier *= 1 + $elemental_clash_damage_modifier;
-                        $player2->barrier *= 1 + $elemental_clash_damage_modifier;
-                    }
-                    break;
-                case 'water':
-                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'earth') {
-                        $player2_elemental_damage_modifier *= 1 - $elemental_clash_damage_modifier;
-                        $player2->barrier *= 1 - $elemental_clash_damage_modifier;
-                    }
-                    if (!empty($player1_jutsu->element) && strtolower($player1_jutsu->element) == 'fire') {
-                        $player2_elemental_damage_modifier *= 1 + $elemental_clash_damage_modifier;
-                        $player2->barrier *= 1 + $elemental_clash_damage_modifier;
-                    }
-                    break;
-            }
-        }
+        $player2_elemental_damage_modifier = $this->getElementalDamageModifier($player2_jutsu, $player1_jutsu);
+        $player2->barrier *= 1 - $player2_elemental_damage_modifier;
 
         // Apply elemental damage modifier
         $player1_damage *= $player1_elemental_damage_modifier;
@@ -1825,5 +1714,67 @@ class BattleManager {
         if ($this->ai_jutsu_used->cooldown > 0) {
             $this->battle->jutsu_cooldowns[$this->ai_jutsu_used->combat_id] = $this->ai_jutsu_used->cooldown;
         }
+    }
+
+    /**
+     * @param Jutsu   $fighter_jutsu
+     * @param Jutsu   $incoming_jutsu
+     * @param float   $elemental_clash_damage_modifier
+     * @param float   $player2_elemental_damage_modifier
+     * @param Fighter $player2
+     * @return float
+     */
+    public function getElementalDamageModifier(Jutsu $fighter_jutsu, Jutsu $incoming_jutsu): float {
+        // Fire > Wind > Lightning > Earth > Water > Fire
+        $elemental_clash_damage_modifier = self::ELEMENTAL_CLASH_MODIFIER;
+
+        $winning_modifier = 1 + $elemental_clash_damage_modifier;
+        $losing_modifier = 1 - $elemental_clash_damage_modifier;
+
+        switch($fighter_jutsu->element) {
+            case Jutsu::ELEMENT_FIRE:
+                if($incoming_jutsu->element === Jutsu::ELEMENT_WATER) {
+                    return $losing_modifier;
+                }
+                if($incoming_jutsu->element == Jutsu::ELEMENT_WIND) {
+                    return $winning_modifier;
+                }
+                break;
+            case Jutsu::ELEMENT_WIND:
+                if($incoming_jutsu->element === Jutsu::ELEMENT_FIRE) {
+                    return $losing_modifier;
+                }
+                if($incoming_jutsu->element === Jutsu::ELEMENT_LIGHTNING) {
+                    return $winning_modifier;
+                }
+                break;
+            case Jutsu::ELEMENT_LIGHTNING:
+                if($incoming_jutsu->element === Jutsu::ELEMENT_WIND) {
+                    return $losing_modifier;
+                }
+                if($incoming_jutsu->element === Jutsu::ELEMENT_EARTH) {
+                    return $winning_modifier;
+                }
+                break;
+            case Jutsu::ELEMENT_EARTH:
+                if($incoming_jutsu->element === Jutsu::ELEMENT_LIGHTNING) {
+                    return $losing_modifier;
+                }
+                if($incoming_jutsu->element === Jutsu::ELEMENT_WATER) {
+                    return $winning_modifier;
+                }
+                break;
+            case Jutsu::ELEMENT_WATER:
+                if($incoming_jutsu->element === Jutsu::ELEMENT_EARTH) {
+                    return $losing_modifier;
+                }
+                if($incoming_jutsu->element === Jutsu::ELEMENT_FIRE) {
+                    return $winning_modifier;
+                }
+                break;
+        }
+
+
+        return 1;
     }
 }
