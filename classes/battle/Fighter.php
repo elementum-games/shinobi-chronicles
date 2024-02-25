@@ -81,53 +81,55 @@ abstract class Fighter {
     public int $max_movement_distance = 2; // not in use yet
 
     // In-combat vars
-    public $ninjutsu_boost = 0;
-    public $taijutsu_boost = 0;
-    public $genjutsu_boost = 0;
+    public float $ninjutsu_boost = 0;
+    public float $taijutsu_boost = 0;
+    public float $genjutsu_boost = 0;
 
-    public $cast_speed_boost = 0;
-    public $speed_boost = 0;
-    public $intelligence_boost = 0;
-    public $willpower_boost = 0;
+    public float $cast_speed_boost = 0;
+    public float $speed_boost = 0;
+    public float $intelligence_boost = 0;
+    public float $willpower_boost = 0;
 
-    public $ninjutsu_resist = 0;
-    public $taijutsu_resist = 0;
-    public $genjutsu_resist = 0;
+    public float $ninjutsu_resist = 0;
+    public float $taijutsu_resist = 0;
+    public float $genjutsu_resist = 0;
 
     public $barrier;
 
     public $reputation_defense_boost = 0;
 
-    public $evasion_boost = 0;
-    public $resist_boost = 0;
-    public $fire_boost = 0;
-    public $wind_boost = 0;
-    public $lightning_boost = 0;
-    public $earth_boost = 0;
-    public $water_boost = 0;
+    public float $evasion_boost = 0;
+    public float $resist_boost = 0;
+    public float $fire_boost = 0;
+    public float $wind_boost = 0;
+    public float $lightning_boost = 0;
+    public float $earth_boost = 0;
+    public float $water_boost = 0;
 
     public $last_damage_taken = 0;
 
     // Combat nerfs
-    public $ninjutsu_nerf = 0;
-    public $taijutsu_nerf = 0;
-    public $genjutsu_nerf = 0;
+    public float $ninjutsu_nerf = 0;
+    public float $taijutsu_nerf = 0;
+    public float $genjutsu_nerf = 0;
 
-    public $cast_speed_nerf = 0;
-    public $speed_nerf = 0;
-    public $intelligence_nerf = 0;
-    public $willpower_nerf = 0;
+    public float $cast_speed_nerf = 0;
+    public float $speed_nerf = 0;
+    public float $intelligence_nerf = 0;
+    public float $willpower_nerf = 0;
 
-    public $evasion_nerf = 0;
+    public float $evasion_nerf = 0;
 
-    public $taijutsu_weakness = 0;
-    public $ninjutsu_weakness = 0;
-    public $genjutsu_weakness = 0;
-    public $fire_weakness = 0;
-    public $wind_weakness = 0;
-    public $lightning_weakness = 0;
-    public $earth_weakness = 0;
-    public $water_weakness = 0;
+    public float $taijutsu_weakness = 0;
+    public float $ninjutsu_weakness = 0;
+    public float $genjutsu_weakness = 0;
+    public float $fire_weakness = 0;
+    public float $wind_weakness = 0;
+    public float $lightning_weakness = 0;
+    public float $earth_weakness = 0;
+    public float $water_weakness = 0;
+
+    public float $erosion = 0;
 
     // Getters
     abstract public function getName(): string;
@@ -140,7 +142,7 @@ abstract class Fighter {
         return $this->money;
     }
 
-    public function applyBloodlineBoosts() {
+    public function applyBloodlineBoosts(): void {
         // Temp number fix inside
         if($this->bloodline != null) {
             if($this->system->debug['bloodline']) {
@@ -463,6 +465,7 @@ abstract class Fighter {
         if($defense <= 0) {
             $defense = 1;
         }
+
         if($apply_resists) {
             if (!empty($this->bloodline_defense_boosts)) {
                 foreach ($this->bloodline_defense_boosts as $id => $boost) {
@@ -486,9 +489,8 @@ abstract class Fighter {
         $weakness_modifier = 0;
         switch($defense_type) {
             case 'ninjutsu':
-                // Resist unfairly applies to nin/tai residuals which only have a 25% or so effect amount, so we lower its effectiveness compared to a regular hit
                 if ($apply_resists && $is_raw_damage) {
-                    $raw_damage -= $residual_damage ? $this->ninjutsu_resist * 0.5 : $this->ninjutsu_resist;
+                    $raw_damage -= $this->ninjutsu_resist;
                 }
                 $weakness_modifier += $this->ninjutsu_weakness;
                 break;
@@ -499,9 +501,8 @@ abstract class Fighter {
                 $weakness_modifier += $this->genjutsu_weakness;
                 break;
             case 'taijutsu':
-                // Resist unfairly applies to residuals, so we lower its effectiveness compared to a regular hit
                 if ($apply_resists && $is_raw_damage) {
-                    $raw_damage -= $residual_damage ? $this->taijutsu_resist * 0.5 : $this->taijutsu_resist;
+                    $raw_damage -= $this->taijutsu_resist;
                 }
                 $weakness_modifier += $this->taijutsu_weakness;
                 break;
@@ -545,16 +546,30 @@ abstract class Fighter {
             $damage = 0;
         }
         if ($apply_resists) {
-            $resist_boost = $this->resist_boost;
+            $resist_boost = $this->resist_boost * (1 - $this->erosion);
+            $resist_boost = max($resist_boost, 0);
+
+            if($this->system->debug['damage']) {
+                echo "Resist ({$this->resist_boost}) / Erosion ({$this->erosion}) => {$resist_boost}<br />";
+            }
+
+            $normalized_resist_boost = BattleManager::diminishingReturns($resist_boost, BattleManager::RESIST_DIMINISHING_RETURN_SCALE);
+
+            /*
             // if higher than soft cap, apply penalty
             if ($resist_boost > BattleManager::RESIST_SOFT_CAP) {
                 $resist_boost = (($resist_boost - BattleManager::RESIST_SOFT_CAP) * BattleManager::RESIST_SOFT_CAP_RATIO) + BattleManager::RESIST_SOFT_CAP;
             }
-            // if still higher than cap cap, set to hard cap
+            // if still higher than cap, set to hard cap
             if ($resist_boost > BattleManager::RESIST_HARD_CAP) {
                 $resist_boost = BattleManager::RESIST_HARD_CAP;
+            }*/
+
+            if($this->system->debug['damage']) {
+                echo "Diminishing returns: {$resist_boost} => {$normalized_resist_boost}";
             }
-            $damage *= 1 - $resist_boost;
+
+            $damage *= 1 - $normalized_resist_boost;
         }
         return $damage;
     }

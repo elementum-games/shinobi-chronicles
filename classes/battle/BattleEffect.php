@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/BattleEffectsManager.php';
+
 class BattleEffect {
     public static array $buff_effects = [
         'heal','ninjutsu_boost','taijutsu_boost','genjutsu_boost',
@@ -52,6 +54,10 @@ class BattleEffect {
         $this->layer_active = $layer_active;
     }
 
+    public function isDamageOverTime(): bool {
+        return in_array($this->effect, BattleEffectsManager::DAMAGE_OVER_TIME_EFFECTS);
+    }
+
     public static function fromArray(array $raw_data): BattleEffect {
         return new BattleEffect(
             user: $raw_data['user'],
@@ -65,4 +71,6 @@ class BattleEffect {
             layer_active: $raw_data['layer_active'] ?? false,
         );
     }
+
+
 }

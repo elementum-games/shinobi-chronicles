@@ -96,8 +96,8 @@ function calcDamage(
     $system->db->query("DELETE FROM `battles` WHERE `battle_id`={$battle_id}");
     $system->db->query("DELETE FROM `battle_logs` WHERE `battle_id`={$battle_id}");
 
-    $player1_collision_damage = $player1_attack->raw_damage;
-    $player2_collision_damage = $player2_attack->raw_damage;
+    $player1_collision_damage = $player1_attack->damage;
+    $player2_collision_damage = $player2_attack->damage;
 
     $player1_starting_health = $player1->health;
     $player2_starting_health = $player2->health;

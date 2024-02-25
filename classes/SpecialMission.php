@@ -651,7 +651,7 @@ class SpecialMission {
         });
 
         $use_bloodline_jutsu = $has_bloodline_jutsu && mt_rand(1, 100) <= self::BLOODLINE_JUTSU_CHANCE;
-        if(!count($uncapped_jutsu_ids) <= 0) {
+        if(count($uncapped_jutsu_ids) <= 0) {
             $use_bloodline_jutsu = true;
         }
 
