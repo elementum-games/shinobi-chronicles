@@ -80,6 +80,7 @@ require_once __DIR__ . "/classes/village/VillageManager.php";
 require_once __DIR__ . "/classes/village/VillageUpgradeManager.php";
 require_once __DIR__ . "/classes/village/VillageAPIResponse.php";
 require_once __DIR__ . "/classes/village/VillageApiPresenter.php";
+require_once __DIR__ . "/classes/village/VillagePolicy.php";
 
 require_once __DIR__ . "/classes/war/WarManager.php";
 require_once __DIR__ . "/classes/war/WarAction.php";

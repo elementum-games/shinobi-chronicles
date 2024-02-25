@@ -810,6 +810,34 @@ class WarManager {
                 return 0;
         }
     }
+
+    /**
+     * @param System $system
+     * @param array $region_location_data
+     * @param ?Village $village
+     * @return int
+     */
+    public static function getLocationMaxStability(System $system, $region_location_data, ?Village $occupying_village = null, ?Village $original_village = null): int {
+        if (!isset($occupying_village)) {
+            $occupying_village = VillageManager::getVillageByID($system, $region_location_data['occupying_village_id']);
+        }
+        if (!isset($original_village)) {
+            $original_village = VillageManager::getVillageByID($system, WarManager::REGION_ORIGINAL_VILLAGE[$region_location_data['region_id']]);
+        }
+        switch ($region_location_data['type']) {
+            case 'castle':
+                $stability = self::MAX_STABILITY + $occupying_village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY] + $occupying_village->policy->max_stability;
+                return $stability;
+            case 'village':
+                $stability = self::MAX_STABILITY + $occupying_village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_MAX_STABILITY] + $occupying_village->policy->max_stability;
+                /*if ($occupying_village->village_id != $original_village->village_id) {
+                    $stability -= $original_village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_OCCUPIED_BASE_STABILITY_REDUCTION];
+                }*/
+                return $stability;
+            default:
+                return 0;
+        }
+    }
 }
 
 class RaidTargetDto {
