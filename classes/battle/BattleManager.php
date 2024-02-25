@@ -1262,10 +1262,10 @@ class BattleManager {
         $player2_jutsu = $player2_attack->jutsu;
 
         $player1_elemental_damage_modifier = $this->getElementalDamageModifier($player1_jutsu, $player2_jutsu);
-        $player1->barrier *= 1 - $player1_elemental_damage_modifier;
+        $player1->barrier *= $player1_elemental_damage_modifier;
 
         $player2_elemental_damage_modifier = $this->getElementalDamageModifier($player2_jutsu, $player1_jutsu);
-        $player2->barrier *= 1 - $player2_elemental_damage_modifier;
+        $player2->barrier *= $player2_elemental_damage_modifier;
 
         // Apply elemental damage modifier
         $player1_attack->damage *= $player1_elemental_damage_modifier;
