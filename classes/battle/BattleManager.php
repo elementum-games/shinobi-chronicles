@@ -138,6 +138,10 @@ class BattleManager {
                 $this->battle->fighter_jutsu_used[$this->battle->player1->combat_id] = [];
             }
             $this->player_jutsu_used =& $this->battle->fighter_jutsu_used[$this->battle->player1->combat_id];
+
+            foreach($this->default_attacks as $id => $attack) {
+                $this->default_attacks[$id]->setCombatId($this->battle->player1->combat_id);
+            }
         }
         else if($this->player->id == $this->battle->player2_id) {
             $this->player_side = Battle::TEAM2;
@@ -150,6 +154,10 @@ class BattleManager {
                 $this->battle->fighter_jutsu_used[$this->battle->player2->combat_id] = [];
             }
             $this->player_jutsu_used =& $this->battle->fighter_jutsu_used[$this->battle->player2->combat_id];
+
+            foreach($this->default_attacks as $id => $attack) {
+                $this->default_attacks[$id]->setCombatId($this->battle->player2->combat_id);
+            }
         }
         else {
             $this->player_side = Battle::TEAM1;
@@ -163,10 +171,6 @@ class BattleManager {
         }
         else {
             $this->opponent =& $this->battle->player1;
-        }
-
-        foreach($this->default_attacks as $id => $attack) {
-            $this->default_attacks[$id]->setCombatId($this->player->combat_id);
         }
 
         if(!$this->spectate && !$this->battle->isComplete()) {
