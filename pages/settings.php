@@ -88,7 +88,7 @@ function userSettings() {
 			}
 			
 			// Limit uploads to 1/day
-			if($current_file_path && (time() - filemtime($current_file_path)) < 86400) {
+			if($current_file_path && (time() - filemtime($current_file_path)) < 60) {
 				throw new RuntimeException("You can only upload a file once per day!");
 			}
 
