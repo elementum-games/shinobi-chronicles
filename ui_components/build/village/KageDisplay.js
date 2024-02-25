@@ -48,7 +48,7 @@ export default function KageDisplay({
   }, "resign"), seatId == null && onClaim && /*#__PURE__*/React.createElement("div", {
     className: "kage_claim_button",
     onClick: onClaim
-  }, "claim"), seatId != null && seatId !== playerSeatId && onChallange && /*#__PURE__*/React.createElement("div", {
+  }, "claim"), seatId != null && seatId !== playerSeatId && onChallenge && /*#__PURE__*/React.createElement("div", {
     className: "kage_challenge_button",
     onClick: onChallenge
   }, "challenge")));

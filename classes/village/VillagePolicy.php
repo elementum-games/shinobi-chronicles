@@ -27,6 +27,7 @@ class VillagePolicy {
     const POLICY_BONUS_PVE_INCOME = "PVE_INCOME";
     const POLICY_BONUS_UPKEEP_REDUCTION = "UPKEEP_REDUCTION";
     const POLICY_BONUS_REPAIR_SPEED = "REPAIR_SPEED";
+    const POLICY_BONUS_PVP_OBJECTIVE_DAMAGE = "PVP_OBJECTIVE_DAMAGE";
     const POLICY_RESTRICTION_WAR_ENABLED = "WAR_ENABLED";
     const POLICY_RESTRICTION_ALLIANCE_ENABLED = "ALLIANCE_ENABLED";
     const POLICY_BASE_MATERIALS_PRODUCTION = "MATERIALS_PRODUCTION";
@@ -75,6 +76,7 @@ class VillagePolicy {
     public int $max_stability;
     public int $upkeep_reduction;
     public int $repair_speed;
+    public int $pvp_objective_damage;
     public bool $war_enabled;
     public bool $alliance_enabled;
     public int $materials_production;
@@ -111,6 +113,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_MAX_STABILITY => 0,
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
                 self::POLICY_BONUS_REPAIR_SPEED => 0,
+                self::POLICY_BONUS_PVP_OBJECTIVE_DAMAGE => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
                 self::POLICY_BASE_MATERIALS_PRODUCTION => 0,
@@ -143,6 +146,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_MAX_STABILITY => 0,
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
                 self::POLICY_BONUS_REPAIR_SPEED => 0,
+                self::POLICY_BONUS_PVP_OBJECTIVE_DAMAGE => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => false,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
                 self::POLICY_BASE_MATERIALS_PRODUCTION => 70,
@@ -175,6 +179,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_MAX_STABILITY => 0,
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
                 self::POLICY_BONUS_REPAIR_SPEED => 0,
+                self::POLICY_BONUS_PVP_OBJECTIVE_DAMAGE => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
                 self::POLICY_BASE_MATERIALS_PRODUCTION => 70,
@@ -207,6 +212,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_MAX_STABILITY => 0,
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
                 self::POLICY_BONUS_REPAIR_SPEED => 0,
+                self::POLICY_BONUS_PVP_OBJECTIVE_DAMAGE => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
                 self::POLICY_BASE_MATERIALS_PRODUCTION => 100,
@@ -232,13 +238,14 @@ class VillagePolicy {
                 self::POLICY_BONUS_SCOUTING => 0,
                 self::POLICY_BONUS_STEALTH => 0,
                 self::POLICY_BONUS_LOOT_CAPACITY => 0,
-                self::POLICY_BONUS_PVP_VILLAGE_POINT => 1,
+                self::POLICY_BONUS_PVP_VILLAGE_POINT => 0,
                 self::POLICY_BONUS_CONSTRUCTION_SPEED => 0,
                 self::POLICY_BONUS_RESEARCH_SPEED => 0,
                 self::POLICY_BONUS_BASE_STABILITY => 0,
                 self::POLICY_BONUS_MAX_STABILITY => 0,
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 0,
                 self::POLICY_BONUS_REPAIR_SPEED => 0,
+                self::POLICY_BONUS_PVP_OBJECTIVE_DAMAGE => 25,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => false,
                 self::POLICY_BASE_MATERIALS_PRODUCTION => 70,
@@ -271,6 +278,7 @@ class VillagePolicy {
                 self::POLICY_BONUS_MAX_STABILITY => 25,
                 self::POLICY_BONUS_UPKEEP_REDUCTION => 25,
                 self::POLICY_BONUS_REPAIR_SPEED => 0,
+                self::POLICY_BONUS_PVP_OBJECTIVE_DAMAGE => 0,
                 self::POLICY_RESTRICTION_WAR_ENABLED => true,
                 self::POLICY_RESTRICTION_ALLIANCE_ENABLED => true,
                 self::POLICY_BASE_MATERIALS_PRODUCTION => 40,
@@ -312,6 +320,7 @@ class VillagePolicy {
         $this->max_stability = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_MAX_STABILITY];
         $this->upkeep_reduction = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_UPKEEP_REDUCTION];
         $this->repair_speed = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_REPAIR_SPEED];
+        $this->pvp_objective_damage = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BONUS_PVP_OBJECTIVE_DAMAGE];
         $this->war_enabled = self::$POLICY_EFFECTS[$policy_id][self::POLICY_RESTRICTION_WAR_ENABLED];
         $this->alliance_enabled = self::$POLICY_EFFECTS[$policy_id][self::POLICY_RESTRICTION_ALLIANCE_ENABLED];
         $this->materials_production = self::$POLICY_EFFECTS[$policy_id][self::POLICY_BASE_MATERIALS_PRODUCTION];

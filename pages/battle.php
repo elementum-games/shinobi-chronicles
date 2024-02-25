@@ -279,7 +279,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         else if ($opponent_alignment == VillageRelation::RELATION_ALLIANCE) {
             if ($region_objective['health'] > 0 && $player->village->isEnemy($region_objective['occupying_village_id'])) {
                 $initial_health = $region_objective['health'];
-                $damage = min($battle->turn_count, 10) * ($player->level / 2) * (1 - ($region_objective['defense'] / 100));
+                $damage = min($battle->turn_count, 10) * ($player->level / 2) * (1 - ($region_objective['defense'] / 100)) * (1 + ($player->village->policy->pvp_objective_damage / 100));
                 $region_objective['health'] -= $damage;
                 if ($region_objective['health'] < 0) {
                     $region_objective['health'] = 0;
