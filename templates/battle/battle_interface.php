@@ -306,7 +306,7 @@ if($battle->battle_text) {
 
                     <!-- Health -->
                     <div class='resourceBarOuter healthPreview'>
-                        <label class='innerResourceBarLabel'><?= number_format($player->health) ?> / <?= number_format($player->max_health) ?></label>
+                        <label class='innerResourceBarLabel'><?= BattleManager::formatNumber($player->health) ?> / <?= BattleManager::formatNumber($player->max_health) ?></label>
                         <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
                     </div>
 
@@ -315,7 +315,7 @@ if($battle->battle_text) {
                     <!-- Chakra -->
                     <div class='resourceBarOuter chakraPreview' style='margin-top:6px;'>
                         <label class='innerResourceBarLabel'>
-                            <?= number_format($player->chakra) ?> / <?= number_format($player->max_chakra) ?>
+                            <?= BattleManager::formatNumber($player->chakra) ?> / <?= BattleManager::formatNumber($player->max_chakra) ?>
                         </label>
                         <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
                     </div>
@@ -323,7 +323,7 @@ if($battle->battle_text) {
                     <!-- Stamina -->
                     <div class='resourceBarOuter staminaPreview' style='margin-top:6px;'>
                         <label class='innerResourceBarLabel'>
-                            <?= number_format($player->stamina) ?> / <?= number_format($player->max_stamina) ?>
+                            <?= BattleManager::formatNumber($player->stamina) ?> / <?= BattleManager::formatNumber($player->max_stamina) ?>
                         </label>
                         <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
                     </div>
@@ -347,7 +347,7 @@ if($battle->battle_text) {
                     <div class='resourceBarOuter healthPreview' style='margin-top:8px;'>
                         <div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
                             <label class='innerResourceBarLabel'>
-                                <?= number_format($opponent->health) ?> / <?= number_format($opponent->max_health) ?>
+                                <?= BattleManager::formatNumber($opponent->health) ?> / <?= BattleManager::formatNumber($opponent->max_health) ?>
                             </label>
                         </div>
                     </div>
@@ -374,7 +374,7 @@ if($battle->battle_text) {
                             if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual" || $effect->effect == "reflect_damage") {
                                 $effect_power = $effect->effect_amount * $effect->turns;
                                 $residual_damage = $player->calcDamageTaken($effect_power, $effect->damage_type, apply_resists: false, apply_weakness: false);
-                                echo "<span class='hover_text'>" . number_format($residual_damage) . " Damage</span>";
+                                echo "<span class='hover_text'>" . BattleManager::formatNumber($residual_damage) . " Damage</span>";
                             } else {
                                 echo "<span class='hover_text'>" . round($effect->effect_amount) . "% Effect</span>";
                             }
@@ -402,7 +402,7 @@ if($battle->battle_text) {
                                             if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual" || $effect->effect == "reflect_damage") {
                                                 $effect_power = $effect->effect_amount * $effect->turns;
                                                 $residual_damage = $opponent->calcDamageTaken($effect_power, $effect->damage_type, apply_resists: false, apply_weakness: false);
-                                                echo "<span class='hover_text'>" . number_format($residual_damage) . " Damage</span>";
+                                                echo "<span class='hover_text'>" . BattleManager::formatNumber($residual_damage) . " Damage</span>";
                                             } else {
                                                 echo "<span class='hover_text'>" . round($effect->effect_amount) . "% Effect</span>";
                                             }
