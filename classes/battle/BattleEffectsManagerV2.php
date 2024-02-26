@@ -60,6 +60,7 @@ class BattleEffectsManagerV2 {
 
         switch($jutsu->effect) {
             case 'residual_damage':
+            case 'compound_residual':
             case 'ninjutsu_boost':
             case 'taijutsu_boost':
             case 'genjutsu_boost':
@@ -296,6 +297,10 @@ class BattleEffectsManagerV2 {
                     $effect
                 );
 
+                if($effect->effect == 'compound_residual') {
+                    $this->active_effects[$id]->effect_amount *= BattleEffectsManager::COMPOUND_RESIDUAL_INCREASE;
+                }
+
                 $this->active_effects[$id]->turns--;
                 if($this->active_effects[$id]->turns <= 0) {
                     unset($this->active_effects[$id]);
@@ -360,7 +365,7 @@ class BattleEffectsManagerV2 {
             return false;
         }
 
-        if($effect->effect == 'residual_damage' || $effect->effect == 'bleed') {
+        if($effect->isDamageOverTime()) {
             $damage = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true);
             $this->addEffectHit($target, new EffectHitLog(
                 caster_id: $attacker->combat_id,
@@ -502,6 +507,9 @@ class BattleEffectsManagerV2 {
                 break;
             case 'residual_damage':
                 $announcement_text = "[opponent] is taking Residual Damage";
+                break;
+            case 'compound_residual':
+                $announcement_text = "[opponent] is taking Compound Residual Damage";
                 break;
             case 'drain_chakra':
                 $announcement_text = "[opponent]'s Chakra is being drained";

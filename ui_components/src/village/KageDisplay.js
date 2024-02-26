@@ -57,12 +57,15 @@ export default function KageDisplay({
             {seatId == null && onClaim &&
                 <div className="kage_claim_button" onClick={onClaim}>claim</div>
             }
-            {(seatId != null && seatId !== playerSeatId) && onChallange &&
+            {(seatId != null && seatId !== playerSeatId) && onChallenge &&
                 <div className="kage_challenge_button" onClick={onChallenge}>challenge</div>
             }
         </div>
     </div>;
 }
+
+// testing
+// more testing
 
 function getKageKanji(village_name) {
     switch (village_name) {
