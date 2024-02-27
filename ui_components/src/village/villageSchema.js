@@ -96,7 +96,7 @@ export type VillageStrategicInfo = {|
                 +village2_id: number,
                 +village1_name: string,
                 +village2_name: string,
-                +relation_type: RELATION_NEUTRAL | RELATION_ALLIANCE | RELATION_WAR,
+                +relation_type: typeof RELATION_NEUTRAL | typeof RELATION_ALLIANCE | typeof RELATION_WAR,
                 +relation_name: string,
                 +relation_start: number,
                 +relation_end: ?number

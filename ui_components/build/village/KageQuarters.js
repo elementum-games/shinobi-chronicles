@@ -774,7 +774,7 @@ function VillageProposals({
     className: "proposal_no_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button disabled"
-  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id === playerID) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button",
@@ -809,7 +809,7 @@ function VillageProposals({
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button",
     onClick: () => handleSubmitVote(0)
-  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id === playerID) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button disabled"
@@ -842,7 +842,7 @@ function VillageProposals({
     className: "proposal_no_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button disabled"
-  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id === playerID) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button",
@@ -877,7 +877,7 @@ function VillageProposals({
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/icons/trade.png",
     className: "trade_view_button_icon"
-  }))), currentProposal.votes.find(vote => vote.user_id === playerID).rep_adjustment === 0 && /*#__PURE__*/React.createElement("div", {
+  }))), currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id).rep_adjustment === 0 && /*#__PURE__*/React.createElement("div", {
     className: "proposal_boost_vote_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_boost_vote_button",
@@ -887,7 +887,7 @@ function VillageProposals({
       ContentComponent: null,
       onConfirm: () => handleBoostVote()
     })
-  }, "boost vote"))), currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id === playerID) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "boost vote"))), currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button disabled"

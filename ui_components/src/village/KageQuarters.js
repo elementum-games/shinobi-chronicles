@@ -600,7 +600,7 @@ type VillageProposalsProps = {|
     +resourceDataState: $ReadOnlyArray<VillageResourceStrategicInfo>,
     +strategicDataState: $ReadOnlyArray<VillageStrategicInfo>,
     +playerVillageData: VillageStrategicInfo,
-    +villageRegions: VillageStrategicInfo["village"]["regions"],
+    +villageRegions: VillageStrategicInfo["regions"],
     +currentProposalKey: ?number,
     +currentProposal: ?VillageProposalType,
     +onEnactClick: () => void,
@@ -756,7 +756,7 @@ function VillageProposals({
                             </div>
                         </>
                     }
-                    {(currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id === playerID)) &&
+                    {(currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id)) &&
                         <>
                             <div className="proposal_yes_button_wrapper">
                                 <div className="proposal_yes_button" onClick={() => handleSubmitVote(1)}>vote in favor</div>
@@ -793,7 +793,7 @@ function VillageProposals({
                             </div>
                         </>
                     }
-                    {(currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id === playerID)) &&
+                    {(currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id)) &&
                         <>
                             <div className="proposal_yes_button_wrapper">
                                 <div className="proposal_yes_button disabled">vote in favor</div>
@@ -830,7 +830,7 @@ function VillageProposals({
                             </div>
                         </>
                     }
-                    {(currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id === playerID)) &&
+                    {(currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id)) &&
                         <>
                             <div className="proposal_cancel_vote_button_wrapper">
                                 <div className="proposal_cancel_vote_button"
@@ -871,7 +871,7 @@ function VillageProposals({
                                     </div>
                                 </div>
                             }
-                            {(currentProposal.votes.find(vote => vote.user_id === playerID).rep_adjustment === 0) &&
+                            {(currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id).rep_adjustment === 0) &&
                                 <div className="proposal_boost_vote_button_wrapper">
                                     <div className="proposal_boost_vote_button" onClick={() => openModal({
                                         header: 'Confirmation',
@@ -883,7 +883,7 @@ function VillageProposals({
                             }
                         </>
                     }
-                    {(currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id === playerID)) &&
+                    {(currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id)) &&
                         <>
                             <div className="proposal_cancel_vote_button_wrapper">
                                 <div className="proposal_cancel_vote_button disabled">cancel vote</div>
