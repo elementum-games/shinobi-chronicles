@@ -395,20 +395,20 @@ export function KageQuarters({
   }, /*#__PURE__*/React.createElement("div", {
     className: "elder_vote_wrapper",
     style: {
-      visibility: currentProposal && currentProposal.votes.find(vote => vote.user_id === elder.user_id) ? null : "hidden"
+      visibility: currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id) ? null : "hidden"
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "elder_vote"
-  }, currentProposal && currentProposal.votes.find(vote => vote.user_id === elder.user_id && vote.vote === 1 && parseInt(vote.rep_adjustment) > 0) && /*#__PURE__*/React.createElement("img", {
+  }, currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id && vote.vote == 1 && parseInt(vote.rep_adjustment) > 0) && /*#__PURE__*/React.createElement("img", {
     className: "vote_yes_image glow",
     src: "/images/v2/icons/yesvote.png"
-  }), currentProposal && currentProposal.votes.find(vote => vote.user_id === elder.user_id && vote.vote === 0 && parseInt(vote.rep_adjustment) < 0) && /*#__PURE__*/React.createElement("img", {
+  }), currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id && vote.vote == 0 && parseInt(vote.rep_adjustment) < 0) && /*#__PURE__*/React.createElement("img", {
     className: "vote_no_image glow",
     src: "/images/v2/icons/novote.png"
-  }), currentProposal && currentProposal.votes.find(vote => vote.user_id === elder.user_id && vote.vote === 1 && parseInt(vote.rep_adjustment) === 0) && /*#__PURE__*/React.createElement("img", {
+  }), currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id && vote.vote == 1 && parseInt(vote.rep_adjustment) === 0) && /*#__PURE__*/React.createElement("img", {
     className: "vote_yes_image",
     src: "/images/v2/icons/yesvote.png"
-  }), currentProposal && currentProposal.votes.find(vote => vote.user_id === elder.user_id && vote.vote === 0 && parseInt(vote.rep_adjustment) === 0) && /*#__PURE__*/React.createElement("img", {
+  }), currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id && vote.vote == 0 && parseInt(vote.rep_adjustment) === 0) && /*#__PURE__*/React.createElement("img", {
     className: "vote_no_image",
     src: "/images/v2/icons/novote.png"
   }))), /*#__PURE__*/React.createElement("div", {
@@ -505,7 +505,7 @@ export function KageQuarters({
   })))), /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_navigation_village_buttons"
   }, villageName !== "Stone" && /*#__PURE__*/React.createElement("div", {
-    className: viewingTargetVillage.village.village_id === 1 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
+    className: viewingTargetVillage.village.village_id == 1 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
     onClick: () => setViewingTargetVillage(strategicDataState[0])
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_nav_button_inner"
@@ -513,7 +513,7 @@ export function KageQuarters({
     src: getVillageIcon(1),
     className: "strategic_info_nav_button_icon"
   }))), villageName !== "Cloud" && /*#__PURE__*/React.createElement("div", {
-    className: viewingTargetVillage.village.village_id === 2 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
+    className: viewingTargetVillage.village.village_id == 2 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
     onClick: () => setViewingTargetVillage(strategicDataState[1])
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_nav_button_inner"
@@ -521,7 +521,7 @@ export function KageQuarters({
     src: getVillageIcon(2),
     className: "strategic_info_nav_button_icon"
   }))), villageName !== "Leaf" && /*#__PURE__*/React.createElement("div", {
-    className: viewingTargetVillage.village.village_id === 3 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
+    className: viewingTargetVillage.village.village_id == 3 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
     onClick: () => setViewingTargetVillage(strategicDataState[2])
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_nav_button_inner"
@@ -529,7 +529,7 @@ export function KageQuarters({
     src: getVillageIcon(3),
     className: "strategic_info_nav_button_icon"
   }))), villageName !== "Sand" && /*#__PURE__*/React.createElement("div", {
-    className: viewingTargetVillage.village.village_id === 4 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
+    className: viewingTargetVillage.village.village_id == 4 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
     onClick: () => setViewingTargetVillage(strategicDataState[3])
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_nav_button_inner"
@@ -537,7 +537,7 @@ export function KageQuarters({
     src: getVillageIcon(4),
     className: "strategic_info_nav_button_icon"
   }))), villageName !== "Mist" && /*#__PURE__*/React.createElement("div", {
-    className: viewingTargetVillage.village.village_id === 5 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
+    className: viewingTargetVillage.village.village_id == 5 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper",
     onClick: () => setViewingTargetVillage(strategicDataState[4])
   }, /*#__PURE__*/React.createElement("div", {
     className: "strategic_info_nav_button_inner"
@@ -774,7 +774,7 @@ function VillageProposals({
     className: "proposal_no_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button disabled"
-  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button",
@@ -789,12 +789,20 @@ function VillageProposals({
         viewOnly: true,
         offeringVillageResources: resourceDataState,
         offeringVillageRegions: playerVillageData.regions,
-        offeredResources: offeredResources,
-        offeredRegions: offeredRegions,
+        offeredResources: {
+          current: currentProposal.trade_data.offered_resources
+        },
+        offeredRegions: {
+          current: currentProposal.trade_data.offered_regions
+        },
         targetVillageResources: null,
-        targetVillageRegions: strategicDisplayRight.regions,
-        requestedResources: requestedResources,
-        requestedRegions: requestedRegions,
+        targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
+        requestedResources: {
+          current: currentProposal.trade_data.requested_resources
+        },
+        requestedRegions: {
+          current: currentProposal.trade_data.requested_regions
+        },
         proposalData: currentProposal.trade_data
       },
       onConfirm: null
@@ -809,7 +817,7 @@ function VillageProposals({
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button",
     onClick: () => handleSubmitVote(0)
-  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_yes_button disabled"
@@ -823,12 +831,20 @@ function VillageProposals({
         viewOnly: true,
         offeringVillageResources: resourceDataState,
         offeringVillageRegions: playerVillageData.regions,
-        offeredResources: offeredResources,
-        offeredRegions: offeredRegions,
+        offeredResources: {
+          current: currentProposal.trade_data.offered_resources
+        },
+        offeredRegions: {
+          current: currentProposal.trade_data.offered_regions
+        },
         targetVillageResources: null,
-        targetVillageRegions: strategicDisplayRight.regions,
-        requestedResources: requestedResources,
-        requestedRegions: requestedRegions,
+        targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
+        requestedResources: {
+          current: currentProposal.trade_data.requested_resources
+        },
+        requestedRegions: {
+          current: currentProposal.trade_data.requested_regions
+        },
         proposalData: currentProposal.trade_data
       },
       onConfirm: null
@@ -842,7 +858,7 @@ function VillageProposals({
     className: "proposal_no_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_no_button disabled"
-  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "vote against"))), currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button",
@@ -862,12 +878,20 @@ function VillageProposals({
         viewOnly: true,
         offeringVillageResources: resourceDataState,
         offeringVillageRegions: playerVillageData.regions,
-        offeredResources: offeredResources,
-        offeredRegions: offeredRegions,
+        offeredResources: {
+          current: currentProposal.trade_data.offered_resources
+        },
+        offeredRegions: {
+          current: currentProposal.trade_data.offered_regions
+        },
         targetVillageResources: null,
-        targetVillageRegions: strategicDisplayRight.regions,
-        requestedResources: requestedResources,
-        requestedRegions: requestedRegions,
+        targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
+        requestedResources: {
+          current: currentProposal.trade_data.requested_resources
+        },
+        requestedRegions: {
+          current: currentProposal.trade_data.requested_regions
+        },
         proposalData: currentProposal.trade_data
       },
       onConfirm: null
@@ -877,7 +901,7 @@ function VillageProposals({
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/icons/trade.png",
     className: "trade_view_button_icon"
-  }))), currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id).rep_adjustment === 0 && /*#__PURE__*/React.createElement("div", {
+  }))), currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id).rep_adjustment === 0 && /*#__PURE__*/React.createElement("div", {
     className: "proposal_boost_vote_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_boost_vote_button",
@@ -887,7 +911,7 @@ function VillageProposals({
       ContentComponent: null,
       onConfirm: () => handleBoostVote()
     })
-  }, "boost vote"))), currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id === playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "boost vote"))), currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "proposal_cancel_vote_button disabled"
@@ -901,12 +925,20 @@ function VillageProposals({
         viewOnly: true,
         offeringVillageResources: resourceDataState,
         offeringVillageRegions: playerVillageData.regions,
-        offeredResources: offeredResources,
-        offeredRegions: offeredRegions,
+        offeredResources: {
+          current: currentProposal.trade_data.offered_resources
+        },
+        offeredRegions: {
+          current: currentProposal.trade_data.offered_regions
+        },
         targetVillageResources: null,
-        targetVillageRegions: strategicDisplayRight.regions,
-        requestedResources: requestedResources,
-        requestedRegions: requestedRegions,
+        targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
+        requestedResources: {
+          current: currentProposal.trade_data.requested_resources
+        },
+        requestedRegions: {
+          current: currentProposal.trade_data.requested_regions
+        },
         proposalData: currentProposal.trade_data
       },
       onConfirm: null
