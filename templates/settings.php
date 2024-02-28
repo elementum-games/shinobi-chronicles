@@ -73,15 +73,28 @@
             <?php if(!$player->checkBan(StaffManager::BAN_TYPE_AVATAR)):?>
                 <div>
                     <b>Avatar info:</b><br />
-                    Avatar must be hosted on another website<br />
+                    <?php if(!$player->forbidden_seal->direct_avatar_upload): ?>
+                        Avatar must be hosted on another website<br />
+                    <?php else: ?>
+                        You have permission to store your avatars on our server<br />
+                    <?php endif ?>
                     Default limit: <?=$player->getAvatarSize()?> x <?=$player->getAvatarSize()?> pixels<br />
                     Avatar can be larger than the limit, but it will be resized<br />
                     Max filesize: <?=$player->getAvatarFileSizeDisplay()?><br />
                     <br />
-                    <form action='<?=$self_link?>' method='post'>
-                        <input type='text' name='avatar_link' value='<?=$player->avatar_link?>' style='width:250px;margin-bottom:5px;' />
-                        <input type='submit' name='change_avatar' value='Change' />
-                    </form>
+                    <?php if($player->forbidden_seal->direct_avatar_upload): ?>
+						<b>Upload Avatar</b><br />
+                        <form action='<?=$self_link?>' method='post' enctype='multipart/form-data'>
+                            <input type='file' name='fileToUpload' id='fileToUpload' />
+                            <input type='submit' name='upload_avatar' value='Upload' />
+                        </form>
+						<br />
+                    <?php endif ?>
+					<b>Change Avatar</b><br />
+					<form action='<?=$self_link?>' method='post'>
+						<input type='text' id='avatar_link' name='avatar_link' value='<?=$player->avatar_link?>' style='width:250px;margin-bottom:5px;' />
+						<input type='submit' name='change_avatar' value='Change' />
+					</form>
                 </div>
                 <br style='clear:both;' />
             <?php else: ?>
