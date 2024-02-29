@@ -56,7 +56,7 @@ function handleTravelRequest(System $system, User $player, string $request) {
                 'success' => true,
                 'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $TravelManager, system: $system),
                 'nearbyPlayers' => TravelApiPresenter::nearbyPlayersResponse(travelManager: $TravelManager),
-                'nearbyPatrols' => TravelApiPresenter::nearbyPatrolsResponse(travelManager: $TravelManager),
+                'nearbyNPCs' => TravelApiPresenter::nearbyNPCsResponse(travelManager: $TravelManager),
                 'travel_message' => $TravelManager->travel_message,
             ];
             break;
@@ -90,15 +90,15 @@ function handleTravelRequest(System $system, User $player, string $request) {
             $TravelAPIResponse->response = TravelApiPresenter::attackPlayerResponse($success, $TravelManager, $system);
             break;
 
-        case 'BeginOperation':
-            $operation_type = $system->db->clean($_POST['operation_type']);
+        case 'BeginWarAction':
+            $war_action_type = $system->db->clean($_POST['war_action_type']);
 
-            $success = $TravelManager->beginOperation($operation_type);
+            $success = $TravelManager->beginWarAction($war_action_type);
             $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
             break;
 
-        case 'CancelOperation':
-            $success = $TravelManager->cancelOperation();
+        case 'CancelWarAction':
+            $success = $TravelManager->cancelWarAction();
             $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
             break;
 
