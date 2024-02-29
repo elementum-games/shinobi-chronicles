@@ -23,18 +23,6 @@ try {
     $VillageAPIResponse = new VillageAPIResponse();
 
     switch($request) {
-        /*
-        case 'LoadVillageData':
-            $VillageAPIResponse->response = [
-                'policyData' => VillageApiPresenter::boostDataResponse($system, $player),
-                'populationData' => VillageApiPresenter::populationDataResponse($system, $player),
-                'seatData' => VillageApiPresenter::seatDataResponse($system, $player),
-                'pointsData' => VillageApiPresenter::pointsDataResponse($system, $player),
-                'diplomacyData' => VillageApiPresenter::diplomacyDataResponse($system, $player),
-                'resourceData' => VillageApiPresenter::resourceDataResponse($system, $player, 7),
-                'clanData' => VillageApiPresenter::clanDataResponse($system, $player),
-            ];
-            break;*/
         case 'LoadResourceData':
             $days = $system->db->clean($_POST['days']);
             $VillageAPIResponse->response = VillageApiPresenter::resourceDataResponse($system, $player, $days);
@@ -87,6 +75,30 @@ try {
                     $requested_regions = isset($_POST['requested_regions']) ? $_POST['requested_regions'] : [];
                     $message = VillageManager::createTradeProposal($system, $player, $target_village_id, $offered_resources, $offered_regions, $requested_resources, $requested_regions);
                     break;
+                case "begin_construction":
+                    $building_key = $system->db->clean($_POST['building_key']);
+                    $message = VillageManager::createConstructionProposal($system, $player, $building_key);
+                    break;
+                case "cancel_construction":
+                    $building_key = $system->db->clean($_POST['building_key']);
+                    $message = VillageManager::createCancelConstructionProposal($system, $player, $building_key);
+                    break;
+                case "begin_research":
+                    $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+                    $message = VillageManager::createResearchProposal($system, $player, $upgrade_key);
+                    break;
+                case "cancel_research":
+                    $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+                    $message = VillageManager::createCancelResearchProposal($system, $player, $upgrade_key);
+                    break;
+                case "boost_construction":
+                    $building_key = $system->db->clean($_POST['building_key']);
+                    $message = VillageManager::createBoostConstructionProposal($system, $player, $building_key);
+                    break;
+                case "boost_research":
+                    $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+                    $message = VillageManager::createBoostResearchProposal($system, $player, $upgrade_key);
+                    break;
                 default:
                     break;
             }
@@ -135,6 +147,8 @@ try {
                 'proposalData' => VillageApiPresenter::proposalDataResponse($system, $player),
                 'policyData' => VillageApiPresenter::policyDataResponse($system, $player),
                 'strategicData' => VillageApiPresenter::strategicDataResponse($system),
+                'buildingUpgradeData' => VillageApiPresenter::buildingUpgradeDataResponse($system, $player),
+                'resourceData' => VillageApiPresenter::resourceDataResponse($system, $player, 1),
                 'response_message' => $message,
             ];
             break;
@@ -172,15 +186,53 @@ try {
             ];
             break;
         case 'GetGlobalWarLeaderboard':
-            $page_number = (int) $_POST['page_number'];
+            $page_number = (int)$_POST['page_number'];
             $VillageAPIResponse->response = [
                 'warLogData' => VillageApiPresenter::playerWarLogDataResponse($system, $player, $page_number),
             ];
             break;
         case 'GetWarRecords':
-            $page_number = (int) $_POST['page_number'];
+            $page_number = (int)$_POST['page_number'];
             $VillageAPIResponse->response = [
                 'warRecordData' => VillageApiPresenter::warRecordDataResponse($system, $player, $page_number),
+            ];
+            break;
+        case 'ActivateUpgrade':
+            $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+            $message = VillageUpgradeManager::activateUpgrade($system, $player->village, $upgrade_key);
+            $VillageAPIResponse->response = [
+                'buildingUpgradeData' => VillageApiPresenter::buildingUpgradeDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'CancelActivation':
+            $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+            $message = VillageUpgradeManager::cancelActivation($system, $player->village, $upgrade_key);
+            $VillageAPIResponse->response = [
+                'buildingUpgradeData' => VillageApiPresenter::buildingUpgradeDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'DeactivateUpgrade':
+            $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+            $message = VillageUpgradeManager::deactivateUpgrade($system, $player->village, $upgrade_key);
+            $VillageAPIResponse->response = [
+                'buildingUpgradeData' => VillageApiPresenter::buildingUpgradeDataResponse($system, $player),
+                'response_message' => $message,
+            ];
+            break;
+        case 'GetConstructionBoostCost':
+            $building_key = $system->db->clean($_POST['building_key']);
+            $message = VillageUpgradeManager::calcBoostConstructionCost($system, $player->village, $building_key);
+            $VillageAPIResponse->response = [
+                'response_message' => $message,
+            ];
+            break;
+        case 'GetResearchBoostCost':
+            $upgrade_key = $system->db->clean($_POST['upgrade_key']);
+            $message = VillageUpgradeManager::calcBoostResearchCost($system, $player->village, $upgrade_key);
+            $VillageAPIResponse->response = [
+                'response_message' => $message,
             ];
             break;
         default:

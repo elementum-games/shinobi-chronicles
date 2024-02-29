@@ -52,23 +52,17 @@ export default function KageDisplay({
     className: "kage_challenge_button",
     onClick: onChallenge
   }, "challenge")));
-} // testing
-// more testing
 
 function getKageKanji(village_name) {
   switch (village_name) {
     case 'Stone':
       return '土影';
-
     case 'Cloud':
       return '雷影';
-
     case 'Leaf':
       return '火影';
-
     case 'Sand':
       return '風影';
-
     case 'Mist':
       return '水影';
   }

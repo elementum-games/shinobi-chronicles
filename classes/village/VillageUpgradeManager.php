@@ -132,7 +132,7 @@ class VillageUpgradeManager {
         }
         // go through all active upgrades and add effects to array
         foreach ($upgrades as $upgrade) {
-            if ($upgrade->status == VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
+            if ($upgrade->status == VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE || $upgrade->status == VillageUpgradeConfig::UPGRADE_STATUS_UNLOCKED) {
                 foreach ($upgrade->getEffects() as $key => $value) {
                     $effects[$key] += $value;
                 }
@@ -156,6 +156,14 @@ class VillageUpgradeManager {
                 foreach (VillageBuildingConfig::UPGRADE_SET_UPGRADES[$upgrade_set_key] as $upgrade_key) {
                     $upgrade_config_data = VillageUpgradeManager::$UPGRADE_CONFIGS[$upgrade_key];
                     $upgrade = $village->upgrades[$upgrade_key] ?? null;
+                    if (isset($upgrade)) {
+                        if ($upgrade->research_progress != null) {
+                            $research_time_remaining = ($upgrade->research_progress_required - $upgrade->research_progress) / $village->research_speed;
+                            $research_time_remaining = System::TimeRemaining($research_time_remaining, format: "long", include_seconds: false, include_minutes: false);
+                        } else {
+                            $research_time_remaining = '';
+                        }
+                    }
                     $upgrades[] = new VillageUpgradeDto(
                         id: $upgrade ? $upgrade->id : null,
                         key: $upgrade_key,
@@ -165,7 +173,7 @@ class VillageUpgradeManager {
                         research_progress_required: $upgrade ? $upgrade->research_progress_required : null,
                         research_progress_last_updated: $upgrade ? $upgrade->research_progress_last_updated : null,
                         research_boosted: $upgrade ? $upgrade->research_boosted : false,
-                        research_time_remaining: $upgrade ? System::TimeRemaining($upgrade->research_progress_required - $upgrade->research_progress, format: "long", include_seconds: false, include_minutes: false) : '',
+                        research_time_remaining: $upgrade ? $research_time_remaining : '',
                         name: $upgrade_config_data->getName(),
                         tier: $upgrade_config_data->getTier(),
                         description: $upgrade_config_data->getDescription(),
@@ -188,6 +196,12 @@ class VillageUpgradeManager {
                     upgrades: $upgrades,
                 );
             }
+            if ($building->construction_progress != null) {
+                $construction_time_remaining = ($building->construction_progress_required - $building->construction_progress) / $village->construction_speed;
+                $construction_time_remaining = System::TimeRemaining($construction_time_remaining, format: "long", include_seconds: false, include_minutes: false);
+            } else {
+                $construction_time_remaining = '';
+            }
             $buildingDtos[] = new VillageBuildingDto(
                 id: $building->id,
                 key: $building->key,
@@ -209,7 +223,7 @@ class VillageUpgradeManager {
                 food_construction_cost: $building->construction_progress != null ? 0 : $building->getConstructionCostFood($building->tier + 1),
                 wealth_construction_cost: $building->construction_progress != null ? 0 : $building->getConstructionCostWealth($building->tier + 1),
                 construction_time: $building->construction_progress != null ? round($building->getConstructionTime($building->tier + 1) * (($building->construction_progress_required - $building->construction_progress) / $building->construction_progress_required)) : $building->getConstructionTime($building->tier + 1),
-                construction_time_remaining: System::TimeRemaining($building->construction_progress_required - $building->construction_progress, format: "long", include_seconds: false, include_minutes: false),
+                construction_time_remaining: $construction_time_remaining,
                 upgrade_sets: $upgrade_sets,
                 requirements_met: VillageUpgradeManager::checkConstructionRequirementsMet($village, $building->key, $building->tier + 1),
             );
@@ -567,6 +581,12 @@ class VillageUpgradeManager {
         return true;
     }
 
+    /**
+     * @param System $system
+     * @param Village $village
+     * @param string $building_key
+     * @return array
+     */
     public static function getActiveUpkeepForBuilding(System $system, Village $village, $building_key): array {
         self::initialize();
         $upkeep = [
@@ -590,6 +610,11 @@ class VillageUpgradeManager {
         return $upkeep;
     }
 
+    /**
+     * @param System $system
+     * @param Village $village
+     * @return array
+     */
     public static function getTotalUpkeepForVillage(System $system, Village $village): array {
         self::initialize();
         $upkeep = [
@@ -602,6 +627,9 @@ class VillageUpgradeManager {
             $upkeep[WarManager::RESOURCE_MATERIALS] += $building_upkeep[WarManager::RESOURCE_MATERIALS];
             $upkeep[WarManager::RESOURCE_FOOD] += $building_upkeep[WarManager::RESOURCE_FOOD];
             $upkeep[WarManager::RESOURCE_WEALTH] += $building_upkeep[WarManager::RESOURCE_WEALTH];
+        }
+        foreach ($upkeep as $resource => $count) {
+            $upkeep[$resource] = ceil($count * (1 - (($village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_UPGRADE_UPKEEP] + $village->policy->upkeep_reduction) / 100)));
         }
         return $upkeep;
     }
@@ -656,6 +684,13 @@ class VillageUpgradeManager {
         return "Construction boosted for " . VillageBuildingConfig::BUILDING_NAMES[$building_key] . "!";
     }
 
+    /**
+     * @param System $system
+     * @param Village $village
+     * @param string $upgrade_key
+     * #throws RuntimeException
+     * @return string
+     */
     public static function boostResearch(System $system, Village $village, string $upgrade_key): string {
         self::initialize();
         // check if the upgrade exists and is under research
@@ -670,7 +705,6 @@ class VillageUpgradeManager {
         // update village points
         $village->subtractPoints($points_cost);
         $village->updatePoints();
-        // log expenditure in resource_logs table
         // update upgrade data
         $village->upgrades[$upgrade_key]->research_boosted = true;
         $village->upgrades[$upgrade_key]->research_progress_last_updated = time();
@@ -680,5 +714,27 @@ class VillageUpgradeManager {
         // update village upgrades table
         $system->db->query("UPDATE `village_upgrades` SET `research_boosted` = 1, `research_progress_last_updated` = " . time() . ", `research_progress_required` = " . $village->upgrades[$upgrade_key]->research_progress_required . " WHERE `id` = {$village->upgrades[$upgrade_key]->id}");
         return "Research boosted for " . VillageUpgradeConfig::UPGRADE_NAMES[$upgrade_key] . "!";
+    }
+
+    public static function calcResearchScore(System $system, Village $village): int {
+        self::initialize();
+        $total_score = 0;
+        foreach ($village->upgrades as $upgrade) {
+            if ($upgrade->status != VillageUpgradeConfig::UPGRADE_STATUS_LOCKED && $upgrade->status != VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING) {
+                $total_score += $upgrade->getResearchTime();
+            }
+        }
+        return $total_score;
+    }
+
+    public static function calcConstructionScore(System $system, Village $village): int {
+        self::initialize();
+        $total_score = 0;
+        foreach ($village->buildings as $building) {
+            for ($i = 1; $i <= $building->tier; $i++) {
+                $total_score += $building->getConstructionTime($i);
+            }
+        }
+        return $total_score;
     }
 }
