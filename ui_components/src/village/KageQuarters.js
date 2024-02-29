@@ -22,11 +22,14 @@ type Props = {|
     +policyDataState: VillagePolicyType,
     +setPolicyDataState: (VillagePolicyType) => void,
     +seatDataState: $ReadOnlyArray<VillageSeatType>,
-    +resourceDataState: $ReadOnlyArray<VillageResourceStrategicInfo>,
+    +resourceDataState: $ReadOnlyArray < VillageResourceStrategicInfo >,
+    +setResourceDataState: ($ReadOnlyArray < VillageResourceStrategicInfo >) => void,
     +proposalDataState: $ReadOnlyArray<VillageProposalType>,
     +strategicDataState: $ReadOnlyArray<VillageStrategicInfo>,
     +setProposalDataState: ($ReadOnlyArray<VillageProposalType>) => void,
-    +setStrategicDataState: ($ReadOnlyArray<VillageStrategicInfo>) => void,
+    +setStrategicDataState: ($ReadOnlyArray < VillageStrategicInfo >) => void,
+    +buildingUpgradeDataState: $ReadOnlyArray < BuildingUpgradeDataType >,
+    +setBuildingUpgradeDataState: ($ReadOnlyArray < BuildingUpgradeDataType >) => void,
     +handleErrors: ($ReadOnlyArray<string>) => void,
 |};
 export function KageQuarters({
@@ -37,10 +40,13 @@ export function KageQuarters({
     setPolicyDataState,
     seatDataState,
     resourceDataState,
+    setResourceDataState,
     proposalDataState,
     setProposalDataState,
     strategicDataState,
     setStrategicDataState,
+    buildingUpgradeDataState,
+    setBuildingUpgradeDataState,
     handleErrors,
 }: Props) {
     const kage = seatDataState.find(seat => seat.seat_type === 'kage');
@@ -243,6 +249,8 @@ export function KageQuarters({
             setStrategicDataState(response.data.strategicData);
             setPlayerVillageData(response.data.strategicData.find(item => item.village.name === villageName));
             setViewingTargetVillage(response.data.strategicData.find(item => item.village.name === viewingTargetVillage.village.name));
+            setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+            setResourceDataState(response.data.resourceData);
             openModal({
                 header: 'Confirmation',
                 text: response.data.response_message,
@@ -387,18 +395,21 @@ export function KageQuarters({
                                     .filter(elder => elder.seat_type === 'elder')
                                     .map((elder, index) => (
                                         <div key={elder.seat_key} className="elder_item">
-                                            <div className="elder_vote_wrapper" style={{ visibility: (currentProposal && currentProposal.votes.find(vote => vote.user_id === elder.user_id)) ? null : "hidden" }}>
+                                            <div
+                                                className="elder_vote_wrapper"
+                                                style={{ visibility: (currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id)) ? null : "hidden" }}
+                                            >
                                                 <div className="elder_vote">
-                                                    {(currentProposal && currentProposal.votes.find(vote => vote.user_id === elder.user_id && vote.vote === 1 && parseInt(vote.rep_adjustment) > 0)) &&
+                                                    {(currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id && vote.vote == 1 && parseInt(vote.rep_adjustment) > 0)) &&
                                                         <img className="vote_yes_image glow" src="/images/v2/icons/yesvote.png" />
                                                     }
-                                                    {(currentProposal && currentProposal.votes.find(vote => vote.user_id === elder.user_id && vote.vote === 0 && parseInt(vote.rep_adjustment) < 0)) &&
+                                                    {(currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id && vote.vote == 0 && parseInt(vote.rep_adjustment) < 0)) &&
                                                         <img className="vote_no_image glow" src="/images/v2/icons/novote.png" />
                                                     }
-                                                    {(currentProposal && currentProposal.votes.find(vote => vote.user_id === elder.user_id && vote.vote === 1 && parseInt(vote.rep_adjustment) === 0)) &&
+                                                    {(currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id && vote.vote == 1 && parseInt(vote.rep_adjustment) === 0)) &&
                                                         <img className="vote_yes_image" src="/images/v2/icons/yesvote.png" />
                                                     }
-                                                    {(currentProposal && currentProposal.votes.find(vote => vote.user_id === elder.user_id && vote.vote === 0 && parseInt(vote.rep_adjustment) === 0)) &&
+                                                    {(currentProposal && currentProposal.votes.find(vote => vote.user_id == elder.user_id && vote.vote == 0 && parseInt(vote.rep_adjustment) === 0)) &&
                                                         <img className="vote_no_image" src="/images/v2/icons/novote.png" />
                                                     }
                                                 </div>
@@ -488,35 +499,35 @@ export function KageQuarters({
                                 </div>
                                 <div className="strategic_info_navigation_village_buttons">
                                     {villageName !== "Stone" &&
-                                        <div className={viewingTargetVillage.village.village_id === 1 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setViewingTargetVillage(strategicDataState[0])}>
+                                        <div className={viewingTargetVillage.village.village_id == 1 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setViewingTargetVillage(strategicDataState[0])}>
                                             <div className="strategic_info_nav_button_inner">
                                                 <img src={getVillageIcon(1)} className="strategic_info_nav_button_icon" />
                                             </div>
                                         </div>
                                     }
                                     {villageName !== "Cloud" &&
-                                        <div className={viewingTargetVillage.village.village_id === 2 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setViewingTargetVillage(strategicDataState[1])}>
+                                        <div className={viewingTargetVillage.village.village_id == 2 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setViewingTargetVillage(strategicDataState[1])}>
                                             <div className="strategic_info_nav_button_inner">
                                                 <img src={getVillageIcon(2)} className="strategic_info_nav_button_icon" />
                                             </div>
                                         </div>
                                     }
                                     {villageName !== "Leaf" &&
-                                        <div className={viewingTargetVillage.village.village_id === 3 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setViewingTargetVillage(strategicDataState[2])}>
+                                        <div className={viewingTargetVillage.village.village_id == 3 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setViewingTargetVillage(strategicDataState[2])}>
                                             <div className="strategic_info_nav_button_inner">
                                                 <img src={getVillageIcon(3)} className="strategic_info_nav_button_icon" />
                                             </div>
                                         </div>
                                     }
                                     {villageName !== "Sand" &&
-                                        <div className={viewingTargetVillage.village.village_id === 4 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setViewingTargetVillage(strategicDataState[3])}>
+                                        <div className={viewingTargetVillage.village.village_id == 4 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setViewingTargetVillage(strategicDataState[3])}>
                                             <div className="strategic_info_nav_button_inner">
                                                 <img src={getVillageIcon(4)} className="strategic_info_nav_button_icon" />
                                             </div>
                                         </div>
                                     }
                                     {villageName !== "Mist" &&
-                                        <div className={viewingTargetVillage.village.village_id === 5 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setViewingTargetVillage(strategicDataState[4])}>
+                                        <div className={viewingTargetVillage.village.village_id == 5 ? "strategic_info_nav_button_wrapper selected" : "strategic_info_nav_button_wrapper"} onClick={() => setViewingTargetVillage(strategicDataState[4])}>
                                             <div className="strategic_info_nav_button_inner">
                                                 <img src={getVillageIcon(5)} className="strategic_info_nav_button_icon" />
                                             </div>
@@ -600,7 +611,7 @@ type VillageProposalsProps = {|
     +resourceDataState: $ReadOnlyArray<VillageResourceStrategicInfo>,
     +strategicDataState: $ReadOnlyArray<VillageStrategicInfo>,
     +playerVillageData: VillageStrategicInfo,
-    +villageRegions: VillageStrategicInfo["village"]["regions"],
+    +villageRegions: VillageStrategicInfo["regions"],
     +currentProposalKey: ?number,
     +currentProposal: ?VillageProposalType,
     +onEnactClick: () => void,
@@ -756,7 +767,7 @@ function VillageProposals({
                             </div>
                         </>
                     }
-                    {(currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id === playerID)) &&
+                    {(currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
                         <>
                             <div className="proposal_yes_button_wrapper">
                                 <div className="proposal_yes_button" onClick={() => handleSubmitVote(1)}>vote in favor</div>
@@ -772,12 +783,12 @@ function VillageProposals({
                                                  viewOnly: true,
                                                  offeringVillageResources: resourceDataState,
                                                  offeringVillageRegions: playerVillageData.regions,
-                                                 offeredResources: offeredResources,
-                                                 offeredRegions: offeredRegions,
+                                                 offeredResources: { current: currentProposal.trade_data.offered_resources },
+                                                 offeredRegions: { current: currentProposal.trade_data.offered_regions },
                                                  targetVillageResources: null,
-                                                 targetVillageRegions: strategicDisplayRight.regions,
-                                                 requestedResources: requestedResources,
-                                                 requestedRegions: requestedRegions,
+                                                 targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
+                                                 requestedResources: { current: currentProposal.trade_data.requested_resources },
+                                                 requestedRegions: { current: currentProposal.trade_data.requested_regions },
                                                  proposalData: currentProposal.trade_data
                                              }),
                                              onConfirm: null,
@@ -793,7 +804,7 @@ function VillageProposals({
                             </div>
                         </>
                     }
-                    {(currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id === playerID)) &&
+                    {(currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
                         <>
                             <div className="proposal_yes_button_wrapper">
                                 <div className="proposal_yes_button disabled">vote in favor</div>
@@ -809,12 +820,12 @@ function VillageProposals({
                                                  viewOnly: true,
                                                  offeringVillageResources: resourceDataState,
                                                  offeringVillageRegions: playerVillageData.regions,
-                                                 offeredResources: offeredResources,
-                                                 offeredRegions: offeredRegions,
+                                                 offeredResources: { current: currentProposal.trade_data.offered_resources },
+                                                 offeredRegions: { current: currentProposal.trade_data.offered_regions },
                                                  targetVillageResources: null,
-                                                 targetVillageRegions: strategicDisplayRight.regions,
-                                                 requestedResources: requestedResources,
-                                                 requestedRegions: requestedRegions,
+                                                 targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
+                                                 requestedResources: { current: currentProposal.trade_data.requested_resources },
+                                                 requestedRegions: { current: currentProposal.trade_data.requested_regions },
                                                  proposalData: currentProposal.trade_data
                                              }),
                                              onConfirm: null,
@@ -830,7 +841,7 @@ function VillageProposals({
                             </div>
                         </>
                     }
-                    {(currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id === playerID)) &&
+                    {(currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
                         <>
                             <div className="proposal_cancel_vote_button_wrapper">
                                 <div className="proposal_cancel_vote_button"
@@ -855,12 +866,12 @@ function VillageProposals({
                                                  viewOnly: true,
                                                  offeringVillageResources: resourceDataState,
                                                  offeringVillageRegions: playerVillageData.regions,
-                                                 offeredResources: offeredResources,
-                                                 offeredRegions: offeredRegions,
+                                                 offeredResources: { current: currentProposal.trade_data.offered_resources },
+                                                 offeredRegions: { current: currentProposal.trade_data.offered_regions },
                                                  targetVillageResources: null,
-                                                 targetVillageRegions: strategicDisplayRight.regions,
-                                                 requestedResources: requestedResources,
-                                                 requestedRegions: requestedRegions,
+                                                 targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
+                                                 requestedResources: { current: currentProposal.trade_data.requested_resources },
+                                                 requestedRegions: { current: currentProposal.trade_data.requested_regions },
                                                  proposalData: currentProposal.trade_data
                                              }),
                                              onConfirm: null,
@@ -871,7 +882,7 @@ function VillageProposals({
                                     </div>
                                 </div>
                             }
-                            {(currentProposal.votes.find(vote => vote.user_id === playerID).rep_adjustment === 0) &&
+                            {(currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id).rep_adjustment === 0) &&
                                 <div className="proposal_boost_vote_button_wrapper">
                                     <div className="proposal_boost_vote_button" onClick={() => openModal({
                                         header: 'Confirmation',
@@ -883,7 +894,7 @@ function VillageProposals({
                             }
                         </>
                     }
-                    {(currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id === playerID)) &&
+                    {(currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
                         <>
                             <div className="proposal_cancel_vote_button_wrapper">
                                 <div className="proposal_cancel_vote_button disabled">cancel vote</div>
@@ -899,12 +910,12 @@ function VillageProposals({
                                                  viewOnly: true,
                                                  offeringVillageResources: resourceDataState,
                                                  offeringVillageRegions: playerVillageData.regions,
-                                                 offeredResources: offeredResources,
-                                                 offeredRegions: offeredRegions,
+                                                 offeredResources: { current: currentProposal.trade_data.offered_resources },
+                                                 offeredRegions: { current: currentProposal.trade_data.offered_regions },
                                                  targetVillageResources: null,
-                                                 targetVillageRegions: strategicDisplayRight.regions,
-                                                 requestedResources: requestedResources,
-                                                 requestedRegions: requestedRegions,
+                                                 targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
+                                                 requestedResources: { current: currentProposal.trade_data.requested_resources },
+                                                 requestedRegions: { current: currentProposal.trade_data.requested_regions },
                                                  proposalData: currentProposal.trade_data
                                              }),
                                              onConfirm: null,

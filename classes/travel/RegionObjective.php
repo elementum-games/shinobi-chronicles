@@ -15,6 +15,7 @@ class RegionObjective {
         public int $village_id,
         public int $resource_id,
         public int $resource_count,
-        public bool $is_occupied = false,
+        public int $stability,
+        public bool $rebellion_active,
     ) {}
 }

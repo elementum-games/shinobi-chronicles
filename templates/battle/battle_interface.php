@@ -397,17 +397,17 @@ if($battle->battle_text) {
                 <?php foreach ($battleManager->getEffects() as $effect): ?>
                     <?php if ($effect->target == $opponent->combat_id && $effect->turns > 0): ?>
                         <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
-                                    <div class="effect_name">
-                                        <?php
-                                            if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual" || $effect->effect == "reflect_damage") {
-                                                $effect_power = $effect->effect_amount * $effect->turns;
-                                                $residual_damage = $opponent->calcDamageTaken($effect_power, $effect->damage_type, apply_resists: false, apply_weakness: false);
-                                                echo "<span class='hover_text'>" . BattleManager::formatNumber($residual_damage) . " Damage</span>";
-                                            } else {
-                                                echo "<span class='hover_text'>" . round($effect->effect_amount) . "% Effect</span>";
-                                            }
-                                        ?>
-                                        <?= "<span class='non_hover_text'>" . System::unSlug($effect->effect) . "</span>" ?>
+                            <div class="effect_name">
+                                <?php
+                                    if ($effect->isDamageOverTime()) {
+                                        $effect_power = $effect->effect_amount * $effect->turns;
+                                        $residual_damage = $opponent->calcDamageTaken($effect_power, $effect->damage_type, apply_resists: false, apply_weakness: false);
+                                        echo "<span class='hover_text'>" . BattleManager::formatNumber($residual_damage) . " Damage</span>";
+                                    } else {
+                                        echo "<span class='hover_text'>" . round($effect->effect_amount) . "% Effect</span>";
+                                    }
+                                ?>
+                                <?= "<span class='non_hover_text'>" . System::unSlug($effect->effect) . "</span>" ?>
                             </div>
                             <svg class="effect_duration_decoration" width="26" height="26">
                                 <polygon points="0,13 13,0 26,13 13,26" fill="#ad9357" stroke="black" stroke-width="1"></polygon>

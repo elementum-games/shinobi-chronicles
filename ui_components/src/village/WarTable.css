@@ -102,6 +102,10 @@
     top: 50%;
     transform: translateY(-50%);
 }
+.war_record_score_victory_marker {
+    position: absolute;
+    bottom: -5px;
+}
 .war_record_village {
     clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
     height: 44px;

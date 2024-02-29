@@ -30,9 +30,9 @@ export default function VillagePolicy({
             <div className="village_policy_bonus_container">
                 {policyDisplay.bonuses.map((bonus, index) => (
                     <div key={index} className="policy_bonus_item">
-                        <svg width="16" height="16" viewBox="0 0 100 100">
-                            <polygon points="25,20 50,45 25,70 0,45" fill="#4a5e45" />
-                            <polygon points="25,0 50,25 25,50 0,25" fill="#6ab352" />
+                        <svg width="16" height="16" viewBox="0 0 100 100" style={{flex: "0 0 auto"}} >
+                            <polygon points="25,40 50,65 25,90 0,65" fill="#4a5e45" />
+                            <polygon points="25,20 50,45 25,70 0,45" fill="#6ab352" />
                         </svg>
                         <div className="policy_bonus_text">{bonus}</div>
                     </div>
@@ -79,6 +79,15 @@ export default function VillagePolicy({
                 </div>
             </div>
             <div className="village_policy_penalty_container">
+                {policyDisplay.resources.map((resource, index) => (
+                    <div key={index} className="policy_resource_item">
+                        <svg width="16" height="16" viewBox="0 0 100 100">
+                            <polygon points="25,20 50,45 25,70 0,45" fill="#414b8c" />
+                            <polygon points="25,0 50,25 25,50 0,25" fill="#5964a6" />
+                        </svg>
+                        <div className="policy_resource_text">{resource}</div>
+                    </div>
+                ))}
                 {policyDisplay.penalties.map((penalty, index) => (
                     <div key={index} className="policy_penalty_item">
                         <svg width="16" height="16" viewBox="0 0 100 100">

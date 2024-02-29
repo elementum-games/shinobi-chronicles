@@ -904,7 +904,8 @@ class BattleManager {
                     break;
                 case 'recoil':
                     $attack->recoil_percent += $effect->effect_amount / 100;
-                    $attack->jutsu->power *= 1 + ($effect->effect_amount / 100);
+                    $attack->raw_damage *= 1 + $effect->effect_amount / 100;
+                    $attack->damage *= 1 + $effect->effect_amount / 100;
                     break;
                 case 'immolate':
                     $attack->immolate_percent += $effect->effect_amount / 100;
