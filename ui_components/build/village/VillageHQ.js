@@ -32,24 +32,19 @@ export function VillageHQ({
   } = useModal();
   const [challengeSubmittedFlag, setChallengeSubmittedFlag] = React.useState(false);
   const [challengeAcceptedFlag, setChallengeAcceptedFlag] = React.useState(false);
-
   const FetchNextIntervalTypeResources = () => {
     var days;
-
     switch (resourceDaysToShow) {
       case 1:
         days = 7;
         break;
-
       case 7:
         days = 30;
         break;
-
       case 30:
         days = 1;
         break;
     }
-
     apiFetch(villageAPI, {
       request: 'LoadResourceData',
       days: days
@@ -58,12 +53,10 @@ export function VillageHQ({
         handleErrors(response.errors);
         return;
       }
-
       setResourceDaysToShow(days);
       setResourceDataState(response.data);
     });
   };
-
   const ClaimSeat = seat_type => {
     apiFetch(villageAPI, {
       request: 'ClaimSeat',
@@ -73,7 +66,6 @@ export function VillageHQ({
         handleErrors(response.errors);
         return;
       }
-
       setSeatDataState(response.data.seatData);
       setPlayerSeatState(response.data.playerSeat);
       openModal({
@@ -84,7 +76,6 @@ export function VillageHQ({
       });
     });
   };
-
   const Resign = () => {
     apiFetch(villageAPI, {
       request: 'Resign'
@@ -93,7 +84,6 @@ export function VillageHQ({
         handleErrors(response.errors);
         return;
       }
-
       setSeatDataState(response.data.seatData);
       setPlayerSeatState(response.data.playerSeat);
       openModal({
@@ -104,7 +94,6 @@ export function VillageHQ({
       });
     });
   };
-
   const Challenge = target_seat => {
     challengeTarget.current = target_seat;
     openModal({
@@ -121,10 +110,8 @@ export function VillageHQ({
       onConfirm: () => setChallengeSubmittedFlag(true)
     });
   };
-
   const ConfirmSubmitChallenge = () => {
     setChallengeSubmittedFlag(false);
-
     if (selectedTimesUTC.length < 12) {
       openModal({
         header: 'Submit Challenge',
@@ -149,7 +136,6 @@ export function VillageHQ({
           handleErrors(response.errors);
           return;
         }
-
         setChallengeDataState(response.data.challengeData);
         openModal({
           header: 'Confirmation',
@@ -160,7 +146,6 @@ export function VillageHQ({
       });
     }
   };
-
   const CancelChallenge = () => {
     apiFetch(villageAPI, {
       request: 'CancelChallenge'
@@ -169,7 +154,6 @@ export function VillageHQ({
         handleErrors(response.errors);
         return;
       }
-
       setChallengeDataState(response.data.challengeData);
       openModal({
         header: 'Confirmation',
@@ -179,7 +163,6 @@ export function VillageHQ({
       });
     });
   };
-
   const AcceptChallenge = target_challenge => {
     challengeTarget.current = target_challenge;
     openModal({
@@ -194,10 +177,8 @@ export function VillageHQ({
       onConfirm: () => setChallengeAcceptedFlag(true)
     });
   };
-
   const ConfirmAcceptChallenge = () => {
     setChallengeAcceptedFlag(false);
-
     if (!selectedTimeUTC) {
       openModal({
         header: 'Accept Challenge',
@@ -220,7 +201,6 @@ export function VillageHQ({
           handleErrors(response.errors);
           return;
         }
-
         setChallengeDataState(response.data.challengeData);
         openModal({
           header: 'Confirmation',
@@ -231,7 +211,6 @@ export function VillageHQ({
       });
     }
   };
-
   const LockChallenge = target_challenge => {
     apiFetch(villageAPI, {
       request: 'LockChallenge',
@@ -241,7 +220,6 @@ export function VillageHQ({
         handleErrors(response.errors);
         return;
       }
-
       setChallengeDataState(response.data.challengeData);
       openModal({
         header: 'Confirmation',
@@ -251,7 +229,6 @@ export function VillageHQ({
       });
     });
   };
-
   React.useEffect(() => {
     if (challengeSubmittedFlag) {
       ConfirmSubmitChallenge();
@@ -430,23 +407,18 @@ export function VillageHQ({
     className: "kage_record_item_length"
   }, kage.time_held)))))))))));
 }
-
 function DisplayFromDays(days) {
   switch (days) {
     case 1:
       return 'daily';
-
     case 7:
       return 'weekly';
-
     case 30:
       return 'monthly';
-
     default:
       return days;
   }
 }
-
 function VillageMembers({
   clans,
   populationData,
@@ -487,7 +459,6 @@ function VillageMembers({
     className: "population_item_count last"
   }, totalPopulation)))));
 }
-
 function VillageElders({
   seatDataState,
   playerSeatState,
@@ -536,7 +507,6 @@ function VillageElders({
     className: "elder_challenge_button disabled"
   }, "challenge")))));
 }
-
 export const ChallengeContainer = ({
   playerID,
   challengeDataState,
@@ -655,21 +625,17 @@ export const TimeGrid = ({
 }) => {
   const [selectedTimes, setSelectedTimes] = React.useState([]);
   const timeSlots = generateSlotsForTimeZone(startHourUTC);
-
   function toggleSlot(time) {
     const formattedTime = time.toFormat('HH:mm');
     let newSelectedTimes;
-
     if (selectedTimes.includes(formattedTime)) {
       newSelectedTimes = selectedTimes.filter(t => t !== formattedTime);
     } else {
       newSelectedTimes = [...selectedTimes, formattedTime];
     }
-
     setSelectedTimes(newSelectedTimes);
     selectedTimesUTC.current = convertSlotsToUTC(newSelectedTimes);
   }
-
   ;
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "schedule_challenge_subtext_wrapper"
@@ -697,7 +663,6 @@ export const TimeGrid = ({
     className: "slot_count"
   }, "Selected: ", selectedTimes.length))));
 };
-
 function generateSlotsForTimeZone(startHour) {
   return Array.from({
     length: 24
@@ -707,13 +672,11 @@ function generateSlotsForTimeZone(startHour) {
     zone: 'utc'
   }).setZone('local'));
 }
-
 function convertSlotsToUTC(times) {
   return times.map(time => luxon.DateTime.fromFormat(time, 'HH:mm', {
     zone: 'local'
   }).setZone('utc').toFormat('HH:mm'));
 }
-
 export const TimeGridResponse = ({
   availableTimesUTC,
   selectedTimeUTC,
@@ -721,7 +684,6 @@ export const TimeGridResponse = ({
 }) => {
   const [selectedTime, setSelectedTime] = React.useState(null);
   const timeSlots = generateSlotsForTimeZone(startHourUTC);
-
   function generateSlotsForTimeZone(startHour) {
     return Array.from({
       length: 24
@@ -731,11 +693,9 @@ export const TimeGridResponse = ({
       zone: 'utc'
     }).toLocal());
   }
-
   function toggleSlot(time) {
     const formattedTimeLocal = time.toFormat('HH:mm');
     const formattedTimeUTC = time.toUTC().toFormat('HH:mm');
-
     if (selectedTime === formattedTimeLocal) {
       setSelectedTime(null);
       selectedTimeUTC.current = null;
@@ -744,7 +704,6 @@ export const TimeGridResponse = ({
       selectedTimeUTC.current = formattedTimeUTC;
     }
   }
-
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "schedule_challenge_subtext_wrapper"
   }, /*#__PURE__*/React.createElement("span", {

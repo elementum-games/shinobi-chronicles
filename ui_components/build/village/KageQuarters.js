@@ -13,10 +13,13 @@ export function KageQuarters({
   setPolicyDataState,
   seatDataState,
   resourceDataState,
+  setResourceDataState,
   proposalDataState,
   setProposalDataState,
   strategicDataState,
   setStrategicDataState,
+  buildingUpgradeDataState,
+  setBuildingUpgradeDataState,
   handleErrors
 }) {
   const kage = seatDataState.find(seat => seat.seat_type === 'kage');
@@ -56,7 +59,6 @@ export function KageQuarters({
   const {
     openModal
   } = useModal();
-
   const ChangePolicy = () => {
     apiFetch(villageApiUrl, {
       request: 'CreateProposal',
@@ -67,7 +69,6 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
-
       setProposalDataState(response.data.proposalData);
       openModal({
         header: 'Confirmation',
@@ -77,7 +78,6 @@ export function KageQuarters({
       });
     });
   };
-
   const DeclareWar = () => {
     apiFetch(villageApiUrl, {
       request: 'CreateProposal',
@@ -88,7 +88,6 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
-
       setProposalDataState(response.data.proposalData);
       openModal({
         header: 'Confirmation',
@@ -98,7 +97,6 @@ export function KageQuarters({
       });
     });
   };
-
   const OfferPeace = () => {
     apiFetch(villageApiUrl, {
       request: 'CreateProposal',
@@ -109,7 +107,6 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
-
       setProposalDataState(response.data.proposalData);
       openModal({
         header: 'Confirmation',
@@ -119,7 +116,6 @@ export function KageQuarters({
       });
     });
   };
-
   const OfferAlliance = () => {
     apiFetch(villageApiUrl, {
       request: 'CreateProposal',
@@ -130,7 +126,6 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
-
       setProposalDataState(response.data.proposalData);
       openModal({
         header: 'Confirmation',
@@ -140,7 +135,6 @@ export function KageQuarters({
       });
     });
   };
-
   const BreakAlliance = () => {
     apiFetch(villageApiUrl, {
       request: 'CreateProposal',
@@ -151,7 +145,6 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
-
       setProposalDataState(response.data.proposalData);
       openModal({
         header: 'Confirmation',
@@ -161,7 +154,6 @@ export function KageQuarters({
       });
     });
   };
-
   const CancelProposal = () => {
     apiFetch(villageApiUrl, {
       request: 'CancelProposal',
@@ -171,7 +163,6 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
-
       setProposalDataState(response.data.proposalData);
       setCurrentProposal(null);
       setCurrentProposalKey(null);
@@ -183,7 +174,6 @@ export function KageQuarters({
       });
     });
   };
-
   const OfferTrade = () => {
     apiFetch(villageApiUrl, {
       request: 'CreateProposal',
@@ -198,7 +188,6 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
-
       setProposalDataState(response.data.proposalData);
       openModal({
         header: 'Confirmation',
@@ -208,7 +197,6 @@ export function KageQuarters({
       });
     });
   };
-
   const EnactProposal = () => {
     apiFetch(villageApiUrl, {
       request: 'EnactProposal',
@@ -218,7 +206,6 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
-
       setProposalDataState(response.data.proposalData);
       setCurrentProposal(null);
       setCurrentProposalKey(null);
@@ -227,6 +214,8 @@ export function KageQuarters({
       setStrategicDataState(response.data.strategicData);
       setPlayerVillageData(response.data.strategicData.find(item => item.village.name === villageName));
       setViewingTargetVillage(response.data.strategicData.find(item => item.village.name === viewingTargetVillage.village.name));
+      setBuildingUpgradeDataState(response.data.buildingUpgradeData);
+      setResourceDataState(response.data.resourceData);
       openModal({
         header: 'Confirmation',
         text: response.data.response_message,
@@ -235,7 +224,6 @@ export function KageQuarters({
       });
     });
   };
-
   const BoostVote = () => {
     apiFetch(villageApiUrl, {
       request: 'BoostVote',
@@ -245,7 +233,6 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
-
       setProposalDataState(response.data.proposalData);
       setCurrentProposal(response.data.proposalData[currentProposalKey]);
       openModal({
@@ -256,7 +243,6 @@ export function KageQuarters({
       });
     });
   };
-
   const CancelVote = () => {
     apiFetch(villageApiUrl, {
       request: 'CancelVote',
@@ -266,7 +252,6 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
-
       setProposalDataState(response.data.proposalData);
       setCurrentProposal(response.data.proposalData[currentProposalKey]);
       openModal({
@@ -277,7 +262,6 @@ export function KageQuarters({
       });
     });
   };
-
   const SubmitVote = vote => {
     apiFetch(villageApiUrl, {
       request: 'SubmitVote',
@@ -288,12 +272,10 @@ export function KageQuarters({
         handleErrors(response.errors);
         return;
       }
-
       setProposalDataState(response.data.proposalData);
       setCurrentProposal(response.data.proposalData[currentProposalKey]);
     });
   };
-
   React.useEffect(() => {
     if (proposalDataState.length && currentProposal === null) {
       setCurrentProposal(proposalDataState[0]);
@@ -573,37 +555,30 @@ export function KageQuarters({
   }))))), /*#__PURE__*/React.createElement(StrategicInfoItem, {
     strategicInfoData: viewingTargetVillage
   }))))));
-
   function cyclePolicy(direction) {
     var newPolicyID;
-
     switch (direction) {
       case "increment":
         newPolicyID = Math.min(5, displayPolicyID + 1);
         setDisplayPolicyID(newPolicyID);
         break;
-
       case "decrement":
         newPolicyID = Math.max(1, displayPolicyID - 1);
         setDisplayPolicyID(newPolicyID);
         break;
     }
   }
-
   function cycleProposal(direction) {
     if (proposalDataState.length === 0) {
       return;
     }
-
     var newProposalKey;
-
     switch (direction) {
       case "increment":
         newProposalKey = Math.min(proposalDataState.length - 1, currentProposalKey + 1);
         setCurrentProposalKey(newProposalKey);
         setCurrentProposal(proposalDataState[newProposalKey]);
         break;
-
       case "decrement":
         newProposalKey = Math.max(0, currentProposalKey - 1);
         setCurrentProposalKey(newProposalKey);
@@ -612,7 +587,6 @@ export function KageQuarters({
     }
   }
 }
-
 function VillageProposals({
   playerSeatState,
   proposalDataState,
@@ -632,12 +606,10 @@ function VillageProposals({
 }) {
   let proposalRepAdjustment = 0;
   let canEnactProposal = false;
-
   if (currentProposal != null) {
     proposalRepAdjustment = currentProposal.votes.reduce((acc, vote) => acc + parseInt(vote.rep_adjustment), 0);
     canEnactProposal = currentProposal.enact_time_remaining !== null || currentProposal.votes.length === seatDataState.filter(seat => seat.seat_type === "elder" && seat.seat_id != null).length;
   }
-
   const {
     openModal
   } = useModal();

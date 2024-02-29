@@ -3,7 +3,7 @@ import { WarTable } from "./WarTable.js";
 import { VillageHQ } from "./VillageHQ.js";
 import { WorldInfo } from "./WorldInfo.js";
 import { KageQuarters } from "./KageQuarters.js";
-
+import { VillageUpgrades } from "./VillageUpgrades.js";
 function Village({
   playerID,
   playerSeat,
@@ -21,7 +21,8 @@ function Village({
   challengeData,
   playerWarLogData,
   warRecordData,
-  kageRecords
+  kageRecords,
+  buildingUpgradeData
 }) {
   const [playerSeatState, setPlayerSeatState] = React.useState(playerSeat);
   const [policyDataState, setPolicyDataState] = React.useState(policyData);
@@ -32,12 +33,11 @@ function Village({
   const [proposalDataState, setProposalDataState] = React.useState(proposalData);
   const [strategicDataState, setStrategicDataState] = React.useState(strategicData);
   const [challengeDataState, setChallengeDataState] = React.useState(challengeData);
+  const [buildingUpgradeDataState, setBuildingUpgradeDataState] = React.useState(buildingUpgradeData);
   const [villageTab, setVillageTab] = React.useState("villageHQ");
-
   function handleErrors(errors) {
     console.warn(errors);
   }
-
   return /*#__PURE__*/React.createElement(ModalProvider, null, /*#__PURE__*/React.createElement("div", {
     className: "navigation_row"
   }, /*#__PURE__*/React.createElement("div", {
@@ -50,8 +50,9 @@ function Village({
     className: "nav_button",
     onClick: () => setVillageTab("warTable")
   }, "war table"), /*#__PURE__*/React.createElement("div", {
-    className: "nav_button disabled"
-  }, "members & teams"), /*#__PURE__*/React.createElement("div", {
+    className: "nav_button",
+    onClick: () => setVillageTab("villageUpgrades")
+  }, "upgrades"), /*#__PURE__*/React.createElement("div", {
     className: playerSeatState.seat_id != null ? "nav_button" : "nav_button disabled",
     onClick: () => setVillageTab("kageQuarters")
   }, "kage's quarters")), villageTab === "villageHQ" && /*#__PURE__*/React.createElement(VillageHQ, {
@@ -92,7 +93,9 @@ function Village({
     setProposalDataState: setProposalDataState,
     strategicDataState: strategicDataState,
     setStrategicDataState: setStrategicDataState,
-    handleErrors: handleErrors
+    handleErrors: handleErrors,
+    buildingUpgradeDataState: buildingUpgradeDataState,
+    setBuildingUpgradeDataState: setBuildingUpgradeDataState
   }), villageTab === "worldInfo" && /*#__PURE__*/React.createElement(WorldInfo, {
     villageName: villageName,
     strategicDataState: strategicDataState
@@ -102,7 +105,15 @@ function Village({
     strategicDataState: strategicDataState,
     villageAPI: villageAPI,
     handleErrors: handleErrors
+  }), villageTab == "villageUpgrades" && /*#__PURE__*/React.createElement(VillageUpgrades, {
+    playerID: playerID,
+    playerSeatState: playerSeatState,
+    villageName: villageName,
+    villageAPI: villageAPI,
+    buildingUpgradeDataState: buildingUpgradeDataState,
+    setBuildingUpgradeDataState: setBuildingUpgradeDataState,
+    resourceDataState: resourceDataState,
+    setProposalDataState: setProposalDataState
   }));
 }
-
 window.Village = Village;
