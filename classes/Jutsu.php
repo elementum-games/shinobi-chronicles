@@ -39,11 +39,31 @@ class Jutsu {
     const TARGET_TYPE_DIRECTION = 'direction';
 
     const POWER_PER_LEVEL_PERCENT = 0.3;
-    const BL_POWER_PER_LEVEL_PERCENT = 0.3;
     const EFFECT_PER_LEVEL_PERCENT = 0.2;
 
     const CHUUNIN_SCALE_MULTIPLIER = 1.4; // 2.9 => 3.9 = +34.4%
     const JONIN_SCALE_MULTIPLIER = 1.75; // 2.9 => 4.9 = +69%
+
+    const BALANCE_BASELINE_POWER = 4.4;
+    const BALANCE_EFFECT_RATIOS = [
+        'offense_boost' => 1.85,
+        'elemental_boost' => 1.15,
+        'evasion_nerf' => 2.1,
+        'offense_nerf' => 2,
+        'erosion' => 0.35,
+        'vulnerability' => 2,
+        'elemental_vulnerability' => 1.25,
+        'hybrid_elemental_vulnerability' => 1.375,
+        'resist_boost' => 1.85,
+        'evasion_boost' => 2.1,
+        'speed_boost' => 1,
+        'piercing' => 0.75,
+        'counter' => 3.25,
+        'reflect' => 3.25,
+        'substitution' => 2.5,
+        'immolate' => 2.5,
+        'recoil' => 0,
+    ];
 
     /* Genjutsu gets declared with full power and effect instead of a tradeoff between them, we balance in code
     const GENJUTSU_ATTACK_POWER_MODIFIER = 0.55;*/
@@ -225,15 +245,10 @@ class Jutsu {
         }
     }
 
-    public function recalculatePower() {
-        $level_power_multiplier = $this->is_bloodline ?
-            self::BL_POWER_PER_LEVEL_PERCENT / 100 : self::POWER_PER_LEVEL_PERCENT / 100;
+    public function recalculatePower(): void {
+        $level_power_multiplier = self::POWER_PER_LEVEL_PERCENT / 100;
 
-        $is_genjutsu_attack = $this->jutsu_type == Jutsu::TYPE_GENJUTSU && in_array($this->use_type, self::$attacking_use_types);
-
-        $this->power = $this->base_power
-            //* ($is_genjutsu_attack ? self::GENJUTSU_ATTACK_POWER_MODIFIER : 1)
-            * (1 + ($this->level * $level_power_multiplier));
+        $this->power = $this->base_power * (1 + ($this->level * $level_power_multiplier));
         $this->power = round($this->power, 2);
     }
 
@@ -338,5 +353,149 @@ class Jutsu {
                 $this->power *= Jutsu::JONIN_SCALE_MULTIPLIER;
             }
         }
+    }
+
+    public function getBalanceMaxUtility(): float {
+        if(!$this->rank_scaling_applied) {
+            $this->applyRankScaling(System::SC_MAX_RANK);
+        }
+
+        $level_power_multiplier = self::POWER_PER_LEVEL_PERCENT / 100;
+        $capped_power = $this->base_power * (1 + (self::MAX_LEVEL * $level_power_multiplier));
+
+        $cr_discount_per_turn_multiplier = 0.005; // 0.5% discount
+
+        $residual_effect_percent = 0;
+        $compound_residual_effect_percent = 0;
+        $compound_residual_discount = 0;
+        $recoil_effect_percent = 0;
+
+        $total_effect_utility = 0;
+        
+        $level_effect_multiplier = self::EFFECT_PER_LEVEL_PERCENT / 100;
+
+        $total_elemental_vuln = 0;
+        $count_elemental_vulns = 0;
+
+        foreach ($this->effects as $effect) {
+            if(!$effect->effect || $effect->effect == 'none') continue;
+
+            $capped_effect_amount = $effect->base_effect_amount * (1 + self::MAX_LEVEL * $level_effect_multiplier);
+            $capped_effect_amount = round($capped_effect_amount / 100, 4);
+
+            switch($effect->effect) {
+                case 'none':
+                case 'barrier':
+                    break;
+                case 'residual_damage':
+                case 'delayed_residual':
+                    $residual_effect_percent += $capped_effect_amount * $effect->effect_length;
+                    break;
+                case 'compound_residual':
+                    $compound_residual_effect_percent += $capped_effect_amount * $effect->effect_length;
+
+                    $max_damage_multiplier = pow(
+                        1 + BattleEffectsManager::COMPOUND_RESIDUAL_INCREASE,
+                        $effect->effect_length - 1
+                    );
+
+                    $extra_effective_percent = $compound_residual_effect_percent * ($max_damage_multiplier - 1) * 0.5;
+                    $compound_residual_effect_percent += $extra_effective_percent;
+
+                    // Discount
+                    $compound_residual_discount += $compound_residual_effect_percent * ($cr_discount_per_turn_multiplier * $effect->effect_length);
+                    break;
+                case 'recoil':
+                    $recoil_effect_percent += $capped_effect_amount * $effect->effect_length;
+                    break;
+                case 'immolate':
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['immolate'] * $capped_effect_amount * $effect->effect_length;
+                    break;
+                case 'counter':
+                case 'substitution':
+                case 'reflect':
+                case 'piercing':
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS[$effect->effect] * $capped_effect_amount * $effect->effect_length;
+                    break;
+                case 'ninjutsu_boost':
+                case 'taijutsu_boost':
+                case 'genjutsu_boost':
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['offense_boost'] * $capped_effect_amount * $effect->effect_length;
+                    break;
+                case 'speed_boost':
+                case 'cast_speed_boost':
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['speed_boost'] * $capped_effect_amount * $effect->effect_length;
+                    break;
+                case 'fire_boost':
+                case 'wind_boost':
+                case 'lightning_boost':
+                case 'earth_boost':
+                case 'water_boost':
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['elemental_boost'] * $capped_effect_amount * $effect->effect_length;
+                    break;
+                case 'evasion_boost':
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['evasion_boost'] * $capped_effect_amount * $effect->effect_length;
+                    break;
+                case 'resist_boost':
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['resist_boost'] * $capped_effect_amount * $effect->effect_length;
+                    break;
+                case 'ninjutsu_nerf':
+                case 'taijutsu_nerf':
+                case 'genjutsu_nerf':
+                case 'offense_nerf':
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['offense_nerf'] * $capped_effect_amount * $effect->effect_length;
+                    break;
+
+                case 'cast_speed_nerf':
+                case 'speed_nerf':
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['speed_boost'] * $capped_effect_amount * $effect->effect_length;
+                    break;
+
+                case 'vulnerability':
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['vulnerability'] * $capped_effect_amount * $effect->effect_length;
+                    break;
+                case 'fire_vulnerability':
+                case 'wind_vulnerability':
+                case 'lightning_vulnerability':
+                case 'earth_vulnerability':
+                case 'water_vulnerability':
+                    $total_elemental_vuln += self::BALANCE_EFFECT_RATIOS['vulnerability'] * $capped_effect_amount * $effect->effect_length;
+                    $count_elemental_vulns++;
+                    break;
+                case 'evasion_nerf':
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['evasion_nerf'] * $capped_effect_amount * $effect->effect_length;
+                    break;
+                case 'erosion':
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['erosion'] * $capped_effect_amount * $effect->effect_length;
+                    break;
+            }
+        }
+        
+        if($count_elemental_vulns >= 2) {
+            $total_effect_utility += ($total_elemental_vuln / $count_elemental_vulns) * self::BALANCE_EFFECT_RATIOS['hybrid_elemental_vulnerability'];
+        }
+        else if($count_elemental_vulns == 1) {
+            $total_effect_utility += $total_elemental_vuln * self::BALANCE_EFFECT_RATIOS['elemental_vulnerability'];
+        }
+
+        $residual_power = $capped_power * $residual_effect_percent;
+        $compound_residual_power = $capped_power * $compound_residual_effect_percent;
+
+        $recoil_power = $recoil_effect_percent * ($capped_power + $residual_power + $compound_residual_power);
+        $recoil_self_damage = $recoil_effect_percent * $capped_power;
+        $recoil_discount = $capped_power * $recoil_effect_percent * 0.15;
+
+        // Final power
+        $total_utility = $capped_power + $residual_power + $compound_residual_power + $recoil_power;
+        $total_utility += $total_effect_utility;
+
+        // Long effect discount (0%)
+
+        $total_utility -= $compound_residual_discount;
+        $total_utility -= $recoil_self_damage;
+        $total_utility -= $recoil_discount;
+
+        return $total_utility;
+
     }
 }

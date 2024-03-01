@@ -46,13 +46,13 @@ $RANK_NAMES = RankManager::fetchNames($system);
 
 <table class='table'>
     <tr>
-        <th style='width:25%;'>Name</th>
+        <th style='width:22%;'>Name</th>
         <th style='width:8%;'>Power</th>
-        <th style='width:30%;'>Effect</th>
-        <th style='width:30%;'>Effect</th>
-        <th style='width:14%;'>Element</th>
-        <th style='width:19%;'>Cost</th>
+        <th style='width:34%;'>Effects</th>
+        <th style='width:12%;'>Element</th>
+        <th style='width:15%;'>Cost</th>
         <th style='width:4%;'>CD</th>
+        <th style='width:5%;'>TP</th>
     </tr>
     <tr><th colspan='7'><?= $RANK_NAMES[1] ?></th></tr>
     <?php $current_rank = 1; ?>
@@ -80,16 +80,16 @@ $RANK_NAMES = RankManager::fetchNames($system);
                         (<?= $jutsu->effects[0]->effect_amount ?>% / <?= $jutsu->effects[0]->effect_length ?> turns)
                     <?php endif; ?>
                 <?php endif; ?>
-            </td>
-            <td>
+                <br />
                 <?= System::unSlug($jutsu->effects[1]->effect) ?>
                 <?php if ($jutsu->effects[1]->effect !== 'none'): ?>
-                            (<?= $jutsu->effects[1]->effect_amount ?>% / <?= $jutsu->effects[1]->effect_length ?> turns)
+                    (<?= $jutsu->effects[1]->effect_amount ?>% / <?= $jutsu->effects[1]->effect_length ?> turns)
                 <?php endif; ?>
             </td>
             <td><?= ucwords($jutsu->element) ?></td>
             <td>&yen;<?= $jutsu->purchase_cost ?></td>
             <td><?= $jutsu->cooldown ?></td>
+            <td><?= round($jutsu->getBalanceMaxUtility(), 2) ?></td>
         </tr>
     <?php endforeach; ?>
 </table>
