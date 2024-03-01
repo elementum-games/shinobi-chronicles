@@ -363,6 +363,9 @@ class Jutsu {
                 $capped_power *= Jutsu::JONIN_SCALE_MULTIPLIER;
             }
         }
+        if($this->use_type == Jutsu::USE_TYPE_BUFF) {
+            $capped_power = 0;
+        }
 
         $cr_discount_per_turn_multiplier = 0.005; // 0.5% discount
 
