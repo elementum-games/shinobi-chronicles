@@ -356,12 +356,13 @@ class Jutsu {
     }
 
     public function getBalanceMaxUtility(): float {
-        if(!$this->rank_scaling_applied) {
-            $this->applyRankScaling(System::SC_MAX_RANK);
-        }
-
         $level_power_multiplier = self::POWER_PER_LEVEL_PERCENT / 100;
         $capped_power = $this->base_power * (1 + (self::MAX_LEVEL * $level_power_multiplier));
+        if(!$this->rank_scaling_applied) {
+            if ($this->purchase_type == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
+                $capped_power *= Jutsu::JONIN_SCALE_MULTIPLIER;
+            }
+        }
 
         $cr_discount_per_turn_multiplier = 0.005; // 0.5% discount
 
@@ -380,7 +381,7 @@ class Jutsu {
         foreach ($this->effects as $effect) {
             if(!$effect->effect || $effect->effect == 'none') continue;
 
-            $capped_effect_amount = $effect->base_effect_amount * (1 + self::MAX_LEVEL * $level_effect_multiplier);
+            $capped_effect_amount = $effect->base_effect_amount * (1 + (self::MAX_LEVEL * $level_effect_multiplier));
             $capped_effect_amount = round($capped_effect_amount / 100, 4);
 
             switch($effect->effect) {
@@ -409,13 +410,13 @@ class Jutsu {
                     $recoil_effect_percent += $capped_effect_amount * $effect->effect_length;
                     break;
                 case 'immolate':
-                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['immolate'] * $capped_effect_amount * $effect->effect_length;
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['immolate'] * $capped_effect_amount;
                     break;
                 case 'counter':
                 case 'substitution':
                 case 'reflect':
                 case 'piercing':
-                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS[$effect->effect] * $capped_effect_amount * $effect->effect_length;
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS[$effect->effect] * $capped_effect_amount;
                     break;
                 case 'ninjutsu_boost':
                 case 'taijutsu_boost':
@@ -486,8 +487,20 @@ class Jutsu {
         $recoil_discount = $capped_power * $recoil_effect_percent * 0.15;
 
         // Final power
+        // Debug
+        /*echo "
+            Capped Power: {$capped_power}<br />
+            Residual: $residual_power<br />
+            CR: $compound_residual_power<br />
+            Recoil Power: $recoil_power<br />
+            <br />
+            Effects: $total_effect_utility<br />
+            CR Discount: -$compound_residual_discount<br />
+            Recoil Self Damage: -$recoil_self_damage<br />
+            Recoil Discount: -$recoil_discount<br />
+        ";*/
         $total_utility = $capped_power + $residual_power + $compound_residual_power + $recoil_power;
-        $total_utility += $total_effect_utility;
+        $total_utility += self::BALANCE_BASELINE_POWER * $total_effect_utility;
 
         // Long effect discount (0%)
 
