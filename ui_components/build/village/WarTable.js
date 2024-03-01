@@ -127,7 +127,7 @@ export function WarTable({
   })), globalLeaderboardWarLogs.map((log, index) => /*#__PURE__*/React.createElement(PlayerWarLog, {
     log: log,
     index: index,
-    animate: true,
+    animate: false,
     getVillageIcon: getVillageIcon
   }))), /*#__PURE__*/React.createElement("div", {
     className: "global_leaderboard_navigation"
@@ -439,7 +439,10 @@ export function WarTable({
     }
     const renderScoreBar = () => {
       const total_score = record.attacker_war_log.war_score + record.defender_war_log.war_score;
-      const attacker_score_percentage = Math.round(record.attacker_war_log.war_score / total_score * 100);
+      let attacker_score_percentage = 50;
+      if (total_score > 0) {
+        attacker_score_percentage = Math.round(record.attacker_war_log.war_score / total_score * 100);
+      }
       const victory_bar_percentage = calculateBarPercent();
       return /*#__PURE__*/React.createElement("div", {
         className: "war_record_score_bar"
@@ -499,6 +502,18 @@ export function WarTable({
         fill: "url(#war_record_score_divider_gradient)",
         stroke: "#4d401c",
         strokeWidth: "20"
+      })), !record.village_relation.relation_end && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("img", {
+        src: "/images/icons/enemywarwin.png",
+        className: "war_record_score_victory_marker",
+        style: {
+          left: victory_bar_percentage + "%"
+        }
+      }), /*#__PURE__*/React.createElement("img", {
+        src: "/images/icons/allywarwin.png",
+        className: "war_record_score_victory_marker",
+        style: {
+          left: 100 - victory_bar_percentage + "%"
+        }
       })));
     };
     return /*#__PURE__*/React.createElement("div", {
@@ -527,7 +542,7 @@ export function WarTable({
       className: "war_record_score left" + (is_active ? " active" : " inactive")
     }, record.attacker_war_log.war_score), /*#__PURE__*/React.createElement("div", {
       className: "war_record_status" + (is_active ? " active" : " inactive")
-    }, record.village_relation.relation_end ? /*#__PURE__*/React.createElement(React.Fragment, null, record.village_relation.relation_start + " - " + record.village_relation.relation_end) : /*#__PURE__*/React.createElement(React.Fragment, null, "war active")), /*#__PURE__*/React.createElement("div", {
+    }, record.village_relation.relation_end ? /*#__PURE__*/React.createElement(React.Fragment, null, record.village_relation.relation_start + " - " + record.village_relation.relation_end) : /*#__PURE__*/React.createElement(React.Fragment, null, record.war_duration)), /*#__PURE__*/React.createElement("div", {
       className: "war_record_score right" + (is_active ? " active" : " inactive")
     }, record.defender_war_log.war_score)), renderScoreBar()), /*#__PURE__*/React.createElement("div", {
       className: "war_record_village right"
@@ -545,7 +560,7 @@ export function WarTable({
     getPolicyDisplayData,
     strategicDataState
   }) {
-    console.log(strategicDataState.find(item => item.village.name == "Stone"));
+    ;
     const policy_name = getPolicyDisplayData(strategicDataState.find(item => item.village.name == log.village_name).village.policy_id).name;
     const scoreData = [{
       name: 'Objective Score',

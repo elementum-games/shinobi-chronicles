@@ -20,6 +20,7 @@ class TrainingManager {
     public ?int $sensei_id;
     public ?int $bloodline_id;
     public VillagePolicy $policy;
+    public int $village_training_speed_bonus;
 
     public int $train_time_remaining;
 
@@ -49,7 +50,7 @@ class TrainingManager {
     public int $base_jutsu_train_length;
     public int $jutsu_train_gain;
 
-    public function __construct(System $system, &$type, &$gain, &$time, $rank, $forbidden_seal, $rep, $team, $clan, $sensei, $bloodline_id, $policy) {
+    public function __construct(System $system, &$type, &$gain, &$time, $rank, $forbidden_seal, $rep, $team, $clan, $sensei, $bloodline_id, $policy, $village) {
         $this->system = $system;
 
         $this->rank = $rank;
@@ -90,6 +91,8 @@ class TrainingManager {
 	    $this->stat_train_gain += $this->system->TRAIN_BOOST;
 	    $this->stat_long_train_gain += $this->system->LONG_TRAIN_BOOST;
 	    $this->stat_extended_train_gain += ($this->system->LONG_TRAIN_BOOST * System::EXTENDED_BOOST_MULTIPLIER);
+
+        $this->training_speed_upgrade_multiplier = $village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_TRAINING_SPEED];
     }
 
     public function hasActiveTraining() {
@@ -224,6 +227,10 @@ class TrainingManager {
                 if ($this->policy->training_speed > 0) {
                     $len = round($len * (100 / (100 + $this->policy->training_speed)));
                 }
+                // Village boost
+                if ($this->village_training_speed_bonus > 0) {
+                    $len = round($len * (100 / (100 + $this->village_training_speed_bonus)));
+                }
                 return ($in_mins) ? $len/60 : $len;
             }
             // Used for basic display in training menu
@@ -256,6 +263,10 @@ class TrainingManager {
                     if ($this->policy->training_speed > 0) {
                         $train_length = round($train_length * (100 / (100 + $this->policy->training_speed)));
                     }
+                    // Village boost
+                    if ($this->village_training_speed_bonus > 0) {
+                        $train_length = round($train_length * (100 / (100 + $this->village_training_speed_bonus)));
+                    }
                     return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 case self::TRAIN_LEN_LONG:
                     $train_length = self::BASE_TRAIN_TIME * 4;
@@ -273,6 +284,10 @@ class TrainingManager {
                     if ($this->policy->training_speed > 0) {
                         $train_length = round($train_length * (100 / (100 + $this->policy->training_speed)));
                     }
+                    // Village boost
+                    if ($this->village_training_speed_bonus > 0) {
+                        $train_length = round($train_length * (100 / (100 + $this->village_training_speed_bonus)));
+                    }
                     return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 case self::TRAIN_LEN_EXTENDED:
                     $train_length = self::BASE_TRAIN_TIME * 30;
@@ -289,6 +304,10 @@ class TrainingManager {
                     // Policy boost
                     if ($this->policy->training_speed > 0) {
                         $train_length = round($train_length * (100 / (100 + $this->policy->training_speed)));
+                    }
+                    // Village boost
+                    if ($this->village_training_speed_bonus > 0) {
+                        $train_length = round($train_length * (100 / (100 + $this->village_training_speed_bonus)));
                     }
                     return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 default:

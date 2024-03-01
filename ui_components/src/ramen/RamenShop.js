@@ -1,7 +1,22 @@
+// @flow strict
+
 import { ModalProvider, useModal } from "../utils/modalContext.js";
 import { apiFetch } from "../utils/network.js";
 import { ResourceBar } from "../utils/resourceBar.js";
 import { parseKeywords } from "../utils/parseKeywords.js";
+
+import type {
+    CharacterRamenType,
+    MysteryRamenType,
+    RamenOwnerType,
+    BasicRamenType,
+    SpecialRamenType
+} from "./RamenShopSchema.js";
+
+import type {
+    PlayerDataType,
+    PlayerResourcesType
+} from "../_schema/userSchema.js";
 
 function RamenShopReactContainer({
     ramenShopAPI,
@@ -29,6 +44,16 @@ function RamenShopReactContainer({
     );
 }
 
+type Props = {|
+    +ramenShopAPI: string,
+    +playerData: PlayerDataType,
+    +playerResourcesData: PlayerResourcesType,
+    +characterRamenData: CharacterRamenType,
+    +ramenOwnerDetails: RamenOwnerType,
+    +basicMenuOptions: Array<BasicRamenType>,
+    +specialMenuOptions: Array<SpecialRamenType>,
+    +mysteryRamenDetails: MysteryRamenType,
+|};
 function RamenShop({
     ramenShopAPI,
     playerData,
@@ -38,36 +63,13 @@ function RamenShop({
     basicMenuOptions,
     specialMenuOptions,
     mysteryRamenDetails,
-}) {
+}: Props) {
     const [playerDataState, setPlayerDataState] = React.useState(playerData);
     const [playerResourcesDataState, setPlayerResourcesDataState] = React.useState(playerResourcesData);
     const [characterRamenDataState, setCharacterRamenDataState] = React.useState(characterRamenData);
     const [mysteryRamenDetailsState, setMysteryRamenDetailsState] = React.useState(mysteryRamenDetails);
+    const [ramenOwnerDetailsState, setRamenOwnerDetailsState] = React.useState(ramenOwnerDetails);
     const { openModal } = useModal();
-    function BasicRamen({ index, ramenInfo, PurchaseBasicRamen }) {
-        return (
-            <div key={index} className="basic_ramen">
-                <img src={ramenInfo.image} className="basic_ramen_img" />
-                <div className="basic_ramen_details">
-                    <div className="basic_ramen_name">{ramenInfo.label}</div>
-                    <div className="basic_ramen_effect">{ramenInfo.health_amount} HP</div>
-                    <div className="basic_ramen_button" onClick={() => PurchaseBasicRamen(ramenInfo.ramen_key)}><>&yen;</>{ramenInfo.cost}</div>
-                </div>
-            </div>
-        );
-    }
-    function SpecialRamen({ index, ramenInfo }) {
-        return (
-            <div key={index} className="special_ramen">
-                <img src={ramenInfo.image} className="special_ramen_img" />
-                <div className="special_ramen_name">{ramenInfo.label}</div>
-                <div className="special_ramen_description">{ramenInfo.description}</div>
-                <div className="special_ramen_effect">{ramenInfo.effect}</div>
-                <div className="special_ramen_duration">Duration: {ramenInfo.duration} minutes</div>
-                <div className="special_ramen_button" onClick={() => PurchaseSpecialRamen(ramenInfo.ramen_key)}><>&yen;</>{ramenInfo.cost}</div>
-            </div>
-        );
-    }
     function PurchaseBasicRamen(ramen_key) {
         apiFetch(
             ramenShopAPI,
@@ -99,6 +101,7 @@ function RamenShop({
             setPlayerDataState(response.data.player_data);
             setMysteryRamenDetailsState(response.data.mystery_ramen_details);
             setCharacterRamenDataState(response.data.character_ramen_data);
+            setRamenOwnerDetailsState(response.data.ramen_owner_details);
             openModal({
                 header: 'Confirmation',
                 text: response.data.response_message,
@@ -141,18 +144,18 @@ function RamenShop({
         <div className="ramen_shop_container">
             <div className="row first">
                 <div className="column first">
-                    <div className="ramen_shop_owner_container" style={{ background: `url(${ramenOwnerDetails.background}) center center no-repeat` }}>
+                    <div className="ramen_shop_owner_container" style={{ background: `url(${ramenOwnerDetailsState.background}) center center no-repeat` }}>
                         <div className="ramen_shop_dialogue_container">
-                            <div className="ramen_shop_dialogue_nameplate">{ramenOwnerDetails.name}</div>
-                            <div className="ramen_shop_dialogue_text">{ramenOwnerDetails.dialogue}</div>
+                            <div className="ramen_shop_dialogue_nameplate">{ramenOwnerDetailsState.name}</div>
+                            <div className="ramen_shop_dialogue_text">{parseKeywords(ramenOwnerDetailsState.dialogue)}</div>
                         </div>
-                        <img src={ramenOwnerDetails.image} className="ramen_shop_owner_img" />
+                        <img src={ramenOwnerDetailsState.image} className="ramen_shop_owner_img" />
                     </div>
                 </div>
                 <div className="column second">
                     <div className="ramen_shop_intro_container box-primary">
-                        <div className="header">{ramenOwnerDetails.shop_name}</div>
-                        <div className="intro_text">{parseKeywords(ramenOwnerDetails.shop_description)}</div>
+                        <div className="header">{ramenOwnerDetailsState.shop_name}</div>
+                        <div className="intro_text">{parseKeywords(ramenOwnerDetailsState.shop_description)}</div>
                     </div>
                     <div className="basic_menu_header_row">
                         <div className="header">Basic menu</div>
@@ -166,7 +169,7 @@ function RamenShop({
                     </div>
                     {basicMenuOptions &&
                         <div className="ramen_shop_basic_menu_container box-primary">
-                            <div className="ramen_shop_descriptive_text">Light savory broth with eggs and noodles, perfect with sake.</div>
+                            <div className="ramen_shop_descriptive_text">{ramenOwnerDetailsState.basic_menu_description}</div>
                             <div className="ramen_shop_basic_menu">
                                 {basicMenuOptions.map((option, index) => {
                                     return (
@@ -215,7 +218,7 @@ function RamenShop({
                             ?
                             specialMenuOptions.map((option, index) => {
                                 return (
-                                    <SpecialRamen index={index} ramenInfo={option} />
+                                    <SpecialRamen index={index} ramenInfo={option} PurchaseSpecialRamen={PurchaseSpecialRamen} />
                                 );
                             })
                             :
@@ -224,6 +227,31 @@ function RamenShop({
                     </div>
                 </div>
             </div>
+        </div>
+    );
+}
+
+function BasicRamen({ index, ramenInfo, PurchaseBasicRamen }) {
+    return (
+        <div key={index} className="basic_ramen">
+            <img src={ramenInfo.image} className="basic_ramen_img" />
+            <div className="basic_ramen_details">
+                <div className="basic_ramen_name">{ramenInfo.label}</div>
+                <div className="basic_ramen_effect">{ramenInfo.health_amount} HP</div>
+                <div className="basic_ramen_button" onClick={() => PurchaseBasicRamen(ramenInfo.ramen_key)}><>&yen;</>{ramenInfo.cost}</div>
+            </div>
+        </div>
+    );
+}
+function SpecialRamen({ index, ramenInfo, PurchaseSpecialRamen }) {
+    return (
+        <div key={index} className="special_ramen">
+            <img src={ramenInfo.image} className="special_ramen_img" />
+            <div className="special_ramen_name">{ramenInfo.label}</div>
+            <div className="special_ramen_description">{ramenInfo.description}</div>
+            <div className="special_ramen_effect">{ramenInfo.effect}</div>
+            <div className="special_ramen_duration">Duration: {ramenInfo.duration} minutes</div>
+            <div className="special_ramen_button" onClick={() => PurchaseSpecialRamen(ramenInfo.ramen_key)}><>&yen;</>{ramenInfo.cost}</div>
         </div>
     );
 }

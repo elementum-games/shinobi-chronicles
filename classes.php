@@ -59,7 +59,7 @@ require_once __DIR__ . "/classes/travel/MapLocation.php";
 require_once __DIR__ . "/classes/travel/NearbyPlayers.php";
 require_once __DIR__ . "/classes/travel/Region.php";
 require_once __DIR__ . "/classes/travel/RegionCoords.php";
-require_once __DIR__ . "/classes/travel/Patrol.php";
+require_once __DIR__ . "/classes/travel/MapNPC.php";
 require_once __DIR__ . "/classes/travel/Travel.php";
 require_once __DIR__ . "/classes/travel/TravelAPIResponse.php";
 require_once __DIR__ . "/classes/travel/TravelApiPresenter.php";
@@ -77,9 +77,15 @@ require_once __DIR__ . "/classes/forbidden_shop/ForbiddenShopManager.php";
 require_once __DIR__ . "/classes/Village.php";
 require_once __DIR__ . "/classes/village/VillageRelation.php";
 require_once __DIR__ . "/classes/village/VillageManager.php";
+require_once __DIR__ . "/classes/village/VillageUpgradeManager.php";
 require_once __DIR__ . "/classes/village/VillageAPIResponse.php";
 require_once __DIR__ . "/classes/village/VillageApiPresenter.php";
+require_once __DIR__ . "/classes/village/VillagePolicy.php";
 
 require_once __DIR__ . "/classes/war/WarManager.php";
 require_once __DIR__ . "/classes/war/WarAction.php";
 require_once __DIR__ . "/classes/war/WarLogManager.php";
+
+require_once __DIR__ . "/classes/ramen_shop/RamenShopManager.php";
+require_once __DIR__ . "/classes/ramen_shop/RamenShopAPIPresenter.php";
+require_once __DIR__ . "/classes/ramen_shop/CharacterRamenData.php";

@@ -52,7 +52,7 @@ export default function KageDisplay({
     className: "kage_challenge_button",
     onClick: onChallenge
   }, "challenge")));
-
+}
 function getKageKanji(village_name) {
   switch (village_name) {
     case 'Stone':

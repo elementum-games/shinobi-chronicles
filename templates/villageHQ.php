@@ -6,6 +6,7 @@
 ?>
 
 <link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/village/Village.css") ?>" />
+<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/village/VillageUpgrades.css") ?>" />
 <link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/village/WarTable.css") ?>" />
 <link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/utils/modal.css") ?>" />
 <div id="villageReactContainer"></div>
@@ -34,6 +35,7 @@
                 playerWarLogData: <?= json_encode(VillageApiPresenter::playerWarLogDataResponse($system, $player)) ?>,
                 warRecordData: <?= json_encode(VillageApiPresenter::warRecordDataResponse($system, $player)) ?>,
                 kageRecords: <?= json_encode(VillageApiPresenter::kageRecordResponse($system, $player)) ?>,
+                buildingUpgradeData: <?= json_encode(VillageApiPresenter::buildingUpgradeDataResponse($system, $player)) ?>,
             }),
             villageContainer
         );

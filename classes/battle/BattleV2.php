@@ -153,8 +153,8 @@ class BattleV2 {
                 $player1->pvp_immunity_ms = 0; // if attacking lose immunity
                 $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player1->user_id}");
             }
-            if ($player1->operation > 0) {
-                Operation::cancelOperation($system, $player1);
+            if ($player1->war_action_id > 0) {
+                WarAction::cancelWarAction($system, $player1);
             }
             $player1->updateData();
         }
@@ -163,8 +163,8 @@ class BattleV2 {
             if ($battle_type == self::TYPE_FIGHT) {
                 $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player2->user_id}");
             }
-            if ($player2->operation > 0) {
-                Operation::cancelOperation($system, $player2);
+            if ($player2->war_action_id > 0) {
+                WarAction::cancelWarAction($system, $player2);
             }
             $player2->updateData();
         }

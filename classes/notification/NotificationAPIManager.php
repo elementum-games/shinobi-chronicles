@@ -412,7 +412,7 @@ class NotificationAPIManager {
                 foreach ($result as $row) {
                     // if travel time is set then only display if active
                     if (!empty($row['travel_time'])) {
-                        if ($row['travel_time'] + ($row['start_time'] * 1000) + Patrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
+                        if ($row['travel_time'] + ($row['start_time'] * 1000) + MapNPC::DESTINATION_BUFFER_MS > (time() * 1000)) {
                             $notifications[] = new NotificationDto(
                                 action_url: $this->system->router->getUrl('travel'),
                                 type: NotificationManager::NOTIFICATION_CARAVAN,
@@ -478,6 +478,19 @@ class NotificationAPIManager {
                     );
                 }
             }
+        }
+        // Ramen Buff
+        if ($this->player->ramen_data->purchase_time + $this->player->ramen_data->buff_duration > time()) {
+            $remaining_time = $this->player->ramen_data->purchase_time + $this->player->ramen_data->buff_duration - time();
+            $notifications[] = new NotificationDto(
+                action_url: $this->system->router->getUrl('healingShop'),
+                type: NotificationManager::NOTIFICATION_RAMEN_BUFF,
+                message: "Ramen Buff Active!",
+                user_id: $this->player->user_id,
+                created: time(),
+                duration: $remaining_time,
+                alert: false,
+            );
         }
 
         return $notifications;

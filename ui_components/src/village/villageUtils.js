@@ -91,7 +91,7 @@ export function getPolicyDisplayData(policy_id) {
             data.name = "Forged in Flames";
             data.phrase = "blades sharp, minds sharper.";
             data.description = "Lead your village on the path of a warmonger.\nFeel no fear, no hesitation, no doubt.";
-            data.bonuses = ["25% increased Raid speed", "+1 Defense reduction from Raiding", "+1 Stability reduction from Raiding", "+1 Village Point from PvP"];
+            data.bonuses = ["25% increased Raid speed", "+1 Defense reduction from Raiding", "+1 Stability reduction from Raiding", "+25% objective damage from PvP wins"];
             data.resources = ["+70 Materials production / hour", "+70 Food production / hour", "+70 Wealth production / hour"];
             data.penalties = ["Cannot form Alliances"];
             data.glowClass = "war_glow";

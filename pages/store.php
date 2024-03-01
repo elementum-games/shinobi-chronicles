@@ -67,7 +67,10 @@ function store() {
             if ($item->use_type == Item::USE_TYPE_CONSUMABLE && $player->rank_num == 4) {
                 $item->purchase_cost *= 2;
             }
-
+            // Village discount benefit
+            if ($item->use_type == Item::USE_TYPE_CONSUMABLE) {
+				$item->purchase_cost *= 1 - ($player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_HEAL_ITEM_COST] / 100));
+            }
 			// Insert item into shop array
 			$shop_items[$row['item_id']] = $item;
 		}

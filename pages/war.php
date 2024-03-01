@@ -50,6 +50,9 @@ function displayBattle(): bool
 function processWarBattleEnd($battle, User $player): string {
     global $system;
 
+    $double_yen_gain_chance = $player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE];
+    $double_xp_gain_chance = $player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_XP_CHANCE];
+
     // Base chance at 100, goes down if fight is too short/lower level AI
     $stat_gain_chance = 100;
 
@@ -64,6 +67,12 @@ function processWarBattleEnd($battle, User $player): string {
         $opponent = $battle->opponent;
 
         $money_gain = $battle->opponent->getMoney();
+        if ($double_yen_gain_chance > 0 && mt_rand(1, 100) <= $double_yen_gain_chance) {
+            $money_gain *= 2;
+            $money_gain_string .= "Lucky! You gained double the amount of yen (" . $money_gain . ") from this battle!<br />";
+        } else {
+            $money_gain_string = "You gained " . $money_gain . " yen.<br />";
+        }
 
         if ($player->level > $opponent->level) {
             $level_difference = $player->level - $opponent->level;
@@ -84,9 +93,13 @@ function processWarBattleEnd($battle, User $player): string {
         ) {
             $stat_to_gain = $player->getTrainingStatForArena();
 
-            $stat_gain_display = '<br />During the fight you realized a way to use your ' . System::unSlug($stat_to_gain) . ' a little
-            more effectively.';
+            $stat_gain_display = 'During the fight you realized a way to use your ' . System::unSlug($stat_to_gain) . ' a little
+            more effectively.<br />';
             $stat_gain = TrainingManager::getAIStatGain($opponent->difficulty_level, $player->rank_num);
+            if ($double_xp_gain_chance > 0 && mt_rand(1, 100) <= $double_xp_gain_chance) {
+                $stat_gain *= 2;
+                $stat_gain_display .= "Lucky! You gained double the amount of " . System::unSlug($stat_to_gain) . " experience (" . $stat_gain . ") from this battle!<br />";
+            }
             $stat_gain_display .= $player->addStatGain($stat_to_gain, $stat_gain) . '.';
         }
 
@@ -108,6 +121,7 @@ function processWarBattleEnd($battle, User $player): string {
         }
 
         $battle_result = "You have defeated your opponent.<br />";
+        $battle_result .= $money_gain_string;
         if ($rep_gain_string != "") {
             $battle_result .= $rep_gain_string;
         }

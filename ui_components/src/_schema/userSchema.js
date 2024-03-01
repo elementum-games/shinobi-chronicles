@@ -133,3 +133,16 @@ export type ItemType = {|
     effect_amount: number,
     quantity: number,
 |};
+
+export type PlayerResourcesType = {
+    regenTime: number,
+    health: number,
+    maxHealth: number,
+    chakra: number,
+    maxChakra: number,
+    stamina: number,
+    maxStamina: number,
+    regenCut: number,
+    healthRegen: number,
+    poolRegen: number,
+};

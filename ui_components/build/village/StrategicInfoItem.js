@@ -114,24 +114,18 @@ export function StrategicInfoItem({
     className: "supply_point_name"
   }, supply_point.name), " x", supply_point.count)))))));
 }
-
 function getStrategicInfoBanner(village_id) {
   switch (village_id) {
     case 1:
       return '/images/v2/decorations/strategic_banners/stratbannerstone.jpg';
-
     case 2:
       return '/images/v2/decorations/strategic_banners/stratbannercloud.jpg';
-
     case 3:
       return '/images/v2/decorations/strategic_banners/stratbannerleaf.jpg';
-
     case 4:
       return '/images/v2/decorations/strategic_banners/stratbannersand.jpg';
-
     case 5:
       return '/images/v2/decorations/strategic_banners/stratbannermist.jpg';
-
     default:
       return null;
   }

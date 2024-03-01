@@ -17,8 +17,8 @@ function arena(): bool {
 		$system->printMessage();
 		return false;
 	}
-    if ($player->operation > 0) {
-        $system->message("You cannot access this page while in an operation!");
+    if ($player->war_action_id > 0) {
+        $system->message("You cannot access this page while taking a war action!");
         $system->printMessage();
         return false;
     }
@@ -144,6 +144,9 @@ function arenaFightAPI(System $system, User $player): BattlePageAPIResponse {
  * @throws RuntimeException
  */
 function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $player): string {
+    $double_yen_gain_chance = $player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE];
+    $double_xp_gain_chance = $player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_XP_CHANCE];
+
     // Base chance at 100, goes down if fight is too short/lower level AI
     $stat_gain_chance = 100;
 
@@ -183,6 +186,10 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
             $stat_gain_display = '<br />During the fight you realized a way to use your ' . System::unSlug($stat_to_gain) . ' a little
             more effectively.<br />';
             $stat_gain = TrainingManager::getAIStatGain($opponent->difficulty_level, $player->rank_num);
+            if ($double_xp_gain_chance > 0 && mt_rand(1, 100) <= $double_xp_gain_chance) {
+                $stat_gain *= 2;
+                $stat_gain_display .= "Lucky! You gained double the amount of " . System::unSlug($stat_to_gain) . " experience (" . $stat_gain . ") from this battle!<br />";
+            }
             $stat_gain_display .= $player->addStatGain($stat_to_gain, $stat_gain) . '.';
         }
 
@@ -206,6 +213,11 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
             if($boost_percent != null) {
                 $boost_amount = ceil($boost_percent * $money_gain);
                 $money_gain += $boost_amount;
+                $lucky_yen = false;
+                if ($double_yen_gain_chance > 0 && mt_rand(1, 100) <= $double_yen_gain_chance) {
+                    $money_gain *= 2;
+                    $lucky_yen = true;
+                }
             }
         }
 
@@ -226,7 +238,11 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
             $battle_result .= $rep_gain_string;
         }
         if ($money_gain > 0) {
-            $battle_result .= "You have claimed your prize of &yen;$money_gain.<br />";
+            if ($lucky_yen) {
+                $battle_result .= "Lucky! You gained double the amount of yen (" . $money_gain . ") from this battle!<br />";
+            } else {
+                $battle_result .= "You have claimed your prize of &yen;$money_gain.<br />";
+            }
         }
         if($append_message != "") {
             $battle_result .= $append_message;

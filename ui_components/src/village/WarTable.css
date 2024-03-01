@@ -13,8 +13,8 @@
     justify-content: space-between;
     align-items: center;
     width: 90%;
-    height: 45px;
-    border: 1px solid #17161b;
+    height: 55px;
+    border: 1px solid var(--war-record-border-color, #17161b);
     cursor: pointer;
 }
     .war_record:hover {
@@ -23,8 +23,8 @@
 .war_record_details_container {
     display: flex;
     flex-direction: column;
-    flex-basis: 50%;
-    margin-bottom: 4px;
+    flex-basis: 55%;
+    margin-bottom: 8px;
 }
 .war_record_relation_name {
     text-align: center;
@@ -33,11 +33,11 @@
     font-variant: small-caps;
 }
     .war_record_relation_name.active {
-        color: #eee1c8;
-        text-shadow: 0 0 1px #ac3b3b, 0 0 3px #ac3b3b;
+        color: var(--war-record-relation-name-active, #eee1c8);
+        text-shadow: var(--war-record-relation-name-active-shadow, 0 0 1px #ac3b3b, 0 0 3px #ac3b3b);
     }
     .war_record_relation_name.inactive {
-        color: #9498a9;
+        color: var(--war-record-relation-name-inactive, #9498a9);
     }
 .war_record_label_row {
     display: flex;
@@ -52,19 +52,19 @@
     flex: 1;
 }
     .war_record_score.left {
-        color: #ffcdcd;
-        text-shadow: 0 0 1px #ac3b3b, 0 0 2px #ac3b3b, 0 0 4px #ac3b3b;
+        color: var(--war-record-score-left-color, #ffcdcd);
+        text-shadow: var(--war-record-score-left-shadow, 0 0 1px #ac3b3b, 0 0 2px #ac3b3b, 0 0 4px #ac3b3b);
         text-align: left;
         padding-left: 12px;
     }
     .war_record_score.right {
-        color: #a3ffc3;
-        text-shadow: 0 0 1px #006827, 0 0 2px #006827, 0 0 4px #006827;
+        color: var(--war-record-score-right-color, #a3ffc3);
+        text-shadow: var(--war-record-score-right-shadow, 0 0 1px #006827, 0 0 2px #006827, 0 0 4px #006827);
         text-align: right;
         padding-right: 12px;
     }
     .war_record_score.inactive {
-        color: #9498a9;
+        color: var(--war-record-score-inactive-color, #9498a9);
         text-shadow: none;
     }
 .war_record_status {
@@ -72,11 +72,11 @@
     font-weight: bold;
 }
     .war_record_status.active {
-        color: #eee1c8;
-        text-shadow: 0 0 1px #ac3b3b, 0 0 3px #ac3b3b;
+        color: var(--war-record-status-active-color, #eee1c8);
+        text-shadow: var(--war-record-status-active-shadow, 0 0 1px #ac3b3b, 0 0 3px #ac3b3b);
     }
     .war_record_status.inactive {
-        color: #9498a9;
+        color: color(--war-record-status-inactive-color, #9498a9);
     }
 .war_record_score_bar {
     display: flex;
@@ -104,7 +104,9 @@
 }
 .war_record_score_victory_marker {
     position: absolute;
-    bottom: -5px;
+    bottom: -12px;
+    height: 16px;
+    transform: translateX(-8px);
 }
 .war_record_village {
     clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);

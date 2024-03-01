@@ -44,7 +44,8 @@ export type NotificationType = {|
         | "challenge_accepted"
         | "kage_change"
         | "achievement"
-        | "daily_task",
+        | "daily_task"
+        | "ramen_buff",
     +message: string,
     +notification_id: number,
     +user_id: number,

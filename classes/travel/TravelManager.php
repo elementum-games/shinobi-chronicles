@@ -720,11 +720,12 @@ class TravelManager {
                     throw new RuntimeException("Target has died within the last minute, please wait " .
                         ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
                 }*/
+            /*
             if ($this->user->war_action_id > 0) {
                 $war_action = $this->warManager->getWarActionById($this->user->war_action_id);
                 $message = "You cannot attack while " . WarAction::WAR_ACTION_TYPE_DESCRIPTOR[$war_action->type] . "!";
                 throw new RuntimeException($message);
-            }
+            }*/
             if ($this->dbFetchIsProtectedByAlly($user) && $this->user->rank_num >= 4) {
                 throw new RuntimeException("Target is protected by a higher rank ally! Attack them first.");
             }
@@ -1103,10 +1104,25 @@ class TravelManager {
     public function fetchRegionObjectives(): array
     {
         $objectives = [];
-
         // Get Region Objectives
         $region_result = $this->system->db->query("SELECT * FROM `region_locations`");
         $region_objectives = $this->system->db->fetch_all($region_result);
+        // Get villages required based on occupying ID in regions
+        $village_ids = [];
+        $villages = [];
+        foreach ($region_objectives as $obj) {
+            if (!in_array($obj['occupying_village_id'], $village_ids)) {
+                $village_ids[] = $obj['occupying_village_id'];
+            }
+        }
+        if (!empty($village_ids)) {
+            $village_ids_string = implode(',', $village_ids);
+            $query = "SELECT * FROM `villages` WHERE `village_id` IN (" . $village_ids_string . ")";
+            $village_result = $this->system->db->query($query);
+            foreach ($village_result as $village_data) {
+                $villages[$village_data['village_id']] = new Village($this->system, village_row: $village_data);
+            }
+        }
         foreach ($region_objectives as $obj) {
             $distance = $this->user->location->distanceDifference(
                 new TravelCoords(
@@ -1126,7 +1142,7 @@ class TravelManager {
                             x: $obj['x'],
                             y: $obj['y'],
                             objective_health: $this->system->war_enabled ? $obj['health'] : WarManager::BASE_CASTLE_HEALTH,
-                            objective_max_health: WarManager::BASE_CASTLE_HEALTH,
+                            objective_max_health: WarManager::getLocationMaxHealth($this->system, $obj, $villages[$obj['occupying_village_id']]),
                             defense: $obj['defense'],
                             objective_type: $obj['type'],
                             image: !empty($obj['background_image']) ? $obj['background_image'] : $default_image,
@@ -1137,26 +1153,6 @@ class TravelManager {
                             rebellion_active: $obj['rebellion_active'],
                         );
                         break;
-                    case "tower":
-                        break;
-                        $default_image = "/images/map/icons/tower.png";
-                        $objectives[] = new RegionObjective(
-                            id: $obj['region_location_id'],
-                            name: $obj['name'],
-                            map_id: 1,
-                            x: $obj['x'],
-                            y: $obj['y'],
-                            objective_health: $obj['health'],
-                            objective_max_health: $obj['max_health'],
-                            defense: $obj['defense'],
-                            objective_type: $obj['type'],
-                            image: !empty($obj['background_image']) ? $obj['background_image'] : $default_image,
-                            village_id: $obj['occupying_village_id'],
-                            resource_id: $obj['resource_id'],
-                            resource_count: $obj['resource_count'],
-                            stability: $obj['stability'],
-                            rebellion_active: $obj['rebellion_active'],
-                        );
                     case "village":
                         if ($distance <= $this->user->scout_range) {
                             $default_image = "/images/map/icons/village.png";
@@ -1167,7 +1163,7 @@ class TravelManager {
                                 x: $obj['x'],
                                 y: $obj['y'],
                                 objective_health: $this->system->war_enabled ? $obj['health'] : WarManager::BASE_TOWN_HEALTH,
-                                objective_max_health: WarManager::BASE_TOWN_HEALTH,
+                                objective_max_health: WarManager::getLocationMaxHealth($this->system, $obj, $villages[$obj['occupying_village_id']]),
                                 defense: $obj['defense'],
                                 objective_type: $obj['type'],
                                 image: !empty($obj['background_image']) ? $obj['background_image'] : $default_image,

@@ -471,9 +471,9 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_I => '5% reduced upkeep from upgrades',
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_II => '5% reduced upkeep from upgrades',
         VillageUpgradeConfig::UPGRADE_KEY_ADMINISTRATION_III => '5% reduced upkeep from upgrades',
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I => '+5 baseline and maximum Stability',
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II => '+5 baseline and maximum Stability',
-        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III => '+5 baseline and maximum Stability',
+        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_I => '+5 Stability in controlled regions',
+        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_II => '+5 Stability in controlled regions',
+        VillageUpgradeConfig::UPGRADE_KEY_POWER_PROJECTION_III => '+5 Stability in controlled regions',
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_I => '3% increased training speed',
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_II => '3% increased training speed',
         VillageUpgradeConfig::UPGRADE_KEY_EDUCATION_SUBSIDIES_III => '3% increased training speed',
@@ -498,9 +498,9 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_I => '5% increased Infiltrate speed',
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_II => '5% increased Infiltrate speed',
         VillageUpgradeConfig::UPGRADE_KEY_UNDERWORLD_CONNECTIONS_III => '5% increased Infiltrate speed',
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => '-5 base and max Stability for occupied villages',
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => '-5 base and max Stability for occupied villages',
-        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => '-5 base and max Stability for occupied villages',
+        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_I => '-5 Stability for occupied villages',
+        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_II => '-5 Stability for occupied villages',
+        VillageUpgradeConfig::UPGRADE_KEY_GUERRILLA_WARFARE_III => '-5  Stability for occupied villages',
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_I => '+5% chance to spawn higher tier patrols',
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_II => '+5% chance to spawn higher tier patrols',
         VillageUpgradeConfig::UPGRADE_KEY_SELECTIVE_RECRUITMENT_III => '+5% chance to spawn higher tier patrols',
@@ -516,18 +516,18 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_I => '5% increased Reinforce heal',
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_II => '5% increased Reinforce heal',
         VillageUpgradeConfig::UPGRADE_KEY_ENGINEERING_CORPS_III => '5% increased Reinforce heal',
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => '5% increased castle and town health',
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => '5% increased castle and town health',
-        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => '5% increased castle and town health',
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => '+25 Materials production/hour',
+        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => '10% increased health of villages and castles',
+        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => '10% increased health of villages and castles',
+        VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => '10% increased health of villages and castles',
+        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => '+35 Materials production/hour',
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => '+50 Materials production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => '+75 Materials production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => '+25 Food production/hour',
+        VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => '+65 Materials production/hour',
+        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => '+35 Food production/hour',
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => '+50 Food production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => '+75 Food production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => '+25 Wealth production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => '+50 Wealth production/hour',
-        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => '+75 Wealth production/hour',
+        VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => '+65 Food production/hour',
+        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => '+60 Wealth production/hour',
+        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => '+75 Wealth production/hour',
+        VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => '+90 Wealth production/hour',
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => '+100000 resource capacity',
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_II => '+300000 resource capacity',
         VillageUpgradeConfig::UPGRADE_KEY_SUPPLY_LINES_I => '+5% increased caravan speed',
@@ -542,8 +542,8 @@ class VillageUpgradeConfig {
         VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_I => 'Unlocks new ramen recipes',
         VillageUpgradeConfig::UPGRADE_KEY_INSPIRED_ITAMAE_II => 'Allows Mystery Ramen to appear',
         VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_I => '+5 minutes to ramen buff duration',
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => '+5 minutes to ramen duration',
-        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => '+5 minutes to ramen duration',
+        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_II => '+5 minutes to ramen buff duration',
+        VillageUpgradeConfig::UPGRADE_KEY_QUALITY_INGREDIENTS_III => '+5 minutes to ramen buff duration',
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_I => '5% decreased ramen cost',
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_II => '5% decreased ramen cost',
         VillageUpgradeConfig::UPGRADE_KEY_NINJA_FRIENDLY_RATES_III => '5% decreased ramen cost',
@@ -2383,40 +2383,43 @@ class VillageUpgradeConfig {
             VillageUpgradeConfig::UPGRADE_EFFECT_REINFORCE_HEAL => 5
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 5
+            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 10,
+            VillageUpgradeConfig::UPGRADE_EFFECT_TOWN_HP => 10
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_II => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 5
+            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 10,
+            VillageUpgradeConfig::UPGRADE_EFFECT_TOWN_HP => 10
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FORTIFICATIONS_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 5
+            VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP => 10,
+            VillageUpgradeConfig::UPGRADE_EFFECT_TOWN_HP => 10
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 25
+            VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 35
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_II => [
             VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 50
         ],
         VillageUpgradeConfig::UPGRADE_KEY_BULK_SUPPLIERS_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 75
+            VillageUpgradeConfig::UPGRADE_EFFECT_MATERIALS_PRODUCTION => 65
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 25
+            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 35
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_II => [
             VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 50
         ],
         VillageUpgradeConfig::UPGRADE_KEY_FARMERS_MARKET_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 75
+            VillageUpgradeConfig::UPGRADE_EFFECT_FOOD_PRODUCTION => 65
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_I => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 50
+            VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 60
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_II => [
             VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 75
         ],
         VillageUpgradeConfig::UPGRADE_KEY_MERCHANTS_GUILD_III => [
-            VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 100
+            VillageUpgradeConfig::UPGRADE_EFFECT_WEALTH_PRODUCTION => 90
         ],
         VillageUpgradeConfig::UPGRADE_KEY_WAREHOUSES_I => [
             VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY => 100000

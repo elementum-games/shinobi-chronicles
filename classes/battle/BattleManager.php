@@ -1202,7 +1202,7 @@ class BattleManager {
             }
         }
 
-       // simulate damage of jutsu effect
+        // simulate damage of jutsu effect
         foreach ($attack->jutsu->effects as $effect) {
             if (BattleEffectsManager::isDamageOverTime($effect)) {
                 $effect_power = $effect->effect_amount * $effect->effect_length;
@@ -1226,7 +1226,7 @@ class BattleManager {
             }
         }
 
-       if($attack->jutsu->hasEffect()){
+        if($attack->jutsu->hasEffect()){
             foreach ($attack->jutsu->effects as $effect) {
                 if ($effect && $effect->effect != 'none') {
                     $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
@@ -1786,5 +1786,9 @@ class BattleManager {
 
     public static function formatNumber(int|float $number, int $precision = 0): string {
         return number_format(num: $number, decimals: $precision, thousands_separator: $number >= 10000 ? ',' : '');
+    }
+
+    public function getTotalLoot(): int {
+        return $this->battle->total_loot;
     }
 }

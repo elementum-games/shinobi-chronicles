@@ -97,7 +97,7 @@
 }
 
 .ramen_shop_owner_img {
-    margin-bottom: -20px;
+
 }
 
 /* Player Info */
@@ -220,14 +220,14 @@
 /* Special Ramen */
 .special_ramen {
     width: 200px;
-    height: 240px;
+    height: 280px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 8px;
     box-sizing: border-box;
-    padding: 15px 5px 15px 5px;
+    padding: 25px 5px 25px 5px;
     position: relative;
 }
 .special_menu_container .special_ramen:not(:last-child)::after {

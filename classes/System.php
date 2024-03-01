@@ -715,7 +715,7 @@ class System {
      * @var bool $include_seconds
      * @return string
      */
-    public static function timeRemaining($time_remaining, $format = 'short', $include_days = true, $include_seconds = true): string {
+    public static function timeRemaining($time_remaining, $format = 'short', $include_days = true, $include_seconds = true, $include_minutes = true): string {
         if($include_days) {
             $days = floor($time_remaining / 86400);
             $time_remaining -= $days * 86400;
@@ -750,13 +750,26 @@ class System {
         $string = '';
         if($format == 'long') {
             if($days && $include_days) {
-                $string = "$days day(s), $hours hour(s), $minutes minute(s)";
+                if ($include_minutes) {
+                    $string = "$days day(s), $hours hour(s), $minutes minute(s)";
+                } else {
+                    $string = "$days day(s), $hours hour(s)";
+                }
             }
             else if ($hours && $hours != '00') {
+                if ($include_minutes) {
+                    $string = "$hours hour(s), $minutes minute(s)";
+                } else {
+                    $string = "$hours hour(s)";
+                }
                 $string = "$hours hour(s), $minutes minute(s)";
             }
             else {
-                $string = "$minutes minute(s)";
+                if ($include_minutes) {
+                    $string = "$minutes minute(s)";
+                } else {
+                    $string = "1 hour";
+                }
             }
 
             if($include_seconds) {
@@ -765,13 +778,26 @@ class System {
         }
         else if($format == 'short') {
             if($days) {
+                if ($include_minutes) {
+                    $string = "$days day(s), $hours:$minutes";
+                } else {
+                    $string = "$days day(s), $hours";
+                }
                 $string = "$days day(s), $hours:$minutes";
             }
             else if($hours && $hours != '00') {
-                $string = "$hours:$minutes";
+                if ($include_minutes) {
+                    $string = "$hours:$minutes";
+                } else {
+                    $string = "$hours";
+                }
             }
             else {
-                $string = "$minutes";
+                if ($include_minutes) {
+                    $string = "$minutes";
+                } else {
+                    $string = "1 hour";
+                }
             }
 
             if($include_seconds) {

@@ -49,6 +49,7 @@ class NotificationManager {
     const NOTIFICATION_ACHIEVEMENT = "achievement";
     const NOTIFICATION_SPAR = "spar"; // General, used for blocking notifications
     const NOTIFICATION_DAILY_TASK = "daily_task";
+    const NOTIFICATION_RAMEN_BUFF = "ramen_buff";
 
     const ACTIVE_PLAYER_DAYS_LAST_ACTIVE = 14;
 
@@ -60,7 +61,7 @@ class NotificationManager {
     const NOTIFICATION_EXPIRATION_DAYS_SPECIAL_MISSION = 1;
     const NOTIFICATION_EXPIRATION_DAYS_DAILY_TASK = 1;
 
-    public static function createNotification(NotificationDto $notification, System $system, int $UPDATE, int $limit = 5): bool {
+    public static function createNotification(NotificationDto $notification, System $system, int $UPDATE, int $limit = 3): bool {
         $db_modified = false;
         $attributes = json_encode($notification->getAttributes(), JSON_FORCE_OBJECT);
 

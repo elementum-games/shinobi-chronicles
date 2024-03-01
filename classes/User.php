@@ -21,6 +21,8 @@ require_once __DIR__ . "/travel/TravelManager.php";
 require_once __DIR__ . "/travel/Region.php";
 require_once __DIR__ . "/notification/BlockedNotificationManager.php";
 require_once __DIR__ . "/user/Blacklist.php";
+require_once __DIR__ . "/ramen_shop/CharacterRamenData.php";
+require_once __DIR__ . "/ramen_shop/RamenShopManager.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -266,7 +268,7 @@ class User extends Fighter {
 
     public int $special_mission_id;
 
-    public int $operation;
+    public int $war_action_id;
 
     public int $exam_stage;
 
@@ -322,6 +324,10 @@ class User extends Fighter {
     public int $locked_challenge;
 
     public BlockedNotificationManager $blocked_notifications;
+
+    public CharacterRamenData $ramen_data;
+
+    public int $fatigue;
 
     /**
      * User constructor.
@@ -564,7 +570,7 @@ class User extends Fighter {
         }
 
         $this->special_mission_id = $user_data['special_mission'];
-        $this->operation = $user_data['operation'];
+        $this->war_action_id = $user_data['war_action_id'];
 
         $this->exam_stage = $user_data['exam_stage'];
 
@@ -679,6 +685,8 @@ class User extends Fighter {
 
         $this->village_changes = $user_data['village_changes'];
         $this->clan_changes = $user_data['clan_changes'];
+
+        $this->fatigue = $user_data['fatigue'];
 
         // Village
         $this->village_location = VillageManager::getLocation($this->system, $this->village->village_id);
@@ -852,7 +860,11 @@ class User extends Fighter {
 
         // Location with Regen Boost
         if ($this->current_location->location_id && $this->current_location->regen) {
-            $this->regen_boost += ($this->current_location->regen / 100) * $this->regen_rate;
+            $regen_modifier = $this->current_location->regen / 100;
+            if ($this->in_village) {
+                $regen_modifier *= (1 + ($this->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_VILLAGE_REGEN] / 100));
+            }
+            $this->regen_boost += $regen_modifier * $this->regen_rate;
         }
 
         // Elements
@@ -948,6 +960,26 @@ class User extends Fighter {
             }
         }
 
+        // Ramen Data
+        $this->ramen_data = RamenShopManager::getCharacterRamenData($this->system, $this->user_id);
+        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_SHOYU)) {
+            $this->stealth += 2;
+        }
+        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_SPICY_MISO)) {
+            $this->regen_boost += 0.25 * RankManager::REGEN_RATE[$this->rank_num];
+        }
+        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_KING)) {
+            $this->reputation->addBonusPveRep(1);
+        }
+        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_WARRIOR)) {
+            $this->fatigue = 0;
+        }
+
+        // Fatigue
+        if ($this->in_village) {
+            $this->fatigue = 0;
+        }
+
         return;
     }
 
@@ -1001,7 +1033,7 @@ class User extends Fighter {
     {
         $this->trainingManager = new TrainingManager($this->system, $this->train_type, $this->train_gain,
     $this->train_time, $this->rank, $this->forbidden_seal, $this->reputation, $this->team, $this->clan, $this->sensei_id,
-            $this->bloodline_id, $this->village->policy);
+            $this->bloodline_id, $this->village->policy, $this->village);
     }
 
     public function setForbiddenSealFromDb(string $forbidden_seal_db, bool $remote_view) {
@@ -1859,7 +1891,7 @@ class User extends Fighter {
             $query .= "`special_mission`='0',";
         }
 
-        $query .= "`operation`='$this->operation',";
+        $query .= "`war_action_id`='$this->war_action_id',";
 
         $query .= "`exam_stage` = '{$this->exam_stage}',
 		`last_ai_ms` = '$this->last_ai_ms',
@@ -1917,7 +1949,8 @@ class User extends Fighter {
 		`clan_changes` = '$this->clan_changes',
         `locked_challenge` = '$this->locked_challenge',
 		`censor_explicit_language` = " . (int)$this->censor_explicit_language . ",
-		`blocked_notifications` = '{$this->blocked_notifications->dbEncode()}'
+		`blocked_notifications` = '{$this->blocked_notifications->dbEncode()}',
+        `fatigue` = '$this->fatigue'
 		WHERE `user_id` = '{$this->user_id}' LIMIT 1";
         $this->system->db->query($query);
 
@@ -2129,10 +2162,10 @@ class User extends Fighter {
 
     public function maxConsumableHealAmountPercent(): int {
         if($this->battle_id) {
-            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT;
+            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT - $this->fatigue;
         }
         if($this->consumableHealReductionMsLeft() > 0) {
-            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT;
+            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT - $this->fatigue;
         }
 
         return 100;
@@ -2272,11 +2305,11 @@ class User extends Fighter {
     const LOG_SPECIAL_MISSION = 'special_mission';
     const LOG_IN_BATTLE = 'in_battle';
     const LOG_NOT_IN_VILLAGE = 'not_in_village';
-    const LOG_OPERATION = 'operation';
+    const LOG_WAR_ACTION = 'war_action_id';
 
     public function log(string $log_type, string $log_contents): bool {
         $valid_log_types = [
-            self::LOG_TRAINING, self::LOG_ARENA, self::LOG_LOGIN, self::LOG_MISSION, self::LOG_SPECIAL_MISSION, self::LOG_IN_BATTLE, self::LOG_NOT_IN_VILLAGE, self::LOG_OPERATION
+            self::LOG_TRAINING, self::LOG_ARENA, self::LOG_LOGIN, self::LOG_MISSION, self::LOG_SPECIAL_MISSION, self::LOG_IN_BATTLE, self::LOG_NOT_IN_VILLAGE, self::LOG_WAR_ACTION
         ];
         if(!in_array($log_type, $valid_log_types)) {
             error_log("Invalid player log type {$log_type}");

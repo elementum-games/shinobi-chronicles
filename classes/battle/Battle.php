@@ -31,6 +31,8 @@ class Battle {
 
     const REPUTATION_DAMAGE_RESISTANCE_BOOST = 5;
 
+    const FATIGUE_PER_BATTLE = 5;
+
     private System $system;
 
     public string $raw_active_effects;
@@ -85,6 +87,8 @@ class Battle {
     public int $round_count = 0;
     public int $team1_wins;
     public int $team2_wins;
+
+    public int $total_loot;
 
     /**
      * @param System  $system
@@ -145,28 +149,32 @@ class Battle {
         ");
         $battle_id = $system->db->last_insert_id;
 
+        $total_loot = 0;
         if($player1 instanceof User) {
             $player1->battle_id = $battle_id;
             if ($battle_type == self::TYPE_FIGHT) {
                 $player1->pvp_immunity_ms = 0; // if attacking lose immunity
-                $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player1->user_id}");
+                $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player1->user_id} AND `claimed_time` IS NULL");
+                $total_loot += $system->db->last_affected_rows;
             }
-            if ($player1->operation > 0) {
-                Operation::cancelOperation($system, $player1);
+            if ($player1->war_action_id > 0) {
+                WarAction::cancelWarAction($system, $player1);
             }
-
             $player1->updateData();
         }
         if($player2 instanceof User) {
             $player2->battle_id = $battle_id;
             if ($battle_type == self::TYPE_FIGHT) {
-                $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player2->user_id}");
+                $system->db->query("UPDATE `loot` SET `battle_id` = {$battle_id} WHERE `user_id` = {$player2->user_id} AND `claimed_time` IS NULL");
+                $total_loot += $system->db->last_affected_rows;
             }
-            if ($player2->operation > 0) {
-                Operation::cancelOperation($system, $player2);
+            if ($player2->war_action_id > 0) {
+                WarAction::cancelWarAction($system, $player2);
             }
             $player2->updateData();
         }
+
+        $system->db->query("UPDATE `battles` SET `total_loot` = {$total_loot} WHERE `battle_id` = {$battle_id}");
 
         // Create Notifications
         if ($battle_type == self::TYPE_FIGHT) {
@@ -272,6 +280,8 @@ class Battle {
         $this->round_count = $battle['round_count'];
         $this->team1_wins = $battle['team1_wins'];
         $this->team2_wins = $battle['team2_wins'];
+
+        $this->total_loot = $battle['total_loot'];
     }
 
     /**
@@ -445,6 +455,15 @@ class Battle {
             `team2_wins` = {$this->team2_wins}
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
         );
+
+        if (isset($this->winner)) {
+            /*if ($this->winner == Battle::TEAM1 && $this->player1 instanceof User && $this->player1->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_WARRIOR)) {
+                $this->player1->health = $this->player1->max_health;
+            }
+            if ($this->winner == Battle::TEAM2 && $this->player2 instanceof User && $this->player2->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_WARRIOR)) {
+                $this->player2->health = $this->player2->max_health;
+            }*/
+        }
 
         $fighter_health = $this->fighter_health;
         $fighter_health[$this->player1->combat_id] = [

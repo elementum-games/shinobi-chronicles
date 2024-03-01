@@ -92,7 +92,7 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
     $new_rank = $player->rank_num + 1;
     $exam_name = $rankManager->ranks[$new_rank]->name . " Exam";
     $exam_time_limit = 300;
-    $bloodline_roll_chance = System::BLOODLINE_ROLL_CHANCE;
+    $bloodline_roll_chance = System::BLOODLINE_ROLL_CHANCE + $player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_BLOODLINE_CHANCE];
 
     $player->getInventory();
 

@@ -21,7 +21,7 @@ require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/inbox/Inbox.php';
 require_once __DIR__ . '/../classes/war/WarManager.php';
-require_once __DIR__ . '/../classes/travel/Patrol.php';
+require_once __DIR__ . '/../classes/travel/MapNPC.php';
 
 $system = System::initialize(load_layout: false);
 $system->db->connect();
@@ -138,7 +138,7 @@ function hourlyCaravan(System $system, $debug = true): void
     $region_result = $system->db->fetch_all($region_result);
     foreach ($region_result as $region) {
         // get region locations for region, ignore occupied villages
-        $region_location_result = $system->db->query("SELECT * FROM `region_locations` WHERE `region_id` = {$region['region_id']} AND `occupying_village_id` IS NULL");
+        $region_location_result = $system->db->query("SELECT * FROM `region_locations` WHERE `region_id` = {$region['region_id']} AND `occupying_village_id` = {$region['village']}");
         $region_location_result = $system->db->fetch_all($region_location_result);
         $caravan_resources = [];
         // add resources to region caravan
@@ -147,20 +147,21 @@ function hourlyCaravan(System $system, $debug = true): void
             $resources_remaining = $region_location['resource_count'] - $resources_taken;
             if (!empty($caravan_resources[$region_location['resource_id']])) {
                 $caravan_resources[$region_location['resource_id']] += $resources_taken;
-                $queries[] = "UPDATE `region_locations` SET `resource_count` = {$resources_remaining} WHERE `id` = {$region_location['id']}";
+                $queries[] = "UPDATE `region_locations` SET `resource_count` = {$resources_remaining} WHERE `region_location_id` = {$region_location['region_location_id']}";
             } else {
                 $caravan_resources[$region_location['resource_id']] = $resources_taken;
-                $queries[] = "UPDATE `region_locations` SET `resource_count` = {$resources_remaining} WHERE `id` = {$region_location['id']}";
+                $queries[] = "UPDATE `region_locations` SET `resource_count` = {$resources_remaining} WHERE `region_location_id` = {$region_location['region_location_id']}";
             }
         }
         // create new caravan for region
         // caravans will spawn from now until the next caravan tick, also giving enough buffer so that they reach their destination before the next tick
         $caravan_time = round(WarManager::BASE_CARAVAN_TIME_MS * (100 / (100 + $villages[$region['village']]->policy->caravan_speed)));
+        $caravan_time *= round(100 / (100 + $villages[$region['village']]->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CARAVAN_SPEED]));
         $start_time = rand(time(), time() + (WarManager::CARAVAN_TIMER_HOURS * 60 * 60) - ($caravan_time / 1000));
         $travel_time = $caravan_time;
         $region_id = $region['region_id'];
         $village_id = $region['village'];
-        $caravan_type = Patrol::CARAVAN_TYPE_RESOURCE;
+        $caravan_type = MapNPC::CARAVAN_TYPE_RESOURCE;
         $resources = json_encode($caravan_resources);
         $name = $villages[$region['village']]->name . " Caravan";
         $queries[] = "INSERT INTO `caravans` (`start_time`, `travel_time`, `region_id`, `village_id`, `caravan_type`, `resources`, `name`)
