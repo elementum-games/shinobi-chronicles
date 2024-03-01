@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/BattleEffectsManager.php';
 require_once __DIR__ . '/BattleLog.php';
-require_once __DIR__ . '/../war/Operation.php';
+require_once __DIR__ . '/../war/WarAction.php';
 
 class Battle {
     const TYPE_AI_ARENA = 1;

@@ -4,7 +4,7 @@ use JetBrains\PhpStorm\Pure;
 
 require_once __DIR__ . '/BattleEffectsManagerV2.php';
 require_once __DIR__ . '/BattleLogV2.php';
-require_once __DIR__ . '/../war/Operation.php';
+require_once __DIR__ . '/../war/WarAction.php';
 
 class BattleV2 {
     const TYPE_AI_ARENA = 1;

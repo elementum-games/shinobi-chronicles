@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . "/war/Operation.php";
+require_once __DIR__ . "/war/WarAction.php";
 
 class UserReputation {
     public static array $VillageRep = [
