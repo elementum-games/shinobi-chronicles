@@ -89,7 +89,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
             <td><?= ucwords($jutsu->element) ?></td>
             <td>&yen;<?= $jutsu->purchase_cost ?></td>
             <td><?= $jutsu->cooldown ?></td>
-            <td><?= round($jutsu->getBalanceMaxUtility(), 2) ?></td>
+            <td><?= round($jutsu->getBalanceMaxUtility(), 1) ?></td>
         </tr>
     <?php endforeach; ?>
 </table>
