@@ -46,16 +46,16 @@ class Jutsu {
 
     const BALANCE_BASELINE_POWER = 4.4;
     const BALANCE_EFFECT_RATIOS = [
-        'offense_boost' => 1.85,
+        'offense_boost' => 1.75,
         'elemental_boost' => 1.15,
-        'evasion_nerf' => 2.1,
-        'offense_nerf' => 2,
+        'evasion_nerf' => 2.,
+        'offense_nerf' => 1.9,
         'erosion' => 0.35,
         'vulnerability' => 2,
         'elemental_vulnerability' => 1.25,
         'hybrid_elemental_vulnerability' => 1.375,
         'resist_boost' => 1.85,
-        'evasion_boost' => 2.1,
+        'evasion_boost' => 2,
         'speed_boost' => 1,
         'piercing' => 0.75,
         'counter' => 3.25,
@@ -487,7 +487,6 @@ class Jutsu {
 
         $recoil_power = $recoil_effect_percent * ($capped_power + $residual_power + $compound_residual_power);
         $recoil_self_damage = $recoil_effect_percent * $capped_power;
-        $recoil_discount = $capped_power * $recoil_effect_percent * 0.15;
 
         // Final power
         // Debug
@@ -509,7 +508,6 @@ class Jutsu {
 
         $total_utility -= $compound_residual_discount;
         $total_utility -= $recoil_self_damage;
-        $total_utility -= $recoil_discount;
 
         return $total_utility;
 
