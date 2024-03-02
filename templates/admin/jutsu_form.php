@@ -40,6 +40,9 @@
 </style>
 
 <div class='jutsuForm'>
+    <?php if($existing_jutsu != null): ?>
+        <label>Current Total Power:</label> <?= round($existing_jutsu->getBalanceMaxUtility(), 2) ?><br />
+    <?php endif; ?>
     <label for="name">Name:</label>
     <input type="text" name="<?= $fieldName("name") ?>" value="<?= $existing_jutsu->name ?? "" ?>"><br />
 

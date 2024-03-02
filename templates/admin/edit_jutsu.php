@@ -24,7 +24,6 @@
             method='post'
         >
         <label>Jutsu ID:</label> <?= $jutsu->id ?><br />
-        <label>Current Total Power:</label> <?= round($jutsu->getBalanceMaxUtility(), 2) ?><br />
 
         <?php require 'templates/admin/jutsu_form.php'; ?>
 
