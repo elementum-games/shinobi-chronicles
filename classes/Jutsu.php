@@ -43,6 +43,7 @@ class Jutsu {
 
     const GENIN_CHUUNIN_SCALE_MULTIPLIER = 1.4; // 2.9 => 3.9 = +34.4%
     const GENIN_JONIN_SCALE_MULTIPLIER = 1.75; // 2.9 => 4.9 = +69%
+    const CHUUNIN_JONIN_SCALE_MULTIPLIER = 1.25;
 
     const BALANCE_BASELINE_POWER = 4.4;
     const BALANCE_EFFECT_RATIOS = [
@@ -372,10 +373,10 @@ class Jutsu {
             }
             else if($this->purchase_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
                 if ($this->rank == 2) {
-                    $this->power *= Jutsu::GENIN_JONIN_SCALE_MULTIPLIER;
+                    $capped_power *= Jutsu::GENIN_JONIN_SCALE_MULTIPLIER;
                 }
-                if ($this->rank == 3) {
-                    $this->power *= Jutsu::GENIN_JONIN_SCALE_MULTIPLIER;
+                else if ($this->rank == 3) {
+                    $capped_power *= Jutsu::CHUUNIN_JONIN_SCALE_MULTIPLIER;
                 }
             }
         }
@@ -429,7 +430,7 @@ class Jutsu {
                     $recoil_effect_percent += $capped_effect_amount * $effect->effect_length;
                     break;
                 case 'immolate':
-                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS['immolate'] * $capped_effect_amount;
+                    $total_effect_utility += max(0, self::BALANCE_EFFECT_RATIOS['immolate'] * ($capped_effect_amount - 1));
                     break;
                 case 'counter':
                 case 'substitution':
@@ -515,12 +516,9 @@ class Jutsu {
             Effects: $total_effect_utility<br />
             CR Discount: -$compound_residual_discount<br />
             Recoil Self Damage: -$recoil_self_damage<br />
-            Recoil Discount: -$recoil_discount<br />
         ";*/
         $total_utility = $capped_power + $residual_power + $compound_residual_power + $recoil_power;
         $total_utility += self::BALANCE_BASELINE_POWER * $total_effect_utility;
-
-        // Long effect discount (0%)
 
         $total_utility -= $compound_residual_discount;
         $total_utility -= $recoil_self_damage;
