@@ -25,6 +25,9 @@ class TestBattleManager extends BattleManager {
         $this->battle->player2 = $player2;
     }
 
+    /**
+     * @throws DatabaseDeadlockException
+     */
     public static function init(
         System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true
     ): TestBattleManager {

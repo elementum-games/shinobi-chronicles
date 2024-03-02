@@ -279,19 +279,17 @@ class Bloodline {
 
             switch($boost->effect) {
                 case 'ninjutsu_boost':
+                case 'genjutsu_boost':
+                case 'taijutsu_boost':
+                    $offense_ratio = $this->offenseToBloodlineRatio(
+                        offense_skill: $ninjutsu_skill + $taijutsu_skill + $genjutsu_skill,
+                        bloodline_skill: $bloodline_skill
+                    );
                     $this->combat_boosts[$id]->power =
                         round(
-                            $boost_power * $this->offenseToBloodlineRatio($ninjutsu_skill, $bloodline_skill) * $ratios['offense_boost'],
+                            $boost_power * $offense_ratio * $ratios['offense_boost'],
                             Bloodline::BOOST_POWER_PRECISION
                         );
-                    break;
-                case 'genjutsu_boost':
-                    $this->combat_boosts[$id]->power =
-                        round($boost_power * $this->offenseToBloodlineRatio($genjutsu_skill, $bloodline_skill) * $ratios['offense_boost'], Bloodline::BOOST_POWER_PRECISION);
-                    break;
-                case 'taijutsu_boost':
-                    $this->combat_boosts[$id]->power =
-                        round($boost_power * $this->offenseToBloodlineRatio($taijutsu_skill, $bloodline_skill) * $ratios['offense_boost'], Bloodline::BOOST_POWER_PRECISION);
                     break;
 
                 case 'ninjutsu_resist':

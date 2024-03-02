@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnnecessaryLocalVariableInspection */
 
 use DDTrace\Trace;
 
@@ -33,6 +33,9 @@ class BattleManager {
     const GENJUTSU_BARRIER_PENALTY = 37.5; // 37.5% reduction against Genjutsu (62.5% strength)
 
     const ELEMENTAL_CLASH_MODIFIER = 0.15; // 20% => 15% damage loss and gain
+
+    // Extra boost to recoil damage to offset the typical losses when facing a high-speed build
+    const RECOIL_DMG_MULTIPLIER = 1.05;
 
     private System $system;
 
@@ -903,9 +906,12 @@ class BattleManager {
                     $attack->counter_percent += $effect->effect_amount / 100;
                     break;
                 case 'recoil':
-                    $attack->recoil_percent += $effect->effect_amount / 100;
-                    $attack->raw_damage *= 1 + $effect->effect_amount / 100;
-                    $attack->damage *= 1 + $effect->effect_amount / 100;
+                    $recoil_percent = ($effect->effect_amount / 100);
+
+                    $attack->recoil_percent = $recoil_percent;
+                    $attack->recoil_raw_damage = $attack->raw_damage * $recoil_percent;
+
+                    $attack->raw_damage *= 1 + ($recoil_percent * self::RECOIL_DMG_MULTIPLIER);
                     break;
                 case 'immolate':
                     $attack->immolate_percent += $effect->effect_amount / 100;
@@ -925,7 +931,7 @@ class BattleManager {
             // Apply element to jutsu
             if($fighter->items[$action->weapon_id]->effect == 'element') {
                 $attack->jutsu->element = $action->weapon_element;
-                $attack->damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
+                $attack->raw_damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
             }
             // Set effect in jutsu
             $attack->jutsu->setWeapon(
@@ -945,6 +951,8 @@ class BattleManager {
             $fighter->barrier += $attack->raw_damage;
             $attack->raw_damage = 0;
         }
+
+        $attack->damage = $attack->raw_damage;
 
         return $attack;
     }
@@ -981,10 +989,20 @@ class BattleManager {
                 }
 
                 // simulate recoil damage
-                if ($attack->recoil_percent > 0) {
-                    $recoil_damage = $user->calcDamageTaken($attack_damage * $attack->recoil_percent, $attack->jutsu->jutsu_type, is_raw_damage: false);
-                    $recoil_damage_raw = $user->calcDamageTaken($attack_damage * $attack->recoil_percent, $attack->jutsu->jutsu_type, apply_resists: false, is_raw_damage: false);
-                    $recoil_damage_resisted = round($recoil_damage_raw - $recoil_damage, 2);
+                if ($attack->recoil_raw_damage > 0) {
+                    $recoil_damage = $user->calcDamageTaken(
+                        raw_damage: $attack->recoil_raw_damage,
+                        defense_type: $attack->jutsu->jutsu_type,
+                        is_raw_damage: false
+                    );
+                    $recoil_damage_pre_resist = $user->calcDamageTaken(
+                        raw_damage: $attack->recoil_raw_damage,
+                        defense_type: $attack->jutsu->jutsu_type,
+                        apply_resists: false,
+                        is_raw_damage: false
+                    );
+
+                    $recoil_damage_resisted = round($recoil_damage_pre_resist - $recoil_damage, 2);
                     $user->last_damage_taken += $recoil_damage;
                     $user->health -= $recoil_damage;
                     if ($user->health < 0) {
@@ -1053,7 +1071,7 @@ class BattleManager {
             }
         }
 
-        if (!$attack->jutsu->effect_only) {
+        if (!$attack->isEffectOnly()) {
             $attack_damage = $target->calcDamageTaken($attack->damage, $attack->jutsu->jutsu_type, element: $attack->jutsu->element);
             $attack_damage_raw = $target->calcDamageTaken($attack->damage, $attack->jutsu->jutsu_type, apply_resists: false, element: $attack->jutsu->element);
             $damage_resisted = round($attack_damage_raw - $attack_damage, 2);
@@ -1064,9 +1082,9 @@ class BattleManager {
                 $target->health = 0;
             }
 
-            if ($attack->recoil_percent > 0) {
-                $recoil_damage = $user->calcDamageTaken($attack_damage * $attack->recoil_percent, $attack->jutsu->jutsu_type, is_raw_damage: false);
-                $recoil_damage_raw = $user->calcDamageTaken($attack_damage * $attack->recoil_percent, $attack->jutsu->jutsu_type, apply_resists: false, is_raw_damage: false);
+            if ($attack->recoil_raw_damage > 0) {
+                $recoil_damage = $user->calcDamageTaken($attack->recoil_raw_damage, $attack->jutsu->jutsu_type);
+                $recoil_damage_raw = $user->calcDamageTaken($attack->recoil_raw_damage, $attack->jutsu->jutsu_type, apply_resists: false);
                 $recoil_damage_resisted = round($recoil_damage_raw - $recoil_damage, 2);
                 $user->last_damage_taken += $recoil_damage;
                 $user->health -= $recoil_damage;
@@ -1180,7 +1198,7 @@ class BattleManager {
             }
         }
 
-        if ($attack->recoil_percent > 0) {
+        if ($attack->recoil_raw_damage > 0) {
             if ($recoil_damage_resisted > 0) {
                 $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . BattleManager::formatNumber($recoil_damage) . "</span> recoil damage- (resists " . "<span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . BattleManager::formatNumber($recoil_damage_resisted) . "</span>" . " recoil damage)" . '</span></br>';
             } else {
@@ -1267,7 +1285,7 @@ class BattleManager {
     public function jutsuCollision(
         Fighter $player1, Fighter $player2, BattleAttack &$player1_attack, BattleAttack &$player2_attack
     ): string {
-        $collision_text = '';
+        $collision_displays = [];
 
         $player1_jutsu = $player1_attack->jutsu;
         $player2_jutsu = $player2_attack->jutsu;
@@ -1286,18 +1304,13 @@ class BattleManager {
         /* if ($player1_attack->piercing_percent > 0) {
             $pierce_percent = round($player1_attack->piercing_percent * 100, 0);
             $player2->resist_boost *= 1 - $player1_attack->piercing_percent;
-            if (!empty($collision_text)) {
-                $collision_text .= "[br]";
-            }
-            $collision_text .= "{$player1->getName()} pierces {$pierce_percent}% of {$player2->getName()}'s defenses!";
+
+            $collision_displays[] = "{$player1->getName()} pierces {$pierce_percent}% of {$player2->getName()}'s defenses!";
         }
         if ($player2_attack->piercing_percent > 0) {
             $pierce_percent = round($player2_attack->piercing_percent * 100, 0);
             $player1->resist_boost *= 1 - $player2_attack->piercing_percent;
-            if (!empty($collision_text)) {
-                $collision_text .= "[br]";
-            }
-            $collision_text .= "{$player2->getName()} pierces {$pierce_percent}% of {$player1->getName()}'s defenses!";
+            $collision_displays[] = "{$player2->getName()} pierces {$pierce_percent}% of {$player1->getName()}'s defenses!";
         }*/
 
         /* Calculate speed values */
@@ -1325,14 +1338,11 @@ class BattleManager {
                 $player2_attack->damage *= 1 - $damage_reduction;
                 $player2->barrier *= 1 - $damage_reduction;
 
-                if (!empty($collision_text)) {
-                    $collision_text .= "[br]";
-                }
                 if($player1_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
-                    $collision_text .= "[player] swiftly evaded " . round($damage_reduction * 100, 0) . "% of [opponent]'s damage!";
+                    $collision_displays[] = "[player] swiftly evaded " . round($damage_reduction * 100, 0) . "% of [opponent]'s damage!";
                 }
                 else {
-                    $collision_text .= "[player] cast [gender2] jutsu before [opponent], negating " .
+                    $collision_displays[] = "[player] cast [gender2] jutsu before [opponent], negating " .
                         round($damage_reduction * 100, 0) . "% of [opponent]'s damage!";
                 }
             }
@@ -1344,7 +1354,7 @@ class BattleManager {
             if ($damage_reduction > self::EVASION_SOFT_CAP) {
                 $damage_reduction = (($damage_reduction - self::EVASION_SOFT_CAP) * self::EVASION_SOFT_CAP_RATIO) + self::EVASION_SOFT_CAP;
             }
-            // if still higher than cap cap, set to hard cap
+            // if still higher than soft cap, set to hard cap
             if ($damage_reduction > self::EVASION_HARD_CAP) {
                 $damage_reduction = self::EVASION_HARD_CAP;
             }
@@ -1353,14 +1363,11 @@ class BattleManager {
                 $player1_attack->damage *= 1 - $damage_reduction;
                 $player1->barrier *= 1 - $damage_reduction;
 
-                if (!empty($collision_text)) {
-                    $collision_text .= "[br]";
-                }
                 if($player2_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
-                    $collision_text .= "[opponent] swiftly evaded " . round($damage_reduction * 100, 0) . "% of [player]'s damage!";
+                    $collision_displays[] = "[opponent] swiftly evaded " . round($damage_reduction * 100, 0) . "% of [player]'s damage!";
                 }
                 else {
-                    $collision_text .= "[opponent] cast [targetGender2] jutsu before [player], negating " .
+                    $collision_displays[] = "[opponent] cast [targetGender2] jutsu before [player], negating " .
                         round($damage_reduction * 100, 0) . "% of [player]'s damage!";
                 }
             }
@@ -1368,92 +1375,68 @@ class BattleManager {
 
         // Barriers
         if($player1->barrier && $player2_attack->isDirectDamage()) {
-            // Apply penalty against Genjutsu
-            if ($player2_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
-                $player1->barrier *= 1 - (self::GENJUTSU_BARRIER_PENALTY / 100);
-            }
-
-            // Apply piercing
-            $player1->barrier *= (1 - $player2_attack->piercing_percent);
-
-            // Block damage from opponent's attack
-            if($player1->barrier >= $player2_attack->damage) {
-                $block_amount = $player2_attack->damage;
-            }
-            else {
-                $block_amount = $player1->barrier;
-            }
-
-            $block_percent = ($player2_attack->damage >= 1) ? ($block_amount / $player2_attack->damage) * 100 : 100;
-            $player1->barrier -= $block_amount;
-            $player2_attack->damage -= $block_amount;
-
-            if($player1->barrier < 0) {
-                $player1->barrier = 0;
-            }
-            if($player2_attack->damage < 0) {
-                $player2_attack->damage = 0;
-            }
-
-            // Set display
-            $block_percent = round($block_percent, 1);
-            if (!empty($collision_text)) {
-                $collision_text .= "[br]";
-            }
-            $collision_text .= "[player]'s barrier blocked $block_percent% of [opponent]'s damage!";
+            $collision_displays[] = $this->applyBarrier(
+                barrier_user: $player1,
+                incoming_attack: $player2_attack,
+                barrier_user_is_p1: true
+            );
         }
         if($player2->barrier && $player1_attack->isDirectDamage()) {
-            // Apply penalty against Genjutsu
-            if ($player1_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
-                $player2->barrier *= 1 - (self::GENJUTSU_BARRIER_PENALTY / 100);
-            }
-
-            // Apply piercing
-            $player2->barrier *= (1 - $player1_attack->piercing_percent);
-
-            // Block damage from opponent's attack
-            if($player2->barrier >= $player1_attack->damage) {
-                $block_amount = $player1_attack->damage;
-            }
-            else {
-                $block_amount = $player2->barrier;
-            }
-
-            $block_percent = ($player1_attack->damage >= 1) ? ($block_amount / $player1_attack->damage) * 100 : 100;
-            $player2->barrier -= $block_amount;
-            $player1_attack->damage -= $block_amount;
-
-            if($player2->barrier < 0) {
-                $player2->barrier = 0;
-            }
-            if($player1_attack->damage < 0) {
-                $player1_attack->damage = 0;
-            }
-
-            // Set display
-            $block_percent = round($block_percent, 0);
-            if (!empty($collision_text)) {
-                $collision_text .= "[br]";
-            }
-            $collision_text .= "[opponent]'s barrier blocked $block_percent% of [player]'s damage!";
+            $collision_displays[] = $this->applyBarrier(
+                barrier_user: $player2,
+                incoming_attack: $player1_attack,
+                barrier_user_is_p1: false
+            );
         }
 
-        $collision_text .= $this->applySubstitution(
-            player1_attack: $player1_attack,
-            player2_attack: $player2_attack
-        );
+        // Substitution
+        if ($player1_attack->substitution_percent > 0 && $player2_attack->isDirectDamage()) {
+            $collision_displays[] = $this->applySubstitution(
+                fighter_attack: $player1_attack,
+                incoming_attack: $player2_attack,
+                fighter_is_p1: true
+            );
+        }
+        if ($player2_attack->substitution_percent > 0 && $player1_attack->isDirectDamage()) {
+            $collision_displays[] = $this->applySubstitution(
+                fighter_attack: $player2_attack,
+                incoming_attack: $player1_attack,
+                fighter_is_p1: false
+            );
+        }
 
-        $collision_text .= $this->applyCounter(
-            player1_attack: $player1_attack,
-            player2_attack: $player2_attack
-        );
+        // Counter
+        if ($player1_attack->counter_percent > 0 && $player2_attack->isDirectDamage()) {
+            $collision_displays[] = $this->applyCounter(
+                fighter_attack: $player1_attack,
+                incoming_attack: $player2_attack,
+                fighter_is_p1: true
+            );
+        }
+        if ($player2_attack->counter_percent > 0 && $player1_attack->isDirectDamage()) {
+            $collision_displays[] = $this->applyCounter(
+                fighter_attack: $player2_attack,
+                incoming_attack: $player1_attack,
+                fighter_is_p1: false
+            );
+        }
 
-        $collision_text .= $this->applyReflect(
-            player1_attack: $player1_attack,
-            player2_attack: $player2_attack
-        );
+        // Reflect
+        if ($player1_attack->reflect_percent > 0 && $player2_attack->isDirectDamage()) {
+            $collision_displays[] = $this->applyReflect(
+                fighter_attack: $player1_attack,
+                incoming_attack: $player2_attack,
+                fighter_is_p1: true);
+        }
+        if ($player1_attack->reflect_percent > 0 && $player2_attack->isDirectDamage()) {
+            $collision_displays[] = $this->applyReflect(
+                fighter_attack: $player1_attack,
+                incoming_attack: $player2_attack,
+                fighter_is_p1: false
+            );
+        }
 
-        return $this->parseCombatText($collision_text, $player1, $player2);
+        return $this->parseCombatText(implode("[br]", $collision_displays), $player1, $player2);
     }
 
     /**
@@ -1548,7 +1531,7 @@ class BattleManager {
     }
 
     #[Trace]
-    protected function setPlayerAction(Fighter $player, Jutsu $jutsu, int $weapon_id, string $weapon_element) {
+    protected function setPlayerAction(Fighter $player, Jutsu $jutsu, int $weapon_id, string $weapon_element): void {
         $this->battle->fighter_actions[$player->combat_id] = new LegacyFighterAction(
             $jutsu->id,
             $jutsu->purchase_type,
@@ -1571,7 +1554,7 @@ class BattleManager {
      * @throws RuntimeException
      */
     #[Trace]
-    protected function chooseAndSetAIAction(Fighter $ai) {
+    protected function chooseAndSetAIAction(Fighter $ai): void {
         if (!($ai instanceof NPC)) {
             throw new RuntimeException("Calling chooseAndSetAIAction on non-AI!");
         }
@@ -1593,11 +1576,8 @@ class BattleManager {
     }
 
     /**
-     * @param Jutsu   $fighter_jutsu
-     * @param Jutsu   $incoming_jutsu
-     * @param float   $elemental_clash_damage_modifier
-     * @param float   $player2_elemental_damage_modifier
-     * @param Fighter $player2
+     * @param Jutsu $fighter_jutsu
+     * @param Jutsu $incoming_jutsu
      * @return float
      */
     public function getElementalDamageModifier(Jutsu $fighter_jutsu, Jutsu $incoming_jutsu): float {
@@ -1654,120 +1634,93 @@ class BattleManager {
         return 1;
     }
 
-    protected function applySubstitution(BattleAttack $player1_attack, BattleAttack $player2_attack): string {
-        $collision_text = '';
-
-        if ($player1_attack->substitution_percent > 0 && $player2_attack->isDirectDamage()) {
-            $player1_attack->substitution_percent *= (1 - $player2_attack->piercing_percent);
-            $player2_attack->damage *= (1 - $player1_attack->substitution_percent);
-
-            $block_percent = round($player1_attack->substitution_percent * 100, 0);
-
-            $collision_text .= "[br]";
-            $collision_text .= "[player]'s substitute took $block_percent% of [opponent]'s damage!";
-        }
-        if ($player2_attack->substitution_percent > 0 && $player1_attack->isDirectDamage()) {
-            $player2_attack->substitution_percent *= (1 - $player1_attack->piercing_percent);
-            $player1_attack->damage *= (1 - $player2_attack->substitution_percent);
-
-            $block_percent = round($player2_attack->substitution_percent * 100, 0);
-
-            $collision_text .= "[br]";
-            $collision_text .= "[opponent]'s substitute took $block_percent% of [player]'s damage!";
+    protected function applyBarrier(Fighter $barrier_user, BattleAttack $incoming_attack, bool $barrier_user_is_p1): string {
+        // Apply penalty against Genjutsu
+        if ($incoming_attack->jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
+            $barrier_user->barrier *= 1 - (self::GENJUTSU_BARRIER_PENALTY / 100);
         }
 
-        return $collision_text;
+        // Apply piercing
+        $barrier_user->barrier *= (1 - $incoming_attack->piercing_percent);
+
+        // Block damage from opponent's attack
+        if($barrier_user->barrier >= $incoming_attack->damage) {
+            $block_amount = $incoming_attack->damage;
+        }
+        else {
+            $block_amount = $barrier_user->barrier;
+        }
+
+        $block_percent = ($incoming_attack->damage >= 1) ? ($block_amount / $incoming_attack->damage) * 100 : 100;
+        $barrier_user->barrier -= $block_amount;
+        $incoming_attack->damage -= $block_amount;
+
+        if($barrier_user->barrier < 0) {
+            $barrier_user->barrier = 0;
+        }
+        if($incoming_attack->damage < 0) {
+            $incoming_attack->damage = 0;
+        }
+
+        // Set display
+        $block_percent = round($block_percent, 1);
+
+        return $barrier_user_is_p1
+            ? "[player]'s barrier blocked $block_percent% of [opponent]'s damage!"
+            : "[opponent]'s barrier blocked $block_percent% of [player]'s damage!";
     }
 
-    protected function applyCounter(BattleAttack $player1_attack, BattleAttack $player2_attack): string {
-        $collision_text = '';
+    protected function applySubstitution(BattleAttack $fighter_attack, BattleAttack $incoming_attack, bool $fighter_is_p1): string {
+        $fighter_attack->substitution_percent *= (1 - $incoming_attack->piercing_percent);
+        $incoming_attack->damage *= (1 - $fighter_attack->substitution_percent);
 
-        if ($player1_attack->counter_percent > 0 && $player2_attack->isDirectDamage()) {
-            // Apply piercing
-            $player1_attack->counter_percent *= (1 - $player2_attack->piercing_percent);
-            // Apply reduction
-            $player2_attack->countered_percent = $player1_attack->counter_percent;
-            $player2_attack->countered_raw_damage = $player2_attack->damage * $player1_attack->counter_percent;
-            $player2_attack->countered_jutsu_type = $player1_attack->jutsu->jutsu_type;
-            $player2_attack->damage *= (1 - $player1_attack->counter_percent);
-            // Set display
-            $block_percent = round($player1_attack->counter_percent * 100, 0);
+        $block_percent = round($fighter_attack->substitution_percent * 100);
 
-            $collision_text .= "[br]";
-            $collision_text .= "[player] countered $block_percent% of [opponent]'s damage!";
-        }
-        if ($player2_attack->counter_percent > 0 && $player1_attack->isDirectDamage()) {
-            // Apply piercing
-            $player2_attack->counter_percent *= (1 - $player1_attack->piercing_percent);
-            // Apply reduction
-            $player1_attack->countered_percent = $player2_attack->counter_percent;
-            $player1_attack->countered_raw_damage = $player1_attack->damage * $player2_attack->counter_percent;
-            $player1_attack->countered_jutsu_type = $player2_attack->jutsu->jutsu_type;
-            $player1_attack->damage *= (1 - $player2_attack->counter_percent);
-            // Set display
-            $block_percent = round($player2_attack->counter_percent * 100, 0);
+        return $fighter_is_p1
+            ? "[player]'s substitute took $block_percent% of [opponent]'s damage!"
+            : "[opponent]'s substitute took $block_percent% of [player]'s damage!";
+    }
+    protected function applyCounter(BattleAttack $fighter_attack, BattleAttack $incoming_attack, bool $fighter_is_p1): string {
+        // Apply piercing
+        $fighter_attack->counter_percent *= (1 - $incoming_attack->piercing_percent);
 
-            $collision_text .= "[br]";
-            $collision_text .= "[opponent] countered $block_percent% of [player]'s damage!";
-        }
+        // Apply reduction
+        $incoming_attack->countered_percent = $fighter_attack->counter_percent;
+        $incoming_attack->countered_raw_damage = $incoming_attack->damage * $fighter_attack->counter_percent;
+        $incoming_attack->countered_jutsu_type = $fighter_attack->jutsu->jutsu_type;
+        $incoming_attack->damage *= (1 - $fighter_attack->counter_percent);
 
-        $player2_attack->countered_raw_damage = min($player2_attack->countered_raw_damage, $player1_attack->damage);
-        $player1_attack->countered_raw_damage = min($player1_attack->countered_raw_damage, $player2_attack->damage);
+        // Set display
+        $block_percent = (int)round($fighter_attack->counter_percent * 100);
 
-        return $collision_text;
+        return $fighter_is_p1
+            ? "[player] countered $block_percent% of [opponent]'s damage!"
+            : "[opponent] countered $block_percent% of [player]'s damage!";
     }
 
-    protected function applyReflect(BattleAttack $player1_attack, BattleAttack $player2_attack): string {
-        $collision_text = '';
+    protected function applyReflect(BattleAttack $fighter_attack, BattleAttack $incoming_attack, bool $fighter_is_p1): string {
+        // Apply piercing
+        $fighter_attack->reflect_percent *= (1 - $incoming_attack->piercing_percent);
 
-        if ($player1_attack->reflect_percent > 0 && $player2_attack->isDirectDamage()) {
-            // Apply piercing
-            $player1_attack->reflect_percent *= (1 - $player2_attack->piercing_percent);
-            // Apply reduction
-            $player2_attack->reflected_percent = $player1_attack->reflect_percent;
-            $player2_attack->reflected_raw_damage = $player2_attack->damage * $player1_attack->reflect_percent;
-            $player2_attack->reflected_jutsu_type = $player1_attack->jutsu->jutsu_type;
-            $player2_attack->damage *= (1 - $player1_attack->reflect_percent);
-            // Set display
-            $block_percent = round($player1_attack->reflect_percent * 100, 0);
+        // Apply reduction
+        $incoming_attack->reflected_percent = $fighter_attack->reflect_percent;
+        $incoming_attack->reflected_raw_damage = $incoming_attack->damage * $fighter_attack->reflect_percent;
+        $incoming_attack->reflected_jutsu_type = $fighter_attack->jutsu->jutsu_type;
+        $incoming_attack->damage *= (1 - $fighter_attack->reflect_percent);
 
-            $collision_text .= "[br]";
-            $collision_text .= "[player] reflected $block_percent% of [opponent]'s damage!";
-        }
-        if ($player2_attack->reflect_percent > 0 && $player1_attack->isDirectDamage()) {
-            // Apply piercing
-            $player2_attack->reflect_percent *= (1 - $player1_attack->piercing_percent);
-            // Apply reduction
-            $player1_attack->reflected_percent = $player2_attack->reflect_percent;
-            $player1_attack->reflected_raw_damage = $player1_attack->damage *  $player2_attack->reflect_percent;
-            $player1_attack->reflected_jutsu_type = $player2_attack->jutsu->jutsu_type;
-            $player1_attack->damage *= (1 - $player2_attack->reflect_percent);
-            // Set display
-            $block_percent = round($player2_attack->reflect_percent * 100, 0);
-
-            $collision_text .= "[br]";
-            $collision_text .= "[opponent] reflected $block_percent% of [player]'s damage!";
-        }
-
-        $player2_attack->reflected_raw_damage = min($player2_attack->reflected_raw_damage, $player1_attack->damage);
-        $player1_attack->reflected_raw_damage = min($player1_attack->reflected_raw_damage, $player2_attack->damage);
-
-        if ($player1_attack->reflect_percent > 0) {
-            $player1_attack->effects[] = new Effect(
+        if ($fighter_attack->reflect_percent > 0) {
+            $fighter_attack->effects[] = new Effect(
                 effect: 'reflect_damage',
-                effect_amount: $player2_attack->reflected_raw_damage / $player1_attack->reflect_duration,
-                effect_length: $player1_attack->reflect_duration
-            );
-        }
-        if ($player2_attack->reflect_percent > 0) {
-            $player2_attack->effects[] = new Effect(
-                effect: 'reflect_damage',
-                effect_amount: $player1_attack->reflected_raw_damage / $player2_attack->reflect_duration,
-                effect_length: $player2_attack->reflect_duration
+                effect_amount: $incoming_attack->reflected_raw_damage / $fighter_attack->reflect_duration,
+                effect_length: $fighter_attack->reflect_duration
             );
         }
 
-        return $collision_text;
+        $block_percent = (int)round($fighter_attack->reflect_percent * 100);
+
+        return $fighter_is_p1
+            ? "[player] reflected $block_percent% of [opponent]'s damage!"
+            : "[opponent] reflected $block_percent% of [player]'s damage!";
     }
 
     public static function diminishingReturns($val, $scale) {

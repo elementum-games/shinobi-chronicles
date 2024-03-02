@@ -245,6 +245,14 @@ function displayJutsuInput(string $fighter_form_key, int $jutsu_index, array $FO
             <?php endforeach; ?>
         </select><br />
 
+        <label>Bloodline</label><input
+            type='checkbox'
+            id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_element'
+            name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][is_bloodline]'
+            value='1'
+            <?= ($jutsu_form_data['is_bloodline'] ?? false) ? "checked='checked'" : "" ?>
+        /><br />
+
         <div class='effect_input'>
             <label>Effect</label>
             <select
@@ -412,6 +420,7 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
             'type' => 'ninjutsu',
             'power' => 4,
             'element' => Jutsu::ELEMENT_NONE,
+            'is_bloodline' => false,
             'effect' => 'none',
             'effect_amount' => 0,
             'effect_length' => 0,
@@ -451,7 +460,7 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
         '33_33_33',
         '40_40_20',
         '50_50_0',
-        '0_85_15',
+        '0_80_20',
         '0_100_0',
     ];
 

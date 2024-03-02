@@ -360,8 +360,9 @@ abstract class Fighter {
                 $offense = self::BASE_OFFENSE + ($off_skill * self::SKILL_OFFENSE_RATIO);
                 break;
             case Jutsu::PURCHASE_TYPE_BLOODLINE:
-                $offense = self::BASE_OFFENSE +
-                    ($off_skill * self::BLOODLINE_JUTSU_OFFENSE_RATIO) + ($this->bloodline_skill * self::BLOODLINE_JUTSU_SKILL_RATIO);
+                $offense = self::BASE_OFFENSE
+                    + ($off_skill * self::BLOODLINE_JUTSU_OFFENSE_RATIO)
+                    + ($this->bloodline_skill * self::BLOODLINE_JUTSU_SKILL_RATIO);
                 break;
             default:
                 throw new RuntimeException("Invalid jutsu type!");

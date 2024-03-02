@@ -43,4 +43,8 @@ class BattleAttack {
     public function isDirectDamage(): bool {
         return in_array($this->jutsu->use_type, Jutsu::$attacking_use_types);
     }
+
+    public function isEffectOnly(): bool {
+        return $this->jutsu->effect_only;
+    }
 }

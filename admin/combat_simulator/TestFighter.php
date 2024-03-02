@@ -68,16 +68,12 @@ class TestFighter extends Fighter {
         return true;
     }
 
-    public function addJutsu(Jutsu $jutsu): void {
-        $jutsu->setLevel(100, 0);
-        $this->jutsu[$jutsu->id] = $jutsu;
-        $this->equipped_jutsu[] = [
-            'id' => $jutsu->id,
-            'type' => $jutsu->jutsu_type,
-        ];
-    }
-
     public function addJutsuFromFormData(array $form_data): Jutsu {
+        if(!isset($form_data['is_bloodline'])) {
+            $form_data['is_bloodline'] = false;
+        }
+        $form_data['is_bloodline'] = (bool)$form_data['is_bloodline'];
+
         $id = count($this->jutsu) + 1;
         $jutsu = new Jutsu(
             id: $id,
@@ -99,13 +95,26 @@ class TestFighter extends Fighter {
             target_type: Jutsu::TARGET_TYPE_TILE,
             use_cost: 0,
             purchase_cost: 0,
-            purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
+            purchase_type: $form_data['is_bloodline'] ? Jutsu::PURCHASE_TYPE_BLOODLINE : Jutsu::PURCHASE_TYPE_PURCHASABLE,
             parent_jutsu: 0,
             element: $form_data['element'],
-            hand_seals: 0
+            hand_seals: 0,
         );
+        $jutsu->is_bloodline = $form_data['is_bloodline'];
+        $jutsu->setLevel(100, 0);
 
-        $this->addJutsu($jutsu);
+        if($jutsu->is_bloodline) {
+            $id = count($this->bloodline->jutsu);
+            $jutsu->id = $id;
+            $this->bloodline->jutsu[$id] = $jutsu;
+        }
+        else {
+            $this->jutsu[$jutsu->id] = $jutsu;
+            $this->equipped_jutsu[] = [
+                'id' => $jutsu->id,
+                'type' => $jutsu->jutsu_type,
+            ];
+        }
 
         return $jutsu;
     }
@@ -128,6 +137,19 @@ class TestFighter extends Fighter {
         $fighter->willpower = 0;
         $fighter->setTotalStats();
 
+        $fighter->bloodline_id = 1;
+        $fighter->bloodline = new Bloodline(
+            id: 1,
+            name: 'P1 Bloodline',
+            rank: $fighter->rank,
+            clan_id: 1,
+            village_name: 'TestVillage',
+            base_passive_boosts: [],
+            base_combat_boosts: [],
+            base_jutsu: [],
+            jutsu: [],
+        );
+
         $fighter_bloodline_boosts = [];
         for($i = 1; $i <= 3; $i++) {
             if(!empty($fighter_data["bloodline_boost_{$i}"]) && $fighter_data["bloodline_boost_{$i}"] != 'none') {
@@ -139,18 +161,7 @@ class TestFighter extends Fighter {
         }
 
         if(count($fighter_bloodline_boosts) > 0) {
-            $fighter->bloodline_id = 1;
-            $fighter->bloodline = new Bloodline(
-                id: 1,
-                name: 'P1 Bloodline',
-                rank: $fighter->rank,
-                clan_id: 1,
-                village_name: 'TestVillage',
-                base_passive_boosts: [],
-                base_combat_boosts: $fighter_bloodline_boosts,
-                base_jutsu: [],
-                jutsu: [],
-            );
+            $fighter->bloodline->base_combat_boosts = $fighter_bloodline_boosts;
 
             $rank = $rankManager->ranks[$fighter->rank];
             $fighter->bloodline->setBoostAmounts(
