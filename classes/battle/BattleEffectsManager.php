@@ -4,12 +4,16 @@ require_once __DIR__ . '/BattleEffect.php';
 
 class BattleEffectsManager {
     const MAX_SPEED_REDUCTION = 50;
+
+    // Amount CR increases every turn
     const COMPOUND_RESIDUAL_INCREASE = 0.1;
+
+    // Reduction in CR effect when contributing to immolate
+    const CR_IMMO_PENALTY = 0.0;
 
     const DAMAGE_EFFECTS = [
         'none',
         'recoil',
-        'reflect',
         'immolate',
         'residual_damage',
         'delayed_residual',
@@ -948,7 +952,12 @@ class BattleEffectsManager {
         $immolate_raw_damage = 0;
         foreach($this->active_effects as $index => $effect) {
             if($effect->isDamageOverTime() && $effect->target == $target->combat_id) {
-                $immolate_raw_damage += ($effect->turns * $effect->effect_amount);
+                $total_damage = $effect->turns * $effect->effect_amount;
+                if($effect->effect == "compound_residual") {
+                    $total_damage *= 1 - BattleEffectsManager::CR_IMMO_PENALTY;
+                }
+                $immolate_raw_damage += $total_damage;
+
                 if(!$simulation) {
                     unset($this->active_effects[$index]);
                 }
