@@ -22,14 +22,14 @@
     <tr>
         <td style='text-align: center;'>
             <form action='' method='post'>
-                <input type='text' name='cap_jutsu' placeholder='Username' style='margin-bottom: 8px;' /><br />
+                <input type='text' name='cap_jutsu' placeholder='Username' style='margin-bottom: 8px;' value='<?= $_GET['user_name'] ?? '' ?>' /><br />
                 <input type='number' name='jutsu_level' min='1' max='100' placeholder='100' style='margin-bottom: 8px' value='100'/><br />
                 <input type='submit' value='Set Jutsu Level' />
             </form>
         </td>
         <td>
             <form action='' method='post'>
-                <input type='text' name='user' placeholder='Username' /><br />
+                <input type='text' name='user' placeholder='Username' value='<?= $_GET['user_name'] ?? '' ?>' /><br />
                 <br />
 
                 Rank to set stats to:<br />

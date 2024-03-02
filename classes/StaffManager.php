@@ -705,8 +705,13 @@ class StaffManager {
                 return $tools ?? array();
             case 'user_tools':
                 if($this->isUserAdmin() || $permission_check) {
-                    $tools = ['edit_user', 'activate_user', 'stat_cut', 'give_bloodline', 'delete_user', 'dev_tools', 'reset_password'];
+                    $tools = ['edit_user', 'activate_user', 'stat_cut', 'give_bloodline', 'delete_user', 'reset_password'];
                 }
+
+                if($this->system->isDevEnvironment() || $this->isHeadAdmin()) {
+                    $tools[] = 'dev_tools';
+                }
+
                 return $tools ?? array();
             case 'misc_tools':
                 if($this->isUserAdmin() || $permission_check) {
