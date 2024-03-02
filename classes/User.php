@@ -784,12 +784,7 @@ class User extends Fighter {
             );
             // Scale Jutsu Power
             foreach ($this->bloodline->jutsu as $jutsu) {
-                if ($this->rank_num >= 3 && $jutsu->rank < 3) {
-                    $jutsu->power *= 1.4;
-                }
-                if ($this->rank_num >= 4 && $jutsu->rank < 4) {
-                    $jutsu->power *= 1.25;
-                }
+                $jutsu->applyRankScaling($this->rank_num);
             }
 
             // Debug info

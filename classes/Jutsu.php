@@ -41,8 +41,8 @@ class Jutsu {
     const POWER_PER_LEVEL_PERCENT = 0.3;
     const EFFECT_PER_LEVEL_PERCENT = 0.2;
 
-    const CHUUNIN_SCALE_MULTIPLIER = 1.4; // 2.9 => 3.9 = +34.4%
-    const JONIN_SCALE_MULTIPLIER = 1.75; // 2.9 => 4.9 = +69%
+    const GENIN_CHUUNIN_SCALE_MULTIPLIER = 1.4; // 2.9 => 3.9 = +34.4%
+    const GENIN_JONIN_SCALE_MULTIPLIER = 1.75; // 2.9 => 4.9 = +69%
 
     const BALANCE_BASELINE_POWER = 4.4;
     const BALANCE_EFFECT_RATIOS = [
@@ -344,13 +344,21 @@ class Jutsu {
         if ($this->purchase_type == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
             if ($player_rank_num == 3) {
                 $this->use_cost *= 2;
-                $this->base_power *= Jutsu::CHUUNIN_SCALE_MULTIPLIER;
-                $this->power *= Jutsu::CHUUNIN_SCALE_MULTIPLIER;
+                $this->base_power *= Jutsu::GENIN_CHUUNIN_SCALE_MULTIPLIER;
+                $this->power *= Jutsu::GENIN_CHUUNIN_SCALE_MULTIPLIER;
             }
             else if ($player_rank_num == 4) {
                 $this->use_cost *= 3;
-                $this->base_power *= Jutsu::JONIN_SCALE_MULTIPLIER;
-                $this->power *= Jutsu::JONIN_SCALE_MULTIPLIER;
+                $this->base_power *= Jutsu::GENIN_JONIN_SCALE_MULTIPLIER;
+                $this->power *= Jutsu::GENIN_JONIN_SCALE_MULTIPLIER;
+            }
+        }
+        else if($this->purchase_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
+            if ($player_rank_num >= 3 && $this->rank < 3) {
+                $this->power *= 1.4;
+            }
+            if ($player_rank_num >= 4 && $this->rank < 4) {
+                $this->power *= 1.25;
             }
         }
     }
@@ -360,7 +368,15 @@ class Jutsu {
         $capped_power = $this->base_power * (1 + (self::MAX_LEVEL * $level_power_multiplier));
         if(!$this->rank_scaling_applied) {
             if ($this->purchase_type == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
-                $capped_power *= Jutsu::JONIN_SCALE_MULTIPLIER;
+                $capped_power *= Jutsu::GENIN_JONIN_SCALE_MULTIPLIER;
+            }
+            else if($this->purchase_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
+                if ($this->rank == 2) {
+                    $this->power *= Jutsu::GENIN_JONIN_SCALE_MULTIPLIER;
+                }
+                if ($this->rank == 3) {
+                    $this->power *= Jutsu::GENIN_JONIN_SCALE_MULTIPLIER;
+                }
             }
         }
         if($this->use_type == Jutsu::USE_TYPE_BUFF) {
