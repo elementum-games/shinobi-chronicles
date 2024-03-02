@@ -251,11 +251,9 @@ $clan_positions = array(
         <?php endif; ?>
         <?php if($player->isUserAdmin()): ?>
             &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['admin'] ?>&page=edit_user&user_name=<?= $viewUser->user_name ?>'>Edit user</a>
-            <?php if($system->isDevEnvironment() || $player->isHeadAdmin()): ?>
-                &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?=
-                    $system->router->getUrl('admin', ['page' => 'dev_tools', 'user_name' => $viewUser->user_name])
-                ?>'>Dev Tools</a>
-            <?php endif; ?>
+            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?=
+                $system->router->getUrl('admin', ['page' => 'dev_tools', 'user_name' => $viewUser->user_name])
+            ?>'>Dev Tools</a>
             <?php if($viewUser->team): ?>
                 &nbsp;|&nbsp; <a href='<?= $system->router->getUrl(
                     page_name: 'admin',

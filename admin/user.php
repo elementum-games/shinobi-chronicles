@@ -558,7 +558,7 @@ function devToolsPage(System $system, User $player): void {
                 throw new RuntimeException("Invalid user!");
             }
 
-            if(!$player->isHeadAdmin() && $user->user_id != $player->user_id) {
+            if(!$system->isDevEnvironment() && !$player->isHeadAdmin() && $user->user_id != $player->user_id) {
                 throw new RuntimeException("You may only edit your own characters!");
             }
 
