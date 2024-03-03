@@ -1059,9 +1059,13 @@ class BattleManager {
         }
         if ($attack->countered_percent > 0) {
             if ($counter_damage_resisted > 0) {
-                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type->value}\">" . BattleManager::formatNumber($counter_damage) . "</span> counter damage- (resists " . "<span class=\"battle_text_{$attack->countered_jutsu_type}\">" . BattleManager::formatNumber($counter_damage_resisted) . "</span>" . " counter damage)" . '</span></br>';
+                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type->value}\">"
+                    . BattleManager::formatNumber($counter_damage) . "</span> counter damage- (resists "
+                    . "<span class=\"battle_text_{$attack->countered_jutsu_type->value}\">" . BattleManager::formatNumber($counter_damage_resisted) . "</span>"
+                    . " counter damage)" . '</span></br>';
             } else {
-                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type->value}\">" . BattleManager::formatNumber($counter_damage) . "</span> counter damage-" . '</span></br>';
+                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type->value}\">"
+                    . BattleManager::formatNumber($counter_damage) . "</span> counter damage-" . '</span></br>';
             }
         }
         if ($attack->immolate_raw_damage > 0) {
