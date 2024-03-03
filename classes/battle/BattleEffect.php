@@ -58,7 +58,7 @@ class BattleEffect {
             turns: $raw_data['turns'],
             effect: $raw_data['effect'],
             effect_amount: $raw_data['effect_amount'],
-            damage_type: $raw_data['damage_type'] ?? null,
+            damage_type: !empty($raw_data['damage_type']) ? JutsuOffenseType::from($raw_data['damage_type']) : null,
             power: $raw_data['power'] ?? 0,
         );
     }

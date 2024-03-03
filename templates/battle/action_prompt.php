@@ -11,9 +11,9 @@ $gold_color = '#FDD017';
 $show_submit_button = false;
 
 $prefill_hand_seals = $_POST['hand_seals'] ?? '';
-$prefill_jutsu_type = $_POST['jutsu_type'] ?? JutsuOffenseType::NINJUTSU;
+$prefill_jutsu_type = $_POST['jutsu_type'] ?? JutsuOffenseType::NINJUTSU->value;
 $prefill_weapon_id = $_POST['weapon_id'] ?? '0';
-$prefill_weapon_element = $_POST['weapon_element'] ?? Element::NONE;
+$prefill_weapon_element = $_POST['weapon_element'] ?? Element::NONE->value;
 $prefill_jutsu_id = $_POST['jutsu_id'] ?? '';
 $prefill_item_id = $_POST['item_id'] ?? '';
 ?>
@@ -467,7 +467,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                     <?php $cd_left = $battle->jutsu_cooldowns[$attack->combat_id] ?? 0; ?>
                     <div
                         id='default<?= $c1_count ?>'
-                        class='jutsuName <?= $jutsu_types[$i] ?>'
+                        class='jutsuName <?= $jutsu_types[$i]->value ?>'
                         data-handseals='<?= ($attack->jutsu_type != JutsuOffenseType::TAIJUTSU ? $attack->hand_seals : '') ?>'
                         data-id='<?= $attack->id ?>'
                         aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'
@@ -520,7 +520,13 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                             $cd_left = $battle->jutsu_cooldowns[$player_jutsu->combat_id] ?? 0;
                             ?>
 
-                            <div id='<?= $jutsu_types[$i] ?><?= $c2_count ?>' class='jutsuName <?= $jutsu_types[$i] ?>' data-handseals='<?= $player_jutsu->hand_seals ?>' data-id='<?= $jutsu['id'] ?>' aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'>
+                            <div
+                                id='<?= $jutsu_types[$i]->value ?><?= $c2_count ?>'
+                                class='jutsuName <?= $jutsu_types[$i]->value ?>'
+                                data-handseals='<?= $player_jutsu->hand_seals ?>'
+                                data-id='<?= $jutsu['id'] ?>'
+                                aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'
+                            >
                                 <span class="jutsu_name"><?= $player_jutsu->name ?></span>
                                 <span class="jutsu_type"><?= $player_jutsu->hasElement()
                                     ? System::unSlug($player_jutsu->jutsu_type->value) . " - " . $player_jutsu->element->value

@@ -191,7 +191,7 @@ class NPC extends Fighter {
                 $move['effect2_length'] = 0;
             }
             if (!isset($move['element'])) {
-                $move['element'] = Element::NONE;
+                $move['element'] = Element::NONE->value;
             }
             $jutsu = $this->initJutsu(
                 id: count($this->jutsu),

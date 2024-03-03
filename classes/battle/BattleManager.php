@@ -287,7 +287,7 @@ class BattleManager {
                     $jutsu_type = $_POST['jutsu_type'];
 
                     // Check for handseals if ninjutsu/genjutsu
-                    if($jutsu_type == JutsuOffenseType::NINJUTSU or $jutsu_type == JutsuOffenseType::GENJUTSU) {
+                    if($jutsu_type == JutsuOffenseType::NINJUTSU->value or $jutsu_type == JutsuOffenseType::GENJUTSU->value) {
                         if(!$_POST['hand_seals']) {
                             throw new RuntimeException("Please enter hand seals!");
                         }
@@ -301,7 +301,7 @@ class BattleManager {
                     }
 
                     // Check jutsu ID if taijutsu
-                    else if($jutsu_type == JutsuOffenseType::TAIJUTSU) {
+                    else if($jutsu_type == JutsuOffenseType::TAIJUTSU->value) {
                         $jutsu_id = (int)$_POST['jutsu_id'];
 
                         $player_jutsu = $this->getJutsuFromId($this->player, $jutsu_id);

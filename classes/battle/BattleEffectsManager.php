@@ -595,15 +595,15 @@ class BattleEffectsManager {
             if($residual_damage_resisted > 0) {
                 $this->addDisplay(
                     $target, $target->getName() . " takes " 
-                      . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" 
-                      . BattleManager::formatNumber($damage) . "</span>" . " $damage_label (resists " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">"
+                      . "<span class=\"battle_text_{$effect->damage_type->value}\" style=\"color:{$attack_jutsu_color}\">"
+                      . BattleManager::formatNumber($damage) . "</span>" . " $damage_label (resists " . "<span class=\"battle_text_{$effect->damage_type->value}\" style=\"color:{$attack_jutsu_color}\">"
                       . BattleManager::formatNumber($residual_damage_resisted) . "</span>" . " damage)"
                 );
             }
             else {
                 $this->addDisplay(
                     $target, $target->getName() . " takes " 
-                      . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" 
+                      . "<span class=\"battle_text_{$effect->damage_type->value}\" style=\"color:{$attack_jutsu_color}\">"
                       . BattleManager::formatNumber($damage) . "</span>" . " $damage_label"
                 );
             }
@@ -620,7 +620,8 @@ class BattleEffectsManager {
             if($effect->effect_amount > 0) {
                 $this->addDisplay(
                     $target,
-                    $target->getName() . " heals " . "<span class=\"battle_text_heal\" style=\"color:green\">" . BattleManager::formatNumber($heal) . "</span>" . " health"
+                    $target->getName() . " heals " . "<span class=\"battle_text_heal\" style=\"color:green\">"
+                        . BattleManager::formatNumber($heal) . "</span>" . " health"
                 );
                 $target->health += $heal;
             }
