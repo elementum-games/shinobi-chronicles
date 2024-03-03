@@ -483,7 +483,7 @@ class Jutsu {
                 case 'lightning_vulnerability':
                 case 'earth_vulnerability':
                 case 'water_vulnerability':
-                    $total_elemental_vuln += self::BALANCE_EFFECT_RATIOS['vulnerability'] * $capped_effect_amount * $effect->effect_length;
+                    $total_elemental_vuln += $capped_effect_amount * $effect->effect_length;
                     $count_elemental_vulns++;
                     break;
                 case 'evasion_nerf':
@@ -494,7 +494,7 @@ class Jutsu {
                     break;
             }
         }
-        
+
         if($count_elemental_vulns >= 2) {
             $total_effect_utility += ($total_elemental_vuln / $count_elemental_vulns) * self::BALANCE_EFFECT_RATIOS['hybrid_elemental_vulnerability'];
         }
@@ -510,6 +510,7 @@ class Jutsu {
 
         // Final power
         $total_effective_power = $capped_power + $residual_power + $compound_residual_power + $recoil_power;
+        $final_effect_utility = $total_effect_utility * self::BALANCE_BASELINE_POWER;
 
         // Debug
         /*echo "
@@ -519,7 +520,7 @@ class Jutsu {
             Recoil Power: $recoil_power<br />
             Total Power: {$total_effective_power}<br />
             <br />
-            Effects: $total_effect_utility<br />
+            Effects: $final_effect_utility<br />
             CR Discount: -$compound_residual_discount<br />
             Recoil Self Damage: -$recoil_self_damage<br />
         ";*/
@@ -531,7 +532,7 @@ class Jutsu {
             $total_utility += $total_effective_power * $piercing_effect_percent * self::BALANCE_EFFECT_RATIOS['piercing'];
         }
         // Effects
-        $total_utility += self::BALANCE_BASELINE_POWER * $total_effect_utility;
+        $total_utility += $final_effect_utility;
 
         // Discounts
         $total_utility -= $compound_residual_discount;
