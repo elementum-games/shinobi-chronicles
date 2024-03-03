@@ -94,9 +94,9 @@ abstract class Fighter {
     public float $taijutsu_resist = 0;
     public float $genjutsu_resist = 0;
 
-    public $barrier;
+    public float $barrier;
 
-    public $reputation_defense_boost = 0;
+    public int $reputation_defense_boost = 0;
 
     public float $evasion_boost = 0;
     public float $resist_boost = 0;
@@ -106,7 +106,7 @@ abstract class Fighter {
     public float $earth_boost = 0;
     public float $water_boost = 0;
 
-    public $last_damage_taken = 0;
+    public float $last_damage_taken = 0;
 
     // Combat nerfs
     public float $ninjutsu_nerf = 0;
@@ -446,7 +446,6 @@ abstract class Fighter {
     /**
      * @param        $raw_damage
      * @param string $defense_type ninjutsu, genjutsu, taijutsu
-     * @param bool   $residual_damage
      * @param bool   $apply_resists
      * @param string $element
      * @param bool   $is_raw_damage
@@ -455,17 +454,11 @@ abstract class Fighter {
     public function calcDamageTaken(
         $raw_damage,
         string $defense_type,
-        bool $residual_damage = false,
         bool $apply_resists = true,
         string $element = Jutsu::ELEMENT_NONE,
-        bool $is_raw_damage = true,
         bool $apply_weakness = true
     ): float|int {
         $defense = self::BASE_DEFENSE;
-
-        if($defense <= 0) {
-            $defense = 1;
-        }
 
         if($apply_resists) {
             if (!empty($this->bloodline_defense_boosts)) {
@@ -490,19 +483,19 @@ abstract class Fighter {
         $weakness_modifier = 0;
         switch($defense_type) {
             case 'ninjutsu':
-                if ($apply_resists && $is_raw_damage) {
+                if ($apply_resists) {
                     $raw_damage -= $this->ninjutsu_resist;
                 }
                 $weakness_modifier += $this->ninjutsu_weakness;
                 break;
             case 'genjutsu':
-                if ($apply_resists && $is_raw_damage) {
+                if ($apply_resists) {
                     $raw_damage -= $this->genjutsu_resist;
                 }
                 $weakness_modifier += $this->genjutsu_weakness;
                 break;
             case 'taijutsu':
-                if ($apply_resists && $is_raw_damage) {
+                if ($apply_resists) {
                     $raw_damage -= $this->taijutsu_resist;
                 }
                 $weakness_modifier += $this->taijutsu_weakness;
@@ -537,11 +530,7 @@ abstract class Fighter {
             $raw_damage *= (100 - $this->reputation_defense_boost) / 100;
         }
 
-        if ($is_raw_damage) {
-            $damage = round($raw_damage / $defense, 2);
-        } else {
-            $damage = $raw_damage;
-        }
+        $damage = round($raw_damage / $defense, 2);
 
         if ($damage < 0.0) {
             $damage = 0;
@@ -555,16 +544,6 @@ abstract class Fighter {
             }
 
             $normalized_resist_boost = BattleManager::diminishingReturns($resist_boost, BattleManager::RESIST_DIMINISHING_RETURN_SCALE);
-
-            /*
-            // if higher than soft cap, apply penalty
-            if ($resist_boost > BattleManager::RESIST_SOFT_CAP) {
-                $resist_boost = (($resist_boost - BattleManager::RESIST_SOFT_CAP) * BattleManager::RESIST_SOFT_CAP_RATIO) + BattleManager::RESIST_SOFT_CAP;
-            }
-            // if still higher than cap, set to hard cap
-            if ($resist_boost > BattleManager::RESIST_HARD_CAP) {
-                $resist_boost = BattleManager::RESIST_HARD_CAP;
-            }*/
 
             if($this->system->debug['damage']) {
                 echo "Diminishing returns: {$resist_boost} => {$normalized_resist_boost}";

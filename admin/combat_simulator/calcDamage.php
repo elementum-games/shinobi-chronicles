@@ -120,13 +120,11 @@ function calcDamage(
 
     $player1_damage_no_resists = $player2->calcDamageTaken(
         raw_damage: $player1_collision_damage,
-        defense_type: $player1_jutsu->jutsu_type,
-        apply_resists: false
+        defense_type: $player1_jutsu->jutsu_type, apply_resists: false
     );
     $player2_damage_no_resists = $player1->calcDamageTaken(
         raw_damage: $player2_collision_damage,
-        defense_type: $player2_jutsu->jutsu_type,
-        apply_resists: false
+        defense_type: $player2_jutsu->jutsu_type, apply_resists: false
     );
 
     // Display

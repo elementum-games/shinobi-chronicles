@@ -615,9 +615,9 @@ class BattleEffectsManager {
         }
 
         if($effect->isDamageOverTime()) {
-            $damage = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true);
+            $damage = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type);
             $residual_damage_raw = $target->calcDamageTaken(
-                $effect->effect_amount, $effect->damage_type, true, apply_resists: false
+                $effect->effect_amount, $effect->damage_type, apply_resists: false
             );
             $residual_damage_resisted = $residual_damage_raw - $damage;
             $attack_jutsu_color = BattleManager::getJutsuTextColor($effect->damage_type);

@@ -366,7 +366,7 @@ class BattleEffectsManagerV2 {
         }
 
         if($effect->isDamageOverTime()) {
-            $damage = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true);
+            $damage = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type);
             $this->addEffectHit($target, new EffectHitLog(
                 caster_id: $attacker->combat_id,
                 target_id: $target->combat_id,

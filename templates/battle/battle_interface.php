@@ -373,7 +373,10 @@ if($battle->battle_text) {
                         <?php
                             if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual" || $effect->effect == "reflect_damage") {
                                 $effect_power = $effect->effect_amount * $effect->turns;
-                                $residual_damage = $player->calcDamageTaken($effect_power, $effect->damage_type, apply_resists: false, apply_weakness: false);
+                                $residual_damage = $player->calcDamageTaken(
+                                    $effect_power, $effect->damage_type, apply_resists: false,
+                                    element: Jutsu::ELEMENT_NONE, apply_weakness: false
+                                );
                                 echo "<span class='hover_text'>" . BattleManager::formatNumber($residual_damage) . " Damage</span>";
                             } else {
                                 echo "<span class='hover_text'>" . round($effect->effect_amount) . "% Effect</span>";
@@ -401,7 +404,10 @@ if($battle->battle_text) {
                                 <?php
                                     if ($effect->isDamageOverTime()) {
                                         $effect_power = $effect->effect_amount * $effect->turns;
-                                        $residual_damage = $opponent->calcDamageTaken($effect_power, $effect->damage_type, apply_resists: false, apply_weakness: false);
+                                        $residual_damage = $opponent->calcDamageTaken(
+                                            $effect_power, $effect->damage_type, apply_resists: false,
+                                            element: Jutsu::ELEMENT_NONE, apply_weakness: false
+                                        );
                                         echo "<span class='hover_text'>" . BattleManager::formatNumber($residual_damage) . " Damage</span>";
                                     } else {
                                         echo "<span class='hover_text'>" . round($effect->effect_amount) . "% Effect</span>";
