@@ -1066,9 +1066,17 @@ class BattleManager {
         }
         if ($attack->immolate_raw_damage > 0) {
             if ($immolate_damage_resisted > 0) {
-                $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu_type->value}\">" . BattleManager::formatNumber($immolate_damage) . "</span> immolation damage- (resists " . "<span class=\"battle_text_{$attack->jutsu_type}\">" . BattleManager::formatNumber($immolate_damage_resisted) . "</span>" . " immolation damage)" . '</span></br>';
+                $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu_type->value}\">"
+                    . BattleManager::formatNumber($immolate_damage)
+                    . "</span> immolation damage- (resists "
+                    . "<span class=\"battle_text_{$attack->jutsu_type->value}\">"
+                    . BattleManager::formatNumber($immolate_damage_resisted)
+                    . "</span>" . " immolation damage)"
+                . '</span></br>';
             } else {
-                $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu_type->value}\">" . BattleManager::formatNumber($immolate_damage) . "</span> immolation damage-" . '</span></br>';
+                $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu_type->value}\">"
+                    . BattleManager::formatNumber($immolate_damage) . "</span> immolation damage-"
+                . '</span></br>';
             }
         }
 
@@ -1555,17 +1563,22 @@ class BattleManager {
     }
 
     protected function applySubstitution(BattleAttack $fighter_attack, BattleAttack $incoming_attack, bool $fighter_is_p1): string {
+        $effect_reduced = false;
+
         $fighter_attack->substitution_percent *= (1 - $incoming_attack->piercing_percent);
         $incoming_attack->damage *= (1 - $fighter_attack->substitution_percent);
         foreach($incoming_attack->effects as $effect) {
-            $effect->effect_amount *= 1 - $fighter_attack->substitution_percent;
+            if(in_array($effect->effect, [...BattleEffectsManager::DEBUFF_EFFECTS, 'immolate'])) {
+                $effect_reduced = true;
+                $effect->effect_amount *= 1 - $fighter_attack->substitution_percent;
+            }
         }
 
         $block_percent = round($fighter_attack->substitution_percent * 100);
 
         return $fighter_is_p1
-            ? "[player]'s substitute took $block_percent% of [opponent]'s damage and effects!"
-            : "[opponent]'s substitute took $block_percent% of [player]'s damage and effects!";
+            ? "[player]'s substitute took $block_percent% of [opponent]'s damage" . ($effect_reduced ? " and effects" : "") . "!"
+            : "[opponent]'s substitute took $block_percent% of [player]'s damage" . ($effect_reduced ? " and effects" : "") . "!";
     }
     protected function applyCounter(BattleAttack $fighter_attack, BattleAttack $incoming_attack, bool $fighter_is_p1): string {
         // Apply piercing
