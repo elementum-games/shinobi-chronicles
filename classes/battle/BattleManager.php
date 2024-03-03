@@ -1595,12 +1595,15 @@ class BattleManager {
     protected function applySubstitution(BattleAttack $fighter_attack, BattleAttack $incoming_attack, bool $fighter_is_p1): string {
         $fighter_attack->substitution_percent *= (1 - $incoming_attack->piercing_percent);
         $incoming_attack->damage *= (1 - $fighter_attack->substitution_percent);
+        foreach($incoming_attack->effects as $effect) {
+            $effect->effect_amount *= 1 - $fighter_attack->substitution_percent;
+        }
 
         $block_percent = round($fighter_attack->substitution_percent * 100);
 
         return $fighter_is_p1
-            ? "[player]'s substitute took $block_percent% of [opponent]'s damage!"
-            : "[opponent]'s substitute took $block_percent% of [player]'s damage!";
+            ? "[player]'s substitute took $block_percent% of [opponent]'s damage and effects!"
+            : "[opponent]'s substitute took $block_percent% of [player]'s damage and effects!";
     }
     protected function applyCounter(BattleAttack $fighter_attack, BattleAttack $incoming_attack, bool $fighter_is_p1): string {
         // Apply piercing
