@@ -94,7 +94,7 @@ abstract class Fighter {
     public float $taijutsu_resist = 0;
     public float $genjutsu_resist = 0;
 
-    public float $barrier;
+    public float $barrier = 0;
 
     public int $reputation_defense_boost = 0;
 
