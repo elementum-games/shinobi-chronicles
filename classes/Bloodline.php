@@ -350,32 +350,33 @@ class Bloodline {
         return $offense_to_bloodline;
     }
 
-    public function getPrimaryJutsuType(): string {
+    public function getPrimaryJutsuType(): JutsuOffenseType {
         foreach($this->combat_boosts as $combat_boost) {
             switch($combat_boost->effect) {
                 case 'ninjutsu_boost':
-                    return 'ninjutsu';
+                    return JutsuOffenseType::NINJUTSU;
                 case 'taijutsu_boost':
-                    return 'taijutsu';
+                    return JutsuOffenseType::TAIJUTSU;
                 case 'genjutsu_boost':
-                    return 'genjutsu';
+                    return JutsuOffenseType::GENJUTSU;
                 default:
-                    return 'ninjutsu';
+                    return JutsuOffenseType::NINJUTSU;
                     break;
             }
         }
 
         // No boosts, default to nin
-        return 'ninjutsu';
+        return JutsuOffenseType::NINJUTSU;
     }
 
     /**
-     * @param System $system
-     * @param int    $bloodline_id
-     * @param int    $user_id
-     * @param bool   $display
+     * @param System    $system
+     * @param int       $bloodline_id
+     * @param int       $user_id
+     * @param User|null $player
+     * @param bool      $display
      * @return bool
-     * @throws RuntimeException
+     * @throws DatabaseDeadlockException
      */
     public static function giveBloodline(System $system, int $bloodline_id, int $user_id, ?User $player = null, bool $display = true): bool {
         $result = $system->db->query("SELECT * FROM `bloodlines` WHERE `bloodline_id` = '$bloodline_id' LIMIT 1");

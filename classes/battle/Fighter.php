@@ -250,7 +250,7 @@ abstract class Fighter {
         return $final_amount * (self::SKILL_OFFENSE_RATIO * 2) * $avg_rand;
     }
 
-    public function getPrimaryJutsuType(): string {
+    public function getPrimaryJutsuType(): JutsuOffenseType {
         // Get total offense value
         $ninjutsu_skill = $this->ninjutsu_skill;
         $taijutsu_skill = $this->taijutsu_skill;
@@ -275,13 +275,13 @@ abstract class Fighter {
 
         // First, is one of the offenses higher than the others
         if($ninjutsu_skill > max($taijutsu_skill, $genjutsu_skill)) {
-            return 'ninjutsu';
+            return JutsuOffenseType::NINJUTSU;
         }
         if($taijutsu_skill > max($ninjutsu_skill, $genjutsu_skill)) {
-            return 'taijutsu';
+            return JutsuOffenseType::TAIJUTSU;
         }
         if($genjutsu_skill > max($ninjutsu_skill, $taijutsu_skill)) {
-            return 'genjutsu';
+            return JutsuOffenseType::GENJUTSU;
         }
 
         // What's the offense boost on bloodline, if any
@@ -290,7 +290,7 @@ abstract class Fighter {
         }
 
         // Fuck it, you're a ninja, you use ninjutsu - lmfao
-        return 'ninjutsu';
+        return JutsuOffenseType::NINJUTSU;
     }
 
     /**
