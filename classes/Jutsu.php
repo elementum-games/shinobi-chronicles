@@ -390,6 +390,7 @@ class Jutsu {
         $compound_residual_effect_percent = 0;
         $compound_residual_discount = 0;
         $recoil_effect_percent = 0;
+        $piercing_effect_percent = 0;
 
         $total_effect_utility = 0;
         
@@ -435,8 +436,10 @@ class Jutsu {
                 case 'counter':
                 case 'substitution':
                 case 'reflect':
-                case 'piercing':
                     $total_effect_utility += self::BALANCE_EFFECT_RATIOS[$effect->effect] * $capped_effect_amount;
+                    break;
+                case 'piercing':
+                    $piercing_effect_percent += $capped_effect_amount;
                     break;
                 case 'ninjutsu_boost':
                 case 'taijutsu_boost':
@@ -506,20 +509,31 @@ class Jutsu {
         $recoil_self_damage = $recoil_effect_percent * $capped_power;
 
         // Final power
+        $total_effective_power = $capped_power + $residual_power + $compound_residual_power + $recoil_power;
+
         // Debug
         /*echo "
             Capped Power: {$capped_power}<br />
             Residual: $residual_power<br />
             CR: $compound_residual_power<br />
             Recoil Power: $recoil_power<br />
+            Total Power: {$total_effective_power}<br />
             <br />
             Effects: $total_effect_utility<br />
             CR Discount: -$compound_residual_discount<br />
             Recoil Self Damage: -$recoil_self_damage<br />
         ";*/
-        $total_utility = $capped_power + $residual_power + $compound_residual_power + $recoil_power;
+
+        // Damage
+        $total_utility = $total_effective_power;
+        // Piercing
+        if($piercing_effect_percent > 0) {
+            $total_utility += $total_effective_power * $piercing_effect_percent * self::BALANCE_EFFECT_RATIOS['piercing'];
+        }
+        // Effects
         $total_utility += self::BALANCE_BASELINE_POWER * $total_effect_utility;
 
+        // Discounts
         $total_utility -= $compound_residual_discount;
         $total_utility -= $recoil_self_damage;
 
