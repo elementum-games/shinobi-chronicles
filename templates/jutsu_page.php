@@ -21,9 +21,11 @@ $rank_names = RankManager::fetchNames($system);
         align-items: center;
         justify-content: center;
     }
+
     .jutsu_list_table tr {
         text-align: center;
     }
+
     .jutsu_list_table {
         position: relative;
     }
@@ -33,30 +35,34 @@ $rank_names = RankManager::fetchNames($system);
         flex-wrap: wrap;
         justify-content: center;
     }
+
     .jutsu_select {
-        width:210px;
-        height:55px;
+        width: 210px;
+        height: 55px;
         outline: none;
         border: 0px;
         text-align: center;
         font-size: 15px;
         font-weight: bold;
     }
+
     .jutsu_select_wrapper {
         border-radius: 36px;
-        display:inline-block;
+        display: inline-block;
         margin: 10px;
-        overflow:hidden;
-        border:solid;
+        overflow: hidden;
+        border: solid;
     }
+
     .jutsu_select_wrapper.over {
-        border-color:var(--theme-text-color-normal) !important;
-        border:dashed;
+        border-color: var(--theme-text-color-normal) !important;
+        border: dashed;
     }
 
     .jutsu_scrolls_expand:hover {
-         box-shadow: 0px 0px 2px 2px rgb(0,0,0);
+        box-shadow: 0px 0px 2px 2px rgb(0, 0, 0);
     }
+
     .jutsu_scrolls_expand {
         cursor: pointer;
         border-radius: 0px 0px 10px 10px;
@@ -68,24 +74,30 @@ $rank_names = RankManager::fetchNames($system);
         border-radius: 10px !important;
         cursor: grab;
     }
+
     .jutsu_block_expand:hover {
-         box-shadow: 0px 0px 2px 2px rgb(0,0,0);
+        box-shadow: 0px 0px 2px 2px rgb(0, 0, 0);
     }
+
     .jutsu_block_expand {
         cursor: pointer;
         border-radius: 0px 0px 10px 10px;
     }
+
     .jutsu_block_title th {
         border-radius: 10px 10px 0px 0px !important;
         font-size: 14px !important;
     }
+
     .jutsu_block_table tr {
         text-align: center;
     }
+
     .jutsu_block_table td {
         padding: 0px !important;
         border-radius: 0px !important;
     }
+
     .jutsu_block_table td p {
         margin: 5px 0px;
     }
@@ -93,6 +105,7 @@ $rank_names = RankManager::fetchNames($system);
     .jutsu_filter {
         text-align: right;
     }
+
     .jutsu_filter_button {
         background-color: var(--theme-content-bg-color);
         color: var(--theme-text-color-dark);
@@ -101,19 +114,24 @@ $rank_names = RankManager::fetchNames($system);
         float: left;
         margin-right: 5px;
     }
+
     .active {
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
         border: solid;
     }
+
     .jutsu_filter_checkbox {
         margin-left: 15px;
     }
+
     .jutsu_filter_checkbox_container {
         padding-right: 15px;
     }
+
     .jutsu_filter_button_container {
         padding-left: 10px;
     }
+
     .type_filter.active {
         background-color: #ccc;
     }
@@ -121,63 +139,79 @@ $rank_names = RankManager::fetchNames($system);
     .jutsu_details_table {
         border-radius: 10px;
     }
-        .jutsu_details_table tr {
-            text-align: center;
-        }
+
+    .jutsu_details_table tr {
+        text-align: center;
+    }
+
     .jutsu_details_label_column {
         vertical-align: top;
         display: inline-block;
         text-align: left;
     }
+
     .jutsu_details_label_column p {
         font-weight: bold;
         margin: 5px 0px;
     }
+
     .jutsu_details_info_column {
         display: inline-block;
         margin-left: 10px;
         text-align: left;
     }
+
     .jutsu_details_info_column p {
         margin: 5px 0px;
     }
+
     .jutsu_details_close {
         border-radius: 0px 0px 10px 10px;
         cursor: pointer;
     }
+
     .jutsu_details_close:hover {
-        box-shadow: 0px 0px 2px 2px rgb(0,0,0);
+        box-shadow: 0px 0px 2px 2px rgb(0, 0, 0);
     }
+
     .jutsu_details_label {
         display: inline-block;
     }
+
     .jutsu_details_label p {
         font-weight: bold;
         margin: 5px 0px;
     }
+
     .jutsu_details_description {
         height: 65px;
         display: flex;
         justify-content: center;
         flex-direction: column;
     }
+
     .jutsu_details_description p {
         margin: 5px 0px;
     }
+
     #jutsu_description {
         height: 40px;
         flex-shrink: 0;
     }
+
     .jutsu_details_child {
         display: inline-block;
     }
+
     .jutsu_details_child p {
         margin: 5px 0px;
     }
+
     #jutsu_name {
         text-align: center;
         margin: 5px 0px 5px 0px;
     }
+
     .hidden {
         display: none;
     }
@@ -202,7 +236,7 @@ $rank_names = RankManager::fetchNames($system);
             }
             else {
                 $(".jutsu_details_table").show();
-                $('.jutsu_details_table').get(0).scrollIntoView({behavior: 'smooth'});
+                $('.jutsu_details_table').get(0).scrollIntoView({ behavior: 'smooth' });
                 // only display child jutsu if set
                 $("#" + $(this).attr("data-target")).attr("data-jutsu_child") == "None" ? $("#jutsu_details_child_row").hide() : $("#jutsu_details_child_row").show();
                 // populate details modal with jutsu data
@@ -257,10 +291,11 @@ $rank_names = RankManager::fetchNames($system);
         $("#jutsu_filter_debuff").on('click', function () {
             filter();
         });
+
         // get list of jutsu, filter and hide based on jutsu_filter input
         function filter() {
             var jutsu = $(".jutsu_block_table").removeClass('hidden');
-            jutsu.each(function() {
+            jutsu.each(function () {
                 var jutsuElement = $(this);
                 var jutsuEffect = jutsuElement.data('jutsu_effect');
                 var hideJutsu = true;
@@ -306,6 +341,7 @@ $rank_names = RankManager::fetchNames($system);
                 }
             });
         }
+
         // Drag and drop functionality
         $(".jutsu_block_table").on('dragstart', function (e) {
             e.originalEvent.dataTransfer.effectAllowed = 'move';
@@ -332,130 +368,141 @@ $rank_names = RankManager::fetchNames($system);
 </script>
 
 <table class='table'>
-    <tr><th colspan='3'>Equipped Jutsu</th></tr>
-    <tr><td colspan='3'>
-        <form action='<?= $self_link ?>' method='post'>
-            <div class='jutsu_slots_container'>
-                <?php for($i = 0; $i < $max_equipped_jutsu; $i++): ?>
-                    <?php $slot_equipped_jutsu = $player->equipped_jutsu[$i]['id'] ?? null; ?>
-                    <div class="jutsu_select_wrapper">
-                        <select class="jutsu_select" name='jutsu[<?= ($i + 1) ?>]'>
-                            <option value='none' <?= (!$player->equipped_jutsu ? "selected='selected'" : "") ?>>None</option>
-                            <?php foreach($player->jutsu as $jutsu): ?>
-                                <option
-                                    value='<?= $jutsu->jutsu_type->value ?>-<?= $jutsu->id ?>'
-                                    <?= ($jutsu->id == $slot_equipped_jutsu ? "selected='selected'" : "") ?>
-                                >
-                                    <?= $jutsu->name ?>
+    <tr>
+        <th colspan='3'>Equipped Jutsu</th>
+    </tr>
+    <tr>
+        <td colspan='3'>
+            <form action='<?= $self_link ?>' method='post'>
+                <div class='jutsu_slots_container'>
+                    <?php for($i = 0; $i < $max_equipped_jutsu; $i++): ?>
+                        <?php $slot_equipped_jutsu = $player->equipped_jutsu[$i]['id'] ?? null; ?>
+                        <div class="jutsu_select_wrapper">
+                            <select class="jutsu_select" name='jutsu[<?= ($i + 1) ?>]'>
+                                <option value='none' <?= (!$player->equipped_jutsu ? "selected='selected'" : "") ?>>
+                                    None
                                 </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                <?php endfor; ?>
-            </div>
-            <div style='text-align:center;margin:8px 0 5px;'>
-                <input type='submit' name='equip_jutsu' value='Equip' />
-            </div>
-        </form>
+                                <?php foreach($player->jutsu as $jutsu): ?>
+                                    <option
+                                            value='<?= $jutsu->jutsu_type->value ?>-<?= $jutsu->id ?>'
+                                        <?= ($jutsu->id == $slot_equipped_jutsu ? "selected='selected'" : "") ?>
+                                    >
+                                        <?= $jutsu->name ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    <?php endfor; ?>
+                </div>
+                <div style='text-align:center;margin:8px 0 5px;'>
+                    <input type='submit' name='equip_jutsu' value='Equip'/>
+                </div>
+            </form>
     </tr>
 
     <!-- Purchase jutsu-->
     <?php if(!empty($player->jutsu_scrolls)): ?>
-        <tr><th colspan='3'>Jutsu Scrolls (<?= count($player->jutsu_scrolls) ?>)</th></tr>
+        <tr>
+            <th colspan='3'>Jutsu Scrolls (<?= count($player->jutsu_scrolls) ?>)</th>
+        </tr>
 
         <?php foreach($player->jutsu_scrolls as $id => $jutsu_scroll): ?>
-            <tr id='jutsu_scrolls' class="jutsu_scroll"><td colspan='3'>
-                <span style='font-weight:bold;'><?= $jutsu_scroll->name ?></span><br />
-                <div style='margin-left:2em;'>
-                    <label style='width:6.5em;'>Rank:</label><?= $jutsu_scroll->rank ?><br />
-                    <label style='width:6.5em;'>Element:</label><?= $jutsu_scroll->element->value ?><br />
-                    <label style='width:6.5em;'>Use cost:</label><?= $jutsu_scroll->use_cost ?><br />
-                    <?php if($jutsu_scroll->cooldown > 0): ?>
-                        <label style='width:6.5em;'>Cooldown:</label><?= $jutsu_scroll->cooldown ?> turn(s)<br />
-                    <?php endif; ?>
-                    <label style='width:6.5em;float:left;'>Description:</label>
-                    <p style='display:inline-block;margin:0;width:37.1em;'><?= $jutsu_scroll->description ?></p>
-                    <br style='clear:both;' />
-                    <label style='width:6.5em;'>Jutsu type:</label><?= ucwords($jutsu_scroll->jutsu_type->value) ?><br />
-                </div>
-                <p style='text-align:right;margin:0;'><a href='<?= $self_link ?>&learn_jutsu=<?= $id ?>'>Learn</a></p>
-            </td></tr>
-        <?php endforeach; ?>
-            <tr>
-                <th class="jutsu_scrolls_expand" colspan="3">-</th>
+            <tr id='jutsu_scrolls' class="jutsu_scroll">
+                <td colspan='3'>
+                    <span style='font-weight:bold;'><?= $jutsu_scroll->name ?></span><br/>
+                    <div style='margin-left:2em;'>
+                        <label style='width:6.5em;'>Rank:</label><?= $jutsu_scroll->rank ?><br/>
+                        <label style='width:6.5em;'>Element:</label><?= $jutsu_scroll->element->value ?><br/>
+                        <label style='width:6.5em;'>Use cost:</label><?= $jutsu_scroll->use_cost ?><br/>
+                        <?php if($jutsu_scroll->cooldown > 0): ?>
+                            <label style='width:6.5em;'>Cooldown:</label><?= $jutsu_scroll->cooldown ?> turn(s)<br/>
+                        <?php endif; ?>
+                        <label style='width:6.5em;float:left;'>Description:</label>
+                        <p style='display:inline-block;margin:0;width:37.1em;'><?= $jutsu_scroll->description ?></p>
+                        <br style='clear:both;'/>
+                        <label style='width:6.5em;'>Jutsu type:</label><?= ucwords($jutsu_scroll->jutsu_type->value) ?>
+                        <br/>
+                    </div>
+                    <p style='text-align:right;margin:0;'><a href='<?= $self_link ?>&learn_jutsu=<?= $id ?>'>Learn</a>
+                    </p>
+                </td>
             </tr>
+        <?php endforeach; ?>
+        <tr>
+            <th class="jutsu_scrolls_expand" colspan="3">-</th>
+        </tr>
     <?php endif; ?>
 </table>
 
- <!--Jutsu Details Modal-->
-            <table class="table jutsu_details_table">
-                <tr>
-                    <th id="jutsu_name" colspan="2"></th>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="jutsu_details_label_column">
-                            <p>Rank:</p>
-                            <p>Type:</p>
-                            <p>Element:</p>
-                            <p>Use cost:</p>
-                            <p>Level:</p>
-                        </div>
-                        <div class="jutsu_details_info_column">
-                            <p id="jutsu_rank"></p>
-                            <p id="jutsu_type"></p>
-                            <p id="jutsu_element"></p>
-                            <p id="jutsu_cost"></p>
-                            <p id="jutsu_level"></p>
-                        </div>
-                    </td>
-                    <td style="vertical-align: top;">
-                        <div class="jutsu_details_label_column">
-                            <p>Hand seals:</p>
-                            <p>Power:</p>
-                            <p>Cooldown:</p>
-                            <p>Effect 1:</p>
-                            <p>Effect 2:</p>
-                        </div>
-                        <div class="jutsu_details_info_column">
-                            <p id="jutsu_seals"></p>
-                            <p id="jutsu_power"></p>
-                            <p id="jutsu_cooldown"></p>
-                            <p id="jutsu_effect_1"></p>
-                            <p id="jutsu_effect_2"></p>
-                        </div>
-                    </td>
-                </tr>
-                <tr id="jutsu_details_child_row">
-                    <td colspan="2">
-                        <div class="jutsu_details_label">
-                            <p>Child Jutsu:</p>
-                        </div>
-                        <div class="jutsu_details_child">
-                            <p id="jutsu_child"></p>
-                
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <div class="jutsu_details_label">
-                            <p>Description:</p>
-                        </div>
-                        <div class="jutsu_details_description">
-                            <p id="jutsu_description"></p>
-                            <p style='text-align:center; margin-top: auto'>
-                                <a id="forget_jutsu" href='<?= $self_link ?>&forget_jutsu='>Forget Jutsu!</a>
-                            </p>
-                        </div>
-                    </td>
-                </tr>
-                <tr style="text-align:center">
-                    <th colspan="2" class="jutsu_details_close">
-                        <div>Close</div>
-                    </th>
-                </tr>
-            </table>
+<!--Jutsu Details Modal-->
+<table class="table jutsu_details_table">
+    <tr>
+        <th id="jutsu_name" colspan="2"></th>
+    </tr>
+    <tr>
+        <td>
+            <div class="jutsu_details_label_column">
+                <p>Rank:</p>
+                <p>Type:</p>
+                <p>Element:</p>
+                <p>Use cost:</p>
+                <p>Level:</p>
+            </div>
+            <div class="jutsu_details_info_column">
+                <p id="jutsu_rank"></p>
+                <p id="jutsu_type"></p>
+                <p id="jutsu_element"></p>
+                <p id="jutsu_cost"></p>
+                <p id="jutsu_level"></p>
+            </div>
+        </td>
+        <td style="vertical-align: top;">
+            <div class="jutsu_details_label_column">
+                <p>Hand seals:</p>
+                <p>Power:</p>
+                <p>Cooldown:</p>
+                <p>Effect 1:</p>
+                <p>Effect 2:</p>
+            </div>
+            <div class="jutsu_details_info_column">
+                <p id="jutsu_seals"></p>
+                <p id="jutsu_power"></p>
+                <p id="jutsu_cooldown"></p>
+                <p id="jutsu_effect_1"></p>
+                <p id="jutsu_effect_2"></p>
+            </div>
+        </td>
+    </tr>
+    <tr id="jutsu_details_child_row">
+        <td colspan="2">
+            <div class="jutsu_details_label">
+                <p>Child Jutsu:</p>
+            </div>
+            <div class="jutsu_details_child">
+                <p id="jutsu_child"></p>
+
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <div class="jutsu_details_label">
+                <p>Description:</p>
+            </div>
+            <div class="jutsu_details_description">
+                <p id="jutsu_description"></p>
+                <p style='text-align:center; margin-top: auto'>
+                    <a id="forget_jutsu" href='<?= $self_link ?>&forget_jutsu='>Forget Jutsu!</a>
+                </p>
+            </div>
+        </td>
+    </tr>
+    <tr style="text-align:center">
+        <th colspan="2" class="jutsu_details_close">
+            <div>Close</div>
+        </th>
+    </tr>
+</table>
 
 <!--Jutsu List-->
 <table class="table jutsu_list_table">
@@ -471,13 +518,17 @@ $rank_names = RankManager::fetchNames($system);
                     <button id="jutsu_filter_genjutsu" class="jutsu_filter_button">Genjutsu</button>
                 </div>
                 <div class="jutsu_filter_checkbox_container">
-                    <input id="jutsu_filter_damage" class="jutsu_filter_checkbox" type="checkbox" name="damage_toggle" checked/>
+                    <input id="jutsu_filter_damage" class="jutsu_filter_checkbox" type="checkbox" name="damage_toggle"
+                           checked/>
                     <label for="damage_toggle">Damage</label>
-                    <input id="jutsu_filter_clash" class="jutsu_filter_checkbox" type="checkbox" name="clash_toggle" checked/ />
+                    <input id="jutsu_filter_clash" class="jutsu_filter_checkbox" type="checkbox" name="clash_toggle"
+                           checked/ />
                     <label for="clash_toggle">Clash</label>
-                    <input id="jutsu_filter_buff" class="jutsu_filter_checkbox" type="checkbox" name="buff_toggle" checked/>
+                    <input id="jutsu_filter_buff" class="jutsu_filter_checkbox" type="checkbox" name="buff_toggle"
+                           checked/>
                     <label for="buff_toggle">Buff</label>
-                    <input id="jutsu_filter_debuff" class="jutsu_filter_checkbox" type="checkbox" name="debuff_toggle" checked/>
+                    <input id="jutsu_filter_debuff" class="jutsu_filter_checkbox" type="checkbox" name="debuff_toggle"
+                           checked/>
                     <label for="debuff_toggle">Debuff</label>
                 </div>
             </div>
@@ -486,83 +537,141 @@ $rank_names = RankManager::fetchNames($system);
     <tr>
         <td>
             <div class="jutsu_list">
-                <?php foreach ($jutsu_list as $jutsu): ?>
+                <?php foreach($jutsu_list as $jutsu): ?>
                     <!--data attributes used for filter logic-->
-                <table
-                    class="table jutsu_block_table"
-                    title="<?= $jutsu->name ?> (<?= $jutsu->level ?>)"
-                    draggable="true"
-                    data-jutsu_type="<?= ucwords($jutsu->jutsu_type->value) ?>"
-                    data-jutsu_effect="<?= System::unSlug($jutsu->effects[0]->effect) . ($jutsu->effects[1]->effect == 'none' ? '' : ', ' . System::unSlug($jutsu->effects[1]->effect)) ?>"
-                    data-jutsu_select="<?= $jutsu->jutsu_type->value . '-' . $jutsu->id ?>"
-                >
-                    <tr class="jutsu_block_title">
-                        <th colspan="2">
-                            <?= strlen($jutsu->name) > 20 ? substr($jutsu->name,0,18)."..." : $jutsu->name; ?>
-                            <!--data attributes used to populate details modal-->
-                            <div id="jutsu_<?=  $jutsu->id?>" class="jutsu_data"
-                                data-jutsu_id="<?= $jutsu->id ?>"
-                                data-jutsu_name="<?= $jutsu->name ?>"
-                                data-jutsu_rank="<?= $rank_names[$jutsu->rank] ?>"
-                                data-jutsu_type="<?= ucwords($jutsu->jutsu_type->value) ?>"
-                                data-jutsu_element="<?= $jutsu->element->value ?>"
-                                data-jutsu_cost="<?= $jutsu->use_cost ?>"
-                                data-jutsu_level="<?php echo $jutsu->level == 100 ? $jutsu->level : $jutsu->level . " (" . $jutsu->exp . "/1000)" ?>"
-                                data-jutsu_experience="<?= $jutsu->exp ?>"
-                                data-jutsu_seals="<?= $jutsu->jutsu_type == JutsuOffenseType::TAIJUTSU ? "None" : $jutsu->hand_seals ?>"
-                                data-jutsu_power="<?= $jutsu->power ?> (+<?= round($jutsu->power - $jutsu->base_power, 2) ?>)"
-                                data-jutsu_cooldown="<?php echo $jutsu->cooldown == 1 ? $jutsu->cooldown . " turn" :  $jutsu->cooldown . " turns" ?>"
-                                data-jutsu_effect_1="<?php
-                                echo in_array($jutsu->effects[0]->effect, ["substitution", "counter", "piercing", "recoil", "immolate"])
-                                    ? System::unSlug($jutsu->effects[0]->effect) . " (" . round($jutsu->effects[0]->effect_amount, 0) . "%)"
-                                    : (($jutsu->effects[0]->effect == "none" || $jutsu->effects[0]->effect == "barrier")
-                                        ? System::unSlug($jutsu->effects[0]->effect)
-                                        : System::unSlug($jutsu->effects[0]->effect) . " (" . round($jutsu->effects[0]->effect_amount, 0) . "%)" . ", " . ($jutsu->effects[0]->effect_length == 1
-                                            ? $jutsu->effects[0]->effect_length . " turn"
-                                            : $jutsu->effects[0]->effect_length . " turns"))
-                                    ?>"
-                                data-jutsu_effect_2="<?php
-                                echo in_array($jutsu->effects[1]->effect, ["substitution", "counter", "piercing", "recoil", "immolate"])
-                                    ? System::unSlug($jutsu->effects[1]->effect) . " (" . round($jutsu->effects[1]->effect_amount, 0) . "%)"
-                                    : (($jutsu->effects[1]->effect == "none" || $jutsu->effects[1]->effect == "barrier")
-                                        ? System::unSlug($jutsu->effects[1]->effect)
-                                        : System::unSlug($jutsu->effects[1]->effect) . " (" . round($jutsu->effects[1]->effect_amount, 0) . "%" . ", " . ($jutsu->effects[1]->effect_length == 1
-                                            ? $jutsu->effects[1]->effect_length . " turn)"
-                                            : $jutsu->effects[1]->effect_length . " turns)"))
-                                    ?>"
-                                data-jutsu_description="<?= $jutsu->description ?>"
-                                data-jutsu_child="<?php echo array_key_exists($jutsu->id, $child_jutsu) ? implode(', ' , $child_jutsu[$jutsu->id][0]) : "None" ?>"
-                                data-jutsu_use_type="<?= $jutsu->use_type ?>"></div>
-                        </th>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p><b>Power</b></p>
-                            <p><?= $jutsu->power ?></p>
-                        </td>
-                        <td>
-                            <p><b>Cooldown</b></p>
-                            <p><?= $jutsu->cooldown ?></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <?php if ($jutsu->effects[0]->effect == "none" || $jutsu->effects[0]->effect == "barrier"): ?>
-                            <p><?= System::unSlug($jutsu->effects[0]->effect) ?></p>
-                            <?php else : ?>
-                            <p><?= System::unSlug($jutsu->effects[0]->effect) ?> (<?= round($jutsu->effects[0]->effect_amount, 0) ?>%)</p>
-                            <?php endif; ?>
-                            <?php if ($jutsu->effects[1]->effect == "barrier"): ?>
-                            <p><?= System::unSlug($jutsu->effects[1]->effect) ?></p>
-                            <?php elseif ($jutsu->effects[1]->effect != "none"): ?>
-                            <p><?= System::unSlug($jutsu->effects[1]->effect) ?> (<?= round($jutsu->effects[1]->effect_amount, 0) ?>%)</p>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th class="jutsu_block_expand" colspan="2" data-target="jutsu_<?= $jutsu->id?>">+</th>
-                    </tr>
-                </table>
+                    <table
+                        class="table jutsu_block_table"
+                        title="<?= $jutsu->name ?> (<?= $jutsu->level ?>)"
+                        draggable="true"
+                        data-jutsu_type="<?= ucwords($jutsu->jutsu_type->value) ?>"
+                        data-jutsu_effect="<?php
+                        if($jutsu->hasEffect()) {
+                            echo System::unSlug($jutsu->effects[0]->effect);
+                            if(isset($jutsu->effects[1])) {
+                                echo ', ' . System::unSlug($jutsu->effects[1]->effect);
+                            }
+                        }
+                        else {
+                            echo 'none';
+                        }
+                        ?>"
+                        data-jutsu_select="<?= $jutsu->jutsu_type->value . '-' . $jutsu->id ?>"
+                    >
+                        <tr class="jutsu_block_title">
+                            <th colspan="2">
+                                <?= strlen($jutsu->name) > 20 ? substr($jutsu->name, 0, 18) . "..." : $jutsu->name; ?>
+                                <!--data attributes used to populate details modal-->
+                                <div id="jutsu_<?= $jutsu->id ?>"
+                                     class="jutsu_data"
+                                     data-jutsu_id="<?= $jutsu->id ?>"
+                                     data-jutsu_name="<?= $jutsu->name ?>"
+                                     data-jutsu_rank="<?= $rank_names[$jutsu->rank] ?>"
+                                     data-jutsu_type="<?= ucwords($jutsu->jutsu_type->value) ?>"
+                                     data-jutsu_element="<?= $jutsu->element->value ?>"
+                                     data-jutsu_cost="<?= $jutsu->use_cost ?>"
+                                     data-jutsu_level="<?php echo $jutsu->level == 100 ? $jutsu->level : $jutsu->level . " (" . $jutsu->exp . "/1000)" ?>"
+                                     data-jutsu_experience="<?= $jutsu->exp ?>"
+                                     data-jutsu_seals="<?= $jutsu->jutsu_type == JutsuOffenseType::TAIJUTSU ? "None" : $jutsu->hand_seals ?>"
+                                     data-jutsu_power="<?= $jutsu->power ?> (+<?= round(
+                                         $jutsu->power - $jutsu->base_power, 2
+                                     ) ?>)"
+                                     data-jutsu_cooldown="<?php echo $jutsu->cooldown == 1 ? $jutsu->cooldown . " turn" : $jutsu->cooldown . " turns" ?>"
+                                     data-jutsu_effect_1="<?php
+                                         if(isset($jutsu->effects[0])) {
+                                             $jutsu_effect = $jutsu->effects[0];
+
+                                             if(in_array($jutsu_effect->effect, BattleEffectsManager::CLASH_EFFECTS)) {
+                                                 echo System::unSlug($jutsu_effect->effect) . " (" . round(
+                                                         $jutsu_effect->effect_amount, 0
+                                                     ) . "%)";
+                                             }
+                                             else if($jutsu_effect->effect == Jutsu::USE_TYPE_BARRIER) {
+                                                 echo System::unSlug($jutsu_effect->effect);
+                                             }
+                                             else {
+                                                 echo System::unSlug($jutsu_effect->effect)
+                                                     . " (" . round($jutsu_effect->effect_amount) . "%)"
+                                                     . ", " . ($jutsu_effect->effect_length == 1
+                                                         ? $jutsu_effect->effect_length . " turn"
+                                                         : $jutsu_effect->effect_length . " turns");
+                                             }
+                                         }
+                                         else {
+                                             echo 'none';
+                                         }
+                                     ?>"
+                                     data-jutsu_effect_2="<?php
+                                         if(isset($jutsu->effects[1])) {
+                                             $jutsu_effect = $jutsu->effects[1];
+
+                                             if(in_array($jutsu_effect->effect, BattleEffectsManager::CLASH_EFFECTS)) {
+                                                 echo System::unSlug($jutsu_effect->effect) . " (" . round(
+                                                         $jutsu_effect->effect_amount, 0
+                                                     ) . "%)";
+                                             }
+                                             else if($jutsu_effect->effect == Jutsu::USE_TYPE_BARRIER) {
+                                                 echo System::unSlug($jutsu_effect->effect);
+                                             }
+                                             else {
+                                                 echo System::unSlug($jutsu_effect->effect)
+                                                     . " (" . round($jutsu_effect->effect_amount) . "%)"
+                                                     . ", " . ($jutsu_effect->effect_length == 1
+                                                         ? $jutsu_effect->effect_length . " turn"
+                                                         : $jutsu_effect->effect_length . " turns");
+                                             }
+                                         }
+                                         else {
+                                             echo 'none';
+                                         }
+                                     ?>"
+                                     data-jutsu_description="<?= $jutsu->description ?>"
+                                     data-jutsu_child="<?php echo array_key_exists($jutsu->id, $child_jutsu) ? implode(
+                                         ', ', $child_jutsu[$jutsu->id][0]
+                                     ) : "None" ?>"
+                                     data-jutsu_use_type="<?= $jutsu->use_type ?>"
+                                ></div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p><b>Power</b></p>
+                                <p><?= $jutsu->power ?></p>
+                            </td>
+                            <td>
+                                <p><b>Cooldown</b></p>
+                                <p><?= $jutsu->cooldown ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <?php if(isset($jutsu->effects[0])): ?>
+                                    <?php if($jutsu->effects[0]->effect == "barrier"): ?>
+                                        <p><?= System::unSlug($jutsu->effects[0]->effect) ?></p>
+                                    <?php else : ?>
+                                        <p>
+                                            <?= System::unSlug($jutsu->effects[0]->effect) ?>
+                                            &nbsp;(<?= round($jutsu->effects[0]->effect_amount) ?>%)
+                                        </p>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <p>None</p>
+                                <?php endif; ?>
+                                <?php if(isset($jutsu->effects[1])): ?>
+                                    <?php if($jutsu->effects[1]->effect == "barrier"): ?>
+                                        <p><?= System::unSlug($jutsu->effects[1]->effect) ?></p>
+                                    <?php else : ?>
+                                        <p>
+                                            <?= System::unSlug($jutsu->effects[1]->effect) ?>
+                                            &nbsp;(<?= round($jutsu->effects[1]->effect_amount) ?>%)
+                                        </p>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="jutsu_block_expand" colspan="2" data-target="jutsu_<?= $jutsu->id ?>">+</th>
+                        </tr>
+                    </table>
                 <?php endforeach; ?>
             </div>
         </td>
