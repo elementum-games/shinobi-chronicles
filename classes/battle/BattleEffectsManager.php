@@ -114,7 +114,7 @@ class BattleEffectsManager {
         $apply_effect = true;
 
         if($this->system->debug['battle_effects']) {
-            echo sprintf("JP: %s<br />", $effect->effect);
+            echo "JP: {$effect->effect} / {$raw_damage}<br />";
         }
 
         switch($effect->effect) {

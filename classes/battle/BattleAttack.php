@@ -64,6 +64,7 @@ class BattleAttack {
         $this->power = $jutsu->power;
         $this->cooldown = $jutsu->cooldown;
         $this->effect_only = $jutsu->effect_only;
+
         $this->effects = [...$this->jutsu->effects];
     }
 

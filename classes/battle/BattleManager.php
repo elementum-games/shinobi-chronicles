@@ -1006,24 +1006,6 @@ class BattleManager {
                 );
             }
         }
-        if (count($attack->effects) > 0) {
-            foreach ($attack->effects as $index => $effect) {
-                if (in_array($effect->effect, BattleEffect::$buff_effects)) {
-                    $target_id = $user->combat_id;
-                } else {
-                    $target_id = $target->combat_id;
-                }
-
-                $this->effects->setEffect(
-                    effect_user: $user,
-                    target_id: $target_id,
-                    effect: $effect,
-                    jutsu_combat_id: $attack->jutsuCombatId(),
-                    effect_num: $index,
-                    raw_damage: $attack->damage
-                );
-            }
-        }
 
         $text = '';
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu_type);
@@ -1102,28 +1084,8 @@ class BattleManager {
                 );
             }
         }
-        foreach ($attack->effects as $effect) {
-            if (BattleEffectsManager::isDamageOverTime($effect)) {
-                $effect_power = $effect->effect_amount * $effect->effect_length;
-                $effect->potential_damage = $target->calcDamageTaken(
-                    raw_damage: $effect_power,
-                    defense_type: $attack->jutsu_type,
-                    apply_resists: false,
-                    apply_weakness: false
-                );
-            }
-        }
 
         if($attack->hasEffect()){
-            foreach ($attack->effects as $effect) {
-                if ($effect && $effect->effect != 'none') {
-                    $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                        $this->system->db->clean($this->effects->getAnnouncementText($effect, $attack->jutsu_type)) .
-                        "</p>";
-                }
-            }
-        }
-        if (count($attack->effects) > 0) {
             foreach ($attack->effects as $effect) {
                 if ($effect && $effect->effect != 'none') {
                     $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .

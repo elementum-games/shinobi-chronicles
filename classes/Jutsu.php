@@ -123,7 +123,7 @@ class Jutsu {
     public int $effect_length;
 
     /** @var Effect[] */
-    public array $effects;
+    public array $effects = [];
 
     public string $description;
     public string $battle_text;
@@ -206,18 +206,22 @@ class Jutsu {
         $this->effect_length = $effect_length_1 ?? 0;
 
         // new effect array
-        $this->effects[] = new Effect(
-            effect: $effect_1,
-            effect_amount: $base_effect_amount_1,
-            effect_length: $effect_length_1,
-            damage_type: $jutsu_type
-        );
-        $this->effects[] = new Effect(
-            effect: $effect_2,
-            effect_amount: $base_effect_amount_2,
-            effect_length: $effect_length_2,
-            damage_type: $jutsu_type
-        );
+        if($effect_1 != 'none') {
+            $this->effects[] = new Effect(
+                effect: $effect_1,
+                effect_amount: $base_effect_amount_1,
+                effect_length: $effect_length_1,
+                damage_type: $jutsu_type
+            );
+        }
+        if($effect_2 != 'none') {
+            $this->effects[] = new Effect(
+                effect: $effect_2,
+                effect_amount: $base_effect_amount_2,
+                effect_length: $effect_length_2,
+                damage_type: $jutsu_type
+            );
+        }
 
         $this->description = $description;
         $this->battle_text = $battle_text;
