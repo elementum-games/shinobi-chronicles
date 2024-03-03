@@ -9,7 +9,15 @@ class BattleEffectsManager {
     const COMPOUND_RESIDUAL_INCREASE = 0.1;
 
     // Reduction in CR effect when contributing to immolate
-    const CR_IMMO_PENALTY = 0.0;
+    const CR_IMMO_PENALTY = 0.15;
+
+    /*
+     * Extra immo amount per stack, starting at 2 stacks. Applied to the bonus over 100%, e.g.
+     * - 130% immo = 30% bonus damage
+     * 2 residuals active = 0.2x bonus (20%)
+     * 30% * 120% = 36% bonus damage
+     */
+    const IMMO_EFFECT_BONUS_PER_STACK = 0.2;
 
     const DAMAGE_EFFECTS = [
         'none',
@@ -71,6 +79,9 @@ class BattleEffectsManager {
         'delayed_residual',
         'reflect_damage'
     ];
+
+    // Effectiveness of substitution at reducing immolate damage. 0x - 1x
+    const SUBSTITUTION_IMMO_EFFECTIVENESS = 0.65;
 
     protected System $system;
 
@@ -878,6 +889,7 @@ class BattleEffectsManager {
 
     public function processImmolate(BattleAttack $battleAttack, Fighter $target, bool $simulation = false): int {
         $immolate_raw_damage = 0;
+        $num_residual_effects = 0;
         foreach($this->active_effects as $index => $effect) {
             if($effect->isDamageOverTime() && $effect->target == $target->combat_id) {
                 $total_damage = $effect->turns * $effect->effect_amount;
@@ -885,12 +897,20 @@ class BattleEffectsManager {
                     $total_damage *= 1 - BattleEffectsManager::CR_IMMO_PENALTY;
                 }
                 $immolate_raw_damage += $total_damage;
+                $num_residual_effects++;
 
                 if(!$simulation) {
                     unset($this->active_effects[$index]);
                 }
             }
         }
-        return $immolate_raw_damage;
+
+        // Apply immo bonus starting at 2 residuals
+        $immolate_bonus_multiplier = 1 + (($num_residual_effects - 1) * self::IMMO_EFFECT_BONUS_PER_STACK);
+        $immolate_percent = 1 + (
+            ($battleAttack->immolate_percent - 1) * $immolate_bonus_multiplier
+        );
+
+        return $immolate_raw_damage * $immolate_percent;
     }
 }

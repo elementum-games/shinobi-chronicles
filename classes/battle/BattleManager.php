@@ -887,7 +887,7 @@ class BattleManager {
                     break;
                 case 'immolate':
                     $attack->immolate_percent += $effect->effect_amount / 100;
-                    $attack->immolate_raw_damage += $this->effects->processImmolate($attack, $target, $simulation) * $attack->immolate_percent;
+                    $attack->immolate_raw_damage += $this->effects->processImmolate($attack, $target, $simulation);
                     break;
                 case 'reflect':
                     $attack->reflect_percent += $effect->effect_amount / 100;
@@ -1568,11 +1568,16 @@ class BattleManager {
         $fighter_attack->substitution_percent *= (1 - $incoming_attack->piercing_percent);
         $incoming_attack->damage *= (1 - $fighter_attack->substitution_percent);
         foreach($incoming_attack->effects as $effect) {
-            if(in_array($effect->effect, [...BattleEffectsManager::DEBUFF_EFFECTS, 'immolate'])) {
+            if(in_array($effect->effect, BattleEffectsManager::DEBUFF_EFFECTS)) {
                 $effect_reduced = true;
                 $effect->effect_amount *= 1 - $fighter_attack->substitution_percent;
             }
         }
+        if($incoming_attack->immolate_raw_damage > 0) {
+            $incoming_attack->immolate_raw_damage *= 1 -
+                ($fighter_attack->substitution_percent * BattleEffectsManager::SUBSTITUTION_IMMO_EFFECTIVENESS);
+        }
+
 
         $block_percent = round($fighter_attack->substitution_percent * 100);
 
