@@ -62,7 +62,7 @@ class Jutsu {
     const BALANCE_EFFECT_RATIOS = [
         'offense_boost' => 1.75,
         'elemental_boost' => 1.15,
-        'evasion_nerf' => 2.,
+        'evasion_nerf' => 2,
         'offense_nerf' => 1.9,
         'erosion' => 0.35,
         'vulnerability' => 2,
