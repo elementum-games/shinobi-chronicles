@@ -386,6 +386,10 @@ class Jutsu {
 
         $cr_discount_per_turn_multiplier = 0.005; // 0.5% discount
 
+        // For calculating resid/vuln synergy
+        $residual_effect_info = [];
+        $vuln_effect_info = [];
+
         $residual_effect_percent = 0;
         $compound_residual_effect_percent = 0;
         $compound_residual_discount = 0;
@@ -412,6 +416,11 @@ class Jutsu {
                 case 'residual_damage':
                 case 'delayed_residual':
                     $residual_effect_percent += $capped_effect_amount * $effect->effect_length;
+
+                    $residual_effect_info[] = [
+                        'total_amount' => $residual_effect_percent,
+                        'length' => $effect->effect_length,
+                    ];
                     break;
                 case 'compound_residual':
                     $compound_residual_effect_percent += $capped_effect_amount * $effect->effect_length;
@@ -424,6 +433,11 @@ class Jutsu {
                     $extra_effective_percent = $compound_residual_effect_percent * ($max_damage_multiplier - 1) * 0.5;
                     $compound_residual_effect_percent += $extra_effective_percent;
 
+                    $residual_effect_info[] = [
+                        'total_amount' => $compound_residual_effect_percent,
+                        'length' => $effect->effect_length,
+                    ];
+
                     // Discount
                     $compound_residual_discount += $compound_residual_effect_percent * ($cr_discount_per_turn_multiplier * $effect->effect_length);
                     break;
@@ -435,12 +449,19 @@ class Jutsu {
                     break;
                 case 'counter':
                 case 'substitution':
+                    $total_effect_utility += self::BALANCE_EFFECT_RATIOS[$effect->effect] * $capped_effect_amount;
+                    break;
                 case 'reflect':
                     $total_effect_utility += self::BALANCE_EFFECT_RATIOS[$effect->effect] * $capped_effect_amount;
+                    $residual_effect_info[] = [
+                        'total_amount' => $total_effect_utility / 2, // only half the effect is residual damage dealt
+                        'length' => $effect->effect_length,
+                    ];
                     break;
                 case 'piercing':
                     $piercing_effect_percent += $capped_effect_amount;
                     break;
+
                 case 'ninjutsu_boost':
                 case 'taijutsu_boost':
                 case 'genjutsu_boost':
@@ -477,6 +498,11 @@ class Jutsu {
 
                 case 'vulnerability':
                     $total_effect_utility += self::BALANCE_EFFECT_RATIOS['vulnerability'] * $capped_effect_amount * $effect->effect_length;
+
+                    $vuln_effect_info[] = [
+                        'amount' => $capped_effect_amount,
+                        'length' => $effect->effect_length,
+                    ];
                     break;
                 case 'fire_vulnerability':
                 case 'wind_vulnerability':
@@ -508,16 +534,28 @@ class Jutsu {
         $recoil_power = $recoil_effect_percent * ($capped_power + $residual_power + $compound_residual_power);
         $recoil_self_damage = $recoil_effect_percent * $capped_power;
 
+        // Resid+Vuln synergy
+        $resid_vuln_extra_power = 0;
+        if(count($residual_effect_info) > 0 && count($vuln_effect_info) > 0) {
+            foreach($residual_effect_info as $residual_effect) {
+                foreach($vuln_effect_info as $vuln_effect) {
+                    $duration_multiplier = min(1, $vuln_effect['length'] / $residual_effect['length']);
+                    $resid_vuln_extra_power += $capped_power * $residual_effect['total_amount'] * $vuln_effect['amount'] * $duration_multiplier;
+                }
+            }
+        }
+
         // Final power
-        $total_effective_power = $capped_power + $residual_power + $compound_residual_power + $recoil_power;
+        $total_effective_power = $capped_power + $residual_power + $compound_residual_power + $recoil_power + $resid_vuln_extra_power;
         $final_effect_utility = $total_effect_utility * self::BALANCE_BASELINE_POWER;
 
         // Debug
-        /*echo "
+        /* echo "
             Capped Power: {$capped_power}<br />
             Residual: $residual_power<br />
             CR: $compound_residual_power<br />
             Recoil Power: $recoil_power<br />
+            Resid+Vuln Power: $resid_vuln_extra_power<br />
             Total Power: {$total_effective_power}<br />
             <br />
             Effects: $final_effect_utility<br />
