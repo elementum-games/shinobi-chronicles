@@ -8,13 +8,21 @@ class Effect {
     public int $effect_length;
     public int $potential_damage = 0;
 
-    public function __construct(?string $effect, float $effect_amount, int $effect_length)
-    {
+    public JutsuOffenseType $damage_type;
+
+    public function __construct(
+        ?string $effect,
+        float $effect_amount,
+        int $effect_length,
+        JutsuOffenseType $damage_type
+    ) {
         $this->effect = $effect;
         $this->base_effect_amount = $effect_amount;
         $this->display_effect_amount = $effect_amount;
         $this->effect_amount = $effect_amount;
         $this->effect_length = $effect_length;
+        $this->damage_type = $damage_type;
+
         $this->potential_damage = 0;
     }
 }

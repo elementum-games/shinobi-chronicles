@@ -79,7 +79,7 @@ class TestFighter extends Fighter {
             id: $id,
             name: $this->name . 'j' . $id,
             rank: $this->rank,
-            jutsu_type: $form_data['type'],
+            jutsu_type: JutsuOffenseType::from($form_data['type']),
             base_power: $form_data['power'],
             range: 1,
             effect_1: $form_data['effect'],
@@ -97,7 +97,7 @@ class TestFighter extends Fighter {
             purchase_cost: 0,
             purchase_type: $form_data['is_bloodline'] ? Jutsu::PURCHASE_TYPE_BLOODLINE : Jutsu::PURCHASE_TYPE_PURCHASABLE,
             parent_jutsu: 0,
-            element: $form_data['element'],
+            element: Element::from($form_data['element']),
             hand_seals: 0,
         );
         $jutsu->is_bloodline = $form_data['is_bloodline'];

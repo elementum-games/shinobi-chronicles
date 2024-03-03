@@ -19,7 +19,7 @@
         <form
             action='<?= $system->router->getUrl(
                 page_name: 'admin',
-                url_params: ['page' => 'edit_jutsu', 'jutsu_id' => $jutsu->id, 'jutsu_type' => $jutsu->jutsu_type,]
+                url_params: ['page' => 'edit_jutsu', 'jutsu_id' => $jutsu->id, 'jutsu_type' => $jutsu->jutsu_type->value]
             ) ?>'
             method='post'
         >

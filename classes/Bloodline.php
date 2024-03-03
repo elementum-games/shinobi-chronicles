@@ -153,7 +153,7 @@ class Bloodline {
                     id: $id,
                     name: $j['name'],
                     rank: $j['rank'],
-                    jutsu_type: $j['jutsu_type'],
+                    jutsu_type: JutsuOffenseType::from($j['jutsu_type']),
                     base_power: $j['power'],
                     range: 2,
                     effect_1: $j['effect'],
@@ -171,7 +171,7 @@ class Bloodline {
                     purchase_cost: $j['purchase_cost'],
                     purchase_type: Jutsu::PURCHASE_TYPE_BLOODLINE,
                     parent_jutsu: $j['parent_jutsu'] ?? 0,
-                    element: $j['element'],
+                    element: Element::from($j['element']),
                     hand_seals: $j['hand_seals'] ?? "",
                     linked_jutsu_id: $j['linked_jutsu_id'] ?? 0,
                 );

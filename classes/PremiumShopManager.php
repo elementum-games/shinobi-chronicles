@@ -482,22 +482,22 @@ class PremiumShopManager {
         }
         //Check player's current element is valid
         switch ($this->player->elements[$editing_element_index]) {
-            case Jutsu::ELEMENT_FIRE:
-            case Jutsu::ELEMENT_WIND:
-            case Jutsu::ELEMENT_LIGHTNING:
-            case Jutsu::ELEMENT_EARTH:
-            case Jutsu::ELEMENT_WATER:
+            case Element::FIRE:
+            case Element::WIND:
+            case Element::LIGHTNING:
+            case Element::EARTH:
+            case Element::WATER:
                 break;
             default:
                 throw new RuntimeException("The $editing_element_index element ({$this->player->elements[$editing_element_index]}) is invalid!");
         }
         //Check that new element is valid
         switch ($new_element) {
-            case Jutsu::ELEMENT_FIRE:
-            case Jutsu::ELEMENT_WIND:
-            case Jutsu::ELEMENT_LIGHTNING:
-            case Jutsu::ELEMENT_EARTH:
-            case Jutsu::ELEMENT_WATER:
+            case Element::FIRE:
+            case Element::WIND:
+            case Element::LIGHTNING:
+            case Element::EARTH:
+            case Element::WATER:
                 break;
             default:
                 throw new RuntimeException("New element $new_element is invalid!");
@@ -533,7 +533,7 @@ class PremiumShopManager {
 
         $message = '';
         switch ($new_element) {
-            case Jutsu::ELEMENT_FIRE:
+            case Element::FIRE:
                 $message = "With the image of blazing fires in your mind, you flow chakra from your stomach,
                     down through your legs and into the seal on the floor. Suddenly one of the pedestals bursts into
                     fire, breaking your focus, and the elders smile and say:<br /
@@ -543,7 +543,7 @@ class PremiumShopManager {
                     can extinguish your fires.\"
                     <br />";
                 break;
-            case Jutsu::ELEMENT_WIND:
+            case Element::WIND:
                 $message = "Picturing a tempestuous tornado, you flow chakra from your stomach,
                     down through your legs and into the seal on the floor. You feel a disturbance in the room and
                     suddenly realize that a small whirlwind has formed around one of the pedestals, and the elders smile and say:<br /
@@ -553,7 +553,7 @@ class PremiumShopManager {
                     because your wind only serves to fan their flames and make them stronger.\"
                     <br />";
                 break;
-            case Jutsu::ELEMENT_LIGHTNING:
+            case Element::LIGHTNING:
                 $message = "Imagining the feel of electricity coursing through your veins, you flow chakra from your stomach,
                     down through your legs and into the seal on the floor. Suddenly you feel a charge in the air and
                     one of the pedestals begins to spark with crackling electricity, and the elders smile and say:<br />
@@ -563,7 +563,7 @@ class PremiumShopManager {
                     but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
                     <br />";
                 break;
-            case Jutsu::ELEMENT_EARTH:
+            case Element::EARTH:
                 $message = "Envisioning stone as hard as the temple you are sitting in, you flow chakra from your stomach,
                     down through your legs and into the seal on the floor. Suddenly dirt from nowhere begins to fall off one of the
                     pedestals and the elders smile and say:<br />
@@ -573,7 +573,7 @@ class PremiumShopManager {
                     Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
                     <br />";
                 break;
-            case Jutsu::ELEMENT_WATER:
+            case Element::WATER:
                 $message = "With thoughts of splashing rivers flowing through your mind, you flow chakra from your stomach,
                     down through your legs and into the seal on the floor. Suddenly a small geyser erupts from one of
                     the pedestals, and the elders smile and say:<br />

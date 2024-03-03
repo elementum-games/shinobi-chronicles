@@ -23,13 +23,10 @@ class BattleEffect {
     public string $effect;
     public float $effect_amount;
 
-    // Required unless this is a passive effect. Should be a valid Jutsu#jutsuType
-    public ?string $damage_type;
+    // Required unless this is a passive effect.
+    public ?JutsuOffenseType $damage_type;
 
     public float $power = 0;
-
-    public bool $first_turn = false;
-    public bool $layer_active = false;
 
     public function __construct(
         string $user,
@@ -37,10 +34,8 @@ class BattleEffect {
         int $turns,
         string $effect,
         float $effect_amount,
-        ?string $damage_type = null,
+        ?JutsuOffenseType $damage_type = null,
         float $power = 0,
-        bool $first_turn = false,
-        bool $layer_active = false
     ) {
         $this->user = $user;
         $this->target = $target;
@@ -50,8 +45,6 @@ class BattleEffect {
         $this->damage_type = $damage_type;
 
         $this->power = $power;
-        $this->first_turn = $first_turn;
-        $this->layer_active = $layer_active;
     }
 
     public function isDamageOverTime(): bool {
@@ -67,8 +60,6 @@ class BattleEffect {
             effect_amount: $raw_data['effect_amount'],
             damage_type: $raw_data['damage_type'] ?? null,
             power: $raw_data['power'] ?? 0,
-            first_turn: $raw_data['first_turn'] ?? false,
-            layer_active: $raw_data['layer_active'] ?? false,
         );
     }
 

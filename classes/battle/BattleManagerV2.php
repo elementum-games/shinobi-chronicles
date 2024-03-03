@@ -809,7 +809,7 @@ class BattleManagerV2 {
             );
 
             // Check for handseals if ninjutsu/genjutsu
-            if($jutsu_category == Jutsu::TYPE_NINJUTSU or $jutsu_category == Jutsu::TYPE_GENJUTSU) {
+            if($jutsu_category == JutsuOffenseType::NINJUTSU or $jutsu_category == JutsuOffenseType::GENJUTSU) {
                 if(!$hand_seals) {
                     throw new RuntimeException("Please enter hand seals!");
                 }
@@ -817,13 +817,13 @@ class BattleManagerV2 {
                 $player_jutsu = $this->getJutsuFromHandSeals($this->player, $hand_seals);
 
                 // Layered genjutsu check
-                if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
+                if($player_jutsu && $player_jutsu->jutsu_type == JutsuOffenseType::GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
                     $this->effects->assertParentGenjutsuActive($this->player, $player_jutsu);
                 }
             }
 
             // Check jutsu ID if taijutsu
-            else if($jutsu_category == Jutsu::TYPE_TAIJUTSU) {
+            else if($jutsu_category == JutsuOffenseType::TAIJUTSU) {
                 $player_jutsu = $this->getJutsuFromId($this->player, $jutsu_id);
             }
             // Check BL jutsu ID if bloodline jutsu
@@ -854,7 +854,7 @@ class BattleManagerV2 {
             }
 
             // Check for weapon if non-BL taijutsu
-            if($jutsu_category == Jutsu::TYPE_TAIJUTSU && !empty($weapon_id)) {
+            if($jutsu_category == JutsuOffenseType::TAIJUTSU && !empty($weapon_id)) {
                 if($this->player->hasItem($weapon_id)) {
                     if(!in_array($weapon_id, $this->player->equipped_weapon_ids)) {
                         $weapon_id = 0;
@@ -974,10 +974,10 @@ class BattleManagerV2 {
 
     private function getJutsuFromId(Fighter $fighter, int $jutsu_id): ?Jutsu {
         $fighter_jutsu = null;
-        if(isset($this->default_attacks[$jutsu_id]) && $this->default_attacks[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+        if(isset($this->default_attacks[$jutsu_id]) && $this->default_attacks[$jutsu_id]->jutsu_type == JutsuOffenseType::TAIJUTSU) {
             $fighter_jutsu = $this->default_attacks[$jutsu_id];
         }
-        if($fighter->hasEquippedJutsu($jutsu_id) && $fighter->jutsu[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+        if($fighter->hasEquippedJutsu($jutsu_id) && $fighter->jutsu[$jutsu_id]->jutsu_type == JutsuOffenseType::TAIJUTSU) {
             $fighter_jutsu = $fighter->jutsu[$jutsu_id];
         }
 

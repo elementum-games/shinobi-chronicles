@@ -11,9 +11,9 @@ $gold_color = '#FDD017';
 $show_submit_button = false;
 
 $prefill_hand_seals = $_POST['hand_seals'] ?? '';
-$prefill_jutsu_type = $_POST['jutsu_type'] ?? Jutsu::TYPE_NINJUTSU;
+$prefill_jutsu_type = $_POST['jutsu_type'] ?? JutsuOffenseType::NINJUTSU;
 $prefill_weapon_id = $_POST['weapon_id'] ?? '0';
-$prefill_weapon_element = $_POST['weapon_element'] ?? Jutsu::ELEMENT_NONE;
+$prefill_weapon_element = $_POST['weapon_element'] ?? Element::NONE;
 $prefill_jutsu_id = $_POST['jutsu_id'] ?? '';
 $prefill_item_id = $_POST['item_id'] ?? '';
 ?>
@@ -457,7 +457,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
             $c3_count = 0;
 
             // Attack list
-            $jutsu_types = array(Jutsu::TYPE_NINJUTSU, Jutsu::TYPE_TAIJUTSU, Jutsu::TYPE_GENJUTSU);
+            $jutsu_types = array(JutsuOffenseType::NINJUTSU, JutsuOffenseType::TAIJUTSU, JutsuOffenseType::GENJUTSU);
 
             ?>
             <div class='jutsuList'>
@@ -468,7 +468,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                     <div
                         id='default<?= $c1_count ?>'
                         class='jutsuName <?= $jutsu_types[$i] ?>'
-                        data-handseals='<?= ($attack->jutsu_type != Jutsu::TYPE_TAIJUTSU ? $attack->hand_seals : '') ?>'
+                        data-handseals='<?= ($attack->jutsu_type != JutsuOffenseType::TAIJUTSU ? $attack->hand_seals : '') ?>'
                         data-id='<?= $attack->id ?>'
                         aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'
                     >

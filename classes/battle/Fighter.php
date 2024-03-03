@@ -51,7 +51,7 @@ abstract class Fighter {
     public float $willpower;
 
     public array $elements = [
-        Jutsu::ELEMENT_NONE
+        Element::NONE
     ];
 
     // Inventory
@@ -311,17 +311,17 @@ abstract class Fighter {
         $cast_speed = $this->cast_speed + $this->cast_speed_boost;
 
         switch($attack->jutsu_type) {
-            case Jutsu::TYPE_TAIJUTSU:
+            case JutsuOffenseType::TAIJUTSU:
                 $off_skill = $this->taijutsu_skill + ($speed * Fighter::SPEED_OFFENSE_RATIO);
                 $off_boost = $this->taijutsu_boost;
                 $off_nerf = $this->taijutsu_nerf;
                 break;
-            case Jutsu::TYPE_GENJUTSU:
+            case JutsuOffenseType::GENJUTSU:
                 $off_skill = $this->genjutsu_skill + ($cast_speed * Fighter::SPEED_OFFENSE_RATIO);
                 $off_boost = $this->genjutsu_boost;
                 $off_nerf = $this->genjutsu_nerf;
                 break;
-            case Jutsu::TYPE_NINJUTSU:
+            case JutsuOffenseType::NINJUTSU:
                 $off_skill = $this->ninjutsu_skill + ($cast_speed * Fighter::SPEED_OFFENSE_RATIO);
                 $off_boost = $this->ninjutsu_boost;
                 $off_nerf = $this->ninjutsu_nerf;
@@ -331,20 +331,20 @@ abstract class Fighter {
         }
 
         if ($attack->hasElement()) {
-            switch (System::unSlug($attack->element)) {
-                case 'Fire':
+            switch ($attack->element) {
+                case Element::FIRE:
                     $off_boost += $this->fire_boost;
                     break;
-                case 'Wind':
+                case Element::WIND:
                     $off_boost += $this->wind_boost;
                     break;
-                case 'Lightning':
+                case Element::LIGHTNING:
                     $off_boost += $this->lightning_boost;
                     break;
-                case 'Earth':
+                case Element::EARTH:
                     $off_boost += $this->earth_boost;
                     break;
-                case 'Water':
+                case Element::WATER:
                     $off_boost += $this->water_boost;
                     break;
                 default:
@@ -444,18 +444,18 @@ abstract class Fighter {
     }
 
     /**
-     * @param        $raw_damage
-     * @param string $defense_type ninjutsu, genjutsu, taijutsu
-     * @param bool   $apply_resists
-     * @param string $element
-     * @param bool   $is_raw_damage
+     * @param                  $raw_damage
+     * @param JutsuOffenseType $defense_type
+     * @param Element          $element
+     * @param bool             $apply_resists
+     * @param bool             $apply_weakness
      * @return float|int
      */
     public function calcDamageTaken(
         $raw_damage,
-        string $defense_type,
+        JutsuOffenseType $defense_type,
+        Element $element = Element::NONE,
         bool $apply_resists = true,
-        string $element = Jutsu::ELEMENT_NONE,
         bool $apply_weakness = true
     ): float|int {
         $defense = self::BASE_DEFENSE;
@@ -482,46 +482,47 @@ abstract class Fighter {
 
         $weakness_modifier = 0;
         switch($defense_type) {
-            case 'ninjutsu':
+            case JutsuOffenseType::NINJUTSU:
                 if ($apply_resists) {
                     $raw_damage -= $this->ninjutsu_resist;
                 }
                 $weakness_modifier += $this->ninjutsu_weakness;
                 break;
-            case 'genjutsu':
+            case JutsuOffenseType::GENJUTSU:
                 if ($apply_resists) {
                     $raw_damage -= $this->genjutsu_resist;
                 }
                 $weakness_modifier += $this->genjutsu_weakness;
                 break;
-            case 'taijutsu':
+            case JutsuOffenseType::TAIJUTSU:
                 if ($apply_resists) {
                     $raw_damage -= $this->taijutsu_resist;
                 }
                 $weakness_modifier += $this->taijutsu_weakness;
                 break;
             default:
-                error_log("Invalid defense type! {$defense_type}");
+                error_log("Invalid defense type! {$defense_type->value}");
         }
-        switch (System::unSlug($element)) {
-            case 'Fire':
+        switch ($element) {
+            case Element::FIRE:
                 $weakness_modifier += $this->fire_weakness;
                 break;
-            case 'Wind':
+            case Element::WIND:
                 $weakness_modifier += $this->wind_weakness;
                 break;
-            case 'Lightning':
+            case Element::LIGHTNING:
                 $weakness_modifier += $this->lightning_weakness;
                 break;
-            case 'Earth':
+            case Element::EARTH:
                 $weakness_modifier += $this->earth_weakness;
                 break;
-            case 'Water':
+            case Element::WATER:
                 $weakness_modifier += $this->water_weakness;
                 break;
             default:
                 break;
         }
+
         if ($apply_weakness) {
             $raw_damage *= 1 + $weakness_modifier;
         }

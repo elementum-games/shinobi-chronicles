@@ -374,8 +374,8 @@ if($battle->battle_text) {
                             if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual" || $effect->effect == "reflect_damage") {
                                 $effect_power = $effect->effect_amount * $effect->turns;
                                 $residual_damage = $player->calcDamageTaken(
-                                    $effect_power, $effect->damage_type, apply_resists: false,
-                                    element: Jutsu::ELEMENT_NONE, apply_weakness: false
+                                    $effect_power, $effect->damage_type, element: Element::NONE,
+                                    apply_resists: false, apply_weakness: false
                                 );
                                 echo "<span class='hover_text'>" . BattleManager::formatNumber($residual_damage) . " Damage</span>";
                             } else {
@@ -405,8 +405,8 @@ if($battle->battle_text) {
                                     if ($effect->isDamageOverTime()) {
                                         $effect_power = $effect->effect_amount * $effect->turns;
                                         $residual_damage = $opponent->calcDamageTaken(
-                                            $effect_power, $effect->damage_type, apply_resists: false,
-                                            element: Jutsu::ELEMENT_NONE, apply_weakness: false
+                                            $effect_power, $effect->damage_type, element: Element::NONE,
+                                            apply_resists: false, apply_weakness: false
                                         );
                                         echo "<span class='hover_text'>" . BattleManager::formatNumber($residual_damage) . " Damage</span>";
                                     } else {

@@ -34,7 +34,7 @@ class JutsuFactory {
             purchase_cost: 100,
             purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
             parent_jutsu: null,
-            element: Jutsu::ELEMENT_NONE,
+            element: Element::NONE,
             hand_seals: '1-2-10'
         );
     }

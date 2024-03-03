@@ -27,7 +27,6 @@ class BattleEffectsManager {
         'piercing',
     ];
     const BUFF_EFFECTS = [
-        'release_genjutsu',
         'ninjutsu_boost',
         'taijutsu_boost',
         'genjutsu_boost',
@@ -105,21 +104,17 @@ class BattleEffectsManager {
     }
 
     public function setEffect(
-        Fighter $effect_user, $target_id, Jutsu $jutsu, Effect $effect, int $effect_num, $raw_damage
+        Fighter $effect_user,
+        string $target_id,
+        Effect $effect,
+        string $jutsu_combat_id,
+        int $effect_num,
+        float $raw_damage
     ): void {
-        if(!$jutsu->combat_id) {
-            $jutsu->setCombatId($effect_user->combat_id);
-        }
-
-        if($effect->effect == 'release_genjutsu') {
-            $this->releaseGenjutsu($effect_user, $jutsu);
-            return;
-        }
-
         $apply_effect = true;
 
         if($this->system->debug['battle_effects']) {
-            echo sprintf("JP: %s (%s)<br />", $jutsu->power, $effect->effect);
+            echo sprintf("JP: %s<br />", $effect->effect);
         }
 
         switch($effect->effect) {
@@ -176,10 +171,6 @@ class BattleEffectsManager {
             case 'intelligence_nerf':
             case 'willpower_nerf':
                 break;
-            case Jutsu::USE_TYPE_BARRIER:
-                $effect->effect_amount = $raw_damage;
-                $apply_effect = false;
-                break;
             case 'substitution':
             case 'counter':
             case 'piercing':
@@ -192,14 +183,7 @@ class BattleEffectsManager {
         }
 
         if($apply_effect) {
-            $effect_id = $jutsu->combat_id;
-            if($effect->effect == Jutsu::USE_TYPE_BARRIER) {
-                $effect_id = self::barrierId($effect_user);
-            }
-            else if($jutsu->is_weapon) {
-                $effect_id = $effect_user->combat_id . ':WE:' . $effect->effect;
-            }
-
+            $effect_id = $jutsu_combat_id;
             $effect_id = $effect_id . "_" . $effect_num;
             $this->active_effects[$effect_id] = new BattleEffect(
                 user: $effect_user->combat_id,
@@ -207,17 +191,8 @@ class BattleEffectsManager {
                 turns: $effect->effect_length,
                 effect: $effect->effect,
                 effect_amount: $effect->effect_amount,
-                damage_type: $jutsu->jutsu_type
+                damage_type: $effect->damage_type
             );
-
-            if($jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
-                $intelligence = ($effect_user->intelligence + $effect_user->intelligence_boost - $effect_user->intelligence_nerf);
-                if($intelligence <= 0) {
-                    $intelligence = 1;
-                }
-                $this->active_effects[$effect_id]->power = $intelligence * $jutsu->power;
-                $this->active_effects[$effect_id]->first_turn = true;
-            }
         }
     }
 
@@ -228,7 +203,7 @@ class BattleEffectsManager {
 
         // Setup bloodline defense bonus
         if(!empty($player1->bloodline_defense_boosts)) {
-            foreach($player1->bloodline_defense_boosts as $id => $boost) {
+            foreach($player1->bloodline_defense_boosts as $boost) {
                 $boost_type = explode('_', $boost['effect'])[0];
                 if($boost_type != 'damage') {
                     continue;
@@ -237,7 +212,7 @@ class BattleEffectsManager {
             }
         }
         if(!empty($player2->bloodline_defense_boosts)) {
-            foreach($player2->bloodline_defense_boosts as $id => $boost) {
+            foreach($player2->bloodline_defense_boosts as $boost) {
                 $boost_type = explode('_', $boost['effect'])[0];
                 if($boost_type != 'damage') {
                     continue;
@@ -337,7 +312,7 @@ class BattleEffectsManager {
                     $effect->effect_amount *= 0.75;
                 }
             }
-            if(!$player2 instanceof NPC) {
+            if(!($player2 instanceof NPC)) {
                 if($jutsu->jutsu_type != $player2_primary_jutsu_type) {
                     $jutsu->power *= 0.5;
                     foreach($jutsu->effects as $effect) {
@@ -420,9 +395,6 @@ class BattleEffectsManager {
             case 'taijutsu_resist':
             case 'harden':
                 $target->taijutsu_resist += $effect->effect_amount;
-                break;
-            case Jutsu::USE_TYPE_BARRIER:
-                $target->barrier += $effect->effect_amount;
                 break;
             case 'resist_boost':
                 $target->resist_boost += ($effect->effect_amount / 100);
@@ -567,10 +539,6 @@ class BattleEffectsManager {
                 if($this->active_genjutsu[$id]->turns <= 0) {
                     unset($this->active_genjutsu[$id]);
                 }
-
-                if($genjutsu->first_turn) {
-                    $genjutsu->first_turn = false;
-                }
             }
         }
 
@@ -602,7 +570,7 @@ class BattleEffectsManager {
                         turns: 1,
                         effect: $boost->effect,
                         effect_amount: $boost->effect_amount,
-                        damage_type: Jutsu::TYPE_TAIJUTSU
+                        damage_type: JutsuOffenseType::TAIJUTSU
                     )
                 );
             }
@@ -617,7 +585,7 @@ class BattleEffectsManager {
         if($effect->isDamageOverTime()) {
             $damage = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type);
             $residual_damage_raw = $target->calcDamageTaken(
-                $effect->effect_amount, $effect->damage_type, apply_resists: false
+                raw_damage: $effect->effect_amount, defense_type: $effect->damage_type, apply_resists: false
             );
             $residual_damage_resisted = $residual_damage_raw - $damage;
             $attack_jutsu_color = BattleManager::getJutsuTextColor($effect->damage_type);
@@ -717,41 +685,22 @@ class BattleEffectsManager {
         return true;
     }
 
-    public function updateBarrier(Fighter $fighter, Jutsu $fighter_jutsu) {
-        if(isset($this->active_effects[self::barrierId($fighter)])) {
-            if($fighter->barrier) {
-                $this->active_effects[self::barrierId($fighter)]->effect_amount = $fighter->barrier;
-            }
-            else {
-                unset($this->active_effects[self::barrierId($fighter)]);
-            }
-        }
-        else if($fighter_jutsu->use_type == Jutsu::USE_TYPE_BARRIER && $fighter->barrier) {
-            $barrier_jutsu = $fighter_jutsu;
-            $barrier_jutsu->effects[0]->effect = Jutsu::USE_TYPE_BARRIER;
-            $barrier_jutsu->effects[0]->effect_length = 1;
-            $this->setEffect(
-                $fighter, $fighter->combat_id, $barrier_jutsu, $barrier_jutsu->effects[0], 0, $fighter->barrier
-            );
-        }
-    }
-
-    public function getAnnouncementText(Effect $effect, string $jutsu_type): string {
+    public function getAnnouncementText(Effect $effect, JutsuOffenseType $jutsu_type): string {
         $announcement_text = "";
         $attack_jutsu_color = BattleManager::getJutsuTextColor($jutsu_type);
         $effect_details = " (" . round(
                 $effect->display_effect_amount, 0
             ) . "%, " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
         switch($jutsu_type) {
-            case "taijutsu":
+            case JutsuOffenseType::TAIJUTSU:
                 $tag_open = "[taijutsu]";
                 $tag_close = "[/taijutsu]";
                 break;
-            case "ninjutsu":
+            case JutsuOffenseType::NINJUTSU:
                 $tag_open = "[ninjutsu]";
                 $tag_close = "[/ninjutsu]";
                 break;
-            case "genjutsu":
+            case JutsuOffenseType::GENJUTSU:
                 $tag_open = "[genjutsu]";
                 $tag_close = "[/genjutsu]";
                 break;
@@ -880,35 +829,13 @@ class BattleEffectsManager {
         return $fighter->combat_id . ':BARRIER';
     }
 
-    public function releaseGenjutsu(Fighter $fighter, Jutsu $fighter_jutsu) {
-        $intelligence = ($fighter->intelligence + $fighter->intelligence_boost - $fighter->intelligence_nerf);
-        if($intelligence <= 0) {
-            $intelligence = 1;
-        }
-
-        $release_power = $intelligence * $fighter_jutsu->power;
-        foreach($this->active_genjutsu as $id => $genjutsu) {
-            if($genjutsu['target'] == $fighter->combat_id && !isset($genjutsu['first_turn'])) {
-                $r_power = $release_power * mt_rand(9, 11);
-                $g_power = $genjutsu['power'] * mt_rand(9, 11);
-                if($r_power > $g_power) {
-                    unset($this->active_genjutsu[$id]);
-                    $this->addDisplay(
-                        $fighter,
-                        $fighter->getName() . " broke free from [opponent]'s Genjutsu!"
-                    );
-                }
-            }
-        }
-    }
-
     /**
      * @param       $fighter
      * @param Jutsu $fighter_jutsu
      * @throws RuntimeException
      */
     public function assertParentGenjutsuActive($fighter, Jutsu $fighter_jutsu) {
-        if($fighter_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {
+        if($fighter_jutsu->jutsu_type != JutsuOffenseType::GENJUTSU) {
             return;
         }
 

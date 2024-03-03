@@ -40,14 +40,7 @@ return [
     'element' => [
         'data_type' => 'string',
         'input_type' => 'text',
-        'options' => [
-            Jutsu::ELEMENT_NONE,
-            Jutsu::ELEMENT_FIRE,
-            Jutsu::ELEMENT_EARTH,
-            Jutsu::ELEMENT_WIND,
-            Jutsu::ELEMENT_WATER,
-            Jutsu::ELEMENT_LIGHTNING,
-        ],
+        'options' => Element::values(),
     ],
     'cooldown' => [
         'data_type' => 'int',
@@ -88,7 +81,7 @@ return [
     'jutsu_type' => [
         'data_type' => 'string',
         'input_type' => 'select',
-        'options' => [Jutsu::TYPE_NINJUTSU, Jutsu::TYPE_TAIJUTSU, Jutsu::TYPE_GENJUTSU],
+        'options' => JutsuOffenseType::values(),
     ],
     'purchase_type' => [
         'data_type' => 'int',

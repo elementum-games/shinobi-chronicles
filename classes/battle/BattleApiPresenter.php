@@ -67,9 +67,9 @@ class BattleApiPresenter {
             'lastTurnLog' => BattleApiPresenter::turnLogResponse($battle->getLastTurnLog()),
             'currentPhaseLabel' => $battle->getCurrentPhaseLabel(),
             'jutsuTypes' => [
-                'taijutsu' => Jutsu::TYPE_TAIJUTSU,
-                'ninjutsu' => Jutsu::TYPE_NINJUTSU,
-                'genjutsu' => Jutsu::TYPE_GENJUTSU
+                'taijutsu' => JutsuOffenseType::TAIJUTSU,
+                'ninjutsu' => JutsuOffenseType::NINJUTSU,
+                'genjutsu' => JutsuOffenseType::GENJUTSU
             ],
         ];
     }

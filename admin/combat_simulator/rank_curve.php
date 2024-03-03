@@ -67,7 +67,7 @@ if(!empty($_POST['run_simulation'])) {
         id: 1,
         name: 'p1j',
         rank: $player1->rank,
-        jutsu_type: Jutsu::TYPE_NINJUTSU,
+        jutsu_type: JutsuOffenseType::NINJUTSU,
         base_power: $base_jutsu_power,
         range: 1,
         effect_1: 'none',
@@ -85,7 +85,7 @@ if(!empty($_POST['run_simulation'])) {
         purchase_cost: 0,
         purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
         parent_jutsu: 0,
-        element: Jutsu::ELEMENT_NONE,
+        element: Element::NONE,
         hand_seals: 1
     );
     $player1_jutsu->setLevel($base_jutsu_level, 0);
@@ -108,7 +108,7 @@ if(!empty($_POST['run_simulation'])) {
         id: 2,
         name: 'p2j',
         rank: $player2->rank,
-        jutsu_type: Jutsu::TYPE_TAIJUTSU,
+        jutsu_type: JutsuOffenseType::TAIJUTSU,
         base_power: $base_jutsu_power,
         range: 1,
         effect_1: 'none',
@@ -126,7 +126,7 @@ if(!empty($_POST['run_simulation'])) {
         purchase_cost: 0,
         purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
         parent_jutsu: 0,
-        element: Jutsu::ELEMENT_NONE,
+        element: Element::NONE,
         hand_seals: 2
     );
     $player2_jutsu->setLevel($base_jutsu_level, 0);
@@ -139,28 +139,28 @@ if(!empty($_POST['run_simulation'])) {
 
     // Set jutsu type specific stats to base for rank
     switch($player1_jutsu->jutsu_type) {
-        case Jutsu::TYPE_NINJUTSU:
+        case JutsuOffenseType::NINJUTSU:
             $player1->ninjutsu_skill = $base_stats * $skill_ratio;
             $player1->cast_speed = $base_stats * $attribute_ratio;
             break;
-        case Jutsu::TYPE_TAIJUTSU:
+        case JutsuOffenseType::TAIJUTSU:
             $player1->taijutsu_skill = $base_stats * $skill_ratio;
             $player1->speed = $base_stats * $attribute_ratio;
             break;
-        case Jutsu::TYPE_GENJUTSU:
+        case JutsuOffenseType::GENJUTSU:
             $player1->genjutsu_skill = $base_stats;
             break;
     }
     switch($player2_jutsu->jutsu_type) {
-        case Jutsu::TYPE_NINJUTSU:
+        case JutsuOffenseType::NINJUTSU:
             $player2->ninjutsu_skill = $base_stats * $skill_ratio;
             $player2->cast_speed = $base_stats * $attribute_ratio;
             break;
-        case Jutsu::TYPE_TAIJUTSU:
+        case JutsuOffenseType::TAIJUTSU:
             $player2->taijutsu_skill = $base_stats * $skill_ratio;
             $player2->speed = $base_stats * $attribute_ratio;
             break;
-        case Jutsu::TYPE_GENJUTSU:
+        case JutsuOffenseType::GENJUTSU:
             $player2->genjutsu_skill = $base_stats;
             break;
     }
@@ -190,28 +190,28 @@ if(!empty($_POST['run_simulation'])) {
 
     for($level = $base_level + 1; $level <= $max_level; $level++) {
         switch($player1_jutsu->jutsu_type) {
-            case Jutsu::TYPE_NINJUTSU:
+            case JutsuOffenseType::NINJUTSU:
                 $player1->ninjutsu_skill += round($stat_gain * $skill_ratio, 1);
                 $player1->cast_speed += round($stat_gain * $attribute_ratio, 1);
                 break;
-            case Jutsu::TYPE_TAIJUTSU:
+            case JutsuOffenseType::TAIJUTSU:
                 $player1->taijutsu_skill += round($stat_gain * $skill_ratio, 1);
                 $player1->speed += round($stat_gain * $attribute_ratio, 1);
                 break;
-            case Jutsu::TYPE_GENJUTSU:
+            case JutsuOffenseType::GENJUTSU:
                 $player1->genjutsu_skill += round($stat_gain, 1);
                 break;
         }
         switch($player2_jutsu->jutsu_type) {
-            case Jutsu::TYPE_NINJUTSU:
+            case JutsuOffenseType::NINJUTSU:
                 $player2->ninjutsu_skill += round($stat_gain * $skill_ratio, 1);
                 $player2->cast_speed += round($stat_gain * $attribute_ratio, 1);
                 break;
-            case Jutsu::TYPE_TAIJUTSU:
+            case JutsuOffenseType::TAIJUTSU:
                 $player2->taijutsu_skill += round($stat_gain * $skill_ratio, 1);
                 $player2->speed += round($stat_gain * $attribute_ratio, 1);
                 break;
-            case Jutsu::TYPE_GENJUTSU:
+            case JutsuOffenseType::GENJUTSU:
                 $player2->genjutsu_skill += round($stat_gain, 1);
                 break;
         }

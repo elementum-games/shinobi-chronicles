@@ -58,7 +58,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
     <?php $current_rank = 1; ?>
     <?php foreach($all_jutsu as $id => $jutsu): ?>
         <?php
-        if($jutsu->jutsu_type != $jutsu_type) {
+        if($jutsu->jutsu_type->value != $jutsu_type) {
             continue;
         }
         if($jutsu->rank > $current_rank) {
@@ -86,7 +86,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
                     (<?= $jutsu->effects[1]->effect_amount ?>% / <?= $jutsu->effects[1]->effect_length ?> turns)
                 <?php endif; ?>
             </td>
-            <td><?= ucwords($jutsu->element) ?></td>
+            <td><?= ucwords($jutsu->element->value) ?></td>
             <td>&yen;<?= $jutsu->purchase_cost ?></td>
             <td><?= $jutsu->cooldown ?></td>
             <td><?= round($jutsu->getBalanceMaxUtility(), 1) ?></td>

@@ -25,7 +25,7 @@ function createJutsuPage(System $system) {
             );
 
             // Do manual hand seal validation
-            if($form_data['jutsu_type'] == Jutsu::TYPE_TAIJUTSU) {
+            if($form_data['jutsu_type'] == JutsuOffenseType::TAIJUTSU) {
                 $data['hand_seals'] = "";
             }
             else {
@@ -124,7 +124,7 @@ function editJutsuPage(System $system) {
             validateFormData($jutsu_constraints, $data, $editing_jutsu_id);
 
             // Do manual hand seal validation
-            if($form_data['jutsu_type'] == Jutsu::TYPE_TAIJUTSU) {
+            if($form_data['jutsu_type'] == JutsuOffenseType::TAIJUTSU) {
                 $data['hand_seals'] = "";
             }
             else {

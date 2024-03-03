@@ -70,9 +70,7 @@ function calcDamage(
         target: $player2,
         action: new LegacyFighterAction(
             jutsu_id: $player1_jutsu->id,
-            jutsu_purchase_type: $player1_jutsu->purchase_type,
-            weapon_id: null,
-            weapon_element: null
+            jutsu_purchase_type: $player1_jutsu->purchase_type
         )
     );
     $player2_attack = $battle->setupFighterAttack(
@@ -80,9 +78,7 @@ function calcDamage(
         target: $player1,
         action: new LegacyFighterAction(
             jutsu_id: $player2_jutsu->id,
-            jutsu_purchase_type: $player2_jutsu->purchase_type,
-            weapon_id: null,
-            weapon_element: null
+            jutsu_purchase_type: $player2_jutsu->purchase_type
         )
     );
 
@@ -120,11 +116,11 @@ function calcDamage(
 
     $player1_damage_no_resists = $player2->calcDamageTaken(
         raw_damage: $player1_collision_damage,
-        defense_type: $player1_jutsu->jutsu_type, apply_resists: false
+        defense_type: $player1_jutsu->jutsu_type, element: Element::NONE, apply_resists: false
     );
     $player2_damage_no_resists = $player1->calcDamageTaken(
         raw_damage: $player2_collision_damage,
-        defense_type: $player2_jutsu->jutsu_type, apply_resists: false
+        defense_type: $player2_jutsu->jutsu_type, element: Element::NONE, apply_resists: false
     );
 
     // Display

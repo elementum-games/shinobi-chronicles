@@ -3,6 +3,19 @@
 use JetBrains\PhpStorm\Pure;
 
 require_once __DIR__ . "/Effect.php";
+require_once __DIR__ . '/enum/Element.php';
+
+enum JutsuOffenseType: string {
+    case NINJUTSU = 'ninjutsu';
+    case TAIJUTSU = 'taijutsu';
+    case GENJUTSU = 'genjutsu';
+
+    public static function values(): array {
+        return array_map(function ($case){
+            return $case->value;
+        }, self::cases());
+    }
+}
 
 class Jutsu {
     const ELEMENT_NONE = 'None';
@@ -95,7 +108,7 @@ class Jutsu {
     public int $id;
     public string $name;
     public int $rank;
-    public string $jutsu_type;
+    public JutsuOffenseType $jutsu_type;
 
     public float $base_power;
     public float $power;
@@ -126,8 +139,7 @@ class Jutsu {
 
     public ?int $parent_jutsu;
 
-    // TODO: Upgrade to enum when PHP 8.1 releases
-    public string $element;
+    public Element $element;
 
     public string $hand_seals;
 
@@ -140,8 +152,6 @@ class Jutsu {
     public int $level = 0;
     public int $exp = 0;
 
-    public ?int $weapon_id = null;
-    public ?Jutsu $weapon_effect = null;
     public bool $effect_only = false;
 
     public ?string $combat_id = null;
@@ -150,11 +160,31 @@ class Jutsu {
 
     private bool $rank_scaling_applied = false;
 
-    public function __construct(int $id, string $name, int $rank, string $jutsu_type, float $base_power, int $range,
-        ?string $effect_1, ?float $base_effect_amount_1, ?int $effect_length_1, ?string $effect_2, ?float $base_effect_amount_2, ?int $effect_length_2,
-        string $description, string $battle_text, int $cooldown,
-        string $use_type, string $target_type, int $use_cost, int $purchase_cost, int $purchase_type, ?int $parent_jutsu, string $element,
-        string $hand_seals, int $linked_jutsu_id = 0
+    public function __construct(
+        int $id,
+        string $name,
+        int $rank,
+        JutsuOffenseType $jutsu_type,
+        float $base_power,
+        int $range,
+        ?string $effect_1,
+        ?float $base_effect_amount_1,
+        ?int $effect_length_1,
+        ?string $effect_2,
+        ?float $base_effect_amount_2,
+        ?int $effect_length_2,
+        string $description,
+        string $battle_text,
+        int $cooldown,
+        string $use_type,
+        string $target_type,
+        int $use_cost,
+        int $purchase_cost,
+        int $purchase_type,
+        ?int $parent_jutsu,
+        Element $element,
+        string $hand_seals,
+        int $linked_jutsu_id = 0
     ) {
         $this->id = $id;
         $this->name = $name;
@@ -165,7 +195,7 @@ class Jutsu {
         $this->power = $this->base_power;
 
         $this->range = $range;
-        if($this->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+        if($this->jutsu_type == JutsuOffenseType::TAIJUTSU) {
             $this->range = 1;
         }
 
@@ -176,8 +206,18 @@ class Jutsu {
         $this->effect_length = $effect_length_1 ?? 0;
 
         // new effect array
-        $this->effects[] = new Effect($effect_1, $base_effect_amount_1, $effect_length_1);
-        $this->effects[] = new Effect($effect_2, $base_effect_amount_2, $effect_length_2);
+        $this->effects[] = new Effect(
+            effect: $effect_1,
+            effect_amount: $base_effect_amount_1,
+            effect_length: $effect_length_1,
+            damage_type: $jutsu_type
+        );
+        $this->effects[] = new Effect(
+            effect: $effect_2,
+            effect_amount: $base_effect_amount_2,
+            effect_length: $effect_length_2,
+            damage_type: $jutsu_type
+        );
 
         $this->description = $description;
         $this->battle_text = $battle_text;
@@ -206,7 +246,7 @@ class Jutsu {
             id: $id,
             name: $jutsu_data['name'],
             rank: $jutsu_data['rank'],
-            jutsu_type: $jutsu_data['jutsu_type'],
+            jutsu_type: JutsuOffenseType::from($jutsu_data['jutsu_type']),
             base_power: $jutsu_data['power'],
             range: $jutsu_data['range'],
             effect_1: $jutsu_data['effect'] ?? 'none',
@@ -224,7 +264,7 @@ class Jutsu {
             purchase_cost: $jutsu_data['purchase_cost'],
             purchase_type: $jutsu_data['purchase_type'],
             parent_jutsu: $jutsu_data['parent_jutsu'],
-            element: $jutsu_data['element'],
+            element: Element::from($jutsu_data['element']),
             hand_seals: $jutsu_data['hand_seals'],
             linked_jutsu_id: $jutsu_data['linked_jutsu_id'],
         );
@@ -253,45 +293,12 @@ class Jutsu {
         $this->power = round($this->power, 2);
     }
 
-    public function setWeapon(int $weapon_id, $effect, $effect_amount): Jutsu {
-        $this->weapon_id = $weapon_id;
-        $this->weapon_effect = new Jutsu(
-            id: $weapon_id * -1,
-            name: $this->name,
-            rank: $this->rank,
-            jutsu_type: Jutsu::TYPE_TAIJUTSU,
-            base_power: $this->power,
-            range: 0,
-            effect_1: $effect,
-            base_effect_amount_1: $effect_amount,
-            effect_length_1: 2,
-            effect_2: 'none',
-            base_effect_amount_2: 0,
-            effect_length_2: 0,
-            description: $this->description,
-            battle_text: $this->battle_text,
-            cooldown: $this->cooldown,
-            use_type: $this->use_type,
-            target_type: $this->target_type,
-            use_cost: $this->use_cost,
-            purchase_cost: $this->purchase_cost,
-            purchase_type: $this->purchase_type,
-            parent_jutsu: $this->parent_jutsu,
-            element: $this->element,
-            hand_seals: $this->hand_seals
-        );
-        $this->weapon_effect->is_weapon = true;
-
-        return $this->weapon_effect;
-    }
-
     public function setCombatId(string $fighter_combat_id) {
         $prefix = $this->is_bloodline ? 'BL_J' : 'J';
         $this->combat_id = $prefix . $this->id . ':' . $fighter_combat_id;
     }
 
-    public function hasEffect(): bool
-    {
+    public function hasEffect(): bool {
         $has_effect = false;
         foreach ($this->effects as $effect) {
             if ($effect && $effect->effect != 'none') {

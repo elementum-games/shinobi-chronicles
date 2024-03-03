@@ -104,7 +104,7 @@ try {
             id: 1,
             name: 'p1j',
             rank: $player1->rank,
-            jutsu_type: Jutsu::TYPE_TAIJUTSU,
+            jutsu_type: JutsuOffenseType::TAIJUTSU,
             base_power: $jutsu_power,
             range: 1,
             effect_1: 'none',
@@ -122,7 +122,7 @@ try {
             purchase_cost: 0,
             purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
             parent_jutsu: 0,
-            element: Jutsu::ELEMENT_NONE,
+            element: Element::NONE,
             hand_seals: 1
         );
         $player1_jutsu->setLevel(50, 0);
@@ -153,7 +153,7 @@ try {
             id: 1,
             name: 'p2j',
             rank: $player2->rank,
-            jutsu_type: Jutsu::TYPE_TAIJUTSU,
+            jutsu_type: JutsuOffenseType::TAIJUTSU,
             base_power: $jutsu_power,
             range: 1,
             effect_1: 'none',
@@ -171,7 +171,7 @@ try {
             purchase_cost: 0,
             purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
             parent_jutsu: 0,
-            element: Jutsu::ELEMENT_NONE,
+            element: Element::NONE,
             hand_seals: 1
         );
         $player2_jutsu->setLevel(50, 0);

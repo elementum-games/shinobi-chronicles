@@ -248,12 +248,12 @@ $constraints['ai'] = [
                 'data_type' => 'string',
                 'input_type' => 'text',
                 'options' => [
-                    Jutsu::ELEMENT_NONE,
-                    Jutsu::ELEMENT_FIRE,
-                    Jutsu::ELEMENT_EARTH,
-                    Jutsu::ELEMENT_WIND,
-                    Jutsu::ELEMENT_WATER,
-                    Jutsu::ELEMENT_LIGHTNING,
+                    Element::NONE,
+                    Element::FIRE,
+                    Element::EARTH,
+                    Element::WIND,
+                    Element::WATER,
+                    Element::LIGHTNING,
                 ],
             ],
             'effect' => [

@@ -287,7 +287,7 @@ class BattleManager {
                     $jutsu_type = $_POST['jutsu_type'];
 
                     // Check for handseals if ninjutsu/genjutsu
-                    if($jutsu_type == Jutsu::TYPE_NINJUTSU or $jutsu_type == Jutsu::TYPE_GENJUTSU) {
+                    if($jutsu_type == JutsuOffenseType::NINJUTSU or $jutsu_type == JutsuOffenseType::GENJUTSU) {
                         if(!$_POST['hand_seals']) {
                             throw new RuntimeException("Please enter hand seals!");
                         }
@@ -295,13 +295,13 @@ class BattleManager {
                         $player_jutsu = $this->getJutsuFromHandSeals($this->player, $_POST['hand_seals']);
 
                         // Layered genjutsu check
-                        /*if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
+                        /*if($player_jutsu && $player_jutsu->jutsu_type == JutsuOffenseType::GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
                             $this->effects->assertParentGenjutsuActive($this->player, $player_jutsu);
                         }*/
                     }
 
                     // Check jutsu ID if taijutsu
-                    else if($jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+                    else if($jutsu_type == JutsuOffenseType::TAIJUTSU) {
                         $jutsu_id = (int)$_POST['jutsu_id'];
 
                         $player_jutsu = $this->getJutsuFromId($this->player, $jutsu_id);
@@ -332,28 +332,8 @@ class BattleManager {
                         throw new RuntimeException($result->error_message);
                     }
 
-                    /* Check for weapon if non-BL taijutsu
-                    $weapon_id = 0;
-                    $weapon_element = Jutsu::ELEMENT_NONE;
-                    if($jutsu_type == Jutsu::TYPE_TAIJUTSU && !empty($_POST['weapon_id'])) {
-                        $weapon_id = (int)$this->system->db->clean($_POST['weapon_id']);
-                        if($weapon_id && $this->player->hasItem($weapon_id)) {
-                            if(!in_array($weapon_id, $this->player->equipped_weapon_ids)) {
-                                $weapon_id = 0;
-                            }
-                        }
-                        else {
-                            $weapon_id = 0;
-                        }
-
-                        $weapon_element = $this->system->db->clean($_POST['weapon_element'] ?? "None");
-                        if(!in_array($weapon_element, $this->player->elements)) {
-                            $weapon_element = Jutsu::ELEMENT_NONE;
-                        }
-                    }*/
-
                     // Log jutsu used
-                    $this->setPlayerAction($this->player, $player_jutsu, 0, Jutsu::ELEMENT_NONE);
+                    $this->setPlayerAction($this->player, $player_jutsu);
 
                     //update player turn time
                     $this->battle->updatePlayerTime($this->player->id);
@@ -577,11 +557,11 @@ class BattleManager {
 
     public static function getJutsuTextColor($jutsu_type): string {
         switch ($jutsu_type) {
-            case Jutsu::TYPE_NINJUTSU:
+            case JutsuOffenseType::NINJUTSU:
                 return "blue";
-            case Jutsu::TYPE_TAIJUTSU:
+            case JutsuOffenseType::TAIJUTSU:
                 return "red";
-            case Jutsu::TYPE_GENJUTSU:
+            case JutsuOffenseType::GENJUTSU:
                 return "purple";
             case 'none':
             default:
@@ -635,14 +615,6 @@ class BattleManager {
                 player1_attack: $player1_attack,
                 player2_attack: $player2_attack
             );
-        }
-
-        // Apply remaining barrier
-        if($player1_attack) {
-            $this->effects->updateBarrier($this->battle->player1, $player1_attack->jutsu);
-        }
-        if($player2_attack) {
-            $this->effects->updateBarrier($this->battle->player2, $player2_attack->jutsu);
         }
 
         // Apply damage/effects and set display
@@ -894,7 +866,7 @@ class BattleManager {
         );
 
         // Setup clash effects
-        foreach ($attack->jutsu->effects as $effect) {
+        foreach ($attack->effects as $effect) {
             switch ($effect->effect) {
                 case 'piercing':
                     $attack->piercing_percent += $effect->effect_amount / 100;
@@ -926,28 +898,11 @@ class BattleManager {
             }
         }
 
-        // Set weapon data into jutsu
-        if($attack->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $action->weapon_id) {
-            // Apply element to jutsu
-            if($fighter->items[$action->weapon_id]->effect == 'element') {
-                $attack->jutsu->element = $action->weapon_element;
-                $attack->raw_damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
-            }
-            // Set effect in jutsu
-            $attack->jutsu->setWeapon(
-                $action->weapon_id,
-                $fighter->items[$action->weapon_id]->effect,
-                $fighter->items[$action->weapon_id]->effect_amount,
-            );
+        if($attack->isAllyTargetType() || $attack->use_type == Jutsu::USE_TYPE_INDIRECT) {
+            $attack->effect_only = true;
         }
 
-        if($attack->jutsu->isAllyTargetType() || $attack->jutsu->use_type == Jutsu::USE_TYPE_INDIRECT) {
-            $attack->jutsu->weapon_id = 0;
-            $attack->jutsu->effect_only = true;
-        }
-
-        if($attack->jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
-            $attack->jutsu->effect_amount = $attack->raw_damage;
+        if($attack->use_type == Jutsu::USE_TYPE_BARRIER) {
             $fighter->barrier += $attack->raw_damage;
             $attack->raw_damage = 0;
         }
@@ -970,7 +925,9 @@ class BattleManager {
         if ($attack->countered_percent > 0) {
             $counter_damage = $user->calcDamageTaken($attack->countered_raw_damage, $attack->countered_jutsu_type);
             $counter_damage_raw = $user->calcDamageTaken(
-                $attack->countered_raw_damage, $attack->countered_jutsu_type, apply_resists: false
+                raw_damage: $attack->countered_raw_damage,
+                defense_type: $attack->countered_jutsu_type,
+                apply_resists: false
             );
             $counter_damage_resisted = round($counter_damage_raw - $counter_damage, 2);
             $user->last_damage_taken += $counter_damage;
@@ -981,9 +938,11 @@ class BattleManager {
         }
 
         if ($attack->immolate_raw_damage > 0) {
-            $immolate_damage = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu->jutsu_type);
+            $immolate_damage = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu_type);
             $immolate_damage_raw = $target->calcDamageTaken(
-                $attack->immolate_raw_damage, $attack->jutsu->jutsu_type, apply_resists: false
+                raw_damage: $attack->immolate_raw_damage,
+                defense_type: $attack->jutsu_type,
+                apply_resists: false
             );
             $immolate_damage_resisted = round($immolate_damage_raw - $immolate_damage, 2);
             $target->last_damage_taken += $immolate_damage;
@@ -995,10 +954,10 @@ class BattleManager {
 
         if (!$attack->isEffectOnly()) {
             $attack_damage = $target->calcDamageTaken(
-                $attack->damage, $attack->jutsu->jutsu_type, true, element: $attack->jutsu->element
+                $attack->damage, $attack->jutsu_type, element: $attack->element, apply_resists: true
             );
             $attack_damage_raw = $target->calcDamageTaken(
-                $attack->damage, $attack->jutsu->jutsu_type, apply_resists: false, element: $attack->jutsu->element
+                $attack->damage, $attack->jutsu_type, element: $attack->element, apply_resists: false
             );
             $damage_resisted = round($attack_damage_raw - $attack_damage, 2);
 
@@ -1009,9 +968,9 @@ class BattleManager {
             }
 
             if ($attack->recoil_raw_damage > 0) {
-                $recoil_damage = $user->calcDamageTaken($attack->recoil_raw_damage, $attack->jutsu->jutsu_type);
+                $recoil_damage = $user->calcDamageTaken($attack->recoil_raw_damage, $attack->jutsu_type);
                 $recoil_damage_raw = $user->calcDamageTaken(
-                    $attack->recoil_raw_damage, $attack->jutsu->jutsu_type, apply_resists: false
+                    $attack->recoil_raw_damage, $attack->jutsu_type, apply_resists: false
                 );
                 $recoil_damage_resisted = round($recoil_damage_raw - $recoil_damage, 2);
                 $user->last_damage_taken += $recoil_damage;
@@ -1022,28 +981,14 @@ class BattleManager {
             }
         }
 
-        // Weapon effect for taijutsu (IN PROGRESS)
-        if($attack->jutsu->weapon_id && !empty($user->items[$attack->jutsu->weapon_id])) {
-            if ($user->items[$attack->jutsu->weapon_id]->effect != 'diffuse' && $user->items[$attack->jutsu->weapon_id]->effect != 'element') {
-                $this->effects->setEffect(
-                    $user,
-                    $target->combat_id,
-                    $attack->jutsu->weapon_effect,
-                    $attack->jutsu->weapon_effect->effects[0],
-                    0,
-                    $attack->damage
-                );
-            }
-        }
-
         // Set cooldowns
-        if($attack->jutsu->cooldown > 0) {
-            $this->battle->jutsu_cooldowns[$attack->jutsu->combat_id] = $attack->jutsu->cooldown;
+        if($attack->cooldown > 0) {
+            $this->battle->jutsu_cooldowns[$attack->jutsuCombatId()] = $attack->cooldown;
         }
 
         // Effects
-        if($attack->jutsu->hasEffect()) {
-            foreach($attack->jutsu->effects as $index => $effect) {
+        if($attack->hasEffect()) {
+            foreach($attack->effects as $index => $effect) {
                 if(in_array($effect->effect, BattleEffect::$buff_effects)) {
                     $target_id = $user->combat_id;
                 }
@@ -1052,12 +997,12 @@ class BattleManager {
                 }
 
                 $this->effects->setEffect(
-                    $user,
-                    $target_id,
-                    $attack->jutsu,
-                    $effect,
-                    $index,
-                    $attack->damage
+                    effect_user: $user,
+                    target_id: $target_id,
+                    effect: $effect,
+                    jutsu_combat_id: $attack->jutsuCombatId(),
+                    effect_num: $index,
+                    raw_damage: $attack->damage
                 );
             }
         }
@@ -1070,46 +1015,43 @@ class BattleManager {
                 }
 
                 $this->effects->setEffect(
-                    $user,
-                    $target_id,
-                    $attack->jutsu,
-                    $effect,
-                    $index,
-                    $attack->damage
+                    effect_user: $user,
+                    target_id: $target_id,
+                    effect: $effect,
+                    jutsu_combat_id: $attack->jutsuCombatId(),
+                    effect_num: $index,
+                    raw_damage: $attack->damage
                 );
             }
         }
 
         $text = '';
-        $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
-        if (!str_contains($attack->jutsu->name, "Move ")) {
-            if ($attack->jutsu->weapon_id) {
-                $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . " / " . System::unSlug($user->items[$attack->jutsu->weapon_id]->name) . "</br>" . '</i></span></b>';
+        $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu_type);
+        if (!str_contains($attack->name, "Move ")) {
+            if ($attack->element != Element::NONE) {
+                $text .= "<b><span class=\"battle_text_{$attack->jutsu_type->value}\" style=\"color:{$attack_jutsu_color}\"><i>"
+                    . System::unSlug($attack->element->value) . " Style: " . System::unSlug($attack->name) . '</i></span></b></br>';
             }
             else {
-                if ($attack->jutsu->element != Jutsu::ELEMENT_NONE && $attack->jutsu->element != "none") {
-                    $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->element) . " Style: " . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
-                }
-                else {
-                    $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
-                }
+                $text .= "<b><span class=\"battle_text_{$attack->jutsu_type->value}\" style=\"color:{$attack_jutsu_color}\"><i>"
+                    . System::unSlug($attack->name) . '</i></span></b></br>';
             }
         }
-        $text .= $attack->jutsu->battle_text;
-        $has_element = ($attack->jutsu->element != Jutsu::ELEMENT_NONE && $attack->jutsu->element != "none");
-        $element_text = ' with ' . $attack->jutsu->element;
+        $text .= $attack->battle_text;
+        $has_element = ($attack->element != Element::NONE && $attack->element != "none");
+        $element_text = ' with ' . $attack->element->value;
 
-        if(empty($attack->jutsu->effect_only)) {
+        if(empty($attack->effect_only)) {
             if($damage_resisted > 0) {
                 $text .= "<p style=\"font-weight:bold;\">
                         {$user->getName()} deals
-                            <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
+                            <span class=\"battle_text_{$attack->jutsu_type->value}\" style=\"color:{$attack_jutsu_color}\">
                                 " . BattleManager::formatNumber($attack_damage) . " damage
                             </span>
                                 to {$target->getName()}" . ($has_element ? $element_text : "") . ".
                             <span style=\"font-weight:bold;\">
                                 (resists
-                             <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
+                             <span class=\"battle_text_{$attack->jutsu_type->value}\" style=\"color:{$attack_jutsu_color}\">
                                 " . BattleManager::formatNumber($damage_resisted) . "
                             </span>
                              damage)
@@ -1118,7 +1060,7 @@ class BattleManager {
             else {
                 $text .= "<p style=\"font-weight:bold;\">
                 {$user->getName()} deals
-                    <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
+                    <span class=\"battle_text_{$attack->jutsu_type->value}\" style=\"color:{$attack_jutsu_color}\">
                         " . BattleManager::formatNumber($attack_damage) . " damage
                     </span>
                         to {$target->getName()}" . ($has_element ? $element_text : "") . ".
@@ -1128,34 +1070,35 @@ class BattleManager {
 
         if ($attack->recoil_raw_damage > 0) {
             if ($recoil_damage_resisted > 0) {
-                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . BattleManager::formatNumber($recoil_damage) . "</span> recoil damage- (resists " . "<span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . BattleManager::formatNumber($recoil_damage_resisted) . "</span>" . " recoil damage)" . '</span></br>';
+                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu_type->value}\">" . BattleManager::formatNumber($recoil_damage) . "</span> recoil damage- (resists " . "<span class=\"battle_text_{$attack->jutsu_type}\">" . BattleManager::formatNumber($recoil_damage_resisted) . "</span>" . " recoil damage)" . '</span></br>';
             } else {
-                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . BattleManager::formatNumber($recoil_damage) . "</span> recoil damage-" . '</span></br>';
+                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu_type->value}\">" . BattleManager::formatNumber($recoil_damage) . "</span> recoil damage-" . '</span></br>';
             }
         }
         if ($attack->countered_percent > 0) {
             if ($counter_damage_resisted > 0) {
-                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type}\">" . BattleManager::formatNumber($counter_damage) . "</span> counter damage- (resists " . "<span class=\"battle_text_{$attack->countered_jutsu_type}\">" . BattleManager::formatNumber($counter_damage_resisted) . "</span>" . " counter damage)" . '</span></br>';
+                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type->value}\">" . BattleManager::formatNumber($counter_damage) . "</span> counter damage- (resists " . "<span class=\"battle_text_{$attack->countered_jutsu_type}\">" . BattleManager::formatNumber($counter_damage_resisted) . "</span>" . " counter damage)" . '</span></br>';
             } else {
-                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type}\">" . BattleManager::formatNumber($counter_damage) . "</span> counter damage-" . '</span></br>';
+                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->countered_jutsu_type->value}\">" . BattleManager::formatNumber($counter_damage) . "</span> counter damage-" . '</span></br>';
             }
         }
         if ($attack->immolate_raw_damage > 0) {
             if ($immolate_damage_resisted > 0) {
-                $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . BattleManager::formatNumber($immolate_damage) . "</span> immolation damage- (resists " . "<span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . BattleManager::formatNumber($immolate_damage_resisted) . "</span>" . " immolation damage)" . '</span></br>';
+                $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu_type->value}\">" . BattleManager::formatNumber($immolate_damage) . "</span> immolation damage- (resists " . "<span class=\"battle_text_{$attack->jutsu_type}\">" . BattleManager::formatNumber($immolate_damage_resisted) . "</span>" . " immolation damage)" . '</span></br>';
             } else {
-                $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu->jutsu_type}\">" . BattleManager::formatNumber($immolate_damage) . "</span> immolation damage-" . '</span></br>';
+                $text .= "<span>-" . $target->getName() . " takes <span class=\"battle_text_{$attack->jutsu_type->value}\">" . BattleManager::formatNumber($immolate_damage) . "</span> immolation damage-" . '</span></br>';
             }
         }
 
         // simulate damage of jutsu effect
-        foreach ($attack->jutsu->effects as $effect) {
+        foreach ($attack->effects as $effect) {
             if (BattleEffectsManager::isDamageOverTime($effect)) {
                 $effect_power = $effect->effect_amount * $effect->effect_length;
                 $effect->potential_damage = $target->calcDamageTaken(
                     raw_damage: $effect_power,
-                    defense_type: $attack->jutsu->jutsu_type,
-                    apply_resists: false, element: Jutsu::ELEMENT_NONE, apply_weakness: false
+                    defense_type: $attack->jutsu_type,
+                    apply_resists: false,
+                    apply_weakness: false
                 );
             }
         }
@@ -1164,17 +1107,18 @@ class BattleManager {
                 $effect_power = $effect->effect_amount * $effect->effect_length;
                 $effect->potential_damage = $target->calcDamageTaken(
                     raw_damage: $effect_power,
-                    defense_type: $attack->jutsu->jutsu_type,
-                    apply_resists: false, element: Jutsu::ELEMENT_NONE, apply_weakness: false
+                    defense_type: $attack->jutsu_type,
+                    apply_resists: false,
+                    apply_weakness: false
                 );
             }
         }
 
-        if($attack->jutsu->hasEffect()){
-            foreach ($attack->jutsu->effects as $effect) {
+        if($attack->hasEffect()){
+            foreach ($attack->effects as $effect) {
                 if ($effect && $effect->effect != 'none') {
                     $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                        $this->system->db->clean($this->effects->getAnnouncementText($effect, $attack->jutsu->jutsu_type)) .
+                        $this->system->db->clean($this->effects->getAnnouncementText($effect, $attack->jutsu_type)) .
                         "</p>";
                 }
             }
@@ -1183,7 +1127,7 @@ class BattleManager {
             foreach ($attack->effects as $effect) {
                 if ($effect && $effect->effect != 'none') {
                     $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                        $this->system->db->clean($this->effects->getAnnouncementText($effect, $attack->jutsu->jutsu_type)) .
+                        $this->system->db->clean($this->effects->getAnnouncementText($effect, $attack->jutsu_type)) .
                         "</p>";
                 }
             }
@@ -1193,15 +1137,7 @@ class BattleManager {
             $text .= '<p>' . $this->effects->getDisplayText($user) . '</p>';
         }
 
-        /*if($attack->jutsu->weapon_id) {
-            $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                $this->system->db->clean($this->effects->getAnnouncementText($attack->jutsu->weapon_effect->effects[0])) .
-                "</p>";
-        }*/
-
         $this->battle->battle_text .= $this->parseCombatText($text, $user, $target);
-
-
     }
 
     public function simulateApplyAttack(BattleAttack $attack, Fighter $user, Fighter $target): void {
@@ -1217,9 +1153,7 @@ class BattleManager {
 
         // simulate direct damage
         if (!$attack->isEffectOnly()) {
-            $attack_damage = $target->calcDamageTaken(
-                $attack->damage, $attack->jutsu->jutsu_type, true, element: $attack->jutsu->element
-            );
+            $attack_damage = $target->calcDamageTaken($attack->damage, $attack->jutsu_type, element: $attack->element);
             $target->last_damage_taken += $attack_damage;
             $target->health -= $attack_damage;
             if ($target->health < 0) {
@@ -1230,11 +1164,12 @@ class BattleManager {
             if ($attack->recoil_raw_damage > 0) {
                 $recoil_damage = $user->calcDamageTaken(
                     raw_damage: $attack->recoil_raw_damage,
-                    defense_type: $attack->jutsu->jutsu_type
+                    defense_type: $attack->jutsu_type
                 );
                 $recoil_damage_pre_resist = $user->calcDamageTaken(
                     raw_damage: $attack->recoil_raw_damage,
-                    defense_type: $attack->jutsu->jutsu_type, apply_resists: false,
+                    defense_type: $attack->jutsu_type,
+                    apply_resists: false,
                 );
 
                 $recoil_damage_resisted = round($recoil_damage_pre_resist - $recoil_damage, 2);
@@ -1258,9 +1193,9 @@ class BattleManager {
 
         // simulate immolate effects
         if ($attack->immolate_raw_damage > 0) {
-            $immolate_damage = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu->jutsu_type);
+            $immolate_damage = $target->calcDamageTaken($attack->immolate_raw_damage, $attack->jutsu_type);
             $immolate_damage_raw = $target->calcDamageTaken(
-                $attack->immolate_raw_damage, $attack->jutsu->jutsu_type, apply_resists: false
+                $attack->immolate_raw_damage, $attack->jutsu_type, apply_resists: false
             );
             $immolate_damage_resisted = round($immolate_damage_raw - $immolate_damage, 2);
             $target->last_damage_taken += $immolate_damage;
@@ -1271,10 +1206,10 @@ class BattleManager {
         }
 
         // simulate residual effects
-        foreach ($attack->jutsu->effects as $effect) {
+        foreach ($attack->effects as $effect) {
             if ($effect->effect == "residual_damage" || $effect->effect == "delayed_residual") {
                 $effect_power = $attack->damage * ($effect->effect_amount / 100) * $effect->effect_length;
-                $residual_damage = $target->calcDamageTaken($effect_power, $attack->jutsu->jutsu_type);
+                $residual_damage = $target->calcDamageTaken($effect_power, $attack->jutsu_type);
                 $target->last_damage_taken += $residual_damage;
                 $target->health -= $residual_damage;
                 if ($target->health < 0) {
@@ -1295,13 +1230,10 @@ class BattleManager {
     ): string {
         $collision_displays = [];
 
-        $player1_jutsu = $player1_attack->jutsu;
-        $player2_jutsu = $player2_attack->jutsu;
-
-        $player1_elemental_damage_modifier = $this->getElementalDamageModifier($player1_jutsu, $player2_jutsu);
+        $player1_elemental_damage_modifier = $this->getElementalDamageModifier($player1_attack, $player2_attack);
         $player1->barrier *= $player1_elemental_damage_modifier;
 
-        $player2_elemental_damage_modifier = $this->getElementalDamageModifier($player2_jutsu, $player1_jutsu);
+        $player2_elemental_damage_modifier = $this->getElementalDamageModifier($player2_attack, $player1_attack);
         $player2->barrier *= $player2_elemental_damage_modifier;
 
         // Apply elemental damage modifier
@@ -1327,8 +1259,8 @@ class BattleManager {
             echo "Player2({$player2->getName()}): {$player2->speed} ({$player2->speed_boost} - {$player2->speed_nerf})<br />";
         }
 
-        $player1_evasion_stat_amount = $this->getEvasionPercent($player1, $player1_jutsu, $player2->getBaseStatTotal());
-        $player2_evasion_stat_amount = $this->getEvasionPercent($player2, $player2_jutsu, $player1->getBaseStatTotal());
+        $player1_evasion_stat_amount = $this->getEvasionPercent($player1, $player1_attack, $player2->getBaseStatTotal());
+        $player2_evasion_stat_amount = $this->getEvasionPercent($player2, $player2_attack, $player1->getBaseStatTotal());
 
         if($player1_evasion_stat_amount >= $player2_evasion_stat_amount) {
             $damage_reduction = round($player1_evasion_stat_amount - $player2_evasion_stat_amount, 2);
@@ -1337,7 +1269,7 @@ class BattleManager {
             if ($damage_reduction > self::EVASION_SOFT_CAP) {
                 $damage_reduction = (($damage_reduction - self::EVASION_SOFT_CAP) * self::EVASION_SOFT_CAP_RATIO) + self::EVASION_SOFT_CAP;
             }
-            // if still higher than cap cap, set to hard cap
+            // if still higher than soft cap, set to hard cap
             if ($damage_reduction > self::EVASION_HARD_CAP) {
                 $damage_reduction = self::EVASION_HARD_CAP;
             }
@@ -1346,7 +1278,7 @@ class BattleManager {
                 $player2_attack->damage *= 1 - $damage_reduction;
                 $player2->barrier *= 1 - $damage_reduction;
 
-                if($player1_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+                if($player1_attack->jutsu_type == JutsuOffenseType::TAIJUTSU) {
                     $collision_displays[] = "[player] swiftly evaded " . round($damage_reduction * 100, 0) . "% of [opponent]'s damage!";
                 }
                 else {
@@ -1371,8 +1303,8 @@ class BattleManager {
                 $player1_attack->damage *= 1 - $damage_reduction;
                 $player1->barrier *= 1 - $damage_reduction;
 
-                if($player2_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
-                    $collision_displays[] = "[opponent] swiftly evaded " . round($damage_reduction * 100, 0) . "% of [player]'s damage!";
+                if($player2_attack->jutsu_type == JutsuOffenseType::TAIJUTSU) {
+                    $collision_displays[] = "[opponent] swiftly evaded " . round($damage_reduction * 100) . "% of [player]'s damage!";
                 }
                 else {
                     $collision_displays[] = "[opponent] cast [targetGender2] jutsu before [player], negating " .
@@ -1450,19 +1382,11 @@ class BattleManager {
     /**
      * @throws RuntimeException
      */
-    private function getEvasionPercent(Fighter $fighter, Jutsu $fighter_jutsu, int $target_stat_total): float|int {
-        switch($fighter_jutsu->jutsu_type) {
-            case Jutsu::TYPE_TAIJUTSU:
-                // get speed stat total
-                $evasion_stat_amount = $fighter->speed + $fighter->speed_boost + $fighter->cast_speed + $fighter->cast_speed_boost;
-                // determine base evasion against opponent
-                $evasion_stat_amount *= BattleManager::SPEED_DAMAGE_REDUCTION_RATIO / max($target_stat_total, 1);
-                // apply all boosts/nerfs to evasion
-                $evasion_stat_amount += $fighter->evasion_boost;
-                $evasion_stat_amount -= $fighter->evasion_nerf;
-                break;
-            case Jutsu::TYPE_GENJUTSU:
-            case Jutsu::TYPE_NINJUTSU:
+    private function getEvasionPercent(Fighter $fighter, BattleAttack $fighter_attack, int $target_stat_total): float|int {
+        switch($fighter_attack->jutsu_type) {
+            case JutsuOffenseType::NINJUTSU:
+            case JutsuOffenseType::GENJUTSU:
+            case JutsuOffenseType::TAIJUTSU:
                 // get speed stat total
                 $evasion_stat_amount = $fighter->speed + $fighter->speed_boost + $fighter->cast_speed + $fighter->cast_speed_boost;
                 // determine base evasion against opponent
@@ -1524,10 +1448,10 @@ class BattleManager {
 
     private function getJutsuFromId(Fighter $fighter, int $jutsu_id): ?Jutsu {
         $fighter_jutsu = null;
-        if (isset($this->default_attacks[$jutsu_id]) && $this->default_attacks[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+        if (isset($this->default_attacks[$jutsu_id]) && $this->default_attacks[$jutsu_id]->jutsu_type == JutsuOffenseType::TAIJUTSU) {
             $fighter_jutsu = $this->default_attacks[$jutsu_id];
         }
-        if ($fighter->hasEquippedJutsu($jutsu_id) && $fighter->jutsu[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+        if ($fighter->hasEquippedJutsu($jutsu_id) && $fighter->jutsu[$jutsu_id]->jutsu_type == JutsuOffenseType::TAIJUTSU) {
             $fighter_jutsu = $fighter->jutsu[$jutsu_id];
         }
 
@@ -1539,13 +1463,8 @@ class BattleManager {
     }
 
     #[Trace]
-    protected function setPlayerAction(Fighter $player, Jutsu $jutsu, int $weapon_id, string $weapon_element): void {
-        $this->battle->fighter_actions[$player->combat_id] = new LegacyFighterAction(
-            $jutsu->id,
-            $jutsu->purchase_type,
-            $weapon_id,
-            $weapon_element
-        );
+    protected function setPlayerAction(Fighter $player, Jutsu $jutsu): void {
+        $this->battle->fighter_actions[$player->combat_id] = new LegacyFighterAction($jutsu->id, $jutsu->purchase_type);
 
         if (isset($this->player_jutsu_used[$jutsu->combat_id])) {
             $this->battle->fighter_jutsu_used[$player->combat_id][$jutsu->combat_id]['count']++;
@@ -1571,12 +1490,7 @@ class BattleManager {
         $this->ai_jutsu_used = $jutsu;
         $this->ai_jutsu_used->setCombatId($ai->combat_id);
 
-        $this->battle->fighter_actions[$ai->combat_id] = new LegacyFighterAction(
-            $jutsu->id,
-            Jutsu::PURCHASE_TYPE_PURCHASABLE,
-            0,
-            Jutsu::ELEMENT_NONE
-        );
+        $this->battle->fighter_actions[$ai->combat_id] = new LegacyFighterAction($jutsu->id, Jutsu::PURCHASE_TYPE_PURCHASABLE);
 
         if ($this->ai_jutsu_used->cooldown > 0) {
             $this->battle->jutsu_cooldowns[$this->ai_jutsu_used->combat_id] = $this->ai_jutsu_used->cooldown;
@@ -1584,55 +1498,55 @@ class BattleManager {
     }
 
     /**
-     * @param Jutsu $fighter_jutsu
-     * @param Jutsu $incoming_jutsu
+     * @param BattleAttack $fighter_attack
+     * @param BattleAttack $incoming_attack
      * @return float
      */
-    public function getElementalDamageModifier(Jutsu $fighter_jutsu, Jutsu $incoming_jutsu): float {
+    public function getElementalDamageModifier(BattleAttack $fighter_attack, BattleAttack $incoming_attack): float {
         // Fire > Wind > Lightning > Earth > Water > Fire
         $elemental_clash_damage_modifier = self::ELEMENTAL_CLASH_MODIFIER;
 
         $winning_modifier = 1 + $elemental_clash_damage_modifier;
         $losing_modifier = 1 - $elemental_clash_damage_modifier;
 
-        switch($fighter_jutsu->element) {
-            case Jutsu::ELEMENT_FIRE:
-                if($incoming_jutsu->element === Jutsu::ELEMENT_WATER) {
+        switch($fighter_attack->element) {
+            case Element::FIRE:
+                if($incoming_attack->element === Element::WATER) {
                     return $losing_modifier;
                 }
-                if($incoming_jutsu->element == Jutsu::ELEMENT_WIND) {
+                if($incoming_attack->element == Element::WIND) {
                     return $winning_modifier;
                 }
                 break;
-            case Jutsu::ELEMENT_WIND:
-                if($incoming_jutsu->element === Jutsu::ELEMENT_FIRE) {
+            case Element::WIND:
+                if($incoming_attack->element === Element::FIRE) {
                     return $losing_modifier;
                 }
-                if($incoming_jutsu->element === Jutsu::ELEMENT_LIGHTNING) {
+                if($incoming_attack->element === Element::LIGHTNING) {
                     return $winning_modifier;
                 }
                 break;
-            case Jutsu::ELEMENT_LIGHTNING:
-                if($incoming_jutsu->element === Jutsu::ELEMENT_WIND) {
+            case Element::LIGHTNING:
+                if($incoming_attack->element === Element::WIND) {
                     return $losing_modifier;
                 }
-                if($incoming_jutsu->element === Jutsu::ELEMENT_EARTH) {
+                if($incoming_attack->element === Element::EARTH) {
                     return $winning_modifier;
                 }
                 break;
-            case Jutsu::ELEMENT_EARTH:
-                if($incoming_jutsu->element === Jutsu::ELEMENT_LIGHTNING) {
+            case Element::EARTH:
+                if($incoming_attack->element === Element::LIGHTNING) {
                     return $losing_modifier;
                 }
-                if($incoming_jutsu->element === Jutsu::ELEMENT_WATER) {
+                if($incoming_attack->element === Element::WATER) {
                     return $winning_modifier;
                 }
                 break;
-            case Jutsu::ELEMENT_WATER:
-                if($incoming_jutsu->element === Jutsu::ELEMENT_EARTH) {
+            case Element::WATER:
+                if($incoming_attack->element === Element::EARTH) {
                     return $losing_modifier;
                 }
-                if($incoming_jutsu->element === Jutsu::ELEMENT_FIRE) {
+                if($incoming_attack->element === Element::FIRE) {
                     return $winning_modifier;
                 }
                 break;
@@ -1644,7 +1558,7 @@ class BattleManager {
 
     protected function applyBarrier(Fighter $barrier_user, BattleAttack $incoming_attack, bool $barrier_user_is_p1): string {
         // Apply penalty against Genjutsu
-        if ($incoming_attack->jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
+        if ($incoming_attack->jutsu_type == JutsuOffenseType::GENJUTSU) {
             $barrier_user->barrier *= 1 - (self::GENJUTSU_BARRIER_PENALTY / 100);
         }
 
@@ -1695,7 +1609,7 @@ class BattleManager {
         // Apply reduction
         $incoming_attack->countered_percent = $fighter_attack->counter_percent;
         $incoming_attack->countered_raw_damage = $incoming_attack->damage * $fighter_attack->counter_percent;
-        $incoming_attack->countered_jutsu_type = $fighter_attack->jutsu->jutsu_type;
+        $incoming_attack->countered_jutsu_type = $fighter_attack->jutsu_type;
         $incoming_attack->damage *= (1 - $fighter_attack->counter_percent);
 
         // Set display
@@ -1713,14 +1627,15 @@ class BattleManager {
         // Apply reduction
         $incoming_attack->reflected_percent = $fighter_attack->reflect_percent;
         $incoming_attack->reflected_raw_damage = $incoming_attack->damage * $fighter_attack->reflect_percent;
-        $incoming_attack->reflected_jutsu_type = $fighter_attack->jutsu->jutsu_type;
+        $incoming_attack->reflected_jutsu_type = $fighter_attack->jutsu_type;
         $incoming_attack->damage *= (1 - $fighter_attack->reflect_percent);
 
         if ($fighter_attack->reflect_percent > 0) {
             $fighter_attack->effects[] = new Effect(
                 effect: 'reflect_damage',
                 effect_amount: $incoming_attack->reflected_raw_damage / $fighter_attack->reflect_duration,
-                effect_length: $fighter_attack->reflect_duration
+                effect_length: $fighter_attack->reflect_duration,
+                damage_type: $fighter_attack->jutsu_type,
             );
         }
 

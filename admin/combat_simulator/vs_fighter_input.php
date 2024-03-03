@@ -235,12 +235,12 @@ function displayJutsuInput(string $fighter_form_key, int $jutsu_index, array $FO
             id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_element'
             name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][element]'
         >
-            <?php foreach(Jutsu::$elements as $element): ?>
+            <?php foreach(Element::cases() as $element): ?>
                 <option
-                    value='<?= $element ?>'
-                    <?= selected(($jutsu_form_data['element']) == $element) ?>
+                    value='<?= $element->value ?>'
+                    <?= selected(($jutsu_form_data['element']) == $element->value) ?>
                 >
-                    <?= System::unSlug($element) ?>
+                    <?= System::unSlug($element->value) ?>
                 </option>
             <?php endforeach; ?>
         </select><br />
@@ -389,7 +389,7 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
         );
         while($row = $system->db->fetch($result)) {
             $jutsu = Jutsu::fromArray($row['jutsu_id'], $row);
-            $group = $rank_names[$jutsu->rank] . " " . ucwords($jutsu->jutsu_type);
+            $group = $rank_names[$jutsu->rank] . " " . ucwords($jutsu->jutsu_type->value);
 
             if(!isset($jutsu_by_group[$group])) {
                 $jutsu_by_group[$group] = [];
@@ -419,7 +419,7 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
             'id' => 0,
             'type' => 'ninjutsu',
             'power' => 4,
-            'element' => Jutsu::ELEMENT_NONE,
+            'element' => Element::NONE,
             'is_bloodline' => false,
             'effect' => 'none',
             'effect_amount' => 0,

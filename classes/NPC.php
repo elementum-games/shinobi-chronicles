@@ -191,18 +191,33 @@ class NPC extends Fighter {
                 $move['effect2_length'] = 0;
             }
             if (!isset($move['element'])) {
-                $move['element'] = Jutsu::ELEMENT_NONE;
+                $move['element'] = Element::NONE;
             }
-            $jutsu = $this->initJutsu(count($this->jutsu), $move['jutsu_type'], $move['name'], $move['power'], $move['cooldown'], $move['battle_text'], $move['use_type'], $move['effect'], $move['effect_amount'], $move['effect_length'], $move['effect2'], $move['effect2_amount'], $move['effect2_length'], $move['element']);
+            $jutsu = $this->initJutsu(
+                id: count($this->jutsu),
+                jutsu_type: JutsuOffenseType::from($move['jutsu_type']),
+                name: $move['name'],
+                power: $move['power'],
+                cooldown: $move['cooldown'],
+                battle_text: $move['battle_text'],
+                use_type: $move['use_type'],
+                effect: $move['effect'],
+                effect_amount: $move['effect_amount'],
+                effect_length: $move['effect_length'],
+                effect2: $move['effect2'],
+                effect2_amount: $move['effect2_amount'],
+                effect2_length: $move['effect2_length'],
+                element: Element::from($move['element'])
+            );
             $jutsu->setLevel($jutsu_level, 0);
             switch($jutsu->jutsu_type) {
-                case Jutsu::TYPE_NINJUTSU:
+                case JutsuOffenseType::NINJUTSU:
                     $jutsu->use_type = $jutsu->use_type != Jutsu::USE_TYPE_MELEE ? $jutsu->use_type : Jutsu::USE_TYPE_PROJECTILE;
                     break;
-                case Jutsu::TYPE_TAIJUTSU:
+                case JutsuOffenseType::TAIJUTSU:
                     $jutsu->use_type = $jutsu->use_type != Jutsu::USE_TYPE_MELEE ? $jutsu->use_type : Jutsu::USE_TYPE_MELEE;
                     break;
-                case Jutsu::TYPE_GENJUTSU:
+                case JutsuOffenseType::GENJUTSU:
                     $jutsu->use_type = $jutsu->use_type != Jutsu::USE_TYPE_MELEE ? $jutsu->use_type : Jutsu::USE_TYPE_PROJECTILE;
                     break;
                 default:
@@ -378,7 +393,7 @@ class NPC extends Fighter {
 
     public function initJutsu(
         int $id,
-        $jutsu_type,
+        JutsuOffenseType $jutsu_type,
         string $name,
         float $power,
         int $cooldown,
@@ -390,7 +405,7 @@ class NPC extends Fighter {
         string $effect2 = "none",
         int $effect2_amount = 0,
         int $effect2_length = 0,
-        string $element = Jutsu::ELEMENT_NONE
+        Element $element = Element::NONE
     ): Jutsu {
         $battle_text_alt = str_replace(
             ['[player]', '[opponent]'],

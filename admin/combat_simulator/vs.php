@@ -15,11 +15,7 @@ if(isset($_POST['run_simulation'])) {
     $player1_data = $_POST['fighter1'];
     $player2_data = $_POST['fighter2'];
 
-    $valid_jutsu_types = [
-        Jutsu::TYPE_NINJUTSU,
-        Jutsu::TYPE_TAIJUTSU,
-        Jutsu::TYPE_GENJUTSU,
-    ];
+    $valid_jutsu_types = JutsuOffenseType::values();
     try {
         if(!in_array($player1_data['jutsu1']['type'], $valid_jutsu_types)) {
             throw new RuntimeException("Invalid jutsu type for player 1!");

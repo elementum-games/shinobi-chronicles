@@ -251,7 +251,7 @@ class BattleActionProcessor {
         );
 
         // Set weapon data into jutsu
-        if($attack->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $action->weapon_id) {
+        if($attack->jutsu->jutsu_type == JutsuOffenseType::TAIJUTSU && $action->weapon_id) {
             // Apply element to jutsu
             if($fighter->items[$action->weapon_id]->effect == 'element') {
                 $attack->jutsu->element = $fighter->elements[0];
@@ -511,43 +511,43 @@ class BattleActionProcessor {
             // Elemental interactions
             if(!empty($attack1->jutsu->element) && !empty($attack2->jutsu->element)) {
                 // Fire > Wind > Lightning > Earth > Water > Fire
-                if($attack1->jutsu->element == Jutsu::ELEMENT_FIRE) {
-                    if($attack2->jutsu->element == Jutsu::ELEMENT_WIND) {
+                if($attack1->jutsu->element == Element::FIRE) {
+                    if($attack2->jutsu->element == Element::WIND) {
                         $attack2_damage *= 0.8;
                     }
-                    else if($attack2->jutsu->element == Jutsu::ELEMENT_WATER) {
+                    else if($attack2->jutsu->element == Element::WATER) {
                         $attack1_damage *= 0.8;
                     }
                 }
-                else if($attack1->jutsu->element == Jutsu::ELEMENT_WIND) {
-                    if($attack2->jutsu->element == Jutsu::ELEMENT_LIGHTNING) {
+                else if($attack1->jutsu->element == Element::WIND) {
+                    if($attack2->jutsu->element == Element::LIGHTNING) {
                         $attack2_damage *= 0.8;
                     }
-                    else if($attack2->jutsu->element == Jutsu::ELEMENT_FIRE) {
+                    else if($attack2->jutsu->element == Element::FIRE) {
                         $attack1_damage *= 0.8;
                     }
                 }
-                else if($attack1->jutsu->element == Jutsu::ELEMENT_LIGHTNING) {
-                    if($attack2->jutsu->element == Jutsu::ELEMENT_EARTH) {
+                else if($attack1->jutsu->element == Element::LIGHTNING) {
+                    if($attack2->jutsu->element == Element::EARTH) {
                         $attack2_damage *= 0.8;
                     }
-                    else if($attack2->jutsu->element == Jutsu::ELEMENT_WIND) {
+                    else if($attack2->jutsu->element == Element::WIND) {
                         $attack1_damage *= 0.8;
                     }
                 }
-                else if($attack1->jutsu->element == Jutsu::ELEMENT_EARTH) {
-                    if($attack2->jutsu->element == Jutsu::ELEMENT_WATER) {
+                else if($attack1->jutsu->element == Element::EARTH) {
+                    if($attack2->jutsu->element == Element::WATER) {
                         $attack2_damage *= 0.8;
                     }
-                    else if($attack2->jutsu->element == Jutsu::ELEMENT_LIGHTNING) {
+                    else if($attack2->jutsu->element == Element::LIGHTNING) {
                         $attack1_damage *= 0.8;
                     }
                 }
-                else if($attack1->jutsu->element == Jutsu::ELEMENT_WATER) {
-                    if($attack2->jutsu->element == Jutsu::ELEMENT_FIRE) {
+                else if($attack1->jutsu->element == Element::WATER) {
+                    if($attack2->jutsu->element == Element::FIRE) {
                         $attack2_damage *= 0.8;
                     }
-                    else if($attack2->jutsu->element == Jutsu::ELEMENT_EARTH) {
+                    else if($attack2->jutsu->element == Element::EARTH) {
                         $attack1_damage *= 0.8;
                     }
                 }
@@ -555,7 +555,7 @@ class BattleActionProcessor {
 
             $collision_text = "";
             // Barriers
-            /* if($attack1_user->barrier && $attack2->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {
+            /* if($attack1_user->barrier && $attack2->jutsu->jutsu_type != JutsuOffenseType::GENJUTSU) {
                  // Block damage from opponent's attack
                  if($attack1_user->barrier >= $attack2_damage) {
                      $block_amount = $attack2_damage;
@@ -579,7 +579,7 @@ class BattleActionProcessor {
                  $block_percent = round($block_percent, 1);
                  $collision_text .= "[player]'s barrier blocked $block_percent% of [opponent]'s damage![br]";
              }
-             if($attack2_user->barrier && $attack1->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {
+             if($attack2_user->barrier && $attack1->jutsu->jutsu_type != JutsuOffenseType::GENJUTSU) {
                  // Block damage from opponent's attack
                  if($attack2_user->barrier >= $attack1_damage) {
                      $block_amount = $attack1_damage;
@@ -606,7 +606,7 @@ class BattleActionProcessor {
 
             // Weapon diffuse (tai diffuse nin)
             /*
-            if($attack1->jutsu->weapon_id && $attack1->jutsu->weapon_effect->effect == 'diffuse' && $attack2->jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
+            if($attack1->jutsu->weapon_id && $attack1->jutsu->weapon_effect->effect == 'diffuse' && $attack2->jutsu->jutsu_type == JutsuOffenseType::NINJUTSU) {
                     if($attack2_damage <= 0) {
                         $attack1_diffuse_percent = 0;
                     }
@@ -621,7 +621,7 @@ class BattleActionProcessor {
                         }
                     }
                 }
-                if($attack2->jutsu->weapon_id && $attack2->jutsu->weapon_effect->effect == 'diffuse' && $attack1->jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
+                if($attack2->jutsu->weapon_id && $attack2->jutsu->weapon_effect->effect == 'diffuse' && $attack1->jutsu->jutsu_type == JutsuOffenseType::NINJUTSU) {
                     if($attack1_damage <= 0) {
                         $attack2_diffuse_percent = 0;
                     }
@@ -682,9 +682,9 @@ class BattleActionProcessor {
             $speed_ratio = 0.8;
             $cast_speed_ratio = 0.8;
             $max_damage_reduction = 0.5;
-            if($attack1->jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
+            if($attack1->jutsu->jutsu_type == JutsuOffenseType::NINJUTSU) {
                 // Nin vs Nin
-                if($attack2->jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
+                if($attack2->jutsu->jutsu_type == JutsuOffenseType::NINJUTSU) {
                     if($attack1_cast_speed >= $attack2_cast_speed) {
                         $damage_reduction = ($attack1_cast_speed / $attack2_cast_speed) - 1.0;
                         $damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
@@ -711,7 +711,7 @@ class BattleActionProcessor {
                     }
                 }
                 // Nin vs Tai
-                else if($attack2->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+                else if($attack2->jutsu->jutsu_type == JutsuOffenseType::TAIJUTSU) {
                     if($attack1_cast_speed >= $attack2_speed) {
                         $damage_reduction = ($attack1_cast_speed / $attack2_speed) - 1.0;
                         $damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
@@ -739,9 +739,9 @@ class BattleActionProcessor {
             }
 
             // Taijutsu clash
-            else if($attack1->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+            else if($attack1->jutsu->jutsu_type == JutsuOffenseType::TAIJUTSU) {
                 // Tai vs Tai
-                if($attack2->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+                if($attack2->jutsu->jutsu_type == JutsuOffenseType::TAIJUTSU) {
                     if($attack1_speed >= $attack2_speed) {
                         $damage_reduction = ($attack1_speed / $attack2_speed) - 1.0;
                         $damage_reduction = round($damage_reduction * $speed_ratio, 2);
@@ -765,7 +765,7 @@ class BattleActionProcessor {
                         }
                     }
                 }
-                else if($attack2->jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
+                else if($attack2->jutsu->jutsu_type == JutsuOffenseType::NINJUTSU) {
                     if($attack1_speed >= $attack2_cast_speed) {
                         $damage_reduction = ($attack1_speed / $attack2_cast_speed) - 1.0;
                         $damage_reduction = round($damage_reduction * $speed_ratio, 2);

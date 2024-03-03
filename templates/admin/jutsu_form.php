@@ -65,7 +65,7 @@
     <label for="element">Element:</label>
     <select name="<?= $fieldName("element") ?>">
         <?php foreach($jutsu_constraints['element']['options'] as $option): ?>
-            <option value="<?= $option ?>" <?= ($option == $existing_jutsu?->element ? "selected" : "") ?>>
+            <option value="<?= $option ?>" <?= ($option == $existing_jutsu?->element->value ? "selected" : "") ?>>
                 <?= System::unSlug($option) ?>
             </option>
         <?php endforeach; ?>
@@ -114,7 +114,7 @@
     <label for="jutsu_type" style="margin-top:5px;">Jutsu Type:</label>
     <select name="<?= $fieldName("jutsu_type") ?>">
         <?php foreach($jutsu_constraints['jutsu_type']['options'] as $option): ?>
-            <option value="<?= $option ?>" <?= ($option == $existing_jutsu?->jutsu_type ? "selected" : "") ?>>
+            <option value="<?= $option ?>" <?= ($option == $existing_jutsu?->jutsu_type->value ? "selected" : "") ?>>
                 <?= System::unSlug($option) ?>
             </option>
         <?php endforeach; ?>
@@ -166,7 +166,7 @@
         <script type='text/javascript'>
             <?php
                 $hand_seals = [];
-                if($existing_jutsu != null && $existing_jutsu->jutsu_type != Jutsu::TYPE_TAIJUTSU) {
+                if($existing_jutsu != null && $existing_jutsu->jutsu_type != JutsuOffenseType::TAIJUTSU) {
                     $hand_seals = explode("-", $existing_jutsu->hand_seals);
                     $hand_seals = array_map(intval(...), $hand_seals);
                 }

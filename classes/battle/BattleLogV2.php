@@ -332,11 +332,11 @@ class EffectHitLog {
      */
     public static function getTypeFromDamageType(string $damage_type): string {
         switch($damage_type) {
-            case Jutsu::TYPE_NINJUTSU:
+            case JutsuOffenseType::NINJUTSU:
                 return EffectHitLog::TYPE_NINJUTSU_DAMAGE;
-            case Jutsu::TYPE_GENJUTSU:
+            case JutsuOffenseType::GENJUTSU:
                 return EffectHitLog::TYPE_GENJUTSU_DAMAGE;
-            case Jutsu::TYPE_TAIJUTSU:
+            case JutsuOffenseType::TAIJUTSU:
                 return EffectHitLog::TYPE_TAIJUTSU_DAMAGE;
             default:
                 throw new RuntimeException("Invalid damage type!");

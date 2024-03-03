@@ -319,10 +319,10 @@
                     <br/>
                     Choose your element to attune to:<br/>
                     <select name='new_element'>
-                        <?php foreach(Jutsu::$elements as $new_element): ?>
-                            <?php if($new_element == Jutsu::ELEMENT_NONE) continue; ?>
+                        <?php foreach(Element::cases() as $new_element): ?>
+                            <?php if($new_element == Element::NONE) continue; ?>
                             <?php if(in_array($new_element, $player->elements)) continue; ?>
-                            <option value='<?= $new_element ?>'><?= $new_element ?></option>
+                            <option value='<?= $new_element->value ?>'><?= $new_element->value ?></option>
                         <?php endforeach; ?>
                     </select><br/>
                     <input type='submit' style='margin-top: 5px' name='change_element' value='Change Element'/>

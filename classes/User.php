@@ -1544,13 +1544,13 @@ class User extends Fighter {
 
                 if($jutsu != null) {
                     switch($jutsu->jutsu_type) {
-                        case Jutsu::TYPE_GENJUTSU:
+                        case JutsuOffenseType::GENJUTSU:
                             $training_stat = 'genjutsu_skill';
                             break;
-                        case Jutsu::TYPE_TAIJUTSU:
+                        case JutsuOffenseType::TAIJUTSU:
                             $training_stat = 'taijutsu_skill';
                             break;
-                        case Jutsu::TYPE_NINJUTSU:
+                        case JutsuOffenseType::NINJUTSU:
                             $training_stat = 'ninjutsu_skill';
                             break;
                     }
@@ -1576,7 +1576,7 @@ class User extends Fighter {
     }
 
     public function hasElement(string $element): bool {
-        if($element == Jutsu::ELEMENT_NONE) {
+        if($element == Element::NONE) {
             return true;
         }
 
@@ -2192,13 +2192,13 @@ class User extends Fighter {
         unset($this->jutsu[$jutsu_id]);
 
         switch($jutsu->jutsu_type) {
-            case Jutsu::TYPE_NINJUTSU:
+            case JutsuOffenseType::NINJUTSU:
                 unset($this->ninjutsu_ids[$jutsu_id]);
                 break;
-            case Jutsu::TYPE_TAIJUTSU:
+            case JutsuOffenseType::TAIJUTSU:
                 unset($this->taijutsu_ids[$jutsu_id]);
                 break;
-            case Jutsu::TYPE_GENJUTSU:
+            case JutsuOffenseType::GENJUTSU:
                 unset($this->genjutsu_ids[$jutsu_id]);
                 break;
         }

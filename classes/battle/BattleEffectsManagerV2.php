@@ -48,7 +48,7 @@ class BattleEffectsManagerV2 {
             echo sprintf("%s / %s<br />", $raw_damage, $debuff_power);
         }
 
-        /*if($jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($jutsu->parent_jutsu)) {
+        /*if($jutsu->jutsu_type == JutsuOffenseType::GENJUTSU && !empty($jutsu->parent_jutsu)) {
             $parent_genjutsu_id = $effect_user->combat_id . ':J' . $jutsu->parent_jutsu;
             if(!empty($this->active_effects[$parent_genjutsu_id]->layer_active)) {
                 $this->active_effects[$parent_genjutsu_id]->layer_active = true;
@@ -117,14 +117,6 @@ class BattleEffectsManagerV2 {
                 effect_amount: $jutsu->effect_amount,
                 damage_type: $jutsu->jutsu_type
             );
-            if($jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
-                $intelligence = ($effect_user->intelligence + $effect_user->intelligence_boost - $effect_user->intelligence_nerf);
-                if($intelligence <= 0) {
-                    $intelligence = 1;
-                }
-                $this->active_effects[$effect_id]->power = $intelligence * $jutsu->power;
-                $this->active_effects[$effect_id]->first_turn = true;
-            }
         }
     }
 
@@ -327,10 +319,6 @@ class BattleEffectsManagerV2 {
                 if($this->active_genjutsu[$id]->turns <= 0) {
                     unset($this->active_genjutsu[$id]);
                 }
-
-                if($genjutsu->first_turn) {
-                    $genjutsu->first_turn = false;
-                }
             }
         }
 
@@ -350,7 +338,7 @@ class BattleEffectsManagerV2 {
                         turns: 1,
                         effect: $boost->effect,
                         effect_amount: $boost->effect_amount,
-                        damage_type: Jutsu::TYPE_TAIJUTSU
+                        damage_type: JutsuOffenseType::TAIJUTSU
                     )
                 );
             }
@@ -579,7 +567,7 @@ class BattleEffectsManagerV2 {
      * @throws RuntimeException
      */
     public function assertParentGenjutsuActive($fighter, Jutsu $fighter_jutsu) {
-        if($fighter_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {
+        if($fighter_jutsu->jutsu_type != JutsuOffenseType::GENJUTSU) {
             return;
         }
 
