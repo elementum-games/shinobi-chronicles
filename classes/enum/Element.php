@@ -13,4 +13,14 @@ enum Element: string {
             return $case->value;
         }, self::cases());
     }
+
+    /**
+     * @param Element[] $elements
+     * @return string[]
+     */
+    public static function getValues(array $elements): array {
+        return array_map(function($element) {
+            return $element->value;
+        }, $elements);
+    }
 }

@@ -553,22 +553,14 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
     }
     else if($player->exam_stage == RankManager::CHUUNIN_STAGE_PASS) {
         try {
-            $element = $_POST['element'] ?? false;
+            $element_input = $_POST['element'] ?? false;
 
-            switch($element) {
-                case 'Fire':
-                case 'Wind':
-                case 'Lightning':
-                case 'Earth':
-                case 'Water':
-                    break;
-                case '':
-                    $element = false;
-                    break;
-                default:
-                    $element = false;
-                    $system->message("Invalid element!");
-                    break;
+
+            try {
+                $element = Element::from($element_input);
+            } catch(Throwable $e) {
+                $element = false;
+                $system->message("Invalid element!");
             }
 
             // Display
@@ -579,7 +571,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             }
             else {
                 switch($element) {
-                    case 'Fire':
+                    case Element::FIRE:
                         $element_display = "With the image of blazing fires in your mind, you focus on the paper and flow chakra from your stomach,
 							through your arms, out your fingertips and into the paper. Suddenly it erupts into flame, and you drop it
 							in shock. The elders smile and say \"Congratulations, you have the Fire element. Fire is the embodiment of
@@ -588,7 +580,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 							can extinguish your fires.\"<br />
 							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
-                    case 'Wind':
+                    case Element::WIND:
                         $element_display = "Picturing a tempestuous tornado, you focus on the paper and flow chakra from your stomach,
 							through your arms, out your fingertips and into the paper. At first nothing seems to happen, but then in an
 							instant the paper splits clean in half. The elders smile and say \"Congratulations, you have the Wind element. Wind
@@ -598,7 +590,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 							<br />
 							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
-                    case 'Lightning':
+                    case Element::LIGHTNING:
                         $element_display = "Imagining the feel of electricity coursing through your veins, you focus on the paper and flow chakra
 							from your stomach, through your arms, out your fingertips and into the paper. With a slight shock the
 							paper crumples into a ball, and the elders smile and say
@@ -609,7 +601,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 							<br />
 							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
-                    case 'Earth':
+                    case Element::EARTH:
                         $element_display = "Firmly planting your feet in the dirt and embracing the feel of it, you focus on the paper and flow
 							chakra from your stomach, through your arms, out your fingertips and into the paper. The paper gradually turns
 							into dirt and crumbles away, and the elders smile and say \"Congratulations, you have the Earth element. Earth
@@ -619,7 +611,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 							<br />
 							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
-                    case 'Water':
+                    case Element::WATER:
                         $element_display = "With thoughts of splashing rivers flowing through your mind, you focus on the paper and flow chakra
 							from your stomach, through your arms, out your fingertips and into the paper. The paper gradually moistens
 							and then turns completely soaked with water. The elders smile and say

@@ -54,7 +54,7 @@ $clan_positions = array(
             <label style='width:6.5em;'>Bloodline:</label> <?= ($viewUser->bloodline_id ? $viewUser->bloodline_name : "None") ?><br />
             <?php if($viewUser->elements): ?>
                 <label style='width:6.5em;'>Element<?= (count($viewUser->elements) > 1 ? 's' : '') ?>:</label>
-                <?= implode(', ', $viewUser->elements) ?><br />
+                <?= implode(', ', Element::getValues($viewUser->elements)) ?><br />
             <?php endif; ?>
             <br />
 

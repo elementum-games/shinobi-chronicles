@@ -31,7 +31,7 @@ class UserApiPresenter {
             'totalStats' => $player->total_stats,
             'totalStatCap' => $player->rank->stat_cap,
             'gender' => $player->gender,
-            'elements' => $player->elements,
+            'elements' => Element::getValues($player->elements),
             'has_bloodline' => isset($player->bloodline),
             'bloodlineName' => $player->bloodline?->name,
             'avatar_size' => $player->getAvatarSize(),

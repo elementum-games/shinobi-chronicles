@@ -446,7 +446,7 @@ $clan_positions = [
 
     <?php if($player->elements): ?>
         <br /><label style='width:9.2em;'>Element<?= (count($player->elements) > 1 ? 's' : '') ?>:</label>
-        <?= implode(', ', $player->elements) ?><br />
+        <?= implode(', ', Element::getValues($player->elements)) ?><br />
     <?php endif; ?>
 
     <br />

@@ -71,7 +71,7 @@ class Jutsu {
         'resist_boost' => 1.85,
         'evasion_boost' => 2,
         'speed_boost' => 1,
-        'piercing' => 0.75,
+        'piercing' => 0.5,
         'counter' => 3.25,
         'reflect' => 3.25,
         'substitution' => 2.5,

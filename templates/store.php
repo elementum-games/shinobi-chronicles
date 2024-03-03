@@ -40,7 +40,7 @@
                     <label style='width:6.5em;'>Element:</label>
                     <span style='
                         color:<?=
-                            $player->elements && in_array($jutsu_to_view['element'], $player->elements)
+                            $player->elements && in_array(Element::from($jutsu_to_view['element']), $player->elements)
                             ? "#00C000"
                             : "#C00000"
                         ?>;

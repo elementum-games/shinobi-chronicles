@@ -164,7 +164,7 @@ function store() {
 
 			// Element check
 			if($shop_jutsu[$jutsu_id]['element'] != 'None') {
-				if(!$player->elements or !in_array($shop_jutsu[$jutsu_id]['element'], $player->elements)) {
+				if(!$player->elements or !in_array(Element::from($shop_jutsu[$jutsu_id]['element']), $player->elements)) {
 					throw new RuntimeException("You do not have the elemental chakra for this jutsu!");
 				}
 			}

@@ -592,7 +592,7 @@ function premiumShop(): void {
 
             //Confirm purchase
             if (!isset($_POST['confirm_chakra_element_change'])) {
-                $confirmation_string = "Are you sure you want to <b>forget the {$player->elements[$editing_element_index]} nature</b>
+                $confirmation_string = "Are you sure you want to <b>forget the {$player->elements[$editing_element_index]->value} nature</b>
                 and <b>attune to the $new_element nature</b>?<br />
                 <br />
                 <b>(IMPORTANT: This is non-reversable once completed! If you want to return to your original element you

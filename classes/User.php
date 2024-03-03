@@ -867,10 +867,15 @@ class User extends Fighter {
         $elements = $user_data['elements'];
         if($elements) {
             // Array values to undo the "first" "second" etc keys
-            $this->elements = array_values(
-                json_decode(
-                    $user_data['elements'] ?? "[]",
-                    true
+            $this->elements = array_map(
+                function($elem) {
+                    return Element::from($elem);
+                },
+                array_values(
+                    json_decode(
+                        $user_data['elements'] ?? "[]",
+                        true
+                    )
                 )
             );
         }
@@ -1899,10 +1904,7 @@ class User extends Fighter {
 
         $forbidden_seal = $this->forbidden_seal->dbEncode();
 
-        $elements = $this->elements;
-        if(is_array($elements)) {
-            $elements = json_encode($this->elements);
-        }
+        $elements = json_encode(Element::getValues($this->elements));
 
         $missions_completed = $this->missions_completed;
         if(is_array($missions_completed)) {

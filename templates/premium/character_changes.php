@@ -313,7 +313,7 @@
                 <form action='<?= $self_link ?>' method='post'>
                     <select name='editing_element_index'>
                         <?php foreach($player->elements as $slot => $element): ?>
-                            <option value='<?= $slot ?>'><?= $element ?></option>
+                            <option value='<?= $slot ?>'><?= $element->value ?></option>
                         <?php endforeach; ?>
                     </select>
                     <br/>

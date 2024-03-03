@@ -473,12 +473,12 @@ class PremiumShopManager {
     }
 
     // Element Change
-    public function assertUserCanChangeElement(int $editing_element_index, string $new_element): void {
+    public function assertUserCanChangeElement(int $editing_element_index, Element $new_element): void {
         $ak_cost = $this->costs['element_change'];
 
         //Player already has new element
         if (in_array($new_element, $this->player->elements)) {
-            throw new RuntimeException("You already attuned to the $new_element element!");
+            throw new RuntimeException("You already attuned to the $new_element->value element!");
         }
         //Check player's current element is valid
         switch ($this->player->elements[$editing_element_index]) {
@@ -489,7 +489,7 @@ class PremiumShopManager {
             case Element::WATER:
                 break;
             default:
-                throw new RuntimeException("The $editing_element_index element ({$this->player->elements[$editing_element_index]}) is invalid!");
+                throw new RuntimeException("The $editing_element_index element ({$this->player->elements[$editing_element_index]->value}) is invalid!");
         }
         //Check that new element is valid
         switch ($new_element) {
@@ -500,7 +500,7 @@ class PremiumShopManager {
             case Element::WATER:
                 break;
             default:
-                throw new RuntimeException("New element $new_element is invalid!");
+                throw new RuntimeException("New element $new_element->value is invalid!");
         }
 
         if ($editing_element_index > $this->player->rank_num - 2) {
@@ -513,7 +513,7 @@ class PremiumShopManager {
         }
     }
 
-    public function changeElement(int $editing_element_index, string $new_element): ActionResult {
+    public function changeElement(int $editing_element_index, Element $new_element): ActionResult {
         $this->assertUserCanChangeElement($editing_element_index, $new_element);
 
         $ak_cost = $this->costs['element_change'];
@@ -522,7 +522,7 @@ class PremiumShopManager {
         // Process purchase
         $this->player->subtractPremiumCredits(
             $ak_cost,
-            "Changed element #{$editing_element_index} from {$this->player->elements[$editing_element_index]} to $new_element"
+            "Changed element #{$editing_element_index} from {$this->player->elements[$editing_element_index]->value} to $new_element->value"
         );
 
         if (isset($this->player->elements[$editing_element_index])) {
@@ -584,7 +584,7 @@ class PremiumShopManager {
                 break;
         }
 
-        $message .=  "<b style='color:green'>You have forgotten the {$previous_element} nature and are now attuned to the {$new_element} nature.</b>";
+        $message .=  "<b style='color:green'>You have forgotten the {$previous_element->value} nature and are now attuned to the {$new_element->value} nature.</b>";
 
         return ActionResult::succeeded($message);
     }
