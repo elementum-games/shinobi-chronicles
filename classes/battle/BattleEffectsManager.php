@@ -285,6 +285,8 @@ class BattleEffectsManager {
         );
 
         foreach($player1->jutsu as $jutsu) {
+            if($jutsu->purchase_type == Jutsu::PURCHASE_TYPE_DEFAULT) continue;
+
             if(!isset($player1_equipped_jutsu_ids[$jutsu->id])) {
                 $jutsu->power *= 0.75;
                 foreach($jutsu->effects as $effect) {
@@ -301,6 +303,8 @@ class BattleEffectsManager {
             }
         }
         foreach($player2->jutsu as $jutsu) {
+            if($jutsu->purchase_type == Jutsu::PURCHASE_TYPE_DEFAULT) continue;
+
             if(!isset($player2_equipped_jutsu_ids[$jutsu->id])) {
                 $jutsu->power *= 0.75;
                 foreach($jutsu->effects as $effect) {
