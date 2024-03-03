@@ -465,7 +465,7 @@ class Jutsu {
                 case 'reflect':
                     $total_effect_utility += self::BALANCE_EFFECT_RATIOS[$effect->effect] * $capped_effect_amount;
                     $residual_effect_info[] = [
-                        'total_amount' => $total_effect_utility / 2, // only half the effect is residual damage dealt
+                        'total_amount' => self::BALANCE_BASELINE_POWER * $total_effect_utility / 2, // only half the effect is residual damage dealt
                         'length' => $effect->effect_length,
                     ];
                     break;
