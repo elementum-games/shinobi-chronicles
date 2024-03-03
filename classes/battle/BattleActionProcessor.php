@@ -250,25 +250,7 @@ class BattleActionProcessor {
             starting_raw_damage: $fighter->calcDamage($jutsu),
         );
 
-        // Set weapon data into jutsu
-        if($attack->jutsu->jutsu_type == JutsuOffenseType::TAIJUTSU && $action->weapon_id) {
-            // Apply element to jutsu
-            if($fighter->items[$action->weapon_id]->effect == 'element') {
-                $attack->jutsu->element = $fighter->elements[0];
-                $attack->starting_raw_damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
-            }
-            // Set effect in jutsu
-            else {
-                $attack->jutsu->setWeapon(
-                    $action->weapon_id,
-                    $fighter->items[$action->weapon_id]->effect,
-                    $fighter->items[$action->weapon_id]->effect_amount,
-                );
-            }
-        }
-
         if($attack->jutsu->isAllyTargetType() || $attack->jutsu->use_type == Jutsu::USE_TYPE_INDIRECT) {
-            $attack->jutsu->weapon_id = 0;
             $attack->jutsu->effect_only = true;
         }
 

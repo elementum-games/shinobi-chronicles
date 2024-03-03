@@ -241,8 +241,8 @@ function bloodline() {
 		foreach($player->bloodline->jutsu as $jutsu) {
 			echo "<label style='font-weight:bold;'>" . $jutsu->name . "</label><br />
 			<label style='width:6.5em;'>Rank:</label>" . $RANK_NAMES[$jutsu->rank] . "<br />";
-			if($jutsu->element != 'none') {
-				echo "<label style='width:6.5em;'>Element:</label>" . $jutsu->element . "<br />";
+			if($jutsu->element != Element::NONE) {
+				echo "<label style='width:6.5em;'>Element:</label>" . $jutsu->element->value . "<br />";
 			}
 			echo "<label style='width:6.5em;'>Use cost:</label>" . $jutsu->use_cost . "<br />";
 			if($jutsu->cooldown) {
@@ -283,7 +283,7 @@ function bloodline() {
 						echo "<label style='width:6.5em;'>Parent Jutsu:</label>" .
 							$base_bloodline->jutsu[($jutsu->parent_jutsu - 1)]->name . "<br />";
 					}
-					if($jutsu->element != 'none') {
+					if($jutsu->element != Element::NONE) {
 						echo "<label style='width:6.5em;'>Element:</label>" . $jutsu->element->value . "<br />";
 					}
 					echo "<label style='width:6.5em;'>Use cost:</label>" . $jutsu->use_cost . "<br />

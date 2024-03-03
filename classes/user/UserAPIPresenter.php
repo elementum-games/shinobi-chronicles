@@ -191,7 +191,7 @@ class UserApiPresenter {
             'targetType' => $jutsu->target_type,
             'handSeals' => explode('-', $jutsu->hand_seals),
             'range' => $jutsu->range,
-            'element' => $jutsu->element,
+            'element' => $jutsu->element->value,
             // todo later
            /* 'level' => $jutsu->level,
             'exp' => $jutsu->exp,*/

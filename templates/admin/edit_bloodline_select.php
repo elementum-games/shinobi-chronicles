@@ -83,7 +83,7 @@ $current_rank = 1;
                         <p>
                             <b><?= $jutsu->name ?></b>
                             <?php if($jutsu->element != Element::NONE): ?>
-                                <i>(<?= ucwords($jutsu->element) ?>)</i>
+                                <i>(<?= ucwords($jutsu->element->value) ?>)</i>
                             <?php endif; ?>
                             &nbsp;[TP <?= number_format($jutsu->getBalanceMaxUtility(), 1) ?>]
                         </p>

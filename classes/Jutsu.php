@@ -82,14 +82,6 @@ class Jutsu {
     /* Genjutsu gets declared with full power and effect instead of a tradeoff between them, we balance in code
     const GENJUTSU_ATTACK_POWER_MODIFIER = 0.55;*/
 
-    public static array $elements = [
-        self::ELEMENT_NONE,
-        self::ELEMENT_FIRE,
-        self::ELEMENT_EARTH,
-        self::ELEMENT_WIND,
-        self::ELEMENT_WATER,
-        self::ELEMENT_LIGHTNING,
-    ];
     public static array $use_types = [
         self::USE_TYPE_MELEE,
         self::USE_TYPE_PROJECTILE,
@@ -313,7 +305,7 @@ class Jutsu {
     }
 
     public function hasElement(): bool {
-        if (isset($this->element) && $this->element != self::ELEMENT_NONE && $this->element != 'none') {
+        if (isset($this->element) && $this->element != self::ELEMENT_NONE) {
            return true;
         }
         return false;
