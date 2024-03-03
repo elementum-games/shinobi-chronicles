@@ -127,7 +127,7 @@
                             <?php if($jutsu->level >= Jutsu::MAX_LEVEL): ?>
                                 <?php continue; ?>
                             <?php endif ?>
-                            <option value="<?=$id?>" title="<?=$jutsu->jutsu_type?>" <?=($player->trainingManager->train_type == 'jutsu:'.System::slug($jutsu->name) ? "selected='selected'" : "")?>
+                            <option value="<?=$id?>" title="<?= $jutsu->jutsu_type->value ?>" <?=($player->trainingManager->train_type == 'jutsu:'.System::slug($jutsu->name) ? "selected='selected'" : "")?>
                             ><?=$jutsu->name?></option>
                         <?php endforeach ?>
                     </select><br />
@@ -142,7 +142,7 @@
                                 <?php if($jutsu->level >= Jutsu::MAX_LEVEL): ?>
                                     <?php continue; ?>
                                 <?php endif ?>
-                                <option value="<?=$id?>" title="<?=$jutsu->jutsu_type?>" <?=($player->trainingManager->train_type == 'jutsu:'.System::slug($jutsu->name) ? "selected='selected'" : "")?>
+                                <option value="<?=$id?>" title="<?= $jutsu->jutsu_type->value ?>" <?=($player->trainingManager->train_type == 'jutsu:'.System::slug($jutsu->name) ? "selected='selected'" : "")?>
                                 ><?=$jutsu->name?></option>
                             <?php endforeach ?>
                         </select><br />

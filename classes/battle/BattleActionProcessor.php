@@ -825,18 +825,6 @@ class BattleActionProcessor {
             }
         }
 
-        // Weapon effect for taijutsu (IN PROGRESS)
-        if($attack->jutsu->weapon_id) {
-            if($user->items[$attack->jutsu->weapon_id]->effect != 'diffuse') {
-                $this->effects->setEffect(
-                    $user,
-                    $target->combat_id,
-                    $attack->jutsu->weapon_effect,
-                    $attack->starting_raw_damage
-                );
-            }
-        }
-
         // Set cooldowns
         if($attack->jutsu->cooldown > 0) {
             $this->battle->jutsu_cooldowns[$attack->jutsu->combat_id] = $attack->jutsu->cooldown;
@@ -877,14 +865,6 @@ class BattleActionProcessor {
                 caster: $user,
                 target: $target,
                 announcement_text: $this->effects->getAnnouncementText($attack->jutsu->effect)
-            );
-        }
-
-        if($attack->jutsu->weapon_id) {
-            $this->battle->current_turn_log->addFighterEffectAnnouncement(
-                caster: $user,
-                target: $target,
-                announcement_text: $this->effects->getAnnouncementText($attack->jutsu->weapon_effect->effect)
             );
         }
     }

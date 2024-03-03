@@ -249,6 +249,7 @@ class User extends Fighter {
      */
     public int $regen_rate;
 
+    /** @var Element[]  */
     public array $elements;
 
     public int $regen_boost = 0;
@@ -1311,7 +1312,7 @@ class User extends Fighter {
                     $message = $this->bloodline->jutsu[$jutsu_id]->name . " has increased to level " .
                         $this->bloodline->jutsu[$jutsu_id]->level . '.';
 
-                    $jutsu_skill_type = $this->bloodline->jutsu[$jutsu_id]->jutsu_type . '_skill';
+                    $jutsu_skill_type = $this->bloodline->jutsu[$jutsu_id]->jutsu_type->value . '_skill';
                     if ($this->total_stats < $this->rank->stat_cap) {
                         $this->{$jutsu_skill_type}++;
                         $this->exp += 10;
@@ -1373,7 +1374,7 @@ class User extends Fighter {
                         $message = $this->jutsu[$jutsu_id]->name . " has increased to level " .
                             $this->jutsu[$jutsu_id]->level . '.';
 
-                        $jutsu_skill_type = $this->jutsu[$jutsu_id]->jutsu_type . '_skill';
+                        $jutsu_skill_type = $this->jutsu[$jutsu_id]->jutsu_type->value . '_skill';
                         if ($this->total_stats < $this->rank->stat_cap) {
                             $message .= $this->addStatGain($jutsu_skill_type, 1, false);
                         }
@@ -1575,7 +1576,7 @@ class User extends Fighter {
         return isset($this->items[$item_id]) ? $this->items[$item_id]->quantity : 0;
     }
 
-    public function hasElement(string $element): bool {
+    public function hasElement(Element $element): bool {
         if($element == Element::NONE) {
             return true;
         }
@@ -1636,11 +1637,11 @@ class User extends Fighter {
      */
     public function useJutsu(Jutsu $jutsu, float $resource_cost_multiplier = 1.0): ActionResult {
         switch($jutsu->jutsu_type) {
-            case 'ninjutsu':
-            case 'genjutsu':
+            case JutsuOffenseType::NINJUTSU:
+            case JutsuOffenseType::GENJUTSU:
                 $energy_type = 'chakra';
                 break;
-            case 'taijutsu':
+            case JutsuOffenseType::TAIJUTSU:
                 $energy_type = 'stamina';
                 break;
             default:

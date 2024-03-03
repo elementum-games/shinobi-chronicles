@@ -372,7 +372,7 @@ abstract class Fighter {
         if(!empty($this->bloodline_offense_boosts)) {
             foreach($this->bloodline_offense_boosts as $id => $boost) {
                 $boost_type = explode('_', $boost['effect'])[0];
-                if($boost_type != $attack->jutsu_type) {
+                if($boost_type != $attack->jutsu_type->value) {
                     continue;
                 }
 

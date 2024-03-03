@@ -70,7 +70,7 @@ class BattleLogV2 {
     }
 
     public function addFighterAttackHit(
-        Fighter $attacker, Fighter $target, string $damage_type, float $damage, int $time_occurred
+        Fighter $attacker, Fighter $target, JutsuOffenseType $damage_type, float $damage, int $time_occurred
     ): void {
         $fighter_action_log = $this->getFighterActionLog($attacker->combat_id);
         $fighter_action_log->hits[] = new AttackHitLog(
@@ -239,16 +239,16 @@ class BattleLogV2 {
 
 class FighterActionLog {
     /**
-     * @param string              $fighter_id
-     * @param string              $action_description
-     * @param AttackPathSegment[] $path_segments
-     * @param AttackHitLog[]      $hits
-     * @param array               $effect_hits
-     * @param array               $new_effect_announcements
-     * @param string|null         $jutsu_element
-     * @param string|null         $jutsu_type
-     * @param string|null         $jutsu_use_type
-     * @param string|null         $jutsu_target_type
+     * @param string                $fighter_id
+     * @param string                $action_description
+     * @param AttackPathSegment[]   $path_segments
+     * @param AttackHitLog[]        $hits
+     * @param array                 $effect_hits
+     * @param array                 $new_effect_announcements
+     * @param Element|null          $jutsu_element
+     * @param JutsuOffenseType|null $jutsu_type
+     * @param string|null           $jutsu_use_type
+     * @param string|null           $jutsu_target_type
      */
     public function __construct(
         public string $fighter_id,
@@ -257,8 +257,8 @@ class FighterActionLog {
         public array $hits,
         public array $effect_hits,
         public array $new_effect_announcements,
-        public ?string $jutsu_element = null,
-        public ?string $jutsu_type = null,
+        public ?Element $jutsu_element = null,
+        public ?JutsuOffenseType $jutsu_type = null,
         public ?string $jutsu_use_type = null,
         public ?string $jutsu_target_type = null,
     ) {}
@@ -270,7 +270,7 @@ class AttackHitLog {
         public string $attacker_name,
         public string $target_id,
         public string $target_name,
-        public string $damage_type,
+        public JutsuOffenseType $damage_type,
         public float $damage,
         public int $time_occurred
     ) {}

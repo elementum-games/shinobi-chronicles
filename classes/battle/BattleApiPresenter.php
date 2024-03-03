@@ -123,12 +123,12 @@ class BattleApiPresenter {
             'name' => $jutsu->name,
             'description' => html_entity_decode($jutsu->description, ENT_QUOTES),
             'activeCooldownTurnsLeft' => $battle->jutsu_cooldowns[$jutsu->combat_id] ?? 0,
-            'jutsuType' => $jutsu->jutsu_type,
+            'jutsuType' => $jutsu->jutsu_type->value,
             'targetType' => $jutsu->target_type,
             'handSeals' => explode('-', $jutsu->hand_seals),
             'power' => $jutsu->base_power,
             'range' => $jutsu->range,
-            'element' => $jutsu->element,
+            'element' => $jutsu->element->value,
             'cooldown' => $jutsu->cooldown,
             'effect' => $jutsu->effects[0]->effect,
             'effectAmount' => $jutsu->effects[0]->effect_amount,
@@ -195,8 +195,8 @@ class BattleApiPresenter {
                         "newEffectAnnouncements" => self::unescapeQuotes(
                             $action_log->new_effect_announcements
                         ),
-                        "jutsuElement" => $action_log->jutsu_element,
-                        "jutsuType" => $action_log->jutsu_type,
+                        "jutsuElement" => $action_log->jutsu_element->value,
+                        "jutsuType" => $action_log->jutsu_type->value,
                         "jutsuUseType" => $action_log->jutsu_use_type,
                         "jutsuTargetType" => $action_log->jutsu_target_type,
                     ];

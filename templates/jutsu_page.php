@@ -2,9 +2,9 @@
 /**
  * @var System $system
  * @var string $self_link
- * @var array $child_jutsu
+ * @var Jutsu[] $child_jutsu
  * @var User $player
- * @var array $jutsu_list
+ * @var Jutsu[] $jutsu_list
  * @var int $max_equipped_jutsu
  */
 
@@ -343,7 +343,7 @@ $rank_names = RankManager::fetchNames($system);
                             <option value='none' <?= (!$player->equipped_jutsu ? "selected='selected'" : "") ?>>None</option>
                             <?php foreach($player->jutsu as $jutsu): ?>
                                 <option
-                                        value='<?= $jutsu->jutsu_type ?>-<?= $jutsu->id ?>'
+                                    value='<?= $jutsu->jutsu_type->value ?>-<?= $jutsu->id ?>'
                                     <?= ($jutsu->id == $slot_equipped_jutsu ? "selected='selected'" : "") ?>
                                 >
                                     <?= $jutsu->name ?>
@@ -368,7 +368,7 @@ $rank_names = RankManager::fetchNames($system);
                 <span style='font-weight:bold;'><?= $jutsu_scroll->name ?></span><br />
                 <div style='margin-left:2em;'>
                     <label style='width:6.5em;'>Rank:</label><?= $jutsu_scroll->rank ?><br />
-                    <label style='width:6.5em;'>Element:</label><?= $jutsu_scroll->element ?><br />
+                    <label style='width:6.5em;'>Element:</label><?= $jutsu_scroll->element->value ?><br />
                     <label style='width:6.5em;'>Use cost:</label><?= $jutsu_scroll->use_cost ?><br />
                     <?php if($jutsu_scroll->cooldown > 0): ?>
                         <label style='width:6.5em;'>Cooldown:</label><?= $jutsu_scroll->cooldown ?> turn(s)<br />
@@ -376,7 +376,7 @@ $rank_names = RankManager::fetchNames($system);
                     <label style='width:6.5em;float:left;'>Description:</label>
                     <p style='display:inline-block;margin:0;width:37.1em;'><?= $jutsu_scroll->description ?></p>
                     <br style='clear:both;' />
-                    <label style='width:6.5em;'>Jutsu type:</label><?= ucwords($jutsu_scroll->jutsu_type) ?><br />
+                    <label style='width:6.5em;'>Jutsu type:</label><?= ucwords($jutsu_scroll->jutsu_type->value) ?><br />
                 </div>
                 <p style='text-align:right;margin:0;'><a href='<?= $self_link ?>&learn_jutsu=<?= $id ?>'>Learn</a></p>
             </td></tr>
@@ -488,7 +488,14 @@ $rank_names = RankManager::fetchNames($system);
             <div class="jutsu_list">
                 <?php foreach ($jutsu_list as $jutsu): ?>
                     <!--data attributes used for filter logic-->
-                <table class="table jutsu_block_table" title="<?= $jutsu->name ?> (<?= $jutsu->level ?>)" draggable="true" data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>" data-jutsu_effect="<?= System::unSlug($jutsu->effects[0]->effect) . ($jutsu->effects[1]->effect == 'none' ? '' : ', ' . System::unSlug($jutsu->effects[1]->effect)) ?>" data-jutsu_select="<?= $jutsu->jutsu_type . '-' . $jutsu->id ?>">
+                <table
+                    class="table jutsu_block_table"
+                    title="<?= $jutsu->name ?> (<?= $jutsu->level ?>)"
+                    draggable="true"
+                    data-jutsu_type="<?= ucwords($jutsu->jutsu_type->value) ?>"
+                    data-jutsu_effect="<?= System::unSlug($jutsu->effects[0]->effect) . ($jutsu->effects[1]->effect == 'none' ? '' : ', ' . System::unSlug($jutsu->effects[1]->effect)) ?>"
+                    data-jutsu_select="<?= $jutsu->jutsu_type->value . '-' . $jutsu->id ?>"
+                >
                     <tr class="jutsu_block_title">
                         <th colspan="2">
                             <?= strlen($jutsu->name) > 20 ? substr($jutsu->name,0,18)."..." : $jutsu->name; ?>
@@ -497,12 +504,12 @@ $rank_names = RankManager::fetchNames($system);
                                 data-jutsu_id="<?= $jutsu->id ?>"
                                 data-jutsu_name="<?= $jutsu->name ?>"
                                 data-jutsu_rank="<?= $rank_names[$jutsu->rank] ?>"
-                                data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>"
-                                data-jutsu_element="<?= $jutsu->element ?>"
+                                data-jutsu_type="<?= ucwords($jutsu->jutsu_type->value) ?>"
+                                data-jutsu_element="<?= $jutsu->element->value ?>"
                                 data-jutsu_cost="<?= $jutsu->use_cost ?>"
                                 data-jutsu_level="<?php echo $jutsu->level == 100 ? $jutsu->level : $jutsu->level . " (" . $jutsu->exp . "/1000)" ?>"
                                 data-jutsu_experience="<?= $jutsu->exp ?>"
-                                data-jutsu_seals="<?= $jutsu->jutsu_type == "taijutsu" ? "None" : $jutsu->hand_seals ?>"
+                                data-jutsu_seals="<?= $jutsu->jutsu_type == JutsuOffenseType::TAIJUTSU ? "None" : $jutsu->hand_seals ?>"
                                 data-jutsu_power="<?= $jutsu->power ?> (+<?= round($jutsu->power - $jutsu->base_power, 2) ?>)"
                                 data-jutsu_cooldown="<?php echo $jutsu->cooldown == 1 ? $jutsu->cooldown . " turn" :  $jutsu->cooldown . " turns" ?>"
                                 data-jutsu_effect_1="<?php

@@ -254,7 +254,7 @@ function bloodline() {
                         System::unSlug($effect->effect) . ' (' . round($effect->effect_amount, 0) . '%) ' . ' - ' . $effect->effect_length . " turns<br />";
                 }
             }
-			echo "<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type) . "<br />
+			echo "<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type->value) . "<br />
 			<label style='width:6.5em;'>Power:</label>" . round($jutsu->power, 1) . "<br />
 
 			<label style='width:6.5em;'>Level:</label>" . $jutsu->level . "<br />
@@ -284,13 +284,13 @@ function bloodline() {
 							$base_bloodline->jutsu[($jutsu->parent_jutsu - 1)]->name . "<br />";
 					}
 					if($jutsu->element != 'none') {
-						echo "<label style='width:6.5em;'>Element:</label>" . $jutsu->element . "<br />";
+						echo "<label style='width:6.5em;'>Element:</label>" . $jutsu->element->value . "<br />";
 					}
 					echo "<label style='width:6.5em;'>Use cost:</label>" . $jutsu->use_cost . "<br />
 					<label style='width:6.5em;float:left;'>Description:</label>
 						<p style='display:inline-block;margin:0;width:37.1em;'>" . $jutsu->description . "</p>
 					<br style='clear:both;' />
-				<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type) . "<br />
+				<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type->value) . "<br />
 				</div>
 				<p style='text-align:right;margin:0;'><a href='$self_link&learn_jutsu=$id'>Learn</a></p>
 			</td></tr>";

@@ -111,13 +111,13 @@ function jutsu(): void {
             $jutsu_name = $player->jutsu_scrolls[$jutsu_id]->name;
 
             switch($player->jutsu[$jutsu_id]->jutsu_type) {
-                case 'ninjutsu':
+                case JutsuOffenseType::NINJUTSU:
                     $player->ninjutsu_ids[] = $jutsu_id;
                     break;
-                case 'taijutsu':
+                case JutsuOffenseType::TAIJUTSU:
                     $player->taijutsu_ids[] = $jutsu_id;
                     break;
-                case 'genjutsu':
+                case JutsuOffenseType::GENJUTSU:
                     $player->genjutsu_ids[] = $jutsu_id;
                     break;
             }

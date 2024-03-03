@@ -187,7 +187,7 @@ class UserApiPresenter {
         return [
             'id' => $jutsu->id,
             'name' => $jutsu->name,
-            'jutsuType' => $jutsu->jutsu_type,
+            'jutsuType' => $jutsu->jutsu_type->value,
             'targetType' => $jutsu->target_type,
             'handSeals' => explode('-', $jutsu->hand_seals),
             'range' => $jutsu->range,

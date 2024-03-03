@@ -37,7 +37,7 @@ class ForbiddenShopApiPresenter {
                 return [
                     'id' => $jutsu->id,
                     'name' => $jutsu->name,
-                    'jutsuType' => $jutsu->jutsu_type,
+                    'jutsuType' => $jutsu->jutsu_type->value,
                     'description' => html_entity_decode($jutsu->description, ENT_QUOTES),
                     'power' => $jutsu->base_power,
                     'cooldown' => $jutsu->cooldown,

@@ -473,7 +473,10 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                         aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'
                     >
                         <span class="jutsu_name"><?= $attack->name ?></span>
-                        <span class="jutsu_type"><?php echo $attack->hasElement() ? System::unSlug($attack->jutsu_type) . " - " . $attack->element : System::unSlug($attack->jutsu_type) ?></span>
+                        <span class="jutsu_type"><?= $attack->hasElement()
+                            ? System::unSlug($attack->jutsu_type->value) . " - " . $attack->element->value
+                            : System::unSlug($attack->jutsu_type->value)
+                        ?></span>
                         <div class="jutsu_details">
                             <div class="jutsu_details_row">
                                 <span class="jutsu_details_power">Power: <?= round($attack->power, 2) ?></span>
@@ -519,7 +522,10 @@ $prefill_item_id = $_POST['item_id'] ?? '';
 
                             <div id='<?= $jutsu_types[$i] ?><?= $c2_count ?>' class='jutsuName <?= $jutsu_types[$i] ?>' data-handseals='<?= $player_jutsu->hand_seals ?>' data-id='<?= $jutsu['id'] ?>' aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'>
                                 <span class="jutsu_name"><?= $player_jutsu->name ?></span>
-                                <span class="jutsu_type"><?php echo $player_jutsu->hasElement() ? System::unSlug($player_jutsu->jutsu_type) . " - " . $player_jutsu->element : System::unSlug($player_jutsu->jutsu_type) ?></span>
+                                <span class="jutsu_type"><?= $player_jutsu->hasElement()
+                                    ? System::unSlug($player_jutsu->jutsu_type->value) . " - " . $player_jutsu->element->value
+                                    : System::unSlug($player_jutsu->jutsu_type->value)
+                                ?></span>
                                 <div class="jutsu_details">
                                     <div class="jutsu_details_row">
                                         <span class="jutsu_details_power">Power: <?= round($player_jutsu->power, 2) ?></span>
@@ -571,7 +577,10 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                                     aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'
                                 >
                                     <span class="jutsu_name"><?= $jutsu->name ?></span>
-                                    <span class="jutsu_type"><?php echo "bloodline " . ($jutsu->hasElement() ? System::unSlug($jutsu->jutsu_type) . " - " . $jutsu->element : System::unSlug($jutsu->jutsu_type)) ?></span>
+                                    <span class="jutsu_type"><?= "bloodline " . ($jutsu->hasElement()
+                                        ? System::unSlug($jutsu->jutsu_type->value) . " - " . $jutsu->element->value
+                                        : System::unSlug($jutsu->jutsu_type->value))
+                                    ?></span>
                                     <div class="jutsu_details">
                                         <div class="jutsu_details_row">
                                             <span class="jutsu_details_power">Power: <?= round($jutsu->power, 2) ?></span>
