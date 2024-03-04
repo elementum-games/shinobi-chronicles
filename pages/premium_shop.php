@@ -587,13 +587,14 @@ function premiumShop(): void {
         try {
             $editing_element_index = (int)$_POST['editing_element_index'];
             $new_element = $system->db->clean($_POST['new_element']);
+            $new_element = Element::from($new_element);
 
             $premiumShopManager->assertUserCanChangeElement($editing_element_index, $new_element);
 
             //Confirm purchase
             if (!isset($_POST['confirm_chakra_element_change'])) {
                 $confirmation_string = "Are you sure you want to <b>forget the {$player->elements[$editing_element_index]->value} nature</b>
-                and <b>attune to the $new_element nature</b>?<br />
+                and <b>attune to the $new_element->value nature</b>?<br />
                 <br />
                 <b>(IMPORTANT: This is non-reversable once completed! If you want to return to your original element you
                 will have to pay another fee.)</b>";
@@ -606,7 +607,7 @@ function premiumShop(): void {
                     form_submit_prompt: 'Change Element',
                     additional_form_data: [
                         'editing_element_index' => ['input_type' => 'hidden', 'value' => $editing_element_index],
-                        'new_element' => ['input_type' => 'hidden', 'value' => $new_element],
+                        'new_element' => ['input_type' => 'hidden', 'value' => $new_element->value],
                     ],
                     ak_cost: $premiumShopManager->costs['element_change'],
                 );

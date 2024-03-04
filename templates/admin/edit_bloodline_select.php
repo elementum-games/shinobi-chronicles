@@ -96,7 +96,7 @@ $current_rank = 1;
                                 No effect
                             <?php endif; ?>
                         </p>
-                        <?php if($jutsu->effects[1]->effect !== 'none'): ?>
+                        <?php if(isset($jutsu->effects[1])): ?>
                             <p>
                                 <?= System::unSlug($jutsu->effects[1]->effect) ?>
                                 (<?= $jutsu->effects[1]->effect_amount ?>% / <?= $jutsu->effects[1]->effect_length ?> turns)
