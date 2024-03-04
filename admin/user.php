@@ -107,7 +107,7 @@ function editUserPage(System $system, User $player): void {
                     throw new RuntimeException("Elements form data must be of type array!");
                 }
                 foreach($FORM_DATA['elements'] as $element) {
-                    if(!in_array($element, User::$ELEMENTS)) {
+                    if(!in_array($element, Element::values())) {
                         throw new RuntimeException("Invalid element ($element).");
                     }
                     $new_elements[] = $element;
@@ -176,7 +176,7 @@ function editUserPage(System $system, User $player): void {
             $variables['elements'] = [
                 'data_type' => 'string',
                 'input_type' => 'checkbox',
-                'options' => User::$ELEMENTS,
+                'options' => Element::values(),
             ];
         }
 

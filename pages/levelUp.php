@@ -759,94 +759,37 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
     }
 
     if($player->exam_stage == $STAGE_PASS) {
-        try {
-            $elements = User::$ELEMENTS;
-            unset($elements[array_search($player->elements[0], $elements)]);
+        $available_elements = Element::cases();
+        unset($available_elements[array_search($player->elements[0], $available_elements)]);
+        unset($available_elements[array_search(Element::NONE, $available_elements)]);
 
-            $element = $_POST['element'] ?? false;
-            if(!in_array($element, $elements)) {
-                $element = false;
-            }
+        $available_element_names = Element::getValues($available_elements);
 
-            if(isset($_POST['select_chakra']) && !$element) {
-                if(in_array($_POST['element'], $player->elements)) {
-                    $system->message("You already have the " . $_POST['element'] . " chakra nature!");
+        $new_element = null;
+
+        if(isset($_POST['element'])) {
+            try {
+                try {
+                    $new_element = Element::from($_POST['element']);
+                } catch(Throwable $e) {
+                    throw new RuntimeException("Invalid chakra nature!");
                 }
-                else {
-                    $system->message("Invalid chakra nature!");
-                }
-            }
 
-            // Display
-            if(!$element) {
-                $system->printMessage();
-                require 'templates/level_rank_up/jonin_exam_graduation.php';
-                return false;
-            }
-            else {
-                switch($element) {
-                    case 'Fire':
-                        $element_display = "With the image of blazing fires in your mind, you flow chakra from your stomach,
-							down through your legs and into the seal on the floor. Suddenly one of the pedestals bursts into
-							fire, breaking your focus. The elders smile and say \"Congratulations, you now have the Fire element. Fire is the embodiment of
-							consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
-							they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they
-							can extinguish your fires.\"<br />
-							<a href='{$system->router->links['profile']}'>Continue</a>";
-                        break;
-                    case 'Wind':
-                        $element_display = "Picturing a tempestuous tornado, you flow chakra from your stomach,
-							down through your legs and into the seal on the floor. You feel a disturbance in the room and
-							suddenly realize that a small whirlwind has formed around one of the pedestals. The elders smile and
-							say \"Congratulations, you have the Wind element. Wind is the sharpest out of all chakra natures,
-							and can slice through anything when used properly. Your Wind chakra will be strong against
-							Lightning jutsu, as you can cut and dissipate it, but you will be weak against Fire jutsu,
-							because your wind only serves to fan their flames and make them stronger.\"
-							<br />
-							<a href='{$system->router->links['profile']}'>Continue</a>";
-                        break;
-                    case 'Lightning':
-                        $element_display = "Imagining the feel of electricity coursing through your veins, you flow chakra from your stomach,
-							down through your legs and into the seal on the floor. Suddenly you feel a charge in the air and
-							one of the pedestals begins to spark with crackling electricity.
-							\"Congratulations, you have the Lightning element. Lightning embodies pure speed, and skilled users of
-							this element physically augment themselves to swiftly strike through almost anything. Your Lightning
-							jutsu will be strong against Earth as your speed can slice straight through the slower techniques of Earth,
-							but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
-							<br />
-							<a href='{$system->router->links['profile']}'>Continue</a>";
-                        break;
-                    case 'Earth':
-                        $element_display = "Envisioning stone as hard as the temple you are sitting in, you flow chakra from your stomach,
-							down through your legs and into the seal on the floor. Suddenly dirt from nowhere begins to fall off one of the
-							pedstals, and the elders smile and say \"Congratulations, you have the Earth element. Earth
-							is the hardiest of elements and can protect you or your teammates from enemy attacks. Your Earth jutsu will be
-							strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to
-							Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
-							<br />
-							<a href='{$system->router->links['profile']}'>Continue</a>";
-                        break;
-                    case 'Water':
-                        $element_display = "With thoughts of splashing rivers flowing through your mind, you flow chakra from your stomach,
-							down through your legs and into the seal on the floor. Suddenly a small geyser erupts from one of
-							the pedestals, and the elders smile and say
-							\"Congratulations, you have the Water element. Water is a versatile element that can control the flow
-							of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
-							Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"
-							<br />
-							<a href='{$system->router->links['profile']}'>Continue</a>";
-                        break;
+                if($player->hasElement($new_element)) {
+                    throw new RuntimeException("You already have the " . $new_element->value . " chakra nature!");
                 }
-            }
 
-            $player->elements[1] = $element;
-            $player->exam_stage = 0;
-            $rankManager->increasePlayerRank($player);
-            require 'templates/level_rank_up/jonin_exam_graduation.php';
-        } catch(RuntimeException $e) {
-            echo "<tr><td style='text-align:center;'>" . $e->getMessage() . "</td></tr>";
+                $player->elements[1] = $new_element;
+                $player->exam_stage = 0;
+
+                $rankManager->increasePlayerRank($player);
+            } catch(RuntimeException $e) {
+                $new_element = null;
+                $system->printMessage($e->getMessage());
+            }
         }
 
+        require 'templates/level_rank_up/jonin_exam_graduation.php';
     }
 
     return true;
