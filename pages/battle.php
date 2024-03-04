@@ -131,7 +131,7 @@ function battle(): bool {
 }
 
 /**
- * @throws RuntimeException
+ * @throws RuntimeException|DatabaseDeadlockException
  */
 function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $player, System $system): string {
     $double_yen_gain_chance = $player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_DOUBLE_BATTLE_YEN_CHANCE];
@@ -143,30 +143,6 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
     }
 
     $result = "";
-
-    $player_alignment = VillageRelation::RELATION_NEUTRAL;
-    $opponent_alignment = VillageRelation::RELATION_NEUTRAL;
-    $region_objective = $system->db->query("SELECT `region_locations`.*, `region_locations`.`occupying_village_id` as `village`
-        FROM `region_locations`
-        INNER JOIN `regions` on `regions`.`region_id` = `region_locations`.`region_id`
-        WHERE `x` = {$player->location->x}
-        AND `y` = {$player->location->y}
-        AND `map_id` = {$player->location->map_id} LIMIT 1");
-    $region_objective = $system->db->fetch($region_objective);
-    if ($system->db->last_num_rows > 0) {
-        if (isset($player->village->relations[$region_objective['village']])) {
-            $player_alignment = $player->village->relations[$region_objective['village']]->relation_type;
-        }
-        else if ($player->village->village_id == $region_objective['village']) {
-            $player_alignment = VillageRelation::RELATION_ALLIANCE;
-        }
-        if (isset($battle->opponent->village->relations[$region_objective['village']])) {
-            $opponent_alignment = $battle->opponent->village->relations[$region_objective['village']]->relation_type;
-        }
-        else if ($battle->opponent->village->village_id == $region_objective['village']) {
-            $opponent_alignment = VillageRelation::RELATION_ALLIANCE;
-        }
-    }
 
     if ($battle->isPlayerWinner()) {
         $player->pvp_wins++;
@@ -208,11 +184,15 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                     $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, $rep_gained);
                 }
             }
-            $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id} LIMIT " . ceil($battle->getTotalLoot() / 2));
+            $system->db->query("UPDATE `loot` SET 
+                `user_id` = {$player->user_id}, 
+                `battle_id` = NULL 
+              WHERE `battle_id` = {$player->battle_id} LIMIT " . ceil($battle->getTotalLoot() / 2));
             if ($system->db->last_affected_rows > 0) {
                 $result .= "You have claimed half the total loot from this battle.[br]";
             }
-        } else {
+        }
+        else {
             // Calculate rep gains
             if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVP) && UserReputation::PVP_REP_ENABLED) {
                 $rep_gained = $player->reputation->handlePvPWin($player, $battle->opponent);
@@ -241,72 +221,11 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
             $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1);
         }
+
         // Objective
-        $occupying_village = VillageManager::getVillageByID($system, $region_objective['village']);
-        $original_village_id = WarManager::REGION_ORIGINAL_VILLAGE[$region_objective['region_id']];
-        $original_village = VillageManager::getVillageByID($system, $original_village_id);
-        $region_objective_max_health = WarManager::getLocationMaxHealth($system, $region_objective, $occupying_village);
-        $region_objective_max_stability = WarManager::getLocationMaxStability($system, $region_objective, $occupying_village, $original_village);
-        // if player is allied with location owner
-        if ($player_alignment == VillageRelation::RELATION_ALLIANCE) {
-
-            if ($region_objective['health'] < $region_objective_max_health) {
-                $initial_health = $region_objective['health'];
-                $heal = min($battle->turn_count, 10) * ($player->level / 4);
-                $region_objective['health'] += $heal;
-                if ($region_objective['health'] > $region_objective_max_health) {
-                    $region_objective['health'] = $region_objective_max_health;
-                }
-                $health_gained = $region_objective['health'] - $initial_health;
-                $system->db->query("UPDATE `region_locations` SET `health` = {$region_objective['health']} WHERE `region_location_id` = {$region_objective['region_location_id']}");
-                WarLogManager::logAction($system, $player, $health_gained, WarLogManager::WAR_LOG_DAMAGE_HEALED, $region_objective['village']);
-                $result .= "Increased objective health by {$health_gained}.[br]";
-            }
-            if ($region_objective['defense'] < 100) {
-                $region_objective['defense']++;
-                $system->db->query("UPDATE `region_locations` SET `defense` = {$region_objective['defense']} WHERE `region_location_id` = {$region_objective['region_location_id']}");
-                WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_DEFENSE_GAINED, $region_objective['village']);
-                $result .= "Increased objective defense by 1.[br]";
-            }
-            if ($region_objective['stability'] < $region_objective_max_stability) {
-                $region_objective['stability']++;
-                $system->db->query("UPDATE `region_locations` SET `stability` = {$region_objective['stability']} WHERE `region_location_id` = {$region_objective['region_location_id']}");
-                WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_STABILITY_GAINED, $region_objective['village']);
-                $result .= "Increased objective stability by 1.[br]";
-            }
+        if($battle->opponent instanceof User) {
+            $result .= WarManager::handlePvPWin($system, $battle, $player, $battle->opponent, $village_point_gain);
         }
-        // if opponent is allied with location owner
-        else if ($opponent_alignment == VillageRelation::RELATION_ALLIANCE) {
-            if ($region_objective['health'] > 0 && $player->village->isEnemy($region_objective['occupying_village_id'])) {
-                $initial_health = $region_objective['health'];
-                $damage = min($battle->turn_count, 10) * ($player->level / 2) * (1 - ($region_objective['defense'] / 100)) * (1 + ($player->village->policy->pvp_objective_damage / 100));
-                $region_objective['health'] -= $damage;
-                if ($region_objective['health'] < 0) {
-                    $region_objective['health'] = 0;
-                }
-                $damage_dealt = $initial_health - $region_objective['health'];
-                $system->db->query("UPDATE `region_locations` SET `health` = {$region_objective['health']} WHERE `region_location_id` = {$region_objective['region_location_id']}");
-                WarLogManager::logAction($system, $player, $damage_dealt, WarLogManager::WAR_LOG_DAMAGE_DEALT, $region_objective['village']);
-                $result .= "Reduced objective health by {$damage_dealt}.[br]";
-            }
-            if ($region_objective['defense'] > 0) {
-                $region_objective['defense']--;
-                $system->db->query("UPDATE `region_locations` SET `defense` = {$region_objective['defense']} WHERE `region_location_id` = {$region_objective['region_location_id']}");
-                WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_DEFENSE_REDUCED, $region_objective['village']);
-                $result .= "Decreased objective defense by 1.[br]";
-            }
-            if ($region_objective['stability'] > WarManager::MIN_STABILITY) {
-                $region_objective['stability']--;
-                $system->db->query("UPDATE `region_locations` SET `stability` = {$region_objective['stability']} WHERE `region_location_id` = {$region_objective['region_location_id']}");
-                WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_STABILITY_REDUCED, $region_objective['village']);
-                $result .= "Decreased objective stability by 1.[br]";
-            }
-        }
-
-        // War Log
-        WarLogManager::logAction($system, $player, 1, WarLogManager::WAR_LOG_PVP_WINS, $battle->opponent->village->village_id);
-        WarLogManager::logAction($system, $player, $village_point_gain, WarLogManager::WAR_LOG_POINTS_GAINED, $battle->opponent->village->village_id);
-
     } else if ($battle->isOpponentWinner()) {
         $result .= "You lose. You were taken back to your village by some allied ninja.[br]";
         $player->pvp_losses++;
