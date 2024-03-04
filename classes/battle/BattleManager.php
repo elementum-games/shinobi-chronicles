@@ -1052,9 +1052,13 @@ class BattleManager {
 
         if ($attack->recoil_raw_damage > 0) {
             if ($recoil_damage_resisted > 0) {
-                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu_type->value}\">" . BattleManager::formatNumber($recoil_damage) . "</span> recoil damage- (resists " . "<span class=\"battle_text_{$attack->jutsu_type}\">" . BattleManager::formatNumber($recoil_damage_resisted) . "</span>" . " recoil damage)" . '</span></br>';
+                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu_type->value}\">"
+                    . BattleManager::formatNumber($recoil_damage) . "</span> recoil damage- (resists "
+                    . "<span class=\"battle_text_{$attack->jutsu_type->value}\">" . BattleManager::formatNumber($recoil_damage_resisted) . "</span>"
+                    . " recoil damage)" . '</span></br>';
             } else {
-                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu_type->value}\">" . BattleManager::formatNumber($recoil_damage) . "</span> recoil damage-" . '</span></br>';
+                $text .= "<span>-" . $user->getName() . " takes <span class=\"battle_text_{$attack->jutsu_type->value}\">"
+                    . BattleManager::formatNumber($recoil_damage) . "</span> recoil damage-" . '</span></br>';
             }
         }
         if ($attack->countered_percent > 0) {
@@ -1342,10 +1346,10 @@ class BattleManager {
                 incoming_attack: $player2_attack,
                 fighter_is_p1: true);
         }
-        if ($player1_attack->reflect_percent > 0 && $player2_attack->isDirectDamage()) {
+        if ($player2_attack->reflect_percent > 0 && $player1_attack->isDirectDamage()) {
             $collision_displays[] = $this->applyReflect(
-                fighter_attack: $player1_attack,
-                incoming_attack: $player2_attack,
+                fighter_attack: $player2_attack,
+                incoming_attack: $player1_attack,
                 fighter_is_p1: false
             );
         }
