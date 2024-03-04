@@ -1487,7 +1487,7 @@ class BattleManager {
     /**
      * @param BattleAttack $fighter_attack
      * @param BattleAttack $incoming_attack
-     * @param int          $modifier_amount
+     * @param float        $modifier_amount
      * @return float
      */
     public function getElementalModifier(BattleAttack $fighter_attack, BattleAttack $incoming_attack, float $modifier_amount): float {

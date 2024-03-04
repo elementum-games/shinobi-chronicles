@@ -493,10 +493,10 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                                         <?php
                                         if ($effect->effect != "none") {
                                             echo in_array($effect->effect, ["substitution", "counter", "piercing", "recoil"])
-                                                ? System::unSlug($effect->effect) . " (" . round($effect->display_effect_amount, 0) . "%)"
+                                                ? System::unSlug($effect->effect) . " (" . round($effect->effect_amount) . "%)"
                                                 : (($effect->effect == "none" && $attack->use_type == Jutsu::USE_TYPE_BARRIER)
                                                     ? "Barrier"
-                                                    : System::unSlug($effect->effect) . " (" . round($effect->display_effect_amount, 0) . "%" . ", " . ($effect->effect_length == 1
+                                                    : System::unSlug($effect->effect) . " (" . round($effect->effect_amount) . "%" . ", " . ($effect->effect_length == 1
                                                         ? $effect->effect_length . " turn)"
                                                         : $effect->effect_length . " turns)"));
                                         }
@@ -548,10 +548,10 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                                             <?php
                                                 if ($effect->effect != "none") {
                                                     echo in_array($effect->effect, ["substitution", "counter", "piercing", "recoil"])
-                                                        ? System::unSlug($effect->effect) . " (" . round($effect->display_effect_amount, 0) . "%)"
+                                                        ? System::unSlug($effect->effect) . " (" . round($effect->effect_amount) . "%)"
                                                         : (($effect->effect == "none" && $player_jutsu->use_type == Jutsu::USE_TYPE_BARRIER)
                                                             ? "Barrier"
-                                                            : System::unSlug($effect->effect) . " (" . round($effect->display_effect_amount, 0) . "%" . ", " . ($effect->effect_length == 1
+                                                            : System::unSlug($effect->effect) . " (" . round($effect->effect_amount) . "%" . ", " . ($effect->effect_length == 1
                                                                 ? $effect->effect_length . " turn)"
                                                                 : $effect->effect_length . " turns)"));
                                                 }
@@ -603,10 +603,10 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                                                         <?php
                                                         if ($effect->effect != "none") {
                                                             echo in_array($effect->effect, ["substitution", "counter", "piercing", "recoil"])
-                                                                ? System::unSlug($effect->effect) . " (" . round($effect->display_effect_amount, 0) . "%)"
+                                                                ? System::unSlug($effect->effect) . " (" . round($effect->effect_amount) . "%)"
                                                                 : (($effect->effect == "none" && $jutsu->use_type == Jutsu::USE_TYPE_BARRIER)
                                                                     ? "Barrier"
-                                                                    : System::unSlug($effect->effect) . " (" . round($effect->display_effect_amount, 0) . "%" . ", " . ($effect->effect_length == 1
+                                                                    : System::unSlug($effect->effect) . " (" . round($effect->effect_amount) . "%" . ", " . ($effect->effect_length == 1
                                                                         ? $effect->effect_length . " turn)"
                                                                         : $effect->effect_length . " turns)"));
                                                         }

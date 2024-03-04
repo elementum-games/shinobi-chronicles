@@ -277,7 +277,6 @@ class Jutsu {
             if ($effect->effect && $effect->effect != 'none') {
                 $this->effects[$index]->effect_amount = $effect->base_effect_amount *
                     (1 + round($this->level * $level_effect_multiplier, 3));
-                $this->effects[$index]->display_effect_amount = $this->effects[$index]->effect_amount;
             }
         }
     }

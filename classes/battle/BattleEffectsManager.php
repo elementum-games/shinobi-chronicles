@@ -301,14 +301,12 @@ class BattleEffectsManager {
             if(!isset($player1_equipped_jutsu_ids[$jutsu->id])) {
                 $jutsu->power *= 0.75;
                 foreach($jutsu->effects as $effect) {
-                    $effect->display_effect_amount *= 0.75;
                     $effect->effect_amount *= 0.75;
                 }
             }
             if($jutsu->jutsu_type != $player1_primary_jutsu_type) {
                 $jutsu->power *= 0.5;
                 foreach($jutsu->effects as $effect) {
-                    $effect->display_effect_amount *= 0.5;
                     $effect->effect_amount *= 0.5;
                 }
             }
@@ -319,7 +317,6 @@ class BattleEffectsManager {
             if(!isset($player2_equipped_jutsu_ids[$jutsu->id])) {
                 $jutsu->power *= 0.75;
                 foreach($jutsu->effects as $effect) {
-                    $effect->display_effect_amount *= 0.75;
                     $effect->effect_amount *= 0.75;
                 }
             }
@@ -327,7 +324,6 @@ class BattleEffectsManager {
                 if($jutsu->jutsu_type != $player2_primary_jutsu_type) {
                     $jutsu->power *= 0.5;
                     foreach($jutsu->effects as $effect) {
-                        $effect->display_effect_amount *= 0.5;
                         $effect->effect_amount *= 0.5;
                     }
                 }
@@ -700,9 +696,8 @@ class BattleEffectsManager {
     public function getAnnouncementText(Effect $effect, JutsuOffenseType $jutsu_type): string {
         $announcement_text = "";
         $attack_jutsu_color = BattleManager::getJutsuTextColor($jutsu_type);
-        $effect_details = " (" . round(
-                $effect->display_effect_amount, 0
-            ) . "%, " . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
+        $effect_details = " (" . round($effect->effect_amount) . "%, "
+            . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
         switch($jutsu_type) {
             case JutsuOffenseType::TAIJUTSU:
                 $tag_open = "[taijutsu]";
