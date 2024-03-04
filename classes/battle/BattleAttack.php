@@ -125,4 +125,23 @@ class BattleAttack {
         }
         return $has_effect;
     }
+
+    public function applyElementalClash(float $elemental_damage_modifier, float $elemental_effect_modifier): void {
+        $this->damage *= $elemental_damage_modifier;
+
+        foreach ($this->effects as $effect) {
+            if(in_array($effect->effect, BattleEffectsManager::DAMAGE_EFFECTS)) {
+                continue;
+            }
+
+            $effect->effect_amount *= $elemental_effect_modifier;
+        }
+
+        $this->piercing_percent *= $elemental_effect_modifier;
+        $this->substitution_percent *= $elemental_effect_modifier;
+        $this->counter_percent *= $elemental_effect_modifier;
+
+        $this->reflect_percent *= $elemental_effect_modifier;
+        $this->immolate_percent *= $elemental_effect_modifier;
+    }
 }

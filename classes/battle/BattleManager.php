@@ -32,7 +32,8 @@ class BattleManager {
 
     const GENJUTSU_BARRIER_PENALTY = 37.5; // 37.5% reduction against Genjutsu (62.5% strength)
 
-    const ELEMENTAL_CLASH_MODIFIER = 0.15; // 20% => 15% damage loss and gain
+    const ELEMENTAL_CLASH_MODIFIER = 0.15; // 15% damage loss and gain
+    const ELEMENTAL_CLASH_EFFECT_MODIFIER = 0.1; // 10% effect loss and gain
 
     // Extra boost to recoil damage to offset the typical losses when facing a high-speed build
     const RECOIL_DMG_MULTIPLIER = 1.05;
@@ -1208,15 +1209,23 @@ class BattleManager {
     ): string {
         $collision_displays = [];
 
-        $player1_elemental_damage_modifier = $this->getElementalDamageModifier($player1_attack, $player2_attack);
-        $player1->barrier *= $player1_elemental_damage_modifier;
+        $p1_elemental_damage_modifier = $this->getElementalModifier(
+            $player1_attack, $player2_attack,self::ELEMENTAL_CLASH_MODIFIER
+        );
+        $p1_elemental_effect_modifier = $this->getElementalModifier(
+            $player1_attack, $player2_attack, self::ELEMENTAL_CLASH_EFFECT_MODIFIER
+        );
+        $player1->barrier *= $p1_elemental_damage_modifier;
+        $player1_attack->applyElementalClash($p1_elemental_damage_modifier, $p1_elemental_effect_modifier);
 
-        $player2_elemental_damage_modifier = $this->getElementalDamageModifier($player2_attack, $player1_attack);
-        $player2->barrier *= $player2_elemental_damage_modifier;
-
-        // Apply elemental damage modifier
-        $player1_attack->damage *= $player1_elemental_damage_modifier;
-        $player2_attack->damage *= $player2_elemental_damage_modifier;
+        $p2_elemental_damage_modifier = $this->getElementalModifier(
+            $player2_attack, $player1_attack, self::ELEMENTAL_CLASH_MODIFIER
+        );
+        $p2_elemental_effect_modifier = $this->getElementalModifier(
+            $player2_attack, $player1_attack,self::ELEMENTAL_CLASH_EFFECT_MODIFIER
+        );
+        $player2->barrier *= $p2_elemental_damage_modifier;
+        $player2_attack->applyElementalClash($p2_elemental_damage_modifier, $p2_elemental_effect_modifier);
 
         // Output piercing message
         /* if ($player1_attack->piercing_percent > 0) {
@@ -1478,14 +1487,13 @@ class BattleManager {
     /**
      * @param BattleAttack $fighter_attack
      * @param BattleAttack $incoming_attack
+     * @param int          $modifier_amount
      * @return float
      */
-    public function getElementalDamageModifier(BattleAttack $fighter_attack, BattleAttack $incoming_attack): float {
+    public function getElementalModifier(BattleAttack $fighter_attack, BattleAttack $incoming_attack, float $modifier_amount): float {
         // Fire > Wind > Lightning > Earth > Water > Fire
-        $elemental_clash_damage_modifier = self::ELEMENTAL_CLASH_MODIFIER;
-
-        $winning_modifier = 1 + $elemental_clash_damage_modifier;
-        $losing_modifier = 1 - $elemental_clash_damage_modifier;
+        $winning_modifier = 1 + $modifier_amount;
+        $losing_modifier = 1 - $modifier_amount;
 
         switch($fighter_attack->element) {
             case Element::FIRE:
