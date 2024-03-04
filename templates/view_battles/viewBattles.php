@@ -1,7 +1,12 @@
 <?php
-/** @var array $battles */
-/** @var array $scheduled_battles */
-/** @var string $self_link */
+
+/**
+ * @var System $system
+ * @var User $player
+ * @var array  $battles
+ * @var array  $scheduled_battles
+ * @var string $self_link
+*/
 
 ?>
 
@@ -69,6 +74,9 @@
             <td>
             <?php if($battle['winner']): ?>
                     <?= $battle['winner'] ?>
+                    <?php if($player->isHeadAdmin()): ?>
+                        <a href='<?= $system->router->getUrl('view_battles', ['view_log' => $battle['id']]) ?>'>(Log)</a>
+                    <?php endif; ?>
                 <?php else: ?>
                     <a href="<?= $self_link ?>&battle_id=<?= $battle['id'] ?>">Watch</a>
                 <?php endif; ?>
