@@ -491,17 +491,17 @@ if($battle->battle_text) {
 
 
 <?php
-function activeEffectsDisplay(BattleManager $battleManager, User $player) {
+function activeEffectsDisplay(BattleManager $battleManager, Fighter $fighter): void {
     ?>
     <div class="active_effects_container">
         <?php foreach ($battleManager->getEffects() as $effect): ?>
-            <?php if ($effect->target == $player->combat_id && $effect->turns > 0): ?>
+            <?php if ($effect->target == $fighter->combat_id && $effect->turns > 0): ?>
                 <div class="<?php echo in_array($effect->effect, BattleEffect::$buff_effects) ? "active_effect buff" : "active_effect nerf" ?>">
                     <div class="effect_name">
                         <?php
                         if ($effect->isDamageOverTime()) {
                             $effect_power = $effect->effect_amount * $effect->turns;
-                            $residual_damage = $player->calcDamageTaken(
+                            $residual_damage = $fighter->calcDamageTaken(
                                 raw_damage: $effect_power,
                                 defense_type: $effect->damage_type,
                                 apply_resists: false,
