@@ -647,7 +647,10 @@ class PremiumShopManager {
                 sprintf("SELECT `clan_id`, `name` FROM `clans` WHERE `clan_id` = '%d'", $this->player->bloodline->clan_id)
             );
             $result = $this->system->db->fetch();
-            $available_clans[$result['clan_id']] = stripslashes($result['name']);
+
+            if($result != null) {
+                $available_clans[$result['clan_id']] = stripslashes($result['name']);
+            }
         }
 
         return $available_clans;
