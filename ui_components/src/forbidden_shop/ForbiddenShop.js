@@ -554,7 +554,7 @@ function FactionSection({
                             onClick={beginMission}
                             missionId={easyMissionId.current}
                         />
-                        <div className="favor_exchange_label">+2 Favor</div>
+                        <div className="favor_exchange_label">+8 Favor</div>
                     </div>
                     <div>
                         <MissionButton
@@ -562,7 +562,7 @@ function FactionSection({
                             onClick={beginMission}
                             missionId={normalMissionId.current}
                         />
-                        <div className="favor_exchange_label">+3 Favor</div>
+                        <div className="favor_exchange_label">+10 Favor</div>
                     </div>
                     <div>
                         <MissionButton
@@ -570,7 +570,7 @@ function FactionSection({
                             onClick={beginMission}
                             missionId={hardMissionId.current}
                         />
-                        <div className="favor_exchange_label">+4 Favor</div>
+                        <div className="favor_exchange_label">+12 Favor</div>
                     </div>
                     <div>
                         <MissionButton
@@ -578,7 +578,7 @@ function FactionSection({
                             onClick={beginMission}
                             missionId={nightmareMissionId.current}
                         />
-                        <div className="favor_exchange_label">+5 Favor</div>
+                        <div className="favor_exchange_label">+18 Favor</div>
                     </div>
                 </div>
             </div>

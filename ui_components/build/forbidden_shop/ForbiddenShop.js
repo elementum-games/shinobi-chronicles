@@ -1,5 +1,6 @@
 import { apiFetch } from "../utils/network.js";
 import { clickOnEnter } from "../utils/uiHelpers.js";
+
 function ForbiddenShop({
   links,
   eventData,
@@ -42,6 +43,7 @@ function ForbiddenShop({
     ayakashiFavorId: ayakashiFavorId
   }));
 }
+
 function ShopMenu({
   ShopMenuButton,
   scrollExchangeRef,
@@ -49,42 +51,51 @@ function ShopMenu({
 }) {
   const [activeButtonName, setActiveButtonName] = React.useState(null);
   const [dialogueText, setDialogueText] = React.useState(null);
+
   function scrollTo(element) {
     if (element == null) return;
     element.scrollIntoView({
       behavior: 'smooth'
     });
   }
+
   function questionOneClick() {
     setDialogueText("A remnant from a past forgotten.\nAn abyss between the realms of yours... and <span class='dialogue_highlight'>ours</span>.");
     setActiveButtonName("questionOne");
   }
+
   function questionTwoClick() {
     setDialogueText("... <span class='dialogue_highlight'>Akuji</span>. Nevermind the what.\n Now, you have something that\n belongs to me.");
     setActiveButtonName("questionTwo");
   }
+
   function questionThreeClick() {
     setDialogueText("<span class='dialogue_highlight'>Forbidden</span> knowledge is not so easily given... but perhaps to those who prove themselves useful.");
     setActiveButtonName("questionThree");
   }
+
   function questionFourClick() {
     setDialogueText("You seek the power of the <span class='dialogue_highlight'>Curse</span>?\n No... you are not yet ready.");
     setActiveButtonName("questionFour");
   }
+
   function scrollExchangeJump() {
     setDialogueText("...");
     setActiveButtonName("scrollExchange");
     scrollTo(scrollExchangeRef.current);
   }
+
   function currencyExchangeJump() {
     setDialogueText("...");
     setActiveButtonName("currencyExchange");
     scrollTo(currencyExchangeRef.current);
   }
+
   function missionsJump() {
     setDialogueText("...");
     setActiveButtonName("missions");
   }
+
   return /*#__PURE__*/React.createElement("div", {
     className: "shop_menu_container"
   }, /*#__PURE__*/React.createElement("img", {
@@ -154,6 +165,7 @@ function ShopMenu({
     buttonClass: "button_fourth"
   })));
 }
+
 function ShopMenuButton({
   onClick,
   buttonText,
@@ -273,6 +285,7 @@ function ShopMenuButton({
     fill: "#f0e2c6"
   }, buttonText)));
 }
+
 function LanternEventCurrencyExchange({
   playerInventory,
   setPlayerInventory,
@@ -291,6 +304,7 @@ function LanternEventCurrencyExchange({
   const totalQuantity = Object.values(playerQuantities).reduce((accum, currentValue) => {
     return accum + parseInt(currentValue);
   }, 0);
+
   function exchangeAllEventCurrency() {
     apiFetch(forbiddenShopApiLink, {
       request: 'exchangeAllEventCurrency',
@@ -305,6 +319,7 @@ function LanternEventCurrencyExchange({
       }
     });
   }
+
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "currency_exchange_header section_title",
     ref: currencyExchangeRef
@@ -352,6 +367,7 @@ function LanternEventCurrencyExchange({
     className: "response_message"
   }, responseMessage)));
 }
+
 function CurrencyExchangeInput({
   name,
   playerQuantity,
@@ -363,6 +379,7 @@ function CurrencyExchangeInput({
     className: "currency_to_exchange"
   }, /*#__PURE__*/React.createElement("span", null, name), /*#__PURE__*/React.createElement("span", null, "x", playerQuantity.toLocaleString()), /*#__PURE__*/React.createElement("span", null, yenToReceive.toLocaleString(), " yen"));
 }
+
 function ScrollExchange({
   playerInventory,
   setPlayerInventory,
@@ -372,6 +389,7 @@ function ScrollExchange({
   scrollExchangeRef
 }) {
   const [responseMessage, setResponseMessage] = React.useState(null);
+
   function buyForbiddenJutsu(jutsuId) {
     setResponseMessage(null);
     apiFetch(forbiddenShopApiLink, {
@@ -383,8 +401,7 @@ function ScrollExchange({
         console.error(response.errors);
       } else {
         setResponseMessage(response.data.message);
-        setPlayerInventory(response.data.playerInventory);
-        // update remaining # of scrolls for display, get new list of jutsu
+        setPlayerInventory(response.data.playerInventory); // update remaining # of scrolls for display, get new list of jutsu
       }
     });
   }
@@ -415,6 +432,7 @@ function ScrollExchange({
     className: "scroll_exchange_response"
   }, responseMessage)));
 }
+
 function JutsuScroll({
   jutsu_data,
   onClick
@@ -508,6 +526,7 @@ function JutsuScroll({
     className: "jutsu_tag_scaling"
   }, "scales with rank"))));
 }
+
 function FactionSection({
   playerInventory,
   setPlayerInventory,
@@ -523,6 +542,7 @@ function FactionSection({
   var hardMissionId = React.useRef(factionMissions['hard']);
   var nightmareMissionId = React.useRef(factionMissions['nightmare']);
   const [responseMessage, setResponseMessage] = React.useState(null);
+
   function exchangeFavor(itemId) {
     apiFetch(forbiddenShopApiLink, {
       request: 'exchangeFavor',
@@ -537,9 +557,11 @@ function FactionSection({
       }
     });
   }
+
   function beginMission(missionId) {
     window.location.href = missionLink + "&mission_type=faction&start_mission=" + missionId;
   }
+
   return /*#__PURE__*/React.createElement("div", {
     className: "faction_section"
   }, /*#__PURE__*/React.createElement("div", {
@@ -578,26 +600,27 @@ function FactionSection({
     missionId: easyMissionId.current
   }), /*#__PURE__*/React.createElement("div", {
     className: "favor_exchange_label"
-  }, "+2 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
+  }, "+8 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
     buttonText: "Normal",
     onClick: beginMission,
     missionId: normalMissionId.current
   }), /*#__PURE__*/React.createElement("div", {
     className: "favor_exchange_label"
-  }, "+3 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
+  }, "+10 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
     buttonText: "Hard",
     onClick: beginMission,
     missionId: hardMissionId.current
   }), /*#__PURE__*/React.createElement("div", {
     className: "favor_exchange_label"
-  }, "+4 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
+  }, "+12 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
     buttonText: "Nightmare",
     onClick: beginMission,
     missionId: nightmareMissionId.current
   }), /*#__PURE__*/React.createElement("div", {
     className: "favor_exchange_label"
-  }, "+5 Favor")))));
+  }, "+18 Favor")))));
 }
+
 function MissionButton({
   buttonText,
   onClick,
@@ -672,6 +695,7 @@ function MissionButton({
     dominantBaseline: "middle"
   }, buttonText)));
 }
+
 function FavorButton({
   buttonText,
   onClick,
@@ -746,4 +770,5 @@ function FavorButton({
     dominantBaseline: "middle"
   }, buttonText)));
 }
+
 window.ForbiddenShop = ForbiddenShop;
