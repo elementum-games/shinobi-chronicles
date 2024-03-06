@@ -899,10 +899,6 @@ class BattleManager {
             }
         }
 
-        if($attack->isAllyTargetType() || $attack->use_type == Jutsu::USE_TYPE_INDIRECT) {
-            $attack->effect_only = true;
-        }
-
         if($attack->use_type == Jutsu::USE_TYPE_BARRIER) {
             $fighter->barrier += $attack->raw_damage;
             $attack->raw_damage = 0;
@@ -953,7 +949,7 @@ class BattleManager {
             }
         }
 
-        if (!$attack->isEffectOnly()) {
+        if (!$attack->effect_only) {
             $attack_damage = $target->calcDamageTaken(
                 $attack->damage, $attack->jutsu_type, element: $attack->element, apply_resists: true
             );

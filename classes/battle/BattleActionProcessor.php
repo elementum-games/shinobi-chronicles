@@ -251,7 +251,7 @@ class BattleActionProcessor {
         );
 
         if($attack->jutsu->isAllyTargetType() || $attack->jutsu->use_type == Jutsu::USE_TYPE_INDIRECT) {
-            $attack->jutsu->effect_only = true;
+            $attack->effect_only = true;
         }
 
         if($attack->jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
@@ -798,7 +798,7 @@ class BattleActionProcessor {
         $raw_damage = $hit->raw_damage;
 
         $attack_damage = $raw_damage;
-        if(empty($attack->jutsu->effect_only)) {
+        if(empty($attack->effect_only)) {
             $attack_damage = $target->calcDamageTaken($attack->starting_raw_damage, $attack->jutsu->jutsu_type);
             $target->last_damage_taken += $attack_damage;
             $target->health -= $attack_damage;
@@ -831,7 +831,7 @@ class BattleActionProcessor {
             );
         }
 
-        if(empty($attack->jutsu->effect_only)) {
+        if(empty($attack->effect_only)) {
             $tag = "{$attack->jutsu->jutsu_type}_damage";
             $this->battle->current_turn_log->addFighterAttackHit(
                 attacker: $user,

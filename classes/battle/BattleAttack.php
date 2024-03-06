@@ -21,7 +21,7 @@ class BattleAttack {
     public float $power;
     public int $cooldown;
 
-    public bool $effect_only;
+    public bool $effect_only = false;
 
     // Combat values
     public float $raw_damage = 0;
@@ -63,17 +63,16 @@ class BattleAttack {
         $this->element = $jutsu->element;
         $this->power = $jutsu->power;
         $this->cooldown = $jutsu->cooldown;
-        $this->effect_only = $jutsu->effect_only;
 
         $this->effects = [...$this->jutsu->effects];
+
+        if($this->isAllyTargetType() || $this->use_type == Jutsu::USE_TYPE_INDIRECT) {
+            $this->effect_only = true;
+        }
     }
 
     public function isDirectDamage(): bool {
         return in_array($this->jutsu->use_type, Jutsu::$attacking_use_types);
-    }
-
-    public function isEffectOnly(): bool {
-        return $this->jutsu->effect_only;
     }
 
     public function setWeapon(int $weapon_id, $effect, $effect_amount): Jutsu {

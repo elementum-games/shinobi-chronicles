@@ -11,6 +11,8 @@ class BattleAttackV2 {
     public Jutsu $jutsu;
     public float $starting_raw_damage;
 
+    public bool $effect_only = false;
+
     public AttackTarget $target;
 
     public BattleFieldTile $first_tile;
