@@ -392,7 +392,8 @@ function getAvatarFileSize(string $avatar_link): bool|int {
     unset($suffix_array);
 
     $content = file_get_contents($avatar_link);
-    $temp_filename = "./images/avatars/" . uniqid(more_entropy: true) . $suffix;
+    // Save to non-public directory
+    $temp_filename = "../images/avatars/" . uniqid(more_entropy: true) . $suffix;
 
     $handle = fopen($temp_filename, "w+");
     fwrite($handle, $content);
