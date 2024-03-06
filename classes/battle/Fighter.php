@@ -59,6 +59,9 @@ abstract class Fighter {
     /** @var Jutsu[] */
     public array $jutsu;
 
+    /** @var Jutsu[] */
+    public array $default_jutsu = [];
+
     public array $items;
 
     public array $equipped_jutsu;

@@ -59,9 +59,6 @@ class BattleManager {
     // private BattleField $field;
     protected BattleEffectsManager $effects;
 
-    /** @var Jutsu[] */
-    public array $default_attacks;
-
     public bool $spectate = false;
 
     // track AI jutsu
@@ -88,8 +85,6 @@ class BattleManager {
         $this->battle = new Battle($system, $player, $battle_id);
         $this->is_retreat = $this->battle->is_retreat;
         $this->turn_count = $this->battle->turn_count;
-
-        $this->default_attacks = $this->getDefaultAttacks();
 
         // $this->field = new BattleField($system, json_decode($this->battle->raw_field, true));
 
@@ -128,9 +123,12 @@ class BattleManager {
 
     /**
      * @throws RuntimeException
+     * @throws DatabaseDeadlockException
      */
     #[Trace]
-    protected function loadFighters() {
+    protected function loadFighters(): void {
+        $default_attacks = $this->getDefaultAttacks();
+
         if($this->player->id == $this->battle->player1_id) {
             $this->player_side = Battle::TEAM1;
             $this->opponent_side = Battle::TEAM2;
@@ -142,10 +140,6 @@ class BattleManager {
                 $this->battle->fighter_jutsu_used[$this->battle->player1->combat_id] = [];
             }
             $this->player_jutsu_used =& $this->battle->fighter_jutsu_used[$this->battle->player1->combat_id];
-
-            foreach($this->default_attacks as $id => $attack) {
-                $this->default_attacks[$id]->setCombatId($this->battle->player1->combat_id);
-            }
         }
         else if($this->player->id == $this->battle->player2_id) {
             $this->player_side = Battle::TEAM2;
@@ -158,10 +152,6 @@ class BattleManager {
                 $this->battle->fighter_jutsu_used[$this->battle->player2->combat_id] = [];
             }
             $this->player_jutsu_used =& $this->battle->fighter_jutsu_used[$this->battle->player2->combat_id];
-
-            foreach($this->default_attacks as $id => $attack) {
-                $this->default_attacks[$id]->setCombatId($this->battle->player2->combat_id);
-            }
         }
         else {
             $this->player_side = Battle::TEAM1;
@@ -169,6 +159,15 @@ class BattleManager {
         }
 
         $this->battle->loadFighters();
+
+        foreach($default_attacks as $id => $attack) {
+            // Have to work on a copy so the combat ID doesn't get polluted by both players
+            $this->battle->player1->default_jutsu[$id] = clone $attack;
+            $this->battle->player1->default_jutsu[$id]->setCombatId($this->battle->player1->combat_id);
+
+            $this->battle->player2->default_jutsu[$id] = clone $attack;
+            $this->battle->player2->default_jutsu[$id]->setCombatId($this->battle->player2->combat_id);
+        }
 
         if($this->player_side == Battle::TEAM1) {
             $this->opponent =& $this->battle->player2;
@@ -841,7 +840,8 @@ class BattleManager {
             $attack_jutsu = $jutsu;
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_DEFAULT) {
-            $attack_jutsu = $this->default_attacks[$action->jutsu_id];
+            print_r($fighter->default_jutsu);
+            $attack_jutsu = $fighter->default_jutsu[$action->jutsu_id];
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASABLE) {
             $attack_jutsu = $fighter->jutsu[$action->jutsu_id];
@@ -980,6 +980,7 @@ class BattleManager {
 
         // Set cooldowns
         if($attack->cooldown > 0) {
+            echo "Set cooldown for {$user->getName()} jutsu {$attack->jutsuCombatId()}<br />";
             $this->battle->jutsu_cooldowns[$attack->jutsuCombatId()] = $attack->cooldown;
         }
 
@@ -1410,7 +1411,7 @@ class BattleManager {
         $seal_string = implode('-', $seals);
 
         $fighter_jutsu = null;
-        foreach($this->default_attacks as $id => $attack) {
+        foreach($fighter->default_jutsu as $id => $attack) {
             if($attack->hand_seals == $seal_string) {
                 $fighter_jutsu = $attack;
                 break;
@@ -1431,8 +1432,8 @@ class BattleManager {
 
     private function getJutsuFromId(Fighter $fighter, int $jutsu_id): ?Jutsu {
         $fighter_jutsu = null;
-        if (isset($this->default_attacks[$jutsu_id]) && $this->default_attacks[$jutsu_id]->jutsu_type == JutsuOffenseType::TAIJUTSU) {
-            $fighter_jutsu = $this->default_attacks[$jutsu_id];
+        if (isset($fighter->default_jutsu[$jutsu_id]) && $fighter->default_jutsu[$jutsu_id]->jutsu_type == JutsuOffenseType::TAIJUTSU) {
+            $fighter_jutsu = $fighter->default_jutsu[$jutsu_id];
         }
         if ($fighter->hasEquippedJutsu($jutsu_id) && $fighter->jutsu[$jutsu_id]->jutsu_type == JutsuOffenseType::TAIJUTSU) {
             $fighter_jutsu = $fighter->jutsu[$jutsu_id];

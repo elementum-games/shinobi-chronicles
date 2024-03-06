@@ -462,7 +462,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
             ?>
             <div class='jutsuList'>
             <?php for ($i = 0; $i < 3; $i++): ?>
-                <?php foreach ($battleManager->default_attacks as $attack): ?>
+                <?php foreach ($player->default_jutsu as $attack): ?>
                     <?php if ($attack->jutsu_type != $jutsu_types[$i]) continue; ?>
                     <?php $cd_left = $battle->jutsu_cooldowns[$attack->combat_id] ?? 0; ?>
                     <div

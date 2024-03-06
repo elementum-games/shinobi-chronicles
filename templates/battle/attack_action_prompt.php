@@ -449,7 +449,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
 
         <?php for($i = 0; $i < 3; $i++): ?>
         <div class='jutsuCategory' style='width:<?= $width ?>;'>
-            <?php foreach($battleManager->default_attacks as $attack): ?>
+            <?php foreach($player->default_jutsu as $attack): ?>
                 <?php if($attack->jutsu_type != $jutsu_types[$i]) continue; ?>
                 <span   id='default<?= $c1_count ?>'
                         class='jutsuName <?= $jutsu_types[$i] ?>'
