@@ -1243,58 +1243,14 @@ class BattleManager {
             echo "Player2({$player2->getName()}): {$player2->speed} ({$player2->speed_boost} - {$player2->speed_nerf})<br />";
         }
 
-        $player1_evasion_stat_amount = $this->getEvasionPercent($player1, $player1_attack, $player2->getBaseStatTotal());
-        $player2_evasion_stat_amount = $this->getEvasionPercent($player2, $player2_attack, $player1->getBaseStatTotal());
-
-        if($player1_evasion_stat_amount >= $player2_evasion_stat_amount) {
-            $damage_reduction = round($player1_evasion_stat_amount - $player2_evasion_stat_amount, 2);
-
-            // if higher than soft cap, apply penalty
-            if ($damage_reduction > self::EVASION_SOFT_CAP) {
-                $damage_reduction = (($damage_reduction - self::EVASION_SOFT_CAP) * self::EVASION_SOFT_CAP_RATIO) + self::EVASION_SOFT_CAP;
-            }
-            // if still higher than soft cap, set to hard cap
-            if ($damage_reduction > self::EVASION_HARD_CAP) {
-                $damage_reduction = self::EVASION_HARD_CAP;
-            }
-
-            if($damage_reduction >= 0.01) {
-                $player2_attack->damage *= 1 - $damage_reduction;
-                $player2->barrier *= 1 - $damage_reduction;
-
-                if($player1_attack->jutsu_type == JutsuOffenseType::TAIJUTSU) {
-                    $collision_displays[] = "[player] swiftly evaded " . round($damage_reduction * 100, 0) . "% of [opponent]'s damage!";
-                }
-                else {
-                    $collision_displays[] = "[player] cast [gender2] jutsu before [opponent], negating " .
-                        round($damage_reduction * 100, 0) . "% of [opponent]'s damage!";
-                }
-            }
-        }
-        else if($player2_evasion_stat_amount >= $player1_evasion_stat_amount) {
-            $damage_reduction = round($player2_evasion_stat_amount - $player1_evasion_stat_amount, 2);
-
-            // if higher than soft cap, apply penalty
-            if ($damage_reduction > self::EVASION_SOFT_CAP) {
-                $damage_reduction = (($damage_reduction - self::EVASION_SOFT_CAP) * self::EVASION_SOFT_CAP_RATIO) + self::EVASION_SOFT_CAP;
-            }
-            // if still higher than soft cap, set to hard cap
-            if ($damage_reduction > self::EVASION_HARD_CAP) {
-                $damage_reduction = self::EVASION_HARD_CAP;
-            }
-
-            if($damage_reduction >= 0.01) {
-                $player1_attack->damage *= 1 - $damage_reduction;
-                $player1->barrier *= 1 - $damage_reduction;
-
-                if($player2_attack->jutsu_type == JutsuOffenseType::TAIJUTSU) {
-                    $collision_displays[] = "[opponent] swiftly evaded " . round($damage_reduction * 100) . "% of [player]'s damage!";
-                }
-                else {
-                    $collision_displays[] = "[opponent] cast [targetGender2] jutsu before [player], negating " .
-                        round($damage_reduction * 100, 0) . "% of [player]'s damage!";
-                }
-            }
+        $evasion_display = $this->applyEvasion(
+            player1: $player1,
+            player2: $player2,
+            player1_attack: $player1_attack,
+            player2_attack: $player2_attack
+        );
+        if(strlen($evasion_display) > 0) {
+            $collision_displays[] = $evasion_display;
         }
 
         // Barriers
@@ -1366,24 +1322,30 @@ class BattleManager {
     /**
      * @throws RuntimeException
      */
-    private function getEvasionPercent(Fighter $fighter, BattleAttack $fighter_attack, int $target_stat_total): float|int {
+    private function getEvasionPercent(
+        Fighter $fighter,
+        BattleAttack $fighter_attack,
+        int $target_stat_total,
+        bool $apply_effects = true
+    ): float|int {
         switch($fighter_attack->jutsu_type) {
             case JutsuOffenseType::NINJUTSU:
             case JutsuOffenseType::GENJUTSU:
             case JutsuOffenseType::TAIJUTSU:
                 // get speed stat total
-                $evasion_stat_amount = $fighter->speed + $fighter->speed_boost + $fighter->cast_speed + $fighter->cast_speed_boost;
-                // determine base evasion against opponent
-                $evasion_stat_amount *= BattleManager::SPEED_DAMAGE_REDUCTION_RATIO / max($target_stat_total, 1);
-                // apply all boosts/nerfs to evasion
-                $evasion_stat_amount += $fighter->evasion_boost;
-                $evasion_stat_amount -= $fighter->evasion_nerf;
+                $evasion_stats = $fighter->speed + $fighter->speed_boost + $fighter->cast_speed + $fighter->cast_speed_boost;
+                $evasion_percent = $evasion_stats * BattleManager::SPEED_DAMAGE_REDUCTION_RATIO / max($target_stat_total, 1);
+
+                if($apply_effects) {
+                    $evasion_percent += $fighter->evasion_boost;
+                    $evasion_percent -= $fighter->evasion_nerf;
+                }
                 break;
             default:
                 throw new RuntimeException("Invalid jutsu type!");
         }
 
-        return $evasion_stat_amount;
+        return $evasion_percent;
     }
 
     // PRIVATE API - PLAYER ACTIONS
@@ -1537,6 +1499,94 @@ class BattleManager {
 
 
         return 1;
+    }
+
+    protected function applyEvasion(Fighter $player1, Fighter $player2, BattleAttack $player1_attack, BattleAttack $player2_attack): string {
+        $display = '';
+
+        $player1_evasion_percent = $this->getEvasionPercent(
+            fighter: $player1,
+            fighter_attack: $player1_attack,
+            target_stat_total: $player2->getBaseStatTotal()
+        );
+        $player2_evasion_percent = $this->getEvasionPercent(
+            fighter: $player2,
+            fighter_attack: $player2_attack,
+            target_stat_total: $player1->getBaseStatTotal()
+        );
+
+        $player1_base_evasion_percent = $this->getEvasionPercent(
+            fighter: $player1,
+            fighter_attack: $player1_attack,
+            target_stat_total: $player2->getBaseStatTotal(),
+            apply_effects: false
+        );
+        $player2_base_evasion_percent = $this->getEvasionPercent(
+            fighter: $player2,
+            fighter_attack: $player2_attack,
+            target_stat_total: $player1->getBaseStatTotal(),
+            apply_effects: false
+        );
+
+        // Barriers - We do not apply evasion boosts/nerfs
+        if($player1_base_evasion_percent >= $player2_base_evasion_percent) {
+            $damage_reduction = $this->getEvasionDamageReduction($player1_base_evasion_percent - $player2_base_evasion_percent);
+            if($damage_reduction >= 0.01) {
+                $player2->barrier *= 1 - $damage_reduction;
+            }
+        }
+        else if($player2_base_evasion_percent > $player1_base_evasion_percent) {
+            $damage_reduction = $this->getEvasionDamageReduction($player2_base_evasion_percent - $player1_base_evasion_percent);
+            if($damage_reduction >= 0.01) {
+                $player1->barrier *= 1 - $damage_reduction;
+            }
+        }
+
+        // Attacks
+        if($player1_evasion_percent >= $player2_evasion_percent) {
+            $damage_reduction = $this->getEvasionDamageReduction($player1_evasion_percent - $player2_evasion_percent);
+            if($damage_reduction >= 0.01) {
+                $player2_attack->damage *= 1 - $damage_reduction;
+
+                if($player1_attack->jutsu_type == JutsuOffenseType::TAIJUTSU) {
+                    $display = "[player] swiftly evaded " . round($damage_reduction * 100, 0) . "% of [opponent]'s damage!";
+                }
+                else {
+                    $display = "[player] cast [gender2] jutsu before [opponent], negating " .
+                        round($damage_reduction * 100, 0) . "% of [opponent]'s damage!";
+                }
+            }
+        }
+        else if($player2_evasion_percent >= $player1_evasion_percent) {
+            $damage_reduction = $this->getEvasionDamageReduction($player2_evasion_percent - $player1_evasion_percent);
+            if($damage_reduction >= 0.01) {
+                $player1_attack->damage *= 1 - $damage_reduction;
+
+                if($player2_attack->jutsu_type == JutsuOffenseType::TAIJUTSU) {
+                    $display = "[opponent] swiftly evaded " . round($damage_reduction * 100) . "% of [player]'s damage!";
+                }
+                else {
+                    $display = "[opponent] cast [targetGender2] jutsu before [player], negating " .
+                        round($damage_reduction * 100, 0) . "% of [player]'s damage!";
+                }
+            }
+        }
+
+        return $display;
+    }
+    protected function getEvasionDamageReduction(float $base_evasion_percent): float {
+        $damage_reduction = $base_evasion_percent;
+
+        // if higher than soft cap, apply penalty
+        if ($damage_reduction > self::EVASION_SOFT_CAP) {
+            $damage_reduction = (($damage_reduction - self::EVASION_SOFT_CAP) * self::EVASION_SOFT_CAP_RATIO) + self::EVASION_SOFT_CAP;
+        }
+        // if still higher than soft cap, set to hard cap
+        if ($damage_reduction > self::EVASION_HARD_CAP) {
+            $damage_reduction = self::EVASION_HARD_CAP;
+        }
+
+        return round($damage_reduction, 2);
     }
 
     protected function applyBarrier(Fighter $barrier_user, BattleAttack $incoming_attack, bool $barrier_user_is_p1): string {
