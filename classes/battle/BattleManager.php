@@ -1127,7 +1127,7 @@ class BattleManager {
         }
 
         // simulate direct damage
-        if (!$attack->isEffectOnly()) {
+        if (!$attack->effect_only) {
             $attack_damage = $target->calcDamageTaken($attack->damage, $attack->jutsu_type, element: $attack->element);
             $target->last_damage_taken += $attack_damage;
             $target->health -= $attack_damage;
