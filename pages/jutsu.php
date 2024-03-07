@@ -227,13 +227,6 @@ function jutsu(): void {
     // sort jutsu list by base power
     $jutsu_list = $player->jutsu;
     usort($jutsu_list, function($a, $b) {return $a->base_power < $b->base_power ? 1 : -1;});
-    // fix barrier
-    foreach ($jutsu_list as &$jutsu) {
-        if ($jutsu->use_type == "barrier") {
-            $jutsu->effects[0]->effect = "barrier";
-        }
-        unset($jutsu);
-    }
 
     require 'templates/jutsu_page.php';
 }

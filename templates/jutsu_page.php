@@ -577,16 +577,15 @@ $rank_names = RankManager::fetchNames($system);
                                      ) ?>)"
                                      data-jutsu_cooldown="<?php echo $jutsu->cooldown == 1 ? $jutsu->cooldown . " turn" : $jutsu->cooldown . " turns" ?>"
                                      data-jutsu_effect_1="<?php
-                                         if(isset($jutsu->effects[0])) {
+                                        if($jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
+                                            echo "Barrier";
+                                        }
+                                        else if(isset($jutsu->effects[0])) {
                                              $jutsu_effect = $jutsu->effects[0];
 
                                              if(in_array($jutsu_effect->effect, BattleEffectsManager::CLASH_EFFECTS)) {
-                                                 echo System::unSlug($jutsu_effect->effect) . " (" . round(
-                                                         $jutsu_effect->effect_amount, 0
-                                                     ) . "%)";
-                                             }
-                                             else if($jutsu_effect->effect == Jutsu::USE_TYPE_BARRIER) {
-                                                 echo System::unSlug($jutsu_effect->effect);
+                                                 echo System::unSlug($jutsu_effect->effect)
+                                                     . " (" . round($jutsu_effect->effect_amount) . "%)";
                                              }
                                              else {
                                                  echo System::unSlug($jutsu_effect->effect)
@@ -597,11 +596,20 @@ $rank_names = RankManager::fetchNames($system);
                                              }
                                          }
                                          else {
-                                             echo 'none';
+                                             echo 'None';
                                          }
                                      ?>"
                                      data-jutsu_effect_2="<?php
-                                         if(isset($jutsu->effects[1])) {
+                                         if($jutsu->use_type == Jutsu::USE_TYPE_BARRIER && isset($jutsu->effects[0])) {
+                                             $jutsu_effect = $jutsu->effects[0];
+
+                                             echo System::unSlug($jutsu_effect->effect)
+                                                 . " (" . round($jutsu_effect->effect_amount) . "%)"
+                                                 . ", " . ($jutsu_effect->effect_length == 1
+                                                     ? $jutsu_effect->effect_length . " turn"
+                                                     : $jutsu_effect->effect_length . " turns");
+                                         }
+                                         else if(isset($jutsu->effects[1])) {
                                              $jutsu_effect = $jutsu->effects[1];
 
                                              if(in_array($jutsu_effect->effect, BattleEffectsManager::CLASH_EFFECTS)) {
@@ -609,9 +617,6 @@ $rank_names = RankManager::fetchNames($system);
                                                          $jutsu_effect->effect_amount, 0
                                                      ) . "%)";
                                              }
-                                             else if($jutsu_effect->effect == Jutsu::USE_TYPE_BARRIER) {
-                                                 echo System::unSlug($jutsu_effect->effect);
-                                             }
                                              else {
                                                  echo System::unSlug($jutsu_effect->effect)
                                                      . " (" . round($jutsu_effect->effect_amount) . "%)"
@@ -621,7 +626,7 @@ $rank_names = RankManager::fetchNames($system);
                                              }
                                          }
                                          else {
-                                             echo 'none';
+                                             echo 'None';
                                          }
                                      ?>"
                                      data-jutsu_description="<?= $jutsu->description ?>"
@@ -644,27 +649,24 @@ $rank_names = RankManager::fetchNames($system);
                         </tr>
                         <tr>
                             <td colspan="2">
+                                <?php if($jutsu->use_type == Jutsu::USE_TYPE_BARRIER): ?>
+                                    <p>Barrier</p>
+                                <?php endif; ?>
+
                                 <?php if(isset($jutsu->effects[0])): ?>
-                                    <?php if($jutsu->effects[0]->effect == "barrier"): ?>
-                                        <p><?= System::unSlug($jutsu->effects[0]->effect) ?></p>
-                                    <?php else : ?>
-                                        <p>
-                                            <?= System::unSlug($jutsu->effects[0]->effect) ?>
-                                            &nbsp;(<?= round($jutsu->effects[0]->effect_amount) ?>%)
-                                        </p>
-                                    <?php endif; ?>
-                                <?php else: ?>
+                                    <p>
+                                        <?= System::unSlug($jutsu->effects[0]->effect) ?>
+                                        &nbsp;(<?= round($jutsu->effects[0]->effect_amount) ?>%)
+                                    </p>
+                                <?php elseif($jutsu->use_type != Jutsu::USE_TYPE_BARRIER): ?>
                                     <p>None</p>
                                 <?php endif; ?>
+
                                 <?php if(isset($jutsu->effects[1])): ?>
-                                    <?php if($jutsu->effects[1]->effect == "barrier"): ?>
-                                        <p><?= System::unSlug($jutsu->effects[1]->effect) ?></p>
-                                    <?php else : ?>
-                                        <p>
-                                            <?= System::unSlug($jutsu->effects[1]->effect) ?>
-                                            &nbsp;(<?= round($jutsu->effects[1]->effect_amount) ?>%)
-                                        </p>
-                                    <?php endif; ?>
+                                    <p>
+                                        <?= System::unSlug($jutsu->effects[1]->effect) ?>
+                                        &nbsp;(<?= round($jutsu->effects[1]->effect_amount) ?>%)
+                                    </p>
                                 <?php endif; ?>
                             </td>
                         </tr>

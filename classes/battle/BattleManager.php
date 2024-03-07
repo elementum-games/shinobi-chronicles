@@ -980,7 +980,6 @@ class BattleManager {
 
         // Set cooldowns
         if($attack->cooldown > 0) {
-            echo "Set cooldown for {$user->getName()} jutsu {$attack->jutsuCombatId()}<br />";
             $this->battle->jutsu_cooldowns[$attack->jutsuCombatId()] = $attack->cooldown;
         }
 

@@ -73,14 +73,14 @@ $RANK_NAMES = RankManager::fetchNames($system);
             <td><?= $jutsu->power ?></td>
             <td>
                 <?php if($jutsu->use_type == Jutsu::USE_TYPE_BARRIER): ?>
-                    Barrier
-                <?php else: ?>
-                    <?php if(isset($jutsu->effects[0])): ?>
-                        <?= System::unSlug($jutsu->effects[0]->effect) ?>
-                        (<?= $jutsu->effects[0]->effect_amount ?>% / <?= $jutsu->effects[0]->effect_length ?> turns)
-                    <?php else: ?>
-                        None
-                    <?php endif; ?>
+                    Barrier<br />
+                <?php endif; ?>
+
+                <?php if(isset($jutsu->effects[0])): ?>
+                    <?= System::unSlug($jutsu->effects[0]->effect) ?>
+                    (<?= $jutsu->effects[0]->effect_amount ?>% / <?= $jutsu->effects[0]->effect_length ?> turns)
+                <?php elseif($jutsu->use_type != Jutsu::USE_TYPE_BARRIER): ?>
+                    None
                 <?php endif; ?>
                 <?php if(isset($jutsu->effects[1])): ?>
                     <br />
