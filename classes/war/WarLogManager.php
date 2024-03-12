@@ -284,10 +284,10 @@ class WarLogManager {
             $war_log_result['village_name'] = VillageManager::VILLAGE_NAMES[$war_log_result['village_id']];
             $defender_war_log = new WarLogDto($war_log_result, self::WAR_LOG_TYPE_VILLAGE);
             self::calculateWarScore($defender_war_log);
-            if (isset($relation->relation_end)) {
-                $war_duration = "";
+            if (!isset($relation->relation_end)) {
+                $war_duration = 0;
             } else {
-                $war_duration = System::timeFormat(time() + 1000000 - $relation->relation_start, format: "long", include_seconds: false);
+                $war_duration = $relation->relation_end - $relation->relation_start;
             }
 
             $war_records[] = new WarRecordDto($relation, $attacker_war_log, $defender_war_log, WarManager::getVictoryPercentRequired($system, $relation), $war_duration);
