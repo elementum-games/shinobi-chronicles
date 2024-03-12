@@ -114,8 +114,8 @@
         );
 
         selectedBloodlineBoosts.forEach((boost, i) => {
-            let boostEl = document.getElementById(`${fighterKey}_bloodline_boost_${i + 1}`);
-            let boostAmountEl = document.getElementById(`${fighterKey}_bloodline_boost_${i + 1}_amount`);
+            let boostEl = document.getElementById(`${fighterKey}_bloodline_boosts_${i + 1}_effect`);
+            let boostAmountEl = document.getElementById(`${fighterKey}_bloodline_boosts_${i + 1}_power`);
 
             boostEl.value = boost.effect;
             boostAmountEl.value = boost.power;
@@ -138,6 +138,7 @@
         let selectedJutsu = JSON.parse(selectedJutsuEl.getAttribute("data-jutsu"));
         
         let typeEl = document.getElementById(`${fighterKey}_${jutsuKey}_type`);
+        let useTypeEl = document.getElementById(`${fighterKey}_${jutsuKey}_use_type`);
         let powerEl = document.getElementById(`${fighterKey}_${jutsuKey}_power`);
         let elementEl = document.getElementById(`${fighterKey}_${jutsuKey}_element`);
 
@@ -150,6 +151,7 @@
         let effect2LengthEl = document.getElementById(`${fighterKey}_${jutsuKey}_effect2_length`);
 
         typeEl.value = selectedJutsu.jutsu_type;
+        useTypeEl.value = selectedJutsu.use_type;
         powerEl.value = selectedJutsu.base_power;
         elementEl.value = selectedJutsu.element;
 
@@ -173,7 +175,7 @@ function selected($condition): string {
  * @param string $fighter_form_key
  * @param int    $jutsu_index
  * @param array  $FORM_DATA
- * @param Jutsu[]  $jutsu_by_group
+ * @param Jutsu[][]  $jutsu_by_group
  * @return void
  */
 function displayJutsuInput(string $fighter_form_key, int $jutsu_index, array $FORM_DATA, array $jutsu_by_group) {
@@ -219,6 +221,19 @@ function displayJutsuInput(string $fighter_form_key, int $jutsu_index, array $FO
                 Genjutsu
             </option>
         </select><br />
+
+        <label>Use Type:</label>
+        <select
+            id='<?= $fighter_form_key ?>_<?= $jutsu_form_key ?>_use_type'
+            name='<?= $fighter_form_key ?>[<?= $jutsu_form_key ?>][use_type]'
+        >
+            <?php foreach(Jutsu::$use_types as $use_type): ?>
+                <option value='<?= $use_type ?>' <?= selected(($jutsu_form_data['use_type']) == $use_type) ?>>
+                    <?= System::unSlug($use_type) ?>
+                </option>
+            <?php endforeach; ?>
+        </select><br />
+
 
         <label>Base Power:</label>
         <input
@@ -418,6 +433,7 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
         'jutsu1' => [
             'id' => 0,
             'type' => 'ninjutsu',
+            'use_type' => Jutsu::USE_TYPE_PROJECTILE,
             'power' => 4,
             'element' => Element::NONE,
             'is_bloodline' => false,
@@ -430,13 +446,14 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
         ],
         'bloodline_id' => 0,
         'active_effects' => [],
+        'bloodline_boosts' => [],
     ];
     foreach($stats as $stat) {
         $default_values[$stat] = 0;
     }
     for($i = 1; $i <= $num_bloodline_boosts; $i++) {
-        $default_values["bloodline_boost_{$i}"] = 'none';
-        $default_values["bloodline_boost_{$i}_power"] = 0;
+        $default_values["bloodline_boosts"][$i]['effect'] = 'none';
+        $default_values["bloodline_boosts"][$i]['power'] = 0;
     }
     for($i = 1; $i <= $num_active_effects; $i++) {
         $default_values['active_effects'][$i] = [
@@ -542,13 +559,13 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
         <p class='bloodline_boosts' style='margin-top:8px;'>
             <?php for($i = 1; $i <= $num_bloodline_boosts; $i++): ?>
                 <select
-                    id='<?= $fighter_form_key?>_bloodline_boost_<?= $i ?>'
-                    name='<?= $fighter_form_key ?>[bloodline_boost_<?= $i ?>]'
+                    id='<?= $fighter_form_key?>_bloodline_boosts_<?= $i ?>_effect'
+                    name='<?= $fighter_form_key ?>[bloodline_boosts][<?= $i ?>][effect]'
                 >
                     <option value='none'>None</option>
                     <?php foreach($bloodline_combat_boosts as $boost): ?>
                         <option value='<?= $boost ?>'
-                            <?= selected(($FORM_DATA[$fighter_form_key]["bloodline_boost_{$i}"]) == $boost) ?>
+                            <?= selected(($FORM_DATA[$fighter_form_key]["bloodline_boosts"][$i]['effect']) == $boost) ?>
                         >
                             <?= $boost ?>
                         </option>
@@ -556,10 +573,10 @@ function displayFighterInput(System $system, string $fighter_form_key): void {
                 </select>
                 <input
                     type='number'
-                    id='<?= $fighter_form_key?>_bloodline_boost_<?= $i ?>_amount'
-                    name='<?= $fighter_form_key ?>[bloodline_boost_<?= $i ?>_power]'
+                    id='<?= $fighter_form_key?>_bloodline_boosts_<?= $i ?>_power'
+                    name='<?= $fighter_form_key ?>[bloodline_boosts][<?= $i ?>][power]'
                     style='width:60px'
-                    value='<?= $FORM_DATA[$fighter_form_key]["bloodline_boost_{$i}_power"] ?>'
+                    value='<?= $FORM_DATA[$fighter_form_key]["bloodline_boosts"][$i]['power'] ?>'
                 />
                 <br />
             <?php endfor; ?>

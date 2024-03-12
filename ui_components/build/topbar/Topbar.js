@@ -94,7 +94,6 @@ function Topbar({
     } else if (a.type !== 'training' && b.type === 'training') {
       return -1; // Move non-'training' types after
     }
-
     return 0; // No change in order for types other than 'training'
   });
 

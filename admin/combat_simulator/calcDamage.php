@@ -46,13 +46,15 @@ class TestBattleManager extends BattleManager {
  * @throws DatabaseDeadlockException
  */
 function calcDamage(
-    Fighter $player1, Fighter $player2,
-    Jutsu $player1_jutsu, Jutsu $player2_jutsu,
-    array $player1_effects, array $player2_effects
+    System $system,
+    User $user,
+    Fighter $player1,
+    Fighter $player2,
+    Jutsu $player1_jutsu,
+    Jutsu $player2_jutsu,
+    array $player1_effects,
+    array $player2_effects
 ): array {
-    global $system;
-    global $user;
-
     // AI battle = disabled randomness
     $battle_id = Battle::start($system, $player1, $player2, Battle::TYPE_AI_ARENA);
     $battle = TestBattleManager::init(

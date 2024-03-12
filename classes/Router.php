@@ -76,6 +76,7 @@ class Router {
         $this->api_links['forbidden_shop'] = $this->base_url . 'api/forbidden_shop.php';
         $this->api_links['village'] = $this->base_url . 'api/village.php';
         $this->api_links['ramen_shop'] = $this->base_url . 'api/ramen_shop.php';
+        $this->api_links['admin'] = $this->base_url . 'api/admin.php';
     }
 
     /**

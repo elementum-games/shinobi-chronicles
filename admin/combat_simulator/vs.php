@@ -9,175 +9,104 @@ require __DIR__ . "/calcDamage.php";
 $rankManager = new RankManager($system);
 $rankManager->loadRanks();
 
+$rank_names = RankManager::fetchNames($system);
+
 $results = null;
 
-if(isset($_POST['run_simulation'])) {
-    $player1_data = $_POST['fighter1'];
-    $player2_data = $_POST['fighter2'];
+// Bloodlines
+$bloodline_ids_by_rank = [];
+$bloodlines_by_id = [];
+$result = $system->db->query("SELECT * FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
+while ($row = $system->db->fetch($result)) {
+    $bloodline = Bloodline::fromArray($row);
+    $bloodline->name = System::unescape($bloodline->name);
 
-    $valid_jutsu_types = JutsuOffenseType::values();
-    try {
-        if(!in_array($player1_data['jutsu1']['type'], $valid_jutsu_types)) {
-            throw new RuntimeException("Invalid jutsu type for player 1!");
-        }
-        if(!in_array($player2_data['jutsu1']['type'], $valid_jutsu_types)) {
-            throw new RuntimeException("Invalid jutsu type for player 2!");
-        }
-
-        $player1 = TestFighter::fromFormData(
-            system: $system,
-            rankManager: $rankManager,
-            fighter_data: $player1_data,
-            name: "Player 1"
-        );
-        $player1->combat_id = Battle::combatId(Battle::TEAM1, $player1);
-        $player1_jutsu = $player1->addJutsuFromFormData($player1_data['jutsu1']);
-
-        $player2 = TestFighter::fromFormData(
-            system: $system,
-            rankManager: $rankManager,
-            fighter_data: $player2_data,
-            name: "Player 2"
-        );
-        $player2->combat_id = Battle::combatId(Battle::TEAM2, $player2);
-        $player2_jutsu = $player2->addJutsuFromFormData($player2_data['jutsu1']);
-
-        // Effects
-        $player1_effects = $player1->activeEffectsFromFormData($player1_data['active_effects']);
-        $player2_effects = $player2->activeEffectsFromFormData($player2_data['active_effects']);
-
-        $results = calcDamage(
-            player1: $player1,
-            player2: $player2,
-            player1_jutsu: $player1_jutsu,
-            player2_jutsu: $player2_jutsu,
-            player1_effects: $player1_effects,
-            player2_effects: $player2_effects
-        );
-
-        $results['winning_fighter'] = null;
-        $results['winning_percent'] = 0;
-        $results['damage_difference'] = 0;
-
-        if($results['player1']['damage_taken'] > $results['player2']['damage_taken']) {
-            $results['winning_fighter'] = 'player2';
-            $results['winning_percent'] = (
-                ($results['player1']['damage_taken'] / max(1, $results['player2']['damage_taken'])) * 100
-            ) - 100;
-            $results['damage_difference'] = $results['player1']['damage_taken'] - $results['player2']['damage_taken'];
-        }
-        if($results['player2']['damage_taken'] > $results['player1']['damage_taken']) {
-            $results['winning_fighter'] = 'player1';
-            $results['winning_percent'] = (
-                ($results['player2']['damage_taken'] / max(1, $results['player1']['damage_taken'])) * 100
-            ) - 100;
-            $results['damage_difference'] = $results['player2']['damage_taken'] - $results['player1']['damage_taken'];
-        }
-    } catch (Exception $e) {
-        echo $e->getMessage();
-    }
+    $bloodlines_by_id[$bloodline->bloodline_id] = $bloodline;
+    $bloodline_ids_by_rank[$row['rank']][] = $bloodline->bloodline_id;
 }
 
-require 'vs_fighter_input.php';
+// Jutsu
+$jutsu_by_id = [];
+$jutsu_ids_by_group = [];
+
+$result = $system->db->query("SELECT * FROM `jutsu` 
+     WHERE `purchase_type` != " . Jutsu::PURCHASE_TYPE_NON_PURCHASABLE . " 
+     ORDER BY `rank` DESC, `purchase_cost` DESC"
+);
+while($row = $system->db->fetch($result)) {
+    $jutsu = Jutsu::fromArray($row['jutsu_id'], $row);
+    $jutsu_by_id[$jutsu->id] = [
+        'id' => $jutsu->id,
+        'name' => System::unescape($jutsu->name),
+        'type' => $jutsu->jutsu_type,
+        'use_type' => $jutsu->use_type,
+        'power' => $jutsu->power,
+        'element' => $jutsu->element->value,
+        'is_bloodline' => $jutsu->is_bloodline,
+        'effect' => $jutsu->effects[0]?->effect ?? "none",
+        'effect_amount' => $jutsu->effects[0]?->effect_amount ?? 0,
+        'effect_length' => $jutsu->effects[0]?->effect_length ?? 0,
+        'effect2' => $jutsu->effects[1]?->effect ?? "none",
+        'effect2_amount' => $jutsu->effects[1]?->effect_amount ?? "none",
+        'effect2_length' => $jutsu->effects[1]?->effect_length ?? "none",
+    ];
+
+    $group = $rank_names[$jutsu->rank] . " " . ucwords($jutsu->jutsu_type->value);
+
+    if(!isset($jutsu_ids_by_group[$group])) {
+        $jutsu_ids_by_group[$group] = [];
+    }
+
+    $jutsu_ids_by_group[$group][] = $jutsu->id;
+}
+
+
+/** @var string[] $bloodline_combat_boosts */
+require __DIR__ . '/../constraints/bloodline.php';
 
 ?>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>SC Combat - VS mode</title>
-    </head>
-    <body>
-        <style>
-            .vs_container {
-                width: 800px;
-                margin: 5px auto;
-                text-align: center;
-            }
+<head>
+    <title>SC Combat - VS mode</title>
+    <?= $system->isDevEnvironment() ? Layout::$react_dev_tags : Layout::$react_prod_tags ?>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+    <link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/admin/CombatSimulator.css") ?>" />
+    <div id="combatSimulatorReactContainer"></div>
+    <script type="module" src="<?= $system->getReactFile("admin/CombatSimulator") ?>"></script>
 
-            input[type='submit'] {
-                display: block;
-                margin: 10px auto auto;
-            }
+    <!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->
+    <script type="text/javascript">
+        const container = document.querySelector("#combatSimulatorReactContainer");
 
-            .results {
-                width:550px;
-                background-color:#EAEAEA;
-                text-align:left;
-                margin-left:auto;
-                margin-right:auto;
-                padding:8px;
-                border:1px solid #000000;
-                border-radius:10px;
+        // const initialPostsResponse = json_encode($initialChatPostsResponse);
+        // const initialBanInfo = json_encode(ChatAPIPresenter::banInfoResponse($system, $player));
 
-                display: flex;
-                flex-direction: row;
-                flex-wrap: wrap;
-                gap: 2%;
-            }
-
-            .player1, .player2 {
-                width: 48%;
-                box-sizing: border-box;
-                padding: 5px;
-
-                background-color:#fafafa;
-            }
-            .winner {
-                background-color: #a0ffa0;
-            }
-
-            .collision {
-                width: 100%;
-                margin-top: 10px;
-                background-color: #fafafa;
-                text-align: center;
-                padding: 5px;
-            }
-        </style>
-
-        <?php if($results != null): ?>
-            <div class='results'>
-                <div class='player1 <?= ($results['winning_fighter'] == 'player1' ? 'winner' : '') ?>'>
-                    <b>Player 1:</b><br />
-                    <?= number_format($results['player1']['raw_damage']) ?> raw damage<br />
-                    <?= number_format($results['player1']['collision_damage']) ?> post-collision damage<br />
-                    <?= number_format($results['player1']['damage_before_resist']) ?> pre-resist damage<br />
-                    <?= number_format($results['player1']['damage_dealt']) ?> final damage dealt<br />
-                    <br />
-                    <?= number_format($results['player1']['damage_taken'], 2) ?> damage taken<br />
-                </div>
-                <div class='player2 <?= ($results['winning_fighter'] == 'player2' ? 'winner' : '') ?>'>
-                    <b>Player 2:</b><br />
-                    <?= number_format($results['player2']['raw_damage']) ?> raw damage<br />
-                    <?= number_format($results['player2']['collision_damage']) ?> post-collision damage<br />
-                    <?= number_format($results['player2']['damage_before_resist']) ?> pre-resist damage<br />
-                    <?= number_format($results['player2']['damage_dealt']) ?> final damage dealt<br />
-                    <br />
-                    <?= number_format($results['player2']['damage_taken'], 2) ?> damage taken<br />
-                </div>
-                <div class='collision'>
-                    <?php if($results['collision_text']): ?>
-                        <?= str_replace("[br]", "<br />", $results['collision_text']) ?><br />
-                    <?php endif; ?>
-
-                    <?php if($results['winning_fighter'] == 'player1'): ?>
-                        <br />
-                        <b>Player 1 won by <?= number_format($results['winning_percent'], 2) ?>%
-                            (<?= number_format($results['damage_difference'], 2) ?> damage)</b><br />
-                    <?php endif; ?>
-                    <?php if($results['winning_fighter'] == 'player2'): ?>
-                        <br />
-                        <b>Player 2 won by <?= number_format($results['winning_percent'], 2) ?>%
-                            (<?= number_format($results['damage_difference'], 2) ?> damage)</b><br />
-                    <?php endif; ?>
-                </div>
-            </div>
-        <?php endif; ?>
-        <form action='vs.php' method='post'>
-            <div class='vs_container'>
-                <?php displayFighterInput(system: $system, fighter_form_key: 'fighter1'); ?>
-                <?php displayFighterInput(system: $system, fighter_form_key: 'fighter2'); ?>
-                <input type='submit' name='run_simulation' value='Run Simulation' />
-            </div>
-        </form>
-    </body>
+        window.addEventListener('load', () => {
+            ReactDOM.render(
+                React.createElement(CombatSimulator, {
+                    adminApiLink: "<?= $system->router->api_links['admin'] ?>",
+                    formOptions: {
+                        bloodlineCombatBoosts: <?= json_encode($bloodline_combat_boosts) ?>,
+                        bloodlineRankLabels: <?= json_encode(Bloodline::$public_ranks) ?>,
+                        damageEffects: <?= json_encode(BattleEffectsManager::DAMAGE_EFFECTS) ?>,
+                        clashEffects: <?= json_encode(BattleEffectsManager::CLASH_EFFECTS) ?>,
+                        buffEffects: <?= json_encode(BattleEffectsManager::BUFF_EFFECTS) ?>,
+                        debuffEffects: <?= json_encode(BattleEffectsManager::DEBUFF_EFFECTS) ?>,
+                        bloodlinesById: <?= json_encode($bloodlines_by_id) ?>,
+                        bloodlineIdsByRank: <?= json_encode($bloodline_ids_by_rank) ?>,
+                        jutsuById: <?= json_encode($jutsu_by_id) ?>,
+                        jutsuIdsByGroup: <?= json_encode($jutsu_ids_by_group) ?>,
+                        jutsuElements: <?= json_encode(Element::values()) ?>,
+                        jutsuUseTypes: <?= json_encode(Jutsu::$use_types) ?>,
+                        statCap: <?= $rankManager->ranks[System::SC_MAX_RANK]->stat_cap ?>,
+                    },
+                }),
+                container
+            );
+        })
+    </script>
+</body>
 </html>

@@ -69,10 +69,7 @@ class TestFighter extends Fighter {
     }
 
     public function addJutsuFromFormData(array $form_data): Jutsu {
-        if(!isset($form_data['is_bloodline'])) {
-            $form_data['is_bloodline'] = false;
-        }
-        $form_data['is_bloodline'] = (bool)$form_data['is_bloodline'];
+        $form_data['is_bloodline'] = filter_var($form_data['is_bloodline'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
         $id = count($this->jutsu) + 1;
         $jutsu = new Jutsu(
@@ -91,7 +88,7 @@ class TestFighter extends Fighter {
             description: 'no',
             battle_text: 'nope',
             cooldown: 0,
-            use_type: Jutsu::USE_TYPE_PROJECTILE,
+            use_type: $form_data['use_type'] ?? Jutsu::USE_TYPE_PROJECTILE,
             target_type: Jutsu::TARGET_TYPE_TILE,
             use_cost: 0,
             purchase_cost: 0,
@@ -151,13 +148,11 @@ class TestFighter extends Fighter {
         );
 
         $fighter_bloodline_boosts = [];
-        for($i = 1; $i <= 3; $i++) {
-            if(!empty($fighter_data["bloodline_boost_{$i}"]) && $fighter_data["bloodline_boost_{$i}"] != 'none') {
-                $fighter_bloodline_boosts[] = new BloodlineBoost(
-                    power: $fighter_data["bloodline_boost_{$i}_power"],
-                    effect: $fighter_data["bloodline_boost_{$i}"]
-                );
-            }
+        foreach($fighter_data["bloodline_boosts"] as $boost) {
+            $fighter_bloodline_boosts[] = new BloodlineBoost(
+                power: $boost['power'],
+                effect: $boost['effect']
+            );
         }
 
         if(count($fighter_bloodline_boosts) > 0) {

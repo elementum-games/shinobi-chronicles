@@ -1,0 +1,95 @@
+.vs_container {
+    width: 800px;
+    margin: 5px auto;
+    text-align: center;
+}
+
+input[type='submit'] {
+    display: block;
+    margin: 10px auto auto;
+}
+
+.results {
+    width:550px;
+    background-color:#EAEAEA;
+    text-align:left;
+    margin-left:auto;
+    margin-right:auto;
+    padding:8px;
+    border:1px solid #000000;
+    border-radius:10px;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2%;
+}
+
+.player1, .player2 {
+    width: 48%;
+    box-sizing: border-box;
+    padding: 5px;
+
+    background-color:#fafafa;
+}
+.winner {
+    background-color: #a0ffa0;
+}
+
+.collision {
+    width: 100%;
+    margin-top: 10px;
+    background-color: #fafafa;
+    text-align: center;
+    padding: 5px;
+}
+.collision p {
+    margin: 2px auto;
+}
+
+
+/* Fighter Input */
+.versusFighterInput {
+    width:325px;
+    display:inline-block;
+    border:1px solid #000000;
+    border-radius:10px;
+
+    text-align: left;
+
+    padding: 10px;
+    margin: 8px;
+
+    background-color: #f2f2f2;
+}
+.versusFighterInput p {
+    margin: 3px auto;
+}
+.versusFighterInput label {
+    width: 110px;
+    margin: 2px auto;
+    display: inline-block;
+}
+
+
+.jutsu_input label {
+    width: 125px;
+    margin: 3px auto;
+}
+.active_effects_input label {
+    width: 130px;
+}
+
+.active_effects_input {
+    margin-bottom: 10px;
+}
+
+.jutsu_input {
+    margin: 1px auto 5px;
+    padding: 3px;
+    background: rgba(0,0,0,0.02);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+.effect_input {
+    margin: 5px auto;
+}

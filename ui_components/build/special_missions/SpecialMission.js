@@ -17,7 +17,6 @@ function SpecialMission({
     });
   }
 }
-
 function SpecialMissionSelect({
   selfLink
 }) {
@@ -45,7 +44,6 @@ function SpecialMissionSelect({
     href: `${selfLink}&start=nightmare`
   }, /*#__PURE__*/React.createElement("button", null, "Start Nightmare Mission!")), /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("br", null));
 }
-
 function ActiveSpecialMission({
   missionId,
   initialMissionData,
@@ -56,56 +54,45 @@ function ActiveSpecialMission({
   const [mission, setMission] = React.useState(initialMissionData);
   const [missionComplete, setMissionComplete] = React.useState(false);
   const workerRef = React.useRef(null);
-
   function startRefresh() {
     if (workerRef.current == null) {
       console.error("No worker active!");
     }
-
     console.log('starting refresh');
-
     workerRef.current.onmessage = function (message) {
       console.log('Component received message from worker ', message);
       handleDataReceived(message.data);
     };
-
     workerRef.current.postMessage({
       refreshActive: true,
       missionId: missionId,
       refreshIntervalMs: serverRefreshIntervalMs
     });
   }
-
   function stopRefresh() {
     if (workerRef.current == null) return;
     workerRef.current.postMessage({
       refreshActive: false
     });
   }
-
   function handleDataReceived(data) {
     if (data.systemMessage) {
       console.log(data.systemMessage);
     }
-
     if (data.mission == null) {
       console.log("Not on a special mission!");
       stopRefresh();
       return true;
     }
-
     if (data.mission.progress >= 100) {
       data.mission.progress = 100;
     }
-
     if (data.missionComplete) {
       setMissionComplete(true);
       stopRefresh();
     }
-
     setMission(data.mission);
   }
-
   React.useEffect(() => {
     workerRef.current = new Worker("ui_components/build/special_missions/specialMissionWorker.js");
     startRefresh();
@@ -114,18 +101,16 @@ function ActiveSpecialMission({
     };
   }, []);
   let missionStatus = 'In Progress';
-
   switch (mission.log[0].event) {
     case 'mission_reward':
       missionStatus = 'Success';
       break;
-
     case 'mission_failed':
       missionStatus = 'Failed';
       break;
-  } // TODO: Make cancel submit via API fetch so we don't need to reload
+  }
 
-
+  // TODO: Make cancel submit via API fetch so we don't need to reload
   return /*#__PURE__*/React.createElement("div", {
     id: "spec_miss_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
@@ -144,18 +129,15 @@ function ActiveSpecialMission({
     missionStartTime: mission.start_time
   }));
 }
-
 function SpecialMissionHeader({
   missionStatus,
   missionComplete,
   mission
 }) {
   let statusClass = '';
-
   if (missionStatus !== 'In Progress') {
     statusClass = `spec_miss_status_${missionStatus}`;
   }
-
   const playerHealthPercent = mission.player_health / mission.player_max_health * 100;
   return /*#__PURE__*/React.createElement("div", {
     id: "spec_miss_header"
@@ -199,7 +181,6 @@ function SpecialMissionHeader({
     id: "spec_miss_reward"
   }, mission.reward))));
 }
-
 function SpecialMissionTimer({
   missionStartTime,
   missionComplete
@@ -227,7 +208,6 @@ function SpecialMissionTimer({
     id: "spec_miss_timer"
   }, timeElapsed));
 }
-
 function SpecialMissionLog({
   logEntries,
   missionStartTime
@@ -242,7 +222,6 @@ function SpecialMissionLog({
     missionStartTime: missionStartTime
   })));
 }
-
 function LogEntry({
   eventType,
   description,
@@ -266,16 +245,16 @@ function LogEntry({
     id: "spec_miss_log_entry_timestamp"
   }, timeDifference(Math.floor(timestampMs / 1000), missionStartTime))));
 }
-
 function timeDifference(timestamp, target = false) {
   // get the current time in milliseconds, UTC
-  let currentTime = Math.floor(Date.now() / 1000); // the newest timestamp to subtract
+  let currentTime = Math.floor(Date.now() / 1000);
 
-  let timeTarget = target ? timestamp : currentTime; // the older timestamp
+  // the newest timestamp to subtract
+  let timeTarget = target ? timestamp : currentTime;
 
+  // the older timestamp
   let timeMinus = target ? target : timestamp;
   let timeDifference = timeTarget - timeMinus;
   return timeRemaining(timeDifference, 'short', false, true);
 }
-
 window.SpecialMission = SpecialMission;

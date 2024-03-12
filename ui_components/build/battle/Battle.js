@@ -115,7 +115,6 @@ function SpectateStatus() {
   </table>
      */
 }
-
 function BattleResult({
   description,
   isBattleComplete

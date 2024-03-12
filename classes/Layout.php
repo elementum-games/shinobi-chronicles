@@ -6,6 +6,15 @@ require_once __DIR__ . '/navigation/NavigationAPIManager.php';
 require_once __DIR__ . '/notification/Notifications.php';
 
 class Layout {
+    public static string $react_dev_tags = "
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js' crossorigin></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js' crossorigin></script>
+    ";
+    public static string $react_prod_tags = "
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js' crossorigin></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js' crossorigin></script>
+    ";
+    
     public function __construct(
         public string $key,
         public string $heading,

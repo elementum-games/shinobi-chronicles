@@ -11,7 +11,6 @@ const styles = {
     border: '0em solid',
     borderRadius: '0.5em 0.5em, 0em, 0em' // Should match parent element
   },
-
   bgColor: {
     backgroundColor: '#d2c9b3',
     color: '958556e6'
@@ -50,7 +49,7 @@ function CancelTrainingDetails({
 }) {
   return /*#__PURE__*/React.createElement("div", {
     style: styles.textAlignCenter
-  }, /*#__PURE__*/React.createElement("h2", null, "Cancel Training"), /*#__PURE__*/React.createElement("p", null, "Are you certain you wish to cancel your training? You will not gain any of your potential ", /*#__PURE__*/React.createElement("strong", null, playerData.trainGains), " gains."), /*#__PURE__*/React.createElement("button", null, /*#__PURE__*/React.createElement("a", {
+  }, /*#__PURE__*/React.createElement("h2", null, "Cancel Training"), playerData.hasPartialGainsBenefits ? /*#__PURE__*/React.createElement("p", null, "Are you certain you wish to cancel your training? You will not gain any of your potential ", /*#__PURE__*/React.createElement("strong", null, playerData.trainGains), " gains.") : /*#__PURE__*/React.createElement("p", null, playerData.partialGain), /*#__PURE__*/React.createElement("button", null, /*#__PURE__*/React.createElement("a", {
     href: headers.selfLink + '&cancel_training=1&cancel_confirm=1'
   }, "Confirm")));
 }

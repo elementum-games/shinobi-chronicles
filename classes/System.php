@@ -212,6 +212,10 @@ class System {
         public array $homeVars = [],
     ){}
 
+    public static function unescape(string $string): string {
+        return str_replace("&#039;", "'", $string);
+    }
+
     /******************************************************
      *        Debuging, System Messages and Strings       *
      ******************************************************/
@@ -1134,7 +1138,8 @@ class System {
      */
     public function getReactFile(string $component_name): string {
         $filename = "ui_components/build/{$component_name}.js";
-        return $this->router->base_url . $filename . "?v=" .  filemtime($filename);
+        $internal_filename =  __DIR__ . "/../" . $filename;
+        return $this->router->base_url . $filename . "?v=" .  filemtime($internal_filename);
     }
 
     /**
@@ -1143,7 +1148,8 @@ class System {
      * @return string
      */
     public function getCssFileLink(string $file_name): string {
-        return $this->router->base_url . $file_name . "?v=" .  filemtime($file_name);
+        $internal_filename =  __DIR__ . "/../" . $file_name;
+        return $this->router->base_url . $file_name . "?v=" .  filemtime($internal_filename);
     }
 
     /**

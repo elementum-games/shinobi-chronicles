@@ -10,7 +10,6 @@ export function parseKeywords(text) {
       afterText: '"'
     } // Adding quotation marks for 'quote'
   };
-
   const tagRegex = new RegExp(`\\[(\\/)?(${Object.keys(tagStyles).join('|')})\\]`, 'g');
   const parts = text.split(tagRegex);
   const processedParts = [];
@@ -46,6 +45,5 @@ export function parseKeywords(text) {
       }
     }
   });
-
   return /*#__PURE__*/React.createElement(React.Fragment, null, processedParts);
 }

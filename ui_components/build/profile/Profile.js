@@ -1,6 +1,5 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
 import RadarNinjaChart from '../charts/Chart.js';
-
 function Profile({
   isDevEnvironment,
   links,
@@ -13,12 +12,11 @@ function Profile({
 }) {
   //Chart.js variables
   const [showChart, setShowChart] = React.useState(false);
-
   function handleShowGraph() {
     setShowChart(!showChart);
-  } //marginRight temp fix for wrapping to same row as chart when window width changes
+  }
 
-
+  //marginRight temp fix for wrapping to same row as chart when window width changes
   let showChartButtonStyle = {
     display: 'block',
     marginRight: '75%',
@@ -63,7 +61,6 @@ function Profile({
     playerAchievements: playerAchievements
   })));
 }
-
 function StatusAttributes({
   playerData,
   playerSettings,
@@ -133,7 +130,6 @@ function StatusAttributes({
     href: links.team
   }, playerData.teamName)))))));
 }
-
 function PlayerStats({
   playerData,
   playerStats
@@ -208,7 +204,6 @@ function PlayerStats({
     className: "ft-c3"
   })))));
 }
-
 function PlayerBloodline({
   playerData,
   bloodlinePageUrl,
@@ -230,7 +225,6 @@ function PlayerBloodline({
     href: buyBloodlineUrl
   }, "None")));
 }
-
 function PlayerUserRep({
   playerData,
   repReset
@@ -256,7 +250,6 @@ function PlayerUserRep({
     timeRemaining: repReset
   })));
 }
-
 function DailyTasks({
   playerData,
   dailyTasks
@@ -290,7 +283,6 @@ function DailyTasks({
     }
   }, dailyTask.progressCaption)))));
 }
-
 function PlayerAchievements({
   playerAchievements
 }) {
@@ -316,7 +308,6 @@ function PlayerAchievements({
     className: "progress_label"
   }, achievement.progressLabel)))));
 }
-
 function Timer({
   timeRemaining: initialTimeRemaining
 }) {
@@ -331,16 +322,17 @@ function Timer({
     return () => clearInterval(intervalId);
   });
   let displayString = '';
-  let seconds = timeRemaining; // Calc days
+  let seconds = timeRemaining;
 
+  // Calc days
   if (seconds > 86400) {
     let days = Math.floor(seconds / 86400);
     seconds -= days * 86400;
     let daysUnit = days >= 1 ? 'days' : 'day';
     displayString += `${days} ${daysUnit} `;
-  } // Calc hours
+  }
 
-
+  // Calc hours
   if (seconds >= 3600) {
     let hours = Math.floor(seconds / 3600);
     let hoursString = hours < 10 ? "0" + hours : hours;
@@ -348,9 +340,9 @@ function Timer({
     displayString += hoursString + ":";
   } else {
     displayString += "00:";
-  } // Calc minutes
+  }
 
-
+  // Calc minutes
   if (seconds >= 60) {
     let minutes = Math.floor(seconds / 60);
     let minutesString = minutes < 10 ? "0" + minutes : minutes;
@@ -358,17 +350,15 @@ function Timer({
     displayString += minutesString + ":";
   } else {
     displayString += "00:";
-  } // Calc seconds
+  }
 
-
+  // Calc seconds
   if (timeRemaining > 0) {
     let secondsString = seconds < 10 ? "0" + seconds : seconds;
     displayString += secondsString;
   } else {
     displayString += "00";
   }
-
   return /*#__PURE__*/React.createElement("span", null, displayString);
 }
-
 window.Profile = Profile;

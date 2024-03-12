@@ -25,18 +25,18 @@ export const Map = ({
      0 offset = tile 1
      +5 offset = tile 6
      -5 offset = tile -4
-      To visualize, imagine the stage is like this. Player location on X
+       To visualize, imagine the stage is like this. Player location on X
      | visible |
      | 1 2 3 4 | 5 6 7 8
          X
-      Easy, offset is 0, first tile is one. What if player moves two tiles to the right?
-          | visible |
+       Easy, offset is 0, first tile is one. What if player moves two tiles to the right?
+           | visible |
      1 2 | 3 4 5 6 | 7 8
              X
-      There are 4 visible tiles, so the stage midpoint is visible tile 2. This is where the player should be shown,
+       There are 4 visible tiles, so the stage midpoint is visible tile 2. This is where the player should be shown,
      but the player is on coordinate 4. Thus we push the stage 2 tiles to the left so that the second visible tile
      is coordinate 4.
-      How do we calculate the starting coordinate in this example? We need to offset the first visible tile by +2 which
+       How do we calculate the starting coordinate in this example? We need to offset the first visible tile by +2 which
      is equal to player X - stage midpoint X.
    */
   const stage_offset_x = player_x - stage_midpoint_x;
@@ -357,7 +357,6 @@ function RegionObjectives({
     } else {
       backgroundColor = '#3c2b2bcc'; // Original background
     }
-
     return /*#__PURE__*/React.createElement("div", {
       className: `region_objective_tooltip${objective.rebellion_active ? ' rebellion_glow' : ''}`,
       style: {

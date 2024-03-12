@@ -126,13 +126,13 @@ export function CreateCharacterButton({
   }, /*#__PURE__*/React.createElement("stop", {
     offset: "0%",
     style: {
-      stopColor: '#84314e',
+      stopColor: '#721B25',
       stopOpacity: 1
     }
   }), /*#__PURE__*/React.createElement("stop", {
     offset: "100%",
     style: {
-      stopColor: '#68293f',
+      stopColor: '#822d31',
       stopOpacity: 1
     }
   })), /*#__PURE__*/React.createElement("radialGradient", {
@@ -145,13 +145,13 @@ export function CreateCharacterButton({
   }, /*#__PURE__*/React.createElement("stop", {
     offset: "0%",
     style: {
-      stopColor: '#68293f',
+      stopColor: '#822d31',
       stopOpacity: 1
     }
   }), /*#__PURE__*/React.createElement("stop", {
     offset: "100%",
     style: {
-      stopColor: '#84314e',
+      stopColor: '#721B25',
       stopOpacity: 1
     }
   })), /*#__PURE__*/React.createElement("rect", {

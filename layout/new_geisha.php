@@ -1,19 +1,9 @@
 <?php
 
 function getNewGeishaLayout(System $system, bool $enable_mobile_layout): Layout {
-    $react_dev_tags = <<<HTML
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js" crossorigin></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js" crossorigin></script>
-HTML;
-
-    $react_prod_tags = <<<HTML
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js" crossorigin></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js" crossorigin></script>
-HTML;
-
     if($system->isDevEnvironment()) {
         $extra_meta_tags = '<meta name="robots" content="noindex" />';
-        $react_tags = $react_dev_tags;
+        $react_tags = Layout::$react_dev_tags;
 
         if($enable_mobile_layout && !isset($_SESSION['user_id'])) {
             $extra_meta_tags .= '<meta name="viewport" content="width=device-width, initial-scale=1" />';
@@ -21,7 +11,7 @@ HTML;
     }
     else {
         $extra_meta_tags = '';
-        $react_tags = $react_prod_tags;
+        $react_tags = Layout::$react_prod_tags;
     }
 
     $heading = <<<HTML

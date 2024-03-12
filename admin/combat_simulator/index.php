@@ -15,7 +15,7 @@ $player2_jutsu_type = $jutsu_type;
 ?>
 
 
-<a href='/admin/combat_simulator/vs.php'>VS</a>
+<a href='/admin/combat_simulator/vs_old.php'>VS</a>
 &nbsp;&nbsp;|&nbsp;&nbsp;
 <a href='/admin/combat_simulator/rank_curve.php'>Damage/Level Curve</a>
 &nbsp;&nbsp;|&nbsp;&nbsp;

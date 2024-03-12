@@ -60,9 +60,9 @@ function CancelTrainingDetails({
             <h2>Cancel Training</h2>
 
             {/* If player has partial gains benefits? */}
-            {playerData.hasPartialGainsBenefits : 
-            (<p>Are you certain you wish to cancel your training? You will not gain any of your potential <strong>{playerData.trainGains}</strong> gains.</p>) : 
-            (<p>{playerData.partialGain}</p>)}
+            {playerData.hasPartialGainsBenefits ?
+                (<p>Are you certain you wish to cancel your training? You will not gain any of your potential <strong>{playerData.trainGains}</strong> gains.</p>)
+                : (<p>{playerData.partialGain}</p>)}
 
             <button><a href={headers.selfLink + '&cancel_training=1&cancel_confirm=1'}>Confirm</a></button>
         </div>
