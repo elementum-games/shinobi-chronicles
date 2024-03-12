@@ -50,7 +50,7 @@ class TrainingManager {
     public int $base_jutsu_train_length;
     public int $jutsu_train_gain;
 
-    public function __construct(System $system, &$type, &$gain, &$time, $rank, $forbidden_seal, $rep, $team, $clan, $sensei, $bloodline_id, $policy, $village) {
+    public function __construct(System $system, &$type, &$gain, &$time, $rank, $forbidden_seal, $rep, $team, $clan, $sensei, $bloodline_id, $policy, Village $village) {
         $this->system = $system;
 
         $this->rank = $rank;
@@ -92,7 +92,7 @@ class TrainingManager {
 	    $this->stat_long_train_gain += $this->system->LONG_TRAIN_BOOST;
 	    $this->stat_extended_train_gain += ($this->system->LONG_TRAIN_BOOST * System::EXTENDED_BOOST_MULTIPLIER);
 
-        $this->training_speed_upgrade_multiplier = $village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_TRAINING_SPEED];
+        $this->village_training_speed_bonus = $village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_TRAINING_SPEED];
     }
 
     public function hasActiveTraining() {
