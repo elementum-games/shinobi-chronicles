@@ -5,7 +5,7 @@ class WarRecordDto {
     public WarLogDto $attacker_war_log;
     public WarLogDto $defender_war_log;
     public int $victory_percent_required;
-    public string $war_duration = "";
+    public int $war_duration = 0;
 
     public function __construct($village_relation, $attacker_war_log, $defender_war_log, $victory_percent_required, $war_duration) {
         $this->village_relation = $village_relation;
