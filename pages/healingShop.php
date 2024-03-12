@@ -12,9 +12,7 @@ function healingShop() {
 	global $player;
 	global $self_link;
 
-	if ($system->isDevEnvironment()) {
-        return require 'templates/ramen_shop_v2.php';
-    }
+	return require 'templates/ramen_shop_v2.php';
 
 	$rankManager = new RankManager($system);
 	$rankManager->loadRanks();
