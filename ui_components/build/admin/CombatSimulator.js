@@ -131,6 +131,7 @@ function FighterInput({
       case 'nin':
         setFighterFormData(prevData => ({
           ...prevData,
+          stats_preset: statPreset,
           ninjutsu_skill: offSkill * formOptions.statCap,
           taijutsu_skill: 0,
           genjutsu_skill: 0,
@@ -146,6 +147,7 @@ function FighterInput({
       case 'tai':
         setFighterFormData(prevData => ({
           ...prevData,
+          stats_preset: statPreset,
           ninjutsu_skill: 0,
           taijutsu_skill: offSkill * formOptions.statCap,
           genjutsu_skill: 0,
@@ -161,6 +163,7 @@ function FighterInput({
       case 'gen':
         setFighterFormData(prevData => ({
           ...prevData,
+          stats_preset: statPreset,
           ninjutsu_skill: 0,
           taijutsu_skill: 0,
           genjutsu_skill: offSkill * formOptions.statCap,
