@@ -8,6 +8,23 @@ require_once __DIR__ . '/BattleEffectsManager.php';
 require_once __DIR__ . '/BattleAttack.php';
 require_once __DIR__ . '/LegacyFighterAction.php';
 
+/*
+V0.12b balance changes
+
+x Elemental clash modifier reduced from 20% => 15%
+x Winning/losing Elemental Clash now increases/reduces jutsu effects by 10%.
+
+x Piercing no longer cuts through Resist Boost
+x Piercing now cuts through Substitution
+
+x Immolate now gets bonus damage based on # of residuals. The extra amount is 0.2x of immolate effect over 100% for each residual from second and onward.
+x Substitution now reduces incoming debuff effects
+x Substitution now reduces immolate damage at 0.65x effectiveness
+
+x Resist boost now uses diminishing returns instead of soft/hard cap
+
+ */
+
 class BattleManager {
     const SPEED_DAMAGE_REDUCTION_RATIO = 1; // e.g. 10% of your stats in speed = 10% evasion
     const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 1; // e.g. 10% of your stats in speed = 10% evasion
@@ -32,7 +49,7 @@ class BattleManager {
 
     const GENJUTSU_BARRIER_PENALTY = 37.5; // 37.5% reduction against Genjutsu (62.5% strength)
 
-    const ELEMENTAL_CLASH_MODIFIER = 0.15; // 15% damage loss and gain
+    const ELEMENTAL_CLASH_MODIFIER = 0.2; // 15% damage loss and gain
     const ELEMENTAL_CLASH_EFFECT_MODIFIER = 0.1; // 10% effect loss and gain
 
     // Extra boost to recoil damage to offset the typical losses when facing a high-speed build
@@ -1224,7 +1241,7 @@ class BattleManager {
         $player2_attack->applyElementalClash($p2_elemental_damage_modifier, $p2_elemental_effect_modifier);
 
         // Output piercing message
-        /* if ($player1_attack->piercing_percent > 0) {
+        if ($player1_attack->piercing_percent > 0) {
             $pierce_percent = round($player1_attack->piercing_percent * 100, 0);
             $player2->resist_boost *= 1 - $player1_attack->piercing_percent;
 
@@ -1234,7 +1251,7 @@ class BattleManager {
             $pierce_percent = round($player2_attack->piercing_percent * 100, 0);
             $player1->resist_boost *= 1 - $player2_attack->piercing_percent;
             $collision_displays[] = "{$player2->getName()} pierces {$pierce_percent}% of {$player1->getName()}'s defenses!";
-        }*/
+        }
 
         /* Calculate speed values */
         if($this->system->debug['jutsu_collision']) {
@@ -1627,9 +1644,9 @@ class BattleManager {
     protected function applySubstitution(BattleAttack $fighter_attack, BattleAttack $incoming_attack, bool $fighter_is_p1): string {
         $effect_reduced = false;
 
-        $fighter_attack->substitution_percent *= (1 - $incoming_attack->piercing_percent);
+        // $fighter_attack->substitution_percent *= (1 - $incoming_attack->piercing_percent);
         $incoming_attack->damage *= (1 - $fighter_attack->substitution_percent);
-        foreach($incoming_attack->effects as $effect) {
+        /* foreach($incoming_attack->effects as $effect) {
             if(in_array($effect->effect, BattleEffectsManager::DEBUFF_EFFECTS)) {
                 $effect_reduced = true;
                 $effect->effect_amount *= 1 - $fighter_attack->substitution_percent;
@@ -1638,7 +1655,7 @@ class BattleManager {
         if($incoming_attack->immolate_raw_damage > 0) {
             $incoming_attack->immolate_raw_damage *= 1 -
                 ($fighter_attack->substitution_percent * BattleEffectsManager::SUBSTITUTION_IMMO_EFFECTIVENESS);
-        }
+        }*/
 
 
         $block_percent = round($fighter_attack->substitution_percent * 100);

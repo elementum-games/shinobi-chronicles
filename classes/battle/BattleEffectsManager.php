@@ -900,12 +900,14 @@ class BattleEffectsManager {
             }
         }
 
+        return $immolate_raw_damage;
+
         // Apply immo bonus starting at 2 residuals
-        $immolate_bonus_multiplier = 1 + (($num_residual_effects - 1) * self::IMMO_EFFECT_BONUS_PER_STACK);
+        /*$immolate_bonus_multiplier = 1 + (($num_residual_effects - 1) * self::IMMO_EFFECT_BONUS_PER_STACK);
         $immolate_percent = 1 + (
             ($battleAttack->immolate_percent - 1) * $immolate_bonus_multiplier
         );
 
-        return $immolate_raw_damage * $immolate_percent;
+        return $immolate_raw_damage * $immolate_percent;*/
     }
 }
