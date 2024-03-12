@@ -72,7 +72,7 @@ require __DIR__ . '/../constraints/bloodline.php';
     <?= $system->isDevEnvironment() ? Layout::$react_dev_tags : Layout::$react_prod_tags ?>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
-<body>
+<body style='background: #2a2a2a;'>
     <link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/admin/CombatSimulator.css") ?>" />
     <div id="combatSimulatorReactContainer"></div>
     <script type="module" src="<?= $system->getReactFile("admin/CombatSimulator") ?>"></script>
