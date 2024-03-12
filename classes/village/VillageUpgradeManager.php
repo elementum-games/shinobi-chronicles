@@ -159,7 +159,7 @@ class VillageUpgradeManager {
                     if (isset($upgrade)) {
                         if ($upgrade->research_progress != null) {
                             $research_time_remaining = ($upgrade->research_progress_required - $upgrade->research_progress) / $village->research_speed;
-                            $research_time_remaining = System::TimeRemaining($research_time_remaining, format: "long", include_seconds: false, include_minutes: false);
+                            $research_time_remaining = System::timeFormat($research_time_remaining, format: "long", include_seconds: false, include_minutes: false);
                         } else {
                             $research_time_remaining = '';
                         }
@@ -198,7 +198,7 @@ class VillageUpgradeManager {
             }
             if ($building->construction_progress != null) {
                 $construction_time_remaining = ($building->construction_progress_required - $building->construction_progress) / $village->construction_speed;
-                $construction_time_remaining = System::TimeRemaining($construction_time_remaining, format: "long", include_seconds: false, include_minutes: false);
+                $construction_time_remaining = System::timeFormat($construction_time_remaining, format: "long", include_seconds: false, include_minutes: false);
             } else {
                 $construction_time_remaining = '';
             }

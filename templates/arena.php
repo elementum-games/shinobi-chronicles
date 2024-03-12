@@ -69,7 +69,7 @@
                         </svg>
                     </a>
                     <?php if (isset($player->ai_cooldowns[NPC::DIFFICULTY_EASY]) && time() < $player->ai_cooldowns[NPC::DIFFICULTY_EASY]): ?>
-                        <br /><span id="easy_cooldown"><?= System::timeRemaining($player->ai_cooldowns[NPC::DIFFICULTY_EASY] - time()) ?></span>
+                        <br /><span id="easy_cooldown"><?= System::timeFormat($player->ai_cooldowns[NPC::DIFFICULTY_EASY] - time()) ?></span>
                         <script type='text/javascript'>
                             countdownTimer(<?php echo ($player->ai_cooldowns[NPC::DIFFICULTY_EASY] - time()) ?>, 'easy_cooldown', false);
                         </script>
@@ -84,7 +84,7 @@
                         </svg>
                     </a>
                     <?php if (isset($player->ai_cooldowns[NPC::DIFFICULTY_NORMAL]) && time() < $player->ai_cooldowns[NPC::DIFFICULTY_NORMAL]): ?>
-                        <br /><span id="normal_cooldown"><?= System::timeRemaining($player->ai_cooldowns[NPC::DIFFICULTY_NORMAL] - time()) ?></span>
+                        <br /><span id="normal_cooldown"><?= System::timeFormat($player->ai_cooldowns[NPC::DIFFICULTY_NORMAL] - time()) ?></span>
                         <script type='text/javascript'>
                             countdownTimer(<?php echo ($player->ai_cooldowns[NPC::DIFFICULTY_NORMAL] - time()) ?>, 'normal_cooldown', false);
                         </script>
@@ -99,7 +99,7 @@
                         </svg>
                     </a>
                     <?php if (isset($player->ai_cooldowns[NPC::DIFFICULTY_HARD]) && time() < $player->ai_cooldowns[NPC::DIFFICULTY_HARD]): ?>
-                        <br /><span id="hard_cooldown"><?= System::timeRemaining($player->ai_cooldowns[NPC::DIFFICULTY_HARD] - time()) ?></span>
+                        <br /><span id="hard_cooldown"><?= System::timeFormat($player->ai_cooldowns[NPC::DIFFICULTY_HARD] - time()) ?></span>
                         <script type='text/javascript'>
                             countdownTimer(<?php echo ($player->ai_cooldowns[NPC::DIFFICULTY_HARD] - time()) ?>, 'hard_cooldown', false);
                         </script>

@@ -223,7 +223,7 @@ function missions(): bool {
     if(!$player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVE)) {
         $remaining = $player->mission_rep_cd - time();
         echo "<br /><br />You can gain village reputation in: <div id='rep_cd' style='display: inline-block'>"
-            . System::timeRemaining($remaining) . "</div>
+            . System::timeFormat($remaining) . "</div>
         <script type='text/javascript'>countdownTimer($remaining, 'rep_cd', false);</script>";
     }
     echo "</td></tr>

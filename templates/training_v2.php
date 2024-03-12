@@ -57,7 +57,7 @@
                     long: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_LONG, TrainingManager::$skill_types[0])?>",
                     extended: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_EXTENDED, TrainingManager::$skill_types[0])?>",
                     jutsuTrainingInfo: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_SHORT, 'jutsu:clone_combo'); ?>",
-                    timeRemaining: "<?= System::timeRemaining($player->train_time - time(), 'short', false) ?>",
+                    timeRemaining: "<?= System::timeFormat($player->train_time - time(), 'short', false) ?>",
                     trainingDisplay: "<?= $player->trainingManager->trainingDisplay() ?>",
                     trainType: "<?= $player->trainingManager->trainType() ?>",
                 },

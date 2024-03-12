@@ -249,7 +249,7 @@ class Layout {
 
         //  timer
         $time_remaining = (System::LOGOUT_LIMIT * 60) - (time() - $player->last_login);
-        $logout_time = System::timeRemaining($time_remaining, 'short', false, true) . " remaining";
+        $logout_time = System::timeFormat($time_remaining, 'short', false, true) . " remaining";
 
         $logout_display = $player->isUserAdmin() ? "Disabled" : $logout_time;
         echo str_replace("<!--LOGOUT_TIMER-->", $logout_display, $this->side_menu_end);
@@ -295,13 +295,13 @@ class Layout {
             $train_type = str_replace('jutsu:', '', $player->train_type);
             $display .= "<p class='trainingNotification'>Training: " . System::unSlug($train_type) . "<br />" .
                 "<span id='trainingTimer'>"
-                    . System::timeRemaining($player->train_time - time(), 'short', false, true)
+                    . System::timeFormat($player->train_time - time(), 'short', false, true)
                     . " remaining</span></p>";
         }
         else {
             $display .= "<p class='trainingNotification'>Training: " . System::unSlug($player->train_type) . "<br />" .
                 "<span id='trainingTimer'>"
-                . System::timeRemaining($player->train_time - time(), 'short', false, true)
+                . System::timeFormat($player->train_time - time(), 'short', false, true)
                 . " remaining</span></p>";
         }
 

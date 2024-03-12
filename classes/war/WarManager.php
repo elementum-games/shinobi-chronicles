@@ -826,7 +826,13 @@ class WarManager {
             $winning_village_id = $war->village2_id;
         }
         // check duration
-        $war_record = new WarRecordDto($war, $attacker_war_log, $defender_war_log, $victory_score_required);
+        $war_record = new WarRecordDto(
+            village_relation: $war,
+            attacker_war_log: $attacker_war_log,
+            defender_war_log: $defender_war_log,
+            victory_percent_required: $victory_score_required,
+            war_duration: $war_duration
+        );
         if ($war_duration <= $min_duration) {
             return [];
         } else if ($war_duration >= $max_duration) {

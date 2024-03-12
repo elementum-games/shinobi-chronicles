@@ -30,7 +30,7 @@ $clan_positions = array(
         <br />
 
         <?php if($player->isModerator()): ?>
-            (Last active <?= System::timeRemaining($last_active, 'long') ?> ago)
+            (Last active <?= System::timeFormat($last_active, 'long') ?> ago)
         <?php else: ?>
             <?php $days = floor($last_active / 86400); ?>
             <?php if($days == 0): ?>
@@ -222,21 +222,21 @@ $clan_positions = array(
                     ?>
                     <?php if($system->db->last_num_rows > 0): ?>
                         <?php $last_post = $system->db->fetch($result)['time']; ?>
-                        Last chat post: <?= System::timeRemaining(time() - $last_post, 'long') ?> ago<br />
+                        Last chat post: <?= System::timeFormat(time() - $last_post, 'long') ?> ago<br />
                     <?php endif; ?>
 
                     <!--// Last AI-->
-                    Last AI battle started: <?= System::timeRemaining((System::currentTimeMs() - $viewUser->last_ai_ms) / 1000, 'short') ?> ago<br />
+                    Last AI battle started: <?= System::timeFormat((System::currentTimeMs() - $viewUser->last_ai_ms) / 1000, 'short') ?> ago<br />
 
                     <!--// Current training-->
                     <?php $display = ''; ?>
                     <?php if(str_contains($viewUser->train_type, 'jutsu:')): ?>
                         <?php $train_type = str_replace('jutsu:', '', $viewUser->train_type) ?>
                         <br />Training: <?= ucwords(str_replace('_', ' ', $train_type)) ?><br />
-                            <?= System::timeRemaining($viewUser->train_time - time(), 'short', false, true) ?> remaining
+                            <?= System::timeFormat($viewUser->train_time - time(), 'short', false, true) ?> remaining
                     <?php else: ?>
                        <br />Training: <?= ucwords(str_replace('_', ' ', $viewUser->train_type)) ?><br />
-                            <?= System::timeRemaining($viewUser->train_time - time(), 'short', false, true) ?> remaining
+                            <?= System::timeFormat($viewUser->train_time - time(), 'short', false, true) ?> remaining
                     <?php endif; ?>
             <?php endif; ?>
         </td></tr>

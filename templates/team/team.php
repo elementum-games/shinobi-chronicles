@@ -45,7 +45,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
                 <?= $player->team->getBoostLabel() ?> (<?= $player->team->boost_amount ?>%)<br />
                 <br />
                 <b>Time Remaining:</b><br>
-                <?= $system->timeRemaining($player->team->boost_time + (60*60*24*7) - time(), 'long') ?>
+                <?= $system->timeFormat($player->team->boost_time + (60*60*24*7) - time(), 'long') ?>
             <?php else: ?>
                 None
             <?php endif; ?>

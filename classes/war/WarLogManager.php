@@ -287,7 +287,7 @@ class WarLogManager {
             if (isset($relation->relation_end)) {
                 $war_duration = "";
             } else {
-                $war_duration = System::timeRemaining(time() + 1000000 - $relation->relation_start, format: "long", include_seconds: false);
+                $war_duration = System::timeFormat(time() + 1000000 - $relation->relation_start, format: "long", include_seconds: false);
             }
 
             $war_records[] = new WarRecordDto($relation, $attacker_war_log, $defender_war_log, WarManager::getVictoryPercentRequired($system, $relation), $war_duration);

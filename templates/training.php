@@ -77,7 +77,7 @@
         <tr>
             <td style="text-align: center;" colspan="<?=($player->bloodline_id != 0 && $trainable_bl_jutsu) ? 4 : 3?>">
                 <?= $player->trainingManager->trainingDisplay(); ?>
-                <p id="train_time_remaining"><?= System::timeRemaining($player->train_time - time(), 'short', false) ?> Remaining</p>
+                <p id="train_time_remaining"><?= System::timeFormat($player->train_time - time(), 'short', false) ?> Remaining</p>
                 <script type="text/javascript">
                     countdownTimer(<?=$player->trainingManager->train_time_remaining?>, 'train_time_remaining');
                 </script>

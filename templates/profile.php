@@ -481,8 +481,8 @@ $clan_positions = [
 </table>
 
 <?php
-    $dt_time_remaining = System::timeRemaining(
-        time_remaining: $player->daily_tasks->last_reset + UserDailyTasks::TASK_RESET - time(),
+    $dt_time_remaining = System::timeFormat(
+        time_seconds: $player->daily_tasks->last_reset + UserDailyTasks::TASK_RESET - time(),
         format: 'short',
         include_days: false,
         include_seconds: true

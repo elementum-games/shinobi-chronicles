@@ -713,32 +713,39 @@ class System {
     /**
      * Static method of returning formatted time string
      * TODO: Consolidate timeRemaining functions to reduce duplicated code
-     * @var int $time_remaining
-     * @var string $format
-     * @var bool $include_days
-     * @var bool $include_seconds
+     *
+     * @param bool $include_days
+     * @param bool $include_seconds
+     * @param bool $include_minutes
      * @return string
+     * @var string $format
      */
-    public static function timeRemaining($time_remaining, $format = 'short', $include_days = true, $include_seconds = true, $include_minutes = true): string {
+    public static function timeFormat(
+        int $time_seconds,
+        string $format = 'short',
+        bool $include_days = true,
+        bool $include_seconds = true,
+        bool $include_minutes = true
+    ): string {
         if($include_days) {
-            $days = floor($time_remaining / 86400);
-            $time_remaining -= $days * 86400;
+            $days = floor($time_seconds / 86400);
+            $time_seconds -= $days * 86400;
         }
         else {
             $days = null;
         }
 
-        $hours = floor($time_remaining / 3600);
-        $time_remaining -= $hours * 3600;
+        $hours = floor($time_seconds / 3600);
+        $time_seconds -= $hours * 3600;
 
         if($include_seconds) {
-            $minutes = floor($time_remaining / 60);
-            $time_remaining -= $minutes * 60;
+            $minutes = floor($time_seconds / 60);
+            $time_seconds -= $minutes * 60;
 
-            $seconds = $time_remaining;
+            $seconds = $time_seconds;
         }
         else {
-            $minutes = ceil($time_remaining / 60);
+            $minutes = ceil($time_seconds / 60);
         }
 
         if($hours < 10 && $format == 'short') {

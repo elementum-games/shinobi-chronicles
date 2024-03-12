@@ -447,7 +447,7 @@ class VillageManager {
                     $has_kage = true;
                     $provisional_days_remaining = "";
                     if ($seat['is_provisional']) {
-                        $provisional_days_remaining = System::timeRemaining(time() - $seat['seat_start'], format: 'days');
+                        $provisional_days_remaining = System::timeFormat(time() - $seat['seat_start'], format: 'days');
                         $seats[] = new VillageSeatDto(
                             seat_key: 'kage',
                             seat_id: $seat['seat_id'],
@@ -2698,7 +2698,7 @@ class VillageManager {
 
         // Format
         foreach ($kageRecords as &$record) {
-            $time_held = System::timeRemaining($record['time_held'], format: 'days', include_seconds: false);
+            $time_held = System::timeFormat($record['time_held'], format: 'days', include_seconds: false);
             $seat_start = date("M jS Y", $record['seat_start']);
             $record['time_held'] = $time_held;
             $record['seat_start'] = $seat_start;

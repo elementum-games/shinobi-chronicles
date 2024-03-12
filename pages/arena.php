@@ -379,7 +379,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
  */
 function getArenaOpponent(string $difficulty_level, User $player, System $system): NPC {
     if (!empty($player->ai_cooldowns[$difficulty_level]) && time() < $player->ai_cooldowns[$difficulty_level]) {
-        throw new RuntimeException("Please wait " . System::timeRemaining($player->ai_cooldowns[$difficulty_level] - time()) . "s to start another battle of this difficulty.");
+        throw new RuntimeException("Please wait " . System::timeFormat($player->ai_cooldowns[$difficulty_level] - time()) . "s to start another battle of this difficulty.");
     }
     switch ($difficulty_level) {
         case NPC::DIFFICULTY_EASY:

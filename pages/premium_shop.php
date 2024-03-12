@@ -165,7 +165,7 @@ function premiumShop(): void {
                     . "Cost: {$premiumShopManager->statTransferPremiumCreditCost($transfer_amount, $transfer_speed)} AK / "
                     . "{$premiumShopManager->statTransferYenCost($transfer_amount, $transfer_speed)} yen<br />"
                     . " This will take "
-                    . System::timeRemaining($time * 60, 'long', true, true);
+                    . System::timeFormat($time * 60, 'long', true, true);
 
                 renderPurchaseConfirmation(
                     purchase_type: "stat_allocate",
@@ -192,7 +192,7 @@ function premiumShop(): void {
                     'Stat Transfer Started',
                     "You have started transferring {$transfer_amount} " . System::unSlug($original_stat)
                     . " to " . System::unSlug($target_stat) . ". This will take "
-                    . System::timeRemaining($time * 60, 'long', true, true)
+                    . System::timeFormat($time * 60, 'long', true, true)
 
                 );
             }
