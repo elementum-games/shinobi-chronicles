@@ -1526,17 +1526,25 @@ class BattleManager {
             apply_effects: false
         );
 
-        // Barriers - We do not apply evasion boosts/nerfs
+        // Barriers/Recoils - We do not apply evasion boosts/nerfs
         if($player1_base_evasion_percent >= $player2_base_evasion_percent) {
             $damage_reduction = $this->getEvasionDamageReduction($player1_base_evasion_percent - $player2_base_evasion_percent);
             if($damage_reduction >= 0.01) {
                 $player2->barrier *= 1 - $damage_reduction;
+
+                if($player1_attack->recoil_raw_damage) {
+                    $player1_attack->recoil_raw_damage *= 1 - $damage_reduction;
+                }
             }
         }
         else if($player2_base_evasion_percent > $player1_base_evasion_percent) {
             $damage_reduction = $this->getEvasionDamageReduction($player2_base_evasion_percent - $player1_base_evasion_percent);
             if($damage_reduction >= 0.01) {
                 $player1->barrier *= 1 - $damage_reduction;
+
+                if($player2_attack->recoil_raw_damage) {
+                    $player2_attack->recoil_raw_damage *= 1 - $damage_reduction;
+                }
             }
         }
 
