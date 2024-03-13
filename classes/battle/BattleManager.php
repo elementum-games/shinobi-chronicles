@@ -840,7 +840,6 @@ class BattleManager {
             $attack_jutsu = $jutsu;
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_DEFAULT) {
-            print_r($fighter->default_jutsu);
             $attack_jutsu = $fighter->default_jutsu[$action->jutsu_id];
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASABLE) {
