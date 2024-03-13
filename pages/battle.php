@@ -155,7 +155,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         }*/
 
         if (!$player->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_WARRIOR)) {
-            $player->fatigue += Battle::FATIGUE_PER_BATTLE;
+            $player->battle_fatigue_count += 1;
         }
 
         $village_point_gain = 1 + $player->village->policy->pvp_village_point;
