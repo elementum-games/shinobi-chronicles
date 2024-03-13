@@ -2159,11 +2159,14 @@ class User extends Fighter {
     }
 
     public function maxConsumableHealAmountPercent(): int {
+        $total_fatigue = ($this->battle_fatigue_count - 1) * Battle::FATIGUE_PER_BATTLE;
+        $total_fatigue = max($total_fatigue, 0);
+
         if($this->battle_id) {
-            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT - ($this->battle_fatigue_count * Battle::FATIGUE_PER_BATTLE);
+            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT - $total_fatigue;
         }
         if($this->consumableHealReductionMsLeft() > 0) {
-            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT - ($this->battle_fatigue_count * Battle::FATIGUE_PER_BATTLE);
+            return Battle::MAX_PRE_FIGHT_HEAL_PERCENT - $total_fatigue;
         }
 
         return 100;
