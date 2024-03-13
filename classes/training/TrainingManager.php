@@ -73,9 +73,9 @@ class TrainingManager {
         $this->base_jutsu_train_length = self::BASE_TRAIN_TIME;
 	    $this->jutsu_train_gain = User::$jutsu_train_gain;
 
-        // 56.25% of standard
+        // 60% of standard
 	    $this->stat_long_train_length = self::BASE_TRAIN_TIME * 4;
-	    $this->stat_long_train_gain = $this->stat_train_gain * 2.25;
+	    $this->stat_long_train_gain = $this->stat_train_gain * 2.4;
 
         // 30x length (5 hrs), 15x gains: 50% of standard
         $this->stat_extended_train_length = self::BASE_TRAIN_TIME * 30;
