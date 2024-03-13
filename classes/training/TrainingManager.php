@@ -77,9 +77,9 @@ class TrainingManager {
 	    $this->stat_long_train_length = self::BASE_TRAIN_TIME * 4;
 	    $this->stat_long_train_gain = $this->stat_train_gain * 2.25;
 
-        // 30x length (5 hrs), 12x gains: 40% of standard
+        // 30x length (5 hrs), 15x gains: 50% of standard
         $this->stat_extended_train_length = self::BASE_TRAIN_TIME * 30;
-	    $this->stat_extended_train_gain = $this->stat_train_gain * 12;
+	    $this->stat_extended_train_gain = $this->stat_train_gain * 15;
 
 	    // Forbidden seal trainings boost
         $this->stat_long_train_length *= $this->forbidden_seal->long_training_time;
