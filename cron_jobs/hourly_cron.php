@@ -105,6 +105,7 @@ function hourlyCron(System $system, $debug = true): void {
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);
     }
+
     // handle research and construction
     foreach ($villages as $village) {
         foreach ($village->upgrades as $upgrade) {
@@ -149,7 +150,8 @@ function hourlyCron(System $system, $debug = true): void {
                     $queries[] = "UPDATE `village_buildings` SET `status` = '{$building->status}', `construction_progress` = NULL, `construction_progress_required` = NULL, `construction_progress_last_updated` = {$building->construction_progress_last_updated}, `tier` = {$building->tier}, `construction_boosted` = 0, `health` = {$building->health} WHERE `village_id` = {$village->village_id} AND `id` = {$building->id}";
                     $village->construction_score = VillageUpgradeManager::calcConstructionScore($system, $village);
                     $queries[] = "UPDATE `villages` SET `construction_score` = {$village->construction_score} WHERE `village_id` = {$village->village_id}";
-                } else {
+                }
+                else {
                     $queries[] = "UPDATE `village_buildings` SET `construction_progress` = {$building->construction_progress}, `construction_progress_last_updated` = {$building->construction_progress_last_updated} WHERE `village_id` = {$village->village_id} AND `id` = {$building->id}";
                 }
             }
@@ -171,6 +173,7 @@ function hourlyCron(System $system, $debug = true): void {
             (`village_id`, `resource_id`, `type`, `quantity`, `time`)
             VALUES ({$village->village_id}, " . WarManager::RESOURCE_WEALTH . ", " . VillageManager::RESOURCE_LOG_UPGRADE_UPKEEP . ", " . $upkeep[WarManager::RESOURCE_WEALTH] . ", " . time() . ")";
     }
+
     // apply resource decay
     $decay_rate = (VillageManager::EXCESS_RESOURCE_DECAY_PER_DAY / 24) / 100;
     foreach ($villages as $village) {
@@ -196,6 +199,7 @@ function hourlyCron(System $system, $debug = true): void {
             }
         }
     }
+
     // trigger victory conditions
     $war_type = VillageRelation::RELATION_WAR;
     $query = "SELECT * FROM `village_relations` WHERE `relation_type` = {$war_type} AND `relation_end` IS NULL";
@@ -205,6 +209,7 @@ function hourlyCron(System $system, $debug = true): void {
         $war = new VillageRelation($war_data);
         $queries = array_merge($queries, WarManager::getHandleVictoryQueries($system, $war));
     }
+
     // apply base production
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);

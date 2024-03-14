@@ -123,6 +123,11 @@ class Village {
                 $this->research_speed += ($num_villages * $this->policy->research_speed) / 100;
             }
         }
+
+        if($system->isDevEnvironment()) {
+            $this->construction_speed *= 20;
+            $this->research_speed *= 20;
+        }
     }
 
     private function getVillageData()

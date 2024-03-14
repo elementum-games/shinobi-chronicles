@@ -215,6 +215,7 @@ class VillageUpgradeManager {
                 construction_progress_required: $building->construction_progress_required,
                 construction_progress_last_updated: $building->construction_progress_last_updated,
                 construction_boosted: $building->construction_boosted,
+                construction_time_remaining: $construction_time_remaining,
                 name: $building->getName(),
                 description: $building->getDescription(),
                 phrase: $building->getPhrase(),
@@ -223,7 +224,6 @@ class VillageUpgradeManager {
                 food_construction_cost: $building->construction_progress != null ? 0 : $building->getConstructionCostFood($building->tier + 1),
                 wealth_construction_cost: $building->construction_progress != null ? 0 : $building->getConstructionCostWealth($building->tier + 1),
                 construction_time: $building->construction_progress != null ? round($building->getConstructionTime($building->tier + 1) * (($building->construction_progress_required - $building->construction_progress) / $building->construction_progress_required)) : $building->getConstructionTime($building->tier + 1),
-                construction_time_remaining: $construction_time_remaining,
                 upgrade_sets: $upgrade_sets,
                 requirements_met: VillageUpgradeManager::checkConstructionRequirementsMet($village, $building->key, $building->tier + 1),
             );
