@@ -1207,20 +1207,24 @@ class BattleManager {
         $p1_elemental_damage_modifier = $this->getElementalModifier(
             $player1_attack, $player2_attack,self::ELEMENTAL_CLASH_MODIFIER
         );
-        $p1_elemental_effect_modifier = $this->getElementalModifier(
-            $player1_attack, $player2_attack, self::ELEMENTAL_CLASH_EFFECT_MODIFIER
-        );
-        $player1->barrier *= $p1_elemental_damage_modifier;
-        $player1_attack->applyElementalClash($p1_elemental_damage_modifier, $p1_elemental_effect_modifier);
-
         $p2_elemental_damage_modifier = $this->getElementalModifier(
             $player2_attack, $player1_attack, self::ELEMENTAL_CLASH_MODIFIER
+        );
+
+        $p1_elemental_effect_modifier = $this->getElementalModifier(
+            $player1_attack, $player2_attack, self::ELEMENTAL_CLASH_EFFECT_MODIFIER
         );
         $p2_elemental_effect_modifier = $this->getElementalModifier(
             $player2_attack, $player1_attack,self::ELEMENTAL_CLASH_EFFECT_MODIFIER
         );
+
+        $player1->barrier *= $p1_elemental_damage_modifier;
         $player2->barrier *= $p2_elemental_damage_modifier;
-        $player2_attack->applyElementalClash($p2_elemental_damage_modifier, $p2_elemental_effect_modifier);
+
+        if($player1_attack->use_type != Jutsu::USE_TYPE_BUFF && $player2_attack != Jutsu::USE_TYPE_BUFF) {
+            $player1_attack->applyElementalClash($p1_elemental_damage_modifier, $p1_elemental_effect_modifier);
+            $player2_attack->applyElementalClash($p2_elemental_damage_modifier, $p2_elemental_effect_modifier);
+        }
 
         // Output piercing message
         /* if ($player1_attack->piercing_percent > 0) {
