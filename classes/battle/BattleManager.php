@@ -30,7 +30,7 @@ class BattleManager {
     const HEAL_SOFT_CAP_RATIO = 0.65; // heal beyond soft cap only 65% as effective
     const HEAL_HARD_CAP = 0.65; // caps at 65% previous turn damage heal
 
-    const GENJUTSU_BARRIER_PENALTY = 37.5; // 37.5% reduction against Genjutsu (62.5% strength)
+    const GENJUTSU_BARRIER_PIERCING = 25; // 25% reduction against Genjutsu (75% strength)
 
     const ELEMENTAL_CLASH_MODIFIER = 0.15; // 15% damage loss and gain
     const ELEMENTAL_CLASH_EFFECT_MODIFIER = 0.1; // 10% effect loss and gain
@@ -1598,7 +1598,7 @@ class BattleManager {
     protected function applyBarrier(Fighter $barrier_user, BattleAttack $incoming_attack, bool $barrier_user_is_p1): string {
         // Apply penalty against Genjutsu
         if ($incoming_attack->jutsu_type == JutsuOffenseType::GENJUTSU) {
-            $barrier_user->barrier *= 1 - (self::GENJUTSU_BARRIER_PENALTY / 100);
+            $barrier_user->barrier *= 1 - (self::GENJUTSU_BARRIER_PIERCING / 100);
         }
 
         // Apply piercing
@@ -1646,7 +1646,6 @@ class BattleManager {
             $incoming_attack->immolate_raw_damage *= 1 -
                 ($fighter_attack->substitution_percent * BattleEffectsManager::SUBSTITUTION_IMMO_EFFECTIVENESS);
         }
-
 
         $block_percent = round($fighter_attack->substitution_percent * 100);
 
