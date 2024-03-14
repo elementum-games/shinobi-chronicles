@@ -39,7 +39,8 @@ class TrainingManager {
     ];
     const BASE_TRAIN_TIME = 600;
     const BASE_STAT_GAIN = 4;
-    const LONG_MODIFIER = 2.15;
+    const LONG_MODIFIER = 2.4;
+    const EXTENDED_MODIFIER = 15;
 
     public int $stat_train_gain;
     public int $stat_long_train_gain;
@@ -75,11 +76,11 @@ class TrainingManager {
 
         // 60% of standard
 	    $this->stat_long_train_length = self::BASE_TRAIN_TIME * 4;
-	    $this->stat_long_train_gain = $this->stat_train_gain * 2.4;
+	    $this->stat_long_train_gain = $this->stat_train_gain * self::LONG_MODIFIER;
 
         // 30x length (5 hrs), 15x gains: 50% of standard
         $this->stat_extended_train_length = self::BASE_TRAIN_TIME * 30;
-	    $this->stat_extended_train_gain = $this->stat_train_gain * 15;
+	    $this->stat_extended_train_gain = $this->stat_train_gain * self::EXTENDED_MODIFIER;
 
 	    // Forbidden seal trainings boost
         $this->stat_long_train_length *= $this->forbidden_seal->long_training_time;
@@ -132,7 +133,7 @@ class TrainingManager {
                     $gain += $this->system->LONG_TRAIN_BOOST;
                     return round($gain);
                 case self::TRAIN_LEN_EXTENDED:
-                    $gain = $base_gains * 12;
+                    $gain = $base_gains * self::EXTENDED_MODIFIER;
                     // Forbidden seal
                     $gain = round($gain * $this->forbidden_seal->extended_training_gains);
                     // Reputation enhancement
