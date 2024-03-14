@@ -201,19 +201,19 @@ function nameColorDisplay(array $name_colors): string {
         <th>Equipment</th>
         <td></td>
         <td>
-            +<?=$twinSeal->extra_jutsu_equips?> jutsu equip slots<br/>
-            +<?=$twinSeal->extra_weapon_equips?> weapon equip slots<br/>
-            +<?=$twinSeal->extra_armor_equips?> armor equip slots<br/>
+            <?=$twinSeal->extra_jutsu_equips?> bonus jutsu slot(s)<br/>
+            <?php /*=$twinSeal->extra_weapon_equips*/?><!-- weapon equip slot(s)<br/>
+            <?php /*=$twinSeal->extra_armor_equips*/?> armor equip slot(s)<br/>-->
         </td>
         <td>
-            +<?=$fourDragonSeal->extra_jutsu_equips?> jutsu equip slots<br/>
-            +<?=$fourDragonSeal->extra_weapon_equips?> weapon equip slots<br/>
-            +<?=$fourDragonSeal->extra_armor_equips?> armor equip slots<br/>
+            <?=$fourDragonSeal->extra_jutsu_equips?> bonus jutsu slot(s)<br/>
+            <?php /*=$fourDragonSeal->extra_weapon_equips*/?><!-- weapon equip slots<br/>
+            <?php /*=$fourDragonSeal->extra_armor_equips*/?> armor equip slots<br/>-->
         </td>
         <td>
-            +<?=$eightDeitiesSeal->extra_jutsu_equips?> jutsu equip slots<br/>
-            +<?=$eightDeitiesSeal->extra_weapon_equips?> weapon equip slots<br/>
-            +<?=$eightDeitiesSeal->extra_armor_equips?> armor equip slots<br/>
+            <?=$eightDeitiesSeal->extra_jutsu_equips?> bonus jutsu slot(s)<br/>
+            <?php /*=$eightDeitiesSeal->extra_weapon_equips*/?><!-- weapon equip slots<br/>
+            <?php /*=$eightDeitiesSeal->extra_armor_equips*/?> armor equip slots<br/>-->
         </td>
     </tr>
     <tr>
