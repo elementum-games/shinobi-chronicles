@@ -1221,7 +1221,7 @@ class BattleManager {
         $player1->barrier *= $p1_elemental_damage_modifier;
         $player2->barrier *= $p2_elemental_damage_modifier;
 
-        if($player1_attack->use_type != Jutsu::USE_TYPE_BUFF && $player2_attack != Jutsu::USE_TYPE_BUFF) {
+        if($player1_attack->use_type != Jutsu::USE_TYPE_BUFF && $player2_attack->use_type != Jutsu::USE_TYPE_BUFF) {
             $player1_attack->applyElementalClash($p1_elemental_damage_modifier, $p1_elemental_effect_modifier);
             $player2_attack->applyElementalClash($p2_elemental_damage_modifier, $p2_elemental_effect_modifier);
         }
