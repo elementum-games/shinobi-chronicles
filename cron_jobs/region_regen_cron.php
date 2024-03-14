@@ -124,7 +124,10 @@ function processRegionRegenInterval(System $system, $debug = true): void
                     // get castle reference
                     $castle = &$region_location;
                     break;
-                case 'village';
+                case 'village':
+                    if ($region_location['stability'] >= 0 && $region_location['rebellion_active']) {
+                        $region_location['rebellion_active'] = 0;
+                    }
                     if ($region_location['rebellion_active']) {
                         $damage = (WarManager::BASE_REBELLION_DAMAGE_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES) * max((1 + (-1 * $region_location['stability'] / 100)), 0);
                         $region_location['health'] = max($region_location['health'] - $damage, 0);
