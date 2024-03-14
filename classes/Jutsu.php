@@ -387,6 +387,7 @@ class Jutsu {
         }
 
         $cr_discount_per_turn_multiplier = 0.005; // 0.5% discount
+        $barrier_power_discount = 0.05; // 5% discount
 
         // For calculating resid/vuln synergy
         $residual_effect_info = [];
@@ -577,6 +578,9 @@ class Jutsu {
         // Discounts
         $total_utility -= $compound_residual_discount;
         $total_utility -= $recoil_self_damage;
+        if($this->use_type == Jutsu::USE_TYPE_BARRIER) {
+            $total_utility -= $capped_power * $barrier_power_discount;
+        }
 
         return $total_utility;
 
