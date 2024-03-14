@@ -200,7 +200,11 @@ function nameColorDisplay(array $name_colors): string {
     <tr>
         <th>Equipment</th>
         <td></td>
-        <td></td>
+        <td>
+            +<?=$twinSeal->extra_jutsu_equips?> jutsu equip slots<br/>
+            +<?=$twinSeal->extra_weapon_equips?> weapon equip slots<br/>
+            +<?=$twinSeal->extra_armor_equips?> armor equip slots<br/>
+        </td>
         <td>
             +<?=$fourDragonSeal->extra_jutsu_equips?> jutsu equip slots<br/>
             +<?=$fourDragonSeal->extra_weapon_equips?> weapon equip slots<br/>

@@ -108,8 +108,8 @@ class PremiumShopManager {
                 90 => $this->calcSealDiscount($this->costs['forbidden_seal_monthly_cost'][3] * 3, self::EDS_90_DAY_DISCOUNT)
             ]
         ];
-        $this->costs['element_change'] = $this->system->isDevEnvironment() ? 0 : 10;
-        $this->costs['village_change'] = $this->system->isDevEnvironment() ? 0 : 5 * $this->player->village_changes;
+        $this->costs['element_change'] = 10;
+        $this->costs['village_change'] = 5 * $this->player->village_changes;
         $this->costs['clan_change'] = 5 * $this->player->clan_changes;
         if ($this->costs['village_change'] > 40) {
             $this->costs['village_change'] = 40;
@@ -120,6 +120,20 @@ class PremiumShopManager {
 
         $this->costs['reset_ai_battles'] = 10;
         $this->costs['reset_pvp_battles'] = 20;
+
+        // Dev Overrides
+        if($this->system->isDevEnvironment()) {
+            $this->costs['element_change'] = 0;
+            $this->costs['village_change'] = 0;
+            $this->costs['forbidden_seal_monthly_cost'] = array_map(function(){
+                return 0;
+            }, $this->costs['forbidden_seal_monthly_cost']);
+            $this->costs['forbidden_seal'] = array_map(function($tier_package_costs){
+                return array_map(function() {
+                    return 0;
+                }, $tier_package_costs);
+            }, $this->costs['forbidden_seal']);
+        }
     }
 
     private function calcSealDiscount(int $cost, float $discount_rate): int {

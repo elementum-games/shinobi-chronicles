@@ -180,9 +180,9 @@ class ForbiddenSeal {
             'armor' => 0,
         ],
         1 => [
-            'jutsu' => 0,
-            'weapon' => 0,
-            'armor' => 0,
+            'jutsu' => 1,
+            'weapon' => 1,
+            'armor' => 1,
         ],
         2 => [
             'jutsu' => 1,

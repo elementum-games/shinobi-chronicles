@@ -50,7 +50,8 @@ function premiumShop(): void {
         } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
-    } else if (isset($_POST['name_change'])) {
+    }
+    else if (isset($_POST['name_change'])) {
         $new_name = $system->db->clean($_POST['new_name']);
 
         try {
@@ -77,7 +78,8 @@ function premiumShop(): void {
         } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
-    } else if (isset($_POST['change_gender'])) {
+    }
+    else if (isset($_POST['change_gender'])) {
         try {
             $new_gender = $system->db->clean($_POST['new_gender']);
 
@@ -102,7 +104,8 @@ function premiumShop(): void {
         } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
-    } else if (isset($_POST['stat_reset'])) {
+    }
+    else if (isset($_POST['stat_reset'])) {
         try {
             $stat = $system->db->clean($_POST['stat']);
             if (!in_array($stat, $player->stats)) {
@@ -133,7 +136,8 @@ function premiumShop(): void {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    } else if (isset($_POST['stat_allocate'])) {
+    }
+    else if (isset($_POST['stat_allocate'])) {
         try {
             $original_stat = $system->db->clean($_POST['original_stat']);
             $target_stat = $system->db->clean($_POST['target_stat']);
@@ -200,7 +204,8 @@ function premiumShop(): void {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    } else if (isset($_POST['reset_ai_battles'])) {
+    }
+    else if (isset($_POST['reset_ai_battles'])) {
         try {
             $cost = $premiumShopManager->costs['reset_ai_battles'];
             if ($player->getPremiumCredits() < $cost) {
@@ -226,7 +231,8 @@ function premiumShop(): void {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    } else if (isset($_POST['reset_pvp_battles'])) {
+    }
+    else if (isset($_POST['reset_pvp_battles'])) {
         try {
             $cost = $premiumShopManager->costs['reset_pvp_battles'];
             if ($player->getPremiumCredits() < $cost) {
@@ -252,7 +258,8 @@ function premiumShop(): void {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    } else if (isset($_POST['purchase_bloodline'])) {
+    }
+    else if (isset($_POST['purchase_bloodline'])) {
         try {
             $self_link .= '&view=bloodlines';
             $bloodline_id = (int) $_POST['bloodline_id'];
@@ -343,7 +350,8 @@ function premiumShop(): void {
         } catch (RuntimeException $e) {
             $system->message($e->getMessage());
         }
-    } else if (isset($_POST['purchase_bloodline_random'])) {
+    }
+    else if (isset($_POST['purchase_bloodline_random'])) {
         try {
             $bloodline_rank = (int) $_POST['bloodline_rank'];
             $self_link .= '&view=bloodlines';
