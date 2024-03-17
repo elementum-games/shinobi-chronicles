@@ -475,6 +475,7 @@ class RamenShopManager {
      * @return ActionResult
      */
     public static function purchaseBasicRamen(System $system, User $player, string $ramen_key): ActionResult {
+	if (self::checkLocationValid($system, $player)) {return ActionResult::failed("Invalid location!");}
         $ramen_options = self::getBasicRamen($system, $player);
         $ramen = $ramen_options[$ramen_key];
         if (!isset($ramen)) {
@@ -505,6 +506,7 @@ class RamenShopManager {
      * @return ActionResult
      */
     public static function purchaseSpecialRamen(System $system, User $player, string $ramen_key): ActionResult {
+    	if (self::checkLocationValid($system, $player)) {return ActionResult::failed("Invalid location!");}
         $ramen_options = self::getSpecialRamen($system, $player);
         $ramen = $ramen_options[$ramen_key];
         if (!isset($ramen)) {
@@ -531,6 +533,7 @@ class RamenShopManager {
      * @return ActionResult
      */
     public static function purchaseMysteryRamen(System $system, User $player): ActionResult {
+	if (self::checkLocationValid($system, $player)) {return ActionResult::failed("Invalid location!");}
         $mystery_ramen = self::getMysteryRamen($player);
         if (!$mystery_ramen->mystery_ramen_unlocked) {
             return ActionResult::failed("Mystery ramen is not available!");
@@ -640,5 +643,16 @@ class RamenShopManager {
                 `purchase_count_since_last_mystery` = {$ramen_data->purchase_count_since_last_mystery}
             WHERE `id` = {$ramen_data->id}
         ");
+    }
+
+    private static function checkLocationValid(System $system, User $player): bool {
+	if ($player->battle_id > 0) {return false;}
+    	$result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
+	$location_result = $system->db->fetch($result);
+	$colosseum_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
+        if (!$player->location->equals($colosseum_coords) && !$player->location->equals($player->village_location)) {
+	    return false;
+	}
+        return true;
     }
 }
