@@ -95,7 +95,7 @@
     <br />
 
     <label for="power">Power:</label>
-    <input type="number" name="<?= $fieldName("power") ?>" step="0.1" value="<?= $form_data['power'] ?>" min="1.0"><br />
+    <input type="number" name="<?= $fieldName("power") ?>" step="0.05" value="<?= $form_data['power'] ?>" min="1.0"><br />
 
     <label for="range">Range:</label>
     <input type="number" name="<?= $fieldName("range") ?>" step="1" value="<?= $form_data['range'] ?>" min="1" max="10"><br />
