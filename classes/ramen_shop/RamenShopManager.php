@@ -474,7 +474,7 @@ class RamenShopManager {
      * @param string $ramen_key
      * @return ActionResult
      */
-    public static function purchaseBasicRamen(System $system, User $player, string $ramen_key): ActionResult {\
+    public static function purchaseBasicRamen(System $system, User $player, string $ramen_key): ActionResult {
 	if (self::checkLocationValid($system, $player) {return ActionResult::failed("Invalid location!");}
         $ramen_options = self::getBasicRamen($system, $player);
         $ramen = $ramen_options[$ramen_key];
