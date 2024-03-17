@@ -27,6 +27,10 @@ class ProposalManager {
 
     private static function getLastProposalData($system, $player): array {
         $query = $system->db->query("SELECT * FROM `proposals` WHERE `user_id` = {$player->user_id} ORDER BY `start_time` DESC LIMIT 1");
-        return $system->db->fetch($query);
+        $result = $system->db->fetch($query);
+        if ($system->db->last_num_rows == 0) {
+            return [];
+        }
+        return $result;
     }
 }
