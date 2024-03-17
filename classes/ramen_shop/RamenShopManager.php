@@ -646,6 +646,7 @@ class RamenShopManager {
     }
 
     private static function checkLocationValid(System $system, User $player): bool {
+	if ($player->battle_id > 0) {return false;}
     	$result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
 	$location_result = $system->db->fetch($result);
 	$colosseum_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
