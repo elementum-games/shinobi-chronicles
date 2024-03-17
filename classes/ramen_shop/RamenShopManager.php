@@ -475,7 +475,7 @@ class RamenShopManager {
      * @return ActionResult
      */
     public static function purchaseBasicRamen(System $system, User $player, string $ramen_key): ActionResult {
-	if (self::checkLocationValid($system, $player) {return ActionResult::failed("Invalid location!");}
+	if (self::checkLocationValid($system, $player)) {return ActionResult::failed("Invalid location!");}
         $ramen_options = self::getBasicRamen($system, $player);
         $ramen = $ramen_options[$ramen_key];
         if (!isset($ramen)) {
@@ -506,7 +506,7 @@ class RamenShopManager {
      * @return ActionResult
      */
     public static function purchaseSpecialRamen(System $system, User $player, string $ramen_key): ActionResult {
-    	if (self::checkLocationValid($system, $player) {return ActionResult::failed("Invalid location!");}
+    	if (self::checkLocationValid($system, $player)) {return ActionResult::failed("Invalid location!");}
         $ramen_options = self::getSpecialRamen($system, $player);
         $ramen = $ramen_options[$ramen_key];
         if (!isset($ramen)) {
@@ -533,7 +533,7 @@ class RamenShopManager {
      * @return ActionResult
      */
     public static function purchaseMysteryRamen(System $system, User $player): ActionResult {
-	if (self::checkLocationValid($system, $player) {return ActionResult::failed("Invalid location!");}
+	if (self::checkLocationValid($system, $player)) {return ActionResult::failed("Invalid location!");}
         $mystery_ramen = self::getMysteryRamen($player);
         if (!$mystery_ramen->mystery_ramen_unlocked) {
             return ActionResult::failed("Mystery ramen is not available!");
