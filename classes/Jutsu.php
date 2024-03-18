@@ -445,7 +445,7 @@ class Jutsu {
                     $compound_residual_discount += $compound_residual_effect_percent * ($cr_discount_per_turn_multiplier * $effect->effect_length);
                     break;
                 case 'recoil':
-                    $recoil_effect_percent += $capped_effect_amount * $effect->effect_length;
+                    $recoil_effect_percent += $capped_effect_amount;
                     break;
                 case 'immolate':
                     $total_effect_utility += max(0, self::BALANCE_EFFECT_RATIOS['immolate'] * ($capped_effect_amount - 1));
