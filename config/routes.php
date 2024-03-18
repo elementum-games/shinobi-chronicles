@@ -144,7 +144,7 @@ return $routes = [
         title: 'View Battles',
         function_name: 'viewBattles',
         menu: Route::MENU_ACTIVITY,
-        battle_ok: false,
+        battle_ok: true,
     ),
 
     // Village Menu

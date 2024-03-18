@@ -1272,14 +1272,14 @@ class BattleManager {
         }
 
         // Substitution
-        if ($player1_attack->substitution_percent > 0 && $player2_attack->isDirectDamage()) {
+        if ($player1_attack->substitution_percent > 0 && $player2_attack->use_type != Jutsu::USE_TYPE_BUFF) {
             $collision_displays[] = $this->applySubstitution(
                 fighter_attack: $player1_attack,
                 incoming_attack: $player2_attack,
                 fighter_is_p1: true
             );
         }
-        if ($player2_attack->substitution_percent > 0 && $player1_attack->isDirectDamage()) {
+        if ($player2_attack->substitution_percent > 0 && $player1_attack->use_type != Jutsu::USE_TYPE_BUFF) {
             $collision_displays[] = $this->applySubstitution(
                 fighter_attack: $player2_attack,
                 incoming_attack: $player1_attack,
