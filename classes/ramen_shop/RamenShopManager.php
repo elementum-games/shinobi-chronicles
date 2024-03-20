@@ -252,7 +252,7 @@ class RamenShopManager {
             $ramenOwnerDto->background = self::RAMEN_SHOP_OWNER_BACKGROUNDS_BY_VILLAGE["colosseum"];
             $ramenOwnerDto->basic_menu_description = self::RAMEN_SHOP_BASIC_MENU_DESCRIPTIONS_BY_VILLAGE["colosseum"];
         }
-        if ($player->ramen_data->mystery_ramen_available) {
+        if ($player->ramen_data->mystery_ramen_available && $player->village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_MYSTERY_RAMEN_ENABLED]) {
             $ramenOwnerDto->name = self::RAMEN_SHOP_OWNER_NAMES_BY_VILLAGE["mystery"];
             $ramenOwnerDto->image = self::RAMEN_SHOP_OWNER_IMAGES_BY_VILLAGE["mystery"];
             $ramenOwnerDto->dialogue = self::RAMEN_SHOP_DIALOGUE_OPTIONS_BY_VILLAGE["mystery"][array_rand(self::RAMEN_SHOP_DIALOGUE_OPTIONS_BY_VILLAGE["mystery"])];
