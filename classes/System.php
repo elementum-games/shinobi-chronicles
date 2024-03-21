@@ -147,8 +147,8 @@ class System {
     const WAR_ENABLED = true;
     const REQUIRE_USER_VERIFICATION = false;
 
-    const VERSION_NUMBER = '0.11';
-    const VERSION_NAME = '0.11 Warring Shadows';
+    const VERSION_NUMBER = '0.12';
+    const VERSION_NAME = '0.12 Warring Shadows';
 
     const LOGOUT_LIMIT = 720;
     const MAX_LINK_DISPLAY_LENGTH = 60;
