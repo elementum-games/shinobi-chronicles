@@ -9,8 +9,7 @@ function arena(): bool {
 	global $player;
 	global $self_link;
 
-    $fight_timer = System::ARENA_COOLDOWN;
-
+    $max_last_ai_ms = System::currentTimeMs() - System::ARENA_COOLDOWN;
     // 1.5 second cooldown on entering arena fight after a PvP
     $max_last_pvp_ms = System::currentTimeMs() - 1500;
 
@@ -50,16 +49,15 @@ function arena(): bool {
 		$ai_opponents = array();
 
         if(!empty($_GET['difficulty'])) {
-            $max_last_ai_ms = System::currentTimeMs() - $fight_timer;
             // check if the current location disallows ai fights
             if ($player->rank_num > 2 && $player->current_location->location_id && $player->current_location->ai_allowed == 0) {
                 $system->message('You cannot fight at this location');
             }
             else if ($player->last_ai_ms > $max_last_ai_ms) {
-                $system->message("Please wait " . ceil(($player->last_ai_ms - $max_last_ai_ms) / 1000) . " more seconds!");
+                $system->message("Please wait " . number_format(($player->last_ai_ms - $max_last_ai_ms) / 1000, 1) . " more seconds!");
             }
             else if ($player->last_pvp_ms > $max_last_pvp_ms) {
-                $system->message("You just finished a PvP fight, please wait " . ceil(($player->last_pvp_ms - $max_last_pvp_ms) / 1000) . " more seconds!");
+                $system->message("You just finished a PvP fight, please wait " . number_format(($player->last_pvp_ms - $max_last_pvp_ms) / 1000, 1) . " more seconds!");
             }
             else {
                 try {
