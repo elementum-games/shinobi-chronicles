@@ -10,6 +10,10 @@ function arena(): bool {
 	global $self_link;
 
     $fight_timer = System::ARENA_COOLDOWN;
+
+    // 1.5 second cooldown on entering arena fight after a PvP
+    $max_last_pvp_ms = System::currentTimeMs() - 1500;
+
     $arena_background = 'images/battle_backgrounds/FightingGrounds.jpg';
 
 	if($player->exam_stage > 0) {
@@ -53,6 +57,9 @@ function arena(): bool {
             }
             else if ($player->last_ai_ms > $max_last_ai_ms) {
                 $system->message("Please wait " . ceil(($player->last_ai_ms - $max_last_ai_ms) / 1000) . " more seconds!");
+            }
+            else if ($player->last_pvp_ms > $max_last_pvp_ms) {
+                $system->message("You just finished a PvP fight, please wait " . ceil(($player->last_pvp_ms - $max_last_pvp_ms) / 1000) . " more seconds!");
             }
             else {
                 try {
