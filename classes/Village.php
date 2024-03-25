@@ -98,8 +98,9 @@ class Village {
             $this->buildings = VillageUpgradeManager::getBuildingsForVillage($this->system, $this->village_id);
             $this->upgrades = VillageUpgradeManager::getUpgradesForVillage($this->system, $this->village_id);
             $this->active_upgrade_effects = VillageUpgradeManager::initializeEffectsForVillage($this->system, $this->upgrades);
-            $this->construction_speed += $this->policy->construction_speed + $this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED];
-            $this->research_speed += $this->policy->research_speed + $this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED];
+            $this->construction_speed += ($this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CONSTRUCTION_SPEED] / 100);
+            $this->research_speed += ($this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RESEARCH_SPEED] / 100);
+            $this->resource_capacity += $this->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_RESOURCE_CAPACITY];
             if ($this->policy->construction_speed > 0) {
                 $result = $system->db->query("SELECT `village_id`, `construction_score` FROM `villages`");
                 $village_scores = $system->db->fetch_all($result);
