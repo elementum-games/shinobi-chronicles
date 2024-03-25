@@ -541,7 +541,7 @@ class VillageUpgradeManager {
         // check if the village has the required upgrades and that those upgrades are also active
         if (isset(VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key][VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES])) {
             foreach (VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key][VillageUpgradeConfig::UPGRADE_REQUIREMENT_UPGRADES] as $required_upgrade_key) {
-                if (!isset($village->upgrades[$required_upgrade_key]) || $village->upgrades[$required_upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
+                if (!isset($village->upgrades[$required_upgrade_key]) || ($village->upgrades[$required_upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE && $village->upgrades[$required_upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_UNLOCKED)) {
                     return false;
                 }
                 if ($village->upgrades[$required_upgrade_key]->status != VillageUpgradeConfig::UPGRADE_STATUS_ACTIVE) {
