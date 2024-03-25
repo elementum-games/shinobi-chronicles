@@ -161,7 +161,8 @@ class VillageUpgradeManager {
                             $research_time_remaining = ($upgrade->research_progress_required - $upgrade->research_progress) / $village->research_speed;
                             $research_time_remaining = System::timeFormat($research_time_remaining, format: "long", include_seconds: false, include_minutes: false);
                         } else {
-                            $research_time_remaining = '';
+                            $research_time_remaining = $upgrade->research_progress_required / $village->research_speed;
+                            $research_time_remaining = System::timeFormat($research_time_remaining, format: "long", include_seconds: false, include_minutes: false);
                         }
                     }
                     $upgrades[] = new VillageUpgradeDto(
@@ -200,7 +201,8 @@ class VillageUpgradeManager {
                 $construction_time_remaining = ($building->construction_progress_required - $building->construction_progress) / $village->construction_speed;
                 $construction_time_remaining = System::timeFormat($construction_time_remaining, format: "long", include_seconds: false, include_minutes: false);
             } else {
-                $construction_time_remaining = '';
+                $construction_time_remaining = $building->construction_progress_required / $village->construction_speed;
+                $construction_time_remaining = System::timeFormat($construction_time_remaining, format: "long", include_seconds: false, include_minutes: false);
             }
             $buildingDtos[] = new VillageBuildingDto(
                 id: $building->id,
