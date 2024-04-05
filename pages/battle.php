@@ -173,7 +173,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
         if ($battle->is_retreat) {
-            // Calculate rep gains
+            // Calculate rep gains and handle loot
             if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVP) && UserReputation::PVP_REP_ENABLED) {
                 $rep_gained = $player->reputation->handlePvPWin($player, $battle->opponent, true);
                 if ($rep_gained > 0) {
@@ -184,12 +184,14 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                     $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, $rep_gained);
                 }
             }
-            $system->db->query("UPDATE `loot` SET 
-                `user_id` = {$player->user_id}, 
-                `battle_id` = NULL 
-              WHERE `battle_id` = {$player->battle_id} LIMIT " . ceil($battle->getTotalLoot() / 2));
+    
+            // Calculate the half of total loot
+            $half_loot = ceil($battle->getTotalLoot() / 2);
+    
+            // Update the loot table for the retreating player to lose half of their loot
+            $system->db->query("UPDATE `loot` SET `user_id` = {$battle->opponent->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id} LIMIT $half_loot");
             if ($system->db->last_affected_rows > 0) {
-                $result .= "You have claimed half the total loot from this battle.[br]";
+                $result .= "You have claimed half of the total loot from this battle.[br]";
             }
         }
         else {
@@ -235,18 +237,19 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->pvp_immunity_ms = System::currentTimeMs() + (5 * 60 * 1000); // 5 minutes
 
         if ($battle->is_retreat) {
+            // Set health, move to village, and handle reputation loss (if any)
             $player->health = 5;
             $player->moveToVillage();
-            // Calc rep loss (if any)
             if (UserReputation::PVP_REP_ENABLED) {
                 $rep_lost = $player->reputation->handlePvPLoss($player, $battle->opponent, true);
                 if ($rep_lost > 0) {
                     $result .= "You have lost $rep_lost village reputation.[br]";
                 }
-                // Loot - winner takes half loser's if retreat
-                $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id} LIMIT " . ceil($battle->getTotalLoot() / 2));
+                // Winner takes half of loser's loot if retreat
+                $half_loot_lost = ceil($battle->getTotalLoot() / 2);
+                $system->db->query("UPDATE `loot` SET `user_id` = {$battle->opponent->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id} LIMIT $half_loot_lost");
                 if ($system->db->last_affected_rows > 0) {
-                    $result .= "You have claimed half the total loot from this battle.[br]";
+                    $result .= "You have lost half of your loot from this battle.[br]";
                 }
             }
         } else {
