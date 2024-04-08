@@ -110,26 +110,45 @@ function RamenShop({
             });
         });
     }
-    function PurchaseMysteryRamen() {
-        apiFetch(
-            ramenShopAPI,
-            {
-                request: 'PurchaseMysteryRamen'
-            }
-        ).then((response) => {
-            if (response.errors.length) {
-                handleErrors(response.errors);
-                return;
-            }
-            setPlayerDataState(response.data.player_data);
-            setMysteryRamenDetailsState(response.data.mystery_ramen_details);
-            setCharacterRamenDataState(response.data.character_ramen_data);
-            openModal({
-                header: 'Confirmation',
-                text: response.data.response_message,
-                ContentComponent: null,
-                onConfirm: null,
-            });
+    function PurchaseSpecialRamen(ramen_key, ramen_label, ramen_cost, ramen_effects, ramen_duration) {
+        // Construct the confirmation message with ramen details
+        const confirmationMessage = `Are you sure you want to purchase ${ramen_label} Ramen for ¥${ramen_cost}? 
+        
+        You will receive ${ramen_effects} for ${ramen_duration} minutes.`;
+    
+        // Open a confirmation modal before purchasing
+        openModal({
+            header: 'Confirmation',
+            text: confirmationMessage,
+            ContentComponent: null,
+            onConfirm: () => {
+                // Proceed with the purchase if confirmed
+                apiFetch(
+                    ramenShopAPI,
+                    {
+                        request: 'PurchaseSpecialRamen',
+                        ramen_key: ramen_key,
+                    }
+                ).then((response) => {
+                    if (response.errors.length) {
+                        handleErrors(response.errors);
+                        return;
+                    }
+                    setPlayerDataState(response.data.player_data);
+                    setMysteryRamenDetailsState(response.data.mystery_ramen_details);
+                    setCharacterRamenDataState(response.data.character_ramen_data);
+                    setRamenOwnerDetailsState(response.data.ramen_owner_details);
+                    openModal({
+                        header: 'Confirmation',
+                        text: response.data.response_message,
+                        ContentComponent: null,
+                        onConfirm: null,
+                    });
+                });
+            },
+            onCancel: () => {
+                // Do nothing if canceled
+            },
         });
     }
     function handleErrors(errors) {
@@ -244,14 +263,20 @@ function BasicRamen({ index, ramenInfo, PurchaseBasicRamen }) {
     );
 }
 function SpecialRamen({ index, ramenInfo, PurchaseSpecialRamen }) {
+    const { ramen_key, label, description, cost, effect, duration } = ramenInfo;
+
+    const handlePurchase = () => {
+        PurchaseSpecialRamen(ramen_key, label, cost, effect, duration);
+    };
+
     return (
         <div key={index} className="special_ramen">
             <img src={ramenInfo.image} className="special_ramen_img" />
-            <div className="special_ramen_name">{ramenInfo.label}</div>
-            <div className="special_ramen_description">{ramenInfo.description}</div>
-            <div className="special_ramen_effect">{ramenInfo.effect}</div>
-            <div className="special_ramen_duration">Duration: {ramenInfo.duration} minutes</div>
-            <div className="special_ramen_button" onClick={() => PurchaseSpecialRamen(ramenInfo.ramen_key)}><>&yen;</>{ramenInfo.cost}</div>
+            <div className="special_ramen_name">{label}</div>
+            <div className="special_ramen_description">{description}</div>
+            <div className="special_ramen_duration">Duration: {duration} minutes</div>
+            <div className="special_ramen_effect">{effect}</div>
+            <div className="special_ramen_button" onClick={handlePurchase}><>&yen;</>{cost}</div>
         </div>
     );
 }
