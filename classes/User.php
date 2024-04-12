@@ -883,6 +883,21 @@ class User extends Fighter {
             $this->elements = [];
         }
 
+        // Ramen Data
+        $this->ramen_data = RamenShopManager::getCharacterRamenData($this->system, $this->user_id);
+        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_SHOYU)) {
+            $this->stealth += 2;
+        }
+        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_SPICY_MISO)) {
+            $this->regen_boost += 0.25 * RankManager::REGEN_RATE[$this->rank_num];
+        }
+        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_KING)) {
+            $this->reputation->addBonusPveRep(1);
+        }
+        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_WARRIOR)) {
+            $this->battle_fatigue_count = 0;
+        }
+
         // Regen/time-based events
         $time_difference = time() - $this->last_update;
         if ($time_difference > 60 && $UPDATE >= User::UPDATE_REGEN) {
@@ -960,22 +975,6 @@ class User extends Fighter {
                 VillageManager::checkChallengeLock($this->system, $this);
             }
         }
-
-        // Ramen Data
-        $this->ramen_data = RamenShopManager::getCharacterRamenData($this->system, $this->user_id);
-        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_SHOYU)) {
-            $this->stealth += 2;
-        }
-        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_SPICY_MISO)) {
-            $this->regen_boost += 0.25 * RankManager::REGEN_RATE[$this->rank_num];
-        }
-        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_KING)) {
-            $this->reputation->addBonusPveRep(1);
-        }
-        if ($this->ramen_data->checkBuffActive(RamenShopManager::SPECIAL_RAMEN_WARRIOR)) {
-            $this->battle_fatigue_count = 0;
-        }
-
         // Fatigue
         if ($this->in_village) {
             $this->battle_fatigue_count = 0;
