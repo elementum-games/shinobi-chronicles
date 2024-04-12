@@ -120,7 +120,7 @@ function processRegionRegenInterval(System $system, $debug = true): void
                 case 'castle':
                     // increase health, cap at max
                     $regen = (WarManager::BASE_CASTLE_REGEN_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES) * max((1 + ($region_location['stability'] / 100)), 0);
-                    $region_location['health'] = min($region_location['health'] + $regen, WarManager::BASE_CASTLE_HEALTH);
+                    $region_location['health'] = min($region_location['health'] + $regen, WarManager($system, $region_location, $villages[$region_location['occupying_village_id']]));
                     // get castle reference
                     $castle = &$region_location;
                     break;
@@ -142,7 +142,7 @@ function processRegionRegenInterval(System $system, $debug = true): void
                     } else {
                         // increase health, cap at max
                         $regen = (WarManager::BASE_TOWN_REGEN_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES) * max((1 + ($region_location['stability'] / 100)), 0);
-                        $region_location['health'] = min($region_location['health'] + $regen, WarManager::BASE_TOWN_HEALTH);
+                        $region_location['health'] = min($region_location['health'] + $regen, WarManager($system, $region_location, $villages[$region_location['occupying_village_id']]));
                         // give a bonus to castle regen if same owner
                         if (isset($castle)) {
                             if ($region_location['occupying_village_id'] == $castle['occupying_village_id']) {
