@@ -1,4 +1,4 @@
-// @flow strict
+// @flow
 
 import { apiFetch } from "../utils/network.js";
 import { StrategicInfoItem } from "./StrategicInfoItem.js";
@@ -9,6 +9,7 @@ import VillagePolicy from "./VillagePolicy.js";
 import { getVillageIcon } from "./villageUtils.js";
 
 import type {
+    VillagePolicyType,
     VillageProposalType,
     VillageResourceStrategicInfo,
     VillageSeatType,
@@ -48,7 +49,7 @@ export function KageQuarters({
     buildingUpgradeDataState,
     setBuildingUpgradeDataState,
     handleErrors,
-}: Props) {
+}: Props): React$Node {
     const kage = seatDataState.find(seat => seat.seat_type === 'kage');
     const [currentProposal, setCurrentProposal] = React.useState(null);
     const [currentProposalKey, setCurrentProposalKey] = React.useState(null);
@@ -756,183 +757,223 @@ function VillageProposals({
                 </>
             }
             {playerSeatState.seat_type === "elder" &&
-                <>
-                    {!currentProposal &&
-                        <>
-                            <div className="proposal_yes_button_wrapper">
-                                <div className="proposal_yes_button disabled">vote in favor</div>
-                            </div>
-                            <div className="proposal_no_button_wrapper">
-                                <div className="proposal_no_button disabled">vote against</div>
-                            </div>
-                        </>
-                    }
-                    {(currentProposal && currentProposal.vote_time_remaining != null && !currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
-                        <>
-                            <div className="proposal_yes_button_wrapper">
-                                <div className="proposal_yes_button" onClick={() => handleSubmitVote(1)}>vote in favor</div>
-                            </div>
-                            {(currentProposal && (currentProposal.type === "offer_trade" || currentProposal.type === "accept_trade")) &&
-                                <div className="trade_view_button_wrapper alliance"
-                                     onClick={
-                                         () => openModal({
-                                             header: 'View trade offer',
-                                             text: '',
-                                             ContentComponent: TradeDisplay,
-                                             componentProps: ({
-                                                 viewOnly: true,
-                                                 offeringVillageResources: resourceDataState,
-                                                 offeringVillageRegions: playerVillageData.regions,
-                                                 offeredResources: { current: currentProposal.trade_data.offered_resources },
-                                                 offeredRegions: { current: currentProposal.trade_data.offered_regions },
-                                                 targetVillageResources: null,
-                                                 targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
-                                                 requestedResources: { current: currentProposal.trade_data.requested_resources },
-                                                 requestedRegions: { current: currentProposal.trade_data.requested_regions },
-                                                 proposalData: currentProposal.trade_data
-                                             }),
-                                             onConfirm: null,
-                                         })
-                                     }>
-                                    <div className="trade_view_button_inner">
-                                        <img src="/images/v2/icons/trade.png" className="trade_view_button_icon" />
-                                    </div>
-                                </div>
-                            }
-                            <div className="proposal_no_button_wrapper">
-                                <div className="proposal_no_button" onClick={() => handleSubmitVote(0)}>vote against</div>
-                            </div>
-                        </>
-                    }
-                    {(currentProposal && currentProposal.vote_time_remaining == null && !currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
-                        <>
-                            <div className="proposal_yes_button_wrapper">
-                                <div className="proposal_yes_button disabled">vote in favor</div>
-                            </div>
-                            {(currentProposal && (currentProposal.type === "offer_trade" || currentProposal.type === "accept_trade")) &&
-                                <div className="trade_view_button_wrapper alliance"
-                                     onClick={
-                                         () => openModal({
-                                             header: 'View trade offer',
-                                             text: '',
-                                             ContentComponent: TradeDisplay,
-                                             componentProps: ({
-                                                 viewOnly: true,
-                                                 offeringVillageResources: resourceDataState,
-                                                 offeringVillageRegions: playerVillageData.regions,
-                                                 offeredResources: { current: currentProposal.trade_data.offered_resources },
-                                                 offeredRegions: { current: currentProposal.trade_data.offered_regions },
-                                                 targetVillageResources: null,
-                                                 targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
-                                                 requestedResources: { current: currentProposal.trade_data.requested_resources },
-                                                 requestedRegions: { current: currentProposal.trade_data.requested_regions },
-                                                 proposalData: currentProposal.trade_data
-                                             }),
-                                             onConfirm: null,
-                                         })
-                                     }>
-                                    <div className="trade_view_button_inner">
-                                        <img src="/images/v2/icons/trade.png" className="trade_view_button_icon" />
-                                    </div>
-                                </div>
-                            }
-                            <div className="proposal_no_button_wrapper">
-                                <div className="proposal_no_button disabled">vote against</div>
-                            </div>
-                        </>
-                    }
-                    {(currentProposal && currentProposal.vote_time_remaining != null && currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
-                        <>
-                            <div className="proposal_cancel_vote_button_wrapper">
-                                <div className="proposal_cancel_vote_button"
-                                     onClick={
-                                         () => openModal({
-                                             header: 'Confirmation',
-                                             text: null,
-                                             ContentComponent: null,
-                                             onConfirm: () => handleCancelVote(),
-                                         })
-                                     }>
-                                    change vote</div>
-                            </div>
-                            {(currentProposal && (currentProposal.type === "offer_trade" || currentProposal.type === "accept_trade")) &&
-                                <div className="trade_view_button_wrapper alliance"
-                                     onClick={
-                                         () => openModal({
-                                             header: 'View trade offer',
-                                             text: '',
-                                             ContentComponent: TradeDisplay,
-                                             componentProps: ({
-                                                 viewOnly: true,
-                                                 offeringVillageResources: resourceDataState,
-                                                 offeringVillageRegions: playerVillageData.regions,
-                                                 offeredResources: { current: currentProposal.trade_data.offered_resources },
-                                                 offeredRegions: { current: currentProposal.trade_data.offered_regions },
-                                                 targetVillageResources: null,
-                                                 targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
-                                                 requestedResources: { current: currentProposal.trade_data.requested_resources },
-                                                 requestedRegions: { current: currentProposal.trade_data.requested_regions },
-                                                 proposalData: currentProposal.trade_data
-                                             }),
-                                             onConfirm: null,
-                                         })
-                                     }>
-                                    <div className="trade_view_button_inner">
-                                        <img src="/images/v2/icons/trade.png" className="trade_view_button_icon" />
-                                    </div>
-                                </div>
-                            }
-                            {(currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id).rep_adjustment === 0) &&
-                                <div className="proposal_boost_vote_button_wrapper">
-                                    <div className="proposal_boost_vote_button" onClick={() => openModal({
-                                        header: 'Confirmation',
-                                        text: "When a vote Against is boosted:\n The Kage will lose 500 Reputation when the proposal is enacted.\n\nWhen a vote In Favor is boosted:\nTotal Reputation loss from Against votes will be reduced by 500.\n\nBoosting a vote will cost 500 Reputation when the proposal is passed.\n\nHowever, a boosted vote In Favor will only cost Reputation if there is a boosted vote Against. If there are more boosted votes In Favor than Against, the cost will be split between between votes In Favor.",
-                                        ContentComponent: null,
-                                        onConfirm: () => handleBoostVote(),
-                                    })}>boost vote</div>
-                                </div>
-                            }
-                        </>
-                    }
-                    {(currentProposal && currentProposal.vote_time_remaining == null && currentProposal.votes.find(vote => vote.user_id == playerSeatState.user_id)) &&
-                        <>
-                            <div className="proposal_cancel_vote_button_wrapper">
-                                <div className="proposal_cancel_vote_button disabled">cancel vote</div>
-                            </div>
-                            {(currentProposal && (currentProposal.type === "offer_trade" || currentProposal.type === "accept_trade")) &&
-                                <div className="trade_view_button_wrapper alliance"
-                                     onClick={
-                                         () => openModal({
-                                             header: 'View trade offer',
-                                             text: '',
-                                             ContentComponent: TradeDisplay,
-                                             componentProps: ({
-                                                 viewOnly: true,
-                                                 offeringVillageResources: resourceDataState,
-                                                 offeringVillageRegions: playerVillageData.regions,
-                                                 offeredResources: { current: currentProposal.trade_data.offered_resources },
-                                                 offeredRegions: { current: currentProposal.trade_data.offered_regions },
-                                                 targetVillageResources: null,
-                                                 targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
-                                                 requestedResources: { current: currentProposal.trade_data.requested_resources },
-                                                 requestedRegions: { current: currentProposal.trade_data.requested_regions },
-                                                 proposalData: currentProposal.trade_data
-                                             }),
-                                             onConfirm: null,
-                                         })
-                                     }>
-                                    <div className="trade_view_button_inner">
-                                        <img src="/images/v2/icons/trade.png" className="trade_view_button_icon" />
-                                    </div>
-                                </div>
-                            }
-                            <div className="proposal_boost_vote_button_wrapper">
-                                <div className="proposal_boost_vote_button disabled">boost vote</div>
-                            </div>
-                        </>
-                    }
-                </>
+                <ElderProposalVote
+                    currentProposal={currentProposal}
+                    resourceDataState={resourceDataState}
+                    strategicDataState={strategicDataState}
+                    playerVillageData={playerVillageData}
+                    playerSeatState={playerSeatState}
+                    handleBoostVote={handleBoostVote}
+                    handleCancelVote={handleCancelVote}
+                    handleSubmitVote={handleSubmitVote}
+                />
             }
         </div>
     </div>;
+}
+
+function ElderProposalVote({
+    currentProposal,
+    resourceDataState,
+    strategicDataState,
+    playerVillageData,
+    playerSeatState,
+    handleBoostVote,
+    handleCancelVote,
+    handleSubmitVote
+}: {
+    +currentProposal: ?VillageProposalType,
+    +resourceDataState: $ReadOnlyArray<VillageResourceStrategicInfo>,
+    +strategicDataState: $ReadOnlyArray<VillageStrategicInfo>,
+    +playerVillageData: VillageStrategicInfo,
+    +playerSeatState: VillageSeatType,
+    +handleBoostVote: () => void,
+    +handleCancelVote: () => void,
+    +handleSubmitVote: (number) => void,
+}) {
+
+    const { openModal } = useModal();
+
+    if(!currentProposal) {
+        return <>
+            <div className="proposal_yes_button_wrapper">
+                <div className="proposal_yes_button disabled">vote in favor</div>
+            </div>
+            <div className="proposal_no_button_wrapper">
+                <div className="proposal_no_button disabled">vote against</div>
+            </div>
+        </>;
+    }
+
+    const currentProposalUserVote = currentProposal.votes.find(vote => parseInt(vote.user_id) === playerSeatState.user_id);
+
+    return <>
+        {(currentProposal.vote_time_remaining != null && !currentProposalUserVote) &&
+            <>
+                <div className="proposal_yes_button_wrapper">
+                    <div className="proposal_yes_button" onClick={() => handleSubmitVote(1)}>vote in favor</div>
+                </div>
+                {(currentProposal && (currentProposal.type === "offer_trade" || currentProposal.type === "accept_trade")) &&
+                    <div className="trade_view_button_wrapper alliance"
+                         onClick={
+                             () => openModal({
+                                 header: 'View trade offer',
+                                 text: '',
+                                 ContentComponent: TradeDisplay,
+                                 componentProps: ({
+                                     viewOnly: true,
+                                     offeringVillageResources: resourceDataState,
+                                     offeringVillageRegions: playerVillageData.regions,
+                                     offeredResources: { current: currentProposal.trade_data.offered_resources },
+                                     offeredRegions: { current: currentProposal.trade_data.offered_regions },
+                                     targetVillageResources: null,
+                                     targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
+                                     requestedResources: { current: currentProposal.trade_data.requested_resources },
+                                     requestedRegions: { current: currentProposal.trade_data.requested_regions },
+                                     proposalData: currentProposal.trade_data
+                                 }),
+                                 onConfirm: null,
+                             })
+                         }>
+                        <div className="trade_view_button_inner">
+                            <img src="/images/v2/icons/trade.png" className="trade_view_button_icon" />
+                        </div>
+                    </div>
+                }
+                <div className="proposal_no_button_wrapper">
+                    <div className="proposal_no_button" onClick={() => handleSubmitVote(0)}>vote against</div>
+                </div>
+            </>
+        }
+        {(currentProposal.vote_time_remaining == null && !currentProposalUserVote) &&
+            <>
+                <div className="proposal_yes_button_wrapper">
+                    <div className="proposal_yes_button disabled">vote in favor</div>
+                </div>
+                {(currentProposal && (currentProposal.type === "offer_trade" || currentProposal.type === "accept_trade")) &&
+                    <div className="trade_view_button_wrapper alliance"
+                         onClick={
+                             () => openModal({
+                                 header: 'View trade offer',
+                                 text: '',
+                                 ContentComponent: TradeDisplay,
+                                 componentProps: ({
+                                     viewOnly: true,
+                                     offeringVillageResources: resourceDataState,
+                                     offeringVillageRegions: playerVillageData.regions,
+                                     offeredResources: { current: currentProposal.trade_data.offered_resources },
+                                     offeredRegions: { current: currentProposal.trade_data.offered_regions },
+                                     targetVillageResources: null,
+                                     targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
+                                     requestedResources: { current: currentProposal.trade_data.requested_resources },
+                                     requestedRegions: { current: currentProposal.trade_data.requested_regions },
+                                     proposalData: currentProposal.trade_data
+                                 }),
+                                 onConfirm: null,
+                             })
+                         }>
+                        <div className="trade_view_button_inner">
+                            <img src="/images/v2/icons/trade.png" className="trade_view_button_icon" />
+                        </div>
+                    </div>
+                }
+                <div className="proposal_no_button_wrapper">
+                    <div className="proposal_no_button disabled">vote against</div>
+                </div>
+                <div className="proposal_vote_warning">
+                    Voting period has ended
+                </div>
+            </>
+        }
+        {(currentProposal.vote_time_remaining != null && currentProposalUserVote) &&
+            <>
+                <div className="proposal_cancel_vote_button_wrapper">
+                    <div className="proposal_cancel_vote_button"
+                         onClick={
+                             () => openModal({
+                                 header: 'Confirmation',
+                                 text: null,
+                                 ContentComponent: null,
+                                 onConfirm: () => handleCancelVote(),
+                             })
+                         }>
+                        change vote</div>
+                </div>
+                {(currentProposal.type === "offer_trade" || currentProposal.type === "accept_trade") &&
+                    <div className="trade_view_button_wrapper alliance"
+                         onClick={
+                             () => openModal({
+                                 header: 'View trade offer',
+                                 text: '',
+                                 ContentComponent: TradeDisplay,
+                                 componentProps: ({
+                                     viewOnly: true,
+                                     offeringVillageResources: resourceDataState,
+                                     offeringVillageRegions: playerVillageData.regions,
+                                     offeredResources: { current: currentProposal.trade_data.offered_resources },
+                                     offeredRegions: { current: currentProposal.trade_data.offered_regions },
+                                     targetVillageResources: null,
+                                     targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
+                                     requestedResources: { current: currentProposal.trade_data.requested_resources },
+                                     requestedRegions: { current: currentProposal.trade_data.requested_regions },
+                                     proposalData: currentProposal.trade_data
+                                 }),
+                                 onConfirm: null,
+                             })
+                         }>
+                        <div className="trade_view_button_inner">
+                            <img src="/images/v2/icons/trade.png" className="trade_view_button_icon" />
+                        </div>
+                    </div>
+                }
+                {(parseInt(currentProposalUserVote.rep_adjustment) === 0) &&
+                    <div className="proposal_boost_vote_button_wrapper">
+                        <div className="proposal_boost_vote_button" onClick={() => openModal({
+                            header: 'Confirmation',
+                            text: "When a vote Against is boosted:\n The Kage will lose 500 Reputation when the proposal is enacted.\n\nWhen a vote In Favor is boosted:\nTotal Reputation loss from Against votes will be reduced by 500.\n\nBoosting a vote will cost 500 Reputation when the proposal is passed.\n\nHowever, a boosted vote In Favor will only cost Reputation if there is a boosted vote Against. If there are more boosted votes In Favor than Against, the cost will be split between between votes In Favor.",
+                            ContentComponent: null,
+                            onConfirm: () => handleBoostVote(),
+                        })}>boost vote</div>
+                    </div>
+                }
+            </>
+        }
+        {(currentProposal.vote_time_remaining == null && currentProposalUserVote) &&
+            <>
+                <div className="proposal_cancel_vote_button_wrapper">
+                    <div className="proposal_cancel_vote_button disabled">cancel vote</div>
+                </div>
+                {(currentProposal && (currentProposal.type === "offer_trade" || currentProposal.type === "accept_trade")) &&
+                    <div className="trade_view_button_wrapper alliance"
+                         onClick={
+                             () => openModal({
+                                 header: 'View trade offer',
+                                 text: '',
+                                 ContentComponent: TradeDisplay,
+                                 componentProps: ({
+                                     viewOnly: true,
+                                     offeringVillageResources: resourceDataState,
+                                     offeringVillageRegions: playerVillageData.regions,
+                                     offeredResources: { current: currentProposal.trade_data.offered_resources },
+                                     offeredRegions: { current: currentProposal.trade_data.offered_regions },
+                                     targetVillageResources: null,
+                                     targetVillageRegions: strategicDataState.find(item => item.village.village_id !== currentProposal.target_village_id),
+                                     requestedResources: { current: currentProposal.trade_data.requested_resources },
+                                     requestedRegions: { current: currentProposal.trade_data.requested_regions },
+                                     proposalData: currentProposal.trade_data
+                                 }),
+                                 onConfirm: null,
+                             })
+                         }>
+                        <div className="trade_view_button_inner">
+                            <img src="/images/v2/icons/trade.png" className="trade_view_button_icon" />
+                        </div>
+                    </div>
+                }
+                <div className="proposal_boost_vote_button_wrapper">
+                    <div className="proposal_boost_vote_button disabled">boost vote</div>
+                </div>
+            </>
+        }
+    </>
 }

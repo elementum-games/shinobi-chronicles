@@ -756,8 +756,9 @@
 }
 .proposal_container_bottom {
     flex-basis: 50%;
+    position: relative;
+
     display: flex;
-    justify-content: center;
     align-items: center;
     justify-content: space-evenly;
 }
@@ -1145,6 +1146,16 @@
 .proposal_enact_button_wrapper {
     position: relative;
 }
+
+.proposal_vote_warning {
+    position: absolute;
+    bottom: 5px;
+    font-style: italic;
+    font-size: 0.8em;
+
+    color: var(--font-color-6);
+}
+
 .rep_change {
     position: absolute;
     left: 50%;

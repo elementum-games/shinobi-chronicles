@@ -19,7 +19,15 @@ export type VillageProposalType = {|
     +name: string,
     +result: ?mixed,
     +type: string, // "offer_trade" | "accept_trade"
-    +votes: $ReadOnlyArray<{}>,
+    +votes: $ReadOnlyArray<{
+        // Most of these should be numbers
+        proposal_id: string,
+        rep_adjustment: string,
+        user_id: string,
+        vote: string,
+        vote_id: string,
+        vote_time: string,
+    }>,
     +vote_time_remaining: ?string,
     +enact_time_remaining: ?string,
     +trade_data: {
