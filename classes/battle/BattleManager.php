@@ -36,7 +36,7 @@ class BattleManager {
     const ELEMENTAL_CLASH_EFFECT_MODIFIER = 0.1; // 10% effect loss and gain
 
     // Extra boost to recoil damage to offset the typical losses when facing a high-speed build
-    const RECOIL_DMG_MULTIPLIER = 1.05;
+    const RECOIL_DMG_MULTIPLIER = 1.1;
 
     private System $system;
 

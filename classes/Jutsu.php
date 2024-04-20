@@ -60,10 +60,10 @@ class Jutsu {
 
     const BALANCE_BASELINE_POWER = 4.4;
     const BALANCE_EFFECT_RATIOS = [
-        'offense_boost' => 1.75,
+        'offense_boost' => 1.8,
         'elemental_boost' => 1.15,
-        'evasion_nerf' => 2,
-        'offense_nerf' => 1.9,
+        'evasion_nerf' => 1.9,
+        'offense_nerf' => 1.8,
         'erosion' => 0.35,
         'vulnerability' => 2,
         'elemental_vulnerability' => 1.25,
@@ -71,7 +71,7 @@ class Jutsu {
         'resist_boost' => 1.85,
         'evasion_boost' => 2,
         'speed_boost' => 1,
-        'piercing' => 0.6,
+        'piercing' => 0.65,
         'counter' => 3.25,
         'reflect' => 3.25,
         'substitution' => 2.5,

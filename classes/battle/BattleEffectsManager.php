@@ -9,15 +9,17 @@ class BattleEffectsManager {
     const COMPOUND_RESIDUAL_INCREASE = 0.1;
 
     // Reduction in CR effect when contributing to immolate
-    const CR_IMMO_PENALTY = 0.15;
+    const CR_IMMO_PENALTY = 0.25;
 
     /*
-     * Extra immo amount per stack, starting at 2 stacks. Applied to the bonus over 100%, e.g.
-     * - 130% immo = 30% bonus damage
-     * 2 residuals active = 0.2x bonus (20%)
-     * 30% * 120% = 36% bonus damage
+     * Extra immo amount per stack, starting at 3 stacks. Example:
+     * 20% immolate
+     *   1 resid = 100% damage
+     *   2 resid = 120% damage
+     *   3 resid = 130% damage (20% * 1.5)
+     *   4 resid = 140% damage (20% * 2)
      */
-    const IMMO_EFFECT_BONUS_PER_STACK = 0.2;
+    const IMMO_EFFECT_BONUS_PER_STACK = 0.5;
 
     const DAMAGE_EFFECTS = [
         'none',
@@ -132,6 +134,18 @@ class BattleEffectsManager {
             case 'residual_damage':
             case 'delayed_residual':
             case 'compound_residual':
+                if($raw_damage > 0) {
+                    $effect->effect_amount = round($raw_damage * ($effect->effect_amount / 100), 2);
+                }
+                else {
+                    $apply_effect = false;
+                }
+                break;
+            case 'reflect_damage':
+                if($effect->effect_amount <= 0) {
+                    $apply_effect = false;
+                }
+                break;
             case 'ninjutsu_nerf':
             case 'taijutsu_nerf':
             case 'genjutsu_nerf':
@@ -173,7 +187,6 @@ class BattleEffectsManager {
             case 'lightning_vulnerability':
             case 'earth_vulnerability':
             case 'water_vulnerability':
-            case 'reflect_damage':
             case 'erosion':
                 // No changes needed to base number, calculated in applyPassiveEffects
                 break;
@@ -900,12 +913,15 @@ class BattleEffectsManager {
             }
         }
 
-        // Apply immo bonus starting at 2 residuals
-        $immolate_bonus_multiplier = 1 + (($num_residual_effects - 1) * self::IMMO_EFFECT_BONUS_PER_STACK);
-        $immolate_percent = 1 + (
-            ($battleAttack->immolate_percent - 1) * $immolate_bonus_multiplier
-        );
+        // Less than 2 effects, just trigger raw damage amount
+        if($num_residual_effects < 2) {
+            return $immolate_raw_damage;
+        }
 
-        return $immolate_raw_damage * $immolate_percent;
+        // Apply immo bonus if more than 2 stacks
+        $immolate_bonus_multiplier = self::IMMO_EFFECT_BONUS_PER_STACK * ($num_residual_effects - 2);
+        $immolate_percent = $battleAttack->immolate_percent * (1 + $immolate_bonus_multiplier);
+
+        return $immolate_raw_damage * (1 + $immolate_percent);
     }
 }
