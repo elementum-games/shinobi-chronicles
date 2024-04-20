@@ -172,40 +172,31 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         );
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
-        if ($battle->is_retreat) {
-            // Calculate rep gains
-            if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVP) && UserReputation::PVP_REP_ENABLED) {
-                $rep_gained = $player->reputation->handlePvPWin($player, $battle->opponent, true);
-                if ($rep_gained > 0) {
-                    $result .= "You have earned $rep_gained village reputation.[br]";
-                }
-                // Daily Task
-                if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVP)) {
-                    $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, $rep_gained);
-                }
+        // Calculate rep gains
+        if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVP) && UserReputation::PVP_REP_ENABLED) {
+            $rep_gained = $player->reputation->handlePvPWin(
+                player: $player,
+                opponent: $battle->opponent,
+                retreat: $battle->is_retreat
+            );
+            if ($rep_gained > 0) {
+                $result .= "You have earned $rep_gained village reputation.[br]";
             }
-            $system->db->query("UPDATE `loot` SET 
-                `user_id` = {$player->user_id}, 
-                `battle_id` = NULL 
-              WHERE `battle_id` = {$player->battle_id} LIMIT " . ceil($battle->getTotalLoot() / 2));
+            // Daily Task
+            if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVP)) {
+                $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, $rep_gained);
+            }
+        }
+
+        // Loot
+        $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}");
+
+        if ($battle->is_retreat) {
             if ($system->db->last_affected_rows > 0) {
                 $result .= "You have claimed half the total loot from this battle.[br]";
             }
         }
         else {
-            // Calculate rep gains
-            if ($player->reputation->canGain(UserReputation::ACTIVITY_TYPE_PVP) && UserReputation::PVP_REP_ENABLED) {
-                $rep_gained = $player->reputation->handlePvPWin($player, $battle->opponent);
-                if ($rep_gained > 0) {
-                    $result .= "You have earned $rep_gained village reputation.[br]";
-                }
-                // Daily Task
-                if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_DAILY_PVP)) {
-                    $player->daily_tasks->progressTask(DailyTask::ACTIVITY_DAILY_PVP, $rep_gained);
-                }
-            }
-            // Loot
-            $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id}");
             if ($system->db->last_affected_rows > 0) {
                 $result .= "You have claimed all of the loot from this battle.[br]";
             }
@@ -234,15 +225,16 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->last_death_ms = System::currentTimeMs();
         $player->pvp_immunity_ms = System::currentTimeMs() + (5 * 60 * 1000); // 5 minutes
 
+        $player->health = 5;
+        $player->moveToVillage();
+
         if ($battle->is_retreat) {
-            $player->health = 5;
-            $player->moveToVillage();
-            // Calc rep loss (if any)
             if (UserReputation::PVP_REP_ENABLED) {
                 $rep_lost = $player->reputation->handlePvPLoss($player, $battle->opponent, true);
                 if ($rep_lost > 0) {
                     $result .= "You have lost $rep_lost village reputation.[br]";
                 }
+
                 // Loot - winner takes half loser's if retreat
                 $system->db->query("UPDATE `loot` SET `user_id` = {$player->user_id}, `battle_id` = NULL WHERE `battle_id` = {$player->battle_id} LIMIT " . ceil($battle->getTotalLoot() / 2));
                 if ($system->db->last_affected_rows > 0) {
@@ -250,9 +242,6 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
                 }
             }
         } else {
-            $player->health = 5;
-            $player->moveToVillage();
-            // Calc rep loss (if any)
             if (UserReputation::PVP_REP_ENABLED) {
                 $rep_lost = $player->reputation->handlePvPLoss($player, $battle->opponent);
                 if ($rep_lost > 0) {
