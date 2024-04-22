@@ -144,6 +144,12 @@ function SimulationResults({
     winningPercent,
     collisionText
 }: SimulationResultsProps) {
+    const p1DamageResisted = player2Results.damage_before_resist - player2Results.damage_dealt;
+    const p1ResistPercent = Math.round((p1DamageResisted / player2Results.damage_before_resist) * 1000) / 10;
+
+    const p2DamageResisted = player1Results.damage_before_resist - player1Results.damage_dealt;
+    const p2ResistPercent = Math.round((p2DamageResisted / player1Results.damage_before_resist) * 1000) / 10;
+
     return <div className="results">
         <div className={`player1 ${winningFighter === 'player1' ? 'winner' : ''}`}>
             <b>Player 1:</b><br/>
@@ -151,8 +157,11 @@ function SimulationResults({
             {numFormat(player1Results.collision_damage)} post-collision damage<br/>
             {numFormat(player1Results.damage_before_resist)} pre-resist damage<br/>
             {numFormat(player1Results.damage_dealt.toLocaleString())} final damage dealt<br/>
-            <br/>
+            <hr/>
             {numFormat(player1Results.damage_taken, 2)} damage taken<br/>
+            {p1ResistPercent > 0 && <>
+                <em>(resisted {p1ResistPercent}%)</em><br/>
+            </>}
         </div>
         <div className={`player2 ${winningFighter === 'player2' ? 'winner' : ''}`}>
             <b>Player 2:</b><br/>
@@ -160,8 +169,11 @@ function SimulationResults({
             {player2Results.collision_damage.toLocaleString()} post-collision damage<br/>
             {player2Results.damage_before_resist.toLocaleString()} pre-resist damage<br/>
             {player2Results.damage_dealt.toLocaleString()} final damage dealt<br/>
-            <br/>
+            <hr />
             {player2Results.damage_taken.toLocaleString()} damage taken<br/>
+            {p2ResistPercent > 0 && <>
+                <em>(resisted {p2ResistPercent}%)</em><br />
+            </>}
         </div>
         <div className='collision'>
             <p dangerouslySetInnerHTML={{__html: collisionText.replace(/\[br]/g, "<br />")}} />
