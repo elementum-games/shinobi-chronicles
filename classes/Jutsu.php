@@ -18,13 +18,6 @@ enum JutsuOffenseType: string {
 }
 
 class Jutsu {
-    const ELEMENT_NONE = 'None';
-    const ELEMENT_FIRE = 'Fire';
-    const ELEMENT_EARTH = 'Earth';
-    const ELEMENT_WIND = 'Wind';
-    const ELEMENT_WATER = 'Water';
-    const ELEMENT_LIGHTNING = 'Lightning';
-
     const PURCHASE_TYPE_DEFAULT = 1;
     const PURCHASE_TYPE_PURCHASABLE = 2;
     const PURCHASE_TYPE_NON_PURCHASABLE = 3;
@@ -304,7 +297,7 @@ class Jutsu {
     }
 
     public function hasElement(): bool {
-        if (isset($this->element) && $this->element != self::ELEMENT_NONE) {
+        if (isset($this->element) && $this->element != Element::NONE) {
            return true;
         }
         return false;
