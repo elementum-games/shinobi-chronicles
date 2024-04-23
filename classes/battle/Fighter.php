@@ -20,10 +20,6 @@ abstract class Fighter {
     // Using Erosion to reduce target's resist below 0 will convert the excess erosion to vuln at this multiplier
     const EROSION_VULN_CONVERSION_RATIO = 0.333;
 
-    const RESIST_SOFT_CAP = 0.5; // caps at 50% evasion
-    const RESIST_SOFT_CAP_RATIO = 0.5; // evasion beyond soft cap only 50% as effective
-    const RESIST_HARD_CAP = 0.75; // caps at 75% evasion
-
     public System $system;
 
     public string $combat_id;
