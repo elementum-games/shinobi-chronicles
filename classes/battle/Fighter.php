@@ -17,6 +17,9 @@ abstract class Fighter {
     const MIN_RAND = 33;
     const MAX_RAND = 36;
 
+    // Using Erosion to reduce target's resist below 0 will convert the excess erosion to vuln at this multiplier
+    const EROSION_VULN_CONVERSION_RATIO = 0.333;
+
     const RESIST_SOFT_CAP = 0.5; // caps at 50% evasion
     const RESIST_SOFT_CAP_RATIO = 0.5; // evasion beyond soft cap only 50% as effective
     const RESIST_HARD_CAP = 0.75; // caps at 75% evasion
@@ -123,14 +126,14 @@ abstract class Fighter {
 
     public float $evasion_nerf = 0;
 
-    public float $taijutsu_weakness = 0;
-    public float $ninjutsu_weakness = 0;
-    public float $genjutsu_weakness = 0;
-    public float $fire_weakness = 0;
-    public float $wind_weakness = 0;
-    public float $lightning_weakness = 0;
-    public float $earth_weakness = 0;
-    public float $water_weakness = 0;
+    public float $taijutsu_vulnerability = 0;
+    public float $ninjutsu_vulnerability = 0;
+    public float $genjutsu_vulnerability = 0;
+    public float $fire_vulnerability = 0;
+    public float $wind_vulnerability = 0;
+    public float $lightning_vulnerability = 0;
+    public float $earth_vulnerability = 0;
+    public float $water_vulnerability = 0;
 
     public float $erosion = 0;
 
@@ -462,65 +465,61 @@ abstract class Fighter {
         bool $apply_weakness = true
     ): float|int {
         $defense = self::BASE_DEFENSE;
+        $resist_boost = 0;
+        $weakness_modifier = 0;
 
+        // Calculate resist/erosion and secondary vuln
         if($apply_resists) {
-            if (!empty($this->bloodline_defense_boosts)) {
-                foreach ($this->bloodline_defense_boosts as $id => $boost) {
-                    $boost_type = explode('_', $boost['effect'])[0];
-                    if ($boost_type != $defense_type) {
-                        continue;
-                    }
+            $resist_boost = $this->resist_boost - $this->erosion;
+            if($this->system->debug['damage']) {
+                echo "Resist ({$this->resist_boost}) / Erosion ({$this->erosion}) => {$resist_boost}<br />";
+            }
 
-                    $boost_amount = $boost['effect_amount'] * self::BLOODLINE_DEFENSE_MULTIPLIER;
-                    if ($raw_damage < $boost_amount) {
-                        $this->bloodline_defense_boosts[$id]['effect_amount'] -= ($raw_damage / self::BLOODLINE_DEFENSE_MULTIPLIER);
-                        $raw_damage = 0;
-                    } else {
-                        $raw_damage -= $boost_amount;
-                        unset($this->bloodline_defense_boosts[$id]);
-                    }
-                }
+            if($resist_boost < 0) {
+                $vuln_amount = abs($resist_boost) * self::EROSION_VULN_CONVERSION_RATIO;
+                $resist_boost = 0;
+
+                $weakness_modifier += $vuln_amount;
             }
         }
 
-        $weakness_modifier = 0;
         switch($defense_type) {
             case JutsuOffenseType::NINJUTSU:
                 if ($apply_resists) {
                     $raw_damage -= $this->ninjutsu_resist;
                 }
-                $weakness_modifier += $this->ninjutsu_weakness;
+                $weakness_modifier += $this->ninjutsu_vulnerability;
                 break;
             case JutsuOffenseType::GENJUTSU:
                 if ($apply_resists) {
                     $raw_damage -= $this->genjutsu_resist;
                 }
-                $weakness_modifier += $this->genjutsu_weakness;
+                $weakness_modifier += $this->genjutsu_vulnerability;
                 break;
             case JutsuOffenseType::TAIJUTSU:
                 if ($apply_resists) {
                     $raw_damage -= $this->taijutsu_resist;
                 }
-                $weakness_modifier += $this->taijutsu_weakness;
+                $weakness_modifier += $this->taijutsu_vulnerability;
                 break;
             default:
                 error_log("Invalid defense type! {$defense_type->value}");
         }
         switch ($element) {
             case Element::FIRE:
-                $weakness_modifier += $this->fire_weakness;
+                $weakness_modifier += $this->fire_vulnerability;
                 break;
             case Element::WIND:
-                $weakness_modifier += $this->wind_weakness;
+                $weakness_modifier += $this->wind_vulnerability;
                 break;
             case Element::LIGHTNING:
-                $weakness_modifier += $this->lightning_weakness;
+                $weakness_modifier += $this->lightning_vulnerability;
                 break;
             case Element::EARTH:
-                $weakness_modifier += $this->earth_weakness;
+                $weakness_modifier += $this->earth_vulnerability;
                 break;
             case Element::WATER:
-                $weakness_modifier += $this->water_weakness;
+                $weakness_modifier += $this->water_vulnerability;
                 break;
             default:
                 break;
@@ -539,14 +538,7 @@ abstract class Fighter {
         if ($damage < 0.0) {
             $damage = 0;
         }
-        if ($apply_resists) {
-            $resist_boost = $this->resist_boost * (1 - $this->erosion);
-            $resist_boost = max($resist_boost, 0);
-
-            if($this->system->debug['damage']) {
-                echo "Resist ({$this->resist_boost}) / Erosion ({$this->erosion}) => {$resist_boost}<br />";
-            }
-
+        if ($apply_resists && $resist_boost > 0) {
             $normalized_resist_boost = BattleManager::diminishingReturns($resist_boost, BattleManager::RESIST_DIMINISHING_RETURN_SCALE);
 
             if($this->system->debug['damage']) {

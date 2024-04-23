@@ -64,7 +64,7 @@ class Jutsu {
         'elemental_boost' => 1.15,
         'evasion_nerf' => 1.9,
         'offense_nerf' => 1.8,
-        'erosion' => 0.35,
+        'erosion' => 1.1,
         'vulnerability' => 2,
         'elemental_vulnerability' => 1.25,
         'hybrid_elemental_vulnerability' => 1.375,

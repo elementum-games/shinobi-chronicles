@@ -467,24 +467,24 @@ class BattleEffectsManager {
                 break;
 
             case 'vulnerability':
-                $target->ninjutsu_weakness += ($effect->effect_amount / 100);
-                $target->taijutsu_weakness += ($effect->effect_amount / 100);
-                $target->genjutsu_weakness += ($effect->effect_amount / 100);
+                $target->ninjutsu_vulnerability += ($effect->effect_amount / 100);
+                $target->taijutsu_vulnerability += ($effect->effect_amount / 100);
+                $target->genjutsu_vulnerability += ($effect->effect_amount / 100);
                 break;
             case 'fire_vulnerability':
-                $target->fire_weakness += ($effect->effect_amount / 100);
+                $target->fire_vulnerability += ($effect->effect_amount / 100);
                 break;
             case 'wind_vulnerability':
-                $target->wind_weakness += ($effect->effect_amount / 100);
+                $target->wind_vulnerability += ($effect->effect_amount / 100);
                 break;
             case 'lightning_vulnerability':
-                $target->lightning_weakness += ($effect->effect_amount / 100);
+                $target->lightning_vulnerability += ($effect->effect_amount / 100);
                 break;
             case 'earth_vulnerability':
-                $target->earth_weakness += ($effect->effect_amount / 100);
+                $target->earth_vulnerability += ($effect->effect_amount / 100);
                 break;
             case 'water_vulnerability':
-                $target->water_weakness += ($effect->effect_amount / 100);
+                $target->water_vulnerability += ($effect->effect_amount / 100);
                 break;
 
             case 'erosion':
