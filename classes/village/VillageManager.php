@@ -2268,10 +2268,13 @@ class VillageManager {
         if ($seat->seat_type != "kage") {
             return "You do not meet the seat requirements.";
         }
+
+        $requirements_result = VillageUpgradeManager::checkResearchRequirementsMet($player->village, $upgrade_key);
         // check research requirements
-        if (!VillageUpgradeManager::checkResearchRequirementsMet($player->village, $upgrade_key)) {
-            return "Research requirements not met.";
+        if ($requirements_result->failed) {
+            return "Research requirements not met: " . $requirements_result->error_message;
         }
+
         // check no pending proposal of same type
         $proposal_type = self::PROPOSAL_TYPE_BEGIN_RESEARCH;
         $query = $system->db->query("SELECT * FROM `proposals` WHERE `end_time` IS NULL AND `village_id` = {$player->village->village_id} AND `type` = '{$proposal_type}' LIMIT 1");

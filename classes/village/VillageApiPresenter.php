@@ -205,10 +205,11 @@ class VillageApiPresenter {
             array_values(VillageManager::getKageRecord($system, $player->village->village_id))
         );
     }
+
     public static function buildingUpgradeDataResponse(System $system, User $player): array {
         $buildings = VillageUpgradeManager::getBuildingUpgradesForDisplay($system, $player->village);
         return array_map(
-            function ($villageBuildingDto) {
+            function (VillageBuildingDto $villageBuildingDto) {
                 return [
                     "id" => $villageBuildingDto->id,
                     "key" => $villageBuildingDto->key,
@@ -233,13 +234,13 @@ class VillageApiPresenter {
                     "construction_time_remaining" => $villageBuildingDto->construction_time_remaining,
                     "requirements_met" => $villageBuildingDto->requirements_met,
                     "upgrade_sets" => array_map(
-                        function ($villageUpgradeSetDto) {
+                        function (VillageUpgradeSetDto $villageUpgradeSetDto) {
                             return [
                                 "key" => $villageUpgradeSetDto->key,
                                 "name" => $villageUpgradeSetDto->name,
                                 "description" => $villageUpgradeSetDto->description,
                                 "upgrades" => array_map(
-                                    function ($villageUpgradeDto) {
+                                    function (VillageUpgradeDto $villageUpgradeDto) {
                                         return [
                                             "id" => $villageUpgradeDto->id,
                                             "key" => $villageUpgradeDto->key,
@@ -261,6 +262,7 @@ class VillageApiPresenter {
                                             "materials_upkeep" => $villageUpgradeDto->materials_upkeep,
                                             "wealth_upkeep" => $villageUpgradeDto->wealth_upkeep,
                                             "requirements_met" => $villageUpgradeDto->requirements_met,
+                                            "requirements_unmet_message" => $villageUpgradeDto->requirements_unmet_message,
                                         ];
                                     },
                                     $villageUpgradeSetDto->upgrades

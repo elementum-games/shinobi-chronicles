@@ -24,5 +24,6 @@ class VillageUpgradeDto {
         public array $research_requirements = [],
         public array $effects = [],
         public bool $requirements_met,
+        public string $requirements_unmet_message = '',
     ) {}
 }

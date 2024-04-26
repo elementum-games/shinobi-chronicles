@@ -165,6 +165,9 @@ class VillageUpgradeManager {
                             $research_time_remaining = System::timeFormat($research_time_remaining, format: "long", include_seconds: false, include_minutes: false);
                         }
                     }
+
+
+                    $upgrade_requirements_result = VillageUpgradeManager::checkResearchRequirementsMet($village, $upgrade_key);
                     $upgrades[] = new VillageUpgradeDto(
                         id: $upgrade ? $upgrade->id : null,
                         key: $upgrade_key,
@@ -187,7 +190,8 @@ class VillageUpgradeManager {
                         wealth_upkeep: $upgrade_config_data->getUpkeepWealth(),
                         research_requirements: $upgrade_config_data->getResearchRequirements(),
                         effects: $upgrade_config_data->getEffects(),
-                        requirements_met: VillageUpgradeManager::checkResearchRequirementsMet($village, $upgrade_key),
+                        requirements_met: $upgrade_requirements_result->succeeded,
+                        requirements_unmet_message: $upgrade_requirements_result->error_message,
                     );
                 }
                 $upgrade_sets[] = new VillageUpgradeSetDto(
@@ -237,7 +241,7 @@ class VillageUpgradeManager {
      * @param Village $village
      * @return array<VillageUpgrade>
      */
-    public static function checkResearchRequirementsMet(Village $village, string $upgrade_key): bool {
+    public static function checkResearchRequirementsMet(Village $village, string $upgrade_key): ActionResult {
         self::initialize();
         if (isset(VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key])) {
             $requirements = VillageUpgradeConfig::UPGRADE_RESEARCH_REQUIREMENTS[$upgrade_key];
@@ -245,7 +249,7 @@ class VillageUpgradeManager {
             if (isset($requirements[VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS])) {
                 foreach ($requirements[VillageUpgradeConfig::UPGRADE_REQUIREMENT_BUILDINGS] as $building_key => $tier) {
                     if ($village->buildings[$building_key]->tier < $tier) {
-                        return false;
+                        return ActionResult::failed($village->buildings[$building_key]->getName() . " must be at least tier {$tier}");
                     }
                 }
             }
@@ -258,17 +262,19 @@ class VillageUpgradeManager {
                         VillageUpgradeConfig::UPGRADE_STATUS_UNLOCKED,
                         VillageUpgradeConfig::UPGRADE_STATUS_INACTIVE
                     ];
-                    if (!isset($village->upgrades[$required_upgrade_key]) || !in_array($village->upgrades[$required_upgrade_key]->status, $valid_status)) {
-                        return false;
+                    if (!isset($village->upgrades[$required_upgrade_key])
+                        || !in_array($village->upgrades[$required_upgrade_key]->status, $valid_status)
+                    ) {
+                        return ActionResult::failed("The " . VillageUpgradeConfig::UPGRADE_NAMES[$required_upgrade_key] . " upgrade is required to research this");
                     }
                 }
             }
         }
         // check if village HQ is at least the same tier as the effective tier for the upgrade
         if ($village->buildings[VillageBuildingConfig::BUILDING_VILLAGE_HQ]->tier < VillageUpgradeManager::$UPGRADE_CONFIGS[$upgrade_key]->getTier()) {
-            return false;
+            return ActionResult::failed("Village HQ must be tier " . VillageUpgradeManager::$UPGRADE_CONFIGS[$upgrade_key]->getTier());
         }
-        return true;
+        return ActionResult::succeeded();
     }
 
     /**
@@ -379,10 +385,13 @@ class VillageUpgradeManager {
         $food_cost = VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$upgrade_key][WarManager::RESOURCE_FOOD];
         $wealth_cost = VillageUpgradeConfig::UPGRADE_RESEARCH_COST[$upgrade_key][WarManager::RESOURCE_WEALTH];
         $progress_required = VillageUpgradeConfig::UPGRADE_RESEARCH_TIME[$upgrade_key] * 86400;
+
         // check if requirements met
-        if (!VillageUpgradeManager::checkResearchRequirementsMet($village, $upgrade_key)) {
-            throw new RuntimeException("Research requirements not met!");
+        $requirements_result = VillageUpgradeManager::checkResearchRequirementsMet($village, $upgrade_key);
+        if ($requirements_result->failed) {
+            throw new RuntimeException("Research requirements not met: {$requirements_result->error_message}");
         }
+
         // check if another upgrade is already under research
         foreach ($village->upgrades as $upgrade) {
             if ($upgrade->status == VillageUpgradeConfig::UPGRADE_STATUS_RESEARCHING) {
