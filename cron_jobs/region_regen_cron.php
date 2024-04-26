@@ -15,6 +15,7 @@ require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/inbox/Inbox.php';
 require_once __DIR__ . '/../classes/war/WarManager.php';
+require_once __DIR__ . '/../classes/travel/RegionLocation.php';
 
 $system = System::initialize(load_layout: false);
 $system->db->connect();
@@ -81,16 +82,18 @@ if (isset($_SESSION['user_id'])) {
     }
 }
 
-function processRegionRegenInterval(System $system, $debug = true): void
-{
+function processRegionRegenInterval(System $system, $debug = true): void {
+    $queries = [];
+
     // get regions
     $region_result = $system->db->query("SELECT * FROM `regions`");
     $region_result = $system->db->fetch_all($region_result);
-    $queries = [];
+
     // get villages
     $village_result = $system->db->query("SELECT * FROM `villages`");
     $village_result = $system->db->fetch_all($village_result);
     $villages = [];
+
     foreach ($village_result as $village) {
         $villages[$village['village_id']] = new Village($system, village_row: $village);
     }
@@ -99,79 +102,50 @@ function processRegionRegenInterval(System $system, $debug = true): void
         $region_location_result = $system->db->query("SELECT * FROM `region_locations` WHERE `region_id` = {$region['region_id']}");
         $region_location_result = $system->db->fetch_all($region_location_result);
 
-        /* step 1: roll for rebellion */
-        foreach ($region_location_result as &$region_location) {
-            // if village, and stability is negative, and not original village, roll for rebellion
-            if ($region_location['type'] == 'village' && $region_location['stability'] < 0 && $region_location['occupying_village_id'] != WarManager::REGION_ORIGINAL_VILLAGE[$region['region_id']]) {
-                // rebellin chance is proportional to stability, spread evenly over each hour
-                $rebellion_chance = abs($region_location['stability']) / (60 / WarManager::REGEN_INTERVAL_MINUTES);
-                if (mt_rand(0, 100) < $rebellion_chance) {
-                    $region_location['rebellion_active'] = 1;
-                }
+        /** @var RegionLocation[] $region_locations */
+        $region_locations = [];
+        $castle = null;
+        foreach ($region_location_result as $row) {
+            $region_location = RegionLocation::fromDb($row, $villages[$row['occupying_village_id']]);
+            $region_locations[] = $region_location;
+
+            /* step 1: roll for rebellion */
+            $region_location->rollForRebellion();
+
+            /* step 2: update health */
+            $region_location->processRegen();
+            if($region_location->type == 'castle') {
+                $castle = &$region_location;
             }
-            unset($region_location);
         }
 
-        /* step 2: update health */
-        $castle = null;
-        $village_regen_share = 0;
-        foreach ($region_location_result as &$region_location) {
-            switch ($region_location['type']) {
-                case 'castle':
-                    // increase health, cap at max
-                    $regen = (WarManager::BASE_CASTLE_REGEN_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES) * max((1 + ($region_location['stability'] / 100)), 0);
-                    $region_location['health'] = min($region_location['health'] + $regen, WarManager::BASE_CASTLE_HEALTH);
-                    // get castle reference
-                    $castle = &$region_location;
-                    break;
-                case 'village':
-                    if ($region_location['stability'] >= 0 && $region_location['rebellion_active']) {
-                        $region_location['rebellion_active'] = 0;
-                    }
-                    if ($region_location['rebellion_active']) {
-                        $damage = (WarManager::BASE_REBELLION_DAMAGE_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES) * max((1 + (-1 * $region_location['stability'] / 100)), 0);
-                        $region_location['health'] = max($region_location['health'] - $damage, 0);
-                        // if health reaches 0, change control
-                        if ($region_location['health'] == 0) {
-                            $region_location['occupying_village_id'] = WarManager::REGION_ORIGINAL_VILLAGE[$region['region_id']];
-                            $region_location['rebellion_active'] = 0;
-                            $region_location['health'] = (WarManager::INITIAL_LOCATION_CAPTURE_HEALTH_PERCENT / 100) * WarManager::BASE_TOWN_HEALTH;
-                            $region_location['defense'] = WarManager::INITIAL_LOCATION_CAPTURE_DEFENSE;
-                            $region_location['stability'] = WarManager::INITIAL_LOCATION_CAPTURE_STABILITY;
-                        }
-                    } else {
-                        // increase health, cap at max
-                        $regen = (WarManager::BASE_TOWN_REGEN_PER_MINUTE * WarManager::REGEN_INTERVAL_MINUTES) * max((1 + ($region_location['stability'] / 100)), 0);
-                        $region_location['health'] = min($region_location['health'] + $regen, WarManager::BASE_TOWN_HEALTH);
-                        // give a bonus to castle regen if same owner
-                        if (isset($castle)) {
-                            if ($region_location['occupying_village_id'] == $castle['occupying_village_id']) {
-                                $village_regen_share += floor((WarManager::TOWN_REGEN_SHARE_PERCENT / 100) * $regen);
-                            }
-                        }
-                    }
-                    break;
-                default;
-                    break;
+        // Check for village regen bonus
+        $village_regen_to_castle = 0;
+        foreach ($region_locations as $region_location) {
+            // give a bonus to castle regen if same owner
+            if (isset($castle)) {
+                if ($region_location->occupying_village_id == $castle->occupying_village_id) {
+                    $village_regen_to_castle += floor(
+                        $region_location->getRegenAmount() * (WarManager::TOWN_REGEN_SHARE_PERCENT / 100)
+                    );
+                }
             }
-            unset($region_location);
         }
 
         // if castle exists, add bonus regen from villages
         if (!empty($castle)) {
-            $castle['health'] = min($castle['health'] + $village_regen_share, WarManager::BASE_CASTLE_HEALTH);
-            unset($castle);
+            $castle['health'] = min($castle['health'] + $village_regen_to_castle, $castle->max_health);
         }
 
         /* update region_locations */
         foreach ($region_location_result as $region_location) {
             $queries[] = "UPDATE `region_locations` SET
-                `health` = {$region_location['health']},
-                `defense` = {$region_location['defense']},
-                `stability` = {$region_location['stability']},
-                `rebellion_active` = {$region_location['rebellion_active']},
-                `occupying_village_id` = {$region_location['occupying_village_id']}
-                WHERE `region_location_id` = {$region_location['region_location_id']}";
+                `health` = {$region_location->health},
+                `defense` = {$region_location->defense},
+                `stability` = {$region_location->stability},
+                `rebellion_active` = {$region_location->rebellion_active},
+                `occupying_village_id` = {$region_location->occupying_village_id}
+                WHERE `region_location_id` = {$region_location->region_location_id}";
         }
     }
 
@@ -184,9 +158,15 @@ function processRegionRegenInterval(System $system, $debug = true): void
     } else {
         echo "Script running...<br>";
         foreach ($queries as $query) {
-            $system->db->query("LOCK TABLES `region_locations` WRITE;");
-            $system->db->query($query);
-            $system->db->query("UNLOCK TABLES;");
+            try {
+                $system->db->query("LOCK TABLES `region_locations` WRITE;");
+                $system->db->query($query);
+                $system->db->query("UNLOCK TABLES;");
+            } catch (Exception $e) {
+                $system->db->query("UNLOCK TABLES;");
+                echo $e->getMessage();
+            }
+
         }
         echo "Script complete";
     }
