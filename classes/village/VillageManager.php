@@ -1668,11 +1668,17 @@ class VillageManager {
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
                     return "Villages must be allied in order to trade!";
                 }
-	    	$relation_type = VillageRelation::RELATION_WAR;
-	    	$system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NULL AND `relation_type` = {$relation_type} AND ((`village1_id` = {$proposal['village_id']} OR `village2_id` = {$proposal['village_id']}) OR (`village2_id` = {$proposal['target_village_id']} OR `village2_id` = {$proposal['target_village_id']}))");
-	    	if ($system->db->last_num_rows > 0) {
-			return "Cannot trade while at war.";
-	    	}
+                $relation_type = VillageRelation::RELATION_WAR;
+                $system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NULL 
+                    AND `relation_type` = {$relation_type} 
+                    AND (
+                        (`village1_id` = {$proposal['village_id']} OR `village2_id` = {$proposal['village_id']}) 
+                        OR 
+                        (`village2_id` = {$proposal['target_village_id']} OR `village2_id` = {$proposal['target_village_id']})
+                    )");
+                if ($system->db->last_num_rows > 0) {
+                    return "Cannot trade while at war.";
+                }
                 // check trade cooldown
                 $proposal_type = self::PROPOSAL_TYPE_OFFER_TRADE;
                 $last_trade_offer = $system->db->query("SELECT * FROM `proposals` WHERE `type` = '{$proposal_type}'
@@ -1710,11 +1716,18 @@ class VillageManager {
                     $system->db->query("UPDATE `proposals` SET `end_time` = {$time}, `result` = 'canceled' WHERE `proposal_id` = {$proposal['proposal_id']}");
                     return "Villages must be at peace in order to trade!";
                 }
-		$relation_type = VillageRelation::RELATION_WAR;
-	    	$system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NULL AND `relation_type` = {$relation_type} AND ((`village1_id` = {$proposal['village_id']} OR `village2_id` = {$proposal['village_id']}) OR (`village2_id` = {$proposal['target_village_id']} OR `village2_id` = {$proposal['target_village_id']}))");
-	    	if ($system->db->last_num_rows > 0) {
-			return "Cannot trade while at war.";
-	    	}
+                $relation_type = VillageRelation::RELATION_WAR;
+                $system->db->query("SELECT * FROM `village_relations` WHERE `relation_end` IS NULL 
+                    AND `relation_type` = {$relation_type} 
+                    AND (
+                        (`village1_id` = {$proposal['village_id']} OR `village2_id` = {$proposal['village_id']}) 
+                        OR 
+                        (`village2_id` = {$proposal['target_village_id']} OR `village2_id` = {$proposal['target_village_id']})
+                    )");
+                if ($system->db->last_num_rows > 0) {
+                    return "Cannot trade while at war.";
+                }
+
                 // check has resources / regions
                 $trade_data = json_decode($proposal['trade_data'], true);
                 $is_valid_trade = self::checkTradeValid($system, $proposal['target_village_id'], $player->village->village_id, $trade_data['offered_resources'], $trade_data['offered_regions'], $trade_data['requested_resources'], $trade_data['requested_regions']);
