@@ -134,11 +134,11 @@ function processRegionRegenInterval(System $system, $debug = true): void {
 
         // if castle exists, add bonus regen from villages
         if (!empty($castle)) {
-            $castle['health'] = min($castle['health'] + $village_regen_to_castle, $castle->max_health);
+            $castle->health = min($castle->health + $village_regen_to_castle, $castle->max_health);
         }
 
         /* update region_locations */
-        foreach ($region_location_result as $region_location) {
+        foreach ($region_locations as $region_location) {
             $queries[] = "UPDATE `region_locations` SET
                 `health` = {$region_location->health},
                 `defense` = {$region_location->defense},

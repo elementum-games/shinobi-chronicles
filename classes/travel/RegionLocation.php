@@ -74,7 +74,7 @@ class RegionLocation {
         }
     }
 
-    public function processRegen(): int {
+    public function processRegen(): void {
         switch ($this->type) {
             case 'castle':
                 // increase health, cap at max
