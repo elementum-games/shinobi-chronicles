@@ -25,15 +25,17 @@ class RegionLocation {
     public static function fromDb(array $data, Village $village): RegionLocation {
         switch ($data['type']) {
             case 'castle':
+                $boost_amount = $village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP];
                 $max_health = floor(
                     WarManager::BASE_CASTLE_HEALTH *
-                    (1 + ($village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_CASTLE_HP] / 100))
+                    (1 + ($boost_amount / 100))
                 );
                 break;
             case 'village':
+                $boost_amount = $village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_TOWN_HP] ;
                 $max_health = floor(
                     WarManager::BASE_TOWN_HEALTH *
-                    (1 + ($village->active_upgrade_effects[VillageUpgradeConfig::UPGRADE_EFFECT_TOWN_HP] / 100))
+                    (1 + ($boost_amount / 100))
                 );
                 break;
             default:
@@ -93,14 +95,14 @@ class RegionLocation {
                     if ($this->health == 0) {
                         $this->occupying_village_id = WarManager::REGION_ORIGINAL_VILLAGE[$this->region_id];
                         $this->rebellion_active = 0;
-                        $this->health = (WarManager::INITIAL_LOCATION_CAPTURE_HEALTH_PERCENT / 100) * WarManager::BASE_TOWN_HEALTH;
+                        $this->health = (WarManager::INITIAL_LOCATION_CAPTURE_HEALTH_PERCENT / 100) * $this->max_health;
                         $this->defense = WarManager::INITIAL_LOCATION_CAPTURE_DEFENSE;
                         $this->stability = WarManager::INITIAL_LOCATION_CAPTURE_STABILITY;
                     }
                 } else {
                     // increase health, cap at max
                     $regen = $this->getRegenAmount();
-                    $this->health = min($this->health + $regen, WarManager::BASE_TOWN_HEALTH);
+                    $this->health = min($this->health + $regen, $this->max_health);
                 }
                 break;
             default;
