@@ -322,9 +322,12 @@ class WarAction {
 
         $target_village = VillageManager::getVillageByID($this->system, $this->target_village);
 
+        $location_target = null;
         $location_target_result = $this->system->db->query("SELECT * from `region_locations` WHERE `region_location_id` = {$this->target_id} LIMIT 1");
         $location_target_row = $this->system->db->fetch($location_target_result);
-        $location_target = RegionLocation::fromDb($location_target_row, $target_village);
+        if($location_target_row != null) {
+            $location_target = RegionLocation::fromDb($location_target_row, $target_village);
+        }
 
         switch ($this->type) {
             case self::WAR_ACTION_INFILTRATE:
