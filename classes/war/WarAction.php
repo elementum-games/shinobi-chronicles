@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__ . '/../travel/RegionLocation.php';
+
 class WarAction {
     const WAR_ACTION_INFILTRATE = 1;
     const WAR_ACTION_REINFORCE = 2;
