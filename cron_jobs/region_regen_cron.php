@@ -115,7 +115,7 @@ function processRegionRegenInterval(System $system, $debug = true): void {
             /* step 2: update health */
             $region_location->processRegen();
             if($region_location->type == 'castle') {
-                $castle = &$region_location;
+                $castle = $region_location;
             }
         }
 

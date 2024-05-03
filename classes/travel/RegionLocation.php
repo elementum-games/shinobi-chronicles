@@ -21,7 +21,7 @@ class RegionLocation {
         public int $rebellion_active,
         public string $background_image,
     ) {}
-    
+
     public static function fromDb(array $data, Village $village): RegionLocation {
         switch ($data['type']) {
             case 'castle':
@@ -44,19 +44,19 @@ class RegionLocation {
         }
 
         return new RegionLocation(
-            region_location_id: $data['region_location_id'], 
-            region_id: $data['region_id'], 
+            region_location_id: $data['region_location_id'],
+            region_id: $data['region_id'],
             health: $data['health'],
             max_health: $max_health,
             type: $data['type'],
-            map_id: $data['map_id'], 
-            x: $data['x'], 
-            y: $data['y'], 
-            name: $data['name'], 
-            resource_id: $data['resource_id'], 
+            map_id: $data['map_id'],
+            x: $data['x'],
+            y: $data['y'],
+            name: $data['name'],
+            resource_id: $data['resource_id'],
             resource_count: $data['resource_count'],
-            defense: $data['defense'], 
-            occupying_village_id: $data['occupying_village_id'], 
+            defense: $data['defense'],
+            occupying_village_id: $data['occupying_village_id'],
             stability: $data['stability'],
             rebellion_active: $data['rebellion_active'],
             background_image: $data['background_image']
