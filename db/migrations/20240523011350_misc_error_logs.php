@@ -12,7 +12,7 @@ final class MiscErrorLogs extends AbstractMigration
     {
         $this->execute("
             -- Create table for misc. error logging not logged by php/mysql
-            CREATE TABLE `error_logs` (
+            CREATE TABLE `misc_error_logs` (
                 `log_id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 `log_type` VARCHAR(25) NOT NULL,
                 `content` TEXT NOT NULL,
@@ -28,7 +28,7 @@ final class MiscErrorLogs extends AbstractMigration
     {
         $this->execute("
             -- Drop misc logs
-            DROP TABLE `error_logs`;
+            DROP TABLE `misc_error_logs`;
         ");
     }
 }

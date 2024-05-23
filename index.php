@@ -183,7 +183,7 @@ else {
     }
     elseif($system->USE_ROUTE_V2) {
         $page_name = isset($_GET['page']) ? $system->db->clean($_GET['page']) : RouterV2::DEFAULT_PAGE;
-        $route = $system->routerV2->routes[$page_name] ?? null;
+        $route = $system->routerV2->routes[$page_name] ?? $system->routerV2->routes[RouterV2::DEFAULT_PAGE];
 
         try {
             // Load page title

@@ -45,7 +45,7 @@ class RouterV2 {
         // Validate navigation to different pages (e.g. profile, chat, etc.)
         if($var_name === RouteV2::ROUTE_PAGE_KEY && !isset($this->routes[$value])) {
             // Log error for unreported instances
-            $this->db->query("INSERT INTO `error_logs`
+            $this->db->query("INSERT INTO `misc_error_logs`
                 (`log_type`, `content`, `time`)
                 VALUES
                 ('set_route', '$var_name => $value', " . time() . ")
