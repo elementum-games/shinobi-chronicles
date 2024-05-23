@@ -148,8 +148,8 @@ function editBloodlinePage($system) {
     // Form for editing data
     if($existing_bloodline != null && $editing_bloodline_id != null) {
         if($system->USE_ROUTE_V2) {
-            $system->router_v2->setCurrentRoute(var_name: 'bloodline_id', value: $existing_bloodline->bloodline_id);
-            $form_action_url = $system->router_v2->current_route;
+            $system->routerV2->setCurrentRoute(var_name: 'bloodline_id', value: $existing_bloodline->bloodline_id);
+            $form_action_url = $system->routerV2->current_route;
         }
         else {
             $form_action_url = $system->router->getUrl('admin', [
