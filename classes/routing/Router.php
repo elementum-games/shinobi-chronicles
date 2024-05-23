@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/battle/Battle.php';
-require_once __DIR__ . '/routing/Route.php';
+require_once __DIR__ . '/../battle/Battle.php';
+require_once __DIR__ . '/../routing/Route.php';
 
 class RouterV2 {
     public function __construct(
