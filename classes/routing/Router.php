@@ -3,6 +3,8 @@ require_once __DIR__ . '/../battle/Battle.php';
 require_once __DIR__ . '/../routing/Route.php';
 
 class RouterV2 {
+    const DEFAULT_PAGE = 'profile';
+    
     public function __construct(
         private Database $db,
         public readonly string $base_url,

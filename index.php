@@ -181,6 +181,99 @@ else {
         require (__DIR__ . '/pages/' . $route->file_name);
         ($route->function_name)();
     }
+    elseif($system->USE_ROUTE_V2) {
+        $page_name = isset($_GET['page']) ? $system->db->clean($_GET['page']) : $system->routerV2->routes[RouterV2::DEFAULT_PAGE];
+        $route = $system->routerV2->routes[$page_name] ?? null;
+
+        try {
+            // Load page title
+            if($system->layout->usesV2Interface()) {
+                $location_name = $player->current_location->location_id
+                    ? ' ' . ' <div id="contentHeaderLocation">' . " | " . $player->current_location->name . '</div>'
+                    : null;
+                $location_coords = "<div id='contentHeaderCoords'>" . " | " . $player->region->name . " (" . $player->location->x . "." . $player->location->y . ")" . '</div>';
+                $content_header_divider = '<div class="contentHeaderDivider"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#77694e" stroke-width="1"></line></svg></div>';
+            }
+            else {
+                $location_name = $player->current_location->location_id
+                    ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
+                    : null;
+                $location_coords = null;
+                $content_header_divider = null;
+            }
+            $page_title = $route->title . $location_name . $location_coords . $content_header_divider;
+
+            // Force battle view if waiting too long
+            if($player->battle_id && empty($route->battle_type)) {
+                $battle_result = $system->db->query(
+                    "SELECT winner, turn_time, battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1"
+                );
+                if($system->db->last_num_rows) {
+                    $battle_data = $system->db->fetch($battle_result);
+                    $time_since_turn = time() - $battle_data['turn_time'];
+
+                    if($battle_data['winner'] && $time_since_turn >= 60) {
+                        foreach($system->routerV2->routes as $page_name => $page) {
+                            $type = $page->battle_type ?? null;
+                            if($type == $battle_data['battle_type']) {
+                                $page = $page_name;
+                                $route = $system->routerV2->routes[$page_name];
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Check for valid route & permissions
+            try {
+                $system->routerV2->assertRouteIsValid(route: $route, player: $player);
+            } catch(RuntimeException $e) {
+                $system->message($e->getMessage());
+                $system->layout->renderBeforeContentHTML(system: $system, player: $player ?? null, page_title: '');
+                $system->printMessage(force_display: true);
+                exit;
+            }
+
+            // TODO: Remove once routerV2 is completely in place
+            $self_link = $system->router->base_url . '?' . Route::ROUTE_PAGE_KEY . '=' . $page_name;
+            $system->routerV2->setCurrentRoute(var_name: Route::ROUTE_PAGE_KEY, value: $page_name);
+
+            // Render page
+            $system->layout->renderBeforeContentHTML(
+                system: $system, player: $player ?? null, page_title: $page_title
+            );
+
+            // Legacy event notification
+            if(!$system->layout->usesV2Interface() && !is_null($system->event)) {
+                require_once ('templates/temp_event_header.php');
+            }
+
+            require (__DIR__ . '/pages/' . $route->file_name);
+            try {
+                ($route->function_name)();
+            } catch(DatabaseDeadlockException $e) {
+                // Wait random time between 100-500ms, then retry deadlocked transaction
+                $system->db->rollbackTransaction();
+                usleep(mt_rand(100000, 500000));
+
+                $system->db->startTransaction();
+                $player->loadData();
+                ($route->function_name)();
+            }
+        } catch (Exception $e) {
+            if($e instanceof DatabaseDeadlockException) {
+                error_log("DEADLOCK - retry did not solve");
+                $system->db->rollbackTransaction();
+                $system->message("Database deadlock, please reload your page and tell Lsm to fix!");
+                $system->printMessage(true);
+            }
+            elseif(strlen($e->getMessage()) > 1) {
+                $system->db->rollbackTransaction();
+                $system->message($e->getMessage());
+                $system->printMessage(true);
+            }
+        }
+    }
     else {
         $id = isset($_GET['id']) ? (int)$_GET['id'] : Router::PAGE_IDS['profile'];
         $route = Router::$routes[$id] ?? null;
