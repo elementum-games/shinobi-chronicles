@@ -76,7 +76,7 @@ function createBloodlinePage($system) {
         }
     }
 
-    $form_action_url = ($system->USE_ROUTE_V2) ? $system->router_v2->current_route : $system->router->getUrl('admin', ['page' => 'create_bloodline']);
+    $form_action_url = ($system->USE_ROUTE_V2) ? $system->routerV2->current_route : $system->router->getUrl('admin', ['page' => 'create_bloodline']);
     require 'templates/admin/bloodline_form.php';
 }
 
