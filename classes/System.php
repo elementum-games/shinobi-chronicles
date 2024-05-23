@@ -1234,7 +1234,7 @@ class System {
             USE_NEW_BATTLES: $USE_NEW_BATTLES ?? self::USE_NEW_BATTLES,
             war_enabled: $WAR_ENABLED ?? self::WAR_ENABLED,
             REQUIRE_USER_VERIFICATION: $REQUIRE_USER_VERIFICATION ?? self::REQUIRE_USER_VERIFICATION,
-            USE_ROUTE_V2: ($ENVIRONMENT == self::ENVIRONEMT_DEV) ? true : false,
+            USE_ROUTE_V2: ($ENVIRONMENT == self::ENVIRONMENT_DEV) ? true : false,
             SERVER_TIME: new DateTimeImmutable("now", new DateTimeZone(self::SERVER_TIME_ZONE)),
             environment: $ENVIRONMENT,
             enable_dev_only_features: $ENABLE_DEV_ONLY_FEATURES ?? self::DEV_ONLY_FEATURES_DEFAULT,

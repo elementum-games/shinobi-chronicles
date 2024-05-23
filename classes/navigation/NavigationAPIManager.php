@@ -69,7 +69,7 @@ class NavigationAPIManager {
             return $return_arr;
         }
         else {
-            $this->getMenuLinks(menu_name: RouteV2::MENU_STAFF);
+            return $this->getMenuLinks(menu_name: RouteV2::MENU_STAFF);
         }
     }
 
@@ -116,7 +116,7 @@ class NavigationAPIManager {
 
                 // Inadequate permissions
                 if($page->user_check) {
-                    if(!$page->user_check($this, $this->player)) {
+                    if(!$page->user_check->call($this, $this->player)) {
                         continue;
                     }
                 }
@@ -126,7 +126,7 @@ class NavigationAPIManager {
             $page_key = ($this->system->USE_ROUTE_V2) ? RouteV2::ROUTE_PAGE_KEY : "id";
             $return_arr[] = new NavigationLinkDto(
                 title: $page->title,
-                url: $this->system->router->base_url . "?$page_key" . $id,
+                url: $this->system->router->base_url . "?$page_key=" . $id,
                 active: true,
                 id: $id
             );
