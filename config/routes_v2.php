@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../classes/routing/Route.php';
 /**
+ * Page Template
+ * Note: See classes/routing/Route.php for configuration details
+ * 
  * 'page_name' => RouteV2::load(
  *      file_name: "",
  *      title: "",
@@ -15,7 +18,8 @@ require_once __DIR__ . '/../classes/routing/Route.php';
  *      challenge_lock_ok: ,
  *      user_check: ,
  *      dev_only: ,
- *      allowed_location_types: 
+ *      allowed_location_types: ,
+ *      location_access_mode: 
  *  ),
  */
 return [

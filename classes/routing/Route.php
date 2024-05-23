@@ -44,7 +44,19 @@ class RouteV2 {
         bool $challenge_lock_ok = true,
         ?Closure $user_check = null,
         bool $dev_only = false,
-        array $allowed_location_types = []
+
+        // Default access to all locations
+        array $allowed_location_types = [
+            TravelManager::LOCATION_TYPE_DEFAULT => true,
+            TravelManager::LOCATION_TYPE_HOME_VILLAGE => true,
+            TravelManager::LOCATION_TYPE_ALLY_VILLAGE => true,
+            TravelManager::LOCATION_TYPE_ENEMY_VILLAGE => true,
+            TravelManager::LOCATION_TYPE_ABYSS => true,
+            TravelManager::LOCATION_TYPE_COLOSSEUM => true,
+            TravelManager::LOCATION_TYPE_TOWN => true,
+            TravelManager::LOCATION_TYPE_CASTLE => true,
+        ],
+        bool $location_access_mode = self::LOCATION_ACCESS_INCLUSIVE
     ): RouteV2 {
         return new RouteV2(
             file_name: $file_name,
