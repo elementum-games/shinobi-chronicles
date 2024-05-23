@@ -157,13 +157,13 @@ class RouterV2 {
      * @param string $base_rul
      * @return RouterV2
      */
-    public static function load(Database $db, string $base_url): RouterV2 {
+    public static function load(Database $db, string $base_url, array $routes): RouterV2 {
         return new RouterV2(
             db: $db,
             base_url: $base_url,
             current_route: $base_url,
             current_route_variables: [],
-            routes: require(__DIR__ . "/../config/routes_v2.php")
+            routes: $routes
         );
     }
 }

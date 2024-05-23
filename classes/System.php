@@ -1238,7 +1238,13 @@ class System {
             enable_dev_only_features: $ENABLE_DEV_ONLY_FEATURES ?? self::DEV_ONLY_FEATURES_DEFAULT,
             local_host: $LOCAL_HOST_CONNECTION ?? self::LOCAL_HOST,
             register_open: $register_open,
-            routerV2: ($ENVIRONMENT == self::ENVIRONMENT_DEV) ? RouterV2::load(db: $db, base_url: $web_url) : null
+            routerV2: ($ENVIRONMENT == self::ENVIRONMENT_DEV) 
+                ? RouterV2::load(
+                    db: $db,
+                    base_url: $web_url,
+                    routes: require(__DIR__ . "/../config/routes_v2.php")
+                )
+                : null
         );
 
         // Load reputation layout, reputation reset and check for server maintenance

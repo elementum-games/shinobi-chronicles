@@ -39,11 +39,11 @@ class RouteV2 {
         string $menu = self::MENU_NONE,
         ?int $battle_type = null,
         ?int $min_rank = null,
-        bool $battle_ok = null,
-        bool $survival_mission_ok = null,
-        bool $challenge_lock_ok = null,
+        bool $battle_ok = true,
+        bool $survival_mission_ok = true,
+        bool $challenge_lock_ok = true,
         ?Closure $user_check = null,
-        bool $dev_only = null,
+        bool $dev_only = false,
         array $allowed_location_types = []
     ): RouteV2 {
         return new RouteV2(
