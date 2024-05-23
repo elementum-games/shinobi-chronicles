@@ -290,4 +290,16 @@ return [
         function_name: 'challenge',
         battle_type: Battle::TYPE_CHALLENGE,
     ),
+
+   /// DEV ONLY
+   'test' => RouteV2::load(
+        file_name: 'test.php',
+        title: "Test",
+        function_name: 'test',
+        menu: RouteV2::MENU_USER,
+        user_check: function(User $u) {
+            return $u->hasAdminPanel();
+        },
+        dev_only: true,
+   ), 
 ];
