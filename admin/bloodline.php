@@ -85,9 +85,6 @@ function editBloodlinePage($system) {
     $bloodline_constraints = require 'admin/constraints/bloodline.php';
 
     $self_link = $system->router->getUrl('admin', ['view' => "edit_bloodline"]);
-    if($system->USE_ROUTE_V2) {
-        $system->routerV2->setCurrentRoute(var_name: 'view', value: 'edit_bloodline');
-    }
 
     // Validate NPC id
     $editing_bloodline_id = null;
