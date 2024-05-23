@@ -75,25 +75,25 @@ function BattleFieldContent({
   debug('----------------');
 
   /* Transition tile display
-        Example 1:
+       Example 1:
           Starting tiles
           | 3 4 5 6 7 |
-            Add new tiles
+           Add new tiles
       1 2 | 3 4 5 6 7 |
-            Animate container over
+           Animate container over
           1 2 | 3 4 5 6 7 |
-            Move(animated) to new visible set
+           Move(animated) to new visible set
           | 1 2 3 4 5 | 6 7
-            Remove old tiles
+           Remove old tiles
           | 1 2 3 4 5 |
-        Example 2:
+       Example 2:
           Starting tiles
           | 3 4 5 6 7 |
-            Add new tiles
+           Add new tiles
       1 2 | 3 4 5 6 7 |
-            Animate container over
+           Animate container over
           1 2 | 3 4 5 6 7 |
-            Disable transitions and update to tiles
+           Disable transitions and update to tiles
           | 1 2 3 4 5 6 |
    */
   React.useEffect(() => {
@@ -160,7 +160,7 @@ function BattleFieldContent({
     /* Display index is based on which tiles are displayed, while tile index is the absolute index
      if the fighters have moved to the right a few times, we might display tile indexes 4-9 like this:
      4 5 6 7 8 9
-       But we need to do our calculations relative to what's visible, so tile index 4 here is tile display index 0
+      But we need to do our calculations relative to what's visible, so tile index 4 here is tile display index 0
     */
     const tileDisplayIndex = tileIndex - leftmostVisibleTileIndex;
     const leftOffset = offsetPerTile * tileDisplayIndex + tileHorizontalGap;

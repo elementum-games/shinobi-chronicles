@@ -50,7 +50,7 @@ export function PlayAttackActions({
           "jutsuUseType": "physical",
           "jutsuTargetType": "tile"
       }
-        setTimeout(() => addAttackToRender(testAttack), 500);
+       setTimeout(() => addAttackToRender(testAttack), 500);
   }, []);*/
 
   console.log('attacksToRender', attacksToRender);

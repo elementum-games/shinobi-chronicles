@@ -7,6 +7,7 @@ class RouteV2 {
     const MENU_USER = 'user';
     const MENU_ACTIVITY = 'activity';
     const MENU_VILLAGE = 'village';
+    const MENU_STAFF = 'staff';
     const MENU_CONDITIONAL = 'conditional';
     const MENU_NONE = 'none';
 

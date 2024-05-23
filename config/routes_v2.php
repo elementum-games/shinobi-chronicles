@@ -200,11 +200,12 @@ return [
     ),
 
     // Staff menu
+    // Note: Do not make these conditional pages, handled logic in NavigatoinApiManager::getStaffMenu
     'support_panel' => RouteV2::load(
         file_name: 'supportPanel.php',
         title: 'Support Panel',
         function_name: 'supportPanel',
-        menu: RouteV2::MENU_CONDITIONAL,
+        menu: RouteV2::MENU_STAFF,
         user_check: function(User $u) {
             return $u->isSupportStaff();
         }
@@ -213,7 +214,7 @@ return [
         file_name: 'modPanel.php',
         title: 'Mod Panel',
         function_name: 'modPanel',
-        menu: RouteV2::MENU_CONDITIONAL,
+        menu: RouteV2::MENU_STAFF,
         user_check: function(User $u) {
             return $u->isModerator();
         }
@@ -222,11 +223,12 @@ return [
         file_name: 'adminPanel.php',
         title: 'Admin Panel',
         function_name: 'adminPanel',
-        menu: RouteV2::MENU_CONDITIONAL,
+        menu: RouteV2::MENU_STAFF,
         user_check: function(User $u) {
             return $u->hasAdminPanel();
         }
     ),
+    // This one is okay to be conditional, not loaded into menus
     'chat_log' => RouteV2::load(
         file_name: 'chat_log.php',
         title: 'Chat Log',
