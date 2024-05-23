@@ -8,6 +8,9 @@ require_once __DIR__ . '/Layout.php';
 require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/Route.php';
 
+require_once __DIR__ . '/../classes/routing/Route.php';
+require_once __DIR__ . '/../classes/routing/Router.php';
+
 require_once __DIR__ . '/../classes/event/DoubleExpEvent.php';
 require_once __DIR__ . '/../classes/event/DoubleReputationEvent.php';
 require_once __DIR__ . '/../classes/event/BonusExpWeekend.php';
@@ -210,6 +213,7 @@ class System {
             'diplomacy' => false,
         ],
         public array $homeVars = [],
+        public ?RouterV2 $routerV2 = null
     ){}
 
     public static function unescape(string $string): string {
@@ -1219,8 +1223,11 @@ class System {
          */
         require_once __DIR__ . '/../secure/vars.php';
 
+        // Load db for System and RouterV2
+        $db = new Database($host, $username, $password, $database);
+
         $system = new System(
-            db: new Database($host, $username, $password, $database),
+            db: $db,
             router: new Router($web_url),
             SC_OPEN: $SC_OPEN,
             USE_NEW_BATTLES: $USE_NEW_BATTLES ?? self::USE_NEW_BATTLES,
@@ -1230,7 +1237,8 @@ class System {
             environment: $ENVIRONMENT,
             enable_dev_only_features: $ENABLE_DEV_ONLY_FEATURES ?? self::DEV_ONLY_FEATURES_DEFAULT,
             local_host: $LOCAL_HOST_CONNECTION ?? self::LOCAL_HOST,
-            register_open: $register_open
+            register_open: $register_open,
+            routerV2: ($ENVIRONMENT == self::ENVIRONMENT_DEV) ? RouterV2::load(db: $db, base_url: $web_url) : null
         );
 
         // Load reputation layout, reputation reset and check for server maintenance
