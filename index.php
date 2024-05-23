@@ -227,16 +227,27 @@ else {
             // Check for valid route & permissions
             try {
                 $system->routerV2->assertRouteIsValid(route: $route, player: $player);
+                $system->routerV2->setCurrentRoute(var_name: RouteV2::ROUTE_PAGE_KEY, value: $page_name);
             } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $system->layout->renderBeforeContentHTML(system: $system, player: $player ?? null, page_title: '');
                 $system->printMessage(force_display: true);
+
+                // Commit transactions on dev to log error
+                $system->db->commitTransaction(); // TODO: REMOVE - This is TEMP only for dev tracing, we shouldn't be comitting transactions on invalid pages
+
+                // Render after content
+                $PAGE_LOAD_TIME = microtime(as_float: true) - $PAGE_LOAD_START;
+                $system->layout->renderAfterContentHTML(
+                    system: $system, player: $player ?? null,
+                    page_load_time: $PAGE_LOAD_TIME,
+                    render_content: $RENDER_CONTENT
+                );
                 exit;
             }
 
             // TODO: Remove once routerV2 is completely in place
             $self_link = $system->router->base_url . '?' . RouteV2::ROUTE_PAGE_KEY . '=' . $page_name;
-            $system->routerV2->setCurrentRoute(var_name: RouteV2::ROUTE_PAGE_KEY, value: $page_name);
 
             // Render page
             $system->layout->renderBeforeContentHTML(
