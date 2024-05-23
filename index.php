@@ -246,9 +246,6 @@ else {
                 exit;
             }
 
-            // TODO: Remove once routerV2 is completely in place
-            $self_link = $system->router->base_url . '?' . RouteV2::ROUTE_PAGE_KEY . '=' . $page_name;
-
             // Render page
             $system->layout->renderBeforeContentHTML(
                 system: $system, player: $player ?? null, page_title: $page_title
