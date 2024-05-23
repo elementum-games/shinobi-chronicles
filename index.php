@@ -182,7 +182,7 @@ else {
         ($route->function_name)();
     }
     elseif($system->USE_ROUTE_V2) {
-        $page_name = isset($_GET['page']) ? $system->db->clean($_GET['page']) : $system->routerV2->routes[RouterV2::DEFAULT_PAGE];
+        $page_name = isset($_GET['page']) ? $system->db->clean($_GET['page']) : RouterV2::DEFAULT_PAGE;
         $route = $system->routerV2->routes[$page_name] ?? null;
 
         try {
@@ -235,8 +235,8 @@ else {
             }
 
             // TODO: Remove once routerV2 is completely in place
-            $self_link = $system->router->base_url . '?' . Route::ROUTE_PAGE_KEY . '=' . $page_name;
-            $system->routerV2->setCurrentRoute(var_name: Route::ROUTE_PAGE_KEY, value: $page_name);
+            $self_link = $system->router->base_url . '?' . RouteV2::ROUTE_PAGE_KEY . '=' . $page_name;
+            $system->routerV2->setCurrentRoute(var_name: RouteV2::ROUTE_PAGE_KEY, value: $page_name);
 
             // Render page
             $system->layout->renderBeforeContentHTML(

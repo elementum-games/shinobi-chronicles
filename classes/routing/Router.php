@@ -4,7 +4,7 @@ require_once __DIR__ . '/../routing/Route.php';
 
 class RouterV2 {
     const DEFAULT_PAGE = 'profile';
-    
+
     public function __construct(
         private Database $db,
         public readonly string $base_url,
@@ -43,7 +43,7 @@ class RouterV2 {
      */
     public function setCurrentRoute(string $var_name, string $value): void {
         // Validate navigation to different pages (e.g. profile, chat, etc.)
-        if($var_name === RouteV2::ROUTE_PAGE_KEY && !isset($this->routes[$var_name])) {
+        if($var_name === RouteV2::ROUTE_PAGE_KEY && !isset($this->routes[$value])) {
             // Log error for unreported instances
             $this->db->query("INSERT INTO `error_logs`
                 (`log_type`, `content`, `time`)
@@ -78,7 +78,7 @@ class RouterV2 {
      * @return void
      * @throws RuntimeException
      */
-    public function assertRouteIsValid(Route $route, User $player): void {
+    public function assertRouteIsValid(RouteV2 $route, User $player): void {
         $system = $player->system;
 
         // Dev only page
