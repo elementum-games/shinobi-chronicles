@@ -23,15 +23,15 @@ $selected_link_style = "text-decoration:none;";
 
 
 <p class='categoryLinks'>
-    <a href='<?= $self_link ?>&item_type=weapon' class='<?= ($item_type == Item::USE_TYPE_WEAPON ? 'selected' : "") ?>'>
+    <a href='<?= $system->routerV2->current_route ?>&item_type=<?= Item::USE_TYPE_WEAPON ?>' class='<?= ($item_type == Item::USE_TYPE_WEAPON ? 'selected' : "") ?>'>
         Weapons</a> |
-    <a href='<?= $self_link ?>&item_type=armor' class='<?= ($item_type == Item::USE_TYPE_ARMOR ? 'selected' : "") ?>'>
+    <a href='<?= $system->routerV2->current_route ?>&item_type=<?= Item::USE_TYPE_ARMOR ?>' class='<?= ($item_type == Item::USE_TYPE_ARMOR ? 'selected' : "") ?>'>
         Armor</a> |
-    <a href='<?= $self_link ?>&item_type=consumable' class='<?= ($item_type == Item::USE_TYPE_CONSUMABLE ? 'selected' : "") ?>'>
+    <a href='<?= $system->routerV2->current_route ?>&item_type=<?= Item::USE_TYPE_CONSUMABLE ?>' class='<?= ($item_type == Item::USE_TYPE_CONSUMABLE ? 'selected' : "") ?>'>
         Consumables</a> |
-    <a href='<?= $self_link ?>&item_type=special' class='<?= ($item_type == Item::USE_TYPE_SPECIAL ? 'selected' : "") ?>'>
+    <a href='<?= $system->routerV2->current_route ?>&item_type=<?= Item::USE_TYPE_SPECIAL ?>' class='<?= ($item_type == Item::USE_TYPE_SPECIAL ? 'selected' : "") ?>'>
         Special</a> | 
-    <a href='<?= $self_link ?>&item_type=currency' class='<?= ($item_type == Item::USE_TYPE_CURRENCY ? 'selected' : "") ?>'>
+    <a href='<?= $system->routerV2->current_route ?>&item_type=<?= Item::USE_TYPE_CURRENCY ?>' class='<?= ($item_type == Item::USE_TYPE_CURRENCY ? 'selected' : "") ?>'>
         Currency
     </a>
 </p>
@@ -47,7 +47,7 @@ $selected_link_style = "text-decoration:none;";
         <?php if($item->use_type != $item_type) continue; ?>
         <tr>
             <td>
-                <a href="<?= $self_link ?>&item_id=<?= $item->id ?>"><?= $item->name ?></a>
+                <a href="<?= $system->routerV2->current_route ?>&item_id=<?= $item->id ?>"><?= $item->name ?></a>
             </td>
             <td><?= $item->effect_amount ?></td>
             <td>

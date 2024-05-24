@@ -373,6 +373,27 @@ function adminPanel() {
         $select_item = true;
         $table_name = 'items';
 
+        // Set item type for displaying form
+        $item_type = Item::USE_TYPE_WEAPON;
+        if(isset($_GET['item_type'])) {
+            if($_GET['item_type'] == Item::USE_TYPE_WEAPON) {
+                $item_type = Item::USE_TYPE_WEAPON;
+            }
+            if($_GET['item_type'] == Item::USE_TYPE_ARMOR) {
+                $item_type = Item::USE_TYPE_ARMOR;
+            }
+            if($_GET['item_type'] == Item::USE_TYPE_CONSUMABLE) {
+                $item_type = Item::USE_TYPE_CONSUMABLE;
+            }
+            if($_GET['item_type'] == Item::USE_TYPE_SPECIAL) {
+                $item_type = Item::USE_TYPE_SPECIAL;
+            }
+            if($_GET['item_type'] == Item::USE_TYPE_CURRENCY) {
+                $item_type = Item::USE_TYPE_CURRENCY;
+            }
+        }
+        $system->routerV2->setCurrentRoute(var_name: 'item_type', value: $item_type);
+
         /* Variables */
         $variables =& $constraints['item'];
 
@@ -389,6 +410,7 @@ function adminPanel() {
                 $select_item = false;
                 $item_being_edited = $system->db->fetch($result);
                 $system->routerV2->setCurrentRoute(var_name: 'item_id', value: $item_id);
+                $system->routerV2->setCurrentRoute(var_name: 'item_type', value: $item_being_edited['use_type']); // Redundancy
             }
         }
 
