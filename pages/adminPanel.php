@@ -31,9 +31,7 @@ function adminPanel() {
 
     // Variable sets
     $constraints = require 'admin/entity_constraints.php';
-
-    $page_key = ($system->USE_ROUTE_V2) ? 'action' : 'page';
-    $page = $_GET[$page_key] ?? '';
+    $page = $_GET['action'] ?? '';
 
     if(in_array($page, $player->staff_manager->getAdminPanelPerms(type: 'misc_tools', permission_check: true)) && !$player->isUserAdmin()) {
         $page = '';
@@ -46,13 +44,11 @@ function adminPanel() {
     }
 
     // Set current route
-    if(!empty($page) && $system->USE_ROUTE_V2) {
-        $system->routerV2->setCurrentRoute(var_name: $page_key, value: $page);
-    }
+    $system->routerV2->setCurrentRoute(var_name: 'action', value: $page);
 
     // Open server from maintenance
     if($page== 'server_maint') {
-        $self_link .= "&page=server_maint";
+        $system->routerV2->setCurrentRoute(var_name: $page_key, value: 'server_maint');
 		
 		// Open server
         if(isset($_POST['open_sc'])) {

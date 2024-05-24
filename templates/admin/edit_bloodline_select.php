@@ -61,7 +61,7 @@ $current_rank = 1;
         ?>
         <tr style='background:rgba(0,0,0,0.15);'>
             <td>
-                <a href="<?= ($system->USE_ROUTE_V2 ? $system->routerV2->current_route : $self_link) ?>&bloodline_id=<?= $bloodline->bloodline_id ?>"><?= $bloodline->name ?></a><br />
+                <a href="<?= $system->routerV2->current_route ?>&bloodline_id=<?= $bloodline->bloodline_id ?>"><?= $bloodline->name ?></a><br />
                 Clan ID: <?= $bloodline->clan_id ?>
             </td>
             <td>
