@@ -48,9 +48,7 @@ function adminPanel() {
 
     // Open server from maintenance
     if($page== 'server_maint') {
-        $system->routerV2->setCurrentRoute(var_name: $page_key, value: 'server_maint');
-		
-		// Open server
+        // Open server
         if(isset($_POST['open_sc'])) {
             $system->db->query("UPDATE `system_storage` SET `maintenance_end_time`=0, `maintenance_begin_time`=0 LIMIT 1");
             if($system->db->last_affected_rows) {
@@ -196,7 +194,7 @@ function adminPanel() {
         }
         echo "<table class='table'><tr><th>Create NPC</th></tr>
 		<tr><td>
-		<form action='{$system->router->getUrl('admin', ['page' => 'create_ai'])}' method='post'>";
+		<form action='{$system->routerV2->current_route}' method='post'>";
         displayFormFields($variables, $data);
         echo "<br />
 		<input type='submit' name='ai_data' value='Create' />
@@ -207,7 +205,6 @@ function adminPanel() {
         /* Variables */
         $variables =& $constraints['ai'];
         $select_ai = true;
-        $self_link = $system->router->getUrl('admin', ['page' => "edit_ai"]);
 
         // Validate NPC id
         if(!empty($_GET['npc_id'])) {
@@ -218,6 +215,7 @@ function adminPanel() {
                 $system->printMessage();
             }
             else {
+                $system->routerV2->setCurrentRoute(var_name: 'npc_id', value: $npce_id);
                 $ai_data = $system->db->fetch($result);
                 $select_ai = false;
             }
@@ -270,7 +268,7 @@ function adminPanel() {
             $data =& $ai_data;
             echo "<table class='table'><tr><th>Edit NPC (" . stripslashes($ai_data['name']) . ")</th></tr>
 			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_ai', 'npc_id' => $ai_data['ai_id']])}' method='post'>";
+			<form action='{$system->routerV2->current_route}' method='post'>";
             displayFormFields($variables, $data);
             echo "<br />
 			<input type='submit' name='ai_data' value='Edit' />
@@ -363,7 +361,7 @@ function adminPanel() {
         }
         echo "<table class='table'><tr><th>Create Item</th></tr>
 		<tr><td>
-		<form action='{$system->router->getUrl('admin', ['page' => 'create_item'])}' method='post'>";
+		<form action='{$system->routerV2->current_route}' method='post'>";
         displayFormFields($variables, $data);
         echo "<br />
 		<input type='submit' name='item_data' value='Create' />
@@ -374,7 +372,6 @@ function adminPanel() {
         $item_being_edited = null;
         $select_item = true;
         $table_name = 'items';
-        $self_link = $system->router->getUrl('admin', ['page' => "edit_item"]);
 
         /* Variables */
         $variables =& $constraints['item'];
@@ -391,6 +388,7 @@ function adminPanel() {
             else {
                 $select_item = false;
                 $item_being_edited = $system->db->fetch($result);
+                $system->routerV2->setCurrentRoute(var_name: 'item_id', value: $item_id);
             }
         }
 
@@ -435,12 +433,12 @@ function adminPanel() {
         if($item_being_edited && !$select_item) {
             $data =& $item_being_edited;
             echo "<p style='text-align:center;margin-top:20px;margin-bottom:-5px;'>
-                <a href='$self_link' style='font-size:14px;'>Back to item select</a> 
+                <a href='{$system->routerV2->linkFromRoute(['item_id'])}' style='font-size:14px;'>Back to item select</a> 
             </p>            
             <table class='table'>
                 <tr><th>Edit Item (" . stripslashes($item_being_edited['name']) . ")</th></tr>
                 <tr><td>
-                    <form action='$self_link&item_id={$item_being_edited['item_id']}' method='post'>";
+                    <form action='{$system->routerV2->current_route}' method='post'>";
 
             displayFormFields($variables, $data);
 

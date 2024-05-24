@@ -1,6 +1,7 @@
 <?php /** @noinspection SqlInsertValues */
 
 require_once 'admin/formTools.php';
+require_once __DIR__ . '/../classes/Jutsu.php';
 
 function createJutsuPage(System $system) {
     /* Variables */
@@ -88,12 +89,28 @@ function createJutsuPage(System $system) {
 
 function editJutsuPage(System $system) {
     $select_jutsu = true;
-    $self_link = $system->router->links['admin'] . '&page=edit_jutsu';
 
     $ALL_JUTSU = Jutsu::fetchAll($system);
 
     /* Variables */
     $jutsu_constraints = require 'admin/constraints/jutsu.php';
+
+    // Set jutsu type for selection
+    $jutsu_type = Jutsu::TYPE_NINJUTSU;
+    if(isset($_GET['jutsu_type'])) {
+        switch($_GET['jutsu_type']) {
+            case Jutsu::TYPE_GENJUTSU:
+                $jutsu_type = Jutsu::TYPE_GENJUTSU;
+                break;
+            case Jutsu::TYPE_TAIJUTSU:
+                $jutsu_type = Jutsu::TYPE_TAIJUTSU;
+                break;
+            case Jutsu::TYPE_NINJUTSU:
+                $jutsu_type = Jutsu::TYPE_NINJUTSU;
+                break;
+        }
+    }
+    $system->routerV2->setCurrentRoute(var_name: 'jutsu_type', value: $jutsu_type);
 
     // Validate jutsu id
     $jutsu_id = null;
@@ -110,6 +127,10 @@ function editJutsuPage(System $system) {
             $jutsu_data = $system->db->fetch($result);
             $jutsu = Jutsu::fromArray($jutsu_data['jutsu_id'], $jutsu_data);
             $select_jutsu = false;
+
+            // Set routing
+            $system->routerV2->setCurrentRoute(var_name: 'jutsu_id', value: $jutsu->id);
+            $system->routerV2->setCurrentRoute(var_name: 'jutsu_type', value: $jutsu->jutsu_type->value); // Redundancy
         }
     }
 

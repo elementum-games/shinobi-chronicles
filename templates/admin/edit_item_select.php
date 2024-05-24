@@ -1,29 +1,8 @@
 <?php
 /**
  * @var Item[] $all_items
- * @var string $self_link
+ * @var string $item_type
  */
-
-$item_type = Item::USE_TYPE_WEAPON;
-if(isset($_GET['item_type'])) {
-    switch($_GET['item_type']) {
-        case 'weapon':
-            $item_type = Item::USE_TYPE_WEAPON;
-            break;
-        case 'armor':
-            $item_type = Item::USE_TYPE_ARMOR;
-            break;
-        case 'consumable':
-            $item_type = Item::USE_TYPE_CONSUMABLE;
-            break;
-        case 'special':
-            $item_type = Item::USE_TYPE_SPECIAL;
-            break;
-        case 'currency':
-            $item_type = Item::USE_TYPE_CURRENCY;
-            break;
-    }
-}
 
 $selected_link_style = "text-decoration:none;";
 

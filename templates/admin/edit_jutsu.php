@@ -11,16 +11,13 @@
 ?>
 
 <p style='text-align:center;margin-top:20px;margin-bottom:-5px;'>
-    <a href='<?= $system->router->getUrl('admin', ['page' => 'edit_jutsu'])?>' style='font-size:14px;'>Back to jutsu list</a>
+    <a href='<?= $system->routerV2->generateRoute("admin", ["action" => "edit_jutsu"]) ?>' style='font-size:14px;'>Back to jutsu list</a>
 </p>
 <table class='table'>
     <tr><th>Edit Jutsu (<?= stripslashes($jutsu->name) ?>)</th></tr>
     <tr><td>
         <form
-            action='<?= $system->router->getUrl(
-                page_name: 'admin',
-                url_params: ['page' => 'edit_jutsu', 'jutsu_id' => $jutsu->id, 'jutsu_type' => $jutsu->jutsu_type->value]
-            ) ?>'
+            action='<?= $system->routerV2->current_route ?>'
             method='post'
         >
         <label>Jutsu ID:</label> <?= $jutsu->id ?><br />

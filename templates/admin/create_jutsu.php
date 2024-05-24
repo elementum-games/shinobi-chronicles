@@ -12,7 +12,7 @@
 <table class='table'>
     <tr><th>Create Jutsu</th></tr>
     <tr><td>
-        <form action="<?= $system->router->links['admin']?>&page=create_jutsu" method="post">
+        <form action="<?= $system->routerV2->current_route ?>" method="post">
             <?php
                 $existing_jutsu = null;
                 require 'templates/admin/jutsu_form.php';

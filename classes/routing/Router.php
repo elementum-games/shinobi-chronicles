@@ -3,6 +3,7 @@ require_once __DIR__ . '/../battle/Battle.php';
 require_once __DIR__ . '/../routing/Route.php';
 
 class RouterV2 {
+    const LOG_FAILED_ROUTES = true;
     const DEFAULT_PAGE = 'profile';
 
     public function __construct(
@@ -45,11 +46,9 @@ class RouterV2 {
         // Validate navigation to different pages (e.g. profile, chat, etc.)
         if($var_name === RouteV2::ROUTE_PAGE_KEY && !isset($this->routes[$value])) {
             // Log error for unreported instances
-            $this->db->query("INSERT INTO `misc_error_logs`
-                (`log_type`, `content`, `time`)
-                VALUES
-                ('set_route', '$var_name => $value', " . time() . ")
-            ");
+            if(self::LOG_FAILED_ROUTES) {
+                $this->logError("set_route", "$var_name => $value");
+            }
 
             // Visual error
             throw new RuntimeException("$value is an invalid " . RouteV2::ROUTE_PAGE_KEY);
@@ -70,6 +69,38 @@ class RouterV2 {
             $this->current_route .= $route_prepend . $name . "=" . $val;
             $route_prepend = "&";
         }
+    }
+
+    public function linkFromRoute(array $ignore_params = []): string {
+        $link = $this->base_url;
+
+        $pre_pend = "?";
+        foreach($this->current_route_variables as $var_name => $value) {
+            if(in_array($var_name, $ignore_params)) {
+                continue;
+            }
+            $link .= $pre_pend . "$var_name=$value";
+            $pre_pend = "&";
+        }
+
+        return $link;
+    }
+
+    public function generateRoute(string $page_name, array $variables = []): string {
+        // Log route generation errors
+        if(!isset($this->routes[$page_name]) && self::LOG_FAILED_ROUTES) {
+            $this->logError("generate_route", "$page_name");
+        }
+
+        // Generate link
+        $link = $this->base_url . "?" . RouteV2::ROUTE_PAGE_KEY . "=$page_name";
+        if(!empty($variables)) {
+            foreach($variables as $name => $value) {
+                $link .= "&$name=$value";
+            }
+        }
+
+        return $link;
     }
 
     /**
@@ -152,6 +183,14 @@ class RouterV2 {
                 throw new RuntimeException("You are not a high enough rank to access this page!");
             }
         }
+    }
+
+    public function logError(string $log_type, string $content): void {
+        $this->db->query("INSERT INTO `misc_error_logs`
+            (`log_type`, `content`, `time`)
+            VALUES
+            ('$log_type', '$content', " . time() . ")
+        ");
     }
     
     /**
