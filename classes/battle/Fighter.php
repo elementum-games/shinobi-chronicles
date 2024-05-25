@@ -18,7 +18,7 @@ abstract class Fighter {
     const MAX_RAND = 36;
 
     // Using Erosion to reduce target's resist below 0 will convert the excess erosion to vuln at this multiplier
-    const EROSION_VULN_CONVERSION_RATIO = 0.333;
+    const EROSION_VULN_CONVERSION_RATIO = 0.4;
 
     public System $system;
 
