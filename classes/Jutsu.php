@@ -68,7 +68,7 @@ class Jutsu {
         'counter' => 3.25,
         'reflect' => 3.25,
         'substitution' => 2.5,
-        'immolate' => 2.5,
+        'immolate' => 3,
         'recoil' => 0,
     ];
 
