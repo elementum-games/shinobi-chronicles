@@ -319,7 +319,7 @@ class Jutsu {
      * @throws DatabaseDeadlockException
      */
     public static function fetchAll(System $system): array {
-        $result = $system->db->query("SELECT * FROM `jutsu` ORDER BY `rank` ASC, `purchase_cost` ASC");
+        $result = $system->db->query("SELECT * FROM `jutsu` ORDER BY `rank` ASC, `purchase_cost` ASC, `element` ASC");
 
         $jutsu = [];
         while($jutsu_db = $system->db->fetch($result)) {
