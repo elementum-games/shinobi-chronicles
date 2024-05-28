@@ -83,7 +83,7 @@ class BattleEffectsManager {
     ];
 
     // Effectiveness of substitution at reducing immolate damage. 0x - 1x
-    const SUBSTITUTION_IMMO_EFFECTIVENESS = 0.65;
+    const SUBSTITUTION_IMMO_EFFECTIVENESS = 0.625;
 
     protected System $system;
 
