@@ -380,7 +380,7 @@ class Jutsu {
         }
 
         $cr_discount_per_turn_multiplier = 0.005; // 0.5% discount
-        $barrier_power_discount = 0.05; // 5% discount
+        $barrier_power_discount = 0.00; // 5% discount
 
         // For calculating resid/vuln synergy
         $residual_effect_info = [];

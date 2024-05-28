@@ -30,7 +30,7 @@ class BattleManager {
     const HEAL_SOFT_CAP_RATIO = 0.65; // heal beyond soft cap only 65% as effective
     const HEAL_HARD_CAP = 0.65; // caps at 65% previous turn damage heal
 
-    const GENJUTSU_BARRIER_PIERCING = 25; // 25% reduction against Genjutsu (75% strength)
+    const GENJUTSU_BARRIER_PIERCING = 27.5; // 27.5% reduction against Genjutsu (75% strength)
 
     const ELEMENTAL_CLASH_MODIFIER = 0.15; // 15% damage loss and gain
     const ELEMENTAL_CLASH_EFFECT_MODIFIER = 0.1; // 10% effect loss and gain
