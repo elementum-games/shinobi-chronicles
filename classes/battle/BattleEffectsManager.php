@@ -33,7 +33,7 @@ class BattleEffectsManager {
         'barrier',
         'counter',
         'substitution',
-        'reflect',
+        'counter_residual',
         'piercing',
     ];
     const BUFF_EFFECTS = [
@@ -79,7 +79,7 @@ class BattleEffectsManager {
         'compound_residual',
         'bleed',
         'delayed_residual',
-        'reflect_damage'
+        'counter_residual_damage'
     ];
 
     // Effectiveness of substitution at reducing immolate damage. 0x - 1x
@@ -141,7 +141,7 @@ class BattleEffectsManager {
                     $apply_effect = false;
                 }
                 break;
-            case 'reflect_damage':
+            case 'counter_residual_damage':
                 if($effect->effect_amount <= 0) {
                     $apply_effect = false;
                 }
@@ -200,7 +200,7 @@ class BattleEffectsManager {
             case 'piercing':
             case 'immolate':
             case 'recoil':
-            case 'reflect':
+            case 'counter_residual':
             default:
                 $apply_effect = false;
                 break;
@@ -610,7 +610,7 @@ class BattleEffectsManager {
             $residual_damage_resisted = $residual_damage_raw - $damage;
             $attack_jutsu_color = BattleManager::getJutsuTextColor($effect->damage_type);
 
-            $damage_label = $effect->effect == 'reflect_damage' ? 'reflect damage' : 'residual damage';
+            $damage_label = $effect->effect == 'counter_residual_damage' ? 'counter_residual damage' : 'residual damage';
 
             if($residual_damage_resisted > 0) {
                 $this->addDisplay(
@@ -742,7 +742,7 @@ class BattleEffectsManager {
                   . " ({$tag_open}" . BattleManager::formatNumber($effect->potential_damage) . "{$tag_close} / "
                   . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
                 break;
-            case 'reflect_damage':
+            case 'counter_residual_damage':
                 $announcement_text = "[opponent] is taking Reflect Damage"
                   . " ({$tag_open}" . BattleManager::formatNumber($effect->potential_damage) . "{$tag_close} / "
                   . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";

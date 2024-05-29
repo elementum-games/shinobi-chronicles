@@ -30,8 +30,8 @@ class BattleAttack {
     public float $substitution_percent = 0;
     public float $counter_percent = 0;
 
-    public float $reflect_percent = 0;
-    public float $reflect_duration = 0;
+    public float $counter_residual_percent = 0;
+    public float $counter_residual_duration = 0;
 
     public float $immolate_percent = 0;
     public float $immolate_raw_damage = 0;
@@ -43,9 +43,9 @@ class BattleAttack {
     public float $countered_raw_damage = 0; // damage dealt from opponent
     public ?JutsuOffenseType $countered_jutsu_type = null; // jutsu type of opponent's counter
 
-    public float $reflected_percent = 0; // opponent's reflect
-    public float $reflected_raw_damage = 0; // damage dealt from opponent
-    public ?JutsuOffenseType $reflected_jutsu_type = null; // jutsu type of opponent's reflect
+    public float $countered_residual_percent = 0; // opponent's counter residual
+    public float $countered_residual_raw_damage = 0; // damage dealt from opponent
+    public ?JutsuOffenseType $countered_residual_jutsu_type = null; // jutsu type of opponent's counter residual
 
     /** @var Effect[] */
     public array $effects = [];
@@ -140,7 +140,7 @@ class BattleAttack {
         $this->substitution_percent *= $elemental_effect_modifier;
         $this->counter_percent *= $elemental_effect_modifier;
 
-        $this->reflect_percent *= $elemental_effect_modifier;
+        $this->counter_residual_percent *= $elemental_effect_modifier;
         $this->immolate_percent *= $elemental_effect_modifier;
     }
 }

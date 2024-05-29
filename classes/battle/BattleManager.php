@@ -889,9 +889,9 @@ class BattleManager {
                     $attack->immolate_percent += $effect->effect_amount / 100;
                     $attack->immolate_raw_damage += $this->effects->processImmolate($attack, $target, $simulation);
                     break;
-                case 'reflect':
-                    $attack->reflect_percent += $effect->effect_amount / 100;
-                    $attack->reflect_duration = max($effect->effect_length, 1);
+                case 'counter_residual':
+                    $attack->counter_residual_percent += $effect->effect_amount / 100;
+                    $attack->counter_residual_duration = max($effect->effect_length, 1);
                     break;
                 default:
                     break;
@@ -1155,11 +1155,11 @@ class BattleManager {
             }
         }
 
-        // simulate reflect damage
-        if ($attack->reflected_percent > 0) {
-            $reflect_damage = $user->calcDamageTaken($attack->reflected_raw_damage, $attack->reflected_jutsu_type);
-            $user->last_damage_taken += $reflect_damage;
-            $user->health -= $reflect_damage;
+        // simulate counter_residual damage
+        if ($attack->countered_residual_percent > 0) {
+            $counter_residual_damage = $user->calcDamageTaken($attack->countered_residual_raw_damage, $attack->countered_residual_jutsu_type);
+            $user->last_damage_taken += $counter_residual_damage;
+            $user->health -= $counter_residual_damage;
             if ($user->health < 0) {
                 $user->health = 0;
             }
@@ -1304,13 +1304,13 @@ class BattleManager {
         }
 
         // Reflect
-        if ($player1_attack->reflect_percent > 0 && $player2_attack->isDirectDamage()) {
+        if ($player1_attack->counter_residual_percent > 0 && $player2_attack->isDirectDamage()) {
             $collision_displays[] = $this->applyReflect(
                 fighter_attack: $player1_attack,
                 incoming_attack: $player2_attack,
                 fighter_is_p1: true);
         }
-        if ($player2_attack->reflect_percent > 0 && $player1_attack->isDirectDamage()) {
+        if ($player2_attack->counter_residual_percent > 0 && $player1_attack->isDirectDamage()) {
             $collision_displays[] = $this->applyReflect(
                 fighter_attack: $player2_attack,
                 incoming_attack: $player1_attack,
@@ -1677,28 +1677,28 @@ class BattleManager {
 
     protected function applyReflect(BattleAttack $fighter_attack, BattleAttack $incoming_attack, bool $fighter_is_p1): string {
         // Apply piercing
-        $fighter_attack->reflect_percent *= (1 - $incoming_attack->piercing_percent);
+        $fighter_attack->counter_residual_percent *= (1 - $incoming_attack->piercing_percent);
 
         // Apply reduction
-        $incoming_attack->reflected_percent = $fighter_attack->reflect_percent;
-        $incoming_attack->reflected_raw_damage = $incoming_attack->damage * $fighter_attack->reflect_percent;
-        $incoming_attack->reflected_jutsu_type = $fighter_attack->jutsu_type;
-        $incoming_attack->damage *= (1 - $fighter_attack->reflect_percent);
+        $incoming_attack->countered_residual_percent = $fighter_attack->counter_residual_percent;
+        $incoming_attack->countered_residual_raw_damage = $incoming_attack->damage * $fighter_attack->counter_residual_percent;
+        $incoming_attack->countered_residual_jutsu_type = $fighter_attack->jutsu_type;
+        $incoming_attack->damage *= (1 - $fighter_attack->counter_residual_percent);
 
-        if ($fighter_attack->reflect_percent > 0) {
+        if ($fighter_attack->counter_residual_percent > 0) {
             $fighter_attack->effects[] = new Effect(
-                effect: 'reflect_damage',
-                effect_amount: $incoming_attack->reflected_raw_damage / $fighter_attack->reflect_duration,
-                effect_length: $fighter_attack->reflect_duration,
+                effect: 'counter_residual_damage',
+                effect_amount: $incoming_attack->countered_residual_raw_damage / $fighter_attack->counter_residual_duration,
+                effect_length: $fighter_attack->counter_residual_duration,
                 damage_type: $fighter_attack->jutsu_type,
             );
         }
 
-        $block_percent = (int)round($fighter_attack->reflect_percent * 100);
+        $block_percent = (int)round($fighter_attack->counter_residual_percent * 100);
 
         return $fighter_is_p1
-            ? "[player] reflected $block_percent% of [opponent]'s damage!"
-            : "[opponent] reflected $block_percent% of [player]'s damage!";
+            ? "[player] counter_residualed $block_percent% of [opponent]'s damage!"
+            : "[opponent] counter_residualed $block_percent% of [player]'s damage!";
     }
 
     public static function diminishingReturns($val, $scale) {

@@ -50,7 +50,7 @@ $jutsu_effects = [
     'piercing',
     'substitution',
     'counter',
-    'reflect',
+    'counter_residual',
 ];
 // Update BattleEffectsManager's type lists if you add an effect here
 

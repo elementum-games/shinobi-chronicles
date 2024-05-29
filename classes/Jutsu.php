@@ -66,7 +66,7 @@ class Jutsu {
         'speed_boost' => 1,
         'piercing' => 0.65,
         'counter' => 3.25,
-        'reflect' => 3.25,
+        'counter_residual' => 3.25,
         'substitution' => 2.5,
         'immolate' => 3,
         'recoil' => 0,
@@ -447,7 +447,7 @@ class Jutsu {
                 case 'substitution':
                     $total_effect_utility += self::BALANCE_EFFECT_RATIOS[$effect->effect] * $capped_effect_amount;
                     break;
-                case 'reflect':
+                case 'counter_residual':
                     $total_effect_utility += self::BALANCE_EFFECT_RATIOS[$effect->effect] * $capped_effect_amount;
                     $residual_effect_info[] = [
                         'total_amount' => self::BALANCE_BASELINE_POWER * $total_effect_utility / 2, // only half the effect is residual damage dealt
