@@ -292,6 +292,15 @@ $rank_names = RankManager::fetchNames($system);
             filter();
         });
 
+        const damageEffects = [
+            'Residual Damage',
+            'Compound Residual',
+            'None',
+            'Piercing',
+            'Recoil',
+            'Immolate'
+        ];
+
         // get list of jutsu, filter and hide based on jutsu_filter input
         function filter() {
             var jutsu = $(".jutsu_block_table").removeClass('hidden');
@@ -302,7 +311,7 @@ $rank_names = RankManager::fetchNames($system);
 
                 // Tag filters (TODO: migrate these to use constants from backend)
                 if ($("#jutsu_filter_damage").is(':checked')) {
-                    if (jutsuEffect.includes('Residual') || jutsuEffect.includes('None') || jutsuEffect.includes('Piercing') || jutsuEffect.includes('Recoil') || jutsuEffect.includes('Reflect') || jutsuEffect.includes('Immolate')) {
+                    if (damageEffects.includes(jutsuEffect)) {
                         hideJutsu = false;
                     }
                 }
@@ -313,12 +322,12 @@ $rank_names = RankManager::fetchNames($system);
                 }
                 if ($("#jutsu_filter_clash").is(':checked')) {
                     if (jutsuEffect.includes('Barrier') || jutsuEffect.includes('Counter') ||
-                        jutsuEffect.includes('Substitution') || jutsuEffect.includes('Reflect') || jutsuEffect.includes('Piercing')) {
+                        jutsuEffect.includes('Substitution') || jutsuEffect.includes('Counter Residual') || jutsuEffect.includes('Piercing')) {
                         hideJutsu = false;
                     }
                 }
                 if ($("#jutsu_filter_debuff").is(':checked')) {
-                    if (jutsuEffect.includes('Nerf') || jutsuEffect.includes('Vulnerability')) {
+                    if (jutsuEffect.includes('Nerf') || jutsuEffect.includes('Vulnerability') || jutsuEffect.includes("Erosion")) {
                         hideJutsu = false;
                     }
                 }
