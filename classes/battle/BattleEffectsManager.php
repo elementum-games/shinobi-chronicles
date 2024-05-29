@@ -610,7 +610,7 @@ class BattleEffectsManager {
             $residual_damage_resisted = $residual_damage_raw - $damage;
             $attack_jutsu_color = BattleManager::getJutsuTextColor($effect->damage_type);
 
-            $damage_label = $effect->effect == 'counter_residual_damage' ? 'counter_residual damage' : 'residual damage';
+            $damage_label = $effect->effect == 'counter_residual_damage' ? 'counter residual damage' : 'residual damage';
 
             if($residual_damage_resisted > 0) {
                 $this->addDisplay(
@@ -743,7 +743,7 @@ class BattleEffectsManager {
                   . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
                 break;
             case 'counter_residual_damage':
-                $announcement_text = "[opponent] is taking Reflect Damage"
+                $announcement_text = "[opponent] is taking Counter Residual Damage"
                   . " ({$tag_open}" . BattleManager::formatNumber($effect->potential_damage) . "{$tag_close} / "
                   . $effect->effect_length . ($effect->effect_length > 1 ? " turns" : " turn") . ")";
                 break;
