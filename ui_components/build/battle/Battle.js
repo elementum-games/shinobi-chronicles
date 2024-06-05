@@ -113,7 +113,7 @@ function SpectateStatus() {
           <?php endif; ?>
       </td></tr>
   </table>
-     */
+    */
 }
 function BattleResult({
   description,

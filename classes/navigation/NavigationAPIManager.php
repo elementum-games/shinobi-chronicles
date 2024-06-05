@@ -13,7 +13,7 @@ class NavigationAPIManager {
      * @return NavigationLinkDto[]
      */
     public function getUserMenu() : array {
-        return $this->getMenuLinks(Route::MENU_USER);
+        return $this->getMenuLinks(RouteV2::MENU_USER);
     }
 
     /**
@@ -21,7 +21,7 @@ class NavigationAPIManager {
      */
     public function getActivityMenu(): array
     {
-        return $this->getMenuLinks(Route::MENU_ACTIVITY);
+        return $this->getMenuLinks(RouteV2::MENU_ACTIVITY);
     }
 
     /**
@@ -29,49 +29,14 @@ class NavigationAPIManager {
      */
     public function getVillageMenu(): array
     {
-        return $this->getMenuLinks(Route::MENU_VILLAGE);
+        return $this->getMenuLinks(RouteV2::MENU_VILLAGE);
     }
     /**
      * @return NavigationLinkDto[]
      */
     public function getStaffMenu(): array
     {
-        if ($this->player->clan) {
-            $this->routes[20]->menu = Route::MENU_VILLAGE;
-        }
-        if ($this->player->rank_num >= 3) {
-            $this->routes[24]->menu = Route::MENU_USER;
-        }
-        $return_arr = [];
-
-        if ($this->player->isModerator() || $this->player->hasAdminPanel() || $this->player->isSupportStaff()) {
-            if ($this->player->isSupportStaff()) {
-                $return_arr[] = new NavigationLinkDto(
-                    title: "Support Panel",
-                    url: $this->system->router->base_url . "?id=30",
-                    active: true,
-                    id: Router::PAGE_IDS['support'],
-                );
-            }
-            if ($this->player->isModerator()) {
-                $return_arr[] = new NavigationLinkDto(
-                    title: "Mod Panel",
-                    url: $this->system->router->base_url . "?id=16",
-                    active: true,
-                    id: Router::PAGE_IDS['mod'],
-                );
-            }
-            if ($this->player->hasAdminPanel()) {
-                $return_arr[] = new NavigationLinkDto(
-                    title: "Admin Panel",
-                    url: $this->system->router->base_url . "?id=17",
-                    active: true,
-                    id: Router::PAGE_IDS['admin'],
-                );
-            }
-        }
-
-        return $return_arr;
+        return $this->getMenuLinks(menu_name: RouteV2::MENU_STAFF);
     }
 
     public function getMenuLinks(string $menu_name): array {
@@ -80,21 +45,43 @@ class NavigationAPIManager {
         // Update condition pages
         if(!is_null($this->player)) {
             if ($this->player->clan) {
-                $this->routes[20]->menu = Route::MENU_VILLAGE;
+                $this->routes['clan']->menu = Route::MENU_VILLAGE;
             }
             if ($this->player->rank_num >= 3) {
-                $this->routes[24]->menu = Route::MENU_USER;
+                $this->routes['team']->menu = Route::MENU_USER;
             }
         }
 
         // Filter menu
         foreach($this->routes as $id => $page) {
-            if(!isset($page->menu) || $page->menu != $menu_name || ($page->dev_only && !$this->system->isDevEnvironment())) {
+            // No menu set or menu does not match current
+            if(!isset($page->menu) || $page->menu != $menu_name) {
                 continue;
             }
+            // Requested page isn't available on production
+            if($page->dev_only && !$this->system->isDevEnvironment()) {
+                continue;
+            }
+
+            // Staff menu logic
+            if($menu_name == RouteV2::MENU_STAFF) {
+                // Failsafe, not a staff member
+                if(!$this->player->staff_manager->isModerator() || !$this->player->staff_manager->hasAdminPanel() || !$this->player->staff_manager->isSupportStaff()) {
+                    continue;
+                }
+
+                // Inadequate permissions
+                if($page->user_check) {
+                    if(!$page->user_check->call($this, $this->player)) {
+                        continue;
+                    }
+                }
+            }
+
+            // Add link to navigation
             $return_arr[] = new NavigationLinkDto(
                 title: $page->title,
-                url: $this->system->router->base_url . "?id=" . $id,
+                url: $this->system->router->base_url . "?" . RouteV2::ROUTE_PAGE_KEY . "=" . $id,
                 active: true,
                 id: $id
             );
@@ -163,7 +150,7 @@ class NavigationAPIManager {
     public static function loadNavigationAPIManager(System $system, ?User $player = null): NavigationAPIManager {
         return new NavigationAPIManager(
             system: $system,
-            routes: Router::$routes,
+            routes: $system->routerV2->routes,
             player: $player
         );
     }

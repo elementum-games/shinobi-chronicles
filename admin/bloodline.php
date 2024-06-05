@@ -76,7 +76,7 @@ function createBloodlinePage($system) {
         }
     }
 
-    $form_action_url = $system->router->getUrl('admin', ['page' => 'create_bloodline']);
+    $form_action_url = $system->routerV2->current_route;
     require 'templates/admin/bloodline_form.php';
 }
 
@@ -84,7 +84,7 @@ function editBloodlinePage($system) {
     /* Variables */
     $bloodline_constraints = require 'admin/constraints/bloodline.php';
 
-    $self_link = $system->router->getUrl('admin', ['page' => "edit_bloodline"]);
+    $self_link = $system->router->getUrl('admin', ['view' => "edit_bloodline"]);
 
     // Validate NPC id
     $editing_bloodline_id = null;
@@ -147,9 +147,8 @@ function editBloodlinePage($system) {
 
     // Form for editing data
     if($existing_bloodline != null && $editing_bloodline_id != null) {
-        $form_action_url = $system->router->getUrl('admin', [
-            'page' => 'edit_bloodline', 'bloodline_id'=> $existing_bloodline->bloodline_id
-        ]);
+        $system->routerV2->setCurrentRoute(var_name: 'bloodline_id', value: $existing_bloodline->bloodline_id);
+        $form_action_url = $system->routerV2->current_route;
         require 'templates/admin/bloodline_form.php';
     }
 

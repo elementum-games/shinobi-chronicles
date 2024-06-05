@@ -163,10 +163,10 @@ class Layout {
         $routes = Router::$routes;
 
         if($player->clan) {
-            $routes[20]->menu = Route::MENU_VILLAGE;
+            $routes['clan']->menu = Route::MENU_VILLAGE;
         }
         if($player->rank_num >= 3) {
-            $routes[24]->menu = Route::MENU_USER;
+            $routes['team']->menu = Route::MENU_USER;
         }
 
         // NEW MESSAGE ALERT

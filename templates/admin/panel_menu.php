@@ -5,7 +5,7 @@
  */
 
 function create_link($system, string $menu_item_slug): void {
-    echo "<a href='{$system->router->getUrl('admin', ['page'=>$menu_item_slug])}'>" . System::unSlug($menu_item_slug) . "</a>";
+    echo "<a href='{$system->routerV2->current_route}&action=$menu_item_slug'>" . System::unSlug($menu_item_slug) . "</a>";
 }
 ?>
 

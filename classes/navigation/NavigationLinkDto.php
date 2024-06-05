@@ -5,6 +5,6 @@ class NavigationLinkDto {
         public string $title,
         public string $url,
         public bool $active,
-        public int $id,
+        public string|int $id,
     ) {}
 }

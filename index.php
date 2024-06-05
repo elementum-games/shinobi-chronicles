@@ -182,8 +182,8 @@ else {
         ($route->function_name)();
     }
     else {
-        $id = isset($_GET['id']) ? (int)$_GET['id'] : Router::PAGE_IDS['profile'];
-        $route = Router::$routes[$id] ?? null;
+        $page_name = isset($_GET['page']) ? $system->db->clean($_GET['page']) : RouterV2::DEFAULT_PAGE;
+        $route = $system->routerV2->routes[$page_name] ?? $system->routerV2->routes[RouterV2::DEFAULT_PAGE];
 
         try {
             // Load page title
@@ -213,11 +213,11 @@ else {
                     $time_since_turn = time() - $battle_data['turn_time'];
 
                     if($battle_data['winner'] && $time_since_turn >= 60) {
-                        foreach(Router::$routes as $page_id => $page) {
+                        foreach($system->routerV2->routes as $page_name => $page) {
                             $type = $page->battle_type ?? null;
                             if($type == $battle_data['battle_type']) {
-                                $id = $page_id;
-                                $route = Router::$routes[$id];
+                                $page = $page_name;
+                                $route = $system->routerV2->routes[$page_name];
                             }
                         }
                     }
@@ -226,16 +226,27 @@ else {
 
             // Check for valid route & permissions
             try {
-                $system->router->assertRouteIsValid(route: $route, player: $player);
+                $system->routerV2->assertRouteIsValid(route: $route, player: $player);
+                $system->routerV2->setCurrentRoute(var_name: RouteV2::ROUTE_PAGE_KEY, value: $page_name);
             } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $system->layout->renderBeforeContentHTML(system: $system, player: $player ?? null, page_title: '');
                 $system->printMessage(force_display: true);
+
+                // Commit transactions on dev to log error
+                if($system->isDevEnvironment()) {
+                    $system->db->commitTransaction();
+                }
+
+                // Render after content
+                $PAGE_LOAD_TIME = microtime(as_float: true) - $PAGE_LOAD_START;
+                $system->layout->renderAfterContentHTML(
+                    system: $system, player: $player ?? null,
+                    page_load_time: $PAGE_LOAD_TIME,
+                    render_content: $RENDER_CONTENT
+                );
                 exit;
             }
-
-            // Set self link
-            $self_link = $system->router->base_url . '?id=' . $id;
 
             // Render page
             $system->layout->renderBeforeContentHTML(

@@ -13,7 +13,7 @@
         <tr><th><?=($system->SC_OPEN) ? "Stop Maintenance" : "Open SC"?></th></tr>
         <tr>
             <td style='text-align: center;'>
-                <form action="<?=$self_link?>" method="post">
+                <form action="<?=$system->routerV2->current_route?>" method="post">
 					<?php if(!$system->SC_OPEN): ?>
                     	Are you sure you would like to reopen SC?<br />
 					<?php else: ?>
@@ -33,7 +33,7 @@
 		</tr>
 		<tr>
 			<td style='text-align: center;'>
-				<form action="<?=$self_link?>" method="post">
+				<form action="<?=$system->routerV2->current_route?>" method="post">
 					You must allow at least 5 minutes notice of site closure.<br />
 					You must allow at least 5 minutes of maintenance.<br />
 					<label class='maint_label'>Begin Maint:</label>
@@ -52,7 +52,7 @@
 				</form>
 			</td>
 			<td style='text-align: center;'>
-				<form action="<?=$self_link?>" method="post">
+				<form action="<?=$system->routerV2->current_route?>" method="post">
 					Close SC for emergency maintenance/rollbacks.<br />
 					This is a HARD closure and must be ended through admin panel.<br />
 					<input type="submit" name="close_server" value="Close" />

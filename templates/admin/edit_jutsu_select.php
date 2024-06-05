@@ -3,23 +3,8 @@
 /**
  * @var System $system
  * @var Jutsu[] $all_jutsu
- * @var string $self_link
+ * @var string $jutsu_type
  */
-
-$jutsu_type = 'ninjutsu';
-if(!empty($_GET['jutsu_type'])) {
-    switch($_GET['jutsu_type']) {
-        case 'ninjutsu':
-            $jutsu_type = 'ninjutsu';
-            break;
-        case 'taijutsu':
-            $jutsu_type = 'taijutsu';
-            break;
-        case 'genjutsu':
-            $jutsu_type = 'genjutsu';
-            break;
-    }
-}
 
 $selected_link_style = "text-decoration:none;";
 
@@ -30,17 +15,17 @@ $RANK_NAMES = RankManager::fetchNames($system);
 
 <!-- // Filter links -->
 <p style='text-align:center;margin-top:20px;margin-bottom:-5px;'>
-    <a href='<?= $self_link ?>&jutsu_type=ninjutsu'
-       style='font-size:14px;<?= ($jutsu_type == 'ninjutsu' ? $selected_link_style : "") ?>'>
-        Ninjutsu
+    <a href='<?= $system->routerV2->current_route ?>&jutsu_type=<?= Jutsu::TYPE_NINJUTSU ?>'
+       style='font-size:14px;<?= ($jutsu_type == Jutsu::TYPE_NINJUTSU ? $selected_link_style : "") ?>'>
+        <?= System::unSlug(Jutsu::TYPE_NINJUTSU) ?>
     </a> |
-    <a href='<?= $self_link ?>&jutsu_type=taijutsu'
-       style='font-size:14px;<?= ($jutsu_type == 'taijutsu' ? $selected_link_style : "") ?>'>
-        Taijutsu
+    <a href='<?= $system->routerV2->current_route ?>&jutsu_type=<?= Jutsu::TYPE_TAIJUTSU ?>'
+       style='font-size:14px;<?= ($jutsu_type == Jutsu::TYPE_TAIJUTSU ? $selected_link_style : "") ?>'>
+        <?= System::unSlug(Jutsu::TYPE_TAIJUTSU) ?>
     </a> |
-    <a href='<?= $self_link ?>&jutsu_type=genjutsu'
-       style='font-size:14px;<?= ($jutsu_type == 'genjutsu' ? $selected_link_style : "") ?>'>
-        Genjutsu
+    <a href='<?= $system->routerV2->current_route ?>&jutsu_type=<?= Jutsu::TYPE_GENJUTSU ?>'
+       style='font-size:14px;<?= ($jutsu_type == Jutsu::TYPE_GENJUTSU ? $selected_link_style : "") ?>'>
+        <? System::unSlug(Jutsu::TYPE_GENJUTSU) ?>
     </a>
 </p>
 
@@ -68,7 +53,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
         ?>
         <tr>
             <td>
-                <a href="<?= $self_link ?>&jutsu_id=<?= $jutsu->id ?>"><?= $jutsu->name ?></a>
+                <a href="<?= $system->routerV2->currnet_route ?>&jutsu_id=<?= $jutsu->id ?>"><?= $jutsu->name ?></a>
             </td>
             <td><?= $jutsu->power ?></td>
             <td>
