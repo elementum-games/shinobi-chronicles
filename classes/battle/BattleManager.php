@@ -30,7 +30,8 @@ class BattleManager {
     const HEAL_SOFT_CAP_RATIO = 0.65; // heal beyond soft cap only 65% as effective
     const HEAL_HARD_CAP = 0.65; // caps at 65% previous turn damage heal
 
-    const GENJUTSU_BARRIER_PIERCING = 27.5; // 27.5% reduction against Genjutsu (75% strength)
+    const GENJUTSU_BARRIER_PIERCING = 20; // 20% piercing against barriers (80% strength)
+    const PIERCING_BARRIER_MULTIPLIER = 1.33; // Piercing is increased in effectiveness against barriers
 
     const ELEMENTAL_CLASH_MODIFIER = 0.15; // 15% damage loss and gain
     const ELEMENTAL_CLASH_EFFECT_MODIFIER = 0.1; // 10% effect loss and gain
@@ -1606,7 +1607,10 @@ class BattleManager {
         }
 
         // Apply piercing
-        $barrier_user->barrier *= (1 - $incoming_attack->piercing_percent);
+        $piercing_percent = $incoming_attack->piercing_percent * self::PIERCING_BARRIER_MULTIPLIER;
+        $piercing_percent = min($piercing_percent, 100);
+
+        $barrier_user->barrier *= 1 - $piercing_percent;
 
         // Block damage from opponent's attack
         if($barrier_user->barrier >= $incoming_attack->damage) {
