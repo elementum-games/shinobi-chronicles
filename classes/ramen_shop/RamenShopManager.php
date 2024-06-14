@@ -198,10 +198,10 @@ class RamenShopManager {
 
     /* ramen effect descriptions indexed by ramen key */
     const RAMEN_EFFECT_DESCRIPTIONS = [
-        self::SPECIAL_RAMEN_SHOYU => "+2 Stealth.",
-        self::SPECIAL_RAMEN_KING => "+1 Reputation gain (PvP excluded).",
-        self::SPECIAL_RAMEN_SPICY_MISO => "+25% base regen.",
-        self::SPECIAL_RAMEN_WARRIOR => "Immunity to post-battle fatigue.",
+        self::SPECIAL_RAMEN_SHOYU => "+2 Stealth",
+        self::SPECIAL_RAMEN_KING => "+1 Reputation gain (PvP excluded)",
+        self::SPECIAL_RAMEN_SPICY_MISO => "+25% base regen",
+        self::SPECIAL_RAMEN_WARRIOR => "Immunity to post-battle fatigue",
     ];
 
     const MYSTERY_RAMEN_COST_MULTIPLIER = 1;
