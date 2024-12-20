@@ -364,4 +364,4 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
 <?php
 $layout->renderAfterContentHTML($system, $player ?? null);
 
-$system->db->commitTransaction();
+$system->db->commitTransaction(); 
