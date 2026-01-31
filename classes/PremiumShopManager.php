@@ -636,7 +636,7 @@ class PremiumShopManager {
     public function getPaypalBusinessId(): string {
         return $this->system->isDevEnvironment()
             ? 'lsmjudoka@lmvisions.com'
-            : 'lsmjudoka05@yahoo.com';
+            : 'payments@elementumgames.com';
     }
 
     public function getPaypalListenerUrl(): string {
